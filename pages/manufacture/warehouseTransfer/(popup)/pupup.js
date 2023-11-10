@@ -258,10 +258,12 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {"Vị trí chuyển"}
+                                            {props.dataLang?.warehouseTransfer_rransferPosition ||
+                                                "warehouseTransfer_rransferPosition"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {"Vị trí nhận"}
+                                            {props.dataLang?.warehouseTransfer_receivingLocation ||
+                                                "warehouseTransfer_receivingLocation"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {props.dataLang?.production_warehouse_inventory ||

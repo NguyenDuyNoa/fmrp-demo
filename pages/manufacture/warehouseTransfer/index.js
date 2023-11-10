@@ -375,6 +375,14 @@ const Index = (props) => {
                     },
                 },
                 {
+                    title: `${dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
                     title: `${dataLang?.import_from_note || "import_from_note"}`,
                     width: { wch: 40 },
                     style: {
@@ -420,6 +428,9 @@ const Index = (props) => {
                 },
                 {
                     value: `${e?.grand_total ? formatNumber(e?.grand_total) : ""}`,
+                },
+                {
+                    value: `${e?.order_id != 0 ? "Đã giữ kho" : "Chưa giữ kho"}`,
                 },
                 { value: `${e?.note ? e?.note : ""}` },
                 {
@@ -478,20 +489,12 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message, alert_type, data_export } = response.data;
                     if (isSuccess) {
-                        // Toast.fire({
-                        //     icon: "success",
-                        //     title: `${dataLang[message]}`,
-                        // });
-                        ToatstNotifi(alert_type, dataLang[message]);
+                        ToatstNotifi(alert_type, dataLang[message] || message);
                         setTimeout(() => {
                             sOnFetching(true);
                         }, 300);
                     } else {
-                        // Toast.fire({
-                        //     icon: "error",
-                        //     title: `${dataLang[message]}`,
-                        // });
-                        ToatstNotifi("error", dataLang[message]);
+                        ToatstNotifi("error", dataLang[message] || message);
                     }
                     if (data_export?.length > 0) {
                         sData_export(data_export);
@@ -939,13 +942,14 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%]">
-                                        <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                        <div className="grid grid-cols-11 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h4>
+
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.warehouseTransfer_transferWarehouse ||
                                                     "warehouseTransfer_transferWarehouse"}
@@ -957,6 +961,9 @@ const Index = (props) => {
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_Total_value ||
                                                     "production_warehouse_Total_value"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_note || "production_warehouse_note"}
@@ -982,7 +989,7 @@ const Index = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                     {data?.map((e) => (
                                                         <div
-                                                            className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                            className="relative  grid grid-cols-11 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
@@ -998,6 +1005,7 @@ const Index = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
+
                                                             <LinkWarehouse
                                                                 warehouse_id={e?.warehouses_id}
                                                                 warehouse_name={e?.warehouses_id_name}
@@ -1010,6 +1018,21 @@ const Index = (props) => {
 
                                                             <h6 className="col-span-1  3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(e?.grand_total)}
+                                                            </h6>
+                                                            <h6 className="col-span-1 mx-auto">
+                                                                {
+                                                                    <span
+                                                                        className={`${
+                                                                            e?.order_id != 0
+                                                                                ? "bg-orange-200 text-orange-500 px-4"
+                                                                                : "bg-red-200 text-red-500 px-2"
+                                                                        }  py-1 rounded-2xl font-medium text-xs`}
+                                                                    >
+                                                                        {e?.order_id != 0
+                                                                            ? "Đã giữ kho"
+                                                                            : "Chưa giữ kho"}
+                                                                    </span>
+                                                                }
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate">
                                                                 {e?.note}
@@ -1157,7 +1180,7 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
+                        <div className="grid grid-cols-11 bg-gray-100 items-center rounded-md">
                             <div className="col-span-4 p-2 text-center">
                                 <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
                                     {dataLang?.import_total || "import_total"}

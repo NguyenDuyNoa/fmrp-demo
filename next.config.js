@@ -5,6 +5,9 @@ const nextConfig = {
     images: {
         domains: ["localhost", "demo.fososoft.com", "192.168.1.178", "fmrp.fososoft.com"],
     },
+    env: {
+        customKey: "my-value",
+    },
 };
 
 module.exports = nextConfig;

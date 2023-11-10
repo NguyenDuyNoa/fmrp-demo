@@ -18,6 +18,7 @@ const SelectComponent = ({
     menuPortalTarget,
     className,
     styles,
+    defaultValue,
     noOptionsMessage,
     menuShouldBlockScroll,
 }) => {
@@ -30,6 +31,7 @@ const SelectComponent = ({
                 onChange={onChange}
                 placeholder={placeholder}
                 {...configSelectFillter}
+                defaultValue={defaultValue}
                 className={className ? className : configSelectFillter.className}
                 isMulti={isMulti ? isMulti : false}
                 components={components}

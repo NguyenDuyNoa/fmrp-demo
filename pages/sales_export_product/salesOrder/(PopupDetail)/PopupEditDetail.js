@@ -1,3 +1,5 @@
+// Chi tiết giữ kho
+
 import moment from "moment";
 import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
@@ -22,31 +24,27 @@ const Popup_EditDetail = (props) => {
         onLoading: false,
         onFetchingCondition: false,
     };
+
     const [data, sData] = useState({});
     const [open, sOpen] = useState(false);
     const [isKeySearch, sIsKeySearch] = useState("");
     const [isFetching, sIsFetching] = useState(initialFetch);
     const [errorQuantity, sErrorQuantity] = useState(false);
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
     const [dataProductSerial, sDataProductSerial] = useState({});
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
-    const _ToggleModal = (e) => {
-        if (e) {
-            sOpen(e);
-        } else {
-            sIsFetchingParent({ onFetching: true });
-            sOpen(e);
-        }
-    };
+    const _ToggleModal = (e) => sOpen(e);
 
     const newData = dataClone?.transfer?.find((e) => e.id == id);
 
-    const setIsFetch = (e) => sIsFetching((prve) => ({ ...prve, ...e }));
+    const setIsFetch = (e) => sIsFetching((prev) => ({ ...prev, ...e }));
 
     useEffect(() => {
-        open && sData(dataClone?.transfer?.find((e) => e.id == id));
-        open && sErrorQuantity(false);
+        id && open && sData(dataClone?.transfer?.find((e) => e.id == id));
+
+        id && open && sErrorQuantity(false);
     }, [open]);
 
     useEffect(() => {
@@ -73,8 +71,8 @@ const Popup_EditDetail = (props) => {
     };
 
     useEffect(() => {
-        isFetching.onFetchingCondition && _ServerFetchingCondition();
-    }, [isFetching.onFetchingCondition]);
+        id && open && isFetching.onFetchingCondition && _ServerFetchingCondition();
+    }, [isFetching.onFetchingCondition, open]);
 
     const handleChange = async (type, value, idParent) => {
         let newData = [];
@@ -93,15 +91,23 @@ const Popup_EditDetail = (props) => {
                 break;
             case "deleteItem":
                 const shouldDelete = await handleDeleteItem();
+
                 if (shouldDelete) {
-                    data.items?.forEach((e) => {
-                        if (e.quantity_delivery > 0) {
-                            ToatstNotifi("error", "Mặt hàng đã giao không thể xóa");
-                        } else {
-                            newData = data.items?.filter((e) => e.quantity_delivery == 0 && e.id !== idParent);
-                            ToatstNotifi("success", "Xóa mặt hàng thành công");
-                        }
-                    });
+                    // let hasDelivery = false;
+
+                    // data.items?.forEach((e) => {
+                    //     if (e.quantity_delivery > 0) {
+                    //         hasDelivery = true;
+                    //     }
+                    // });
+                    // if (hasDelivery) {
+                    //     ToatstNotifi("error", "Mặt hàng đã giao không thể xóa");
+                    //     newData = data.items;
+                    // } else {
+                    //     newData = data.items?.filter((e) => e.id !== idParent);
+                    //     ToatstNotifi("success", "Xóa mặt hàng thành công");
+                    // }
+                    newData = deleteItem(idParent);
                 } else {
                     newData = data.items;
                 }
@@ -110,16 +116,33 @@ const Popup_EditDetail = (props) => {
             default:
                 newData = data;
         }
+
         sData({ ...data, items: newData });
+    };
+
+    const deleteItem = (idParent) => {
+        let hasDelivery = data.items?.some((e) => idParent == e.id && e.quantity_delivery > 0);
+
+        if (hasDelivery) {
+            ToatstNotifi("error", "Mặt hàng đã giao không thể xóa");
+            return data.items;
+        }
+
+        ToatstNotifi("success", "Xóa mặt hàng thành công");
+
+        return data.items?.filter((e) => e.id !== idParent);
     };
 
     const handleSearch = (inputValue) => {
         const keyword = inputValue.target.value;
+
         sIsKeySearch(keyword);
+
         if (keyword.trim() === "") {
             sData({ ...newData });
         } else {
             const fieldsToSearch = ["item", "warehouse_location_to", "warehouse_location"];
+
             const filteredItems = newData?.items?.filter((e) =>
                 fieldsToSearch.some((field) => {
                     return Object.values(e[field]).some(
@@ -127,6 +150,7 @@ const Popup_EditDetail = (props) => {
                     );
                 })
             );
+
             sData({ ...data, items: [...filteredItems] });
         }
     };
@@ -178,6 +202,7 @@ const Popup_EditDetail = (props) => {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
                         ToatstNotifi("success", `${dataLang[message] || message}`);
+                        sIsFetchingParent({ onFetching: true });
                         sOpen(false);
                     } else {
                         ToatstNotifi("error", `${dataLang[message] || message}`);
@@ -227,23 +252,28 @@ const Popup_EditDetail = (props) => {
                         </form>
                     </div>
                     <div className=" w-[100%]">
-                        <div className={`grid-cols-10  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}>
-                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
+                        <div
+                            className={`grid-cols-11  grid sticky top-0 bg-white shadow-lg p-2 divide-x z-10 rounded `}
+                        >
+                            <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
                                 {dataLang?.inventory_items || "inventory_items"}
                             </h4>
-                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                            <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                {"ĐVT"}
+                            </h4>
+                            <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                 {dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
                             </h4>
-                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                {dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
+                            <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                {dataLang?.warehouseTransfer_rransferPosition || "warehouseTransfer_rransferPosition"}
                             </h4>
-                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                            <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                 {dataLang?.salesOrder_Slkeeps_stocks || "salesOrder_Slkeeps_stocks"}
                             </h4>
-                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                            <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                 {dataLang?.salesOrder_Sl_delivered || "salesOrder_Sl_delivered"}
                             </h4>
-                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                            <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                 {dataLang?.salesOrder_action || "salesOrder_action"}
                             </h4>
                         </div>
@@ -259,7 +289,7 @@ const Popup_EditDetail = (props) => {
                                     <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
                                         {data?.items?.map((e) => (
                                             <div
-                                                className="grid grid-cols-10 hover:bg-slate-50 items-center border-b"
+                                                className="grid grid-cols-11 hover:bg-slate-50 items-center border-b"
                                                 key={e.id}
                                             >
                                                 <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
@@ -332,6 +362,9 @@ const Popup_EditDetail = (props) => {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </h6>
+                                                <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
+                                                    <h6 className="font-medium">{e?.item.unit_name}</h6>
                                                 </h6>
                                                 <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
                                                     <h6 className="font-medium">
@@ -412,15 +445,7 @@ const Popup_EditDetail = (props) => {
                         )}
                     </div>
                     <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between border-t">
-                        <div className="col-span-7 font-medium grid grid-cols-7 text-left">
-                            {/* <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] ">
-                       {dataLang?.price_quote_note || "price_quote_note"}
-                   </h3>
-                   <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] col-span-5 font-normal rounded-lg">
-                       {dataClone?.order?.note}
-                   </h3> */}
-                        </div>
-                        <div className="col-span-3 space-y-2"></div>
+                        <div className="col-span-10 font-medium grid grid-cols-7 text-left"></div>
                         <div className="col-span-2 space-y-2">
                             <div className="text-right mt-5 mr-2 space-x-2">
                                 <button

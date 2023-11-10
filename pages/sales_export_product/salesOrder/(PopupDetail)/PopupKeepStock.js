@@ -1,3 +1,5 @@
+// giữ kho
+
 import moment from "moment";
 import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
@@ -39,7 +41,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
             : ToatstNotifi("error", "Trạng thái đơn hàng chưa được duyệt, vui lòng duyệt để giữ kho !");
     };
 
-    const setIsFetch = (e) => sIsFetching((prve) => ({ ...prve, ...e }));
+    const setIsFetch = (e) => sIsFetching((prev) => ({ ...prev, ...e }));
 
     useEffect(() => {
         id && open && setIsFetch({ onFetching: true, onFetchingWarehouse: true });
