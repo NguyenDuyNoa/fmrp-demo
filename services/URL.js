@@ -1,3 +1,3 @@
-// export const ulrExel = "https://demo.fososoft.com/FMRP";
-// export const ulrExel = "http://192.168.1.178/FMRP";
-export const ulrExel = "https://fmrp.fososoft.com/";
+// export const urlApi = "https://demo.fososoft.com/FMRP";
+// export const urlApi = "http://192.168.1.178/FMRP";
+export const urlApi = "https://fmrp.fososoft.com/";

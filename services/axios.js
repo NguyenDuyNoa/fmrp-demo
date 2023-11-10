@@ -1,6 +1,6 @@
 import axios from "axios";
 import store from "/services/redux";
-import { ulrExel as url } from "/services/URL";
+import { urlApi as url } from "/services/URL";
 // axios.defaults.baseURL = "https://demo.fososoft.com/FMRP";
 axios.defaults.baseURL = `${url}`;
 

@@ -32,7 +32,7 @@ import Select, { components } from "react-select";
 
 import { TiTick } from "react-icons/ti";
 
-import { ulrExel } from "services/URL";
+import { urlApi } from "services/URL";
 
 import Popup_status from "./(popup)/popup";
 import Popup_stages from "./(popup)/popupStages";
@@ -1362,7 +1362,7 @@ const Index = (props) => {
                                         //     />
                                         //   </h5>
                                         //   <a
-                                        //     href={`${ulrExel}/file/products/import_stages.xlsx`}
+                                        //     href={`${urlApi}/file/products/import_stages.xlsx`}
                                         //     className="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
                                         //   >
                                         //     <span className="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
@@ -1388,14 +1388,10 @@ const Index = (props) => {
                                         //     </span>
                                         //   </a>
                                         // </React.Fragment>
-                                        <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} ulrExel={ulrExel} />
+                                        <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} urlApi={urlApi} />
                                     )) ||
                                         (tabPage == 6 && (
-                                            <ImportFileTemplate
-                                                dataLang={dataLang}
-                                                ulrExel={ulrExel}
-                                                tabPage={tabPage}
-                                            />
+                                            <ImportFileTemplate dataLang={dataLang} urlApi={urlApi} tabPage={tabPage} />
                                         )) ||
                                         (tabPage != 5 && tabPage != 6 && (
                                             <React.Fragment>
