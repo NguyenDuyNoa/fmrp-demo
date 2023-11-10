@@ -501,10 +501,8 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                     </h6>
                                                     <h6
                                                         className={`2xl:text-[13px] flex items-start ${
-                                                            e?.item?.warehouse_location?.length > 0
-                                                                ? e?.item?.warehouse_location?.length == 1
-                                                                    ? "justify-center"
-                                                                    : "justify-start"
+                                                            e?.item?.warehouse_location?.length > 1
+                                                                ? "justify-start"
                                                                 : "justify-center"
                                                         }  flex-wrap gap-2 xl:text-[12px] text-[11px] py-0.5 col-span-3  rounded-md  break-words`}
                                                     >
