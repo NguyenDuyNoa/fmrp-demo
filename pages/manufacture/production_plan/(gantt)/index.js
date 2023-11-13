@@ -362,4 +362,5 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
         </div>
     );
 };
-export default BodyGantt;
+
+export default React.memo(BodyGantt);

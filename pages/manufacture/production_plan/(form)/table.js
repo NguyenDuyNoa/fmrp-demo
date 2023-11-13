@@ -2,6 +2,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { NumericFormat } from "react-number-format";
 
+import React from "react";
 import PopupEditer from "./popup";
 
 import Loading from "@/components/UI/loading";
@@ -247,4 +248,4 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
         </>
     );
 };
-export default Table;
+export default React.memo(Table);

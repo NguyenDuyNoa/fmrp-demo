@@ -1,3 +1,4 @@
+import React from "react";
 import dynamic from "next/dynamic";
 import DatePicker from "react-datepicker";
 import { ArrowDown2 } from "iconsax-react";
@@ -151,4 +152,4 @@ const FilterHeader = ({ onChangeValue, isValue }) => {
         </>
     );
 };
-export default FilterHeader;
+export default React.memo(FilterHeader);

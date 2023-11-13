@@ -1,13 +1,13 @@
 import Head from "next/head";
 import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
-
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { useChangeValue } from "@/hooks/useChangeValue";
+import { useMemo } from "react";
 
 const Table = dynamic(() => import("./(form)/table"), { ssr: false });
 const InFo = dynamic(() => import("./(form)/info"), { ssr: false });
@@ -78,30 +78,32 @@ const FormAdd = (props) => {
     };
 
     ///Xóa từng item ở table
-    const handleRemoveItem = (idParen, id) => {
-        Swal.fire({
-            title: `Xóa đơn hàng`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const newData = data
-                    .map((e) => {
-                        if (e.id == idParen) {
-                            return { ...e, listProducts: e.listProducts.filter((i) => i.id != id) };
-                        }
-                        return e;
-                    })
-                    .flat()
-                    .filter((i) => i.listProducts?.length > 0);
-                getFreshData(newData);
-            }
-        });
-    };
+    const handleRemoveItem = useMemo(() => {
+        return (idParen, id) => {
+            Swal.fire({
+                title: `Xóa đơn hàng`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#296dc1",
+                cancelButtonColor: "#d33",
+                confirmButtonText: `${dataLang?.aler_yes}`,
+                cancelButtonText: `${dataLang?.aler_cancel}`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newData = data
+                        .map((e) => {
+                            if (e.id == idParen) {
+                                return { ...e, listProducts: e.listProducts.filter((i) => i.id != id) };
+                            }
+                            return e;
+                        })
+                        .flat()
+                        .filter((i) => i.listProducts?.length > 0);
+                    getFreshData(newData);
+                }
+            });
+        };
+    }, [data]);
 
     const backPage = () => {
         ToatstNotifi("error", "Không có đơn hàng. Vui lòng thêm đơn hàng !", 3000);
@@ -137,7 +139,7 @@ const FormAdd = (props) => {
     const handleChange = () => {};
 
     const shareProps = { data, isLoading, handleRemoveBtn, handleRemoveItem, isValue, onChangeValue };
-
+    console.log("tess");
     return (
         <>
             <Head>
@@ -151,4 +153,4 @@ const FormAdd = (props) => {
         </>
     );
 };
-export default FormAdd;
+export default React.memo(FormAdd);

@@ -2,7 +2,7 @@ import Head from "next/head";
 import { v4 as uuid } from "uuid";
 import dynamic from "next/dynamic";
 import { useSelector } from "react-redux";
-import { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
@@ -2068,20 +2068,25 @@ const Index = (props) => {
 
             const newArrMonth = [...Array(12)].map((_, index) => {
                 const crrItem = product.processArr.find((p) => p.month === index + 1);
+
                 if (crrItem) {
                     return crrItem;
                 }
+
                 return { month: index + 1 };
             });
             ///Sắp xếp theo ngày
             const newArrDays = newArrMonth.map((i) => {
                 const check = [...Array(7)].map((_, index) => {
                     const crrItem = i.days?.find((p) => p.id == index + 1);
+
                     if (crrItem) {
                         return crrItem;
                     }
+
                     return { id: index + 1, active: false };
                 });
+
                 return {
                     ...i,
 
@@ -2098,6 +2103,7 @@ const Index = (props) => {
 
         const processDefault = [...Array(12)].map((_, index) => {
             const crrItem = order.processDefault.find((p) => p.month === index + 1);
+
             if (crrItem) {
                 return crrItem;
             }
@@ -2108,11 +2114,14 @@ const Index = (props) => {
         const processDefault2 = processDefault.map((i) => {
             const check = [...Array(7)].map((_, index) => {
                 const crrItem = i.days?.find((p) => p.id == index + 1);
+
                 if (crrItem) {
                     return crrItem;
                 }
+
                 return { id: index + 1, active: false };
             });
+
             return {
                 ...i,
                 days: check,
@@ -2155,16 +2164,18 @@ const Index = (props) => {
         sIsFetching(true);
     }, []);
 
-    const handleShowSub = (index) => {
-        const updatedData = [...data];
+    const handleShowSub = useMemo(() => {
+        return (index) => {
+            const updatedData = [...data];
 
-        updatedData.forEach((order, i) => {
-            if (i === index) {
-                order.show = !order.show;
-            }
-        });
-        sData(updatedData);
-    };
+            updatedData.forEach((order, i) => {
+                if (i === index) {
+                    order.show = !order.show;
+                }
+            });
+            sData(updatedData);
+        };
+    }, []);
 
     const handleCheked = useMemo(() => {
         return (idParent, idChild) => {
@@ -2194,20 +2205,22 @@ const Index = (props) => {
         localStorage.removeItem("arrData");
     }, []);
 
-    const handleSort = (e) => {
-        const updatedData = [...data];
+    const handleSort = useMemo(() => {
+        return () => {
+            const updatedData = [...data];
 
-        updatedData.sort((a, b) => {
-            if (isAscending) {
-                return a.nameOrder.localeCompare(b.nameOrder); // Sắp xếp từ nhỏ đến lớn
-            } else {
-                return b.nameOrder.localeCompare(a.nameOrder); // Sắp xếp từ lớn đến nhỏ
-            }
-        });
-        ToatstNotifi("success", "Sắp xếp đơn hàng thành công");
-        sData(updatedData);
-        sIsAscending(!isAscending); // Đảo ngược trạng thái sắp xếp
-    };
+            updatedData.sort((a, b) => {
+                if (isAscending) {
+                    return a.nameOrder.localeCompare(b.nameOrder); // Sắp xếp từ nhỏ đến lớn
+                } else {
+                    return b.nameOrder.localeCompare(a.nameOrder); // Sắp xếp từ lớn đến nhỏ
+                }
+            });
+            ToatstNotifi("success", "Sắp xếp đơn hàng thành công");
+            sData(updatedData);
+            sIsAscending(!isAscending); // Đảo ngược trạng thái sắp xếp
+        };
+    }, [data]);
 
     return (
         <>

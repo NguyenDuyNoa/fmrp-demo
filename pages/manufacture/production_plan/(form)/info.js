@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -297,4 +297,4 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
         </>
     );
 };
-export default InFo;
+export default React.memo(InFo);
