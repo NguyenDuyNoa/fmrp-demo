@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 import Popup from "reactjs-popup";
 import React, { useEffect, useRef, useState } from "react";
 
-const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending, timeLine }) => {
+const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending, timeLine, handleToggle }) => {
     const header = [
         { id: uuid(), name: "Đơn hàng" },
         { id: uuid(), name: "Trạng thái" },
@@ -353,7 +353,7 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
             </div>
             <div className="w-full border-b flex flex-col">
                 <div className="border-b">
-                    <button type="button" className="flex items-center gap-2 my-2">
+                    <button type="button" onClick={handleToggle} className="flex items-center gap-2 my-2">
                         <Image src={"/productionPlan/Vector.png"} width={10} height={10} className="object-cover" />
                         <h1 className="text-[#52575E] font-normal text-sm"> Thêm sản phẩm</h1>
                     </button>

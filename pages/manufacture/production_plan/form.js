@@ -1,23 +1,46 @@
 import Head from "next/head";
 import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
+
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
+
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import { useChangeValue } from "@/hooks/useChangeValue";
+
 const Table = dynamic(() => import("./(form)/table"), { ssr: false });
 const InFo = dynamic(() => import("./(form)/info"), { ssr: false });
 const Header = dynamic(() => import("./(form)/header"), { ssr: false });
 
 const FormAdd = (props) => {
     const router = useRouter();
+
     const dataLang = props.dataLang;
+
     const [data, sData] = useState([]);
+
     const [isLoading, sIsLoading] = useState(false);
+
     const [isCheckRemove, sIsCheckRemove] = useState(false);
+
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     const getLocalStorage = () => (localStorage.getItem("arrData") ? JSON.parse(localStorage.getItem("arrData")) : []);
+
     let dataLocals = getLocalStorage();
+
+    const initialValue = {
+        idBrach: null,
+        date: new Date(),
+        actions: false,
+        idOrder: null,
+        startDate: null,
+        endDate: null,
+        auto: false,
+    };
+
+    const { isValue, onChangeValue } = useChangeValue(initialValue);
 
     /// Check điều kiện và lọc listProducts có check == true
     useEffect(() => {
@@ -113,7 +136,8 @@ const FormAdd = (props) => {
 
     const handleChange = () => {};
 
-    const shareProps = { data, isLoading, handleRemoveBtn, handleRemoveItem };
+    const shareProps = { data, isLoading, handleRemoveBtn, handleRemoveItem, isValue, onChangeValue };
+
     return (
         <>
             <Head>

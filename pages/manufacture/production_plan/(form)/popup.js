@@ -1,23 +1,25 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { v4 as uuid } from "uuid";
+
+import { useToggle } from "@/hooks/useToggle";
+
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
 const PopupEditer = ({}) => {
-    const [isOpenPopup, sIsOpenPopup] = useState(false);
+    const [isOpen, handleOpen] = useToggle(false);
+
     const [isLoading, sIsLoading] = useState(false);
 
     useEffect(() => {
-        isOpenPopup && sIsLoading(true);
+        isOpen && sIsLoading(true);
+
         setTimeout(() => {
             sIsLoading(false);
         }, 1000);
-    }, [isOpenPopup]);
-
-    const handleOpenPopup = (e) => sIsOpenPopup(e);
+    }, [isOpen]);
 
     return (
         <PopupEdit
@@ -39,9 +41,9 @@ const PopupEditer = ({}) => {
                     />
                 </Zoom>
             }
-            onClickOpen={() => handleOpenPopup(true)}
-            open={isOpenPopup}
-            onClose={() => handleOpenPopup(false)}
+            onClickOpen={() => handleOpen(true)}
+            open={isOpen}
+            onClose={() => handleOpen(false)}
             // classNameBtn={props?.className}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
@@ -184,7 +186,7 @@ const PopupEditer = ({}) => {
                 <div className="text-right mt-5 space-x-2">
                     <button
                         type="button"
-                        onClick={() => handleOpenPopup(false)}
+                        onClick={() => handleOpen(false)}
                         className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD] hover:scale-105 transition-all ease-linear"
                     >
                         {"Hủy"}

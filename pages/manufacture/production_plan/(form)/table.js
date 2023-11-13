@@ -1,11 +1,14 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import Loading from "@/components/UI/loading";
 import { NumericFormat } from "react-number-format";
-import NoData from "@/components/UI/noData/nodata";
+
 import PopupEditer from "./popup";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+
 const Table = ({ data, isLoading, handleRemoveItem }) => {
     const dataNew = data
         .map((e) => {

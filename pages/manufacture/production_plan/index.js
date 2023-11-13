@@ -1,17 +1,21 @@
 import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useDispatch, useSelector } from "react-redux";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { v4 as uuid } from "uuid";
-import { useState } from "react";
-import { useMemo } from "react";
-import { useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useSelector } from "react-redux";
+import { useMemo, useEffect, useState } from "react";
+import { _ServerInstance as Axios } from "/services/axios";
+
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+
+import { useToggle } from "@/hooks/useToggle";
+import { useSetData } from "@/hooks/useSetData";
+import { useChangeValue } from "@/hooks/useChangeValue";
+
+const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
 
 const Header = dynamic(() => import("./(header)/header"), { ssr: false });
 
 const FilterHeader = dynamic(() => import("./(filterHeader)/filterHeader"), { ssr: false });
-
-const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -20,6 +24,7 @@ const Index = (props) => {
     const propss = {
         dataLang,
     };
+
     const timeLine = [
         {
             id: uuid(),
@@ -526,6 +531,7 @@ const Index = (props) => {
             ],
         },
     ];
+
     const listOrder = [
         {
             id: uuid(),
@@ -2032,7 +2038,29 @@ const Index = (props) => {
         },
     ];
 
-    const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
+    const initialData = {
+        timeLine: [],
+        listOrder: [],
+        client: [],
+        productGroup: [],
+    };
+
+    const initialValues = {
+        startDate: null,
+        endDate: null,
+        idClient: null,
+        idProductGroup: null,
+        idProduct: null,
+        planStatus: null,
+    };
+
+    const [isOpen, handleToggle] = useToggle(false);
+
+    const { isData, updateData } = useSetData(initialData);
+
+    const { isValue, onChangeValue } = useChangeValue(initialValues);
+
+    const [isFetching, sIsFetching] = useState(false);
 
     const updatedListOrder = listOrder.map((order) => {
         const updatedListProducts = order.listProducts.map((product) => {
@@ -2099,10 +2127,37 @@ const Index = (props) => {
         };
     });
 
+    const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
+
     const [data, sData] = useState(updatedListOrder);
+
+    const _ServerFetching = () => {
+        Axios(
+            "GET",
+            ``,
+            {
+                params: {},
+            },
+            (err, response) => {
+                if (!err) {
+                    let data = response.data;
+                }
+                sIsFetching(false);
+            }
+        );
+    };
+
+    useEffect(() => {
+        isFetching && _ServerFetching();
+    }, [isFetching]);
+
+    useEffect(() => {
+        sIsFetching(true);
+    }, []);
 
     const handleShowSub = (index) => {
         const updatedData = [...data];
+
         updatedData.forEach((order, i) => {
             if (i === index) {
                 order.show = !order.show;
@@ -2119,13 +2174,18 @@ const Index = (props) => {
                         if (i.id === idChild) {
                             return { ...i, checked: !i.checked };
                         }
+
                         return i;
                     });
+
                     return { ...e, listProducts: newListProducts };
                 }
+
                 return e;
             });
+
             localStorage.setItem("arrData", JSON.stringify(updatedData));
+
             sData(updatedData);
         };
     }, [data]);
@@ -2136,6 +2196,7 @@ const Index = (props) => {
 
     const handleSort = (e) => {
         const updatedData = [...data];
+
         updatedData.sort((a, b) => {
             if (isAscending) {
                 return a.nameOrder.localeCompare(b.nameOrder); // Sắp xếp từ nhỏ đến lớn
@@ -2148,8 +2209,6 @@ const Index = (props) => {
         sIsAscending(!isAscending); // Đảo ngược trạng thái sắp xếp
     };
 
-    
-
     return (
         <>
             <Head>
@@ -2157,8 +2216,9 @@ const Index = (props) => {
             </Head>
             <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {trangthaiExprired ? <div className="p-4"></div> : <Header {...propss} />}
-                <FilterHeader {...propss} />
+                <FilterHeader {...propss} onChangeValue={onChangeValue} isValue={isValue} />
                 <BodyGantt
+                    handleToggle={handleToggle}
                     {...propss}
                     handleShowSub={handleShowSub}
                     handleSort={handleSort}

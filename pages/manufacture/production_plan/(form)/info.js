@@ -7,16 +7,7 @@ import Datepicker from "react-tailwindcss-datepicker";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
-const InFo = ({ data, handleRemoveBtn }) => {
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
-
-    const handleDateChange = (dates) => {
-        const [start, end] = dates;
-        setStartDate(start);
-        setEndDate(end);
-    };
-
+const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
     return (
         <>
             <div className="bg-[#ECF0F4] font text-[#141522] font-medium 3xl:text-sm text-xs p-3 rounded">
@@ -42,6 +33,10 @@ const InFo = ({ data, handleRemoveBtn }) => {
                     <SelectComponent
                         classNamePrefix={"productionSmoothing"}
                         placeholder={"Chọn chi nhánh"}
+                        isClearable={true}
+                        value={isValue.idBrach}
+                        onChange={onChangeValue("idBrach")}
+                        options={[{ label: "hi", value: 1 }]}
                         className={"w-full"}
                         styles={{
                             placeholder: (base) => ({
@@ -74,14 +69,16 @@ const InFo = ({ data, handleRemoveBtn }) => {
                     <div className="w-full relative">
                         <DatePicker
                             id="start"
+                            dateFormat={"dd/MM/yyyy h:mm aa"}
                             calendarClassName="rasta-stripes"
-                            clearButtonClassName="text"
-                            // selected={startDate}
+                            selected={isValue.date}
+                            onChange={onChangeValue("date")}
                             monthsShown={2}
                             showTimeSelect
                             timeFormat="p"
                             timeIntervals={15}
-                            dateFormat="Pp"
+                            isClearable
+                            clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
                             placeholderText="13/02/2023 12:12:11"
                             className="py-[8px] px-4 3xl:placeholder:text-sm  xxl:placeholder:text-xs 2xl:placeholder:text-[11px] xl:placeholder:text-[10px] lg:placeholder:text-[9px] text-sm placeholder:text-[#6b7280] text-sm w-full outline-none focus:outline-none 
                                     border-[#E1E1E1] focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] "
@@ -105,11 +102,13 @@ const InFo = ({ data, handleRemoveBtn }) => {
                                 id="default-radio-1"
                                 type="radio"
                                 value=""
-                                name="default-radio"
+                                checked={isValue.actions}
+                                onChange={() => onChangeValue("actions")(!isValue.actions)}
+                                name="default-radio1"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
                             />
                             <label
-                                for="default-radio-1"
+                                htmlFor="default-radio-1"
                                 className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
                             >
                                 Đơn hàng
@@ -117,15 +116,16 @@ const InFo = ({ data, handleRemoveBtn }) => {
                         </div>
                         <div className="flex items-center cursor-pointer">
                             <input
-                                checked
                                 id="default-radio-2"
                                 type="radio"
                                 value=""
-                                name="default-radio"
+                                checked={!isValue.actions}
+                                onChange={() => onChangeValue("actions")(!isValue.actions)}
+                                name="default-radio2"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
                             />
                             <label
-                                for="default-radio-2"
+                                htmlFor="default-radio-2"
                                 className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
                             >
                                 Kế hoạch nội nộ
@@ -139,10 +139,14 @@ const InFo = ({ data, handleRemoveBtn }) => {
                     </label>
                     <div className="w-full relative">
                         <DatePicker
-                            selected={startDate}
-                            onChange={handleDateChange}
-                            startDate={startDate}
-                            endDate={endDate}
+                            selected={isValue.startDate}
+                            onChange={(dates) => {
+                                const [start, end] = dates;
+                                onChangeValue("startDate")(start);
+                                onChangeValue("endDate")(end);
+                            }}
+                            startDate={isValue.startDate}
+                            endDate={isValue.endDate}
                             selectsRange
                             monthsShown={2}
                             shouldCloseOnSelect={false}
@@ -208,6 +212,10 @@ const InFo = ({ data, handleRemoveBtn }) => {
                         classNamePrefix={"productionSmoothing"}
                         placeholder={"Chọn hoặc tìm kiếm đơn hàng"}
                         className={"w-full"}
+                        isClearable={true}
+                        value={isValue.idOrder}
+                        onChange={onChangeValue("idOrder")}
+                        options={[{ label: "hi", value: 1 }]}
                         styles={{
                             placeholder: (base) => ({
                                 ...base,
@@ -234,8 +242,19 @@ const InFo = ({ data, handleRemoveBtn }) => {
                 </div>
                 <div className="col-span-6 flex flex-col gap-y-4">
                     <div className="flex items-center gap-4">
-                        <input type="checkbox" className="h-4 w-4"></input>
-                        <label className="text-[#344054] font-medium 3xl:text-base text-sm">Tự động tạo LSX tổng</label>
+                        <input
+                            id="auto"
+                            type="checkbox"
+                            checked={isValue.auto}
+                            onChange={(event) => onChangeValue("auto")(event.target.checked)}
+                            className="h-4 w-4"
+                        ></input>
+                        <label
+                            htmlFor="auto"
+                            className="text-[#344054] font-medium 3xl:text-base text-sm cursor-pointer"
+                        >
+                            Tự động tạo LSX tổng
+                        </label>
                     </div>
                     <div className="text-red-500 font-normal 3xl:text-base text-sm">
                         Ghi chú: chỉ lấy những phiếu đã duyệt

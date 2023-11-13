@@ -1,11 +1,13 @@
 import dynamic from "next/dynamic";
+import DatePicker from "react-datepicker";
+import { ArrowDown2 } from "iconsax-react";
+import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
+
 const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), {
     ssr: false,
 });
-import { ArrowDown2 } from "iconsax-react";
-import DatePicker from "react-datepicker";
-import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
-const FilterHeader = () => {
+
+const FilterHeader = ({ onChangeValue, isValue }) => {
     const renderMonthContent = (month, shortMonth, longMonth) => {
         const tooltipText = `Tooltip for month: ${longMonth}`;
         return <span title={tooltipText}>{shortMonth}</span>;
@@ -23,8 +25,8 @@ const FilterHeader = () => {
                                 id="start"
                                 calendarClassName="rasta-stripes"
                                 clearButtonClassName="text"
-                                // selected={startDate}
-                                // onChange={(date) => setStartDate(date)}
+                                selected={isValue.startDate}
+                                onChange={onChangeValue("startDate")}
                                 isClearable
                                 placeholderText="Ngày bắt đầu"
                                 className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
@@ -47,8 +49,8 @@ const FilterHeader = () => {
                                 id="start"
                                 calendarClassName="rasta-stripes"
                                 clearButtonClassName="text"
-                                // selected={startDate}
-                                // onChange={(date) => setStartDate(date)}
+                                selected={isValue.endDate}
+                                onChange={onChangeValue("endDate")}
                                 isClearable
                                 placeholderText="Ngày kết thúc"
                                 className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
@@ -63,11 +65,31 @@ const FilterHeader = () => {
                 </div>
                 <div className="col-span-2">
                     <h3 className="text-sm text-[#051B44] font-medium ml-1">Khách hàng</h3>
-                    <SelectComponent classNamePrefix={"productionSmoothing"} placeholder={"Khách hàng"} />
+                    <SelectComponent
+                        isClearable={true}
+                        value={isValue.idClient}
+                        onChange={onChangeValue("idClient")}
+                        options={[
+                            { label: "test1", value: 1 },
+                            { label: "test2", value: 2 },
+                        ]}
+                        classNamePrefix={"productionSmoothing"}
+                        placeholder={"Khách hàng"}
+                    />
                 </div>
                 <div className="col-span-2">
                     <h3 className="text-sm text-[#051B44] font-medium ml-1">Nhóm thành phẩm</h3>
-                    <SelectComponent classNamePrefix={"productionSmoothing"} placeholder={"Nhóm thành phẩm"} />
+                    <SelectComponent
+                        value={isValue.idProductGroup}
+                        isClearable={true}
+                        options={[
+                            { label: "test1", value: 1 },
+                            { label: "test2", value: 2 },
+                        ]}
+                        onChange={onChangeValue("idProductGroup")}
+                        classNamePrefix={"productionSmoothing"}
+                        placeholder={"Nhóm thành phẩm"}
+                    />
                 </div>
                 <div className="col-span-2">
                     <div class="">
@@ -76,11 +98,13 @@ const FilterHeader = () => {
                         </label>
                         <div className="w-full relative">
                             <DatePicker
-                                // selected={new Date()}
+                                selected={isValue.idProduct}
                                 renderMonthContent={renderMonthContent}
                                 showFourColumnMonthYearPicker
                                 showMonthYearPicker
                                 locale={vi}
+                                isClearable
+                                onChange={onChangeValue("idProduct")}
                                 showFullMonthYearPicker
                                 dateFormat="MM/yyyy"
                                 monthPlaceholder="Tháng"
@@ -102,11 +126,13 @@ const FilterHeader = () => {
                         </label>
                         <div className="w-full relative">
                             <DatePicker
-                                // selected={new Date()}
+                                selected={isValue.planStatus}
                                 renderMonthContent={renderMonthContent}
                                 showFourColumnMonthYearPicker
                                 showMonthYearPicker
                                 locale={vi}
+                                isClearable
+                                onChange={onChangeValue("planStatus")}
                                 showFullMonthYearPicker
                                 dateFormat="MM/yyyy"
                                 monthPlaceholder="Tháng"
