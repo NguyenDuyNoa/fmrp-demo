@@ -14,8 +14,9 @@ import {
     ImportCurve as IconImport,
     Framer as IconFramer,
 } from "iconsax-react";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const Index = () => {
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
     return (
         <React.Fragment>
             <Head>

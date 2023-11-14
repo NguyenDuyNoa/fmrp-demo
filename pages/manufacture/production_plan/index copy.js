@@ -1,20 +1,16 @@
 import Head from "next/head";
 import { v4 as uuid } from "uuid";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 import React, { useMemo, useEffect, useState } from "react";
-
-import Pagination from "@/components/UI/pagination";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
-
 import { _ServerInstance as Axios } from "/services/axios";
+
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 
 import { useToggle } from "@/hooks/useToggle";
 import { useSetData } from "@/hooks/useSetData";
-import usePagination from "@/hooks/usePagination";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
 
@@ -24,9 +20,6 @@ const FilterHeader = dynamic(() => import("./(filterHeader)/filterHeader"), { ss
 
 const Index = (props) => {
     const dataLang = props.dataLang;
-
-    const router = useRouter();
-
     const trangthaiExprired = useStatusExprired();
 
     const propss = {
@@ -1919,8 +1912,8 @@ const Index = (props) => {
         {
             id: uuid(),
             nameOrder: "PO-223420",
-            status: "unfulfilled",
-            process: "0%",
+            status: "sussces",
+            process: "84%",
             processDefault: [
                 {
                     month: 1,
@@ -2047,8 +2040,8 @@ const Index = (props) => {
     ];
 
     const initialData = {
-        timeLine: timeLine,
-        listOrder: listOrder,
+        timeLine: [],
+        listOrder: [],
         client: [],
         productGroup: [],
     };
@@ -2062,19 +2055,55 @@ const Index = (props) => {
         planStatus: null,
     };
 
-    const { paginate } = usePagination();
-
     const [isOpen, handleToggle] = useToggle(false);
-
-    const [isFetching, sIsFetching] = useState(false);
 
     const { isData, updateData } = useSetData(initialData);
 
     const { isValue, onChangeValue } = useChangeValue(initialValues);
 
-    const sortArrayByMonth = (arr) => {
-        return [...Array(12)].map((_, index) => {
-            const crrItem = arr.find((p) => p.month === index + 1);
+    const [isFetching, sIsFetching] = useState(false);
+
+    const updatedListOrder = listOrder.map((order) => {
+        const updatedListProducts = order.listProducts.map((product) => {
+            ///Sắp xếp theo tháng
+
+            const newArrMonth = [...Array(12)].map((_, index) => {
+                const crrItem = product.processArr.find((p) => p.month === index + 1);
+
+                if (crrItem) {
+                    return crrItem;
+                }
+
+                return { month: index + 1 };
+            });
+            ///Sắp xếp theo ngày
+            const newArrDays = newArrMonth.map((i) => {
+                const check = [...Array(7)].map((_, index) => {
+                    const crrItem = i.days?.find((p) => p.id == index + 1);
+
+                    if (crrItem) {
+                        return crrItem;
+                    }
+
+                    return { id: index + 1, active: false };
+                });
+
+                return {
+                    ...i,
+
+                    days: check,
+                };
+            });
+            return {
+                ...product,
+                checked: false,
+                processArr: newArrDays,
+            };
+        });
+        ///Sắp xếp default theo tháng
+
+        const processDefault = [...Array(12)].map((_, index) => {
+            const crrItem = order.processDefault.find((p) => p.month === index + 1);
 
             if (crrItem) {
                 return crrItem;
@@ -2082,10 +2111,8 @@ const Index = (props) => {
 
             return { month: index + 1 };
         });
-    };
-
-    const sortArrayByDay = (arr) => {
-        return arr.map((i) => {
+        ///Sắp xếp default theo ngày
+        const processDefault2 = processDefault.map((i) => {
             const check = [...Array(7)].map((_, index) => {
                 const crrItem = i.days?.find((p) => p.id == index + 1);
 
@@ -2101,57 +2128,18 @@ const Index = (props) => {
                 days: check,
             };
         });
-    };
 
-    const updateListProducts = (order) => {
-        return order.listProducts.map((product) => {
-            const newArrMonth = sortArrayByMonth(product.processArr);
-
-            const newArrDays = sortArrayByDay(newArrMonth);
-
-            return {
-                ...product,
-                checked: false,
-                processArr: newArrDays,
-            };
-        });
-    };
-
-    const updateProcessDefault = (order) => {
-        const processDefault = sortArrayByMonth(order.processDefault);
-
-        const processDefaultUpdate = sortArrayByDay(processDefault);
-
-        return processDefaultUpdate;
-    };
-
-    const updateListOrder = (listOrder) => {
-        return listOrder.map((order) => {
-            const updatedListProducts = updateListProducts(order);
-
-            const processDefaultUpdate = updateProcessDefault(order);
-
-            return {
-                ...order,
-                show: true,
-                processDefault: processDefaultUpdate,
-                listProducts: updatedListProducts,
-            };
-        });
-    };
-
-    const updatedListOrder = updateListOrder(isData.listOrder);
+        return {
+            ...order,
+            show: true,
+            processDefault: processDefault2,
+            listProducts: updatedListProducts,
+        };
+    });
 
     const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
 
     const [data, sData] = useState(updatedListOrder);
-
-    const { limit, totalItems, updateLimit, updateTotalItems } = useLimitAndTotalItems(15, {
-        iTotalDisplayRecords: 10,
-        iTotalRecords: 10,
-    });
-
-    console.log(limit, totalItems);
 
     const _ServerFetching = () => {
         Axios(
@@ -2190,7 +2178,7 @@ const Index = (props) => {
             });
             sData(updatedData);
         };
-    }, [data]);
+    }, []);
 
     const handleCheked = useMemo(() => {
         return (idParent, idChild) => {
@@ -2254,22 +2242,10 @@ const Index = (props) => {
                     handleShowSub={handleShowSub}
                     handleSort={handleSort}
                     data={data}
-                    timeLine={isData.timeLine}
+                    timeLine={timeLine}
                     isAscending={isAscending}
                     handleCheked={handleCheked}
                 />
-                <div className="flex space-x-5 items-center">
-                    <h6 className="">
-                        {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                        {totalItems?.iTotalRecords} {dataLang?.ingredient}
-                    </h6>
-                    <Pagination
-                        postsPerPage={limit}
-                        totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                        paginate={paginate}
-                        currentPage={router.query?.page || 1}
-                    />
-                </div>
             </div>
         </>
     );

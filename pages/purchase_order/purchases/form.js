@@ -32,6 +32,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
 import { routerPurchases } from "components/UI/router/buyImportGoods";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -50,7 +51,7 @@ const Index = (props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);

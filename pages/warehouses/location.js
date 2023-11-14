@@ -29,6 +29,7 @@ import moment from "moment/moment";
 import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -325,7 +326,7 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
     const _HandleFresh = () => {
         sOnFetching(true);
     };

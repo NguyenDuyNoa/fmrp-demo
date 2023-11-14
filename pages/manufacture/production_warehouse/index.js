@@ -51,6 +51,7 @@ import { useSelector } from "react-redux";
 import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
 import TabStatus from "../(filterTab)/filterTab";
 import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -96,7 +97,7 @@ const Index = (props) => {
         endDate: null,
     });
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const _HandleSelectTab = (e) => {
         router.push({

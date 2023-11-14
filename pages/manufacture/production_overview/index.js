@@ -10,9 +10,10 @@ import Loading from "components/UI/loading";
 import Step from "./(modalDetail)/steps";
 import ModalDetail from "./(modalDetail)/modalDetail";
 import { useMemo } from "react";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const Index = (props) => {
     const dataLang = props.dataLang;
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     const [isShow, sIsshow] = useState({
         showHidden: false,
         showHistory: 1,

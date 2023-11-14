@@ -5,9 +5,10 @@ import Image from "next/image";
 import { ArrowRight2 as IconRight } from "iconsax-react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = () => {
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     const router = useRouter();
     return (
         <React.Fragment>

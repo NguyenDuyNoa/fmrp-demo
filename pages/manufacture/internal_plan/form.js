@@ -16,6 +16,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 import { routerInternalPlan } from "@/components/UI/router/internalPlan";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = (props) => {
     const initsFetching = {
@@ -46,7 +47,7 @@ const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
     const dataLang = props?.dataLang;
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
     const [fetChingData, sFetchingData] = useState(initsFetching);
     const [dataSelect, sDataSelect] = useState(initsArr);
     const [idChange, sIdChange] = useState(initsValue);

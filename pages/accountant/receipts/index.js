@@ -35,11 +35,12 @@ import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import OnResetData from "components/UI/btnResetData/btnReset";
 import HeaderTable from "components/UI/headerTable/headerTable";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     const inistialValue = {
         idBranch: null,
         idObject: null,

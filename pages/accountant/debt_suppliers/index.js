@@ -34,6 +34,7 @@ import SelectComponent from "components/UI/filterComponents/selectComponent";
 import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import OnResetData from "components/UI/btnResetData/btnReset";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -72,7 +73,7 @@ const Index = (props) => {
         startDate: null,
         endDate: null,
     });
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const _HandleSelectTab = (e) => {
         router.push({

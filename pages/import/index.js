@@ -49,6 +49,7 @@ import Row from "./(row)/row";
 import Radio from "./(radio)/radio";
 import Popup_bom from "./(popup)/popupBom";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -137,7 +138,7 @@ const Index = (props) => {
         extra: false,
     });
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const _ServerFetching = () => {
         sOnLoading(true);

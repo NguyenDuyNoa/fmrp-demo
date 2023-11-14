@@ -6,10 +6,11 @@ import Link from "next/link";
 import { ArrowRight2 as IconRight } from "iconsax-react";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = () => {
     const router = useRouter();
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     return (
         <React.Fragment>
             <Head>

@@ -25,6 +25,7 @@ import SearchComponent from "components/UI/filterComponents/searchComponent";
 import OnResetData from "components/UI/btnResetData/btnReset";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -196,7 +197,7 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const _HandleFresh = () => sOnFetching(true);
     return (

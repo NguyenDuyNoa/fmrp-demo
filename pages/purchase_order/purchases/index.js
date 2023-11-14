@@ -60,6 +60,7 @@ import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/popup";
 import { useSelector } from "react-redux";
 import { routerPurchases } from "components/UI/router/buyImportGoods";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -468,7 +469,7 @@ const Index = (props) => {
         return integerPart.toLocaleString("en");
     };
     const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>

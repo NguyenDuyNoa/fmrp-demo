@@ -21,6 +21,7 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const PopupDetail = dynamic(() => import("./(popupDetail)/PopupDetail"), { ssr: false });
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -30,7 +31,7 @@ const Index = (props) => {
         idBranch: null,
         valueDate: { startDate: null, endDate: null },
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     const [listData, sListData] = useState(initsArr);
     const [idFillter, sIdFillter] = useState(initsId);
     const [onFetching, sOnFetching] = useState(false);

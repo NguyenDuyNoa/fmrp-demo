@@ -19,6 +19,7 @@ import SelectComponent from "components/UI/filterComponents/selectComponent";
 import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
 import OnResetData from "components/UI/btnResetData/btnReset";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = (props) => {
     const initialData = {
@@ -35,7 +36,7 @@ const Index = (props) => {
             endDate: null,
         },
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     const dataLang = props.dataLang;
     const router = useRouter();
     const [onFetching, sOnFetching] = useState(false);

@@ -24,6 +24,7 @@ import ModalImage from "react-modal-image";
 import Link from "next/link";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -68,15 +69,9 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[location_id]": idLocation?.value
-                        ? idLocation?.value
-                        : null,
-                    "filter[variation_option_id_1]": idVariantMain?.value
-                        ? idVariantMain?.value
-                        : null,
-                    "filter[variation_option_id_2]": idVariantSub?.value
-                        ? idVariantSub?.value
-                        : null,
+                    "filter[location_id]": idLocation?.value ? idLocation?.value : null,
+                    "filter[variation_option_id_1]": idVariantMain?.value ? idVariantMain?.value : null,
+                    "filter[variation_option_id_2]": idVariantSub?.value ? idVariantSub?.value : null,
                 },
             },
             (err, response) => {
@@ -89,36 +84,20 @@ const Index = (props) => {
                 sOnFetching(false);
             }
         );
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { name } = response.data;
-                    sTitle(name);
-                }
+        });
+        Axios("GET", `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { name } = response.data;
+                sTitle(name);
             }
-        );
+        });
     };
 
     const _ServerFetching_localtion = () => {
@@ -129,34 +108,26 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { rResult } = response.data;
-                    sListLocation(
-                        rResult.map((e) => ({ label: e.name, value: e.id }))
-                    );
+                    sListLocation(rResult.map((e) => ({ label: e.name, value: e.id })));
                 }
                 sOnFetching(false);
             }
         );
     };
     const _ServerFetching_Variation = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_variation/variation?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data ?? {};
-                    const options =
-                        rResult?.flatMap(({ option }) => option) ?? [];
-                    sListVariant(
-                        options?.map(({ id, name }) => ({
-                            label: name,
-                            value: id,
-                        }))
-                    );
-                }
-                sOnFetching(false);
+        Axios("GET", `/api_web/Api_variation/variation?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                const { rResult } = response.data ?? {};
+                const options = rResult?.flatMap(({ option }) => option) ?? [];
+                sListVariant(
+                    options?.map(({ id, name }) => ({
+                        label: name,
+                        value: id,
+                    }))
+                );
             }
-        );
+            sOnFetching(false);
+        });
     };
 
     const onchang_filter = (type, value) => {
@@ -230,10 +201,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_type ||
-                        "warehouses_detail_type"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_type || "warehouses_detail_type"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -241,10 +209,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_plu ||
-                        "warehouses_detail_plu"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_plu || "warehouses_detail_plu"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -252,10 +217,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_productname ||
-                        "warehouses_detail_productname"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_productname || "warehouses_detail_productname"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -263,10 +225,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_wareLoca ||
-                        "warehouses_detail_wareLoca"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -274,10 +233,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_mainVar ||
-                        "warehouses_detail_mainVar"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -285,10 +241,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_subVar ||
-                        "warehouses_detail_subVar"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -312,10 +265,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_date ||
-                        "warehouses_detail_date"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_date || "warehouses_detail_date"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -323,10 +273,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_quantity ||
-                        "warehouses_detail_quantity"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -334,10 +281,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_detail_value ||
-                        "warehouses_detail_value"
-                    }`,
+                    title: `${dataLang?.warehouses_detail_value || "warehouses_detail_value"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -351,36 +295,22 @@ const Index = (props) => {
                 { value: `${e.item_code ? e.item_code : ""}` },
                 { value: `${e.item_name ? e.item_name : ""}` },
                 {
+                    value: `${e?.detail.location_name ? e?.detail.location_name : ""}`,
+                },
+                {
+                    value: `${e?.detail.option_name_1 ? e?.detail.option_name_1 : ""}`,
+                },
+                {
+                    value: `${e?.detail.option_name_2 ? e?.detail.option_name_2 : ""}`,
+                },
+                {
                     value: `${
-                        e?.detail.location_name ? e?.detail.location_name : ""
+                        dataProductSerial.is_enable === "1" ? (e?.detail.serial != null ? e?.detail.serial : "") : ""
                     }`,
                 },
                 {
                     value: `${
-                        e?.detail.option_name_1 ? e?.detail.option_name_1 : ""
-                    }`,
-                },
-                {
-                    value: `${
-                        e?.detail.option_name_2 ? e?.detail.option_name_2 : ""
-                    }`,
-                },
-                {
-                    value: `${
-                        dataProductSerial.is_enable === "1"
-                            ? e?.detail.serial != null
-                                ? e?.detail.serial
-                                : ""
-                            : ""
-                    }`,
-                },
-                {
-                    value: `${
-                        dataMaterialExpiry.is_enable === "1"
-                            ? e?.detail.lot != null
-                                ? e?.detail.lot
-                                : ""
-                            : ""
+                        dataMaterialExpiry.is_enable === "1" ? (e?.detail.lot != null ? e?.detail.lot : "") : ""
                     }`,
                 },
                 {
@@ -398,14 +328,10 @@ const Index = (props) => {
                     }`,
                 },
                 {
-                    value: `${
-                        e?.detail.quantity != null ? e?.detail.quantity : ""
-                    }`,
+                    value: `${e?.detail.quantity != null ? e?.detail.quantity : ""}`,
                 },
                 {
-                    value: `${
-                        e?.detail.amount != null ? e?.detail.amount : ""
-                    }`,
+                    value: `${e?.detail.amount != null ? e?.detail.amount : ""}`,
                 },
             ]),
         },
@@ -419,7 +345,7 @@ const Index = (props) => {
     const _HandleFresh = () => {
         sOnFetching(true);
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>
@@ -431,9 +357,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.warehouses_localtion_ware}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.warehouses_localtion_ware}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.warehouses_detail_title}</h6>
                     </div>
@@ -444,9 +368,7 @@ const Index = (props) => {
                             <div className="flex justify-between">
                                 <div className="flex items-center gap-2 ">
                                     <House2 size="32" color="#0F4F9E" />
-                                    <h2 className="text-2xl text-[#52575E]">
-                                        {title}
-                                    </h2>
+                                    <h2 className="text-2xl text-[#52575E]">{title}</h2>
                                 </div>
                                 <div className="flex justify-end items-center">
                                     <button
@@ -472,12 +394,8 @@ const Index = (props) => {
                                                     <input
                                                         className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                                         type="text"
-                                                        onChange={_HandleOnChangeKeySearch.bind(
-                                                            this
-                                                        )}
-                                                        placeholder={
-                                                            dataLang?.branch_search
-                                                        }
+                                                        onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                        placeholder={dataLang?.branch_search}
                                                     />
                                                 </form>
                                             </div>
@@ -495,10 +413,7 @@ const Index = (props) => {
                                                         },
                                                         ...location,
                                                     ]}
-                                                    onChange={onchang_filter.bind(
-                                                        this,
-                                                        "location"
-                                                    )}
+                                                    onChange={onchang_filter.bind(this, "location")}
                                                     value={idLocation}
                                                     hideSelectedOptions={false}
                                                     isClearable={true}
@@ -508,9 +423,7 @@ const Index = (props) => {
                                                     }
                                                     className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                     isSearchable={true}
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
                                                     components={{ MultiValue }}
                                                     // closeMenuOnSelect={false}
                                                     style={{
@@ -522,31 +435,23 @@ const Index = (props) => {
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
-                                                        control: (
-                                                            base,
-                                                            state
-                                                        ) => ({
+                                                        control: (base, state) => ({
                                                             ...base,
                                                             border: "none",
                                                             outline: "none",
                                                             boxShadow: "none",
                                                             ...(state.isFocused && {
-                                                                boxShadow:
-                                                                    "0 0 0 1.5px #0F4F9E",
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
                                                             }),
                                                         }),
                                                     }}
@@ -566,10 +471,7 @@ const Index = (props) => {
                                                         },
                                                         ...variant,
                                                     ]}
-                                                    onChange={onchang_filter.bind(
-                                                        this,
-                                                        "MainVariation"
-                                                    )}
+                                                    onChange={onchang_filter.bind(this, "MainVariation")}
                                                     value={idVariantMain}
                                                     hideSelectedOptions={false}
                                                     isClearable={true}
@@ -579,9 +481,7 @@ const Index = (props) => {
                                                     }
                                                     className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                     isSearchable={true}
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
                                                     components={{ MultiValue }}
                                                     // closeMenuOnSelect={false}
                                                     style={{
@@ -593,31 +493,23 @@ const Index = (props) => {
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
-                                                        control: (
-                                                            base,
-                                                            state
-                                                        ) => ({
+                                                        control: (base, state) => ({
                                                             ...base,
                                                             border: "none",
                                                             outline: "none",
                                                             boxShadow: "none",
                                                             ...(state.isFocused && {
-                                                                boxShadow:
-                                                                    "0 0 0 1.5px #0F4F9E",
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
                                                             }),
                                                         }),
                                                     }}
@@ -637,10 +529,7 @@ const Index = (props) => {
                                                         },
                                                         ...variant,
                                                     ]}
-                                                    onChange={onchang_filter.bind(
-                                                        this,
-                                                        "SubVariation"
-                                                    )}
+                                                    onChange={onchang_filter.bind(this, "SubVariation")}
                                                     value={idVariantSub}
                                                     hideSelectedOptions={false}
                                                     isClearable={true}
@@ -650,9 +539,7 @@ const Index = (props) => {
                                                     }
                                                     className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                     isSearchable={true}
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
                                                     components={{ MultiValue }}
                                                     closeMenuOnSelect={false}
                                                     style={{
@@ -664,31 +551,23 @@ const Index = (props) => {
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
-                                                        control: (
-                                                            base,
-                                                            state
-                                                        ) => ({
+                                                        control: (base, state) => ({
                                                             ...base,
                                                             border: "none",
                                                             outline: "none",
                                                             boxShadow: "none",
                                                             ...(state.isFocused && {
-                                                                boxShadow:
-                                                                    "0 0 0 1.5px #0F4F9E",
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
                                                             }),
                                                         }),
                                                     }}
@@ -697,9 +576,7 @@ const Index = (props) => {
                                         </div>
                                         <div className="flex space-x-2 items-center justify-end col-span-2">
                                             <button
-                                                onClick={_HandleFresh.bind(
-                                                    this
-                                                )}
+                                                onClick={_HandleFresh.bind(this)}
                                                 type="button"
                                                 className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                             >
@@ -715,14 +592,8 @@ const Index = (props) => {
                                                     title="Ctkh"
                                                     element={
                                                         <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                            <IconExcel
-                                                                size={18}
-                                                            />
-                                                            <span>
-                                                                {
-                                                                    dataLang?.client_list_exportexcel
-                                                                }
-                                                            </span>
+                                                            <IconExcel size={18} />
+                                                            <span>{dataLang?.client_list_exportexcel}</span>
                                                         </button>
                                                     }
                                                 >
@@ -733,31 +604,20 @@ const Index = (props) => {
                                                     />
                                                 </ExcelFile>
                                             )}
-                                            <label className="font-[300] text-slate-400">
-                                                {dataLang?.display}
-                                            </label>
+                                            <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                                             <select
                                                 className="outline-none"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
+                                                onChange={(e) => sLimit(e.target.value)}
                                                 value={limit}
                                             >
-                                                <option
-                                                    disabled
-                                                    className="hidden"
-                                                >
-                                                    {limit == -1
-                                                        ? "Tất cả"
-                                                        : limit}
+                                                <option disabled className="hidden">
+                                                    {limit == -1 ? "Tất cả" : limit}
                                                 </option>
                                                 <option value={15}>15</option>
                                                 <option value={20}>20</option>
                                                 <option value={40}>40</option>
                                                 <option value={60}>60</option>
-                                                <option value={-1}>
-                                                    Tất cả
-                                                </option>
+                                                <option value={-1}>Tất cả</option>
                                             </select>
                                         </div>
                                     </div>
@@ -766,107 +626,84 @@ const Index = (props) => {
                                     <div className={`2xl:w-[100%] pr-2`}>
                                         <div
                                             className={`${
-                                                dataProductSerial.is_enable ==
-                                                "1"
-                                                    ? dataMaterialExpiry.is_enable !=
-                                                      dataProductExpiry.is_enable
+                                                dataProductSerial.is_enable == "1"
+                                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                                         ? "grid-cols-12"
-                                                        : dataMaterialExpiry.is_enable ==
-                                                          "1"
+                                                        : dataMaterialExpiry.is_enable == "1"
                                                         ? "grid-cols-12"
                                                         : "grid-cols-10"
-                                                    : dataMaterialExpiry.is_enable !=
-                                                      dataProductExpiry.is_enable
+                                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                                     ? "grid-cols-11"
-                                                    : dataMaterialExpiry.is_enable ==
-                                                      "1"
+                                                    : dataMaterialExpiry.is_enable == "1"
                                                     ? "grid-cols-11"
                                                     : "grid-cols-9"
                                             }  grid sticky top-0 bg-white shadow-lg p-2 divide-x  z-10`}
                                         >
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_img ||
-                                                    "warehouses_detail_img"}
+                                                {dataLang?.warehouses_detail_img || "warehouses_detail_img"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_type ||
-                                                    "warehouses_detail_type"}
+                                                {dataLang?.warehouses_detail_type || "warehouses_detail_type"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_plu ||
-                                                    "warehouses_detail_plu"}
+                                                {dataLang?.warehouses_detail_plu || "warehouses_detail_plu"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
                                                 {dataLang?.warehouses_detail_productname ||
                                                     "warehouses_detail_productname"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_wareLoca ||
-                                                    "warehouses_detail_wareLoca"}
+                                                {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_mainVar ||
-                                                    "warehouses_detail_mainVar"}
+                                                {dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_subVar ||
-                                                    "warehouses_detail_subVar"}
+                                                {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
                                             </h4>
-                                            {dataProductSerial.is_enable ===
-                                                "1" && (
+                                            {dataProductSerial.is_enable === "1" && (
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
                                                     {"Serial"}
                                                 </h4>
                                             )}
-                                            {dataMaterialExpiry.is_enable ===
-                                                "1" ||
-                                            dataProductExpiry.is_enable ===
-                                                "1" ? (
+                                            {dataMaterialExpiry.is_enable === "1" ||
+                                            dataProductExpiry.is_enable === "1" ? (
                                                 <>
                                                     <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
                                                         {"Lot"}
                                                     </h4>
                                                     <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                        {dataLang?.warehouses_detail_date ||
-                                                            "warehouses_detail_date"}
+                                                        {dataLang?.warehouses_detail_date || "warehouses_detail_date"}
                                                     </h4>
                                                 </>
                                             ) : (
                                                 ""
                                             )}
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_quantity ||
-                                                    "warehouses_detail_quantity"}
+                                                {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
-                                                {dataLang?.warehouses_detail_value ||
-                                                    "warehouses_detail_value"}
+                                                {dataLang?.warehouses_detail_value || "warehouses_detail_value"}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
                                                 {data?.map((e) => (
                                                     <div
                                                         className={`${
-                                                            dataProductSerial.is_enable ==
-                                                            "1"
+                                                            dataProductSerial.is_enable == "1"
                                                                 ? dataMaterialExpiry.is_enable !=
                                                                   dataProductExpiry.is_enable
                                                                     ? "grid-cols-12"
-                                                                    : dataMaterialExpiry.is_enable ==
-                                                                      "1"
+                                                                    : dataMaterialExpiry.is_enable == "1"
                                                                     ? "grid-cols-12"
                                                                     : "grid-cols-10"
                                                                 : dataMaterialExpiry.is_enable !=
                                                                   dataProductExpiry.is_enable
                                                                 ? "grid-cols-11"
-                                                                : dataMaterialExpiry.is_enable ==
-                                                                  "1"
+                                                                : dataMaterialExpiry.is_enable == "1"
                                                                 ? "grid-cols-11"
                                                                 : "grid-cols-9"
                                                         }  grid hover:bg-slate-50`}
@@ -875,8 +712,7 @@ const Index = (props) => {
                                                             className={`${""}col-span-1 border-l  flex justify-center items-center border-r  border-b`}
                                                         >
                                                             <h6 className="xl:text-base text-xs w-[full]  ">
-                                                                {e?.image ==
-                                                                null ? (
+                                                                {e?.image == null ? (
                                                                     <ModalImage
                                                                         small="/no_image.png"
                                                                         large="/no_image.png"
@@ -885,12 +721,8 @@ const Index = (props) => {
                                                                 ) : (
                                                                     <>
                                                                         <ModalImage
-                                                                            small={
-                                                                                e?.image
-                                                                            }
-                                                                            large={
-                                                                                e?.image
-                                                                            }
+                                                                            small={e?.image}
+                                                                            large={e?.image}
                                                                             className="w-[40px] h-[40px]  rounded-[100%] object-cover"
                                                                         />
                                                                     </>
@@ -901,170 +733,130 @@ const Index = (props) => {
                                                             <h6 className=" 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] py-3  w-fit text-left ">
                                                                 <span
                                                                     className={`${
-                                                                        e.item_type ==
-                                                                        "product"
+                                                                        e.item_type == "product"
                                                                             ? "text-lime-500  border-lime-500 "
                                                                             : " text-orange-500 border-orange-500"
                                                                     } border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px]`}
                                                                 >
-                                                                    {e.item_type
-                                                                        ? dataLang[
-                                                                              e
-                                                                                  ?.item_type
-                                                                          ]
-                                                                        : ""}
+                                                                    {e.item_type ? dataLang[e?.item_type] : ""}
                                                                 </span>
                                                             </h6>
                                                         </div>
                                                         <div className=" col-span-1 border-r  border-b flex  items-center">
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                {e.item_code ==
-                                                                null
-                                                                    ? "-"
-                                                                    : e.item_code}
+                                                                {e.item_code == null ? "-" : e.item_code}
                                                             </h6>
                                                         </div>
                                                         <div className=" col-span-1   border-b flex  items-center">
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                {e.item_name ==
-                                                                null
-                                                                    ? "-"
-                                                                    : e.item_name}
+                                                                {e.item_name == null ? "-" : e.item_name}
                                                             </h6>
                                                         </div>
                                                         <div
                                                             className={`border-l border-r grid ${
-                                                                dataProductSerial.is_enable ==
-                                                                "1"
+                                                                dataProductSerial.is_enable == "1"
                                                                     ? dataMaterialExpiry.is_enable !=
                                                                       dataProductExpiry.is_enable
                                                                         ? "col-span-8"
-                                                                        : dataMaterialExpiry.is_enable ==
-                                                                          "1"
+                                                                        : dataMaterialExpiry.is_enable == "1"
                                                                         ? "col-span-8"
                                                                         : "col-span-6"
                                                                     : dataMaterialExpiry.is_enable !=
                                                                       dataProductExpiry.is_enable
                                                                     ? "col-span-7"
-                                                                    : dataMaterialExpiry.is_enable ==
-                                                                      "1"
+                                                                    : dataMaterialExpiry.is_enable == "1"
                                                                     ? "col-span-7"
                                                                     : "col-span-5"
                                                             }`}
                                                         >
-                                                            {e?.detail.map(
-                                                                (e) => (
-                                                                    <div
-                                                                        className={`grid ${
-                                                                            dataProductSerial.is_enable ==
-                                                                            "1"
-                                                                                ? dataMaterialExpiry.is_enable !=
-                                                                                  dataProductExpiry.is_enable
-                                                                                    ? "grid-cols-8"
-                                                                                    : dataMaterialExpiry.is_enable ==
-                                                                                      "1"
-                                                                                    ? "grid-cols-8"
-                                                                                    : "grid-cols-6"
-                                                                                : dataMaterialExpiry.is_enable !=
-                                                                                  dataProductExpiry.is_enable
-                                                                                ? "grid-cols-7"
-                                                                                : dataMaterialExpiry.is_enable ==
-                                                                                  "1"
-                                                                                ? "grid-cols-7"
-                                                                                : " grid-cols-5"
-                                                                        }`}
-                                                                    >
-                                                                        <div className="col-span-1 border-r border-b">
+                                                            {e?.detail.map((e) => (
+                                                                <div
+                                                                    className={`grid ${
+                                                                        dataProductSerial.is_enable == "1"
+                                                                            ? dataMaterialExpiry.is_enable !=
+                                                                              dataProductExpiry.is_enable
+                                                                                ? "grid-cols-8"
+                                                                                : dataMaterialExpiry.is_enable == "1"
+                                                                                ? "grid-cols-8"
+                                                                                : "grid-cols-6"
+                                                                            : dataMaterialExpiry.is_enable !=
+                                                                              dataProductExpiry.is_enable
+                                                                            ? "grid-cols-7"
+                                                                            : dataMaterialExpiry.is_enable == "1"
+                                                                            ? "grid-cols-7"
+                                                                            : " grid-cols-5"
+                                                                    }`}
+                                                                >
+                                                                    <div className="col-span-1 border-r border-b">
+                                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
+                                                                            {" "}
+                                                                            {e.location_name == null
+                                                                                ? "-"
+                                                                                : e.location_name}
+                                                                        </h6>
+                                                                    </div>
+                                                                    <div className=" col-span-1 border-r border-b">
+                                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
+                                                                            {e.option_name_1 == null
+                                                                                ? "-"
+                                                                                : e.option_name_1}
+                                                                        </h6>
+                                                                    </div>
+                                                                    <div className=" col-span-1 border-r border-b">
+                                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
+                                                                            {e.option_name_2 == null
+                                                                                ? "-"
+                                                                                : e.option_name_2}
+                                                                        </h6>
+                                                                    </div>
+                                                                    {dataProductSerial.is_enable === "1" ? (
+                                                                        <div className=" col-span-1 border-r border-b">
                                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                                {" "}
-                                                                                {e.location_name ==
-                                                                                null
+                                                                                {e.serial == null || e.serial == ""
                                                                                     ? "-"
-                                                                                    : e.location_name}
+                                                                                    : e.serial}
                                                                             </h6>
                                                                         </div>
-                                                                        <div className=" col-span-1 border-r border-b">
-                                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
-                                                                                {e.option_name_1 ==
-                                                                                null
-                                                                                    ? "-"
-                                                                                    : e.option_name_1}
-                                                                            </h6>
-                                                                        </div>
-                                                                        <div className=" col-span-1 border-r border-b">
-                                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
-                                                                                {e.option_name_2 ==
-                                                                                null
-                                                                                    ? "-"
-                                                                                    : e.option_name_2}
-                                                                            </h6>
-                                                                        </div>
-                                                                        {dataProductSerial.is_enable ===
-                                                                        "1" ? (
-                                                                            <div className=" col-span-1 border-r border-b">
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
+                                                                    {dataMaterialExpiry.is_enable === "1" ||
+                                                                    dataProductExpiry.is_enable === "1" ? (
+                                                                        <>
+                                                                            <div className=" col-span-1 border-r border-b ">
                                                                                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                                    {e.serial ==
-                                                                                        null ||
-                                                                                    e.serial ==
-                                                                                        ""
+                                                                                    {e.lot == null || e.lot == ""
                                                                                         ? "-"
-                                                                                        : e.serial}
+                                                                                        : e.lot}
                                                                                 </h6>
                                                                             </div>
-                                                                        ) : (
-                                                                            ""
-                                                                        )}
-                                                                        {dataMaterialExpiry.is_enable ===
-                                                                            "1" ||
-                                                                        dataProductExpiry.is_enable ===
-                                                                            "1" ? (
-                                                                            <>
-                                                                                <div className=" col-span-1 border-r border-b ">
-                                                                                    <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                                        {e.lot ==
-                                                                                            null ||
-                                                                                        e.lot ==
-                                                                                            ""
-                                                                                            ? "-"
-                                                                                            : e.lot}
-                                                                                    </h6>
-                                                                                </div>
-                                                                                <div className=" col-span-1 border-r border-b ">
-                                                                                    <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
-                                                                                        {e.expiration_date
-                                                                                            ? moment(
-                                                                                                  e.expiration_date
-                                                                                              ).format(
-                                                                                                  "DD/MM/YYYY"
-                                                                                              )
-                                                                                            : "-"}
-                                                                                    </h6>
-                                                                                </div>
-                                                                            </>
-                                                                        ) : (
-                                                                            ""
-                                                                        )}
-                                                                        <div className=" col-span-1 border-r border-b ">
-                                                                            <h6 className="xl:text-base text-sm  px-2 py-3  w-[full] text-red-500 font-medium text-center ">
-                                                                                {e.quantity
-                                                                                    ? formatNumber(
-                                                                                          e?.quantity
-                                                                                      )
-                                                                                    : "-"}
-                                                                            </h6>
-                                                                        </div>
-                                                                        <div className=" col-span-1 border-b">
-                                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-right ">
-                                                                                {e.amount
-                                                                                    ? formatNumber(
-                                                                                          e?.amount
-                                                                                      )
-                                                                                    : "-"}
-                                                                            </h6>
-                                                                        </div>
+                                                                            <div className=" col-span-1 border-r border-b ">
+                                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
+                                                                                    {e.expiration_date
+                                                                                        ? moment(
+                                                                                              e.expiration_date
+                                                                                          ).format("DD/MM/YYYY")
+                                                                                        : "-"}
+                                                                                </h6>
+                                                                            </div>
+                                                                        </>
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
+                                                                    <div className=" col-span-1 border-r border-b ">
+                                                                        <h6 className="xl:text-base text-sm  px-2 py-3  w-[full] text-red-500 font-medium text-center ">
+                                                                            {e.quantity
+                                                                                ? formatNumber(e?.quantity)
+                                                                                : "-"}
+                                                                        </h6>
                                                                     </div>
-                                                                )
-                                                            )}
+                                                                    <div className=" col-span-1 border-b">
+                                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-right ">
+                                                                            {e.amount ? formatNumber(e?.amount) : "-"}
+                                                                        </h6>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
                                                 ))}
@@ -1089,16 +881,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItem?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among} {totalItem?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItem?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />

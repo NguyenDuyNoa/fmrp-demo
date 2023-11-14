@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { v4 as uuid } from "uuid";
 import Popup from "reactjs-popup";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 
 const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending, timeLine, handleToggle }) => {
     const header = [
@@ -36,7 +36,7 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                     <div className="flex items-center  gap-2  px-1 ">
                         <div onClick={() => handleSort()} className="flex-col flex gap-1 cursor-pointer w-[2%]">
                             <Image
-                                alt=""
+                                alt={!isAscending ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
                                 width={7}
                                 height={4}
                                 src={!isAscending ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
@@ -45,7 +45,7 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                 } object-cover hover:scale-110 transition-all ease-linear duration-200`}
                             />
                             <Image
-                                alt=""
+                                alt={isAscending ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
                                 width={7}
                                 height={4}
                                 src={isAscending ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
@@ -104,24 +104,24 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                     ref={container3Ref}
                     onScroll={handleScrollContainer2}
                     className="flex-col min-w-[35%] w-[35%] overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
-                        3xl:h-[65.2vh] xxl:h-[51vh] 2xl:h-[57.5vh] xl:h-[53vh] lg:h-[51vh] h-[55vh]"
+                        3xl:h-[61.5vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                 >
                     {data.map((e, eIndex) => {
                         const outDate = ["outDate"].includes(e.status);
                         const processing = ["processing"].includes(e.status);
                         const sussces = ["sussces"].includes(e.status);
+                        const unfulfilled = ["unfulfilled"].includes(e.status);
                         return (
                             <React.Fragment>
-                                <div className={`w-full`}>
+                                <div key={e.id} className={`w-full`}>
                                     <div className={`${!e.show ? "my-1" : "mt-1"}`}>
                                         <div
                                             onClick={() => handleShowSub(eIndex)}
                                             type="button"
-                                            key={e.id}
                                             className="flex w-full  cursor-pointer items-center group gap-2 py-2 bg-[#F3F4F6] rounded  px-1"
                                         >
                                             <Image
-                                                alt=""
+                                                alt="sub"
                                                 width={7}
                                                 height={4}
                                                 src={"/productionPlan/Shapedow.png"}
@@ -134,7 +134,8 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                                     className={`text-[#52575E] ${
                                                         (outDate && "group-hover:text-[#EE1E1E]") ||
                                                         (processing && "group-hover:text-[#3276FA]") ||
-                                                        (sussces && "group-hover:text-[#0BAA2E]")
+                                                        (sussces && "group-hover:text-[#0BAA2E]") ||
+                                                        (unfulfilled && "group-hover:text-[#FF8F0D]")
                                                     } 3xl:text-sm  transition-all ease-in-out xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-semibold col-span-3`}
                                                 >
                                                     {e.nameOrder}
@@ -144,12 +145,14 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                                         className={`${
                                                             (outDate && "text-[#EE1E1E]") ||
                                                             (processing && "text-[#3276FA]") ||
-                                                            (sussces && "text-[#0BAA2E]")
+                                                            (sussces && "text-[#0BAA2E]") ||
+                                                            (unfulfilled && "text-[#FF8F0D]")
                                                         }  3xl:text-[13px] whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] font-medium`}
                                                     >
                                                         {(outDate && "Đã quá hạn") ||
                                                             (processing && "Đang thực hiện") ||
-                                                            (sussces && "Hoàn thành")}
+                                                            (sussces && "Hoàn thành") ||
+                                                            (unfulfilled && "Chưa thực hiện")}
                                                     </h2>
                                                     <h3
                                                         className={`${
@@ -157,7 +160,10 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                                                 "text-[#EE1E1E] border-[#EE1E1E] bg-[#FFEEF0]") ||
                                                             (processing &&
                                                                 "text-[#3276FA] border-[#3276FA] bg-[#EBF5FF]") ||
-                                                            (sussces && "text-[#0BAA2E] border-[#0BAA2E] bg-[#EBFEF2]")
+                                                            (sussces &&
+                                                                "text-[#0BAA2E] border-[#0BAA2E] bg-[#EBFEF2]") ||
+                                                            (unfulfilled &&
+                                                                "text-[#FF8F0D] border-[#FF8F0D] bg-[#fef3c7]")
                                                         } 3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal  py-0.5 px-2 rounded-lg border`}
                                                     >
                                                         {e.process}
@@ -211,7 +217,7 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                                             src={i.images}
                                                             width={36}
                                                             height={36}
-                                                            alt=""
+                                                            alt="sub-"
                                                             className="object-cover rounded-md"
                                                         />
                                                         <div className="flex flex-col">
@@ -252,11 +258,11 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                     ref={container1Ref}
                     onScroll={handleScroll}
                     className="flex-col  overflow-x  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
-                 3xl:h-[65.2vh] xxl:h-[51vh] 2xl:h-[57.5vh] xl:h-[53vh] lg:h-[51vh] h-[55vh]"
+                     3xl:h-[61.2vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                 >
                     {data.map((e, eIndex) => {
                         return (
-                            <div className="">
+                            <div key={e.id} className="">
                                 <div className={`py-2 h-[41px]`}>
                                     <div className="flex gap-1 items-center ">
                                         <p className="text-[#11315B]  3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal">
@@ -268,7 +274,7 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                                     src={"/productionPlan/tick-circle.png"}
                                                     width={36}
                                                     height={36}
-                                                    alt=""
+                                                    alt="hii"
                                                     className="object-cover w-full h-full"
                                                 />
                                             </div>
@@ -294,7 +300,7 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                 {e.show &&
                                     e.listProducts.map((i, iIndex) => {
                                         return (
-                                            <div className="flex  w-[65%] h-[35px] my-2 ">
+                                            <div key={i.id} className="flex  w-[65%] h-[35px] my-2 ">
                                                 {i.processArr.map((ce, ceIndex) => {
                                                     return ce.days.map((ci, ciIndex) => {
                                                         return (
@@ -354,7 +360,13 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
             <div className="w-full border-b flex flex-col">
                 <div className="border-b">
                     <button type="button" onClick={handleToggle} className="flex items-center gap-2 my-2">
-                        <Image src={"/productionPlan/Vector.png"} width={10} height={10} className="object-cover" />
+                        <Image
+                            alt=""
+                            src={"/productionPlan/Vector.png"}
+                            width={10}
+                            height={10}
+                            className="object-cover"
+                        />
                         <h1 className="text-[#52575E] font-normal text-sm"> Thêm sản phẩm</h1>
                     </button>
                 </div>

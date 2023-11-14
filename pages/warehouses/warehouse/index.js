@@ -30,6 +30,7 @@ import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
 import formatNumber from "components/UI/formanumber/formanumber";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -61,10 +62,7 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]":
-                        idBranch?.length > 0
-                            ? idBranch.map((e) => e.value)
-                            : null,
+                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
@@ -106,9 +104,7 @@ const Index = (props) => {
         }
     };
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = listBr_filter
-        ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value))
-        : [];
+    const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
     const paginate = (pageNumber) => {
         router.push({
@@ -127,13 +123,10 @@ const Index = (props) => {
         }, 500);
     };
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_brand());
+        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_brand());
     }, [onFetching]);
     useEffect(() => {
-        sOnFetching(true) ||
-            (keySearch && sOnFetching(true)) ||
-            (idBranch?.length > 0 && sOnFetching(true));
+        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, idBranch]);
     const handleDelete = (event) => {
         Swal.fire({
@@ -147,28 +140,23 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 const id = event;
-                Axios(
-                    "DELETE",
-                    `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang?.aler_success_delete,
-                                });
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: dataLang?.aler_success_delete,
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: dataLang[message],
+                            });
                         }
-                        _ServerFetching();
                     }
-                );
+                    _ServerFetching();
+                });
             }
         });
     };
@@ -193,10 +181,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.Warehouse_poppup_name ||
-                        "Warehouse_poppup_name"
-                    }`,
+                    title: `${dataLang?.Warehouse_poppup_name || "Warehouse_poppup_name"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -212,9 +197,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.Warehouse_inventory || "Warehouse_inventory"
-                    }`,
+                    title: `${dataLang?.Warehouse_inventory || "Warehouse_inventory"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -222,10 +205,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.Warehouse_poppup_address ||
-                        "Warehouse_poppup_address"
-                    }`,
+                    title: `${dataLang?.Warehouse_poppup_address || "Warehouse_poppup_address"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -233,9 +213,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.client_popup_note || "client_popup_note"
-                    }`,
+                    title: `${dataLang?.client_popup_note || "client_popup_note"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -243,9 +221,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.Warehouse_factory || "Warehouse_factory"
-                    }`,
+                    title: `${dataLang?.Warehouse_factory || "Warehouse_factory"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -265,7 +241,7 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     return (
         <React.Fragment>
             <Head>
@@ -276,9 +252,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.Warehouse_title}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.Warehouse_title}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.Warehouse_title}</h6>
                     </div>
@@ -288,9 +262,7 @@ const Index = (props) => {
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
-                                <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.Warehouse_title}
-                                </h2>
+                                <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.Warehouse_title}</h2>
                                 <div className="flex justify-end items-center">
                                     <Popup_kho
                                         listBr={listBr}
@@ -306,19 +278,12 @@ const Index = (props) => {
                                     <div className="bg-slate-100 w-full rounded flex justify-between items-center  xl:p-3 p-2">
                                         <div className="flex gap-2">
                                             <form className="flex items-center relative">
-                                                <IconSearch
-                                                    size={20}
-                                                    className="absolute left-3 z-10 text-[#cccccc]"
-                                                />
+                                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                                                 <input
                                                     className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
                                                     type="text"
-                                                    onChange={_HandleOnChangeKeySearch.bind(
-                                                        this
-                                                    )}
-                                                    placeholder={
-                                                        dataLang?.branch_search
-                                                    }
+                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                    placeholder={dataLang?.branch_search}
                                                 />
                                             </form>
                                             <div className="ml-1 w-[23vw]">
@@ -333,22 +298,15 @@ const Index = (props) => {
                                                         },
                                                         ...options,
                                                     ]}
-                                                    onChange={onchang_filterBr.bind(
-                                                        this,
-                                                        "branch"
-                                                    )}
+                                                    onChange={onchang_filterBr.bind(this, "branch")}
                                                     value={idBranch}
                                                     hideSelectedOptions={false}
                                                     isMulti
                                                     isClearable={true}
-                                                    placeholder={
-                                                        dataLang?.client_list_filterbrand
-                                                    }
+                                                    placeholder={dataLang?.client_list_filterbrand}
                                                     className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
                                                     isSearchable={true}
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
                                                     components={{ MultiValue }}
                                                     closeMenuOnSelect={false}
                                                     style={{
@@ -360,31 +318,23 @@ const Index = (props) => {
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
-                                                        control: (
-                                                            base,
-                                                            state
-                                                        ) => ({
+                                                        control: (base, state) => ({
                                                             ...base,
                                                             border: "none",
                                                             outline: "none",
                                                             boxShadow: "none",
                                                             ...(state.isFocused && {
-                                                                boxShadow:
-                                                                    "0 0 0 1.5px #0F4F9E",
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
                                                             }),
                                                         }),
                                                     }}
@@ -398,14 +348,8 @@ const Index = (props) => {
                                                     title="Dsk"
                                                     element={
                                                         <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                            <IconExcel
-                                                                size={18}
-                                                            />
-                                                            <span>
-                                                                {
-                                                                    dataLang?.client_list_exportexcel
-                                                                }
-                                                            </span>
+                                                            <IconExcel size={18} />
+                                                            <span>{dataLang?.client_list_exportexcel}</span>
                                                         </button>
                                                     }
                                                 >
@@ -416,31 +360,20 @@ const Index = (props) => {
                                                     />
                                                 </ExcelFile>
                                             )}
-                                            <label className="font-[300] text-slate-400">
-                                                {dataLang?.display}
-                                            </label>
+                                            <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                                             <select
                                                 className="outline-none"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
+                                                onChange={(e) => sLimit(e.target.value)}
                                                 value={limit}
                                             >
-                                                <option
-                                                    disabled
-                                                    className="hidden"
-                                                >
-                                                    {limit == -1
-                                                        ? "Tất cả"
-                                                        : limit}
+                                                <option disabled className="hidden">
+                                                    {limit == -1 ? "Tất cả" : limit}
                                                 </option>
                                                 <option value={15}>15</option>
                                                 <option value={20}>20</option>
                                                 <option value={40}>40</option>
                                                 <option value={60}>60</option>
-                                                <option value={-1}>
-                                                    Tất cả
-                                                </option>
+                                                <option value={-1}>Tất cả</option>
                                             </select>
                                         </div>
                                     </div>
@@ -448,10 +381,7 @@ const Index = (props) => {
                                 <div className="min:h-[500px] 2xl:h-[88%] xl:h-[85%] h-[100%] max:h-[800px]] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2">
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] max:h-[1000px] h-[100%] ">
@@ -464,84 +394,51 @@ const Index = (props) => {
                                                                 <div className="">
                                                                     <div className="flex items-center justify-between gap-2 p-2">
                                                                         <div className="flex items-center gap-2 ">
-                                                                            <House2
-                                                                                size="32"
-                                                                                color="#0F4F9E"
-                                                                            />
+                                                                            <House2 size="32" color="#0F4F9E" />
                                                                             <h3 className="text-[#0F4F9E] font-medium capitalize">
-                                                                                {
-                                                                                    e?.name
-                                                                                }
+                                                                                {e?.name}
                                                                             </h3>
                                                                         </div>
                                                                         <div>
-                                                                            {e?.is_system ===
-                                                                                "1" && (
+                                                                            {e?.is_system === "1" && (
                                                                                 <h3 className="bg-[#EBFEF2] text-[#0BAA2E] rounded-lg font-normal p-1.5">
-                                                                                    {
-                                                                                        dataLang?.Warehouse_system
-                                                                                    }
+                                                                                    {dataLang?.Warehouse_system}
                                                                                 </h3>
                                                                             )}
                                                                         </div>
                                                                     </div>
                                                                     <div className="">
                                                                         <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {
-                                                                                dataLang?.Warehouse_code
-                                                                            }
-                                                                            :{" "}
+                                                                            {dataLang?.Warehouse_code}:{" "}
                                                                             <span className=" text-[#0F4F9E] font-medium capitalize">
-                                                                                {
-                                                                                    e?.code
-                                                                                }
+                                                                                {e?.code}
                                                                             </span>
                                                                         </h3>
                                                                         <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {
-                                                                                dataLang?.Warehouse_total
-                                                                            }
-                                                                            :{" "}
+                                                                            {dataLang?.Warehouse_total}:{" "}
                                                                             <span className=" text-[#0F4F9E] font-medium capitalize">
-                                                                                {formatNumber(
-                                                                                    e?.totalItems
-                                                                                )}
+                                                                                {formatNumber(e?.totalItems)}
                                                                             </span>
                                                                         </h3>
                                                                         <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {
-                                                                                dataLang?.Warehouse_inventory
-                                                                            }
-                                                                            :{" "}
+                                                                            {dataLang?.Warehouse_inventory}:{" "}
                                                                             <span className=" text-[#0F4F9E] font-medium capitalize">
-                                                                                {formatNumber(
-                                                                                    e?.totalQuantity
-                                                                                )}
+                                                                                {formatNumber(e?.totalQuantity)}
                                                                             </span>
                                                                         </h3>
                                                                         <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {
-                                                                                dataLang?.Warehouse_factory
-                                                                            }{" "}
+                                                                            {dataLang?.Warehouse_factory}{" "}
                                                                             <span className="flex flex-wrap pt-2">
-                                                                                {e?.branch?.map(
-                                                                                    (
-                                                                                        e
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <span
-                                                                                                key={
-                                                                                                    e?.id
-                                                                                                }
-                                                                                                className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px] capitalize"
-                                                                                            >
-                                                                                                {
-                                                                                                    e.name
-                                                                                                }
-                                                                                            </span>
-                                                                                        );
-                                                                                    }
-                                                                                )}
+                                                                                {e?.branch?.map((e) => {
+                                                                                    return (
+                                                                                        <span
+                                                                                            key={e?.id}
+                                                                                            className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px] capitalize"
+                                                                                        >
+                                                                                            {e.name}
+                                                                                        </span>
+                                                                                    );
+                                                                                })}
                                                                             </span>
                                                                         </h3>
                                                                     </div>
@@ -551,52 +448,31 @@ const Index = (props) => {
                                                                         href={`/warehouses/warehouse/${e?.id}`}
                                                                         className={`rounded-lg w-[80%]  p-2  cursor-pointer bg-[#e2f0fe] hover:bg-[#C7DFFB] text-center`}
                                                                     >
-                                                                        {
-                                                                            dataLang?.Warehouse_detail
-                                                                        }
+                                                                        {dataLang?.Warehouse_detail}
                                                                     </Link>
                                                                     <div>
-                                                                        {e?.is_system ===
-                                                                            "0" && (
+                                                                        {e?.is_system === "0" && (
                                                                             <div className="flex  gap-2 w-[20%]">
                                                                                 <div className="">
                                                                                     <Popup_kho
-                                                                                        listBr={
-                                                                                            listBr
-                                                                                        }
-                                                                                        sValueBr={
-                                                                                            e.branch
-                                                                                        }
+                                                                                        listBr={listBr}
+                                                                                        sValueBr={e.branch}
                                                                                         onRefresh={_ServerFetching.bind(
                                                                                             this
                                                                                         )}
                                                                                         className="xl:text-base text-xs "
-                                                                                        dataLang={
-                                                                                            dataLang
-                                                                                        }
-                                                                                        name={
-                                                                                            e.name
-                                                                                        }
-                                                                                        code={
-                                                                                            e.code
-                                                                                        }
-                                                                                        address={
-                                                                                            e.address
-                                                                                        }
-                                                                                        note={
-                                                                                            e.note
-                                                                                        }
-                                                                                        id={
-                                                                                            e?.id
-                                                                                        }
+                                                                                        dataLang={dataLang}
+                                                                                        name={e.name}
+                                                                                        code={e.code}
+                                                                                        address={e.address}
+                                                                                        note={e.note}
+                                                                                        id={e?.id}
                                                                                     />
                                                                                 </div>
                                                                                 <div>
                                                                                     <button
                                                                                         onClick={() =>
-                                                                                            handleDelete(
-                                                                                                e.id
-                                                                                            )
+                                                                                            handleDelete(e.id)
                                                                                         }
                                                                                         className="xl:text-base text-xs "
                                                                                     >
@@ -634,16 +510,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItem?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among} {totalItem?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItem?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -786,12 +658,7 @@ const Popup_kho = (props) => {
     const _HandleSubmit = (e) => {
         console.log(branch_id);
         e.preventDefault();
-        if (
-            code.length == 0 ||
-            branch_id == null ||
-            name.length == 0 ||
-            address.length == 0
-        ) {
+        if (code.length == 0 || branch_id == null || name.length == 0 || address.length == 0) {
             code?.length == 0 && sErrInputCode(true);
             name?.length == 0 && sErrInputName(true);
             address?.length == 0 && sErrInputAddress(true);
@@ -821,17 +688,9 @@ const Popup_kho = (props) => {
         <>
             <PopupEdit
                 title={
-                    props.id
-                        ? `${props.dataLang?.Warehouse_poppup_edit}`
-                        : `${props.dataLang?.Warehouse_poppup_add}`
+                    props.id ? `${props.dataLang?.Warehouse_poppup_edit}` : `${props.dataLang?.Warehouse_poppup_add}`
                 }
-                button={
-                    props.id ? (
-                        <IconEdit />
-                    ) : (
-                        `${props.dataLang?.branch_popup_create_new}`
-                    )
-                }
+                button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
@@ -850,24 +709,13 @@ const Popup_kho = (props) => {
                                     <div className="w-full">
                                         <div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.Warehouse_poppup_code
-                                                }
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.Warehouse_poppup_code}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 value={code}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "code"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.Warehouse_poppup_code
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "code")}
+                                                placeholder={props.dataLang?.Warehouse_poppup_code}
                                                 name="fname"
                                                 type="text"
                                                 className={`${
@@ -878,33 +726,19 @@ const Popup_kho = (props) => {
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.Warehouse_poppup_errcode
-                                                    }
+                                                    {props.dataLang?.Warehouse_poppup_errcode}
                                                 </label>
                                             )}
                                         </div>
                                         <div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.Warehouse_poppup_name
-                                                }
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.Warehouse_poppup_name}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 value={name}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "name"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.Warehouse_poppup_name
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "name")}
+                                                placeholder={props.dataLang?.Warehouse_poppup_name}
                                                 name="fname"
                                                 type="text"
                                                 className={`${
@@ -915,33 +749,19 @@ const Popup_kho = (props) => {
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.Warehouse_poppup_errname
-                                                    }
+                                                    {props.dataLang?.Warehouse_poppup_errname}
                                                 </label>
                                             )}
                                         </div>
                                         <div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.Warehouse_poppup_address
-                                                }
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.Warehouse_poppup_address}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 value={address}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "address"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.Warehouse_poppup_address
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "address")}
+                                                placeholder={props.dataLang?.Warehouse_poppup_address}
                                                 name="fname"
                                                 type="text"
                                                 className={`${
@@ -952,39 +772,23 @@ const Popup_kho = (props) => {
                                             />
                                             {errInputAddress && (
                                                 <label className="mb-4  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.Warehouse_poppup_erraddress
-                                                    }
+                                                    {props.dataLang?.Warehouse_poppup_erraddress}
                                                 </label>
                                             )}
                                         </div>
                                         <div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.client_list_brand
-                                                }{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.client_list_brand}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 //  closeMenuOnSelect={false}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.client_list_brand
-                                                }
+                                                placeholder={props.dataLang?.client_list_brand}
                                                 options={brandpOpt}
                                                 isSearchable={true}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "valueBr"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "valueBr")}
                                                 // isMulti
-                                                noOptionsMessage={() =>
-                                                    "Không có dữ liệu"
-                                                }
+                                                noOptionsMessage={() => "Không có dữ liệu"}
                                                 value={valueBr}
                                                 maxMenuHeight="200px"
                                                 // isClearable={true}
@@ -1016,17 +820,12 @@ const Popup_kho = (props) => {
                                                     }),
                                                 }}
                                                 className={`${
-                                                    errInputBr
-                                                        ? "border-red-500"
-                                                        : "border-transparent"
+                                                    errInputBr ? "border-red-500" : "border-transparent"
                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             />
                                             {errInputBr && (
                                                 <label className="mb-2  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.client_list_bran
-                                                    }
+                                                    {props.dataLang?.client_list_bran}
                                                 </label>
                                             )}
                                         </div>
@@ -1036,13 +835,8 @@ const Popup_kho = (props) => {
                                     </label>
                                     <textarea
                                         value={note}
-                                        placeholder={
-                                            props.dataLang?.client_popup_note
-                                        }
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "note"
-                                        )}
+                                        placeholder={props.dataLang?.client_popup_note}
+                                        onChange={_HandleChangeInput.bind(this, "note")}
                                         name="fname"
                                         type="text"
                                         className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[80px] max-h-[150px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"

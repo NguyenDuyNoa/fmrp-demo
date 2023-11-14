@@ -21,6 +21,7 @@ import { NumericFormat } from "react-number-format";
 import BtnParent from "./(children)/(btnParent)/btnParent";
 import Progress from "./(children)/(progress)/progress";
 import moment from "moment";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -34,7 +35,7 @@ const Index = (props) => {
         materials: [],
         products: [],
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const scrollAreaRef = useRef(null);
 

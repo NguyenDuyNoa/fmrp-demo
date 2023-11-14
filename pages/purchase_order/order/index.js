@@ -52,6 +52,7 @@ import Popup_TableValidateEdit from "./(popup)/validateEdit";
 import Popup_TableValidateDelete from "./(popup)/validateDelete";
 import { useSelector } from "react-redux";
 import { routerOrder } from "components/UI/router/buyImportGoods";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -433,7 +434,7 @@ const Index = (props) => {
         },
     ];
     const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired =useStatusExprired()
 
     return (
         <React.Fragment>

@@ -8,6 +8,7 @@ import React, { useState, useEffect } from "react";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import { useMemo } from "react";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Table = dynamic(() => import("./(form)/table"), { ssr: false });
 const InFo = dynamic(() => import("./(form)/info"), { ssr: false });
@@ -24,7 +25,7 @@ const FormAdd = (props) => {
 
     const [isCheckRemove, sIsCheckRemove] = useState(false);
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const getLocalStorage = () => (localStorage.getItem("arrData") ? JSON.parse(localStorage.getItem("arrData")) : []);
 
@@ -33,7 +34,8 @@ const FormAdd = (props) => {
     const initialValue = {
         idBrach: null,
         date: new Date(),
-        actions: false,
+        internalPlan: false,
+        order: false,
         idOrder: null,
         startDate: null,
         endDate: null,
@@ -139,7 +141,7 @@ const FormAdd = (props) => {
     const handleChange = () => {};
 
     const shareProps = { data, isLoading, handleRemoveBtn, handleRemoveItem, isValue, onChangeValue };
-    console.log("tess");
+    console.log(isValue);
     return (
         <>
             <Head>

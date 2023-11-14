@@ -11,18 +11,14 @@ import DatePicker from "react-datepicker";
 
 import Select, { components } from "react-select";
 
-import {
-    Add,
-    Trash as IconDelete,
-    Image as IconImage,
-    Minus,
-} from "iconsax-react";
+import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import Link from "next/link";
 import moment from "moment/moment";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -42,8 +38,7 @@ const Index = (props) => {
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
-    const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] =
-        useState(false);
+    const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] = useState(false);
 
     const [onLoading, sOnLoading] = useState(false);
     const [onLoadingChild, sOnLoadingChild] = useState(false);
@@ -83,24 +78,17 @@ const Index = (props) => {
         router.query && sStartDate(new Date());
         router.query && sNote("");
     }, [router.query]);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const _ServerFetching = () => {
         sOnLoading(true);
-        Axios(
-            "GET",
-            "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { result } = response.data;
-                    sDataBranch(
-                        result?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                    sOnLoading(false);
-                }
+        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { result } = response.data;
+                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+                sOnLoading(false);
             }
-        );
+        });
         sOnFetching(false);
     };
 
@@ -109,26 +97,15 @@ const Index = (props) => {
     }, [onFetching]);
 
     const _ServerFetchingCondition = () => {
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
-                sOnFetchingCondition(false);
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-        );
+            sOnFetchingCondition(false);
+        });
     };
 
     useEffect(() => {
@@ -188,13 +165,8 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${
-                                    e.item?.name
-                                } <span style={{display: none}}>${
-                                    e.item?.code +
-                                    e.item?.product_variation +
-                                    e.item?.text_type +
-                                    e.item?.unit_name
+                                label: `${e.item?.name} <span style={{display: none}}>${
+                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
                                 }</span>`,
                                 value: e.item?.id,
                             },
@@ -202,44 +174,25 @@ const Index = (props) => {
                                 idChildBackEnd: Number(ce?.id),
                                 id: Number(ce?.id),
                                 disabledDate:
-                                    (ce?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "1" &&
-                                        false) ||
-                                    (ce?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "0" &&
-                                        true) ||
-                                    (ce?.text_type == "products" &&
-                                        dataProductExpiry?.is_enable == "1" &&
-                                        false) ||
-                                    (ce?.text_type == "products" &&
-                                        dataProductExpiry?.is_enable == "0" &&
-                                        true),
+                                    (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                                    (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                                    (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                                    (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                                 location:
                                     ce?.warehouse_location?.location_name ||
                                     ce?.warehouse_location?.id ||
                                     ce?.warehouse_location?.warehouse_name ||
                                     ce?.warehouse_location?.quantity
                                         ? {
-                                              label:
-                                                  ce?.warehouse_location
-                                                      ?.location_name || null,
-                                              value:
-                                                  ce?.warehouse_location?.id ||
-                                                  null,
-                                              warehouse_name:
-                                                  ce?.warehouse_location
-                                                      ?.warehouse_name || null,
-                                              qty:
-                                                  +ce?.warehouse_location
-                                                      ?.quantity || null,
+                                              label: ce?.warehouse_location?.location_name || null,
+                                              value: ce?.warehouse_location?.id || null,
+                                              warehouse_name: ce?.warehouse_location?.warehouse_name || null,
+                                              qty: +ce?.warehouse_location?.quantity || null,
                                           }
                                         : null,
                                 serial: ce?.serial == null ? "" : ce?.serial,
                                 lot: ce?.lot == null ? "" : ce?.lot,
-                                date:
-                                    ce?.expiration_date != null
-                                        ? moment(ce?.expiration_date).toDate()
-                                        : null,
+                                date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
                                 unit: {
                                     label: ce?.unit_data.unit,
                                     value: ce?.unit_data.id,
@@ -293,9 +246,7 @@ const Index = (props) => {
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse
-                        ? idExportWarehouse?.value
-                        : null,
+                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
                 },
             },
             (err, response) => {
@@ -314,9 +265,7 @@ const Index = (props) => {
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse
-                        ? idExportWarehouse?.value
-                        : null,
+                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
                 },
             },
             (err, response) => {
@@ -375,9 +324,7 @@ const Index = (props) => {
                     `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
                     {
                         params: {
-                            "filter[branch_id]": idBranch
-                                ? idBranch?.value
-                                : null,
+                            "filter[branch_id]": idBranch ? idBranch?.value : null,
                         },
 
                         data: {
@@ -405,10 +352,7 @@ const Index = (props) => {
             if (listData?.length > 0) {
                 if (type === "branch" && idBranch != value) {
                     Swal.fire({
-                        title: `${
-                            dataLang?.returns_err_DeleteItem ||
-                            "returns_err_DeleteItem"
-                        }`,
+                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#296dc1",
@@ -435,10 +379,7 @@ const Index = (props) => {
             if (listData?.length > 0) {
                 if (type === "idExportWarehouse" && idBranch != value) {
                     Swal.fire({
-                        title: `${
-                            dataLang?.returns_err_DeleteItem ||
-                            "returns_err_DeleteItem"
-                        }`,
+                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#296dc1",
@@ -474,12 +415,8 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const hasNullKho = listData.some((item) =>
-            item.child?.some((childItem) => childItem.location === null)
-        );
-        const hasNullUnit = listData.some((item) =>
-            item.child?.some((childItem) => childItem.unit === null)
-        );
+        const hasNullKho = listData.some((item) => item.child?.some((childItem) => childItem.location === null));
+        const hasNullUnit = listData.some((item) => item.child?.some((childItem) => childItem.unit === null));
         const hasNullQty = listData.some((item) =>
             item.child?.some(
                 (childItem) =>
@@ -489,14 +426,7 @@ const Index = (props) => {
             )
         );
         const isEmpty = listData?.length === 0 ? true : false;
-        if (
-            idBranch == null ||
-            hasNullKho ||
-            hasNullUnit ||
-            hasNullQty ||
-            isEmpty ||
-            idExportWarehouse == null
-        ) {
+        if (idBranch == null || hasNullKho || hasNullUnit || hasNullQty || isEmpty || idExportWarehouse == null) {
             idBranch == null && sErrBranch(true);
             idExportWarehouse == null && sErrExportWarehouse(true);
             hasNullKho && sErrWarehouse(true);
@@ -558,40 +488,22 @@ const Index = (props) => {
     const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
-        formData.append(
-            "date",
-            moment(startDate).format("YYYY-MM-DD HH:mm:ss")
-        );
+        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
         formData.append("branch_id", idBranch?.value);
         formData.append("warehouse_id", idExportWarehouse?.value);
         formData.append("note", note);
         listData.forEach((item, index) => {
-            formData.append(
-                `items[${index}][id]`,
-                id ? item?.idParenBackend : ""
-            );
+            formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
             formData.append(`items[${index}][item]`, item?.matHang?.value);
             item?.child?.forEach((childItem, childIndex) => {
-                formData.append(
-                    `items[${index}][child][${childIndex}][row_id]`,
-                    id ? childItem?.idChildBackEnd : ""
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][unit]`,
-                    childItem?.unit?.value
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][note]`,
-                    childItem?.note ? childItem?.note : ""
-                );
+                formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
+                formData.append(`items[${index}][child][${childIndex}][unit]`, childItem?.unit?.value);
+                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
                     childItem?.location?.value || 0
                 );
-                formData.append(
-                    `items[${index}][child][${childIndex}][quantity]`,
-                    childItem?.exportQuantity
-                );
+                formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.exportQuantity);
             });
         });
         Axios(
@@ -623,18 +535,10 @@ const Index = (props) => {
                         sErrDate(false);
                         //new
                         sListData([]);
-                        router.push(
-                            "/manufacture/production_warehouse?tab=all"
-                        );
+                        router.push("/manufacture/production_warehouse?tab=all");
                     } else {
                         handleCheckError(
-                            `${dataLang[message]} ${
-                                item !== undefined &&
-                                item !== null &&
-                                item !== ""
-                                    ? item
-                                    : ""
-                            }`
+                            `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
                         );
                     }
                 }
@@ -655,18 +559,10 @@ const Index = (props) => {
                 const newChild = {
                     id: uuidv4(),
                     disabledDate:
-                        (value?.e?.text_type === "material" &&
-                            dataMaterialExpiry?.is_enable === "1" &&
-                            false) ||
-                        (value?.e?.text_type === "material" &&
-                            dataMaterialExpiry?.is_enable === "0" &&
-                            true) ||
-                        (value?.e?.text_type === "products" &&
-                            dataProductExpiry?.is_enable === "1" &&
-                            false) ||
-                        (value?.e?.text_type === "products" &&
-                            dataProductExpiry?.is_enable === "0" &&
-                            true),
+                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
+                        (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                        (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
                     location: null,
                     unit: null,
                     dataWarehouse: value?.e?.warehouse.map((e) => ({
@@ -699,9 +595,7 @@ const Index = (props) => {
 
     const _HandleAddParent = (value) => {
         sOnLoadingChild(true);
-        const checkData = listData?.some(
-            (e) => e?.matHang?.value === value?.value
-        );
+        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
             const newData = {
                 id: Date.now(),
@@ -712,18 +606,10 @@ const Index = (props) => {
                         idChildBackEnd: null,
                         id: uuidv4(),
                         disabledDate:
-                            (value?.e?.text_type === "material" &&
-                                dataMaterialExpiry?.is_enable === "1" &&
-                                false) ||
-                            (value?.e?.text_type === "material" &&
-                                dataMaterialExpiry?.is_enable === "0" &&
-                                true) ||
-                            (value?.e?.text_type === "products" &&
-                                dataProductExpiry?.is_enable === "1" &&
-                                false) ||
-                            (value?.e?.text_type === "products" &&
-                                dataProductExpiry?.is_enable === "0" &&
-                                true),
+                            (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                            (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
+                            (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                            (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
                         location: null,
                         dataWarehouse: value?.e?.warehouse.map((e) => ({
                             label: e?.location_name,
@@ -753,18 +639,14 @@ const Index = (props) => {
             }, 500);
             sListData([newData, ...listData]);
         } else {
-            handleCheckError(
-                dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-            );
+            handleCheckError(dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect");
         }
     };
     const _HandleDeleteChild = (parentId, childId) => {
         const newData = listData
             .map((e) => {
                 if (e.id === parentId) {
-                    const newChild = e.child?.filter(
-                        (ce) => ce?.id !== childId
-                    );
+                    const newChild = e.child?.filter((ce) => ce?.id !== childId);
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -777,9 +659,7 @@ const Index = (props) => {
         const newData = listData
             .map((e) => {
                 if (e.id === parentId) {
-                    const newChild = e.child?.filter(
-                        (ce) => ce?.location !== null
-                    );
+                    const newChild = e.child?.filter((ce) => ce?.location !== null);
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -795,9 +675,7 @@ const Index = (props) => {
         // Tìm vị trí của phần tử cần cập nhật trong mảng newData
         const parentIndex = newData.findIndex((e) => e.id === parentId);
         if (parentIndex !== -1) {
-            const childIndex = newData[parentIndex].child.findIndex(
-                (ce) => ce.id === childId
-            );
+            const childIndex = newData[parentIndex].child.findIndex((ce) => ce.id === childId);
             if (childIndex !== -1) {
                 // Thực hiện cập nhật dữ liệu tại vị trí tìm thấy
                 const updatedChild = {
@@ -805,8 +683,7 @@ const Index = (props) => {
                 };
                 if (type === "exportQuantity") {
                     const newSoluongxuat = Number(value?.value);
-                    const newSoluongquydoi =
-                        newSoluongxuat / Number(updatedChild?.exchangeValue);
+                    const newSoluongquydoi = newSoluongxuat / Number(updatedChild?.exchangeValue);
                     if (newSoluongquydoi > +updatedChild?.location?.qty) {
                         handleQuantityError(updatedChild?.location?.qty);
                         setTimeout(() => {
@@ -840,19 +717,14 @@ const Index = (props) => {
                     } else if (updatedChild.unit == null) {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (
-                        updatedChild.numberOfConversions ==
-                            updatedChild.location?.qty ||
-                        (id &&
-                            updatedChild.numberOfConversions >=
-                                updatedChild.location?.qty)
+                        updatedChild.numberOfConversions == updatedChild.location?.qty ||
+                        (id && updatedChild.numberOfConversions >= updatedChild.location?.qty)
                     ) {
                         handleQuantityError(updatedChild?.location?.qty);
                     } else {
-                        updatedChild.exportQuantity =
-                            Number(updatedChild.exportQuantity) + 1;
+                        updatedChild.exportQuantity = Number(updatedChild.exportQuantity) + 1;
                         updatedChild.numberOfConversions =
-                            Number(updatedChild.exportQuantity) *
-                            Number(updatedChild.exchangeValue);
+                            Number(updatedChild.exportQuantity) * Number(updatedChild.exchangeValue);
                     }
                 } else if (type === "decrease") {
                     if (updatedChild.location == null) {
@@ -860,11 +732,9 @@ const Index = (props) => {
                     } else if (updatedChild.unit == null) {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (updatedChild.exportQuantity >= 2) {
-                        updatedChild.exportQuantity =
-                            Number(updatedChild.exportQuantity) - 1;
+                        updatedChild.exportQuantity = Number(updatedChild.exportQuantity) - 1;
                         updatedChild.numberOfConversions =
-                            Number(updatedChild.exportQuantity) *
-                            Number(updatedChild.exchangeValue);
+                            Number(updatedChild.exportQuantity) * Number(updatedChild.exchangeValue);
                     }
                 } else if (type === "note") {
                     updatedChild.note = value?.target.value;
@@ -877,9 +747,7 @@ const Index = (props) => {
 
     const handleQuantityError = (e) => {
         Toast.fire({
-            title: `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                e
-            )} số lượng tồn`,
+            title: `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(e)} số lượng tồn`,
             icon: "error",
             confirmButtonColor: "#296dc1",
             cancelButtonColor: "#d33",
@@ -896,9 +764,7 @@ const Index = (props) => {
 
     const _HandleChangeValue = (parentId, value) => {
         sOnLoadingChild(true);
-        const checkData = listData?.some(
-            (e) => e?.matHang?.value === value?.value
-        );
+        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
             const newData = listData?.map((e) => {
                 if (e?.id === parentId) {
@@ -962,9 +828,7 @@ const Index = (props) => {
             //     }`,
             //     icon: "error",
             // });
-            handleCheckError(
-                dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-            );
+            handleCheckError(dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect");
         }
     };
 
@@ -978,11 +842,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>
-                    {id
-                        ? dataLang?.production_warehouse_edit
-                        : dataLang?.production_warehouse_add}
-                </title>
+                <title>{id ? dataLang?.production_warehouse_edit : dataLang?.production_warehouse_add}</title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
@@ -991,30 +851,19 @@ const Index = (props) => {
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
                             <h6 className="text-[#141522]/40">
-                                {dataLang?.production_warehouse ||
-                                    "production_warehouse"}
+                                {dataLang?.production_warehouse || "production_warehouse"}
                             </h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.production_warehouse_edit
-                                    : dataLang?.production_warehouse_add}
-                            </h6>
+                            <h6>{id ? dataLang?.production_warehouse_edit : dataLang?.production_warehouse_add}</h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
                         <h2 className="xl:text-2xl text-xl ">
-                            {id
-                                ? dataLang?.production_warehouse_edit
-                                : dataLang?.production_warehouse_add}
+                            {id ? dataLang?.production_warehouse_edit : dataLang?.production_warehouse_add}
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() =>
-                                    router.push(
-                                        "/manufacture/production_warehouse?tab=all"
-                                    )
-                                }
+                                onClick={() => router.push("/manufacture/production_warehouse?tab=all")}
                                 className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
@@ -1031,28 +880,22 @@ const Index = (props) => {
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.import_code_vouchers ||
-                                            "import_code_vouchers"}{" "}
+                                        {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
                                     </label>
                                     <input
                                         value={code}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "code"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
                                         placeholder={
-                                            dataLang?.purchase_order_system_default ||
-                                            "purchase_order_system_default"
+                                            dataLang?.purchase_order_system_default || "purchase_order_system_default"
                                         }
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
                                 <div className="col-span-2 relative">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.import_day_vouchers ||
-                                            "import_day_vouchers"}
+                                        {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </label>
                                     <div className="custom-date-picker flex flex-row">
                                         <DatePicker
@@ -1060,34 +903,23 @@ const Index = (props) => {
                                             fixedHeight
                                             showTimeSelect
                                             selected={startDate}
-                                            onSelect={(date) =>
-                                                sStartDate(date)
-                                            }
-                                            onChange={(e) =>
-                                                handleTimeChange(e)
-                                            }
+                                            onSelect={(date) => sStartDate(date)}
+                                            onChange={(e) => handleTimeChange(e)}
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
                                             placeholder={
-                                                dataLang?.price_quote_system_default ||
-                                                "price_quote_system_default"
+                                                dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
                                             className={`border ${
-                                                errDate
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                             } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
                                                 <MdClear
                                                     className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                    onClick={() =>
-                                                        handleClearDate(
-                                                            "startDate"
-                                                        )
-                                                    }
+                                                    onClick={() => handleClearDate("startDate")}
                                                 />
                                             </>
                                         )}
@@ -1096,35 +928,21 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.import_branch ||
-                                            "import_branch"}{" "}
+                                        {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={dataBranch}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "branch"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
-                                        isLoading={
-                                            idBranch != null ? false : onLoading
-                                        }
+                                        isLoading={idBranch != null ? false : onLoading}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.import_branch ||
-                                            "import_branch"
-                                        }
-                                        noOptionsMessage={() =>
-                                            dataLang?.returns_nodata ||
-                                            "returns_nodata"
-                                        }
+                                        placeholder={dataLang?.import_branch || "import_branch"}
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         className={`${
-                                            errBranch
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            errBranch ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1162,8 +980,7 @@ const Index = (props) => {
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.purchase_order_errBranch ||
-                                                "purchase_order_errBranch"}
+                                            {dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}
                                         </label>
                                     )}
                                 </div>
@@ -1175,19 +992,11 @@ const Index = (props) => {
                                     </label>
                                     <Select
                                         options={dataWarehouse}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "idExportWarehouse"
-                                        )}
-                                        isLoading={
-                                            idBranch != null ? false : onLoading
-                                        }
+                                        onChange={_HandleChangeInput.bind(this, "idExportWarehouse")}
+                                        isLoading={idBranch != null ? false : onLoading}
                                         value={idExportWarehouse}
                                         isClearable={true}
-                                        noOptionsMessage={() =>
-                                            dataLang?.returns_nodata ||
-                                            "returns_nodata"
-                                        }
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={
@@ -1195,9 +1004,7 @@ const Index = (props) => {
                                             "production_warehouse_expWarehouse"
                                         }
                                         className={`${
-                                            errExportWarehouse
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            errExportWarehouse ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1234,37 +1041,23 @@ const Index = (props) => {
                                         }}
                                     />
                                     {errExportWarehouse && (
-                                        <label className="text-sm text-red-500">
-                                            {"Vui lòng chọn kho"}
-                                        </label>
+                                        <label className="text-sm text-red-500">{"Vui lòng chọn kho"}</label>
                                     )}
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.production_warehouse_LSX ||
-                                            "production_warehouse_LSX"}
+                                        {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
                                     <Select
                                         options={[]}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            ""
-                                        )}
-                                        isLoading={
-                                            idBranch != null ? false : onLoading
-                                        }
+                                        onChange={_HandleChangeInput.bind(this, "")}
+                                        isLoading={idBranch != null ? false : onLoading}
                                         value={""}
                                         isClearable={true}
-                                        noOptionsMessage={() =>
-                                            dataLang?.returns_nodata ||
-                                            "returns_nodata"
-                                        }
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.production_warehouse_LSX ||
-                                            "production_warehouse_LSX"
-                                        }
+                                        placeholder={dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                         className={`${"border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1306,8 +1099,7 @@ const Index = (props) => {
                     </div>
                     <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
                         <div className="font-normal col-span-12">
-                            {dataLang?.import_item_information ||
-                                "import_item_information"}
+                            {dataLang?.import_item_information || "import_item_information"}
                         </div>
                     </div>
                     <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
@@ -1317,8 +1109,7 @@ const Index = (props) => {
                         <div className="col-span-9">
                             <div className="grid grid-cols-8">
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_expLoca ||
-                                        "production_warehouse_expLoca"}
+                                    {dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
@@ -1336,12 +1127,10 @@ const Index = (props) => {
                                         "production_warehouse_amount_of_conversion"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_note ||
-                                        "production_warehouse_note"}
+                                    {dataLang?.production_warehouse_note || "production_warehouse_note"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
-                                    {dataLang?.import_from_operation ||
-                                        "import_from_operation"}
+                                    {dataLang?.import_from_operation || "import_from_operation"}
                                 </h4>
                             </div>
                         </div>
@@ -1354,12 +1143,8 @@ const Index = (props) => {
                                 value={null}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
-                                placeholder={
-                                    dataLang?.returns_items || "returns_items"
-                                }
-                                noOptionsMessage={() =>
-                                    dataLang?.returns_nodata || "returns_nodata"
-                                }
+                                placeholder={dataLang?.returns_items || "returns_items"}
+                                noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                 menuPortalTarget={document.body}
                                 formatOptionLabel={(option) => (
                                     <div className="flex items-center  justify-between py-2">
@@ -1390,51 +1175,28 @@ const Index = (props) => {
                                                         {option.e?.code}
                                                     </h5>
                                                     <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {
-                                                            option.e
-                                                                ?.product_variation
-                                                        }
+                                                        {option.e?.product_variation}
                                                     </h5>
                                                 </div>
                                                 <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                    {
-                                                        dataLang[
-                                                            option.e?.text_type
-                                                        ]
-                                                    }
+                                                    {dataLang[option.e?.text_type]}
                                                 </h5>
                                                 <div className="flex items-center gap-2 italic">
-                                                    {dataProductSerial.is_enable ===
-                                                        "1" && (
+                                                    {dataProductSerial.is_enable === "1" && (
                                                         <div className="text-[11px] text-[#667085] font-[500]">
-                                                            Serial:{" "}
-                                                            {option.e?.serial
-                                                                ? option.e
-                                                                      ?.serial
-                                                                : "-"}
+                                                            Serial: {option.e?.serial ? option.e?.serial : "-"}
                                                         </div>
                                                     )}
-                                                    {dataMaterialExpiry.is_enable ===
-                                                        "1" ||
-                                                    dataProductExpiry.is_enable ===
-                                                        "1" ? (
+                                                    {dataMaterialExpiry.is_enable === "1" ||
+                                                    dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
-                                                                Lot:{" "}
-                                                                {option.e?.lot
-                                                                    ? option.e
-                                                                          ?.lot
-                                                                    : "-"}
+                                                                Lot: {option.e?.lot ? option.e?.lot : "-"}
                                                             </div>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Date:{" "}
-                                                                {option.e
-                                                                    ?.expiration_date
-                                                                    ? moment(
-                                                                          option
-                                                                              .e
-                                                                              ?.expiration_date
-                                                                      ).format(
+                                                                {option.e?.expiration_date
+                                                                    ? moment(option.e?.expiration_date).format(
                                                                           "DD/MM/YYYY"
                                                                       )
                                                                     : "-"}
@@ -1492,8 +1254,7 @@ const Index = (props) => {
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
-                                            dataLang?.production_warehouse_expLoca ||
-                                            "production_warehouse_expLoca"
+                                            dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"
                                         }
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
@@ -1502,10 +1263,7 @@ const Index = (props) => {
                                 <div className="col-span-1">
                                     <Select
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={
-                                            dataLang?.production_warehouse_unit ||
-                                            "production_warehouse_unit"
-                                        }
+                                        placeholder={dataLang?.production_warehouse_unit || "production_warehouse_unit"}
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -1517,19 +1275,13 @@ const Index = (props) => {
                 /> */}
                                 <div className="col-span-1 flex items-center justify-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus
-                                            className="2xl:scale-100 xl:scale-100 scale-50"
-                                            size="16"
-                                        />
+                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
                                     </button>
                                     <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b w-full border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add
-                                            className="2xl:scale-100 xl:scale-100 scale-50"
-                                            size="16"
-                                        />
+                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
                                     </button>
                                 </div>
 
@@ -1540,17 +1292,12 @@ const Index = (props) => {
                                     1
                                 </div>
                                 <input
-                                    placeholder={
-                                        dataLang?.returns_note || "returns_note"
-                                    }
+                                    placeholder={dataLang?.returns_note || "returns_note"}
                                     disabled
                                     className=" disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
                                 />
                                 <button
-                                    title={
-                                        dataLang?.returns_delete ||
-                                        "returns_delete"
-                                    }
+                                    title={dataLang?.returns_delete || "returns_delete"}
                                     disabled
                                     className="col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
                                 >
@@ -1562,10 +1309,7 @@ const Index = (props) => {
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
                             {onFetchingDetail ? (
-                                <Loading
-                                    className="h-10 w-full"
-                                    color="#0f4f9e"
-                                />
+                                <Loading className="h-10 w-full" color="#0f4f9e" />
                             ) : (
                                 <>
                                     {listData?.map((e) => (
@@ -1579,32 +1323,16 @@ const Index = (props) => {
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
-                                                        onInputChange={_HandleSeachApi.bind(
-                                                            this
-                                                        )}
-                                                        onChange={_HandleChangeValue.bind(
-                                                            this,
-                                                            e?.id
-                                                        )}
-                                                        menuPortalTarget={
-                                                            document.body
-                                                        }
-                                                        formatOptionLabel={(
-                                                            option
-                                                        ) => (
+                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        onChange={_HandleChangeValue.bind(this, e?.id)}
+                                                        menuPortalTarget={document.body}
+                                                        formatOptionLabel={(option) => (
                                                             <div className="flex items-center  justify-between py-2">
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="w-[40px] h-h-[60px]">
-                                                                        {option
-                                                                            .e
-                                                                            ?.images !=
-                                                                        null ? (
+                                                                        {option.e?.images != null ? (
                                                                             <img
-                                                                                src={
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.images
-                                                                                }
+                                                                                src={option.e?.images}
                                                                                 alt="Product Image"
                                                                                 className="max-w-[30px] h-[40px] text-[8px] object-cover rounded"
                                                                             />
@@ -1620,78 +1348,44 @@ const Index = (props) => {
                                                                     </div>
                                                                     <div>
                                                                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {
-                                                                                option
-                                                                                    .e
-                                                                                    ?.name
-                                                                            }
+                                                                            {option.e?.name}
                                                                         </h3>
                                                                         <div className="flex gap-2">
                                                                             <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.code
-                                                                                }
+                                                                                {option.e?.code}
                                                                             </h5>
                                                                             <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.product_variation
-                                                                                }
+                                                                                {option.e?.product_variation}
                                                                             </h5>
                                                                         </div>
                                                                         <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {
-                                                                                dataLang[
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.text_type
-                                                                                ]
-                                                                            }
+                                                                            {dataLang[option.e?.text_type]}
                                                                         </h5>
                                                                         <div className="flex items-center gap-2 italic">
-                                                                            {dataProductSerial.is_enable ===
-                                                                                "1" && (
+                                                                            {dataProductSerial.is_enable === "1" && (
                                                                                 <div className="text-[11px] text-[#667085] font-[500]">
                                                                                     Serial:{" "}
-                                                                                    {option
-                                                                                        .e
-                                                                                        ?.serial
-                                                                                        ? option
-                                                                                              .e
-                                                                                              ?.serial
+                                                                                    {option.e?.serial
+                                                                                        ? option.e?.serial
                                                                                         : "-"}
                                                                                 </div>
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable ===
-                                                                                "1" ||
-                                                                            dataProductExpiry.is_enable ===
-                                                                                "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" ||
+                                                                            dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
-                                                                                        {option
-                                                                                            .e
-                                                                                            ?.lot
-                                                                                            ? option
-                                                                                                  .e
-                                                                                                  ?.lot
+                                                                                        {option.e?.lot
+                                                                                            ? option.e?.lot
                                                                                             : "-"}
                                                                                     </div>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Date:{" "}
-                                                                                        {option
-                                                                                            .e
-                                                                                            ?.expiration_date
+                                                                                        {option.e?.expiration_date
                                                                                             ? moment(
-                                                                                                  option
-                                                                                                      .e
+                                                                                                  option.e
                                                                                                       ?.expiration_date
-                                                                                              ).format(
-                                                                                                  "DD/MM/YYYY"
-                                                                                              )
+                                                                                              ).format("DD/MM/YYYY")
                                                                                             : "-"}
                                                                                     </div>
                                                                                 </>
@@ -1704,8 +1398,7 @@ const Index = (props) => {
                                                             </div>
                                                         )}
                                                         noOptionsMessage={() =>
-                                                            dataLang?.returns_nodata ||
-                                                            "returns_nodata"
+                                                            dataLang?.returns_nodata || "returns_nodata"
                                                         }
                                                         classNamePrefix="customDropdow"
                                                         style={{
@@ -1717,81 +1410,49 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            menuPortal: (
-                                                                base
-                                                            ) => ({
+                                                            menuPortal: (base) => ({
                                                                 ...base,
                                                                 // zIndex: 9999,
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 ...(state.isFocused && {
                                                                     border: "0 0 0 1px #92BFF7",
-                                                                    boxShadow:
-                                                                        "none",
+                                                                    boxShadow: "none",
                                                                 }),
                                                             }),
-                                                            menu: (
-                                                                provided,
-                                                                state
-                                                            ) => ({
+                                                            menu: (provided, state) => ({
                                                                 ...provided,
                                                                 width: "100%",
                                                             }),
                                                         }}
                                                     />
                                                     <button
-                                                        onClick={_HandleAddChild.bind(
-                                                            this,
-                                                            e?.id,
-                                                            e?.matHang
-                                                        )}
+                                                        onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
                                                         className="w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-5 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
                                                     >
                                                         <Add className="" />
                                                     </button>
                                                 </div>
-                                                {e?.child?.filter(
-                                                    (e) => e?.location == null
-                                                ).length >= 2 && (
+                                                {e?.child?.filter((e) => e?.location == null).length >= 2 && (
                                                     <button
-                                                        onClick={_HandleDeleteAllChild.bind(
-                                                            this,
-                                                            e?.id,
-                                                            e?.matHang
-                                                        )}
+                                                        onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
                                                         className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
                                                     >
                                                         <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                                         <span className="relative text-xs">
-                                                            Xóa{" "}
-                                                            {
-                                                                e?.child?.filter(
-                                                                    (e) =>
-                                                                        e?.location ==
-                                                                        null
-                                                                ).length
-                                                            }{" "}
-                                                            hàng chưa chọn vị
-                                                            trí
+                                                            Xóa {e?.child?.filter((e) => e?.location == null).length}{" "}
+                                                            hàng chưa chọn vị trí
                                                         </span>
                                                     </button>
                                                 )}
@@ -1799,327 +1460,241 @@ const Index = (props) => {
                                             <div className="col-span-9  items-center">
                                                 <div className="grid grid-cols-8  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                                                     {load ? (
-                                                        <Loading
-                                                            className="h-2 col-span-8"
-                                                            color="#0f4f9e"
-                                                        />
+                                                        <Loading className="h-2 col-span-8" color="#0f4f9e" />
                                                     ) : (
-                                                        e?.child?.map(
-                                                            (ce, index) => (
-                                                                <React.Fragment
-                                                                    key={ce?.id?.toString()}
-                                                                >
-                                                                    {console.log(
-                                                                        "ce?.location",
-                                                                        ce?.location
-                                                                    )}
-                                                                    <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
-                                                                        <Select
-                                                                            options={
-                                                                                ce?.dataWarehouse
-                                                                            }
-                                                                            value={
-                                                                                ce?.location
-                                                                            }
-                                                                            isLoading={
-                                                                                ce?.location !=
-                                                                                null
-                                                                                    ? false
-                                                                                    : onLoadingChild
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "location"
-                                                                            )}
-                                                                            className={`${
-                                                                                errWarehouse &&
-                                                                                ce?.location ==
-                                                                                    null
-                                                                                    ? "border-red-500 border"
-                                                                                    : ""
-                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                            placeholder={
-                                                                                onLoadingChild
-                                                                                    ? ""
-                                                                                    : dataLang?.production_warehouse_expLoca ||
-                                                                                      "production_warehouse_expLoca"
-                                                                            }
-                                                                            noOptionsMessage={() =>
-                                                                                dataLang?.returns_nodata ||
-                                                                                "returns_nodata"
-                                                                            }
-                                                                            menuPortalTarget={
-                                                                                document.body
-                                                                            }
-                                                                            formatOptionLabel={(
-                                                                                option
-                                                                            ) =>
-                                                                                option?.label !=
-                                                                                    null && (
-                                                                                    <div className="">
-                                                                                        <div className="flex gap-1"></div>
-                                                                                        <div className="flex gap-1">
-                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                                {
-                                                                                                    option?.label
-                                                                                                }
-                                                                                            </h2>
-                                                                                        </div>
-                                                                                        <div className="flex gap-1">
-                                                                                            {
-                                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                                    {dataLang?.returns_survive ||
-                                                                                                        "returns_survive"}
-
-                                                                                                    :
-                                                                                                </h2>
-                                                                                            }
-                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
-                                                                                                {formatNumber(
-                                                                                                    option?.qty
-                                                                                                )}
-                                                                                            </h2>
-                                                                                        </div>
+                                                        e?.child?.map((ce, index) => (
+                                                            <React.Fragment key={ce?.id?.toString()}>
+                                                                {console.log("ce?.location", ce?.location)}
+                                                                <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
+                                                                    <Select
+                                                                        options={ce?.dataWarehouse}
+                                                                        value={ce?.location}
+                                                                        isLoading={
+                                                                            ce?.location != null
+                                                                                ? false
+                                                                                : onLoadingChild
+                                                                        }
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "location"
+                                                                        )}
+                                                                        className={`${
+                                                                            errWarehouse && ce?.location == null
+                                                                                ? "border-red-500 border"
+                                                                                : ""
+                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        placeholder={
+                                                                            onLoadingChild
+                                                                                ? ""
+                                                                                : dataLang?.production_warehouse_expLoca ||
+                                                                                  "production_warehouse_expLoca"
+                                                                        }
+                                                                        noOptionsMessage={() =>
+                                                                            dataLang?.returns_nodata || "returns_nodata"
+                                                                        }
+                                                                        menuPortalTarget={document.body}
+                                                                        formatOptionLabel={(option) =>
+                                                                            option?.label != null && (
+                                                                                <div className="">
+                                                                                    <div className="flex gap-1"></div>
+                                                                                    <div className="flex gap-1">
+                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                            {option?.label}
+                                                                                        </h2>
                                                                                     </div>
-                                                                                )
-                                                                            }
-                                                                            style={{
-                                                                                border: "none",
-                                                                                boxShadow:
-                                                                                    "none",
-                                                                                outline:
-                                                                                    "none",
-                                                                            }}
-                                                                            theme={(
-                                                                                theme
-                                                                            ) => ({
-                                                                                ...theme,
-                                                                                colors: {
-                                                                                    ...theme.colors,
-                                                                                    primary25:
-                                                                                        "#EBF5FF",
-                                                                                    primary50:
-                                                                                        "#92BFF7",
-                                                                                    primary:
-                                                                                        "#0F4F9E",
-                                                                                },
-                                                                            })}
-                                                                            classNamePrefix="customDropdow"
-                                                                        />
-                                                                    </div>
-                                                                    <div className=" flex flex-col items-center p-1 h-full justify-center">
-                                                                        <Select
-                                                                            options={
-                                                                                ce?.dataUnit
-                                                                            }
-                                                                            value={
-                                                                                ce?.unit
-                                                                            }
-                                                                            isLoading={
-                                                                                ce?.unit ==
-                                                                                null
-                                                                                    ? onLoadingChild
-                                                                                    : false
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "unit"
-                                                                            )}
-                                                                            noOptionsMessage={() =>
-                                                                                dataLang?.returns_nodata ||
-                                                                                "returns_nodata"
-                                                                            }
-                                                                            placeholder={
-                                                                                dataLang?.production_warehouse_unit ||
-                                                                                "production_warehouse_unit"
-                                                                            }
-                                                                            className={`${
-                                                                                errUnit &&
-                                                                                ce?.unit ==
-                                                                                    null
-                                                                                    ? "border-red-500 border"
-                                                                                    : ""
-                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
-                                                                            menuPortalTarget={
-                                                                                document.body
-                                                                            }
-                                                                            style={{
-                                                                                border: "none",
-                                                                                boxShadow:
-                                                                                    "none",
-                                                                                outline:
-                                                                                    "none",
-                                                                            }}
-                                                                            formatOptionLabel={(
-                                                                                option
-                                                                            ) => (
-                                                                                <div className="flex justify-start flex-wrap items-center">
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full ">
-                                                                                        {dataLang?.production_warehouse_unit ||
-                                                                                            "production_warehouse_unit"}
-
-                                                                                        :{" "}
+                                                                                    <div className="flex gap-1">
                                                                                         {
-                                                                                            option?.label
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                {dataLang?.returns_survive ||
+                                                                                                    "returns_survive"}
+                                                                                                :
+                                                                                            </h2>
                                                                                         }
-                                                                                    </h2>
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">{`${
-                                                                                        dataLang?.production_warehouse_exchange_value ||
-                                                                                        "production_warehouse_exchange_value"
-                                                                                    }: (${
-                                                                                        option?.coefficient
-                                                                                    })`}</h2>
+                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
+                                                                                            {formatNumber(option?.qty)}
+                                                                                        </h2>
+                                                                                    </div>
                                                                                 </div>
-                                                                            )}
-                                                                            theme={(
-                                                                                theme
-                                                                            ) => ({
-                                                                                ...theme,
-                                                                                colors: {
-                                                                                    ...theme.colors,
-                                                                                    primary25:
-                                                                                        "#EBF5FF",
-                                                                                    primary50:
-                                                                                        "#92BFF7",
-                                                                                    primary:
-                                                                                        "#0F4F9E",
-                                                                                },
-                                                                            })}
-                                                                            classNamePrefix="customDropdow"
-                                                                        />
-                                                                    </div>
-                                                                    <div className="flex items-center justify-center  h-full p-0.5">
-                                                                        <button
-                                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                            onClick={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "decrease"
-                                                                            )}
-                                                                        >
-                                                                            <Minus
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                                size="16"
-                                                                            />
-                                                                        </button>
-
-                                                                        <NumericFormat
-                                                                            placeholder={
-                                                                                (ce?.location ==
-                                                                                    null ||
-                                                                                    ce?.unit ==
-                                                                                        null) &&
-                                                                                "Chọn vị trí và Đvt trước"
-                                                                            }
-                                                                            disabled={
-                                                                                ce?.location ==
-                                                                                    null ||
-                                                                                ce?.unit ==
-                                                                                    null
-                                                                            }
-                                                                            className={`${
-                                                                                errQty &&
-                                                                                (ce?.exportQuantity ==
-                                                                                    null ||
-                                                                                    ce?.exportQuantity ==
-                                                                                        "" ||
-                                                                                    ce?.exportQuantity ==
-                                                                                        0)
-                                                                                    ? "border-red-500 border-b"
-                                                                                    : ""
-                                                                            }  placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
-                                                                            onValueChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "exportQuantity"
-                                                                            )}
-                                                                            value={
-                                                                                ce?.exportQuantity
-                                                                            }
-                                                                            allowNegative={
-                                                                                false
-                                                                            }
-                                                                            // decimalScale={
-                                                                            //     0
-                                                                            // }
-                                                                            isNumericString={
-                                                                                true
-                                                                            }
-                                                                            // decimalSeparator=","
-                                                                            thousandSeparator=","
-                                                                        />
-
-                                                                        <button
-                                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                            onClick={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "increase"
-                                                                            )}
-                                                                        >
-                                                                            <Add
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                                size="16"
-                                                                            />
-                                                                        </button>
-                                                                    </div>
-                                                                    <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                        {
-                                                                            ce?.exchangeValue
+                                                                            )
                                                                         }
-                                                                    </div>
-                                                                    <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                        {formatNumber(
-                                                                            // ce?.exportQuantity * Number(ce?.exchangeValue)
-                                                                            ce?.exportQuantity /
-                                                                                ce?.exchangeValue ||
-                                                                                0
-                                                                        )}{" "}
-                                                                        {
-                                                                            ce
-                                                                                ?.unit
-                                                                                ?.label
+                                                                        style={{
+                                                                            border: "none",
+                                                                            boxShadow: "none",
+                                                                            outline: "none",
+                                                                        }}
+                                                                        theme={(theme) => ({
+                                                                            ...theme,
+                                                                            colors: {
+                                                                                ...theme.colors,
+                                                                                primary25: "#EBF5FF",
+                                                                                primary50: "#92BFF7",
+                                                                                primary: "#0F4F9E",
+                                                                            },
+                                                                        })}
+                                                                        classNamePrefix="customDropdow"
+                                                                    />
+                                                                </div>
+                                                                <div className=" flex flex-col items-center p-1 h-full justify-center">
+                                                                    <Select
+                                                                        options={ce?.dataUnit}
+                                                                        value={ce?.unit}
+                                                                        isLoading={
+                                                                            ce?.unit == null ? onLoadingChild : false
                                                                         }
-                                                                    </div>
-                                                                    <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
-                                                                        <input
-                                                                            value={
-                                                                                ce?.note
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "note"
-                                                                            )}
-                                                                            placeholder="Ghi chú"
-                                                                            type="text"
-                                                                            className="  placeholder:text-slate-300  w-full bg-white rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none"
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "unit"
+                                                                        )}
+                                                                        noOptionsMessage={() =>
+                                                                            dataLang?.returns_nodata || "returns_nodata"
+                                                                        }
+                                                                        placeholder={
+                                                                            dataLang?.production_warehouse_unit ||
+                                                                            "production_warehouse_unit"
+                                                                        }
+                                                                        className={`${
+                                                                            errUnit && ce?.unit == null
+                                                                                ? "border-red-500 border"
+                                                                                : ""
+                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
+                                                                        menuPortalTarget={document.body}
+                                                                        style={{
+                                                                            border: "none",
+                                                                            boxShadow: "none",
+                                                                            outline: "none",
+                                                                        }}
+                                                                        formatOptionLabel={(option) => (
+                                                                            <div className="flex justify-start flex-wrap items-center">
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full ">
+                                                                                    {dataLang?.production_warehouse_unit ||
+                                                                                        "production_warehouse_unit"}
+                                                                                    : {option?.label}
+                                                                                </h2>
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">{`${
+                                                                                    dataLang?.production_warehouse_exchange_value ||
+                                                                                    "production_warehouse_exchange_value"
+                                                                                }: (${option?.coefficient})`}</h2>
+                                                                            </div>
+                                                                        )}
+                                                                        theme={(theme) => ({
+                                                                            ...theme,
+                                                                            colors: {
+                                                                                ...theme.colors,
+                                                                                primary25: "#EBF5FF",
+                                                                                primary50: "#92BFF7",
+                                                                                primary: "#0F4F9E",
+                                                                            },
+                                                                        })}
+                                                                        classNamePrefix="customDropdow"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex items-center justify-center  h-full p-0.5">
+                                                                    <button
+                                                                        className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                        onClick={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "decrease"
+                                                                        )}
+                                                                    >
+                                                                        <Minus
+                                                                            className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                            size="16"
                                                                         />
-                                                                    </div>
-                                                                    <div className=" h-full p-0.5 flex flex-col items-center justify-center">
-                                                                        <button
-                                                                            title="Xóa"
-                                                                            onClick={_HandleDeleteChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id
-                                                                            )}
-                                                                            className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
-                                                                        >
-                                                                            <IconDelete />
-                                                                        </button>
-                                                                    </div>
-                                                                </React.Fragment>
-                                                            )
-                                                        )
+                                                                    </button>
+
+                                                                    <NumericFormat
+                                                                        placeholder={
+                                                                            (ce?.location == null ||
+                                                                                ce?.unit == null) &&
+                                                                            "Chọn vị trí và Đvt trước"
+                                                                        }
+                                                                        disabled={
+                                                                            ce?.location == null || ce?.unit == null
+                                                                        }
+                                                                        className={`${
+                                                                            errQty &&
+                                                                            (ce?.exportQuantity == null ||
+                                                                                ce?.exportQuantity == "" ||
+                                                                                ce?.exportQuantity == 0)
+                                                                                ? "border-red-500 border-b"
+                                                                                : ""
+                                                                        }  placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
+                                                                        onValueChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "exportQuantity"
+                                                                        )}
+                                                                        value={ce?.exportQuantity}
+                                                                        allowNegative={false}
+                                                                        // decimalScale={
+                                                                        //     0
+                                                                        // }
+                                                                        isNumericString={true}
+                                                                        // decimalSeparator=","
+                                                                        thousandSeparator=","
+                                                                    />
+
+                                                                    <button
+                                                                        className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                        onClick={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "increase"
+                                                                        )}
+                                                                    >
+                                                                        <Add
+                                                                            className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                            size="16"
+                                                                        />
+                                                                    </button>
+                                                                </div>
+                                                                <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                    {ce?.exchangeValue}
+                                                                </div>
+                                                                <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                    {formatNumber(
+                                                                        // ce?.exportQuantity * Number(ce?.exchangeValue)
+                                                                        ce?.exportQuantity / ce?.exchangeValue || 0
+                                                                    )}{" "}
+                                                                    {ce?.unit?.label}
+                                                                </div>
+                                                                <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
+                                                                    <input
+                                                                        value={ce?.note}
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "note"
+                                                                        )}
+                                                                        placeholder="Ghi chú"
+                                                                        type="text"
+                                                                        className="  placeholder:text-slate-300  w-full bg-white rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none"
+                                                                    />
+                                                                </div>
+                                                                <div className=" h-full p-0.5 flex flex-col items-center justify-center">
+                                                                    <button
+                                                                        title="Xóa"
+                                                                        onClick={_HandleDeleteChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id
+                                                                        )}
+                                                                        className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                                    >
+                                                                        <IconDelete />
+                                                                    </button>
+                                                                </div>
+                                                            </React.Fragment>
+                                                        ))
                                                     )}
                                                 </div>
                                             </div>
@@ -2140,9 +1715,7 @@ const Index = (props) => {
                         </div>
                         <textarea
                             value={note}
-                            placeholder={
-                                dataLang?.returns_reason || "returns_reason"
-                            }
+                            placeholder={dataLang?.returns_reason || "returns_reason"}
                             onChange={_HandleChangeInput.bind(this, "note")}
                             name="fname"
                             type="text"
@@ -2153,41 +1726,28 @@ const Index = (props) => {
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal">
-                                <h3>
-                                    {dataLang?.production_warehouse_totalItem ||
-                                        "production_warehouse_totalItem"}
-                                </h3>
+                                <h3>{dataLang?.production_warehouse_totalItem || "production_warehouse_totalItem"}</h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">
-                                    {formatNumber(listData?.length)}
-                                </h3>
+                                <h3 className="text-blue-600">{formatNumber(listData?.length)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
                             <div className="font-normal">
-                                <h3>
-                                    {dataLang?.production_warehouse_totalEx ||
-                                        "production_warehouse_totalEx"}
-                                </h3>
+                                <h3>{dataLang?.production_warehouse_totalEx || "production_warehouse_totalEx"}</h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {formatNumber(
                                         listData?.reduce((total, item) => {
-                                            item?.child?.forEach(
-                                                (childItem) => {
-                                                    if (
-                                                        childItem.exportQuantity !==
-                                                            undefined &&
-                                                        childItem.exportQuantity !==
-                                                            null
-                                                    ) {
-                                                        total +=
-                                                            childItem.exportQuantity;
-                                                    }
+                                            item?.child?.forEach((childItem) => {
+                                                if (
+                                                    childItem.exportQuantity !== undefined &&
+                                                    childItem.exportQuantity !== null
+                                                ) {
+                                                    total += childItem.exportQuantity;
                                                 }
-                                            );
+                                            });
                                             return total;
                                         }, 0)
                                     )}
@@ -2196,23 +1756,17 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() =>
-                                    router.push(
-                                        "/manufacture/production_warehouse?tab=all"
-                                    )
-                                }
+                                onClick={() => router.push("/manufacture/production_warehouse?tab=all")}
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
-                                {dataLang?.purchase_order_purchase_back ||
-                                    "purchase_order_purchase_back"}
+                                {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
                             </button>
                             <button
                                 onClick={_HandleSubmit.bind(this)}
                                 type="submit"
                                 className="button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
                             >
-                                {dataLang?.purchase_order_purchase_save ||
-                                    "purchase_order_purchase_save"}
+                                {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}
                             </button>
                         </div>
                     </div>

@@ -102,8 +102,13 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                                 id="default-radio-1"
                                 type="radio"
                                 value=""
-                                checked={isValue.actions}
-                                onChange={() => onChangeValue("actions")(!isValue.actions)}
+                                checked={isValue.internalPlan}
+                                onChange={() => {
+                                    console.log("Setting internalPlan to true, order to false");
+
+                                    onChangeValue("internalPlan")(!isValue.internalPlan);
+                                    onChangeValue("order")(false);
+                                }}
                                 name="default-radio1"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
                             />
@@ -119,8 +124,13 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                                 id="default-radio-2"
                                 type="radio"
                                 value=""
-                                checked={!isValue.actions}
-                                onChange={() => onChangeValue("actions")(!isValue.actions)}
+                                checked={isValue.order}
+                                onChange={() => {
+                                    console.log("Setting order to true, internalPlan to false");
+
+                                    onChangeValue("order")(!isValue.order);
+                                    onChangeValue("internalPlan")(false);
+                                }}
                                 name="default-radio2"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
                             />

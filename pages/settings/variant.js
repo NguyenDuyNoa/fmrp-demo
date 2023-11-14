@@ -8,12 +8,7 @@ import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import Pagination from "/components/UI/pagination";
 
-import {
-    Edit as IconEdit,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-} from "iconsax-react";
+import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch, Add as IconAdd } from "iconsax-react";
 import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
 
@@ -78,23 +73,18 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 const id = event;
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_variation/variation/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/Api_variation/variation/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: dataLang[message],
+                            });
                         }
-                        _ServerFetching();
                     }
-                );
+                    _ServerFetching();
+                });
             }
         });
     };
@@ -116,7 +106,7 @@ const Index = (props) => {
             sOnFetching(true);
         }, 1500);
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     return (
         <React.Fragment>
             <Head>
@@ -127,9 +117,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.branch_seting}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.list_btn_seting_variant}</h6>
                     </div>
@@ -141,9 +129,7 @@ const Index = (props) => {
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
                             <h2 className="text-2xl text-[#52575E]">
-                                {dataLang?.variant_title
-                                    ? dataLang?.variant_title
-                                    : "variant_title"}
+                                {dataLang?.variant_title ? dataLang?.variant_title : "variant_title"}
                             </h2>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                                 <div className="flex justify-end">
@@ -156,47 +142,29 @@ const Index = (props) => {
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
                                         <form className="flex items-center relative">
-                                            <IconSearch
-                                                size={20}
-                                                className="absolute left-3 z-10 text-[#cccccc]"
-                                            />
+                                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                                             <input
                                                 className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
                                                 type="text"
-                                                onChange={_HandleOnChangeKeySearch.bind(
-                                                    this
-                                                )}
-                                                placeholder={
-                                                    dataLang?.branch_search
-                                                }
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                placeholder={dataLang?.branch_search}
                                             />
                                         </form>
                                         <div className="flex space-x-2">
-                                            <label className="font-[300] text-slate-400">
-                                                {dataLang?.display} :
-                                            </label>
+                                            <label className="font-[300] text-slate-400">{dataLang?.display} :</label>
                                             <select
                                                 className="outline-none"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
+                                                onChange={(e) => sLimit(e.target.value)}
                                                 value={limit}
                                             >
-                                                <option
-                                                    disabled
-                                                    className="hidden"
-                                                >
-                                                    {limit == -1
-                                                        ? "Tất cả"
-                                                        : limit}
+                                                <option disabled className="hidden">
+                                                    {limit == -1 ? "Tất cả" : limit}
                                                 </option>
                                                 <option value={15}>15</option>
                                                 <option value={20}>20</option>
                                                 <option value={40}>40</option>
                                                 <option value={60}>60</option>
-                                                <option value={-1}>
-                                                    Tất cả
-                                                </option>
+                                                <option value={-1}>Tất cả</option>
                                             </select>
                                         </div>
                                     </div>
@@ -208,21 +176,14 @@ const Index = (props) => {
                                                 {dataLang?.variant_name}
                                             </h4>
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">
-                                                {
-                                                    dataLang?.branch_popup_variant_option
-                                                }
+                                                {dataLang?.branch_popup_variant_option}
                                             </h4>
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
-                                                {
-                                                    dataLang?.branch_popup_properties
-                                                }
+                                                {dataLang?.branch_popup_properties}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : (
                                             <React.Fragment>
                                                 {data.length == 0 && (
@@ -232,8 +193,7 @@ const Index = (props) => {
                                                                 <IconSearch />
                                                             </div>
                                                             <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                                Không tìm thấy
-                                                                các mục
+                                                                Không tìm thấy các mục
                                                             </h1>
                                                         </div>
                                                     </div>
@@ -248,42 +208,26 @@ const Index = (props) => {
                                                                 {e?.name}
                                                             </h6>
                                                             <div className="col-span-5 px-2 flex flex-wrap">
-                                                                {e?.option?.map(
-                                                                    (e) => (
-                                                                        <h6
-                                                                            key={e.id.toString()}
-                                                                            className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg"
-                                                                        >
-                                                                            {
-                                                                                e.name
-                                                                            }
-                                                                        </h6>
-                                                                    )
-                                                                )}
+                                                                {e?.option?.map((e) => (
+                                                                    <h6
+                                                                        key={e.id.toString()}
+                                                                        className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg"
+                                                                    >
+                                                                        {e.name}
+                                                                    </h6>
+                                                                ))}
                                                             </div>
                                                             <div className="space-x-2 col-span-2 flex justify-center items-start">
                                                                 <Popup_ChiNhanh
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
-                                                                    name={
-                                                                        e.name
-                                                                    }
-                                                                    option={
-                                                                        e.option
-                                                                    }
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    name={e.name}
+                                                                    option={e.option}
                                                                     id={e.id}
                                                                     className="xl:text-base text-xs"
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                 />
                                                                 <button
-                                                                    onClick={() =>
-                                                                        handleDelete(
-                                                                            e.id
-                                                                        )
-                                                                    }
+                                                                    onClick={() => handleDelete(e.id)}
                                                                     className="xl:text-base text-xs"
                                                                 >
                                                                     <IconDelete color="red" />
@@ -301,15 +245,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    Hiển thị {totalItems?.iTotalDisplayRecords}{" "}
-                                    trong số {totalItems?.iTotalRecords} biến
-                                    thể
+                                    Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords}{" "}
+                                    biến thể
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -436,13 +377,7 @@ const Popup_ChiNhanh = (props) => {
                     ? `${props.dataLang?.variant_popup_edit}`
                     : `${props.dataLang?.branch_popup_create_new_variant}`
             }
-            button={
-                props.id ? (
-                    <IconEdit />
-                ) : (
-                    `${props.dataLang?.branch_popup_create_new}`
-                )
-            }
+            button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}
@@ -452,8 +387,7 @@ const Popup_ChiNhanh = (props) => {
                 <form onSubmit={_HandleSubmit.bind(this)} className="space-y-5">
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal text-base">
-                            {props.dataLang?.variant_name}{" "}
-                            <span className="text-red-500">*</span>
+                            {props.dataLang?.variant_name} <span className="text-red-500">*</span>
                         </label>
                         <input
                             value={name}
@@ -462,16 +396,10 @@ const Popup_ChiNhanh = (props) => {
                             placeholder={props.dataLang?.variant_name}
                             type="text"
                             className={`${
-                                required
-                                    ? "border-red-500"
-                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
                         />
-                        {required && (
-                            <label className="text-sm text-red-500">
-                                Vui lòng nhập tên biến thể
-                            </label>
-                        )}
+                        {required && <label className="text-sm text-red-500">Vui lòng nhập tên biến thể</label>}
                     </div>
                     <div className="space-y-1.5">
                         <h6 className="text-[#344054] font-normal text-sm">
@@ -479,23 +407,15 @@ const Popup_ChiNhanh = (props) => {
                         </h6>
                         <div className="pr-3 max-h-60 overflow-auto space-y-1.5 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                             {option.map((e) => (
-                                <div
-                                    className="flex space-x-3 items-center"
-                                    key={e.id?.toString()}
-                                >
+                                <div className="flex space-x-3 items-center" key={e.id?.toString()}>
                                     <input
                                         value={e.name}
-                                        onChange={_OnChangeOption.bind(
-                                            this,
-                                            e.id
-                                        )}
+                                        onChange={_OnChangeOption.bind(this, e.id)}
                                         placeholder="Nhập tùy chọn"
                                         name="optionVariant"
                                         type="text"
                                         className={`${
-                                            listOptErr?.some(
-                                                (i) => i === e.name
-                                            )
+                                            listOptErr?.some((i) => i === e.name)
                                                 ? "border-red-500"
                                                 : "border-[#d0d5dd] focus:border-[#92BFF7]"
                                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}

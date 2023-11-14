@@ -5,9 +5,10 @@ import FilterHeader from "./(filterHeader)/filterHeader";
 import MainTable from "./(mainTable)/mainTable";
 import { useEffect, useMemo, useState } from "react";
 import { v4 as uuid } from "uuid";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const Index = (props) => {
     const dataLang = props.dataLang;
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
     const initialData = {
         data: [
             {

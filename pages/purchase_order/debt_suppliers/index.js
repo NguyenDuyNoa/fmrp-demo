@@ -5,11 +5,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 
-import {
-    Grid6 as IconExcel,
-    SearchNormal1 as IconSearch,
-    Refresh2,
-} from "iconsax-react";
+import { Grid6 as IconExcel, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
 
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
@@ -30,6 +26,7 @@ import Popup_chitietPhatsinh from "./(popup)/details_arises";
 import Popup_chitietDauki from "./(popup)/details_first";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -68,7 +65,7 @@ const Index = (props) => {
         startDate: null,
         endDate: null,
     });
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -93,17 +90,12 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                     "filter[supplier_id]": idSupplier ? idSupplier.value : null,
                     "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? moment(valueDate?.startDate).format("YYYY-MM-DD")
-                            : null,
+                        valueDate?.startDate != null ? moment(valueDate?.startDate).format("YYYY-MM-DD") : null,
                     "filter[end_date]":
-                        valueDate?.endDate != null
-                            ? moment(valueDate?.endDate).format("YYYY-MM-DD")
-                            : null,
+                        valueDate?.endDate != null ? moment(valueDate?.endDate).format("YYYY-MM-DD") : null,
                 },
             },
             (err, response) => {
@@ -120,30 +112,18 @@ const Index = (props) => {
     };
 
     const _ServerFetching_filter = async () => {
-        await Axios(
-            "GET",
-            `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response.data;
-                    sListBr(result);
-                }
+        await Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response.data;
+                sListBr(result);
             }
-        );
-        await Axios(
-            "GET",
-            "/api_web/api_supplier/supplier/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data.rResult;
-                    sListSupplier(
-                        db?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        });
+        await Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var db = response.data.rResult;
+                sListSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
+        });
 
         sOnFetching_filter(false);
     };
@@ -161,9 +141,7 @@ const Index = (props) => {
             (keySearch && sOnFetching(true)) ||
             (router.query?.tab && sOnFetching_filter(true)) ||
             (idBranch != null && sOnFetching(true)) ||
-            (valueDate.startDate != null &&
-                valueDate.endDate != null &&
-                sOnFetching(true)) ||
+            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
             (idSupplier != null && sOnFetching(true)) ||
             (idCode != null && sOnFetching(true));
     }, [
@@ -212,9 +190,7 @@ const Index = (props) => {
         });
     };
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
+    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
 
     const onchang_filter = (type, value) => {
         if (type == "branch") {
@@ -243,9 +219,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_code || "debt_suppliers_code"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_code || "debt_suppliers_code"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -253,9 +227,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_name || "debt_suppliers_name"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_name || "debt_suppliers_name"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -263,10 +235,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_detail_opening ||
-                        "debt_suppliers_detail_opening"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_detail_opening || "debt_suppliers_detail_opening"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -274,10 +243,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_detail_period ||
-                        "debt_suppliers_detail_period"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_detail_period || "debt_suppliers_detail_period"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -285,10 +251,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_detail_incurred ||
-                        "debt_suppliers_detail_incurred"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_detail_incurred || "debt_suppliers_detail_incurred"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -296,10 +259,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_detail_expenses ||
-                        "debt_suppliers_detail_expenses"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_detail_expenses || "debt_suppliers_detail_expenses"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -307,10 +267,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_detail_debt_period ||
-                        "debt_suppliers_detail_debt_period"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_detail_debt_period || "debt_suppliers_detail_debt_period"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -318,10 +275,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.debt_suppliers_detail_Ending ||
-                        "debt_suppliers_detail_Ending"
-                    }`,
+                    title: `${dataLang?.debt_suppliers_detail_Ending || "debt_suppliers_detail_Ending"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -380,12 +334,8 @@ const Index = (props) => {
                 {trangthaiExprired ? (
                     <div className="p-3"></div>
                 ) : (
-                    <div
-                        className={` flex space-x-3 xl:text-[14.5px] text-[12px]`}
-                    >
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.debt_suppliers || "debt_suppliers"}
-                        </h6>
+                    <div className={` flex space-x-3 xl:text-[14.5px] text-[12px]`}>
+                        <h6 className="text-[#141522]/40">{dataLang?.debt_suppliers || "debt_suppliers"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.debt_suppliers || "debt_suppliers"}</h6>
                     </div>
@@ -396,8 +346,7 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.debt_suppliers ||
-                                        "debt_suppliers"}
+                                    {dataLang?.debt_suppliers || "debt_suppliers"}
                                 </h2>
                             </div>
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
@@ -414,12 +363,8 @@ const Index = (props) => {
                                                         <input
                                                             className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                                             type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
+                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                            placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
@@ -435,24 +380,18 @@ const Index = (props) => {
                                                             },
                                                             ...listBr_filter,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "branch")}
                                                         value={idBranch}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_branch ||
                                                             "purchase_order_table_branch"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() =>
-                                                            dataLang?.returns_nodata ||
-                                                            "returns_nodata"
+                                                            dataLang?.returns_nodata || "returns_nodata"
                                                         }
                                                         closeMenuOnSelect={true}
                                                         style={{
@@ -464,33 +403,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -508,24 +437,18 @@ const Index = (props) => {
                                                             },
                                                             ...listSupplier,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "supplier"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "supplier")}
                                                         value={idSupplier}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_supplier ||
                                                             "purchase_order_table_supplier"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white   2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() =>
-                                                            dataLang?.returns_nodata ||
-                                                            "returns_nodata"
+                                                            dataLang?.returns_nodata || "returns_nodata"
                                                         }
                                                         style={{
                                                             border: "none",
@@ -536,33 +459,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -573,27 +486,16 @@ const Index = (props) => {
                                                         value={valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "date"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "date")}
                                                         showShortcuts={true}
-                                                        displayFormat={
-                                                            "DD/MM/YYYY"
-                                                        }
+                                                        displayFormat={"DD/MM/YYYY"}
                                                         configs={{
                                                             shortcuts: {
                                                                 today: "Hôm nay",
-                                                                yesterday:
-                                                                    "Hôm qua",
-                                                                past: (
-                                                                    period
-                                                                ) =>
-                                                                    `${period}  ngày qua`,
-                                                                currentMonth:
-                                                                    "Tháng này",
-                                                                pastMonth:
-                                                                    "Tháng trước",
+                                                                yesterday: "Hôm qua",
+                                                                past: (period) => `${period}  ngày qua`,
+                                                                currentMonth: "Tháng này",
+                                                                pastMonth: "Tháng trước",
                                                             },
                                                             footer: {
                                                                 cancel: "Từ bỏ",
@@ -609,9 +511,7 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
+                                                    onClick={_HandleFresh.bind(this)}
                                                     type="button"
                                                     className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                                 >
@@ -624,33 +524,21 @@ const Index = (props) => {
                                                 <div>
                                                     {dataExcel?.length > 0 && (
                                                         <ExcelFile
-                                                            filename={
-                                                                "Danh sách công nợ nhà cung cấp"
-                                                            }
+                                                            filename={"Danh sách công nợ nhà cung cấp"}
                                                             title="DSCNNCC"
                                                             element={
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
                                                                         className="2xl:scale-100 xl:scale-100 scale-75"
-                                                                        size={
-                                                                            18
-                                                                        }
+                                                                        size={18}
                                                                     />
-                                                                    <span>
-                                                                        {
-                                                                            dataLang?.client_list_exportexcel
-                                                                        }
-                                                                    </span>
+                                                                    <span>{dataLang?.client_list_exportexcel}</span>
                                                                 </button>
                                                             }
                                                         >
                                                             <ExcelSheet
-                                                                dataSet={
-                                                                    multiDataSet
-                                                                }
-                                                                data={
-                                                                    multiDataSet
-                                                                }
+                                                                dataSet={multiDataSet}
+                                                                data={multiDataSet}
                                                                 name="Organization"
                                                             />
                                                         </ExcelFile>
@@ -662,20 +550,14 @@ const Index = (props) => {
                                                     </div>
                                                     <select
                                                         className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) =>
-                                                            sLimit(
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => sLimit(e.target.value)}
                                                         value={limit}
                                                     >
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm hidden"
                                                             disabled
                                                         >
-                                                            {limit == -1
-                                                                ? "Tất cả"
-                                                                : limit}
+                                                            {limit == -1 ? "Tất cả" : limit}
                                                         </option>
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm"
@@ -712,64 +594,50 @@ const Index = (props) => {
                                         <div className="grid grid-cols-12  sticky top-0 z-10 rounded-xl shadow-md bg-gray-50 divide-x">
                                             <div className="col-span-1 grid items-center">
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
-                                                    {dataLang?.debt_suppliers_code ||
-                                                        "debt_suppliers_code"}
+                                                    {dataLang?.debt_suppliers_code || "debt_suppliers_code"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-2 grid items-center">
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
-                                                    {dataLang?.debt_suppliers_name ||
-                                                        "debt_suppliers_name"}
+                                                    {dataLang?.debt_suppliers_name || "debt_suppliers_name"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                                                    {dataLang?.debt_suppliers_balance ||
-                                                        "debt_suppliers_balance"}
+                                                    {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_inDebt ||
-                                                        "debt_suppliers_inDebt"}
+                                                    {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_Spend ||
-                                                        "debt_suppliers_Spend"}
+                                                    {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-3 grid grid-cols-4   items-center justify-center">
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                                                    {dataLang?.debt_suppliers_Arise ||
-                                                        "debt_suppliers_Arise"}
+                                                    {dataLang?.debt_suppliers_Arise || "debt_suppliers_Arise"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_inDebt ||
-                                                        "debt_suppliers_inDebt"}
+                                                    {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_Spend ||
-                                                        "debt_suppliers_Spend"}
+                                                    {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                                                    {dataLang?.debt_suppliers_Ending ||
-                                                        "debt_suppliers_Ending"}
+                                                    {dataLang?.debt_suppliers_Ending || "debt_suppliers_Ending"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_inDebt ||
-                                                        "debt_suppliers_inDebt"}
+                                                    {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_Spend ||
-                                                        "debt_suppliers_Spend"}
+                                                    {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
                                                 </h4>
                                             </div>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
@@ -786,161 +654,89 @@ const Index = (props) => {
                                                             </h6>
                                                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.no_start ==
-                                                                    "0" ? (
+                                                                    {e.no_start == "0" ? (
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietDauki
-                                                                            dataLang={
-                                                                                dataLang
-                                                                            }
+                                                                            dataLang={dataLang}
                                                                             className="text-left"
                                                                             name={
-                                                                                e.no_start ==
-                                                                                "0"
+                                                                                e.no_start == "0"
                                                                                     ? "-"
-                                                                                    : formatNumber(
-                                                                                          e.no_start
-                                                                                      )
+                                                                                    : formatNumber(e.no_start)
                                                                             }
-                                                                            id={
-                                                                                e?.id
-                                                                            }
-                                                                            type={
-                                                                                "no_start"
-                                                                            }
-                                                                            date={
-                                                                                valueDate
-                                                                            }
-                                                                            supplier_name={
-                                                                                e.name
-                                                                            }
-                                                                            idBranch={
-                                                                                idBranch
-                                                                            }
-                                                                            idSupplier={
-                                                                                idSupplier
-                                                                            }
+                                                                            id={e?.id}
+                                                                            type={"no_start"}
+                                                                            date={valueDate}
+                                                                            supplier_name={e.name}
+                                                                            idBranch={idBranch}
+                                                                            idSupplier={idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.chi_start ==
-                                                                    "0" ? (
+                                                                    {e.chi_start == "0" ? (
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietDauki
-                                                                            dataLang={
-                                                                                dataLang
-                                                                            }
+                                                                            dataLang={dataLang}
                                                                             className="text-left"
                                                                             name={
-                                                                                e.chi_start ==
-                                                                                "0"
+                                                                                e.chi_start == "0"
                                                                                     ? "-"
-                                                                                    : formatNumber(
-                                                                                          e.chi_start
-                                                                                      )
+                                                                                    : formatNumber(e.chi_start)
                                                                             }
-                                                                            date={
-                                                                                valueDate
-                                                                            }
-                                                                            supplier_name={
-                                                                                e.name
-                                                                            }
-                                                                            id={
-                                                                                e?.id
-                                                                            }
-                                                                            type={
-                                                                                "chi_start"
-                                                                            }
-                                                                            idBranch={
-                                                                                idBranch
-                                                                            }
-                                                                            idSupplier={
-                                                                                idSupplier
-                                                                            }
+                                                                            date={valueDate}
+                                                                            supplier_name={e.name}
+                                                                            id={e?.id}
+                                                                            type={"chi_start"}
+                                                                            idBranch={idBranch}
+                                                                            idSupplier={idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>
                                                             </div>
                                                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.no_debt ==
-                                                                    "0" ? (
+                                                                    {e.no_debt == "0" ? (
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietPhatsinh
-                                                                            dataLang={
-                                                                                dataLang
-                                                                            }
+                                                                            dataLang={dataLang}
                                                                             className="text-left uppercase"
-                                                                            supplier_name={
-                                                                                e.name
-                                                                            }
+                                                                            supplier_name={e.name}
                                                                             name={
-                                                                                e.no_debt ==
-                                                                                "0"
+                                                                                e.no_debt == "0"
                                                                                     ? "-"
-                                                                                    : formatNumber(
-                                                                                          e.no_debt
-                                                                                      )
+                                                                                    : formatNumber(e.no_debt)
                                                                             }
-                                                                            id={
-                                                                                e?.id
-                                                                            }
-                                                                            date={
-                                                                                valueDate
-                                                                            }
-                                                                            type={
-                                                                                "no_debt"
-                                                                            }
-                                                                            idBranch={
-                                                                                idBranch
-                                                                            }
-                                                                            idSupplier={
-                                                                                idSupplier
-                                                                            }
+                                                                            id={e?.id}
+                                                                            date={valueDate}
+                                                                            type={"no_debt"}
+                                                                            idBranch={idBranch}
+                                                                            idSupplier={idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>
 
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.chi_debt ==
-                                                                    "0" ? (
+                                                                    {e.chi_debt == "0" ? (
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietPhatsinh
-                                                                            dataLang={
-                                                                                dataLang
-                                                                            }
+                                                                            dataLang={dataLang}
                                                                             className="text-left uppercase"
-                                                                            supplier_name={
-                                                                                e.name
-                                                                            }
+                                                                            supplier_name={e.name}
                                                                             name={
-                                                                                e.chi_debt ==
-                                                                                "0"
+                                                                                e.chi_debt == "0"
                                                                                     ? "-"
-                                                                                    : formatNumber(
-                                                                                          e.chi_debt
-                                                                                      )
+                                                                                    : formatNumber(e.chi_debt)
                                                                             }
-                                                                            id={
-                                                                                e?.id
-                                                                            }
-                                                                            date={
-                                                                                valueDate
-                                                                            }
-                                                                            type={
-                                                                                "chi_debt"
-                                                                            }
-                                                                            idBranch={
-                                                                                idBranch
-                                                                            }
-                                                                            idSupplier={
-                                                                                idSupplier
-                                                                            }
+                                                                            id={e?.id}
+                                                                            date={valueDate}
+                                                                            type={"chi_debt"}
+                                                                            idBranch={idBranch}
+                                                                            idSupplier={idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>
@@ -948,20 +744,10 @@ const Index = (props) => {
 
                                                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                    {e.no_end ==
-                                                                    "0"
-                                                                        ? "-"
-                                                                        : formatNumber(
-                                                                              e.no_end
-                                                                          )}
+                                                                    {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
                                                                 </h4>
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                    {e.chi_end ==
-                                                                    "0"
-                                                                        ? "-"
-                                                                        : formatNumber(
-                                                                              e.chi_end
-                                                                          )}
+                                                                    {e.chi_end == "0" ? "-" : formatNumber(e.chi_end)}
                                                                 </h4>
                                                             </div>
                                                         </div>
@@ -1021,17 +807,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
-                                    {dataLang?.display}{" "}
-                                    {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />

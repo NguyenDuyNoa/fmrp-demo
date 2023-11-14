@@ -25,6 +25,7 @@ import Popup from "reactjs-popup";
 import { useSelector } from "react-redux";
 import { routerReturns } from "components/UI/router/buyImportGoods";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -44,7 +45,7 @@ const Index = (props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);

@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { ArrowUp as IconArrowUp, ArrowDown as IconArrowDown, ArrowRight2 as IconArrowRight2 } from "iconsax-react";
 import Expirred from "components/UI/expired";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const Pie = dynamic(() => import("@ant-design/plots").then(({ Pie }) => Pie), {
     ssr: false,
 });
@@ -21,7 +22,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 const Index = () => {
     const dispatch = useDispatch();
     const dataPstWH = useSelector((state) => state.trangthai);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const _HandleExample = () => {
         dispatch({

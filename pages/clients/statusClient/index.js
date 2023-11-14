@@ -25,6 +25,7 @@ import SelectComponent from "components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import OnResetData from "components/UI/btnResetData/btnReset";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -40,7 +41,7 @@ const Toast = Swal.mixin({
 const Index = (props) => {
     const router = useRouter();
     const dataLang = props.dataLang;
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const [data, sData] = useState([]);
     const [onFetching, sOnFetching] = useState(true);

@@ -50,6 +50,7 @@ import Popup_chitiet from "./(popup)/pupup";
 import { useSelector } from "react-redux";
 import { routerReturns } from "components/UI/router/buyImportGoods";
 import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -478,7 +479,7 @@ const Index = (props) => {
         checkedWare.id != null && sOnSending(true);
     }, [checkedWare.id != null]);
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     return (
         <React.Fragment>
             <Head>

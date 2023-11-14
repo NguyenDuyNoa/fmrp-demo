@@ -50,6 +50,7 @@ import OnResetData from "components/UI/btnResetData/btnReset";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import HeaderTable from "components/UI/headerTable/headerTable";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -64,7 +65,7 @@ const Index = (props) => {
     const router = useRouter();
     const tabPage = router.query?.tab;
     const dispatch = useDispatch();
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
     const [totalItem, sTotalItems] = useState([]);

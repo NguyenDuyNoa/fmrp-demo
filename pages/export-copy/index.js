@@ -15,11 +15,12 @@ import FormClientEndSuplier from "./(client)/client";
 import ClientEndSuplier from "./(client)/client";
 import ClientSuplier from "./(client)/client";
 import Client from "./(client)/client";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const scrollAreaRef = useRef(null);
 

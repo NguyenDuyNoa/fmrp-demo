@@ -4,9 +4,10 @@ import Image from "next/image";
 
 import { ArrowUp2, ArrowRight2 as IconRight } from "iconsax-react";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = () => {
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
     const dataSell = [
         {
             name: "Bắt đầu",

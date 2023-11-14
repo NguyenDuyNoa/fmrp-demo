@@ -23,6 +23,7 @@ import Link from "next/link";
 import moment from "moment/moment";
 import { useSelector } from "react-redux";
 import { routerImport } from "components/UI/router/buyImportGoods";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -1491,7 +1492,7 @@ const Index = (props) => {
             );
     };
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     return (
         <React.Fragment>

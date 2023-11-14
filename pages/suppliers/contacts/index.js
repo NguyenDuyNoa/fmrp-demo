@@ -28,6 +28,7 @@ import SelectComponent from "components/UI/filterComponents/selectComponent";
 import OnResetData from "components/UI/btnResetData/btnReset";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -44,6 +45,8 @@ const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
     const tabPage = router.query?.tab;
+
+    const trangthaiExprired = useStatusExprired();
 
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
@@ -270,7 +273,6 @@ const Index = (props) => {
     const _HandleFresh = () => {
         sOnFetching(true);
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     return (
         <React.Fragment>

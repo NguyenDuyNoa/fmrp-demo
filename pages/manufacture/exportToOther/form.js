@@ -27,6 +27,7 @@ import moment from "moment/moment";
 import { useSelector } from "react-redux";
 import { useRef } from "react";
 import ButtonSubmit from "components/UI/buttonSubmit/buttonSubmit";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -73,7 +74,7 @@ const Index = (props) => {
     const [dataProductSerial, sDataProductSerial] = useState({});
     //new
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const [listData, sListData] = useState([]);
     const [warehouse, sDataWarehouse] = useState([]);

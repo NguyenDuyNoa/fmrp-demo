@@ -1,6 +1,7 @@
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Header = dynamic(() => import("./(header)/header"), { ssr: false });
 
@@ -10,7 +11,7 @@ const MainTable = dynamic(() => import("./(mainTable)/mainTable"), { ssr: false 
 
 const Index = (props) => {
     const dataLang = props.dataLang;
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     const propsDefault = {
         dataLang,
     };

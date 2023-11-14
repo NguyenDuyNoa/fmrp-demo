@@ -30,6 +30,7 @@ import { useRef } from "react";
 import Popup_chitiet from "./(popup)/popupDetail";
 import Popup_status from "./(popup)/popupStatus";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -283,7 +284,7 @@ const Index = (props) => {
     ];
 
     const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
     return (
         <>
             <Head>

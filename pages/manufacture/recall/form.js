@@ -24,6 +24,7 @@ import { NumericFormat } from "react-number-format";
 import Link from "next/link";
 import moment from "moment/moment";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -66,7 +67,7 @@ const Index = (props) => {
     const [dataProductSerial, sDataProductSerial] = useState({});
     //new
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired()
 
     const [listData, sListData] = useState([]);
     const [warehouse, sDataWarehouse] = useState([]);
