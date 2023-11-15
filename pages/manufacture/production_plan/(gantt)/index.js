@@ -134,7 +134,7 @@ const BodyGantt = ({
                             ref={container3Ref}
                             onScroll={handleScrollContainer2}
                             className="flex-col min-w-[35%] w-[35%] overflow-x-auto overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
-                        3xl:h-[60vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                        3xl:h-[60vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                         >
                             {data?.map((e, eIndex) => {
                                 const outDate = ["outDate"].includes(e.status);
@@ -310,7 +310,7 @@ const BodyGantt = ({
                             ref={container1Ref}
                             onScroll={handleScroll}
                             className="flex-col  overflow-x  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
-                     3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                     3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                         >
                             {data?.map((e, eIndex) => {
                                 return (
