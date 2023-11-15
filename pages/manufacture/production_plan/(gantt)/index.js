@@ -261,7 +261,7 @@ const BodyGantt = ({
                                                                         width={36}
                                                                         height={36}
                                                                         alt={i.name}
-                                                                        className="object-cover rounded-md w-[36px] h-[36px]"
+                                                                        className="object-cover rounded-md 3xl:w-[36px] 3xl:h-[36px] w-[28px] h-[28px]"
                                                                     />
                                                                 ) : (
                                                                     <ModalImage
@@ -269,11 +269,11 @@ const BodyGantt = ({
                                                                         height={36}
                                                                         small="/no_img.png"
                                                                         large="/no_img.png"
-                                                                        className="object-cover rounded-md w-[36px] h-[36px]"
+                                                                        className="object-cover rounded-md 3xl:w-[36px] 3xl:h-[36px] w-[28px] h-[28px]"
                                                                     ></ModalImage>
                                                                 )}
                                                                 <div className="flex flex-col">
-                                                                    <h1 className="text-[#000000] font-semibold 3xl:text-xs  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px]">
+                                                                    <h1 className="text-[#000000] font-semibold 3xl:text-xs  xxl:text-[11px] 2xl:text-[10px] xl:text-[9px] lg:text-[9px] text-[11px]">
                                                                         {i.name}
                                                                     </h1>
                                                                     <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
