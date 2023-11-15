@@ -2,12 +2,10 @@ import Head from "next/head";
 import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import useToast from "@/hooks/useToast";
 import { useChangeValue } from "@/hooks/useChangeValue";
-import { useMemo } from "react";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Table = dynamic(() => import("./(form)/table"), { ssr: false });
@@ -18,6 +16,8 @@ const FormAdd = (props) => {
     const router = useRouter();
 
     const dataLang = props.dataLang;
+
+    const showToat = useToast();
 
     const [data, sData] = useState([]);
 
@@ -108,7 +108,7 @@ const FormAdd = (props) => {
     }, [data]);
 
     const backPage = () => {
-        ToatstNotifi("error", "Không có đơn hàng. Vui lòng thêm đơn hàng !", 3000);
+        showToat("error", "Không có đơn hàng. Vui lòng thêm đơn hàng !", 3000);
         setTimeout(() => {
             router.push("/manufacture/production_plan");
         }, 3100);
@@ -118,7 +118,7 @@ const FormAdd = (props) => {
         localStorage.setItem("arrData", JSON.stringify(data));
         sData(data);
         sIsCheckRemove(true);
-        ToatstNotifi("success", "Xóa đơn hàng thành công");
+        showToat("success", "Xóa đơn hàng thành công");
     };
 
     const checkLoading = () => {

@@ -9,6 +9,7 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ModalImage from "react-modal-image";
 
 const Table = ({ data, isLoading, handleRemoveItem }) => {
     const dataNew = data
@@ -80,13 +81,24 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                     </h3>
                                 </h3>
                                 <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs capitalize flex items-center gap-2">
-                                    <Image
-                                        src={i?.images}
-                                        width={36}
-                                        height={36}
-                                        alt=""
-                                        className="object-cover rounded-md"
-                                    />
+                                    {i.images != null ? (
+                                        <ModalImage
+                                            small={i.images}
+                                            large={i.images}
+                                            width={36}
+                                            height={36}
+                                            alt={i.name}
+                                            className="object-cover rounded-md w-[36px] h-[36px]"
+                                        />
+                                    ) : (
+                                        <ModalImage
+                                            width={36}
+                                            height={36}
+                                            small="/no_img.png"
+                                            large="/no_img.png"
+                                            className="object-cover rounded-md w-[36px] h-[36px]"
+                                        ></ModalImage>
+                                    )}
 
                                     <div className="flex flex-col items-start">
                                         <h2 className="text-[#000000] 3xl:text-base text-sm font-medium">{i?.name}</h2>
@@ -134,7 +146,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                     />
                                 </h3>
                                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize ">
-                                    Đôi
+                                    {i.unitName}
                                 </h3>
                                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize ">
                                     <SelectComponent

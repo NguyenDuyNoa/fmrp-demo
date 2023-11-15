@@ -6,6 +6,7 @@ const NoData = (props) => {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
+            {...props}
         >
             <div className=" max-w-[352px] mt-24 mx-auto">
                 <div className="text-center">

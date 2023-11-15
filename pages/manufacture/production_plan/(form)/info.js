@@ -7,7 +7,31 @@ import Datepicker from "react-tailwindcss-datepicker";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+
 const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
+    const isBreakpoint = {
+        placeholder: (base) => ({
+            ...base,
+            color: "#cbd5e1",
+            fontSize: "13px !important",
+            "@media screen and (max-width: 1600px)": {
+                fontSize: "14px !important",
+            },
+            "@media screen and (max-width: 1400px)": {
+                fontSize: "12px !important",
+            },
+            "@media screen and (max-width: 1536px)": {
+                fontSize: "11px !important",
+            },
+            "@media screen and (max-width: 1280px)": {
+                fontSize: "10px !important",
+            },
+            "@media screen and (max-width: 1024px)": {
+                fontSize: "9px !important",
+            },
+        }),
+    };
+
     return (
         <>
             <div className="bg-[#ECF0F4] font text-[#141522] font-medium 3xl:text-sm text-xs p-3 rounded">
@@ -38,28 +62,7 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                         onChange={onChangeValue("idBrach")}
                         options={[{ label: "hi", value: 1 }]}
                         className={"w-full"}
-                        styles={{
-                            placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                                fontSize: "13px !important",
-                                "@media screen and (max-width: 1600px)": {
-                                    fontSize: "14px !important",
-                                },
-                                "@media screen and (max-width: 1400px)": {
-                                    fontSize: "12px !important",
-                                },
-                                "@media screen and (max-width: 1536px)": {
-                                    fontSize: "11px !important",
-                                },
-                                "@media screen and (max-width: 1280px)": {
-                                    fontSize: "10px !important",
-                                },
-                                "@media screen and (max-width: 1024px)": {
-                                    fontSize: "9px !important",
-                                },
-                            }),
-                        }}
+                        styles={isBreakpoint}
                     />
                 </div>
                 <div className="col-span-6">
@@ -102,12 +105,10 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                                 id="default-radio-1"
                                 type="radio"
                                 value=""
-                                checked={isValue.internalPlan}
+                                checked={isValue.order}
                                 onChange={() => {
-                                    console.log("Setting internalPlan to true, order to false");
-
-                                    onChangeValue("internalPlan")(!isValue.internalPlan);
-                                    onChangeValue("order")(false);
+                                    onChangeValue("order")(!isValue.order);
+                                    onChangeValue("internalPlan")(false);
                                 }}
                                 name="default-radio1"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
@@ -124,12 +125,10 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                                 id="default-radio-2"
                                 type="radio"
                                 value=""
-                                checked={isValue.order}
+                                checked={isValue.internalPlan}
                                 onChange={() => {
-                                    console.log("Setting order to true, internalPlan to false");
-
-                                    onChangeValue("order")(!isValue.order);
-                                    onChangeValue("internalPlan")(false);
+                                    onChangeValue("internalPlan")(!isValue.internalPlan);
+                                    onChangeValue("order")(false);
                                 }}
                                 name="default-radio2"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
@@ -226,28 +225,7 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                         value={isValue.idOrder}
                         onChange={onChangeValue("idOrder")}
                         options={[{ label: "hi", value: 1 }]}
-                        styles={{
-                            placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                                fontSize: "13px !important",
-                                "@media screen and (max-width: 1600px)": {
-                                    fontSize: "14px !important",
-                                },
-                                "@media screen and (max-width: 1400px)": {
-                                    fontSize: "12px !important",
-                                },
-                                "@media screen and (max-width: 1536px)": {
-                                    fontSize: "11px !important",
-                                },
-                                "@media screen and (max-width: 1280px)": {
-                                    fontSize: "10px !important",
-                                },
-                                "@media screen and (max-width: 1024px)": {
-                                    fontSize: "9px !important",
-                                },
-                            }),
-                        }}
+                        styles={isBreakpoint}
                     />
                 </div>
                 <div className="col-span-6 flex flex-col gap-y-4">

@@ -4,11 +4,13 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useMemo, useEffect, useState } from "react";
 
+import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
+import useToast from "@/hooks/useToast";
+import { useMoment } from "@/hooks/useMoment";
 import { useToggle } from "@/hooks/useToggle";
 import { useSetData } from "@/hooks/useSetData";
 import usePagination from "@/hooks/usePagination";
@@ -28,10 +30,6 @@ const Index = (props) => {
     const router = useRouter();
 
     const trangthaiExprired = useStatusExprired();
-
-    const propss = {
-        dataLang,
-    };
 
     const timeLine = [
         {
@@ -540,1517 +538,12 @@ const Index = (props) => {
         },
     ];
 
-    const listOrder = [
-        {
-            id: uuid(),
-            nameOrder: "PO-223429",
-            status: "outDate",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 2,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 3,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 4,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 5,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 6,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 7,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 8,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 9,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 10,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 11,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 12,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: false },
-                                { id: 2, type: "t3", active: true, outDate: false },
-                                { id: 3, type: "t4", active: true, outDate: false },
-                                { id: 4, type: "t5", active: true, outDate: false },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 4,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 5,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                        {
-                            month: 6,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                        {
-                            month: 7,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                        {
-                            month: 8,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                        {
-                            month: 9,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                        {
-                            month: 10,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                        {
-                            month: 11,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                        {
-                            month: 12,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 4,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223428",
-            status: "processing",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: false },
-                                { id: 2, type: "t3", active: true, outDate: false },
-                                { id: 3, type: "t4", active: true, outDate: false },
-                                { id: 4, type: "t5", active: true, outDate: false },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223427",
-            status: "sussces",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 2,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 3,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t6", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t6", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223426",
-            status: "sussces",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                                { id: 8, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223425",
-            status: "processing",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                                { id: 8, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223424",
-            status: "outDate",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t7", active: true },
-                        { id: 6, type: "t7", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                                { id: 8, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223423",
-            status: "sussces",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 2,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                                { id: 8, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223422",
-            status: "processing",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 2,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                                { id: 8, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223421",
-            status: "processing",
-            process: "84%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 2,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                                { id: 8, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            id: uuid(),
-            nameOrder: "PO-223420",
-            status: "unfulfilled",
-            process: "0%",
-            processDefault: [
-                {
-                    month: 1,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-                {
-                    month: 2,
-                    days: [
-                        { id: 1, type: "t2", active: true },
-                        { id: 2, type: "t3", active: true },
-                        { id: 3, type: "t4", active: true },
-                        { id: 4, type: "t5", active: true },
-                        { id: 5, type: "t6", active: true },
-                        { id: 6, type: "t7", active: true },
-                        { id: 7, type: "cn", active: true },
-                    ],
-                },
-            ],
-            listProducts: [
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "outDate",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                                { id: 8, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "sussces",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 1,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                        {
-                            month: 3,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: false },
-                                { id: 6, type: "t7", active: true, outDate: false },
-                                { id: 7, type: "cn", active: true, outDate: false },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    id: uuid(),
-                    name: "Cổ áo",
-                    images: "/productionPlan/coaothun.png",
-                    desription: "COAOTHUN",
-                    status: "unfulfilled",
-                    quantity: "8.000",
-                    actions: "Lập KH NVL",
-                    processArr: [
-                        {
-                            month: 2,
-                            days: [
-                                { id: 1, type: "t2", active: true, outDate: true },
-                                { id: 2, type: "t3", active: true, outDate: true },
-                                { id: 3, type: "t4", active: true, outDate: true },
-                                { id: 4, type: "t5", active: true, outDate: true },
-                                { id: 5, type: "t7", active: true, outDate: true },
-                                { id: 6, type: "t7", active: true, outDate: true },
-                                { id: 7, type: "cn", active: true, outDate: true },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-    ];
-
     const initialData = {
         timeLine: timeLine,
-        listOrder: listOrder,
+        listOrder: [],
         client: [],
         productGroup: [],
+        product: [],
     };
 
     const initialValues = {
@@ -2062,6 +555,8 @@ const Index = (props) => {
         planStatus: null,
     };
 
+    const showToast = useToast();
+
     const { paginate } = usePagination();
 
     const [isOpen, handleToggle] = useToggle(false);
@@ -2071,6 +566,143 @@ const Index = (props) => {
     const { isData, updateData } = useSetData(initialData);
 
     const { isValue, onChangeValue } = useChangeValue(initialValues);
+
+    const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
+
+    const [data, sData] = useState([]);
+
+    const { limit, totalItems, updateLimit, updateTotalItems } = useLimitAndTotalItems(15, {});
+
+    const _ServerFetching = () => {
+        Axios(
+            "GET",
+            `/api_web/api_manufactures/getProductionPlan?csrf_protection=true`,
+            {
+                params: {
+                    page: router.query?.page || 1,
+                    limit: limit,
+                    date_start: isValue.startDate ? useMoment(isValue.startDate, "DD/MM/YYYY") : "",
+                    date_end: isValue.endDate ? useMoment(isValue.endDate, "DD/MM/YYYY") : "",
+                    customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
+                    category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
+                    product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+
+                    updateData({
+                        listOrder: data?.rResult?.map((i) => ({
+                            id: i.id,
+                            nameOrder: i.nameOrder,
+                            status: i.status,
+                            process: i.process,
+                            processDefault: i.processDefault,
+                            listProducts: i.listProducts.map((s) => ({
+                                id: s.id,
+                                name: s.name,
+                                images: s.images,
+                                desription: s.desription,
+                                status: s.status,
+                                quantity: s.quantity,
+                                actions: s.actions,
+                                processArr: s.processArr,
+                                unitName: s.unit_name,
+                            })),
+                        })),
+                    });
+
+                    updateTotalItems({
+                        iTotalDisplayRecords: data?.output?.iTotalDisplayRecords,
+                        iTotalRecords: data?.output?.iTotalRecords,
+                    });
+                }
+                sIsFetching(false);
+            }
+        );
+    };
+
+    const _ServerFetching_filter = () => {
+        Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                let { rResult } = response?.data;
+
+                updateData({ client: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
+            }
+        });
+
+        Axios("GET", "api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                let { rResult } = response?.data;
+
+                updateData({
+                    productGroup: rResult.map((e) => ({
+                        label: `${e.name + " " + "(" + e.code + ")"}`,
+                        value: e.id,
+                        level: e.level,
+                        code: e.code,
+                        parent_id: e.parent_id,
+                    })),
+                });
+            }
+        });
+
+        Axios(
+            "POST",
+            "/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true&term",
+            {
+                params: {
+                    "filter[branch_id]": 0,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response.data.data;
+                    updateData({ product: result });
+                }
+            }
+        );
+    };
+
+    let searchTimeout;
+
+    const _HandleSeachApi = (inputValue) => {
+        if (inputValue == "") return;
+        else {
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                Axios(
+                    "POST",
+                    `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+                    {
+                        params: {
+                            "filter[branch_id]": 0,
+                        },
+                        data: {
+                            term: inputValue,
+                        },
+                    },
+                    (err, response) => {
+                        if (!err) {
+                            let { result } = response.data.data;
+
+                            updateData({ product: result });
+                        }
+                    }
+                );
+            }, 500);
+        }
+    };
+
+    const options = isData?.product?.map((e) => ({
+        label: `${e.name}
+                <spa style={{display: none}}>${e.code}</spa
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+        value: e.id,
+        e,
+    }));
 
     const sortArrayByMonth = (arr) => {
         return [...Array(12)].map((_, index) => {
@@ -2105,7 +737,7 @@ const Index = (props) => {
 
     const updateListProducts = (order) => {
         return order.listProducts.map((product) => {
-            const newArrMonth = sortArrayByMonth(product.processArr);
+            const newArrMonth = product.processArr?.length > 0 ? sortArrayByMonth(product.processArr) : [];
 
             const newArrDays = sortArrayByDay(newArrMonth);
 
@@ -2125,66 +757,29 @@ const Index = (props) => {
         return processDefaultUpdate;
     };
 
-    const updateListOrder = (listOrder) => {
-        return listOrder.map((order) => {
-            const updatedListProducts = updateListProducts(order);
+    const updateListOrder = useMemo(() => {
+        return (listOrder) => {
+            return listOrder?.map((order) => {
+                const updatedListProducts = updateListProducts(order);
 
-            const processDefaultUpdate = updateProcessDefault(order);
+                const processDefaultUpdate = updateProcessDefault(order);
 
-            return {
-                ...order,
-                show: true,
-                processDefault: processDefaultUpdate,
-                listProducts: updatedListProducts,
-            };
-        });
-    };
-
-    const updatedListOrder = updateListOrder(isData.listOrder);
-
-    const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
-
-    const [data, sData] = useState(updatedListOrder);
-
-    const { limit, totalItems, updateLimit, updateTotalItems } = useLimitAndTotalItems(15, {
-        iTotalDisplayRecords: 10,
-        iTotalRecords: 10,
-    });
-
-    console.log(limit, totalItems);
-
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `url...`,
-            {
-                params: {},
-                data: "",
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                }
-                sIsFetching(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        isFetching && _ServerFetching();
-    }, [isFetching]);
-
-    useEffect(() => {
-        sIsFetching(true);
+                return {
+                    ...order,
+                    show: updatedListProducts?.length > 0,
+                    processDefault: processDefaultUpdate || [],
+                    listProducts: updatedListProducts,
+                };
+            });
+        };
     }, []);
 
     const handleShowSub = useMemo(() => {
-        return (index) => {
+        return (id) => {
             const updatedData = [...data];
 
-            updatedData.forEach((order, i) => {
-                if (i === index) {
+            updatedData.forEach((order) => {
+                if (order.id === id) {
                     order.show = !order.show;
                 }
             });
@@ -2212,13 +807,9 @@ const Index = (props) => {
 
             localStorage.setItem("arrData", JSON.stringify(updatedData));
 
-            sData(updatedData);
+            sData([...updatedData]);
         };
     }, [data]);
-
-    useEffect(() => {
-        localStorage.removeItem("arrData");
-    }, []);
 
     const handleSort = useMemo(() => {
         return () => {
@@ -2232,7 +823,7 @@ const Index = (props) => {
                 }
             });
 
-            ToatstNotifi("success", "Sắp xếp đơn hàng thành công");
+            showToast("success", "Sắp xếp đơn hàng thành công");
 
             sData(updatedData);
 
@@ -2240,36 +831,63 @@ const Index = (props) => {
         };
     }, [data]);
 
+    useEffect(() => {
+        const istOrders = updateListOrder(isData.listOrder);
+
+        sData(istOrders);
+    }, [isData.listOrder]);
+
+    useEffect(() => {
+        isFetching && _ServerFetching();
+    }, [isFetching]);
+
+    useEffect(() => {
+        sIsFetching(true);
+        _ServerFetching_filter();
+    }, [router.query.page, isValue]);
+
+    useEffect(() => {
+        localStorage.removeItem("arrData");
+    }, []);
+
+    const shareProps = { dataLang, isData, isFetching, options, _HandleSeachApi };
+
     return (
         <>
             <Head>
                 <title>{"Kế hoạch sản xuất"}</title>
             </Head>
             <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                {trangthaiExprired ? <div className="p-4"></div> : <Header {...propss} />}
-                <FilterHeader {...propss} onChangeValue={onChangeValue} isValue={isValue} />
-                <BodyGantt
-                    handleToggle={handleToggle}
-                    {...propss}
-                    handleShowSub={handleShowSub}
-                    handleSort={handleSort}
-                    data={data}
-                    timeLine={isData.timeLine}
-                    isAscending={isAscending}
-                    handleCheked={handleCheked}
-                />
-                <div className="flex space-x-5 items-center">
-                    <h6 className="">
-                        {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                        {totalItems?.iTotalRecords} {dataLang?.ingredient}
-                    </h6>
-                    <Pagination
-                        postsPerPage={limit}
-                        totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                        paginate={paginate}
-                        currentPage={router.query?.page || 1}
+                {trangthaiExprired ? <div className="p-4"></div> : <Header {...shareProps} />}
+                <FilterHeader {...shareProps} onChangeValue={onChangeValue} isValue={isValue} />
+                {isFetching ? (
+                    <Loading className="h-80" color="#0f4f9e" />
+                ) : (
+                    <BodyGantt
+                        handleToggle={handleToggle}
+                        {...shareProps}
+                        handleShowSub={handleShowSub}
+                        handleSort={handleSort}
+                        data={data}
+                        timeLine={isData.timeLine}
+                        isAscending={isAscending}
+                        handleCheked={handleCheked}
                     />
-                </div>
+                )}
+                {data?.length > 0 && (
+                    <div className="flex space-x-5 items-center">
+                        <h6 className="">
+                            {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                            {totalItems?.iTotalRecords} {dataLang?.ingredient}
+                        </h6>
+                        <Pagination
+                            postsPerPage={limit}
+                            totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                            paginate={paginate}
+                            currentPage={router.query?.page || 1}
+                        />
+                    </div>
+                )}
             </div>
         </>
     );
