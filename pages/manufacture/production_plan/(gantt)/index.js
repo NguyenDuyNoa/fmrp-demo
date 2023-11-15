@@ -261,7 +261,7 @@ const BodyGantt = ({
                                                                         width={36}
                                                                         height={36}
                                                                         alt={i.name}
-                                                                        className="object-cover rounded-md 3xl:w-[36px] 3xl:h-[36px] w-[28px] h-[28px]"
+                                                                        className="object-cover rounded-md w-[36px] h-[36px]"
                                                                     />
                                                                 ) : (
                                                                     <ModalImage
@@ -269,7 +269,7 @@ const BodyGantt = ({
                                                                         height={36}
                                                                         small="/no_img.png"
                                                                         large="/no_img.png"
-                                                                        className="object-cover rounded-md 3xl:w-[36px] 3xl:h-[36px] w-[28px] h-[28px]"
+                                                                        className="object-cover rounded-md w-[36px] h-[36px]"
                                                                     ></ModalImage>
                                                                 )}
                                                                 <div className="flex flex-col">
