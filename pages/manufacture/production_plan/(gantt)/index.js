@@ -229,6 +229,7 @@ const BodyGantt = ({
                                                                     /> */}
                                                                     <button
                                                                         type="button"
+                                                                        id={i.id}
                                                                         className={`w-4 h-4 rounded-full cursor-pointer outline-none focus:outline-none  border border-gray-300 flex justify-center items-center ${
                                                                             i.checked ? "bg-blue-600" : "bg-white"
                                                                         }`}
