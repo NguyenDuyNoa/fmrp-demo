@@ -133,8 +133,8 @@ const BodyGantt = ({
                         <div
                             ref={container3Ref}
                             onScroll={handleScrollContainer2}
-                            className="flex-col min-w-[35%] w-[35%] overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
-                        3xl:h-[61.5vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                            className="flex-col min-w-[35%] w-[35%] overflow-x-auto overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
+                        3xl:h-[60vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                         >
                             {data?.map((e, eIndex) => {
                                 const outDate = ["outDate"].includes(e.status);
@@ -206,8 +206,7 @@ const BodyGantt = ({
                                                         <label
                                                             key={i.id}
                                                             htmlFor={i.id}
-                                                            className={`
-                                                       cursor-pointer grid grid-cols-12 items-center my-2`}
+                                                            className={`cursor-pointer grid grid-cols-12 items-center my-2`}
                                                         >
                                                             <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
                                                                 {/* <input
@@ -221,15 +220,16 @@ const BodyGantt = ({
                                                                     htmlFor={i.id}
                                                                     className="inline-flex items-center"
                                                                 >
-                                                                    <input
+                                                                    {/* <input
                                                                         id={i.id}
                                                                         type="checkbox"
                                                                         className="hidden"
                                                                         checked={i.checked}
                                                                         onChange={() => handleCheked(e.id, i.id)}
-                                                                    />
-                                                                    <div
-                                                                        className={`w-4 h-4 rounded-full  border border-gray-300 flex justify-center items-center ${
+                                                                    /> */}
+                                                                    <button
+                                                                        type="button"
+                                                                        className={`w-4 h-4 rounded-full cursor-pointer outline-none focus:outline-none  border border-gray-300 flex justify-center items-center ${
                                                                             i.checked ? "bg-blue-600" : "bg-white"
                                                                         }`}
                                                                         onClick={() => handleCheked(e.id, i.id)}
@@ -243,7 +243,7 @@ const BodyGantt = ({
                                                                                 <circle cx="50%" cy="50%" r="40%" />
                                                                             </svg>
                                                                         )}
-                                                                    </div>
+                                                                    </button>
                                                                 </label>
 
                                                                 {/* <Image
@@ -309,7 +309,7 @@ const BodyGantt = ({
                             ref={container1Ref}
                             onScroll={handleScroll}
                             className="flex-col  overflow-x  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
-                     3xl:h-[61.2vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                     3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[53.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                         >
                             {data?.map((e, eIndex) => {
                                 return (

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-export const useChangeValue = (initialState) => {
-    const [isValue, sIsValue] = useState(initialState);
+export const useChangeValue = (initialValue) => {
+    const [isValue, sIsValue] = useState(initialValue);
 
     const onChangeValue = (key) => (event) => sIsValue((prev) => ({ ...prev, [key]: event }));
 
