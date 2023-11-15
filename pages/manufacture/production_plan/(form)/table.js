@@ -101,7 +101,9 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                     )}
 
                                     <div className="flex flex-col items-start justify-start">
-                                        <h2 className="text-[#000000] 3xl:text-base text-sm font-medium">{i?.name}</h2>
+                                        <h2 className="text-[#000000] 3xl:text-base text-sm font-medium text-left">
+                                            {i?.name}
+                                        </h2>
                                         <h3 className="text-[#9295A4] text-[10px] font-normal">{i?.desription}</h3>
                                     </div>
                                 </h3>
