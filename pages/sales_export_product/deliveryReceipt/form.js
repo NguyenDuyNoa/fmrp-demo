@@ -229,15 +229,18 @@ const Index = (props) => {
                                 value: e?.item?.warehouse_location?.id,
                                 warehouse_name: e?.item?.warehouse_location?.warehouse_name,
                                 qty: e?.item?.warehouse_location?.quantity,
+                                lot: e?.item?.warehouse_location?.lot,
+                                date: e?.item?.warehouse_location?.expiration_date,
+                                serial: e?.item?.warehouse_location?.serial,
                             },
-                            dataWarehouse: e?.item?.warehouseList?.map((ce) => ({
-                                label: ce?.location_name,
-                                value: ce?.id,
-                                warehouse_name: ce?.warehouse_name,
-                                qty: ce?.quantity,
-                                lot: ce?.lot,
-                                date: ce?.expiration_date,
-                                serial: ce?.serial,
+                            dataWarehouse: e?.item?.warehouseList?.map((s) => ({
+                                label: s?.location_name,
+                                value: s?.id,
+                                warehouse_name: s?.warehouse_name,
+                                qty: s?.quantity,
+                                lot: s?.lot,
+                                date: s?.expiration_date,
+                                serial: s?.serial,
                             })),
                             quantityStock: e?.item?.quantity,
                             quantityDelive: e?.item?.quantity_delivery,
@@ -287,6 +290,7 @@ const Index = (props) => {
             sOnFetchingDetail(false);
         });
     };
+    console.log("lisss", listData);
 
     useEffect(() => {
         onFetchingDetail && _ServerFetchingDetailPage();
@@ -1911,6 +1915,7 @@ const Index = (props) => {
                                                                         }
                                                                         menuPortalTarget={document.body}
                                                                         formatOptionLabel={(option) => {
+                                                                            console.log("option", option);
                                                                             return (
                                                                                 (option?.warehouse_name ||
                                                                                     option?.label ||

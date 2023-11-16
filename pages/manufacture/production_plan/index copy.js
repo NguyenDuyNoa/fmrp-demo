@@ -2055,7 +2055,7 @@ const Index = (props) => {
         planStatus: null,
     };
 
-    const [isOpen, handleToggle] = useToggle(false);
+    const { isOpen, handleToggle } = useToggle(false);
 
     const { isData, updateData } = useSetData(initialData);
 

@@ -35,6 +35,9 @@ import SearchComponent from "components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { useToggle } from "@/hooks/useToggle";
+import useToast from "@/hooks/useToast";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -52,6 +55,8 @@ const Index = (props) => {
     const router = useRouter();
     const tabPage = router.query?.tab;
 
+    const { isOpen, isId, handleQueryId } = useToggle();
+    const isShow = useToast();
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
     const [totalItem, sTotalItems] = useState([]);
@@ -217,32 +222,17 @@ const Index = (props) => {
             (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, router.query?.tab, idBranch]);
 
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/api_client/client/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var isSuccess = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang?.aler_success_delete,
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/api_client/client/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var isSuccess = response.data;
+                if (isSuccess) {
+                    isShow("success", dataLang?.aler_success_delete);
+                }
             }
+            _ServerFetching();
         });
+        handleQueryId({ status: false });
     };
 
     //excel
@@ -374,7 +364,6 @@ const Index = (props) => {
                         <h6>{dataLang?.client_list_title}</h6>
                     </div>
                 )}
-
                 <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
@@ -631,8 +620,11 @@ const Index = (props) => {
                                                                     ward={e.ward}
                                                                     id={e?.id}
                                                                 />
+
                                                                 <button
-                                                                    onClick={() => handleDelete(e.id)}
+                                                                    onClick={() =>
+                                                                        handleQueryId({ id: e.id, status: true })
+                                                                    }
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -678,6 +670,14 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                type="warning"
+                title="Bạn có muốn xóa không"
+                subtitle="Xác nhận xóa !"
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

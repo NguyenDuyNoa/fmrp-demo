@@ -1,11 +1,10 @@
 import dynamic from "next/dynamic";
-import Image from "next/image";
-import { useRouter } from "next/router";
+
 const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), {
     ssr: false,
 });
+
 const Header = () => {
-    const router = useRouter();
     return (
         <>
             <div className="flex items-center justify-between">

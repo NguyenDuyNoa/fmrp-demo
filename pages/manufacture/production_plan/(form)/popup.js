@@ -9,7 +9,7 @@ import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
 const PopupEditer = ({}) => {
-    const [isOpen, handleOpen] = useToggle(false);
+    const { isOpen, handleOpen } = useToggle(false);
 
     const [isLoading, sIsLoading] = useState(false);
 

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import dynamic from "next/dynamic";
+import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
 
 import React from "react";
@@ -9,7 +9,6 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ModalImage from "react-modal-image";
 
 const Table = ({ data, isLoading, handleRemoveItem }) => {
     const dataNew = data
@@ -88,7 +87,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                             width={36}
                                             height={36}
                                             alt={i.name}
-                                            className="object-cover rounded-md w-[36px] h-[36px]"
+                                            className="object-cover rounded-md min-w-[36px] max-w-[36px] w-[36px] max-h-[36px] min-h-[36px] h-[36px]"
                                         />
                                     ) : (
                                         <ModalImage
@@ -96,7 +95,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                             height={36}
                                             small="/no_img.png"
                                             large="/no_img.png"
-                                            className="object-cover rounded-md w-[36px] h-[36px]"
+                                            className="object-cover rounded-md min-w-[36px] max-w-[36px] w-[36px] max-h-[36px] min-h-[36px] h-[36px]"
                                         ></ModalImage>
                                     )}
 

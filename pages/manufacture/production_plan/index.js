@@ -9,6 +9,7 @@ import Pagination from "@/components/UI/pagination";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
+import useTab from "@/hooks/useTab";
 import useToast from "@/hooks/useToast";
 import { useMoment } from "@/hooks/useMoment";
 import { useToggle } from "@/hooks/useToggle";
@@ -565,15 +566,17 @@ const Index = (props) => {
 
     const { paginate } = usePagination();
 
-    const [isOpen, handleToggle] = useToggle(false);
+    const { handleTab } = useTab("order");
+
+    const {isOpen, handleToggle} = useToggle(false);
 
     const [isFetching, sIsFetching] = useState(false);
+
+    const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
 
     const { isData, updateData } = useSetData(initialData);
 
     const { isValue, onChangeValue } = useChangeValue(initialValues);
-
-    const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
 
     const [data, sData] = useState([]);
 
@@ -813,6 +816,7 @@ const Index = (props) => {
             });
 
             localStorage.setItem("arrData", JSON.stringify(updatedData));
+            localStorage.setItem("tab", router.query?.tab);
 
             sData([...updatedData]);
         };
@@ -851,13 +855,22 @@ const Index = (props) => {
     useEffect(() => {
         sIsFetching(true);
         _ServerFetching_filter();
-    }, [router.query.page, isValue]);
+    }, [router.query.page, router.query?.tab, isValue]);
 
     useEffect(() => {
         localStorage.removeItem("arrData");
     }, []);
 
-    const shareProps = { dataLang, isData, isFetching, options, _HandleSeachApi };
+    const shareProps = {
+        dataLang,
+        isData,
+        isValue,
+        isFetching,
+        options,
+        _HandleSeachApi,
+        handleTab,
+        router: router.query?.tab,
+    };
 
     return (
         <>
@@ -866,7 +879,7 @@ const Index = (props) => {
             </Head>
             <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {trangthaiExprired ? <div className="p-4"></div> : <Header {...shareProps} />}
-                <FilterHeader {...shareProps} onChangeValue={onChangeValue} isValue={isValue} />
+                <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
                 <BodyGantt
                     handleToggle={handleToggle}
                     {...shareProps}

@@ -8,8 +8,8 @@ import useToast from "@/hooks/useToast";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const Table = dynamic(() => import("./(form)/table"), { ssr: false });
 const InFo = dynamic(() => import("./(form)/info"), { ssr: false });
+const Table = dynamic(() => import("./(form)/table"), { ssr: false });
 const Header = dynamic(() => import("./(form)/header"), { ssr: false });
 
 const FormAdd = (props) => {
@@ -29,13 +29,17 @@ const FormAdd = (props) => {
 
     const getLocalStorage = () => (localStorage.getItem("arrData") ? JSON.parse(localStorage.getItem("arrData")) : []);
 
+    const getLocalStorageTab = () => localStorage.getItem("tab");
+
+    const tab = getLocalStorageTab();
+
     let dataLocals = getLocalStorage();
 
     const initialValue = {
         idBrach: null,
         date: new Date(),
-        internalPlan: false,
-        order: false,
+        internalPlan: tab == "plan",
+        order: tab == "order",
         idOrder: null,
         startDate: null,
         endDate: null,
@@ -109,6 +113,7 @@ const FormAdd = (props) => {
 
     const backPage = () => {
         showToat("error", "Không có đơn hàng. Vui lòng thêm đơn hàng !", 3000);
+
         setTimeout(() => {
             router.push("/manufacture/production_plan");
         }, 3100);
@@ -116,13 +121,17 @@ const FormAdd = (props) => {
 
     const getFreshData = (data) => {
         localStorage.setItem("arrData", JSON.stringify(data));
+
         sData(data);
+
         sIsCheckRemove(true);
+
         showToat("success", "Xóa đơn hàng thành công");
     };
 
     const checkLoading = () => {
         sIsLoading(true);
+
         setTimeout(() => {
             sIsLoading(false);
         }, 1000);
@@ -140,8 +149,8 @@ const FormAdd = (props) => {
 
     const handleChange = () => {};
 
-    const shareProps = { data, isLoading, handleRemoveBtn, handleRemoveItem, isValue, onChangeValue };
-    console.log(isValue);
+    const shareProps = { data, isLoading, handleRemoveBtn, handleRemoveItem, isValue, onChangeValue, tab };
+
     return (
         <>
             <Head>

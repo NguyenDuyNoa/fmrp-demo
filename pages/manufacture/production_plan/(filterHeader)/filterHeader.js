@@ -3,19 +3,12 @@ import dynamic from "next/dynamic";
 import DatePicker from "react-datepicker";
 import { ArrowDown2 } from "iconsax-react";
 import { components } from "react-select";
-import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
-import { useRef } from "react";
 
 const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), {
     ssr: false,
 });
 
 const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options, dataLang }) => {
-    const renderMonthContent = (month, shortMonth, longMonth) => {
-        const tooltipText = `Tooltip for month: ${longMonth}`;
-        return <span title={tooltipText}>{shortMonth}</span>;
-    };
-
     return (
         <>
             <div className="grid grid-cols-12 items-center gap-2 ">
@@ -113,32 +106,22 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         isMulti={true}
                         options={options}
                         closeMenuOnSelect={false}
-                        formatOptionLabel={(option, { selectProps }) => (
-                            // <div className="">
-                            //     <div className="flex items-center gap-1">
-                            //         <div>
-                            //             <h3 className="font-medium 3xl:text-[10px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
-                            //                 {option.e?.item_name} -{" "}
-                            //                 <span className="italic text-[9px]">{option.e?.product_variation}</span>
-                            //             </h3>
-                            //         </div>
-                            //     </div>
-                            // </div>
+                        formatOptionLabel={(option) => (
                             <div className="">
-                                <div className="flex items-center ">
-                                    <div className="custom-none w-[40px] h-[50px]">
+                                <div className="flex items-center gap-2">
+                                    <div className="custom-none max-w-[30px] w-[30px] h-[30px] max-h-[30px]">
                                         {option.e?.images != null ? (
                                             <img
                                                 src={option.e?.images}
                                                 alt="Product Image"
-                                                className="max-w-[40px] h-[50px] text-[8px] object-cover rounded"
+                                                className="max-max-w-[30px] w-[30px] h-[30px] max-h-[30px] text-[8px] object-cover rounded"
                                             />
                                         ) : (
-                                            <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
+                                            <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
                                                 <img
                                                     src="/no_img.png"
                                                     alt="Product Image"
-                                                    className="w-[30px] h-[30px] object-cover rounded"
+                                                    className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
                                                 />
                                             </div>
                                         )}
@@ -147,7 +130,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                             {option.e?.item_name}
                                         </h3>
-                                        <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] tru">
+                                        <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
                                             {option.e?.product_variation}
                                         </h5>
                                     </div>
@@ -155,7 +138,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                             </div>
                         )}
                         styles={{
-                            multiValueLabel: (provided, state) => ({
+                            multiValueLabel: (provided) => ({
                                 ...provided,
                                 "& .custom-none": {
                                     display: "none",
@@ -172,7 +155,8 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                                     whiteSpace: "nowrap",
                                 },
                             }),
-                            menu: (provided, state) => ({
+
+                            menu: (provided) => ({
                                 ...provided,
                                 width: "150%",
                             }),
@@ -196,6 +180,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
         </>
     );
 };
+
 const MoreSelectedBadge = ({ items }) => {
     const style = {
         marginLeft: "auto",

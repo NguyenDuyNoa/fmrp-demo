@@ -1,9 +1,21 @@
+import useToast from "@/hooks/useToast";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/router";
+
 const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
-const Header = ({ data, listStaff }) => {
+
+const Header = (props) => {
     const router = useRouter();
+
+    const getLocalStorage = () => (localStorage.getItem("arrData") ? JSON.parse(localStorage.getItem("arrData")) : []);
+
+    const showToat = useToast();
+
+    const dataLocals = getLocalStorage();
+
+    const isCheck = dataLocals?.some((order) => order.listProducts.some((product) => product.checked));
+
     return (
         <>
             <div className="flex items-center justify-between">
@@ -20,7 +32,13 @@ const Header = ({ data, listStaff }) => {
                         <Zoom>
                             <button
                                 type="button"
-                                onClick={() => router.push("/manufacture/production_plan/form")}
+                                onClick={() => {
+                                    if (isCheck) {
+                                        router.push("/manufacture/production_plan/form");
+                                    } else {
+                                        showToat("error", "Vui lòng chọn ít nhất một đơn hàng");
+                                    }
+                                }}
                                 className="bg-[#0F4F9E] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
                             >
                                 <Image

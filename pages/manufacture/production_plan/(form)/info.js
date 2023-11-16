@@ -1,14 +1,21 @@
-import Image from "next/image";
 import React from "react";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
+
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 
-const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
+import useToast from "@/hooks/useToast";
+
+const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
+    const showToat = useToast();
+
     const isBreakpoint = {
         placeholder: (base) => ({
             ...base,
@@ -107,8 +114,12 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                                 value=""
                                 checked={isValue.order}
                                 onChange={() => {
-                                    onChangeValue("order")(!isValue.order);
-                                    onChangeValue("internalPlan")(false);
+                                    if (tab == "order") {
+                                        onChangeValue("order")(!isValue.order);
+                                        onChangeValue("internalPlan")(false);
+                                    } else {
+                                        showToat("error", "Kế hoạch nội bộ không thể chuyển thành đơn hàng");
+                                    }
                                 }}
                                 name="default-radio1"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
@@ -127,8 +138,12 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                                 value=""
                                 checked={isValue.internalPlan}
                                 onChange={() => {
-                                    onChangeValue("internalPlan")(!isValue.internalPlan);
-                                    onChangeValue("order")(false);
+                                    if (tab == "plan") {
+                                        onChangeValue("internalPlan")(!isValue.internalPlan);
+                                        onChangeValue("order")(false);
+                                    } else {
+                                        showToat("error", "Đơn hàng không thể chuyển thành kế hoạch nội bộ");
+                                    }
                                 }}
                                 name="default-radio2"
                                 className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
@@ -137,7 +152,7 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue }) => {
                                 htmlFor="default-radio-2"
                                 className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
                             >
-                                Kế hoạch nội nộ
+                                Kế hoạch nội bộ
                             </label>
                         </div>
                     </div>

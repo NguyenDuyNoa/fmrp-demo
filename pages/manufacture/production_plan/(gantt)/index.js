@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { v4 as uuid } from "uuid";
 import Popup from "reactjs-popup";
 import React, { useRef } from "react";
 import ModalImage from "react-modal-image";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
 import formatNumber from "@/components/UI/formanumber/formanumber";
 
 const BodyGantt = ({
@@ -15,14 +15,9 @@ const BodyGantt = ({
     timeLine,
     handleToggle,
     dataLang,
+    handleTab,
+    router,
 }) => {
-    const header = [
-        { id: uuid(), name: "Đơn hàng" },
-        { id: uuid(), name: "Trạng thái" },
-        { id: uuid(), name: "Số lượng" },
-        { id: uuid(), name: "Action" },
-    ];
-
     const container1Ref = useRef();
     const container2Ref = useRef();
     const container3Ref = useRef();
@@ -47,6 +42,25 @@ const BodyGantt = ({
                 <div className="flex flex-col ">
                     <div className="flex items-end  border-t overflow-hidden border-b">
                         <div className={`min-w-[35%]  w-[35%]`}>
+                            <div className="flex items-center gap-5 pb-1 pl-2">
+                                {[
+                                    { name: " Đơn hàng bán", tab: "order" },
+                                    { name: "Kế hoạch nội bộ", tab: "plan" },
+                                ].map((e) => (
+                                    <Zoom className="w-fit">
+                                        <button
+                                            key={e.tab}
+                                            onClick={() => handleTab(e.tab)}
+                                            type="button"
+                                            className={`${
+                                                router == e.tab ? "bg-sky-200 text-sky-600" : "bg-sky-50 text-sky-500"
+                                            }  hover:bg-sky-200 hover:text-sky-600 font-semibold text-[11px] text-sky-400 px-2 py-[5px] rounded-xl transition-all duration-150 ease-linear`}
+                                        >
+                                            {e.name}
+                                        </button>
+                                    </Zoom>
+                                ))}
+                            </div>
                             <div className="flex items-center  gap-2  px-1 ">
                                 <div onClick={() => handleSort()} className="flex-col flex gap-1 cursor-pointer w-[2%]">
                                     <Image
@@ -85,14 +99,18 @@ const BodyGantt = ({
                                     />
                                 </div>
                                 <div className="grid grid-cols-12 w-full">
-                                    {header.map((e) => (
-                                        <div
-                                            key={e.id}
-                                            className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3"
-                                        >
-                                            {e.name}
-                                        </div>
-                                    ))}
+                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                        Đơn hàng
+                                    </div>
+                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                        Trạng thái
+                                    </div>
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                        Số lượng
+                                    </div>
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                        Action
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -264,7 +282,7 @@ const BodyGantt = ({
                                                                 {i.status == "sussces" && "Hoàn thành"}
                                                                 {i.status == "unfulfilled" && "Chưa thực hiện"}
                                                             </h3>
-                                                            <h3 className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                                            <h3 className="text-[#52575E] pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
                                                                 {formatNumber(i.quantity)}
                                                             </h3>
                                                             <h3 className="text-[#667085] border-b w-fit font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3 ">
