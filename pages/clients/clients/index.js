@@ -38,6 +38,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { useToggle } from "@/hooks/useToggle";
 import useToast from "@/hooks/useToast";
+import { TITLE_DELETE, CONFIRM_DELETION } from "@/constants/delete/deleteTable";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -672,8 +673,8 @@ const Index = (props) => {
             </div>
             <PopupConfim
                 type="warning"
-                title="Bạn có muốn xóa không"
-                subtitle="Xác nhận xóa !"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
                 save={handleDelete}
                 cancel={() => handleQueryId({ status: false })}
