@@ -544,6 +544,12 @@ const Index = (props) => {
         client: [],
         productGroup: [],
         product: [],
+        planStatus: [
+            { id: uuid(), value: "outDate", label: "Đã quá hạn" },
+            { id: uuid(), value: "processing", label: "Đang thực hiện" },
+            { id: uuid(), value: "sussces", label: "Hoàn thành" },
+            { id: uuid(), value: "unfulfilled", label: "Chưa thực hiện" },
+        ],
     };
 
     const initialValues = {
@@ -698,8 +704,8 @@ const Index = (props) => {
 
     const options = isData?.product?.map((e) => ({
         label: `${e.name}
-                <spa style={{display: none}}>${e.code}</spa
-                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                <span style={{display: none}}>${e.code}</span>
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} ${e.product_variation} </span>`,
         value: e.id,
         e,
     }));
@@ -793,6 +799,7 @@ const Index = (props) => {
                 if (e.id === idParent) {
                     const newListProducts = e.listProducts.map((i) => {
                         if (i.id === idChild) {
+                            console.log(!i.checked);
                             return { ...i, checked: !i.checked };
                         }
 

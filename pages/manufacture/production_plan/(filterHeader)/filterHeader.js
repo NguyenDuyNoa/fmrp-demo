@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import { ArrowDown2 } from "iconsax-react";
 import { components } from "react-select";
 import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
+import { useRef } from "react";
 
 const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), {
     ssr: false,
@@ -17,7 +18,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
 
     return (
         <>
-            <div className="grid grid-cols-13 items-center gap-2 ">
+            <div className="grid grid-cols-12 items-center gap-2 ">
                 <div className="col-span-2">
                     <div class="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
@@ -101,7 +102,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         placeholder={"Nhóm thành phẩm"}
                     />
                 </div>
-                <div className="col-span-3">
+                <div className="col-span-2">
                     <h3 className="text-sm text-[#051B44] font-medium ml-1">Thành phẩm</h3>
                     <SelectComponent
                         isClearable={true}
@@ -112,49 +113,84 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         isMulti={true}
                         options={options}
                         closeMenuOnSelect={false}
-                        formatOptionLabel={(option) => (
+                        formatOptionLabel={(option, { selectProps }) => (
+                            // <div className="">
+                            //     <div className="flex items-center gap-1">
+                            //         <div>
+                            //             <h3 className="font-medium 3xl:text-[10px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
+                            //                 {option.e?.item_name} -{" "}
+                            //                 <span className="italic text-[9px]">{option.e?.product_variation}</span>
+                            //             </h3>
+                            //         </div>
+                            //     </div>
+                            // </div>
                             <div className="">
-                                <div className="flex items-center gap-1">
-                                    <div>
-                                        <h3 className="font-medium 3xl:text-[10px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                            {option.e?.item_name} -{" "}
-                                            <span className="italic text-[9px]">{option.e?.product_variation}</span>
+                                <div className="flex items-center ">
+                                    <div className="custom-none w-[40px] h-[50px]">
+                                        {option.e?.images != null ? (
+                                            <img
+                                                src={option.e?.images}
+                                                alt="Product Image"
+                                                className="max-w-[40px] h-[50px] text-[8px] object-cover rounded"
+                                            />
+                                        ) : (
+                                            <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
+                                                <img
+                                                    src="/no_img.png"
+                                                    alt="Product Image"
+                                                    className="w-[30px] h-[30px] object-cover rounded"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="custom-text">
+                                        <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                            {option.e?.item_name}
                                         </h3>
+                                        <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] tru">
+                                            {option.e?.product_variation}
+                                        </h5>
                                     </div>
                                 </div>
                             </div>
                         )}
+                        styles={{
+                            multiValueLabel: (provided, state) => ({
+                                ...provided,
+                                "& .custom-none": {
+                                    display: "none",
+                                },
+                                "& .custom-text": {
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "5px",
+                                    maxWidth: "50px",
+                                },
+                                "& .custom-text h5": {
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                },
+                            }),
+                            menu: (provided, state) => ({
+                                ...provided,
+                                width: "150%",
+                            }),
+                        }}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={"Thành phẩm"}
                     />
                 </div>
                 <div className="col-span-2">
-                    <div class="">
-                        <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                            Trạng thái kế hoạch
-                        </label>
-                        <div className="w-full relative">
-                            <DatePicker
-                                selected={isValue.planStatus}
-                                renderMonthContent={renderMonthContent}
-                                showFourColumnMonthYearPicker
-                                showMonthYearPicker
-                                locale={vi}
-                                isClearable
-                                onChange={onChangeValue("planStatus")}
-                                showFullMonthYearPicker
-                                dateFormat="MM/yyyy"
-                                monthPlaceholder="Tháng"
-                                placeholderText="Theo tháng"
-                                className="p-2 mb-[5px] placeholder:text-[12px] focus:border-[#0F4F9E] focus:border-2 placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] border  rounded-md"
-                            />
-                            <ArrowDown2
-                                size="11"
-                                color="#6b7280"
-                                className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                            />
-                        </div>
-                    </div>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">Trạng thái kế hoạch</h3>
+                    <SelectComponent
+                        isClearable={true}
+                        value={isValue.planStatus}
+                        onChange={onChangeValue("planStatus")}
+                        options={[{ label: "Trạng thái kế hoạch", value: "", isDisabled: true }, ...isData.planStatus]}
+                        classNamePrefix={"productionSmoothing"}
+                        placeholder={"Trạng thái kế hoạch"}
+                    />
                 </div>
             </div>
         </>
@@ -182,7 +218,7 @@ const MoreSelectedBadge = ({ items }) => {
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 1;
+    const maxToShow = 2;
     const overflow = getValue()
         .slice(maxToShow)
         .map((x) => x.label);
