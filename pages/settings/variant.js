@@ -1,34 +1,42 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 
 import { ListBtn_Setting } from "./information";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
+
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
 import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch, Add as IconAdd } from "iconsax-react";
-import Swal from "sweetalert2";
-import { useSelector } from "react-redux";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const Index = (props) => {
     const router = useRouter();
+
     const dataLang = props.dataLang;
 
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const trangthaiExprired = useStatusExprired();
+
     const [data, sData] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
 
     const _ServerFetching = () => {
@@ -61,32 +69,20 @@ const Index = (props) => {
         sOnFetching(true) || (keySearch && sOnFetching(true));
     }, [limit, router.query?.page]);
 
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/Api_variation/variation/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang[message],
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/Api_variation/variation/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", dataLang[message] || message);
+                } else {
+                    isShow("error", dataLang[message] || message);
+                }
             }
+            _ServerFetching();
         });
+
+        handleQueryId({ status: false });
     };
 
     const paginate = (pageNumber) => {
@@ -106,7 +102,6 @@ const Index = (props) => {
             sOnFetching(true);
         }, 1500);
     };
-    const trangthaiExprired = useStatusExprired();
     return (
         <React.Fragment>
             <Head>
@@ -227,7 +222,9 @@ const Index = (props) => {
                                                                     dataLang={dataLang}
                                                                 />
                                                                 <button
-                                                                    onClick={() => handleDelete(e.id)}
+                                                                    onClick={() =>
+                                                                        handleQueryId({ id: e.id, status: true })
+                                                                    }
                                                                     className="xl:text-base text-xs"
                                                                 >
                                                                     <IconDelete color="red" />
@@ -259,21 +256,36 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };
 
 const Popup_ChiNhanh = (props) => {
     const [open, sOpen] = useState(false);
+
+    const isShow = useToast();
+
     const _ToggleModal = (e) => sOpen(e);
 
     const [onSending, sOnSending] = useState(false);
 
     const [name, sName] = useState("");
+
     const [option, sOption] = useState([]);
+
     const [required, sRequired] = useState(false);
 
     const [optionErr, sOptionErr] = useState(false);
+
     const [listOptErr, sListOptErr] = useState();
 
     useEffect(() => {
@@ -284,6 +296,7 @@ const Popup_ChiNhanh = (props) => {
     }, [open]);
 
     const [optionName, sOptionName] = useState("");
+
     const id = props.id;
 
     const _HandleChangeInput = (type, value) => {
@@ -318,20 +331,14 @@ const Popup_ChiNhanh = (props) => {
                 if (!err) {
                     var { isSuccess, message, same_option } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", props.dataLang[message]);
                         sName("");
                         sOption([]);
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                         sListOptErr();
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message]);
                         // const res = option.filter(i => same_option.some(item => i.name === item));
                         sListOptErr(same_option);
                     }
@@ -349,10 +356,7 @@ const Popup_ChiNhanh = (props) => {
         e.preventDefault();
         if (name.length == 0) {
             sRequired(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }

@@ -1,34 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 
+import Select, { components } from "react-select";
 import { ListBtn_Setting } from "./information";
-import PopupEdit from "../../components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
 import {
     Edit as IconEdit,
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
-    ArrowCircleDown,
     CloseCircle,
     TickCircle,
     Minus as IconMinus,
     ArrowDown2 as IconDown,
 } from "iconsax-react";
-import Loading from "components/UI/loading";
-import Swal from "sweetalert2";
-import Select, { components } from "react-select";
-import { useSelector } from "react-redux";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -36,14 +33,19 @@ const CustomSelectOption = ({ value, label, level, code }) => (
         {level == 2 && <span>----</span>}
         {level == 3 && <span>------</span>}
         {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">
-            {label}
-        </span>
+        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 );
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const isShow = useToast();
+
+    const trangthaiExprired = useStatusExprired();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const router = useRouter();
 
     const _HandleSelectTab = (e) => {
@@ -52,30 +54,33 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: "/settings/category",
             query: { tab: router.query?.tab ? router.query?.tab : "units" },
         });
     }, []);
+
     const [data, sData] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingOpt, sOnFetchingOpt] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const _ServerFetching = () => {
         Axios(
             "GET",
             `${
-                (router.query?.tab === "units" &&
-                    `/api_web/Api_unit/unit/?csrf_protection=true`) ||
-                (router.query?.tab === "stages" &&
-                    "/api_web/api_product/stage/?csrf_protection=true") ||
-                (router.query?.tab === "costs" &&
-                    "/api_web/Api_cost/cost/?csrf_protection=true")
+                (router.query?.tab === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) ||
+                (router.query?.tab === "stages" && "/api_web/api_product/stage/?csrf_protection=true") ||
+                (router.query?.tab === "costs" && "/api_web/Api_cost/cost/?csrf_protection=true")
             } `,
             {
                 params: {
@@ -100,53 +105,34 @@ const Index = (props) => {
     }, [onFetching]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) ||
-            (keySearch && sOnFetching(true));
+        (router.query.tab && sOnFetching(true)) || (keySearch && sOnFetching(true));
     }, [limit, router.query?.page, router.query?.tab]);
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios(
-                    "DELETE",
-                    `${
-                        (router.query.tab === "units" &&
-                            `/api_web/Api_unit/unit/${id}?csrf_protection=true`) ||
-                        (router.query.tab === "stages" &&
-                            `/api_web/api_product/stage/${id}?csrf_protection=true`) ||
-                        (router.query.tab === "costs" &&
-                            `/api_web/Api_cost/cost/${id}?csrf_protection=true`)
-                    } `,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang[message],
-                                });
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: dataLang[message],
-                                });
-                            }
-                        }
-                        _ServerFetching();
+
+    const handleDelete = async () => {
+        Axios(
+            "DELETE",
+            `${
+                (router.query.tab === "units" && `/api_web/Api_unit/unit/${isId}?csrf_protection=true`) ||
+                (router.query.tab === "stages" && `/api_web/api_product/stage/${isId}?csrf_protection=true`) ||
+                (router.query.tab === "costs" && `/api_web/Api_cost/cost/${isId}?csrf_protection=true`)
+            } `,
+            {},
+            (err, response) => {
+                if (!err) {
+                    var { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        isShow("success", dataLang[message]);
+                    } else {
+                        isShow("error", dataLang[message]);
                     }
-                );
+                }
+                _ServerFetching();
             }
-        });
+        );
+
+        handleQueryId({ status: false });
     };
+
     const paginate = (pageNumber) => {
         router.push({
             pathname: "/settings/category",
@@ -156,6 +142,7 @@ const Index = (props) => {
             },
         });
     };
+
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
@@ -171,13 +158,6 @@ const Index = (props) => {
             sOnFetching(true);
         }, 500);
     };
-    const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-    });
 
     const _ServerFetchingOtp = () => {
         // Axios("GET", "/api_web/Api_cost/costCombobox/?csrf_protection=true", {}, (err, response) => {
@@ -187,26 +167,19 @@ const Index = (props) => {
         //         sDataOption(rResult.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
         //     }
         // })
-        Axios(
-            "GET",
-            "/api_web/Api_Branch/branch/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataBranchOption(
-                        rResult.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                    dispatch({
-                        type: "branch/update",
-                        payload: rResult.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        })),
-                    });
-                }
+        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
+                dispatch({
+                    type: "branch/update",
+                    payload: rResult.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                    })),
+                });
             }
-        );
+        });
         sOnFetchingOpt(false);
     };
 
@@ -218,17 +191,13 @@ const Index = (props) => {
         sOnFetchingOpt(true);
     }, []);
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     return (
         <React.Fragment>
             <Head>
                 <title>
-                    {(router.query.tab === "units" &&
-                        dataLang?.category_unit) ||
-                        (router.query.tab === "stages" &&
-                            dataLang?.settings_category_stages_title) ||
-                        (router.query.tab === "costs" &&
-                            dataLang?.expense_costs) ||
+                    {(router.query.tab === "units" && dataLang?.category_unit) ||
+                        (router.query.tab === "stages" && dataLang?.settings_category_stages_title) ||
+                        (router.query.tab === "costs" && dataLang?.expense_costs) ||
                         "expense_costs"}
                 </title>
             </Head>
@@ -237,17 +206,12 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.branch_seting}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>
-                            {(router.query.tab === "units" &&
-                                dataLang?.category_unit) ||
-                                (router.query.tab === "stages" &&
-                                    dataLang?.settings_category_stages_title) ||
-                                (router.query.tab === "costs" &&
-                                    dataLang?.expense_costs) ||
+                            {(router.query.tab === "units" && dataLang?.category_unit) ||
+                                (router.query.tab === "stages" && dataLang?.settings_category_stages_title) ||
+                                (router.query.tab === "costs" && dataLang?.expense_costs) ||
                                 "expense_costs"}
                         </h6>
                     </div>
@@ -258,15 +222,10 @@ const Index = (props) => {
                     </div>
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
-                            <h2 className="text-2xl text-[#52575E]">
-                                {dataLang?.category_titel}
-                            </h2>
+                            <h2 className="text-2xl text-[#52575E]">{dataLang?.category_titel}</h2>
                             <div className="flex space-x-3 items-center justify-start">
                                 <button
-                                    onClick={_HandleSelectTab.bind(
-                                        this,
-                                        "units"
-                                    )}
+                                    onClick={_HandleSelectTab.bind(this, "units")}
                                     className={`${
                                         router.query?.tab === "units"
                                             ? "text-[#0F4F9E] bg-[#e2f0fe]"
@@ -276,10 +235,7 @@ const Index = (props) => {
                                     {dataLang?.category_unit}
                                 </button>
                                 <button
-                                    onClick={_HandleSelectTab.bind(
-                                        this,
-                                        "stages"
-                                    )}
+                                    onClick={_HandleSelectTab.bind(this, "stages")}
                                     className={`${
                                         router.query?.tab === "stages"
                                             ? "text-[#0F4F9E] bg-[#e2f0fe]"
@@ -289,10 +245,7 @@ const Index = (props) => {
                                     {dataLang?.settings_category_stages_title}
                                 </button>
                                 <button
-                                    onClick={_HandleSelectTab.bind(
-                                        this,
-                                        "costs"
-                                    )}
+                                    onClick={_HandleSelectTab.bind(this, "costs")}
                                     className={`${
                                         router.query?.tab === "costs"
                                             ? "text-[#0F4F9E] bg-[#e2f0fe]"
@@ -313,47 +266,29 @@ const Index = (props) => {
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
                                         <form className="flex items-center relative">
-                                            <IconSearch
-                                                size={20}
-                                                className="absolute left-3 z-10 text-[#cccccc]"
-                                            />
+                                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                                             <input
                                                 className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
                                                 type="text"
-                                                onChange={_HandleOnChangeKeySearch.bind(
-                                                    this
-                                                )}
-                                                placeholder={
-                                                    dataLang?.branch_search
-                                                }
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                placeholder={dataLang?.branch_search}
                                             />
                                         </form>
                                         <div className="flex space-x-2">
-                                            <label className="font-[300] text-slate-400">
-                                                Hiển thị :
-                                            </label>
+                                            <label className="font-[300] text-slate-400">Hiển thị :</label>
                                             <select
                                                 className="outline-none"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
+                                                onChange={(e) => sLimit(e.target.value)}
                                                 value={limit}
                                             >
-                                                <option
-                                                    disabled
-                                                    className="hidden"
-                                                >
-                                                    {limit == -1
-                                                        ? "Tất cả"
-                                                        : limit}
+                                                <option disabled className="hidden">
+                                                    {limit == -1 ? "Tất cả" : limit}
                                                 </option>
                                                 <option value={15}>15</option>
                                                 <option value={20}>20</option>
                                                 <option value={40}>40</option>
                                                 <option value={60}>60</option>
-                                                <option value={-1}>
-                                                    Tất cả
-                                                </option>
+                                                <option value={-1}>Tất cả</option>
                                             </select>
                                         </div>
                                     </div>
@@ -361,17 +296,14 @@ const Index = (props) => {
                                 <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div
                                         className={`${
-                                            router.query?.tab === "units"
-                                                ? "w-[100%]"
-                                                : "w-[110%]"
+                                            router.query?.tab === "units" ? "w-[100%]" : "w-[110%]"
                                         } 2xl:w-[100%] pr-2`}
                                     >
                                         <div
                                             className={`${
                                                 router.query?.tab === "units"
                                                     ? "grid-cols-6"
-                                                    : router.query?.tab ===
-                                                      "stages"
+                                                    : router.query?.tab === "stages"
                                                     ? "grid-cols-9"
                                                     : "grid-cols-11"
                                             } grid  sticky top-0 bg-white p-2 z-10`}
@@ -379,33 +311,23 @@ const Index = (props) => {
                                             {router.query?.tab === "units" && (
                                                 <React.Fragment>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">
-                                                        {router.query?.tab ===
-                                                            "units" &&
-                                                            dataLang?.category_unit_name}
+                                                        {router.query?.tab === "units" && dataLang?.category_unit_name}
                                                     </h4>
                                                 </React.Fragment>
                                             )}
                                             {router.query?.tab === "stages" && (
                                                 <React.Fragment>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
-                                                        {
-                                                            dataLang?.settings_category_stages_code
-                                                        }
+                                                        {dataLang?.settings_category_stages_code}
                                                     </h4>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
-                                                        {
-                                                            dataLang?.settings_category_stages_name
-                                                        }
+                                                        {dataLang?.settings_category_stages_name}
                                                     </h4>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
-                                                        {
-                                                            dataLang?.settings_category_stages_status
-                                                        }
+                                                        {dataLang?.settings_category_stages_status}
                                                     </h4>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
-                                                        {
-                                                            dataLang?.settings_category_stages_note
-                                                        }
+                                                        {dataLang?.settings_category_stages_note}
                                                     </h4>
                                                 </React.Fragment>
                                             )}
@@ -415,34 +337,25 @@ const Index = (props) => {
                                                         {"#"}
                                                     </h4>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">
-                                                        {dataLang?.expense_code ||
-                                                            "expense_code"}
+                                                        {dataLang?.expense_code || "expense_code"}
                                                     </h4>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
-                                                        {dataLang?.expense_name ||
-                                                            "expense_name"}
+                                                        {dataLang?.expense_name || "expense_name"}
                                                     </h4>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
-                                                        {dataLang?.expense_grant ||
-                                                            "expense_grant"}
+                                                        {dataLang?.expense_grant || "expense_grant"}
                                                     </h4>
                                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
-                                                        {dataLang?.expense_branch ||
-                                                            "expense_branch"}
+                                                        {dataLang?.expense_branch || "expense_branch"}
                                                     </h4>
                                                 </React.Fragment>
                                             )}
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">
-                                                {
-                                                    dataLang?.branch_popup_properties
-                                                }
+                                                {dataLang?.branch_popup_properties}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : (
                                             <React.Fragment>
                                                 {data.length == 0 && (
@@ -452,17 +365,12 @@ const Index = (props) => {
                                                                 <IconSearch />
                                                             </div>
                                                             <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                                Không tìm thấy
-                                                                các mục
+                                                                Không tìm thấy các mục
                                                             </h1>
                                                             <div className="flex items-center justify-around mt-6 ">
                                                                 <Popup_danhmuc
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    dataLang={dataLang}
                                                                     className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                                                 />
                                                             </div>
@@ -474,155 +382,92 @@ const Index = (props) => {
                                                         <div
                                                             key={e.id.toString()}
                                                             className={`${
-                                                                router.query
-                                                                    ?.tab ===
-                                                                "units"
+                                                                router.query?.tab === "units"
                                                                     ? "grid-cols-6"
-                                                                    : router
-                                                                          .query
-                                                                          ?.tab ===
-                                                                      "stages"
+                                                                    : router.query?.tab === "stages"
                                                                     ? "grid-cols-9"
                                                                     : "grid-cols-11"
                                                             } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
                                                         >
-                                                            {(router.query
-                                                                ?.tab ===
-                                                                "units" ||
-                                                                router.query
-                                                                    ?.tab ===
-                                                                    "currencies") && (
+                                                            {(router.query?.tab === "units" ||
+                                                                router.query?.tab === "currencies") && (
                                                                 <React.Fragment>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-5">
-                                                                        {router
-                                                                            .query
-                                                                            ?.tab ===
-                                                                            "units" &&
-                                                                            e?.unit}
+                                                                        {router.query?.tab === "units" && e?.unit}
                                                                     </h6>
                                                                 </React.Fragment>
                                                             )}
-                                                            {router.query
-                                                                ?.tab ===
-                                                                "stages" && (
+                                                            {router.query?.tab === "stages" && (
                                                                 <React.Fragment>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-2">
-                                                                        {router
-                                                                            .query
-                                                                            ?.tab ===
-                                                                            "stages" &&
-                                                                            e?.code}
+                                                                        {router.query?.tab === "stages" && e?.code}
                                                                     </h6>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-2">
-                                                                        {router
-                                                                            .query
-                                                                            ?.tab ===
-                                                                            "stages" &&
-                                                                            e?.name}
+                                                                        {router.query?.tab === "stages" && e?.name}
                                                                     </h6>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-2 mx-auto">
-                                                                        {router
-                                                                            .query
-                                                                            ?.tab ===
-                                                                            "stages" &&
-                                                                        e?.status_qc ===
-                                                                            "1" ? (
-                                                                            <TickCircle
-                                                                                size={
-                                                                                    32
-                                                                                }
-                                                                                color="#0BAA2E"
-                                                                            />
+                                                                        {router.query?.tab === "stages" &&
+                                                                        e?.status_qc === "1" ? (
+                                                                            <TickCircle size={32} color="#0BAA2E" />
                                                                         ) : (
-                                                                            <CloseCircle
-                                                                                size={
-                                                                                    32
-                                                                                }
-                                                                                color="#EE1E1E"
-                                                                            />
+                                                                            <CloseCircle size={32} color="#EE1E1E" />
                                                                         )}
                                                                     </h6>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-2">
-                                                                        {router
-                                                                            .query
-                                                                            ?.tab ===
-                                                                            "stages" &&
-                                                                            e?.note}
+                                                                        {router.query?.tab === "stages" && e?.note}
                                                                     </h6>
                                                                 </React.Fragment>
                                                             )}
-                                                            {router.query
-                                                                ?.tab ===
-                                                                "costs" && (
+                                                            {router.query?.tab === "costs" && (
                                                                 <React.Fragment>
                                                                     <div className="col-span-11">
                                                                         <Items
-                                                                            onRefresh={_ServerFetching.bind(
-                                                                                this
-                                                                            )}
-                                                                            onRefreshOpt={_ServerFetchingOtp.bind(
-                                                                                this
-                                                                            )}
-                                                                            dataLang={
-                                                                                dataLang
-                                                                            }
-                                                                            key={
-                                                                                e.id
-                                                                            }
-                                                                            data={
-                                                                                e
-                                                                            }
+                                                                            onRefresh={_ServerFetching.bind(this)}
+                                                                            onRefreshOpt={_ServerFetchingOtp.bind(this)}
+                                                                            dataLang={dataLang}
+                                                                            key={e.id}
+                                                                            data={e}
                                                                             className="col-span-11"
                                                                         />
                                                                     </div>
                                                                 </React.Fragment>
                                                             )}
-                                                            {router.query
-                                                                ?.tab ===
-                                                                "units" && (
+                                                            {router.query?.tab === "units" && (
                                                                 <div className="flex space-x-2 justify-center ">
                                                                     <Popup_danhmuc
-                                                                        onRefresh={_ServerFetching.bind(
-                                                                            this
-                                                                        )}
+                                                                        onRefresh={_ServerFetching.bind(this)}
                                                                         className="xl:text-base text-xs "
-                                                                        dataLang={
-                                                                            dataLang
-                                                                        }
+                                                                        dataLang={dataLang}
                                                                         data={e}
                                                                     />
                                                                     <button className="xl:text-base text-xs  ">
                                                                         <IconDelete
                                                                             onClick={() =>
-                                                                                handleDelete(
-                                                                                    e.id
-                                                                                )
+                                                                                handleQueryId({
+                                                                                    id: e.id,
+                                                                                    status: true,
+                                                                                })
                                                                             }
                                                                             color="red"
                                                                         />
                                                                     </button>
                                                                 </div>
                                                             )}
-                                                            {router.query
-                                                                ?.tab ===
-                                                                "stages" && (
+                                                            {router.query?.tab === "stages" && (
                                                                 <div className="flex space-x-2 justify-center ">
                                                                     <Popup_danhmuc
-                                                                        onRefresh={_ServerFetching.bind(
-                                                                            this
-                                                                        )}
+                                                                        onRefresh={_ServerFetching.bind(this)}
                                                                         className="xl:text-base text-xs "
-                                                                        dataLang={
-                                                                            dataLang
-                                                                        }
+                                                                        dataLang={dataLang}
                                                                         data={e}
                                                                     />
                                                                     <button className="xl:text-base text-xs  ">
                                                                         <IconDelete
                                                                             onClick={() =>
-                                                                                handleDelete(
-                                                                                    e.id
-                                                                                )
+                                                                                handleQueryId({
+                                                                                    id: e.id,
+                                                                                    status: true,
+                                                                                })
                                                                             }
                                                                             color="red"
                                                                         />
@@ -641,15 +486,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    Hiển thị {totalItems?.iTotalDisplayRecords}{" "}
-                                    trong số {totalItems?.iTotalRecords} thành
-                                    phần
+                                    Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords}{" "}
+                                    thành phần
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -658,50 +500,43 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };
 
 const Items = React.memo((props) => {
     const [hasChild, sHasChild] = useState(false);
+
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_cost/cost/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
-                        }
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshOpt && props.onRefreshOpt();
-                    }
-                );
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/Api_cost/cost/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message]);
+                } else {
+                    isShow("error", props.dataLang[message]);
+                }
             }
+            props.onRefresh && props.onRefresh();
+            props.onRefreshOpt && props.onRefreshOpt();
         });
+
+        handleQueryId({ status: false });
     };
 
     useEffect(() => {
@@ -713,34 +548,19 @@ const Items = React.memo((props) => {
             <div className="grid grid-cols-11 py-2  bg-white hover:bg-slate-50 relative">
                 <div className="col-span-1 flex justify-center">
                     <button
-                        disabled={
-                            props.data?.children?.length > 0 ? false : true
-                        }
+                        disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
                         className={`${
-                            hasChild
-                                ? "bg-red-600"
-                                : "bg-green-600 disabled:bg-slate-300"
+                            hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
                         } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
                     >
                         <IconMinus size={16} />
-                        <IconMinus
-                            size={16}
-                            className={`${
-                                hasChild ? "" : "rotate-90"
-                            } transition absolute`}
-                        />
+                        <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </div>
-                <h6 className="xl:text-base text-xs px-2 col-span-3">
-                    {props.data?.code}
-                </h6>
-                <h6 className="xl:text-base text-xs px-2 col-span-2">
-                    {props.data?.name}
-                </h6>
-                <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">
-                    {props.data?.level}
-                </h6>
+                <h6 className="xl:text-base text-xs px-2 col-span-3">{props.data?.code}</h6>
+                <h6 className="xl:text-base text-xs px-2 col-span-2">{props.data?.name}</h6>
+                <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">{props.data?.level}</h6>
                 <div className=" col-span-2 flex flex-wrap px-2">
                     {props.data?.branch?.map((e) => (
                         <h6
@@ -760,7 +580,7 @@ const Items = React.memo((props) => {
                         dataOption={props.dataOption}
                     />
                     <button
-                        onClick={_HandleDelete.bind(this, props.data?.id)}
+                        onClick={() => handleQueryId({ id: props.data?.id, status: true })}
                         className="xl:text-base text-xs outline-none"
                     >
                         <IconDelete color="red" />
@@ -771,7 +591,7 @@ const Items = React.memo((props) => {
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
                         <ItemsChild
-                            onClick={_HandleDelete.bind(this, e.id)}
+                            onClick={() => handleQueryId({ id: e.id, status: true })}
                             onRefresh={props.onRefresh}
                             onRefreshOpt={props.onRefreshOpt}
                             dataLang={props.dataLang}
@@ -780,7 +600,7 @@ const Items = React.memo((props) => {
                             grandchild="0"
                             children={e?.children?.map((e) => (
                                 <ItemsChild
-                                    onClick={_HandleDelete.bind(this, e.id)}
+                                    onClick={() => handleQueryId({ id: e.id, status: true })}
                                     onRefresh={props.onRefresh}
                                     onRefreshOpt={props.onRefreshOpt}
                                     dataLang={props.dataLang}
@@ -789,10 +609,7 @@ const Items = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={_HandleDelete.bind(
-                                                this,
-                                                e.id
-                                            )}
+                                            onClick={() => handleQueryId({ id: e.id, status: true })}
                                             onRefresh={props.onRefresh}
                                             onRefreshOpt={props.onRefreshOpt}
                                             dataLang={props.dataLang}
@@ -836,15 +653,9 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className="mt-1.5" />
                     </div>
                 )}
-                <h6 className="xl:text-base text-xs col-span-3 px-[7px] ">
-                    {props.data?.code}
-                </h6>
-                <h6 className="xl:text-base text-xs col-span-2 px-[7px]  truncate">
-                    {props.data?.name}
-                </h6>
-                <h6 className="xl:text-base text-xs col-span-2 px-[7px] text-center truncate">
-                    {props.data?.level}
-                </h6>
+                <h6 className="xl:text-base text-xs col-span-3 px-[7px] ">{props.data?.code}</h6>
+                <h6 className="xl:text-base text-xs col-span-2 px-[7px]  truncate">{props.data?.name}</h6>
+                <h6 className="xl:text-base text-xs col-span-2 px-[7px] text-center truncate">{props.data?.level}</h6>
                 <div className="col-span-2 flex flex-wrap ">
                     {props.data?.branch.map((e) => (
                         <h6
@@ -856,15 +667,8 @@ const ItemsChild = React.memo((props) => {
                     ))}
                 </div>
                 <div className="col-span-1 flex justify-center space-x-2">
-                    <Popup_danhmuc
-                        onRefresh={props.onRefresh}
-                        dataLang={props.dataLang}
-                        data={props.data}
-                    />
-                    <button
-                        onClick={props.onClick}
-                        className="xl:text-base text-xs"
-                    >
+                    <Popup_danhmuc onRefresh={props.onRefresh} dataLang={props.dataLang} data={props.data} />
+                    <button onClick={props.onClick} className="xl:text-base text-xs">
                         <IconDelete color="red" />
                     </button>
                 </div>
@@ -876,6 +680,9 @@ const ItemsChild = React.memo((props) => {
 
 const Popup_danhmuc = (props) => {
     const router = useRouter();
+
+    const isShow = useToast();
+
     const tabPage = router.query?.tab;
 
     const scrollAreaRef = useRef(null);
@@ -885,30 +692,43 @@ const Popup_danhmuc = (props) => {
     };
 
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [onSending, sOnSending] = useState(false);
 
     const [dataOption, sDataOption] = useState([]);
+
     const [dataBranch, sDataBranch] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
 
     const [unit, sUnit] = useState("");
 
     const [stages_code, sTagesCode] = useState("");
+
     const [stages_name, sTagesName] = useState("");
+
     const [stages_status, sTagesStatus] = useState("0");
+
     const [stages_note, sTagesNote] = useState("");
 
     const [costs_code, sCosts_Code] = useState(null);
+
     const [costs_name, sCosts_Name] = useState(null);
+
     const [costs_branch, sCosts_Branch] = useState([]);
 
     const [errInput, sErrInput] = useState(false);
+
     const [errInputcode, sErrInputcode] = useState(false);
+
     const [errInputName, sErrInputName] = useState(false);
 
     const [errCode, sErrcode] = useState(false);
+
     const [errName, sErrName] = useState(false);
+
     const [errBranch, sErrBranch] = useState(false);
 
     const [idCategory, sIdCategory] = useState(null);
@@ -926,8 +746,7 @@ const Popup_danhmuc = (props) => {
                       }))
                     : []
             );
-        open &&
-            sIdCategory(props.data?.parent_id ? props.data?.parent_id : null);
+        open && sIdCategory(props.data?.parent_id ? props.data?.parent_id : null);
         sErrcode(false);
         sErrName(false);
         sErrBranch(false);
@@ -965,20 +784,14 @@ const Popup_danhmuc = (props) => {
             "POST",
             id
                 ? `${
-                      (tabPage === "units" &&
-                          `/api_web/Api_unit/unit/${id}?csrf_protection=true `) ||
-                      (tabPage === "stages" &&
-                          `/api_web/api_product/stage/${id}?csrf_protection=true`) ||
-                      (tabPage === "costs" &&
-                          `/api_web/Api_cost/cost/${id}?csrf_protection=true`)
+                      (tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true `) ||
+                      (tabPage === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`) ||
+                      (tabPage === "costs" && `/api_web/Api_cost/cost/${id}?csrf_protection=true`)
                   } `
                 : `${
-                      (tabPage === "units" &&
-                          `/api_web/Api_unit/unit/?csrf_protection=true`) ||
-                      (tabPage === "stages" &&
-                          `/api_web/api_product/stage/?csrf_protection=true`) ||
-                      (tabPage === "costs" &&
-                          `/api_web/Api_cost/cost/?csrf_protection=true`)
+                      (tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) ||
+                      (tabPage === "stages" && `/api_web/api_product/stage/?csrf_protection=true`) ||
+                      (tabPage === "costs" && `/api_web/Api_cost/cost/?csrf_protection=true`)
                   } `,
             {
                 data: data,
@@ -988,10 +801,7 @@ const Popup_danhmuc = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: props.dataLang[message],
-                        });
+                        isShow("success", props.dataLang[message]);
                         sUnit("");
                         sTagesCode("");
                         sTagesName("");
@@ -1010,10 +820,7 @@ const Popup_danhmuc = (props) => {
                         sOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: props.dataLang[message],
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -1051,19 +858,12 @@ const Popup_danhmuc = (props) => {
     const valueIdCategory = (e) => sIdCategory(e?.value);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response.data;
-                    sDataBranch(
-                        result?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response.data;
+                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
+        });
         Axios(
             "GET",
             `${
@@ -1092,22 +892,12 @@ const Popup_danhmuc = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-    });
     const _HandleSubmit = (e) => {
         e.preventDefault();
         if (tabPage === "units") {
             if (unit?.length == 0) {
                 unit?.length == 0 && sErrInput(true);
-                Toast.fire({
-                    icon: "error",
-                    title: `${props.dataLang?.required_field_null}`,
-                });
+                isShow("error", props.dataLang?.required_field_null);
             } else {
                 sOnSending(true);
             }
@@ -1115,26 +905,16 @@ const Popup_danhmuc = (props) => {
             if (stages_name?.length == 0 || stages_code?.length == 0) {
                 stages_name?.length == 0 && sErrInputName(true);
                 stages_code?.length == 0 && sErrInputcode(true);
-                Toast.fire({
-                    icon: "error",
-                    title: `${props.dataLang?.required_field_null}`,
-                });
+                isShow("error", props.dataLang?.required_field_null);
             } else {
                 sOnSending(true);
             }
         } else if (tabPage === "costs") {
-            if (
-                costs_code == "" ||
-                costs_name == "" ||
-                costs_branch?.length == 0
-            ) {
+            if (costs_code == "" || costs_name == "" || costs_branch?.length == 0) {
                 costs_code == "" && sErrcode(true);
                 costs_name == "" && sErrName(true);
                 costs_branch?.length == 0 && sErrBranch(true);
-                Toast.fire({
-                    icon: "error",
-                    title: `${props.dataLang?.required_field_null}`,
-                });
+                isShow("error", props.dataLang?.required_field_null);
             } else {
                 sOnSending(true);
             }
@@ -1161,42 +941,27 @@ const Popup_danhmuc = (props) => {
         sErrBranch(false);
     }, [costs_branch?.length > 0]);
 
-    const hiddenOptionsClient =
-        costs_branch?.length > 3 ? costs_branch?.slice(0, 3) : [];
-    const optionsClient = dataBranch
-        ? dataBranch?.filter((x) => !hiddenOptionsClient.includes(x.value))
-        : [];
+    const hiddenOptionsClient = costs_branch?.length > 3 ? costs_branch?.slice(0, 3) : [];
+    const optionsClient = dataBranch ? dataBranch?.filter((x) => !hiddenOptionsClient.includes(x.value)) : [];
 
     return (
         <PopupEdit
             title={
                 props.data?.id
                     ? `${
-                          (tabPage === "units" &&
-                              props.dataLang?.category_unit_edit) ||
-                          (tabPage === "stages" &&
-                              props.dataLang?.settings_category_stages_edit) ||
-                          (tabPage === "costs" &&
-                              props.dataLang?.expense_edit) ||
+                          (tabPage === "units" && props.dataLang?.category_unit_edit) ||
+                          (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) ||
+                          (tabPage === "costs" && props.dataLang?.expense_edit) ||
                           "expense_edit"
                       }`
                     : `${
-                          (tabPage === "units" &&
-                              props.dataLang?.category_unit_add) ||
-                          (tabPage === "stages" &&
-                              props.dataLang?.settings_category_stages_add) ||
-                          (tabPage === "costs" &&
-                              props.dataLang?.expense_add) ||
+                          (tabPage === "units" && props.dataLang?.category_unit_add) ||
+                          (tabPage === "stages" && props.dataLang?.settings_category_stages_add) ||
+                          (tabPage === "costs" && props.dataLang?.expense_add) ||
                           "expense_add"
                       }`
             }
-            button={
-                props.data?.id ? (
-                    <IconEdit />
-                ) : (
-                    `${props.dataLang?.branch_popup_create_new}`
-                )
-            }
+            button={props.data?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}
@@ -1209,21 +974,15 @@ const Popup_danhmuc = (props) => {
                             <React.Fragment>
                                 <div className="flex flex-wrap justify-between">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {props.dataLang?.category_unit_name}{" "}
-                                        <span className="text-red-500">*</span>
+                                        {props.dataLang?.category_unit_name} <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         value={unit}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "unit"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "unit")}
                                         name="fname"
                                         type="text"
                                         className={`${
-                                            errInput
-                                                ? "border-red-500"
-                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                     />
                                     {errInput && (
@@ -1239,20 +998,16 @@ const Popup_danhmuc = (props) => {
                                 <div className="flex flex-wrap justify-between">
                                     <div className="w-full">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                            {props.dataLang
-                                                ?.settings_category_stages_codeAdd ||
+                                            {props.dataLang?.settings_category_stages_codeAdd ||
                                                 "settings_category_stages_codeAdd"}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
+                                            <span className="text-red-500">*</span>
                                         </label>
                                         <div>
                                             <input
                                                 // value={stages_code}
                                                 // onChange={_HandleChangeInput.bind(this, "code")}
                                                 placeholder={
-                                                    props.dataLang
-                                                        ?.settings_category_stages_codeAdd ||
+                                                    props.dataLang?.settings_category_stages_codeAdd ||
                                                     "settings_category_stages_codeAdd"
                                                 }
                                                 name="fname"
@@ -1263,20 +1018,16 @@ const Popup_danhmuc = (props) => {
                                     </div>
                                     <div className="w-full">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                            {props.dataLang
-                                                ?.settings_category_stages_codenName ||
+                                            {props.dataLang?.settings_category_stages_codenName ||
                                                 "settings_category_stages_codenName"}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
+                                            <span className="text-red-500">*</span>
                                         </label>
                                         <div>
                                             <input
                                                 // value={stages_code}
                                                 // onChange={_HandleChangeInput.bind(this, "code")}
                                                 placeholder={
-                                                    props.dataLang
-                                                        ?.settings_category_stages_codenName ||
+                                                    props.dataLang?.settings_category_stages_codenName ||
                                                     "settings_category_stages_codenName"
                                                 }
                                                 name="fname"
@@ -1287,25 +1038,14 @@ const Popup_danhmuc = (props) => {
                                     </div>
                                     <div className="w-full">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                            {
-                                                props.dataLang
-                                                    ?.settings_category_stages_name
-                                            }
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
+                                            {props.dataLang?.settings_category_stages_name}
+                                            <span className="text-red-500">*</span>
                                         </label>
                                         <div>
                                             <input
                                                 value={stages_name}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "name"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.settings_category_stages_name
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "name")}
+                                                placeholder={props.dataLang?.settings_category_stages_name}
                                                 name="fname"
                                                 type="text"
                                                 className={`${
@@ -1316,10 +1056,7 @@ const Popup_danhmuc = (props) => {
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.settings_category_stages_errName
-                                                    }
+                                                    {props.dataLang?.settings_category_stages_errName}
                                                 </label>
                                             )}
                                         </div>
@@ -1338,15 +1075,9 @@ const Popup_danhmuc = (props) => {
                                                     id="1"
                                                     value={stages_status}
                                                     checked={
-                                                        stages_status === "0"
-                                                            ? false
-                                                            : stages_status ===
-                                                                  "1" && true
+                                                        stages_status === "0" ? false : stages_status === "1" && true
                                                     }
-                                                    onChange={_HandleChangeInput.bind(
-                                                        this,
-                                                        "status"
-                                                    )}
+                                                    onChange={_HandleChangeInput.bind(this, "status")}
                                                 />
                                                 <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                                     <svg
@@ -1369,10 +1100,7 @@ const Popup_danhmuc = (props) => {
                                                 htmlFor="1"
                                                 className="text-[#344054] font-medium text-base  cursor-pointer "
                                             >
-                                                {
-                                                    props.dataLang
-                                                        ?.settings_category_stages_status
-                                                }
+                                                {props.dataLang?.settings_category_stages_status}
                                             </label>
                                         </div>
                                     </div>
@@ -1380,21 +1108,12 @@ const Popup_danhmuc = (props) => {
                                     <div className="w-full flex justify-between flex-wrap">
                                         <div className="w-full ">
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.settings_category_stages_note
-                                                }
+                                                {props.dataLang?.settings_category_stages_note}
                                             </label>
                                             <textarea
                                                 value={stages_note}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.settings_category_stages_note
-                                                }
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "note"
-                                                )}
+                                                placeholder={props.dataLang?.settings_category_stages_note}
+                                                onChange={_HandleChangeInput.bind(this, "note")}
                                                 name="fname"
                                                 type="text"
                                                 className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[140px] h-[40px] max-h-[240px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
@@ -1409,98 +1128,60 @@ const Popup_danhmuc = (props) => {
                                 <div className="py-4 space-y-5">
                                     <div className="space-y-1">
                                         <label className="text-[#344054] font-normal text-base">
-                                            {props.dataLang?.expense_code ||
-                                                "expense_code"}{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
+                                            {props.dataLang?.expense_code || "expense_code"}{" "}
+                                            <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             value={costs_code}
-                                            onChange={_HandleChangeInput.bind(
-                                                this,
-                                                "costs_code"
-                                            )}
+                                            onChange={_HandleChangeInput.bind(this, "costs_code")}
                                             type="text"
-                                            placeholder={
-                                                props.dataLang?.expense_code ||
-                                                "expense_code"
-                                            }
+                                            placeholder={props.dataLang?.expense_code || "expense_code"}
                                             className={`${
-                                                errCode
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                         />
                                         {errCode && (
                                             <label className="text-sm text-red-500">
-                                                {props.dataLang
-                                                    ?.expense_errCode ||
-                                                    "expense_errCode"}
+                                                {props.dataLang?.expense_errCode || "expense_errCode"}
                                             </label>
                                         )}
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-[#344054] font-normal text-base">
-                                            {props.dataLang?.expense_name ||
-                                                "expense_name"}{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
+                                            {props.dataLang?.expense_name || "expense_name"}{" "}
+                                            <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             value={costs_name}
-                                            onChange={_HandleChangeInput.bind(
-                                                this,
-                                                "costs_name"
-                                            )}
+                                            onChange={_HandleChangeInput.bind(this, "costs_name")}
                                             type="text"
-                                            placeholder={
-                                                props.dataLang?.expense_name ||
-                                                "expense_name"
-                                            }
+                                            placeholder={props.dataLang?.expense_name || "expense_name"}
                                             className={`${
-                                                errName
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                         />
                                         {errName && (
                                             <label className="text-sm text-red-500">
-                                                {props.dataLang
-                                                    ?.expense_errName ||
-                                                    "expense_errName"}
+                                                {props.dataLang?.expense_errName || "expense_errName"}
                                             </label>
                                         )}
                                     </div>
                                     <div className="col-span-6 max-h-[65px] min-h-[65px]">
                                         <label className="text-[#344054] font-normal text-base mb-1 ">
-                                            {props.dataLang?.expense_branch ||
-                                                "expense_branch"}{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
+                                            {props.dataLang?.expense_branch || "expense_branch"}{" "}
+                                            <span className="text-red-500">*</span>
                                         </label>
                                         <Select
                                             closeMenuOnSelect={true}
-                                            placeholder={
-                                                props.dataLang
-                                                    ?.expense_branch ||
-                                                "expense_branch"
-                                            }
+                                            placeholder={props.dataLang?.expense_branch || "expense_branch"}
                                             options={dataBranch}
                                             isSearchable={true}
-                                            onChange={_HandleChangeInput.bind(
-                                                this,
-                                                "costs_branch"
-                                            )}
+                                            onChange={_HandleChangeInput.bind(this, "costs_branch")}
                                             value={costs_branch}
                                             isMulti
                                             components={{ MultiValue }}
                                             LoadingIndicator
-                                            noOptionsMessage={() =>
-                                                "Không có dữ liệu"
-                                            }
+                                            noOptionsMessage={() => "Không có dữ liệu"}
                                             maxMenuHeight="200px"
                                             isClearable={true}
                                             menuPortalTarget={document.body}
@@ -1526,43 +1207,30 @@ const Popup_danhmuc = (props) => {
                                                 }),
                                             }}
                                             className={`${
-                                                errBranch
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
+                                                errBranch ? "border-red-500" : "border-transparent"
                                             } text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] mb-2 font-normal outline-none border `}
                                         />
                                         {errBranch && (
                                             <label className="mb-2 text-sm text-red-500">
-                                                {props.dataLang
-                                                    ?.expense_errBranch ||
-                                                    "expense_errBranch"}
+                                                {props.dataLang?.expense_errBranch || "expense_errBranch"}
                                             </label>
                                         )}
                                     </div>
                                     <div className="space-y-1 mt-2">
                                         <label className="text-[#344054] font-normal text-base">
-                                            {props.dataLang?.expense_group ||
-                                                "expense_group"}
+                                            {props.dataLang?.expense_group || "expense_group"}
                                         </label>
                                         <Select
                                             options={dataOption}
-                                            formatOptionLabel={
-                                                CustomSelectOption
-                                            }
+                                            formatOptionLabel={CustomSelectOption}
                                             defaultValue={
                                                 idCategory == "0" || !idCategory
                                                     ? { label: `${"Nhóm cha"}` }
                                                     : {
-                                                          label: dataOption.find(
-                                                              (x) =>
-                                                                  x?.parent_id ==
-                                                                  idCategory
-                                                          )?.label,
-                                                          code: dataOption.find(
-                                                              (x) =>
-                                                                  x?.parent_id ==
-                                                                  idCategory
-                                                          )?.code,
+                                                          label: dataOption.find((x) => x?.parent_id == idCategory)
+                                                              ?.label,
+                                                          code: dataOption.find((x) => x?.parent_id == idCategory)
+                                                              ?.code,
                                                           value: idCategory,
                                                       }
                                             }
@@ -1573,22 +1241,12 @@ const Popup_danhmuc = (props) => {
                                                           code: "nhóm cha",
                                                       }
                                                     : {
-                                                          label: dataOption.find(
-                                                              (x) =>
-                                                                  x?.value ==
-                                                                  idCategory
-                                                          )?.label,
-                                                          code: dataOption.find(
-                                                              (x) =>
-                                                                  x?.value ==
-                                                                  idCategory
-                                                          )?.code,
+                                                          label: dataOption.find((x) => x?.value == idCategory)?.label,
+                                                          code: dataOption.find((x) => x?.value == idCategory)?.code,
                                                           value: idCategory,
                                                       }
                                             }
-                                            onChange={valueIdCategory.bind(
-                                                this
-                                            )}
+                                            onChange={valueIdCategory.bind(this)}
                                             isClearable={true}
                                             placeholder={"Nhóm cha"}
                                             className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"

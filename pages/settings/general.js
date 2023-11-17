@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
+import React, { useState, useEffect } from "react";
 
 import { ListBtn_Setting } from "./information";
 import { _ServerInstance as Axios } from "/services/axios";
@@ -8,48 +8,38 @@ import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import Swal from "sweetalert2";
-import { useSelector } from "react-redux";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import useToast from "@/hooks/useToast";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const isShow = useToast();
+
     const [onFetching, sOnFetching] = useState(false);
+
+    const trangthaiExprired = useStatusExprired();
+
     const [onSending, sOnSending] = useState(false);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
 
     const [data, sData] = useState([]);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-        );
+        });
     };
 
     useEffect(() => {
@@ -129,15 +119,9 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", props.dataLang[message]);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -151,14 +135,10 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        sData([
-            { ...dataMaterialExpiry },
-            { ...dataProductExpiry },
-            { ...dataProductSerial },
-        ]);
+        sData([{ ...dataMaterialExpiry }, { ...dataProductExpiry }, { ...dataProductSerial }]);
         sOnSending(true);
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     return (
         <React.Fragment>
             <Head>
@@ -169,9 +149,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.branch_seting}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>Thiết lập chung</h6>
                     </div>
@@ -182,9 +160,7 @@ const Index = (props) => {
                     </div>
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-5 h-[96%] overflow-hidden">
-                            <h2 className="text-2xl text-[#52575E]">
-                                Thiết Lập Chung
-                            </h2>
+                            <h2 className="text-2xl text-[#52575E]">Thiết Lập Chung</h2>
                             <ScrollArea
                                 className="max-h-[600px] min:h-[500px] h-[90%] max:h-[800px]"
                                 speed={1}
@@ -197,34 +173,18 @@ const Index = (props) => {
                                         </h1>
                                         <div className="divide-y divide-[#ECF0F4]">
                                             <div className="space-y-2 py-1.5">
-                                                <h6>
-                                                    Quản lý thời hạn sử dụng
-                                                </h6>
+                                                <h6>Quản lý thời hạn sử dụng</h6>
                                                 <label
-                                                    htmlFor={
-                                                        dataMaterialExpiry.code
-                                                    }
+                                                    htmlFor={dataMaterialExpiry.code}
                                                     className="relative inline-flex items-center cursor-pointer ml-1"
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         className="sr-only peer"
-                                                        value={
-                                                            dataMaterialExpiry.is_enable
-                                                        }
-                                                        id={
-                                                            dataMaterialExpiry.code
-                                                        }
-                                                        checked={
-                                                            dataMaterialExpiry.is_enable ==
-                                                            "0"
-                                                                ? false
-                                                                : true
-                                                        }
-                                                        onChange={_ToggleStatus.bind(
-                                                            this,
-                                                            dataMaterialExpiry.code
-                                                        )}
+                                                        value={dataMaterialExpiry.is_enable}
+                                                        id={dataMaterialExpiry.code}
+                                                        checked={dataMaterialExpiry.is_enable == "0" ? false : true}
+                                                        onChange={_ToggleStatus.bind(this, dataMaterialExpiry.code)}
                                                     />
                                                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                                 </label>
@@ -237,34 +197,18 @@ const Index = (props) => {
                                         </h1>
                                         <div className="divide-y divide-[#ECF0F4]">
                                             <div className="space-y-2 py-1.5">
-                                                <h6>
-                                                    Quản lý thời hạn sử dụng
-                                                </h6>
+                                                <h6>Quản lý thời hạn sử dụng</h6>
                                                 <label
-                                                    htmlFor={
-                                                        dataProductExpiry.code
-                                                    }
+                                                    htmlFor={dataProductExpiry.code}
                                                     className="relative inline-flex items-center cursor-pointer ml-1"
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         className="sr-only peer"
-                                                        value={
-                                                            dataProductExpiry.is_enable
-                                                        }
-                                                        id={
-                                                            dataProductExpiry.code
-                                                        }
-                                                        checked={
-                                                            dataProductExpiry.is_enable ==
-                                                            "0"
-                                                                ? false
-                                                                : true
-                                                        }
-                                                        onChange={_ToggleStatus.bind(
-                                                            this,
-                                                            dataProductExpiry.code
-                                                        )}
+                                                        value={dataProductExpiry.is_enable}
+                                                        id={dataProductExpiry.code}
+                                                        checked={dataProductExpiry.is_enable == "0" ? false : true}
+                                                        onChange={_ToggleStatus.bind(this, dataProductExpiry.code)}
                                                     />
                                                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                                 </label>
@@ -272,30 +216,16 @@ const Index = (props) => {
                                             <div className="space-y-2 py-1.5">
                                                 <h6>Quản lý serial</h6>
                                                 <label
-                                                    htmlFor={
-                                                        dataProductSerial.code
-                                                    }
+                                                    htmlFor={dataProductSerial.code}
                                                     className="relative inline-flex items-center cursor-pointer ml-1"
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         className="sr-only peer"
-                                                        value={
-                                                            dataProductSerial.is_enable
-                                                        }
-                                                        id={
-                                                            dataProductSerial.code
-                                                        }
-                                                        checked={
-                                                            dataProductSerial.is_enable ==
-                                                            "0"
-                                                                ? false
-                                                                : true
-                                                        }
-                                                        onChange={_ToggleStatus.bind(
-                                                            this,
-                                                            dataProductSerial.code
-                                                        )}
+                                                        value={dataProductSerial.is_enable}
+                                                        id={dataProductSerial.code}
+                                                        checked={dataProductSerial.is_enable == "0" ? false : true}
+                                                        onChange={_ToggleStatus.bind(this, dataProductSerial.code)}
                                                     />
                                                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                                 </label>
