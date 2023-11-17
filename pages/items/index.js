@@ -18,7 +18,6 @@ import {
     Grid6 as IconExcel,
     Image as IconImage,
     GalleryEdit as IconEditImg,
-    Refresh2,
 } from "iconsax-react";
 import { NumericFormat } from "react-number-format";
 import Select, { components } from "react-select";
@@ -26,17 +25,19 @@ import Swal from "sweetalert2";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import ReactExport from "react-data-export";
-import moment from "moment";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import moment from "moment";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -58,18 +59,30 @@ const CustomSelectOption_GroupNVL = ({ value, label, level, code }) => (
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
+    const isShow = useToast();
+
     const dispatch = useDispatch();
 
     const [data, sData] = useState([]);
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const trangthaiExprired = useStatusExprired();
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingUnit, sOnFetchingUnit] = useState(false);
 
     //Bộ lọc Danh mục
     const [dataCateOption, sDataCateOption] = useState([]);
+
     const [idCategory, sIdCategory] = useState(null);
     //Bộ lọc Chi nhánh
     const [dataBranchOption, sDataBranchOption] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
 
     const _HandleFilterOpt = (type, value) => {
@@ -81,8 +94,11 @@ const Index = (props) => {
     };
 
     const [totalItems, sTotalItems] = useState({});
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
     const _ServerFetching = () => {
@@ -209,43 +225,25 @@ const Index = (props) => {
         }, 1500);
     };
 
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/api_material/material/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: props.dataLang[message],
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: props.dataLang[message],
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/api_material/material/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message]);
+                } else {
+                    isShow("success", props.dataLang[message]);
+                }
             }
+            _ServerFetching();
         });
+
+        handleQueryId({ status: false });
     };
-    const _HandleFresh = () => {
-        sOnFetching(true);
-        sOnFetchingUnit(true);
-    };
+
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
+
     const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
 
     //excel
@@ -347,7 +345,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>
@@ -591,7 +588,7 @@ const Index = (props) => {
                                                         className="xl:scale-100 scale-[0.8] outline-none"
                                                     />
                                                     <button
-                                                        onClick={_HandleDelete.bind(this, e?.id)}
+                                                        onClick={() => handleQueryId({ id: e.id, status: true })}
                                                         className="xl:scale-100 scale-[0.8] outline-none"
                                                     >
                                                         <IconDelete color="red" />
@@ -619,6 +616,14 @@ const Index = (props) => {
                     </div>
                 )}
             </div>
+            <PopupConfim  dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };
@@ -659,19 +664,28 @@ const MultiValue = ({ index, getValue, ...props }) => {
 
 const Popup_NVL = React.memo((props) => {
     const dataOptUnit = useSelector((state) => state.unit_NVL);
+
     const dataOptBranch = useSelector((state) => state.branch);
+
     const dataOptVariant = useSelector((state) => state.variant_NVL);
 
     const scrollAreaRef = useRef(null);
+
+    const isShow = useToast();
+
+    const { isOpen, isId, isIdChild, handleQueryId } = useToggle();
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
 
     const [tab, sTab] = useState(0);
+
     const _HandleSelectTab = (e) => sTab(e);
 
     const [onSending, sOnSending] = useState(false);
@@ -681,38 +695,58 @@ const Popup_NVL = React.memo((props) => {
     const [onFetching, sOnFetching] = useState(false);
 
     const [branch, sBranch] = useState([]);
+
     const branch_id = branch.map((e) => e.value);
 
     const [dataOptGr, sDataOptGr] = useState([]);
+
     const [groupId, sGroupId] = useState();
+
     const [code, sCode] = useState("");
+
     const [name, sName] = useState("");
+
     const [minimumAmount, sMinimumAmount] = useState();
+
     const [price, sPrice] = useState();
+
     const [expiry, sExpiry] = useState();
 
     const [unit, sUnit] = useState();
+
     const [unitChild, sUnitChild] = useState();
+
     const [unitAmount, sUnitAmount] = useState();
+
     const [note, sNote] = useState("");
 
     const [thumb, sThumb] = useState(null);
+
     const [thumbFile, sThumbFile] = useState(null);
+
     const [isDeleteThumb, sIsDeleteThumb] = useState(false);
 
     ///Biến thể
     const [variantMain, sVariantMain] = useState(null);
+
     const [prevVariantMain, sPrevVariantMain] = useState(null);
+
     const [variantSub, sVariantSub] = useState(null);
+
     const [prevVariantSub, sPrevVariantSub] = useState(null);
+
     const [optVariantMain, sOptVariantMain] = useState([]);
+
     const [optVariantSub, sOptVariantSub] = useState([]);
+
     const [optSelectedVariantMain, sOptSelectedVariantMain] = useState([]);
+
     const [optSelectedVariantSub, sOptSelectedVariantSub] = useState([]);
 
     const [dataTotalVariant, sDataTotalVariant] = useState([]);
+
     const [dataVariantSending, sDataVariantSending] = useState([]);
-    console.log("variantMain", variantMain);
+
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
         // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
@@ -720,10 +754,7 @@ const Popup_NVL = React.memo((props) => {
         !variantMain && sOptSelectedVariantMain([]);
         if (variantMain === variantSub && variantSub != null && variantMain != null) {
             sVariantSub(null);
-            Toast.fire({
-                icon: "error",
-                title: `Biến thể bị trùng`,
-            });
+            isShow("error", `Biến thể bị trùng`);
         }
     }, [variantMain]);
 
@@ -734,10 +765,7 @@ const Popup_NVL = React.memo((props) => {
         !variantSub && sOptSelectedVariantSub([]);
         if (variantSub === variantMain && variantSub != null && variantMain != null) {
             sVariantSub(null);
-            Toast.fire({
-                icon: "error",
-                title: `Biến thể bị trùng`,
-            });
+            isShow("error", `Biến thể bị trùng`);
         }
     }, [variantSub]);
 
@@ -813,10 +841,7 @@ const Popup_NVL = React.memo((props) => {
                 },
             ]);
         } else {
-            Toast.fire({
-                icon: "error",
-                title: `Phải chọn tùy chọn của biến thể chính`,
-            });
+            isShow("error", `Phải chọn tùy chọn của biến thể chính`);
         }
     };
 
@@ -967,10 +992,7 @@ const Popup_NVL = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", props.dataLang[message]);
                         sOpen(false);
                         props.onRefresh && props.onRefresh();
                         sGroupId();
@@ -986,10 +1008,7 @@ const Popup_NVL = React.memo((props) => {
                         sThumb(null);
                         sThumbFile(null);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -1015,10 +1034,7 @@ const Popup_NVL = React.memo((props) => {
             groupId == null && sErrGroup(true);
             unit == null && sErrUnit(true);
             branch.length == 0 && sErrBranch(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }
@@ -1135,79 +1151,110 @@ const Popup_NVL = React.memo((props) => {
     //     sDataTotalVariant([...dataTotalVariant])
     // }
 
-    const _HandleDeleteVariant = (parentId, id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const newData = dataTotalVariant
-                    .map((item) => {
-                        if (item.id === parentId) {
-                            item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== id);
-                        }
-                        return item;
-                    })
-                    .filter((item) => item.variation_option_2.length > 0);
-                sDataTotalVariant(newData);
+    // const _HandleDeleteVariant = (parentId, id) => {
+    //     Swal.fire({
+    //         title: `${props.dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${props.dataLang?.aler_yes}`,
+    //         cancelButtonText: `${props.dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const newData = dataTotalVariant
+    //                 .map((item) => {
+    //                     if (item.id === parentId) {
+    //                         item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== id);
+    //                     }
+    //                     return item;
+    //                 })
+    //                 .filter((item) => item.variation_option_2.length > 0);
+    //             sDataTotalVariant(newData);
 
-                const foundParent = newData.some((item) => item.id === parentId);
-                if (foundParent === false) {
+    //             const foundParent = newData.some((item) => item.id === parentId);
+    //             if (foundParent === false) {
+    //                 const newData2 = dataVariantSending.map((item) => {
+    //                     return {
+    //                         ...item,
+    //                         option: item.option.filter((opt) => opt.id !== parentId),
+    //                     };
+    //                 });
+    //                 if (newData2[0].option?.length === 0) {
+    //                     sDataVariantSending(newData2.map((item) => ({ name: item.name })));
+    //                 } else {
+    //                     sDataVariantSending(newData2);
+    //                 }
+    //             } else {
+    //                 const found = dataTotalVariant.some((item) => {
+    //                     return item.variation_option_2.some((opt) => opt.id === id);
+    //                 });
+    //                 if (found === false) {
+    //                     const newData2 = dataVariantSending.map((item) => {
+    //                         return {
+    //                             ...item,
+    //                             option: item.option.filter((opt) => opt.id !== id),
+    //                         };
+    //                     });
+    //                     sDataVariantSending(newData2);
+    //                 }
+    //             }
+    //         }
+    //     });
+    // };
+
+    const handleDeleteVariantItems = async () => {
+        if (isId && isIdChild) {
+            const newData = dataTotalVariant
+                .map((item) => {
+                    if (item.id === isId) {
+                        item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== isIdChild);
+                    }
+                    return item;
+                })
+                .filter((item) => item.variation_option_2.length > 0);
+            sDataTotalVariant(newData);
+
+            const foundParent = newData.some((item) => item.id === isId);
+            if (foundParent === false) {
+                const newData2 = dataVariantSending.map((item) => {
+                    return {
+                        ...item,
+                        option: item.option.filter((opt) => opt.id !== isId),
+                    };
+                });
+                if (newData2[0].option?.length === 0) {
+                    sDataVariantSending(newData2.map((item) => ({ name: item.name })));
+                } else {
+                    sDataVariantSending(newData2);
+                }
+            } else {
+                const found = dataTotalVariant.some((item) => {
+                    return item.variation_option_2.some((opt) => opt.id === isIdChild);
+                });
+                if (found === false) {
                     const newData2 = dataVariantSending.map((item) => {
                         return {
                             ...item,
-                            option: item.option.filter((opt) => opt.id !== parentId),
+                            option: item.option.filter((opt) => opt.id !== isIdChild),
                         };
                     });
-                    if (newData2[0].option?.length === 0) {
-                        sDataVariantSending(newData2.map((item) => ({ name: item.name })));
-                    } else {
-                        sDataVariantSending(newData2);
-                    }
-                } else {
-                    const found = dataTotalVariant.some((item) => {
-                        return item.variation_option_2.some((opt) => opt.id === id);
-                    });
-                    if (found === false) {
-                        const newData2 = dataVariantSending.map((item) => {
-                            return {
-                                ...item,
-                                option: item.option.filter((opt) => opt.id !== id),
-                            };
-                        });
-                        sDataVariantSending(newData2);
-                    }
+                    sDataVariantSending(newData2);
                 }
             }
-        });
-    };
+            handleQueryId({ status: false });
+        } else {
+            sDataTotalVariant([...dataTotalVariant.filter((x) => x.id !== isId)]);
+            const filteredOption = dataVariantSending[0].option.filter((opt) => opt.id !== isId);
+            const updatedData = [...dataVariantSending];
+            updatedData[0] = {
+                ...dataVariantSending[0],
+                option: filteredOption,
+            };
+            sDataVariantSending(updatedData);
 
-    const _HandleDeleteVariantItems = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sDataTotalVariant([...dataTotalVariant.filter((x) => x.id !== id)]);
-                const filteredOption = dataVariantSending[0].option.filter((opt) => opt.id !== id);
-                const updatedData = [...dataVariantSending];
-                updatedData[0] = {
-                    ...dataVariantSending[0],
-                    option: filteredOption,
-                };
-                sDataVariantSending(updatedData);
-            }
-        });
+            handleQueryId({ status: false });
+        }
     };
 
     return (
@@ -2002,11 +2049,18 @@ const Popup_NVL = React.memo((props) => {
                                                                                 <div>{ce.name}</div>
                                                                                 <div className="flex justify-center">
                                                                                     <button
-                                                                                        onClick={_HandleDeleteVariant.bind(
-                                                                                            this,
-                                                                                            e.id,
-                                                                                            ce.id
-                                                                                        )}
+                                                                                        // onClick={_HandleDeleteVariant.bind(
+                                                                                        //     this,
+                                                                                        //     e.id,
+                                                                                        //     ce.id
+                                                                                        // )}
+                                                                                        onClick={() =>
+                                                                                            handleQueryId({
+                                                                                                id: e.id,
+                                                                                                status: true,
+                                                                                                idChild: ce.id,
+                                                                                            })
+                                                                                        }
                                                                                         className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
                                                                                     >
                                                                                         <IconDelete size="22" />
@@ -2019,10 +2073,12 @@ const Popup_NVL = React.memo((props) => {
                                                                 ) : (
                                                                     <div className="flex justify-center">
                                                                         <button
-                                                                            onClick={_HandleDeleteVariantItems.bind(
-                                                                                this,
-                                                                                e.id
-                                                                            )}
+                                                                            onClick={() =>
+                                                                                handleQueryId({
+                                                                                    id: e.id,
+                                                                                    status: true,
+                                                                                })
+                                                                            }
                                                                             className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
                                                                         >
                                                                             <IconDelete size="22" />
@@ -2039,6 +2095,15 @@ const Popup_NVL = React.memo((props) => {
                                     )}
                                 </div>
                             )}
+                            <PopupConfim
+                                type="warning"
+                                title={TITLE_DELETE}
+                                subtitle={CONFIRM_DELETION}
+                                isOpen={isOpen}
+                                dataLang={props.dataLang}
+                                save={handleDeleteVariantItems}
+                                cancel={() => handleQueryId({ status: false })}
+                            />
                         </React.Fragment>
                     )}
                 </ScrollArea>

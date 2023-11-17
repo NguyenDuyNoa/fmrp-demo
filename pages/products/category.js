@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
 
 import {
     Minus as IconMinus,
@@ -14,21 +11,24 @@ import {
     ArrowDown2 as IconDown,
     Trash as IconDelete,
     Edit as IconEdit,
-    Grid6 as IconExcel,
-    Refresh2,
 } from "iconsax-react";
 import Select, { components } from "react-select";
-import Swal from "sweetalert2";
-import ReactExport from "react-data-export";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+
+import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const MoreSelectedBadge = ({ items }) => {
     const style = {
@@ -64,14 +64,6 @@ const MultiValue = ({ index, getValue, ...props }) => {
     ) : null;
 };
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const CustomSelectOption = ({ value, label, level }) => (
     <div className="flex space-x-2 truncate">
         {level == 1 && <span>--</span>}
@@ -84,23 +76,33 @@ const CustomSelectOption = ({ value, label, level }) => (
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const dispatch = useDispatch();
 
+    const trangthaiExprired = useStatusExprired();
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingAnother, sOnFetchingAnother] = useState(false);
+
     const [onFetchingSub, sOnFetchingSub] = useState(false);
 
     const [data, sData] = useState([]);
     //Bộ lọc Chi nhánh
     const [dataBranchOption, sDataBranchOption] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
     //Bộ lọc Chức vụ
     const [dataCategoryOption, sDataCategoryOption] = useState([]);
+
     const [idCategory, sIdCategory] = useState(null);
 
     const [totalItems, sTotalItems] = useState({});
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
 
     const _ServerFetching = () => {
@@ -220,6 +222,7 @@ const Index = (props) => {
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
+
     const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
 
     const multiDataSet = [
@@ -275,8 +278,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useStatusExprired()
 
     return (
         <React.Fragment>
@@ -450,39 +451,28 @@ const Index = (props) => {
 
 const Item = React.memo((props) => {
     const [hasChild, sHasChild] = useState(false);
+
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/api_product/category/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: props.dataLang[message],
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: props.dataLang[message],
-                            });
-                        }
-                    }
-                    props.onRefresh && props.onRefresh();
-                    props.onRefreshSub && props.onRefreshSub();
-                });
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/api_product/category/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message]);
+                } else {
+                    isShow("success", props.dataLang[message]);
+                }
             }
+            props.onRefresh && props.onRefresh();
+            props.onRefreshSub && props.onRefreshSub();
         });
+
+        handleQueryId({ status: false });
     };
 
     useEffect(() => {
@@ -531,7 +521,7 @@ const Item = React.memo((props) => {
                         id={props.data?.id}
                     />
                     <button
-                        onClick={_HandleDelete.bind(this, props.data?.id)}
+                        onClick={() => handleQueryId({ id: props.data?.id, status: true })}
                         className="xl:text-base text-xs outline-none"
                     >
                         <IconDelete color="red" />
@@ -542,7 +532,7 @@ const Item = React.memo((props) => {
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
                         <ItemsChild
-                            onClick={_HandleDelete.bind(this, e.id)}
+                            onClick={() => handleQueryId({ id: e.id, status: true })}
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
@@ -551,7 +541,7 @@ const Item = React.memo((props) => {
                             grandchild="0"
                             children={e?.children?.map((e) => (
                                 <ItemsChild
-                                    onClick={_HandleDelete.bind(this, e.id)}
+                                    onClick={() => handleQueryId({ id: e.id, status: true })}
                                     onRefresh={props.onRefresh}
                                     onRefreshSub={props.onRefreshSub}
                                     dataLang={props.dataLang}
@@ -560,7 +550,7 @@ const Item = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={_HandleDelete.bind(this, e.id)}
+                                            onClick={() => handleQueryId({ id: e.id, status: true })}
                                             onRefresh={props.onRefresh}
                                             onRefreshSub={props.onRefreshSub}
                                             dataLang={props.dataLang}
@@ -575,6 +565,15 @@ const Item = React.memo((props) => {
                     ))}
                 </div>
             )}
+            <PopupConfim
+                type="warning"
+                dataLang={props.dataLang}
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </div>
     );
 });

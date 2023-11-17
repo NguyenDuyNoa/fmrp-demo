@@ -27,6 +27,10 @@ import OnResetData from "components/UI/btnResetData/btnReset";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -41,14 +45,23 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const router = useRouter();
+
     const dataLang = props.dataLang;
 
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const [data, sData] = useState([]);
+
     const [onFetching, sOnFetching] = useState(true);
+
     const [data_ex, sData_ex] = useState([]);
 
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [totalItem, sTotalItem] = useState([]);
 
     const _ServerFetching = () => {
@@ -109,39 +122,54 @@ const Index = (props) => {
         sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, idBranch]);
 
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-
-                Axios("DELETE", `/api_web/Api_client/group/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang[message],
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: dataLang[message],
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/Api_client/group/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                let { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", dataLang[message]);
+                } else {
+                    isShow("error", dataLang[message]);
+                }
             }
+            _ServerFetching();
         });
+        handleQueryId({ status: false });
     };
+
+    // const handleDelete = (event) => {
+    //     Swal.fire({
+    //         title: `${dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${dataLang?.aler_yes}`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const id = event;
+
+    //             Axios("DELETE", `/api_web/Api_client/group/${id}?csrf_protection=true`, {}, (err, response) => {
+    //                 if (!err) {
+    //                     var { isSuccess, message } = response.data;
+    //                     if (isSuccess) {
+    //                         Toast.fire({
+    //                             icon: "success",
+    //                             title: dataLang[message],
+    //                         });
+    //                     } else {
+    //                         Toast.fire({
+    //                             icon: "error",
+    //                             title: dataLang[message],
+    //                         });
+    //                     }
+    //                 }
+    //                 _ServerFetching();
+    //             });
+    //         }
+    //     });
+    // };
 
     const paginate = (pageNumber) => {
         router.push({
@@ -210,7 +238,7 @@ const Index = (props) => {
     const _HandleFresh = () => {
         sOnFetching(true);
     };
-    const trangthaiExprired = useStatusExprired()
+    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>
@@ -343,7 +371,9 @@ const Index = (props) => {
                                                                     id={e.id}
                                                                 />
                                                                 <button
-                                                                    onClick={() => handleDelete(e.id)}
+                                                                    onClick={() =>
+                                                                        handleQueryId({ id: e.id, status: true })
+                                                                    }
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -393,6 +423,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                type="warning"
+                dataLang={dataLang}
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

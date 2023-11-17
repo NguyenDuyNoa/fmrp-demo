@@ -3,12 +3,6 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import ReactExport from "react-data-export";
-
-import Swal from "sweetalert2";
 
 import {
     Edit as IconEdit,
@@ -18,53 +12,52 @@ import {
     Add as IconAdd,
     Refresh2,
 } from "iconsax-react";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
+import { Tooltip } from "react-tippy";
 import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import TabFilter from "components/UI/TabFilter";
+
 import Popup_dskh from "./(popup)/popupAdd";
 import Popup_chitiet from "./(popup)/popupDetail";
-import ImageErrors from "components/UI/imageErrors";
-import { Tooltip } from "react-tippy";
-import { useSelector } from "react-redux";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+
+import Loading from "@/components/UI/loading";
+import TabFilter from "@/components/UI/TabFilter";
+import Pagination from "@/components/UI/pagination";
+import ImageErrors from "@/components/UI/imageErrors";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { useToggle } from "@/hooks/useToggle";
-import useToast from "@/hooks/useToast";
+
 import { TITLE_DELETE, CONFIRM_DELETION } from "@/constants/delete/deleteTable";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const Index = (props) => {
+    const isShow = useToast();
+
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const tabPage = router.query?.tab;
 
     const { isOpen, isId, handleQueryId } = useToggle();
-    const isShow = useToast();
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [totalItem, sTotalItems] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [data, sData] = useState({});
+
     const [data_ex, sData_ex] = useState([]);
+
     const [listDs, sListDs] = useState();
 
     const [listSelectCt, sListSelectCt] = useState();
@@ -79,6 +72,7 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -672,6 +666,7 @@ const Index = (props) => {
                 </div>
             </div>
             <PopupConfim
+                dataLang={dataLang}
                 type="warning"
                 title={TITLE_DELETE}
                 subtitle={CONFIRM_DELETION}

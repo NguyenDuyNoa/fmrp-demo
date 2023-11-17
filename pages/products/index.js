@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect, useRef } from "react";
 
 import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
-
 import Popup from "reactjs-popup";
+
 import {
     SearchNormal1 as IconSearch,
     Trash as IconDelete,
@@ -23,35 +20,32 @@ import {
     Maximize4 as IconMax,
     CloseCircle as IconClose,
     TickCircle as IconTick,
-    Refresh2,
 } from "iconsax-react";
 import { NumericFormat } from "react-number-format";
 import Select, { components } from "react-select";
-import Swal from "sweetalert2";
 import ModalImage from "react-modal-image";
+
 import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
 import { arrayMoveImmutable } from "array-move";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import ReactExport from "react-data-export";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -99,8 +93,12 @@ const MultiValue = ({ index, getValue, ...props }) => {
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const dispatch = useDispatch();
+
+    const trangthaiExprired = useStatusExprired();
 
     useEffect(() => {
         router.push({
@@ -119,23 +117,31 @@ const Index = (props) => {
     const [openDetail, sOpenDetail] = useState(false);
 
     const [data, sData] = useState([]);
+
     const [dataExcel, sDataExcel] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingAnother, sOnFetchingAnother] = useState(false);
     //Bộ lọc Chi nhánh
     const [dataBranchOption, sDataBranchOption] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
     //Bộ lọc Danh mục
     const [dataCategory, sDataCategory] = useState([]);
+
     const [valueCategory, sValueCategory] = useState(null);
     //Bộ lọc Thành phẩm
     const [dataFinishedPro, sDataFinishedPro] = useState([]);
+
     const [valueFinishedPro, sValueFinishedPro] = useState(null);
 
     const [dataProductExpiry, sDataProductExpiry] = useState({});
 
     const [totalItems, sTotalItems] = useState({});
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
 
     const _ServerFetching = () => {
@@ -202,6 +208,7 @@ const Index = (props) => {
                 });
             }
         });
+
         Axios("GET", "/api_web/api_product/productType/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var data = response.data;
@@ -214,6 +221,7 @@ const Index = (props) => {
                 });
             }
         });
+
         Axios("GET", "/api_web/Api_unit/unit/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
@@ -226,6 +234,7 @@ const Index = (props) => {
                 });
             }
         });
+
         Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
@@ -239,6 +248,7 @@ const Index = (props) => {
                 });
             }
         });
+
         Axios("GET", "api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
@@ -253,6 +263,7 @@ const Index = (props) => {
                 );
             }
         });
+
         Axios("GET", "/api_web/api_product/product/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
@@ -265,6 +276,7 @@ const Index = (props) => {
                 sDataExcel(rResult);
             }
         });
+
         Axios("GET", `/api_web/api_product/stage/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
@@ -277,6 +289,7 @@ const Index = (props) => {
                 });
             }
         });
+
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var data = response.data;
@@ -306,7 +319,9 @@ const Index = (props) => {
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
+
     const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
+
     const _HandleFresh = () => {
         sOnFetchingAnother(true);
         sOnFetching(true);
@@ -414,7 +429,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useStatusExprired()
 
     return (
         <React.Fragment>
@@ -958,44 +972,34 @@ const Index = (props) => {
 };
 
 const BtnTacVu = React.memo((props) => {
+    const isShow = useToast();
+
     const [openTacvu, sOpenTacvu] = useState(false);
+
     const _ToggleModal = (e) => sOpenTacvu(e);
 
     const [open, sOpen] = useState(false);
+
     const [openDetail, sOpenDetail] = useState(false);
+
     const [openBom, sOpenBom] = useState(false);
 
+    const { isOpen, isId, isIdChild, handleOpen, handleToggle, handleQueryId } = useToggle();
+
     ////
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/api_product/product/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: props.dataLang[message],
-                            });
-                            props.onRefresh && props.onRefresh();
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: props.dataLang[message],
-                            });
-                        }
-                    }
-                });
+    const handleDelete = () => {
+        Axios("DELETE", `/api_web/api_product/product/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message]);
+                    props.onRefresh && props.onRefresh();
+                } else {
+                    isShow("error", props.dataLang[message]);
+                }
             }
         });
+        handleQueryId({ status: false });
     };
     return (
         <div>
@@ -1068,13 +1072,22 @@ const BtnTacVu = React.memo((props) => {
                             className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                         />
                         <button
-                            onClick={_HandleDelete.bind(this, props.id)}
+                            onClick={() => handleQueryId({ id: props.id, status: true })}
                             className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                         >
                             Xoá
                         </button>
                     </div>
                 </div>
+                <PopupConfim
+                    type="warning"
+                    dataLang={props.dataLang}
+                    title={TITLE_DELETE}
+                    subtitle={CONFIRM_DELETION}
+                    isOpen={isOpen}
+                    save={handleDelete}
+                    cancel={() => handleQueryId({ status: false })}
+                />
             </Popup>
         </div>
     );
@@ -1082,11 +1095,19 @@ const BtnTacVu = React.memo((props) => {
 
 const Popup_ThanhPham = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
+
     const dataOptType = useSelector((state) => state.type_finishedProduct);
+
     const dataOptUnit = useSelector((state) => state.unit_finishedProduct);
+
     const dataOptVariant = useSelector((state) => state.variant_NVL);
 
+    const isShow = useToast();
+
+    const { isOpen, isId, isIdChild, handleOpen, handleToggle, handleQueryId } = useToggle();
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
@@ -1095,40 +1116,64 @@ const Popup_ThanhPham = React.memo((props) => {
     const _ToggleModal = (e) => props.setOpen(e);
 
     const [tab, sTab] = useState(0);
+
     const _HandleSelectTab = (e) => sTab(e);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingCategory, sOnFetchingCategory] = useState(false);
+
     const [onSending, sOnSending] = useState(false);
 
     const [name, sName] = useState("");
+
     const [code, sCode] = useState("");
+
     const [price, sPrice] = useState(null);
+
     const [minimumAmount, sMinimumAmount] = useState(null);
+
     const [note, sNote] = useState("");
+
     const [branch, sBranch] = useState([]);
+
     const [type, sType] = useState(null);
+
     const [dataCategory, sDataCategory] = useState([]);
+
     const [category, sCategory] = useState(null);
+
     const [unit, sUnit] = useState(null);
+
     const [expiry, sExpiry] = useState();
 
     const [thumb, sThumb] = useState(null);
+
     const [thumbFile, sThumbFile] = useState(null);
+
     const [isDeleteThumb, sIsDeleteThumb] = useState(false);
 
     ///Biến thể
     const [variantMain, sVariantMain] = useState(null);
+
     const [prevVariantMain, sPrevVariantMain] = useState(null);
+
     const [variantSub, sVariantSub] = useState(null);
+
     const [prevVariantSub, sPrevVariantSub] = useState(null);
+
     const [optVariantMain, sOptVariantMain] = useState([]);
+
     const [optVariantSub, sOptVariantSub] = useState([]);
+
     const [optSelectedVariantMain, sOptSelectedVariantMain] = useState([]);
+
     const [optSelectedVariantSub, sOptSelectedVariantSub] = useState([]);
 
     const [dataTotalVariant, sDataTotalVariant] = useState([]);
+
     const [dataVariantSending, sDataVariantSending] = useState([]);
+
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
         // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
@@ -1136,10 +1181,7 @@ const Popup_ThanhPham = React.memo((props) => {
         !variantMain && sOptSelectedVariantMain([]);
         if (variantMain === variantSub && variantSub != null && variantMain != null) {
             sVariantSub(null);
-            Toast.fire({
-                icon: "error",
-                title: `Biến thể bị trùng`,
-            });
+            isShow("error", `Biến thể bị trùng`);
         }
     }, [variantMain]);
 
@@ -1150,10 +1192,7 @@ const Popup_ThanhPham = React.memo((props) => {
         !variantSub && sOptSelectedVariantSub([]);
         if (variantSub === variantMain && variantSub != null && variantMain != null) {
             sVariantSub(null);
-            Toast.fire({
-                icon: "error",
-                title: `Biến thể bị trùng`,
-            });
+            isShow("error", `Biến thể bị trùng`);
         }
     }, [variantSub]);
 
@@ -1229,19 +1268,21 @@ const Popup_ThanhPham = React.memo((props) => {
                 },
             ]);
         } else {
-            Toast.fire({
-                icon: "error",
-                title: `Phải chọn tùy chọn của biến thể chính`,
-            });
+            isShow("error", `Phải chọn tùy chọn của biến thể chính`);
         }
     };
     //////
 
     const [errGroup, sErrGroup] = useState(false);
+
     const [errName, sErrName] = useState(false);
+
     const [errCode, sErrCode] = useState(false);
+
     const [errUnit, sErrUnit] = useState(false);
+
     const [errBranch, sErrBranch] = useState(false);
+
     const [errType, sErrType] = useState(false);
 
     useEffect(() => {
@@ -1467,17 +1508,11 @@ const Popup_ThanhPham = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", props.dataLang[message]);
                         props.setOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                     sOnSending(false);
                 }
@@ -1505,10 +1540,7 @@ const Popup_ThanhPham = React.memo((props) => {
             props?.id && code == "" && sErrCode(true);
             unit?.value == null && sErrUnit(true);
             name == "" && sErrName(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }
@@ -1532,79 +1564,130 @@ const Popup_ThanhPham = React.memo((props) => {
         sDataTotalVariant([...dataTotalVariant]);
     };
 
-    const _HandleDeleteVariant = (parentId, id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const newData = dataTotalVariant
-                    .map((item) => {
-                        if (item.id === parentId) {
-                            item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== id);
-                        }
-                        return item;
-                    })
-                    .filter((item) => item.variation_option_2.length > 0);
-                sDataTotalVariant(newData);
+    // const _HandleDeleteVariant = (parentId, id) => {
+    //     Swal.fire({
+    //         title: `${props.dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${props.dataLang?.aler_yes}`,
+    //         cancelButtonText: `${props.dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const newData = dataTotalVariant
+    //                 .map((item) => {
+    //                     if (item.id === parentId) {
+    //                         item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== id);
+    //                     }
+    //                     return item;
+    //                 })
+    //                 .filter((item) => item.variation_option_2.length > 0);
+    //             sDataTotalVariant(newData);
 
-                const foundParent = newData.some((item) => item.id === parentId);
-                if (foundParent === false) {
+    //             const foundParent = newData.some((item) => item.id === parentId);
+    //             if (foundParent === false) {
+    //                 const newData2 = dataVariantSending.map((item) => {
+    //                     return {
+    //                         ...item,
+    //                         option: item.option.filter((opt) => opt.id !== parentId),
+    //                     };
+    //                 });
+    //                 if (newData2[0].option?.length === 0) {
+    //                     sDataVariantSending(newData2.map((item) => ({ name: item.name })));
+    //                 } else {
+    //                     sDataVariantSending(newData2);
+    //                 }
+    //             } else {
+    //                 const found = dataTotalVariant.some((item) => {
+    //                     return item.variation_option_2.some((opt) => opt.id === id);
+    //                 });
+    //                 if (found === false) {
+    //                     const newData2 = dataVariantSending.map((item) => {
+    //                         return {
+    //                             ...item,
+    //                             option: item.option.filter((opt) => opt.id !== id),
+    //                         };
+    //                     });
+    //                     sDataVariantSending(newData2);
+    //                 }
+    //             }
+    //         }
+    //     });
+    // };
+
+    const handleDeleteVariantItems = () => {
+        if (isId && isIdChild) {
+            const newData = dataTotalVariant
+                .map((item) => {
+                    if (item.id === isId) {
+                        item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== isIdChild);
+                    }
+                    return item;
+                })
+                .filter((item) => item.variation_option_2.length > 0);
+            sDataTotalVariant(newData);
+
+            const foundParent = newData.some((item) => item.id === isId);
+            if (foundParent === false) {
+                const newData2 = dataVariantSending.map((item) => {
+                    return {
+                        ...item,
+                        option: item.option.filter((opt) => opt.id !== isId),
+                    };
+                });
+                if (newData2[0].option?.length === 0) {
+                    sDataVariantSending(newData2.map((item) => ({ name: item.name })));
+                } else {
+                    sDataVariantSending(newData2);
+                }
+            } else {
+                const found = dataTotalVariant.some((item) => {
+                    return item.variation_option_2.some((opt) => opt.id === isIdChild);
+                });
+                if (found === false) {
                     const newData2 = dataVariantSending.map((item) => {
                         return {
                             ...item,
-                            option: item.option.filter((opt) => opt.id !== parentId),
+                            option: item.option.filter((opt) => opt.id !== isIdChild),
                         };
                     });
-                    if (newData2[0].option?.length === 0) {
-                        sDataVariantSending(newData2.map((item) => ({ name: item.name })));
-                    } else {
-                        sDataVariantSending(newData2);
-                    }
-                } else {
-                    const found = dataTotalVariant.some((item) => {
-                        return item.variation_option_2.some((opt) => opt.id === id);
-                    });
-                    if (found === false) {
-                        const newData2 = dataVariantSending.map((item) => {
-                            return {
-                                ...item,
-                                option: item.option.filter((opt) => opt.id !== id),
-                            };
-                        });
-                        sDataVariantSending(newData2);
-                    }
+                    sDataVariantSending(newData2);
                 }
             }
-        });
-    };
+            handleQueryId({ status: false });
+        } else {
+            sDataTotalVariant([...dataTotalVariant.filter((x) => x.id !== isId)]);
+            const filteredOption = dataVariantSending[0].option.filter((opt) => opt.id !== isId);
+            const updatedData = [...dataVariantSending];
+            updatedData[0] = {
+                ...dataVariantSending[0],
+                option: filteredOption,
+            };
+            sDataVariantSending(updatedData);
+            handleQueryId({ status: false });
+        }
 
-    const _HandleDeleteVariantItems = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sDataTotalVariant([...dataTotalVariant.filter((x) => x.id !== id)]);
-                const filteredOption = dataVariantSending[0].option.filter((opt) => opt.id !== id);
-                const updatedData = [...dataVariantSending];
-                updatedData[0] = {
-                    ...dataVariantSending[0],
-                    option: filteredOption,
-                };
-                sDataVariantSending(updatedData);
-            }
-        });
+        // Swal.fire({
+        //     title: `${props.dataLang?.aler_ask}`,
+        //     icon: "warning",
+        //     showCancelButton: true,
+        //     confirmButtonColor: "#296dc1",
+        //     cancelButtonColor: "#d33",
+        //     confirmButtonText: `${props.dataLang?.aler_yes}`,
+        //     cancelButtonText: `${props.dataLang?.aler_cancel}`,
+        // }).then((result) => {
+        //     if (result.isConfirmed) {
+        //         sDataTotalVariant([...dataTotalVariant.filter((x) => x.id !== id)]);
+        //         const filteredOption = dataVariantSending[0].option.filter((opt) => opt.id !== id);
+        //         const updatedData = [...dataVariantSending];
+        //         updatedData[0] = {
+        //             ...dataVariantSending[0],
+        //             option: filteredOption,
+        //         };
+        //         sDataVariantSending(updatedData);
+        //     }
+        // });
     };
 
     return (
@@ -2357,11 +2440,18 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                             />
                                                                             <div className="flex justify-center">
                                                                                 <button
-                                                                                    onClick={_HandleDeleteVariant.bind(
-                                                                                        this,
-                                                                                        e.id,
-                                                                                        ce.id
-                                                                                    )}
+                                                                                    // onClick={_HandleDeleteVariant.bind(
+                                                                                    //     this,
+                                                                                    //     e.id,
+                                                                                    //     ce.id
+                                                                                    // )}
+                                                                                    onClick={() =>
+                                                                                        handleQueryId({
+                                                                                            id: e.id,
+                                                                                            status: true,
+                                                                                            idChild: ce.id,
+                                                                                        })
+                                                                                    }
                                                                                     className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
                                                                                 >
                                                                                     <IconDelete size="22" />
@@ -2385,10 +2475,16 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                     />
                                                                     <div className="flex justify-center">
                                                                         <button
-                                                                            onClick={_HandleDeleteVariantItems.bind(
-                                                                                this,
-                                                                                e.id
-                                                                            )}
+                                                                            // onClick={_HandleDeleteVariantItems.bind(
+                                                                            //     this,
+                                                                            //     e.id
+                                                                            // )}
+                                                                            onClick={() =>
+                                                                                handleQueryId({
+                                                                                    id: e.id,
+                                                                                    status: true,
+                                                                                })
+                                                                            }
                                                                             className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
                                                                         >
                                                                             <IconDelete size="22" />
@@ -2404,6 +2500,15 @@ const Popup_ThanhPham = React.memo((props) => {
                                     )}
                                 </div>
                             )}
+                            <PopupConfim
+                                dataLang={props.dataLang}
+                                type="warning"
+                                title={TITLE_DELETE}
+                                subtitle={CONFIRM_DELETION}
+                                isOpen={isOpen}
+                                save={handleDeleteVariantItems}
+                                cancel={() => handleQueryId({ status: false })}
+                            />
                         </React.Fragment>
                     )}
                 </ScrollArea>
@@ -3006,6 +3111,8 @@ const Popup_ThongTin = React.memo((props) => {
 const Popup_GiaiDoan = React.memo((props) => {
     const listCd = useSelector((state) => state.congdoan_finishedProduct);
 
+    const isShow = useToast();
+
     const _ToggleModal = (e) => props.setOpen(e);
 
     const scrollAreaRef = useRef(null);
@@ -3015,17 +3122,23 @@ const Popup_GiaiDoan = React.memo((props) => {
     };
 
     const [onSending, sOnSending] = useState(false);
+
     const [onFetching, sOnFetching] = useState(false);
 
     const [statusBtnAdd, sStatusBtnAdd] = useState(false);
+
     const [errName, sErrName] = useState(false);
 
     const [listCdChosen, sListCdChosen] = useState([]);
+
     const [option, sOption] = useState([]);
+
     const [listCdRest, sListCdRest] = useState([]);
 
     const [name, sName] = useState(null);
+
     const [radio1, sRadio1] = useState(0);
+
     const [radio2, sRadio2] = useState(0);
 
     useEffect(() => {
@@ -3091,17 +3204,11 @@ const Popup_GiaiDoan = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: props.dataLang[message],
-                        });
+                        isShow("success", props.dataLang[message]);
                         props.setOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: props.dataLang[message],
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -3118,10 +3225,7 @@ const Popup_GiaiDoan = React.memo((props) => {
         const hasNullLabel = option.some((item) => item.name === null);
         if (hasNullLabel) {
             sErrName(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sErrName(false);
             sOnSending(true);
@@ -3380,23 +3484,30 @@ const Popup_GiaiDoan = React.memo((props) => {
 
 const Popup_Bom = React.memo((props) => {
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
+    const isShow = useToast();
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [loadingData, sLoadingData] = useState(false);
 
     const [onFetchingCd, sOnFetchingCd] = useState(false);
+
     const _ToggleModal = (e) => props.setOpen(e);
 
     const [onSending, sOnSending] = useState(false);
 
     const [dataVariant, sDataVariant] = useState([]);
+
     const [valueVariant, sValueVariant] = useState(null);
 
     const [tab, sTab] = useState(null);
+
     const [selectedList, sSelectedList] = useState(null);
 
     const [dataTypeCd, sDataTypeCd] = useState([]);
@@ -3405,12 +3516,14 @@ const Popup_Bom = React.memo((props) => {
     const _HandleSelectTab = (e) => sTab(e);
 
     const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
+
     const dataRestVariant = dataVariant?.filter(
         (item1) => !dataSelectedVariant?.some((item2) => item1.label === item2?.label && item1.value === item2?.value)
     );
     const [currentData, sCurrentData] = useState([]);
 
     const [errType, sErrType] = useState(false);
+
     const [errName, sErrName] = useState(false);
 
     useEffect(() => {
@@ -3845,17 +3958,11 @@ const Popup_Bom = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: props.dataLang[message],
-                        });
+                        isShow("success", props.dataLang[message]);
                         props.setOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: props.dataLang[message],
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -3874,10 +3981,7 @@ const Popup_Bom = React.memo((props) => {
         if (errType || errName) {
             errNullType && sErrType(true);
             errNullName && sErrName(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sErrType(false);
             sErrName(false);

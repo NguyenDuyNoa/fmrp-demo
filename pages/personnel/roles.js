@@ -4,9 +4,6 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 
 import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
 
 import {
     Minus as IconMinus,
@@ -15,19 +12,23 @@ import {
     Trash as IconDelete,
     Edit as IconEdit,
     Grid6 as IconExcel,
-    Refresh2,
 } from "iconsax-react";
 import Select, { components } from "react-select";
 import Swal from "sweetalert2";
-import ReactExport from "react-data-export";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import useToast from "@/hooks/useToast";
 
 const MoreSelectedBadge = ({ items }) => {
     const style = {
@@ -83,23 +84,33 @@ const CustomSelectOption = ({ value, label, level }) => (
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const trangthaiExprired = useStatusExprired();
+
     const router = useRouter();
+
     const dispatch = useDispatch();
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingAnother, sOnFetchingAnother] = useState(false);
+
     const [onFetchingSub, sOnFetchingSub] = useState(false);
 
     const [data, sData] = useState([]);
     //Bộ lọc Chi nhánh
     const [dataBranchOption, sDataBranchOption] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
     //Bộ lọc Chức vụ
     const [dataPositionOption, sDataPositionOption] = useState([]);
+
     const [idPosition, sIdPosition] = useState(null);
 
     const [totalItems, sTotalItems] = useState({});
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
 
     const _ServerFetching = () => {
@@ -227,6 +238,7 @@ const Index = (props) => {
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
+
     const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
 
     const multiDataSet = [
@@ -284,8 +296,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired =useStatusExprired()
 
     return (
         <React.Fragment>
@@ -462,40 +472,59 @@ const Index = (props) => {
 
 const Item = React.memo((props) => {
     const [hasChild, sHasChild] = useState(false);
+
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/api_staff/position/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: props.dataLang[message],
-                            });
-                            props.onRefresh && props.onRefresh();
-                            props.onRefreshSub && props.onRefreshSub();
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: props.dataLang[message],
-                            });
-                        }
-                    }
-                });
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/api_staff/position/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message]);
+                } else {
+                    isShow("error", props.dataLang[message]);
+                }
             }
+            _ServerFetching();
         });
+
+        handleQueryId({ status: false });
     };
+
+    // const _HandleDelete = (id) => {
+    //     Swal.fire({
+    //         title: `${props.dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${props.dataLang?.aler_yes}`,
+    //         cancelButtonText: `${props.dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             Axios("DELETE", `/api_web/api_staff/position/${id}?csrf_protection=true`, {}, (err, response) => {
+    //                 if (!err) {
+    //                     var { isSuccess, message } = response.data;
+    //                     if (isSuccess) {
+    //                         Toast.fire({
+    //                             icon: "success",
+    //                             title: props.dataLang[message],
+    //                         });
+    //                         props.onRefresh && props.onRefresh();
+    //                         props.onRefreshSub && props.onRefreshSub();
+    //                     } else {
+    //                         Toast.fire({
+    //                             icon: "error",
+    //                             title: props.dataLang[message],
+    //                         });
+    //                     }
+    //                 }
+    //             });
+    //         }
+    //     });
+    // };
 
     useEffect(() => {
         sHasChild(false);
@@ -543,7 +572,7 @@ const Item = React.memo((props) => {
                         id={props.data?.id}
                     />
                     <button
-                        onClick={_HandleDelete.bind(this, props.data?.id)}
+                        onClick={() => handleQueryId({ id: props.data?.id, status: true })}
                         className="xl:text-base text-xs outline-none"
                     >
                         <IconDelete color="red" />
@@ -554,7 +583,7 @@ const Item = React.memo((props) => {
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
                         <ItemsChild
-                            onClick={_HandleDelete.bind(this, e.id)}
+                            onClick={() => handleQueryId({ id: e.id, status: true })}
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
@@ -563,7 +592,7 @@ const Item = React.memo((props) => {
                             grandchild="0"
                             children={e?.children?.map((e) => (
                                 <ItemsChild
-                                    onClick={_HandleDelete.bind(this, e.id)}
+                                    onClick={() => handleQueryId({ id: e.id, status: true })}
                                     onRefresh={props.onRefresh}
                                     onRefreshSub={props.onRefreshSub}
                                     dataLang={props.dataLang}
@@ -572,7 +601,7 @@ const Item = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={_HandleDelete.bind(this, e.id)}
+                                            onClick={() => handleQueryId({ id: e.id, status: true })}
                                             onRefresh={props.onRefresh}
                                             onRefreshSub={props.onRefreshSub}
                                             dataLang={props.dataLang}
@@ -587,6 +616,15 @@ const Item = React.memo((props) => {
                     ))}
                 </div>
             )}
+            <PopupConfim
+                dataLang={props.dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </div>
     );
 });
@@ -654,25 +692,37 @@ const ItemsChild = React.memo((props) => {
 
 const Popup_ChucVu = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
+
     const dataOptDepartment = useSelector((state) => state.department_staff);
+
     const dataOptPosition = useSelector((state) => state.position_staff);
 
     const [open, sOpen] = useState(false);
+
+    const isShow = useToast();
+
     const _ToggleModal = (e) => sOpen(e);
 
     const [dataOption, sDataOption] = useState([]);
 
     const [onSending, sOnSending] = useState(false);
+
     const [onFetching, sOnFetching] = useState(false);
 
     const [name, sName] = useState("");
+
     const [position, sPosition] = useState(null);
+
     const [department, sDepartment] = useState(null);
+
     const [branch, sBranch] = useState([]);
+
     const branch_id = branch?.map((e) => e.value);
 
     const [errBranch, sErrBranch] = useState(false);
+
     const [errName, sErrName] = useState(false);
+
     const [errDepartment, sErrDepartment] = useState(false);
 
     useEffect(() => {
@@ -722,10 +772,7 @@ const Popup_ChucVu = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", props.dataLang[message]);
                         sOpen(false);
                         sName("");
                         sPosition(null);
@@ -734,10 +781,7 @@ const Popup_ChucVu = React.memo((props) => {
                         props.onRefresh && props.onRefresh();
                         props.onRefreshSub && props.onRefreshSub();
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                     sOnSending(false);
                 }
@@ -755,10 +799,7 @@ const Popup_ChucVu = React.memo((props) => {
             name?.length == 0 && sErrName(true);
             department == null && sErrDepartment(true);
             branch?.length == 0 && sErrBranch(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }

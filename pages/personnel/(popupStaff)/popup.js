@@ -1,20 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 import dynamic from "next/dynamic";
-import Select, { components } from "react-select";
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-import Swal from "sweetalert2";
+import Select from "react-select";
 
 import {
     Edit as IconEdit,
@@ -28,6 +19,7 @@ import {
     GalleryEdit as IconEditImg,
 } from "iconsax-react";
 import Image from "next/image";
+import useToast from "@/hooks/useToast";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -35,53 +27,76 @@ const CustomSelectOption = ({ value, label, level, code }) => (
         {level == 2 && <span>----</span>}
         {level == 3 && <span>------</span>}
         {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">
-            {label}
-        </span>
+        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 );
 
 const Popup_dsnd = (props) => {
     const dataLang = props.dataLang;
+
+    const isShow = useToast();
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onSending, sOnSending] = useState(false);
+
     const [onFetching_Manage, sOnFetching_Manage] = useState(false);
 
     const [errInput, sErrInput] = useState(false);
+
     const [errInputBr, sErrInputBr] = useState(false);
+
     const [errInputPas, sErrInputPas] = useState(false);
 
     const [name, sName] = useState("");
+
     const [code, sCode] = useState(null);
+
     const [password, sPassword] = useState("");
+
     const [phone_number, sPhone] = useState(null);
+
     const [email, sEmail] = useState("");
+
     const [admin, sAdmin] = useState("0");
 
     const [valueBr, sValueBr] = useState([]);
+
     const [dataDepar, sDataDepar] = useState([]);
+
     const depar_id = dataDepar?.map((e) => {
         return e?.id;
     });
+
     const [room, sRoom] = useState([]);
     // const [valuePosi, sValuePosi] = useState()
     const [tab, sTab] = useState(0);
+
     const _HandleSelectTab = (e) => sTab(e);
 
     const [thumb, sThumb] = useState(null);
+
     const [thumbFile, sThumbFile] = useState(null);
+
     const [isDeleteThumb, sIsDeleteThumb] = useState(false);
+
     const [dataOption, sDataOption] = useState();
+
     const [typePassword, sTypePassword] = useState(false);
+
     const _TogglePassword = () => sTypePassword(!typePassword);
+
     const _HandleChangeFileThumb = ({ target: { files } }) => {
         var [file] = files;
         if (file) {
@@ -90,6 +105,7 @@ const Popup_dsnd = (props) => {
         }
         sIsDeleteThumb(false);
     };
+
     const _DeleteThumb = (e) => {
         e.preventDefault();
         sThumbFile(null);
@@ -145,39 +161,34 @@ const Popup_dsnd = (props) => {
     }, [open]);
 
     const _ServerFetching_detailUser = () => {
-        Axios(
-            "GET",
-            `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sName(db?.full_name);
-                    sCode(db?.code);
-                    sPhone(db?.phonenumber);
-                    sEmail(db?.email);
-                    // sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
-                    sValueBr(
-                        db?.branch?.map((e) => ({
-                            label: e.name,
-                            value: Number(e.id),
-                        }))
-                    );
-                    sValueManage(
-                        db?.manage?.map((x) => ({
-                            label: x.full_name,
-                            value: Number(x.id),
-                        }))
-                    );
-                    sAdmin(db?.admin);
-                    sDataDepar(db?.department);
-                    sThumb(db?.profile_image);
-                    sIdPos(db?.position_id);
-                }
-                // sOnSending(false)
-                sOnFetching(false);
+        Axios("GET", `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var db = response.data;
+                sName(db?.full_name);
+                sCode(db?.code);
+                sPhone(db?.phonenumber);
+                sEmail(db?.email);
+                // sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
+                sValueBr(
+                    db?.branch?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    }))
+                );
+                sValueManage(
+                    db?.manage?.map((x) => ({
+                        label: x.full_name,
+                        value: Number(x.id),
+                    }))
+                );
+                sAdmin(db?.admin);
+                sDataDepar(db?.department);
+                sThumb(db?.profile_image);
+                sIdPos(db?.position_id);
             }
-        );
+            // sOnSending(false)
+            sOnFetching(false);
+        });
     };
     useEffect(() => {
         open && props?.id && _ServerFetching_detailUser();
@@ -206,16 +217,11 @@ const Popup_dsnd = (props) => {
 
             if (value?.target.checked) {
                 // Thêm giá trị và id vào mảng khi input được chọn
-                const updatedOptions = dataDepar && [
-                    ...dataDepar,
-                    { name, id },
-                ];
+                const updatedOptions = dataDepar && [...dataDepar, { name, id }];
                 sDataDepar(updatedOptions);
             } else {
                 // Xóa giá trị và id khỏi mảng khi input được bỏ chọn
-                const updatedOptions = dataDepar?.filter(
-                    (option) => option.id !== id
-                );
+                const updatedOptions = dataDepar?.filter((option) => option.id !== id);
                 sDataDepar(updatedOptions);
             }
         } else if (type == "valueBr") {
@@ -278,6 +284,7 @@ const Popup_dsnd = (props) => {
                             icon: "success",
                             title: `${props?.dataLang[message]}`,
                         });
+                        isShow("success", props?.dataLang[message]);
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                         sErrInput(false);
@@ -294,12 +301,7 @@ const Popup_dsnd = (props) => {
                         sIdPos();
                         sValueManage([]);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${
-                                props.dataLang[message] + " " + branch_name
-                            } `,
-                        });
+                        isShow("error", props.dataLang[message] + " " + branch_name);
                     }
                 }
                 sOnSending(false);
@@ -312,12 +314,11 @@ const Popup_dsnd = (props) => {
     }, [onSending]);
 
     const [manage, sManage] = useState([]);
+
     const _ServerFetching__Manage = () => {
         Axios(
             "GET",
-            `/api_web/api_staff/staffManage/${
-                idPos ? idPos : -1
-            }?csrf_protection=true`,
+            `/api_web/api_staff/staffManage/${idPos ? idPos : -1}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
@@ -336,9 +337,7 @@ const Popup_dsnd = (props) => {
                                     label: e.full_name,
                                     value: Number(e.id),
                                 }))
-                                ?.filter((e) =>
-                                    valueManage.some((x) => e.value !== x.value)
-                                )
+                                ?.filter((e) => valueManage.some((x) => e.value !== x.value))
                         );
                     }
                     // else{
@@ -368,18 +367,11 @@ const Popup_dsnd = (props) => {
     // save form
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (
-            name?.length == 0 ||
-            branch_id?.length == 0 ||
-            password?.length == 0
-        ) {
+        if (name?.length == 0 || branch_id?.length == 0 || password?.length == 0) {
             name?.length == 0 && sErrInput(true);
             branch_id?.length == 0 && sErrInputBr(true);
             password?.length == 0 && sErrInputPas(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }
@@ -408,13 +400,7 @@ const Popup_dsnd = (props) => {
                         ? `${props.dataLang?.personnels_staff_popup_edit}`
                         : `${props.dataLang?.personnels_staff_popup_add}`
                 }
-                button={
-                    props.id ? (
-                        <IconEdit />
-                    ) : (
-                        `${props.dataLang?.branch_popup_create_new}`
-                    )
-                }
+                button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
@@ -424,9 +410,7 @@ const Popup_dsnd = (props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
                         className={`${
-                            tab === 0
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_info}
@@ -434,9 +418,7 @@ const Popup_dsnd = (props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
                         className={`${
-                            tab === 1
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_power}
@@ -455,46 +437,26 @@ const Popup_dsnd = (props) => {
                                     <div className="flex justify-between gap-5">
                                         <div className="w-1/2">
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.personnels_staff_popup_code
-                                                }{" "}
+                                                {props.dataLang?.personnels_staff_popup_code}{" "}
                                             </label>
                                             <input
                                                 value={code}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "code"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "code")}
                                                 name="fname"
                                                 type="text"
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.client_popup_sytem
-                                                }
+                                                placeholder={props.dataLang?.client_popup_sytem}
                                                 className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                             />
 
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.personnels_staff_popup_name
-                                                }
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.personnels_staff_popup_name}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <div>
                                                 <input
                                                     value={name}
-                                                    onChange={_HandleChangeInput.bind(
-                                                        this,
-                                                        "name"
-                                                    )}
-                                                    placeholder={
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_name
-                                                    }
+                                                    onChange={_HandleChangeInput.bind(this, "name")}
+                                                    placeholder={props.dataLang?.personnels_staff_popup_name}
                                                     type="text"
                                                     className={`${
                                                         errInput
@@ -505,103 +467,66 @@ const Popup_dsnd = (props) => {
 
                                                 {errInput && (
                                                     <label className="mb-4  text-[14px] text-red-500">
-                                                        {
-                                                            props.dataLang
-                                                                ?.personnels_staff_popup_errName
-                                                        }
+                                                        {props.dataLang?.personnels_staff_popup_errName}
                                                     </label>
                                                 )}
                                             </div>
                                             <div>
                                                 <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                    {
-                                                        props.dataLang
-                                                            ?.client_list_brand
-                                                    }{" "}
-                                                    <span className="text-red-500">
-                                                        *
-                                                    </span>
+                                                    {props.dataLang?.client_list_brand}{" "}
+                                                    <span className="text-red-500">*</span>
                                                 </label>
                                                 <Select
                                                     closeMenuOnSelect={false}
-                                                    placeholder={
-                                                        props.dataLang
-                                                            ?.client_list_brand
-                                                    }
+                                                    placeholder={props.dataLang?.client_list_brand}
                                                     options={brandpOpt}
                                                     isSearchable={true}
-                                                    onChange={_HandleChangeInput.bind(
-                                                        this,
-                                                        "valueBr"
-                                                    )}
+                                                    onChange={_HandleChangeInput.bind(this, "valueBr")}
                                                     LoadingIndicator
                                                     isMulti
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
                                                     value={valueBr}
                                                     maxMenuHeight="200px"
                                                     isClearable={true}
-                                                    menuPortalTarget={
-                                                        document.body
-                                                    }
+                                                    menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     theme={(theme) => ({
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
                                                         menuPortal: (base) => ({
                                                             ...base,
                                                             zIndex: 9999,
-                                                            position:
-                                                                "absolute",
+                                                            position: "absolute",
                                                         }),
                                                     }}
                                                     className={`${
-                                                        errInputBr
-                                                            ? "border-red-500"
-                                                            : "border-transparent"
+                                                        errInputBr ? "border-red-500" : "border-transparent"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 />
                                                 {errInputBr && (
                                                     <label className="mb-2  text-[14px] text-red-500">
-                                                        {
-                                                            props.dataLang
-                                                                ?.client_list_bran
-                                                        }
+                                                        {props.dataLang?.client_list_bran}
                                                     </label>
                                                 )}
                                             </div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.personnels_staff_popup_email
-                                                }
+                                                {props.dataLang?.personnels_staff_popup_email}
                                             </label>
                                             <input
                                                 value={email}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "email"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.personnels_staff_popup_email
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "email")}
+                                                placeholder={props.dataLang?.personnels_staff_popup_email}
                                                 name="fname"
                                                 type="email"
                                                 className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
@@ -609,21 +534,12 @@ const Popup_dsnd = (props) => {
 
                                             <div className="">
                                                 <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                    {
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_phone
-                                                    }
+                                                    {props.dataLang?.personnels_staff_popup_phone}
                                                 </label>
                                                 <input
                                                     value={phone_number}
-                                                    placeholder={
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_phone
-                                                    }
-                                                    onChange={_HandleChangeInput.bind(
-                                                        this,
-                                                        "phone_number"
-                                                    )}
+                                                    placeholder={props.dataLang?.personnels_staff_popup_phone}
+                                                    onChange={_HandleChangeInput.bind(this, "phone_number")}
                                                     name="fname"
                                                     type="number"
                                                     className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
@@ -641,17 +557,8 @@ const Popup_dsnd = (props) => {
                                                         id="checkbox-6"
                                                         // defaultChecked={admin == "1" && true}
                                                         value={admin}
-                                                        checked={
-                                                            admin === "0"
-                                                                ? false
-                                                                : admin ===
-                                                                      "1" &&
-                                                                  true
-                                                        }
-                                                        onChange={_HandleChangeInput.bind(
-                                                            this,
-                                                            "admin"
-                                                        )}
+                                                        checked={admin === "0" ? false : admin === "1" && true}
+                                                        onChange={_HandleChangeInput.bind(this, "admin")}
                                                     />
                                                     <div className="pointer-events-none absolute top-2/4 left-[10%]   -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                                         <svg
@@ -671,10 +578,7 @@ const Popup_dsnd = (props) => {
                                                     </div>
                                                     <div>
                                                         <span className="text-[#344054] font-normal text-sm ">
-                                                            {
-                                                                props.dataLang
-                                                                    ?.personnels_staff_popup_manager
-                                                            }
+                                                            {props.dataLang?.personnels_staff_popup_manager}
                                                         </span>
                                                     </div>
                                                 </label>
@@ -682,30 +586,15 @@ const Popup_dsnd = (props) => {
                                             <div className="relative flex flex-col mt-3">
                                                 <div>
                                                     <label className="text-[#344054] font-normal text-sm ">
-                                                        {
-                                                            props.dataLang
-                                                                ?.personnels_staff_popup_pas
-                                                        }
-                                                        <span className="text-red-500">
-                                                            *
-                                                        </span>
+                                                        {props.dataLang?.personnels_staff_popup_pas}
+                                                        <span className="text-red-500">*</span>
                                                     </label>
                                                     <input
-                                                        type={
-                                                            typePassword
-                                                                ? "text"
-                                                                : "password"
-                                                        }
-                                                        placeholder={
-                                                            props.dataLang
-                                                                ?.personnels_staff_popup_pas
-                                                        }
+                                                        type={typePassword ? "text" : "password"}
+                                                        placeholder={props.dataLang?.personnels_staff_popup_pas}
                                                         value={password}
                                                         id="userpwd"
-                                                        onChange={_HandleChangeInput.bind(
-                                                            this,
-                                                            "password"
-                                                        )}
+                                                        onChange={_HandleChangeInput.bind(this, "password")}
                                                         className={`${
                                                             errInputPas
                                                                 ? "border-red-500"
@@ -714,24 +603,15 @@ const Popup_dsnd = (props) => {
                                                     />
                                                     <button
                                                         type="button"
-                                                        onClick={_TogglePassword.bind(
-                                                            this
-                                                        )}
+                                                        onClick={_TogglePassword.bind(this)}
                                                         className="absolute right-3 top-[50%]"
                                                     >
-                                                        {typePassword ? (
-                                                            <IconEyeSlash />
-                                                        ) : (
-                                                            <IconEye />
-                                                        )}
+                                                        {typePassword ? <IconEyeSlash /> : <IconEye />}
                                                     </button>
                                                 </div>
                                                 {errInputPas && (
                                                     <label className="mb-2  text-[14px] text-red-500">
-                                                        {
-                                                            props.dataLang
-                                                                ?.personnels_staff_popup_errPas
-                                                        }
+                                                        {props.dataLang?.personnels_staff_popup_errPas}
                                                     </label>
                                                 )}
                                             </div>
@@ -739,10 +619,7 @@ const Popup_dsnd = (props) => {
                                         <div className="w-1/2">
                                             <div className="space-y-1 ">
                                                 <label className="text-[#344054] font-normal text-sm">
-                                                    {
-                                                        props.dataLang
-                                                            ?.personnels_staff_table_avtar
-                                                    }
+                                                    {props.dataLang?.personnels_staff_table_avtar}
                                                 </label>
                                                 <div className="flex justify-center">
                                                     <div className="relative h-[180px] w-[180px] rounded bg-slate-200">
@@ -752,12 +629,9 @@ const Popup_dsnd = (props) => {
                                                                 height={180}
                                                                 quality={100}
                                                                 src={
-                                                                    typeof thumb ===
-                                                                    "string"
+                                                                    typeof thumb === "string"
                                                                         ? thumb
-                                                                        : URL.createObjectURL(
-                                                                              thumb
-                                                                          )
+                                                                        : URL.createObjectURL(thumb)
                                                                 }
                                                                 alt="thumb type"
                                                                 className="w-[180px] h-[180px] rounded object-contain"
@@ -773,9 +647,7 @@ const Popup_dsnd = (props) => {
                                                         )}
                                                         <div className="absolute bottom-0 -right-12 flex flex-col space-y-2">
                                                             <input
-                                                                onChange={_HandleChangeFileThumb.bind(
-                                                                    this
-                                                                )}
+                                                                onChange={_HandleChangeFileThumb.bind(this)}
                                                                 type="file"
                                                                 id={`upload`}
                                                                 accept="image/png, image/jpeg"
@@ -789,14 +661,8 @@ const Popup_dsnd = (props) => {
                                                                 <IconEditImg size="17" />
                                                             </label>
                                                             <button
-                                                                disabled={
-                                                                    !thumb
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                                onClick={_DeleteThumb.bind(
-                                                                    this
-                                                                )}
+                                                                disabled={!thumb ? true : false}
+                                                                onClick={_DeleteThumb.bind(this)}
                                                                 title="Xóa hình"
                                                                 className="w-8 h-8 rounded-full bg-red-500 disabled:opacity-30 flex flex-col justify-center items-center text-white"
                                                             >
@@ -823,81 +689,52 @@ const Popup_dsnd = (props) => {
                                             <div className="w-1/2">
                                                 <div className="">
                                                     <label className="text-[#344054] font-normal text-base">
-                                                        {
-                                                            props.dataLang
-                                                                ?.personnels_staff_position
-                                                        }
+                                                        {props.dataLang?.personnels_staff_position}
                                                     </label>
                                                     <Select
                                                         options={dataOption}
-                                                        formatOptionLabel={
-                                                            CustomSelectOption
-                                                        }
+                                                        formatOptionLabel={CustomSelectOption}
                                                         defaultValue={
-                                                            idPos == "0" ||
-                                                            !idPos
+                                                            idPos == "0" || !idPos
                                                                 ? {
                                                                       label: `${props.dataLang?.personnels_staff_position}`,
                                                                   }
                                                                 : {
                                                                       label: dataOption.find(
-                                                                          (x) =>
-                                                                              x?.parent_id ==
-                                                                              idPos
+                                                                          (x) => x?.parent_id == idPos
                                                                       )?.label,
                                                                       code: dataOption.find(
-                                                                          (x) =>
-                                                                              x?.parent_id ==
-                                                                              idPos
+                                                                          (x) => x?.parent_id == idPos
                                                                       )?.code,
                                                                       value: idPos,
                                                                   }
                                                         }
                                                         value={
-                                                            idPos == "0" ||
-                                                            !idPos
+                                                            idPos == "0" || !idPos
                                                                 ? {
-                                                                      label: props
-                                                                          .dataLang
-                                                                          ?.personnels_staff_position,
-                                                                      code: props
-                                                                          .dataLang
-                                                                          ?.personnels_staff_position,
+                                                                      label: props.dataLang?.personnels_staff_position,
+                                                                      code: props.dataLang?.personnels_staff_position,
                                                                   }
                                                                 : {
-                                                                      label: dataOption.find(
-                                                                          (x) =>
-                                                                              x?.value ==
-                                                                              idPos
-                                                                      )?.label,
-                                                                      code: dataOption.find(
-                                                                          (x) =>
-                                                                              x?.value ==
-                                                                              idPos
-                                                                      )?.code,
+                                                                      label: dataOption.find((x) => x?.value == idPos)
+                                                                          ?.label,
+                                                                      code: dataOption.find((x) => x?.value == idPos)
+                                                                          ?.code,
                                                                       value: idPos,
                                                                   }
                                                         }
-                                                        onChange={valueIdPos.bind(
-                                                            this
-                                                        )}
+                                                        onChange={valueIdPos.bind(this)}
                                                         isClearable={true}
-                                                        placeholder={
-                                                            props.dataLang
-                                                                ?.personnels_staff_position
-                                                        }
+                                                        placeholder={props.dataLang?.personnels_staff_position}
                                                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
                                                         isSearchable={true}
                                                         theme={(theme) => ({
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                     />
@@ -905,17 +742,11 @@ const Popup_dsnd = (props) => {
                                             </div>
                                             <div className="w-1/2">
                                                 <label className="text-[#344054] font-normal text-sm  ">
-                                                    {
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_mana
-                                                    }{" "}
+                                                    {props.dataLang?.personnels_staff_popup_mana}{" "}
                                                 </label>
                                                 <Select
                                                     closeMenuOnSelect={false}
-                                                    placeholder={
-                                                        props.dataLang
-                                                            ?.personnels_staff_popup_mana
-                                                    }
+                                                    placeholder={props.dataLang?.personnels_staff_popup_mana}
                                                     options={manage}
                                                     // value={valueManage ? {label: listWar?.find(x => x.value == valueManage)?.label, value: valueManage} : null}
                                                     isSearchable={true}
@@ -923,32 +754,23 @@ const Popup_dsnd = (props) => {
                                                     LoadingIndicator
                                                     //hihihi
                                                     isMulti
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
                                                     value={valueManage}
                                                     maxMenuHeight="200px"
                                                     isClearable={true}
-                                                    menuPortalTarget={
-                                                        document.body
-                                                    }
+                                                    menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
                                                         menuPortal: (base) => ({
                                                             ...base,
                                                             zIndex: 9999,
-                                                            position:
-                                                                "absolute",
+                                                            position: "absolute",
                                                         }),
-                                                        control: (
-                                                            provided
-                                                        ) => ({
+                                                        control: (provided) => ({
                                                             ...provided,
                                                             border: "1px solid #d0d5dd",
                                                             "&:focus": {
@@ -967,19 +789,13 @@ const Popup_dsnd = (props) => {
                                         </div>
                                         <div className="h-[400px] w-full">
                                             <label className="text-[#344054] font-normal text-base mb-3">
-                                                {
-                                                    props?.dataLang
-                                                        ?.personnels_staff_table_depart
-                                                }
+                                                {props?.dataLang?.personnels_staff_table_depart}
                                             </label>
                                             <div className="">
                                                 <div className=" flex  flex-wrap justify-between">
                                                     {room?.map((e) => {
                                                         return (
-                                                            <div
-                                                                className="w-[50%]  mt-2"
-                                                                key={e.id}
-                                                            >
+                                                            <div className="w-[50%]  mt-2" key={e.id}>
                                                                 <div
                                                                     className="flex w-max 
                                                 items-center"
@@ -987,27 +803,18 @@ const Popup_dsnd = (props) => {
                                                                     <div className="inline-flex items-center">
                                                                         <label
                                                                             className="relative flex cursor-pointer items-center rounded-full p-3"
-                                                                            htmlFor={
-                                                                                e.id
-                                                                            }
+                                                                            htmlFor={e.id}
                                                                             data-ripple-dark="true"
                                                                         >
                                                                             <input
                                                                                 type="checkbox"
                                                                                 className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                                                                id={
-                                                                                    e.id
-                                                                                }
+                                                                                id={e.id}
                                                                                 // defaultChecked
-                                                                                value={
-                                                                                    e.name
-                                                                                }
+                                                                                value={e.name}
                                                                                 checked={dataDepar?.some(
-                                                                                    (
-                                                                                        selectedOpt
-                                                                                    ) =>
-                                                                                        selectedOpt?.id ===
-                                                                                        e?.id
+                                                                                    (selectedOpt) =>
+                                                                                        selectedOpt?.id === e?.id
                                                                                 )}
                                                                                 onChange={_HandleChangeInput.bind(
                                                                                     this,
@@ -1033,9 +840,7 @@ const Popup_dsnd = (props) => {
                                                                         </label>
                                                                     </div>
                                                                     <label
-                                                                        htmlFor={
-                                                                            e.id
-                                                                        }
+                                                                        htmlFor={e.id}
                                                                         className="text-[#344054] font-medium text-base cursor-pointer"
                                                                     >
                                                                         {e.name}

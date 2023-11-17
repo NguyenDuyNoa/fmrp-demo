@@ -1,53 +1,47 @@
-import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useEffect, useRef, useState } from "react";
 
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
-import {
-    Edit as IconEdit,
-    Trash as IconDelete,
-    Grid6 as IconExcel,
-    SearchNormal1 as IconSearch,
-    Refresh2,
-} from "iconsax-react";
-import ReactExport from "react-data-export";
-import Swal from "sweetalert2";
+import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
-import Select, { components } from "react-select";
+import { components } from "react-select";
 import Popup_phongban from "./(popupDepartments)/popup";
-import { useSelector } from "react-redux";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const Index = (props) => {
     const router = useRouter();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const dataLang = props.dataLang;
 
+    const trangthaiExprired = useStatusExprired();
+
     const [data, sData] = useState([]);
+
     const [data_ex, sData_ex] = useState([]);
+
     const [onFetching, sOnFetching] = useState(true);
 
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [totalItem, sTotalItem] = useState([]);
 
     const _ServerFetching = () => {
@@ -74,6 +68,7 @@ const Index = (props) => {
         );
     };
     const [listBr, sListBr] = useState();
+
     const _ServerFetching_brand = () => {
         Axios(
             "GET",
@@ -93,7 +88,9 @@ const Index = (props) => {
         );
     };
     const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+
     const [idBranch, sIdBranch] = useState(null);
+
     const onchang_filterBr = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
@@ -108,33 +105,49 @@ const Index = (props) => {
         sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, idBranch]);
 
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/api_staff/department/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var isSuccess = response.data?.isSuccess;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang?.aler_success_delete,
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/api_staff/department/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                let { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", dataLang[message] || message);
+                } else {
+                    isShow("error", dataLang[message] || message);
+                }
             }
+            _ServerFetching();
         });
+
+        handleQueryId({ status: false });
     };
+
+    // const handleDelete = (event) => {
+    //     Swal.fire({
+    //         title: `${dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${dataLang?.aler_yes}`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const id = event;
+    //             Axios("DELETE", `/api_web/api_staff/department/${id}?csrf_protection=true`, {}, (err, response) => {
+    //                 if (!err) {
+    //                     var isSuccess = response.data?.isSuccess;
+    //                     if (isSuccess) {
+    //                         Toast.fire({
+    //                             icon: "success",
+    //                             title: dataLang?.aler_success_delete,
+    //                         });
+    //                     }
+    //                 }
+    //                 _ServerFetching();
+    //             });
+    //         }
+    //     });
+    // };
 
     const paginate = (pageNumber) => {
         router.push({
@@ -197,9 +210,7 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useStatusExprired();
 
-    const _HandleFresh = () => sOnFetching(true);
     return (
         <React.Fragment>
             <Head>
@@ -329,7 +340,9 @@ const Index = (props) => {
                                                                     id={e.id}
                                                                 />
                                                                 <button
-                                                                    onClick={() => handleDelete(e.id)}
+                                                                    onClick={() =>
+                                                                        handleQueryId({ id: e.id, status: true })
+                                                                    }
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -379,6 +392,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

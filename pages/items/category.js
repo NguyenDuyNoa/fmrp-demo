@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
 
 import {
     Minus as IconMinus,
@@ -14,21 +11,26 @@ import {
     ArrowDown2 as IconDown,
     Trash as IconDelete,
     Edit as IconEdit,
-    Grid6 as IconExcel,
-    Refresh2,
 } from "iconsax-react";
-import Swal from "sweetalert2";
-import Select, { components } from "react-select";
-import ReactExport from "react-data-export";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import Swal from "sweetalert2";
+
+import Select, { components } from "react-select";
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -50,14 +52,20 @@ const CustomSelectOption = ({ value, label, level, code }) => (
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const dispatch = useDispatch();
+
+    const trangthaiExprired = useStatusExprired();
 
     //Bộ lọc Danh mục
     const [dataOption, sDataOption] = useState([]);
+
     const [idCategory, sIdCategory] = useState(null);
     //Bộ lọc Chi nhánh
     const [dataBranchOption, sDataBranchOption] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
 
     const _HandleFilterOpt = (type, value) => {
@@ -69,12 +77,15 @@ const Index = (props) => {
     };
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingOpt, sOnFetchingOpt] = useState(false);
 
     const [data, sData] = useState([]);
 
     const [totalItems, sTotalItems] = useState({});
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
 
     const _ServerFetching = () => {
@@ -217,12 +228,8 @@ const Index = (props) => {
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
 
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
-    const trangthaiExprired = useStatusExprired()
+    const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
 
     return (
         <React.Fragment>
@@ -439,39 +446,28 @@ const Index = (props) => {
 
 const Items = React.memo((props) => {
     const [hasChild, sHasChild] = useState(false);
+
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/api_material/category/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: props.dataLang[message],
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: props.dataLang[message],
-                            });
-                        }
-                    }
-                    props.onRefresh && props.onRefresh();
-                    props.onRefreshOpt && props.onRefreshOpt();
-                });
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const handleDelete = () => {
+        Axios("DELETE", `/api_web/api_material/category/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", props.dataLang[message]);
+                } else {
+                    isShow("success", props.dataLang[message]);
+                }
             }
+            props.onRefresh && props.onRefresh();
+            props.onRefreshOpt && props.onRefreshOpt();
         });
+
+        handleQueryId({ status: false });
     };
 
     useEffect(() => {
@@ -524,7 +520,7 @@ const Items = React.memo((props) => {
                         dataOption={props.dataOption}
                     />
                     <button
-                        onClick={_HandleDelete.bind(this, props.data?.id)}
+                        onClick={() => handleQueryId({ id: props.data?.id, status: true })}
                         className="xl:text-base text-xs outline-none"
                     >
                         <IconDelete color="red" />
@@ -535,7 +531,7 @@ const Items = React.memo((props) => {
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
                         <ItemsChild
-                            onClick={_HandleDelete.bind(this, e.id)}
+                            onClick={() => handleQueryId({ id: e.id, status: true })}
                             onRefresh={props.onRefresh}
                             onRefreshOpt={props.onRefreshOpt}
                             dataLang={props.dataLang}
@@ -544,7 +540,7 @@ const Items = React.memo((props) => {
                             grandchild="0"
                             children={e?.children?.map((e) => (
                                 <ItemsChild
-                                    onClick={_HandleDelete.bind(this, e.id)}
+                                    onClick={() => handleQueryId({ id: e.id, status: true })}
                                     onRefresh={props.onRefresh}
                                     onRefreshOpt={props.onRefreshOpt}
                                     dataLang={props.dataLang}
@@ -553,7 +549,7 @@ const Items = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={_HandleDelete.bind(this, e.id)}
+                                            onClick={() => handleQueryId({ id: e.id, status: true })}
                                             onRefresh={props.onRefresh}
                                             onRefreshOpt={props.onRefreshOpt}
                                             dataLang={props.dataLang}
@@ -568,6 +564,14 @@ const Items = React.memo((props) => {
                     ))}
                 </div>
             )}
+            <PopupConfim
+                type="warning" dataLang={dataLang}
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </div>
     );
 });
@@ -638,6 +642,8 @@ const Popup_NVL = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
 
     const [dataOption, sDataOption] = useState([]);
+
+    const isShow = useToast();
 
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
@@ -741,10 +747,7 @@ const Popup_NVL = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", props.dataLang[message]);
                         sName("");
                         sCode("");
                         sEditorValue("");
@@ -753,10 +756,7 @@ const Popup_NVL = React.memo((props) => {
                         props.onRefreshOpt && props.onRefreshOpt();
                         sOpen(false);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                     sOnSending(false);
                 }
@@ -774,10 +774,7 @@ const Popup_NVL = React.memo((props) => {
             name?.length == 0 && sErrName(true);
             code?.length == 0 && sErrCode(true);
             branch?.length == 0 && sErrBranch(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }
@@ -796,6 +793,7 @@ const Popup_NVL = React.memo((props) => {
     }, [branch?.length > 0]);
 
     const [idCategory, sIdCategory] = useState(null);
+
     const valueIdCategory = (e) => sIdCategory(e?.value);
 
     return (

@@ -1,12 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import Image from "next/image";
-import ReactExport from "react-data-export";
+
 import ModalImage from "react-modal-image";
 
 import Swal from "sweetalert2";
@@ -21,27 +17,29 @@ import {
     EyeSlash as IconEyeSlash,
     Image as IconImage,
     GalleryEdit as IconEditImg,
-    Refresh2,
 } from "iconsax-react";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
+
 import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import Popup_chitiet from "./(popupStaff)/popupDetail";
+import { components } from "react-select";
+
 import Popup_dsnd from "./(popupStaff)/popup";
-import { useSelector } from "react-redux";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import OnResetData from "components/UI/btnResetData/btnReset";
+import Popup_chitiet from "./(popupStaff)/popupDetail";
+
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -62,19 +60,35 @@ const CustomSelectOption = ({ value, label, level, code }) => (
 );
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const isShow = useToast();
+
+    const { isOpen, isId, isIdChild, handleQueryId } = useToggle();
+
     const router = useRouter();
 
+    const trangthaiExprired = useStatusExprired();
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [totalItem, sTotalItems] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [data, sData] = useState({});
+
     const [data_ex, sData_ex] = useState([]);
+
     const [listDs, sListDs] = useState();
+
     const [onSending, sOnSending] = useState(false);
+
     const [dataOption, sDataOption] = useState([]);
+
     const [idPos, sIdPos] = useState(null);
+
     const [onFetchingOpt, sOnFetchingOpt] = useState(false);
 
     const [room, sRoom] = useState([]);
@@ -88,6 +102,7 @@ const Index = (props) => {
             sOnFetching(false);
         });
     };
+
     const _ServerFetching = () => {
         Axios(
             "GET",
@@ -114,6 +129,7 @@ const Index = (props) => {
     };
 
     const [listBr, sListBr] = useState();
+
     const _ServerFetching_brand = () => {
         Axios(
             "GET",
@@ -130,8 +146,11 @@ const Index = (props) => {
             }
         );
     };
+
     const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
+
     const [idBranch, sIdBranch] = useState(null);
+
     const onchang_filterBr = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
@@ -155,11 +174,13 @@ const Index = (props) => {
         });
         sOnFetchingOpt(false);
     };
+
     const _HandleFilterOpt = (type, value) => {
         if (type == "pos") {
             sIdPos(value);
         }
     };
+
     useEffect(() => {
         onFetchingOpt && _ServerFetchingOtp();
     }, [onFetchingOpt]);
@@ -169,7 +190,9 @@ const Index = (props) => {
     }, []);
 
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
+
     const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
+
     const paginate = (pageNumber) => {
         router.push({
             pathname: router.route,
@@ -195,11 +218,13 @@ const Index = (props) => {
             sOnFetching(true);
         }, 500);
     };
+
     useEffect(() => {
         (onFetching && _ServerFetching()) ||
             (onFetching && _ServerFetching_brand()) ||
             (onFetching && _ServerFetching_room());
     }, [onFetching]);
+
     useEffect(() => {
         sOnFetching(true) ||
             (keySearch && sOnFetching(true)) ||
@@ -207,41 +232,71 @@ const Index = (props) => {
             (idPos && sOnFetching(true));
     }, [limit, router.query?.page, , idBranch, idPos]);
 
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/api_staff/staff/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang?.aler_success_delete,
-                            });
-                        } else if (message) {
-                            Toast.fire({
-                                icon: "error",
-                                title: `${dataLang[message]}`,
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
-            }
-        });
-    };
     const [status, sStatus] = useState("");
+
     const [active, sActive] = useState("");
+
+    const handleDelete = async () => {
+        if (isIdChild) {
+            sStatus(isIdChild);
+            var index = data.findIndex((x) => x.id === isIdChild);
+            if (index !== -1 && data[index].active === "0") {
+                sActive((data[index].active = "1"));
+            } else if (index !== -1 && data[index].active === "1") {
+                sActive((data[index].active = "0"));
+            }
+            sData([...data]);
+            handleQueryId({ status: false });
+        } else {
+            Axios("DELETE", `/api_web/api_staff/staff/${isId}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        isShow("success", dataLang?.aler_success_delete);
+                    } else {
+                        isShow("error", dataLang[message]);
+                    }
+                }
+                _ServerFetching();
+            });
+            handleQueryId({ status: false });
+        }
+    };
+
+    // const handleDelete = (event) => {
+    //     Swal.fire({
+    //         title: `${dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${dataLang?.aler_yes}`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const id = event;
+    //             Axios("DELETE", `/api_web/api_staff/staff/${id}?csrf_protection=true`, {}, (err, response) => {
+    //                 if (!err) {
+    //                     var { isSuccess, message } = response.data;
+
+    //                     if (isSuccess) {
+    //                         Toast.fire({
+    //                             icon: "success",
+    //                             title: dataLang?.aler_success_delete,
+    //                         });
+    //                     } else if (message) {
+    //                         Toast.fire({
+    //                             icon: "error",
+    //                             title: `${dataLang[message]}`,
+    //                         });
+    //                     }
+    //                 }
+    //                 _ServerFetching();
+    //             });
+    //         }
+    //     });
+    // };
+
     // const [fecthActive,sFecthActive] = useState(false)
     // const _ToggleStatus = (id, value) => {
     //   var index = data.findIndex(x => {
@@ -257,28 +312,29 @@ const Index = (props) => {
     //   // data[index]?.active = !active
     //   // sData([...data])
     // }
-    const _ToggleStatus = (id) => {
-        Swal.fire({
-            title: `${"Thay đổi trạng thái"}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sStatus(id);
-                var index = data.findIndex((x) => x.id === id);
-                if (index !== -1 && data[index].active === "0") {
-                    sActive((data[index].active = "1"));
-                } else if (index !== -1 && data[index].active === "1") {
-                    sActive((data[index].active = "0"));
-                }
-                sData([...data]);
-            }
-        });
-    };
+    // const _ToggleStatus = (id) => {
+    //     Swal.fire({
+    //         title: `${"Thay đổi trạng thái"}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${dataLang?.aler_yes}`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             sStatus(id);
+    //             var index = data.findIndex((x) => x.id === id);
+    //             if (index !== -1 && data[index].active === "0") {
+    //                 sActive((data[index].active = "1"));
+    //             } else if (index !== -1 && data[index].active === "1") {
+    //                 sActive((data[index].active = "0"));
+    //             }
+    //             sData([...data]);
+    //         }
+    //     });
+    // };
+
     const _ServerSending = () => {
         let id = status;
         var data = new FormData();
@@ -306,6 +362,7 @@ const Index = (props) => {
             }
         );
     };
+
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
@@ -432,8 +489,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useStatusExprired();
-    const _HandleFresh = () => sOnFetching(true);
     return (
         <React.Fragment>
             <Head>
@@ -634,7 +689,13 @@ const Index = (props) => {
                                                                         id={e.id}
                                                                         // defaultChecked
                                                                         checked={e.active == "0" ? false : true}
-                                                                        onChange={_ToggleStatus.bind(this, e.id)}
+                                                                        // onChange={_ToggleStatus.bind(this, e.id)}
+                                                                        onChange={() =>
+                                                                            handleQueryId({
+                                                                                idChild: e.id,
+                                                                                status: true,
+                                                                            })
+                                                                        }
                                                                     />
 
                                                                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
@@ -685,7 +746,9 @@ const Index = (props) => {
                                                                     last_login={e.last_login}
                                                                 />
                                                                 <button
-                                                                    onClick={() => handleDelete(e.id)}
+                                                                    onClick={() =>
+                                                                        handleQueryId({ id: e.id, status: true })
+                                                                    }
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -729,6 +792,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={isIdChild ? TITLE_STATUS : TITLE_DELETE}
+                subtitle={isIdChild ? CONFIRMATION_OF_CHANGES : CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

@@ -1,16 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import Link from "next/link";
 import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import { NumericFormat } from "react-number-format";
-import ReactExport from "react-data-export";
-
-import Swal from "sweetalert2";
-
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
@@ -18,74 +10,91 @@ import {
     SearchNormal1 as IconSearch,
     Add as IconAdd,
 } from "iconsax-react";
+
 import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
 import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import { useDispatch } from "react-redux";
 import ButtonAdd from "../(buttonContact)/buttonAdd";
-import ButtonDelete from "../(buttonContact)/buttonDelete";
 import FormContact from "../(form)/formContact";
 import FormInfo from "../(form)/formInfo";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { useToggle } from "@/hooks/useToggle";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import useToast from "@/hooks/useToast";
 
 const Popup_dsncc = (props) => {
     const dataLang = props.dataLang;
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const isShow = useToast();
+
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [onSending, sOnSending] = useState(false);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingDis, sOnFetchingDis] = useState(false);
+
     const [onFetchingWar, sOnFetchingWar] = useState(false);
-    const [onFetchingChar, sOnFetchingChar] = useState(false);
+
     const [onFetchingBr, sOnFetchingBr] = useState(false);
+
     const [onFetchingGr, sOnFetchingGr] = useState(false);
 
     const [errInput, sErrInput] = useState(false);
+
     const [errInputBr, sErrInputBr] = useState(false);
 
     const [option, sOption] = useState([]);
+
     const [optionfull_name, sOptionFull_name] = useState("");
+
     const [optionEmail, sOptionEmail] = useState("");
+
     const [optionposition, sPosition] = useState("");
-    const [optionbirthday, sOptionBirthday] = useState("");
+
     const [optionaddress, sOptionAddress] = useState("");
+
     const [optionphone_number, sOptionPhone_number] = useState("");
 
     const [name, sName] = useState("");
+
     const [code, sCode] = useState(null);
+
     const [tax_code, sTaxcode] = useState(null);
+
     const [representative, sRepresentative] = useState(null);
+
     const [phone_number, sPhone] = useState(null);
+
     const [address, sAdress] = useState("");
+
     const [date_incorporation, sDate_incorporation] = useState("");
+
     const [email, sEmail] = useState("");
+
     const [note, sNote] = useState("");
+
     const [debt_begin, sDebt_begin] = useState("");
 
     const [tab, sTab] = useState(0);
 
     const [valueBr, sValueBr] = useState([]);
+
     const branch = valueBr.map((e) => e.value);
 
     const _HandleSelectTab = (e) => sTab(e);
+
     const [hidden, sHidden] = useState(false);
 
     useEffect(() => {
@@ -129,43 +138,38 @@ const Popup_dsncc = (props) => {
     }, [open]);
 
     const _ServerFetching_detailUser = () => {
-        Axios(
-            "GET",
-            `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sName(db?.name);
-                    sCode(db?.code);
-                    sTaxcode(db?.tax_code);
-                    sRepresentative(db?.representative);
-                    sPhone(db?.phone_number);
-                    sAdress(db?.address);
-                    sEmail(db?.email);
-                    sDebt_begin(db?.debt_begin);
-                    sDate_incorporation(db?.date_incorporation);
-                    sValueDis(db?.district.districtid);
-                    sValueCt(db?.city.provinceid);
-                    sNote(db?.note);
-                    sValueBr(
-                        db?.branch?.map((e) => ({
-                            label: e.name,
-                            value: Number(e.id),
-                        }))
-                    );
-                    sValueWa(db?.ward.wardid);
-                    sValueGr(
-                        db?.supplier_group.map((e) => ({
-                            label: e.name,
-                            value: Number(e.id),
-                        }))
-                    );
-                    sOption(db?.contact ? db?.contact : []);
-                }
-                sOnFetching(false);
+        Axios("GET", `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var db = response.data;
+                sName(db?.name);
+                sCode(db?.code);
+                sTaxcode(db?.tax_code);
+                sRepresentative(db?.representative);
+                sPhone(db?.phone_number);
+                sAdress(db?.address);
+                sEmail(db?.email);
+                sDebt_begin(db?.debt_begin);
+                sDate_incorporation(db?.date_incorporation);
+                sValueDis(db?.district.districtid);
+                sValueCt(db?.city.provinceid);
+                sNote(db?.note);
+                sValueBr(
+                    db?.branch?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    }))
+                );
+                sValueWa(db?.ward.wardid);
+                sValueGr(
+                    db?.supplier_group.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    }))
+                );
+                sOption(db?.contact ? db?.contact : []);
             }
-        );
+            sOnFetching(false);
+        });
     };
 
     useEffect(() => {
@@ -197,20 +201,11 @@ const Popup_dsncc = (props) => {
         } else if (type == "valueBr") {
             sValueBr(value);
         }
-
-        // else if(type == "optionName"){
-        //   sOptionName(value.target?.value)
-        // }else if(type == "optionHapy"){
-        //   sOptionHapy(value.target?.value)
-        // }else if(type == "optionNote"){
-        //   sOptionNote(value.target?.value)
-        // }else if(type == "optionPhone"){
-        //   sOptionPhone(value.target?.value)
-        // }
     };
 
     // branh
     const [brandpOpt, sListBrand] = useState([]);
+
     const branch_id = valueBr?.map((e) => {
         return e?.value;
     });
@@ -218,6 +213,7 @@ const Popup_dsncc = (props) => {
     // group
 
     const [listGr, sListGr] = useState();
+
     const _ServerFetching_Gr = () => {
         Axios(
             "GET",
@@ -245,9 +241,7 @@ const Popup_dsncc = (props) => {
                                     label: x.name,
                                     value: Number(x.id),
                                 }))
-                                ?.filter((e) =>
-                                    valueGr.some((x) => e.value !== x.value)
-                                )
+                                ?.filter((e) => valueGr.some((x) => e.value !== x.value))
                         );
                     }
                 }
@@ -256,15 +250,20 @@ const Popup_dsncc = (props) => {
             }
         );
     };
+
     // const listGrp  = listGr?.map(e=> ({label: e.name, value:e.id}))
     const [valueGr, sValueGr] = useState([]);
+
     const group = valueGr?.map((e) => e.value);
+
     const handleChangeGr = (e) => {
         sValueGr(e);
     };
+
     useEffect(() => {
         onFetchingBr && _ServerFetching_Gr();
     }, [onFetchingBr]);
+
     useEffect(() => {
         open && _ServerFetching_Gr(true);
     }, [valueBr]);
@@ -275,6 +274,7 @@ const Popup_dsncc = (props) => {
 
     // on chang city
     const [cityOpt, sCityOpt] = useState();
+
     const [valueCt, sValueCt] = useState();
 
     const handleChangeCt = (e) => {
@@ -283,6 +283,7 @@ const Popup_dsncc = (props) => {
 
     // fecht distric
     const [ditrict, sDistricts] = useState();
+
     const _ServerFetching_distric = () => {
         Axios(
             "GET",
@@ -311,12 +312,14 @@ const Popup_dsncc = (props) => {
 
     //on chang ditrict
     const [valueDis, sValueDis] = useState();
+
     const handleChangeDtric = (e) => {
         sValueDis(e?.value);
     };
 
     //fecth ward
     const [ward_id, sWard] = useState();
+
     const _ServerFetching_war = () => {
         Axios(
             "GET",
@@ -337,9 +340,7 @@ const Popup_dsncc = (props) => {
         );
     };
 
-    const listWar = ward_id && [
-        ...ward_id?.map((e) => ({ label: e.name, value: Number(e.wardid) })),
-    ];
+    const listWar = ward_id && [...ward_id?.map((e) => ({ label: e.name, value: Number(e.wardid) }))];
     //onchang ward
     const [valueWa, sValueWa] = useState();
 
@@ -358,10 +359,7 @@ const Popup_dsncc = (props) => {
         data.append("representative", representative ? representative : "");
         data.append("phone_number", phone_number ? phone_number : "");
         data.append("address", address ? address : "");
-        data.append(
-            "date_incorporation",
-            date_incorporation ? date_incorporation : ""
-        );
+        data.append("date_incorporation", date_incorporation ? date_incorporation : "");
         data.append("note", note ? note : "");
         data.append("email", email ? email : "");
         data.append("debt_begin", debt_begin ? debt_begin : "");
@@ -374,10 +372,7 @@ const Popup_dsncc = (props) => {
             data.append(`branch_id[${index}]`, e?.value ? e?.value : "");
         });
         valueGr?.forEach((e, index) => {
-            data.append(
-                `supplier_group_id[${index}]`,
-                e?.value ? e?.value : ""
-            );
+            data.append(`supplier_group_id[${index}]`, e?.value ? e?.value : "");
         });
         option?.forEach((e, index) => {
             data.append(`contact[${index}][id]`, id ? e?.id : "");
@@ -420,10 +415,7 @@ const Popup_dsncc = (props) => {
                 if (!err) {
                     var { isSuccess, message, branch_name } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props?.dataLang[message]}`,
-                        });
+                        isShow("success", props?.dataLang[message]);
                         props.onRefresh && props.onRefresh();
                         props.onRefreshGroup && props.onRefreshGroup();
                         sOpen(false);
@@ -445,10 +437,7 @@ const Popup_dsncc = (props) => {
                         sValueBr([]);
                         sGroupOpt([]);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props?.dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -493,22 +482,11 @@ const Popup_dsncc = (props) => {
         sOptionPhone_number("");
     };
 
-    // delete option form
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sOption([...option.filter((x) => x.id !== id)]);
-            }
-        });
+    const handleDelete = async () => {
+        sOption([...option.filter((x) => x.id !== isId)]);
+        handleQueryId({ status: false });
     };
+
     useEffect(() => {
         option.length == 0 && sHidden(false);
         option.length != 0 && sHidden(true);
@@ -523,10 +501,7 @@ const Popup_dsncc = (props) => {
         if (name?.length == 0 || branch_id?.length == 0) {
             name?.length == 0 && sErrInput(true);
             branch_id?.length == 0 && sErrInputBr(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }
@@ -558,6 +533,7 @@ const Popup_dsncc = (props) => {
     useEffect(() => {
         onFetchingDis && _ServerFetching_distric();
     }, [onFetchingDis]);
+
     useEffect(() => {
         onFetchingWar && _ServerFetching_war();
     }, [onFetchingWar]);
@@ -570,13 +546,7 @@ const Popup_dsncc = (props) => {
                         ? `${props.dataLang?.suppliers_supplier_edit}`
                         : `${props.dataLang?.suppliers_supplier_add}`
                 }
-                button={
-                    props.id ? (
-                        <IconEdit />
-                    ) : (
-                        `${props.dataLang?.branch_popup_create_new}`
-                    )
-                }
+                button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
@@ -586,9 +556,7 @@ const Popup_dsncc = (props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
                         className={`${
-                            tab === 0
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_general}
@@ -596,9 +564,7 @@ const Popup_dsncc = (props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
                         className={`${
-                            tab === 1
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_contact}
@@ -996,9 +962,7 @@ const Popup_dsncc = (props) => {
                                     listGr={listGr}
                                     valueGr={valueGr}
                                     debt_begin={debt_begin}
-                                    _HandleChangeInput={_HandleChangeInput.bind(
-                                        this
-                                    )}
+                                    _HandleChangeInput={_HandleChangeInput.bind(this)}
                                     handleChangeGr={handleChangeGr.bind(this)}
                                     handleMenuOpen={handleMenuOpen.bind(this)}
                                     cityOpt={cityOpt}
@@ -1006,9 +970,7 @@ const Popup_dsncc = (props) => {
                                     handleChangeCt={handleChangeCt.bind(this)}
                                     ditrict={ditrict}
                                     valueDis={valueDis}
-                                    handleChangeDtric={handleChangeDtric.bind(
-                                        this
-                                    )}
+                                    handleChangeDtric={handleChangeDtric.bind(this)}
                                     listWar={listWar}
                                     valueWa={valueWa}
                                     handleChangeWar={handleChangeWar.bind(this)}
@@ -1115,19 +1077,12 @@ const Popup_dsncc = (props) => {
                                                 <FormContact
                                                     dataLang={dataLang}
                                                     e={e}
-                                                    _OnChangeOption={_OnChangeOption.bind(
-                                                        this
-                                                    )}
-                                                    _HandleDelete={_HandleDelete.bind(
-                                                        this
-                                                    )}
+                                                    _OnChangeOption={_OnChangeOption.bind(this)}
+                                                    _HandleDelete={handleQueryId}
                                                 />
                                             </div>
                                         ))}
-                                        <ButtonAdd
-                                            onClick={_HandleAddNew.bind(this)}
-                                            dataLang={dataLang}
-                                        ></ButtonAdd>
+                                        <ButtonAdd onClick={_HandleAddNew.bind(this)} dataLang={dataLang}></ButtonAdd>
                                     </div>
                                 </ScrollArea>
                             </div>
@@ -1150,6 +1105,15 @@ const Popup_dsncc = (props) => {
                     </form>
                 </div>
             </PopupEdit>
+            <PopupConfim
+                dataLang={props.dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </>
     );
 };

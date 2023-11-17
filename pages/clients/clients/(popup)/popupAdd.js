@@ -27,6 +27,10 @@ import ButtoonDelete from "./(button)/buttonDelete";
 import FormContactInfo from "./(form)/formContactInfo";
 import FormContactDelivery from "./(form)/formDelivery";
 import Form from "./(form)/form";
+import { useToggle } from "@/hooks/useToggle";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import useToast from "@/hooks/useToast";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -38,54 +42,86 @@ const Toast = Swal.mixin({
 
 const Popup_dskh = (props) => {
     const dataLang = props.dataLang;
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const isShow = useToast();
+
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
 
     const [onSending, sOnSending] = useState(false);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingDis, sOnFetchingDis] = useState(false);
+
     const [onFetchingWar, sOnFetchingWar] = useState(false);
+
     const [onFetchingChar, sOnFetchingChar] = useState(false);
+
     const [onFetchingBr, sOnFetchingBr] = useState(false);
+
     const [onFetchingGr, sOnFetchingGr] = useState(false);
 
     const [errInput, sErrInput] = useState(false);
+
     const [errInputBr, sErrInputBr] = useState(false);
 
     const [option, sOption] = useState([]);
+
     const [optionDelivery, sOptionDelivery] = useState([]);
 
     const [optionfull_name, sOptionFull_name] = useState("");
+
     const [optionEmail, sOptionEmail] = useState("");
+
     const [optionposition, sPosition] = useState("");
+
     const [optionbirthday, sOptionBirthday] = useState("");
+
     const [optionaddress, sOptionAddress] = useState("");
+
     const [optionphone_number, sOptionPhone_number] = useState("");
+
     const [name, sName] = useState("");
+
     const [code, sCode] = useState(null);
 
     const [tax_code, sTaxcode] = useState(null);
+
     const [representative, sRepresentative] = useState(null);
+
     const [phone_number, sPhone] = useState(null);
+
     const [address, sAdress] = useState("");
+
     const [date_incorporation, sDate_incorporation] = useState("");
+
     const [email, sEmail] = useState("");
+
     const [note, sNote] = useState("");
+
     const [debt_limit, sDebt_limit] = useState("");
+
     const [debt_limit_day, sDebt_limit_day] = useState("");
 
     const [tab, sTab] = useState(0);
 
     const [valueBr, sValueBr] = useState([]);
+
     const branch = valueBr.map((e) => e.value);
 
     const _HandleSelectTab = (e) => sTab(e);
+
     const [hidden, sHidden] = useState(false);
 
     useEffect(() => {
@@ -134,64 +170,59 @@ const Popup_dskh = (props) => {
     }, [open]);
 
     const _ServerFetching_detailUser = async () => {
-        await Axios(
-            "GET",
-            `/api_web/api_client/client/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
+        await Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var db = response.data;
 
-                    sValueBr(
-                        db?.branch?.map((e) => ({
-                            label: e.name,
-                            value: Number(e.id),
-                        }))
-                    );
-                    sValueChar(
-                        db?.staff_charge.map((e) => ({
-                            label: e.full_name,
-                            value: Number(e.staffid),
-                        }))
-                    );
-                    sValueGr(
-                        db?.client_group.map((e) => ({
-                            label: e.name,
-                            value: Number(e.id),
-                        }))
-                    );
-                    sName(db?.name);
-                    sCode(db?.code);
-                    sTaxcode(db?.tax_code);
-                    sRepresentative(db?.representative);
-                    sPhone(db?.phone_number);
-                    sAdress(db?.address);
-                    sEmail(db?.email);
-                    sDebt_limit(db?.debt_limit);
-                    sDebt_limit_day(db?.debt_limit_day);
-                    sDate_incorporation(db?.date_incorporation);
-                    sValueDis({
-                        label: db?.district.name,
-                        value: db?.district.districtid,
-                    });
-                    sValueCt(db?.city.provinceid);
-                    sNote(db?.note);
-                    sValueWa({ label: db?.ward.name, value: db?.ward.wardid });
-                    sOption(db?.contact ? db?.contact : []);
-                    sOptionDelivery(
-                        db?.clients_address_delivery?.map((e) => ({
-                            id: e?.id,
-                            nameDelivery: e?.fullname,
-                            phoneDelivery: e?.phone,
-                            addressDelivery: e?.address,
-                            actionDelivery: e?.is_primary == "1" ? true : false,
-                            idUpdate: e?.id,
-                        }))
-                    );
-                }
-                sOnFetching(false);
+                sValueBr(
+                    db?.branch?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    }))
+                );
+                sValueChar(
+                    db?.staff_charge.map((e) => ({
+                        label: e.full_name,
+                        value: Number(e.staffid),
+                    }))
+                );
+                sValueGr(
+                    db?.client_group.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    }))
+                );
+                sName(db?.name);
+                sCode(db?.code);
+                sTaxcode(db?.tax_code);
+                sRepresentative(db?.representative);
+                sPhone(db?.phone_number);
+                sAdress(db?.address);
+                sEmail(db?.email);
+                sDebt_limit(db?.debt_limit);
+                sDebt_limit_day(db?.debt_limit_day);
+                sDate_incorporation(db?.date_incorporation);
+                sValueDis({
+                    label: db?.district.name,
+                    value: db?.district.districtid,
+                });
+                sValueCt(db?.city.provinceid);
+                sNote(db?.note);
+                sValueWa({ label: db?.ward.name, value: db?.ward.wardid });
+                sOption(db?.contact ? db?.contact : []);
+                sOptionDelivery(
+                    db?.clients_address_delivery?.map((e) => ({
+                        id: e?.id,
+                        nameDelivery: e?.fullname,
+                        phoneDelivery: e?.phone,
+                        addressDelivery: e?.address,
+                        actionDelivery: e?.is_primary == "1" ? true : false,
+                        idUpdate: e?.id,
+                    }))
+                );
             }
-        );
+            sOnFetching(false);
+        });
     };
     useEffect(() => {
         onFetching && props?.id && _ServerFetching_detailUser();
@@ -238,6 +269,7 @@ const Popup_dskh = (props) => {
     const [valueChar, sValueChar] = useState([]);
 
     const [listChar, sListChar] = useState([]);
+
     const _ServerFetching_Char = async () => {
         await Axios(
             "GET",
@@ -265,9 +297,7 @@ const Popup_dskh = (props) => {
                                     label: e.name,
                                     value: Number(e.staffid),
                                 }))
-                                ?.filter((e) =>
-                                    valueChar.some((x) => e.value !== x.value)
-                                )
+                                ?.filter((e) => valueChar.some((x) => e.value !== x.value))
                         );
                     }
                 }
@@ -278,6 +308,7 @@ const Popup_dskh = (props) => {
     };
     // console.log(listChar)
     const char = valueChar?.map((e) => e.value);
+
     const handleChangeChar = (e) => {
         sValueChar(e);
     };
@@ -292,12 +323,14 @@ const Popup_dskh = (props) => {
 
     // branh
     const [brandpOpt, sListBrand] = useState([]);
+
     const branch_id = valueBr?.map((e) => {
         return e?.value;
     });
 
     // group
     const [valueGr, sValueGr] = useState([]);
+
     const [listGr, sListGr] = useState([]);
     const _ServerFetching_Gr = async () => {
         await Axios(
@@ -325,9 +358,7 @@ const Popup_dskh = (props) => {
                                     label: x.name,
                                     value: Number(x.id),
                                 }))
-                                ?.filter((e) =>
-                                    valueGr.some((x) => e.value !== x.value)
-                                )
+                                ?.filter((e) => valueGr.some((x) => e.value !== x.value))
                         );
                     }
                 }
@@ -336,6 +367,7 @@ const Popup_dskh = (props) => {
         );
     };
     const group = valueGr?.map((e) => e.value);
+
     const handleChangeGr = (e) => {
         sValueGr(e);
     };
@@ -358,6 +390,7 @@ const Popup_dskh = (props) => {
 
     // on chang city
     const [cityOpt, sCityOpt] = useState();
+
     const [valueCt, sValueCt] = useState();
 
     const handleChangeCt = (e) => {
@@ -366,6 +399,7 @@ const Popup_dskh = (props) => {
 
     // fecht distric
     const [ditrict, sDistricts] = useState();
+
     const _ServerFetching_distric = async () => {
         await Axios(
             "GET",
@@ -394,12 +428,14 @@ const Popup_dskh = (props) => {
 
     //on chang ditrict
     const [valueDis, sValueDis] = useState();
+
     const handleChangeDtric = (e) => {
         sValueDis(e);
     };
 
     //fecth ward
     const [ward_id, sWard] = useState();
+
     const _ServerFetching_war = async () => {
         await Axios(
             "GET",
@@ -420,9 +456,7 @@ const Popup_dskh = (props) => {
         );
     };
 
-    const listWar = ward_id && [
-        ...ward_id?.map((e) => ({ label: e.name, value: Number(e.wardid) })),
-    ];
+    const listWar = ward_id && [...ward_id?.map((e) => ({ label: e.name, value: Number(e.wardid) }))];
     //onchang ward
     const [valueWa, sValueWa] = useState();
 
@@ -433,7 +467,6 @@ const Popup_dskh = (props) => {
 
     //post db
 
-    console.log("option", option);
     const _ServerSending = async () => {
         let id = props?.id;
         var data = new FormData();
@@ -443,10 +476,7 @@ const Popup_dskh = (props) => {
         data.append("representative", representative ? representative : "");
         data.append("phone_number", phone_number ? phone_number : "");
         data.append("address", address ? address : "");
-        data.append(
-            "date_incorporation",
-            date_incorporation ? date_incorporation : ""
-        );
+        data.append("date_incorporation", date_incorporation ? date_incorporation : "");
         data.append("note", note ? note : "");
         data.append("email", email ? email : "");
         data.append("debt_limit", debt_limit ? debt_limit : "");
@@ -477,22 +507,10 @@ const Popup_dskh = (props) => {
         });
         optionDelivery?.forEach((e, index) => {
             data.append(`items[${index}][id]`, id ? e?.idUpdate : "");
-            data.append(
-                `items[${index}][fullname]`,
-                e?.nameDelivery ? e?.nameDelivery : ""
-            );
-            data.append(
-                `items[${index}][phone]`,
-                e?.phoneDelivery ? e?.phoneDelivery : ""
-            );
-            data.append(
-                `items[${index}][address]`,
-                e?.addressDelivery ? e?.addressDelivery : ""
-            );
-            data.append(
-                `items[${index}][is_primary]`,
-                e?.actionDelivery ? 1 : 0
-            );
+            data.append(`items[${index}][fullname]`, e?.nameDelivery ? e?.nameDelivery : "");
+            data.append(`items[${index}][phone]`, e?.phoneDelivery ? e?.phoneDelivery : "");
+            data.append(`items[${index}][address]`, e?.addressDelivery ? e?.addressDelivery : "");
+            data.append(`items[${index}][is_primary]`, e?.actionDelivery ? 1 : 0);
         });
         await Axios(
             "POST",
@@ -529,14 +547,10 @@ const Popup_dskh = (props) => {
                 if (!err) {
                     var { isSuccess, message, branch_name } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${
-                                typeof props?.dataLang[message] !== "undefined"
-                                    ? props?.dataLang[message]
-                                    : message
-                            }`,
-                        });
+                        isShow(
+                            "success",
+                            typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message
+                        );
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                         sErrInput(false);
@@ -561,16 +575,12 @@ const Popup_dskh = (props) => {
                         sValueChar([]);
                         sOptionDelivery([]);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${
-                                typeof props?.dataLang[message] !== "undefined"
-                                    ? props.dataLang[message] +
-                                      " " +
-                                      branch_name
-                                    : message
-                            } `,
-                        });
+                        isShow(
+                            "error",
+                            typeof props?.dataLang[message] !== "undefined"
+                                ? props.dataLang[message] + " " + branch_name
+                                : message
+                        );
                     }
                 }
                 sOnSending(false);
@@ -628,10 +638,7 @@ const Popup_dskh = (props) => {
             if (item.id === id) {
                 return {
                     ...item,
-                    [type]:
-                        type === "actionDelivery"
-                            ? value.target?.checked
-                            : value.target?.value,
+                    [type]: type === "actionDelivery" ? value.target?.checked : value.target?.value,
                 };
             } else if (type === "actionDelivery" && value.target.checked) {
                 return { ...item, actionDelivery: false };
@@ -677,37 +684,42 @@ const Popup_dskh = (props) => {
     };
 
     // delete option form
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sOption([...option.filter((x) => x.id !== id)]);
-            }
-        });
+    // const _HandleDelete = (id) => {
+    //     Swal.fire({
+    //         title: `${dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${dataLang?.aler_yes}`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             sOption([...option.filter((x) => x.id !== id)]);
+    //         }
+    //     });
+    // };
+    const _HandleDelete = async () => {
+        tab == 1 && sOption([...option.filter((x) => x.id !== isId)]);
+        tab == 2 && sOptionDelivery([...optionDelivery.filter((x) => x.id !== isId)]);
+        handleQueryId({ status: false });
     };
 
-    const _HandleDeleteDelivery = (id) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sOptionDelivery([...optionDelivery.filter((x) => x.id !== id)]);
-            }
-        });
-    };
+    // const _HandleDeleteDelivery = (id) => {
+    //     Swal.fire({
+    //         title: `${dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${dataLang?.aler_yes}`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             sOptionDelivery([...optionDelivery.filter((x) => x.id !== id)]);
+    //         }
+    //     });
+    // };
     useEffect(() => {
         option.length == 0 && sHidden(false);
         option.length != 0 && sHidden(true);
@@ -723,10 +735,7 @@ const Popup_dskh = (props) => {
         if (name?.length == 0 || branch_id?.length == 0) {
             name?.length == 0 && sErrInput(true);
             branch_id?.length == 0 && sErrInputBr(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             sOnSending(true);
         }
@@ -769,18 +778,8 @@ const Popup_dskh = (props) => {
     return (
         <>
             <PopupEdit
-                title={
-                    props.id
-                        ? `${props.dataLang?.client_popup_edit}`
-                        : `${props.dataLang?.client_popup_add}`
-                }
-                button={
-                    props.id ? (
-                        <IconEdit />
-                    ) : (
-                        `${props.dataLang?.branch_popup_create_new}`
-                    )
-                }
+                title={props.id ? `${props.dataLang?.client_popup_edit}` : `${props.dataLang?.client_popup_add}`}
+                button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
@@ -790,9 +789,7 @@ const Popup_dskh = (props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
                         className={`${
-                            tab === 0
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_general}
@@ -800,9 +797,7 @@ const Popup_dskh = (props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
                         className={`${
-                            tab === 1
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_contact}
@@ -810,9 +805,7 @@ const Popup_dskh = (props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 2)}
                         className={`${
-                            tab === 2
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_devivelyInfo}
@@ -860,9 +853,7 @@ const Popup_dskh = (props) => {
                                     debt_limit={debt_limit}
                                     debt_limit_day={debt_limit_day}
                                     note={note}
-                                    _HandleChangeInput={_HandleChangeInput.bind(
-                                        this
-                                    )}
+                                    _HandleChangeInput={_HandleChangeInput.bind(this)}
                                 />
                             </ScrollArea>
                         )}
@@ -879,24 +870,15 @@ const Popup_dskh = (props) => {
                                                 key={e.id?.toString()}
                                                 option={e}
                                                 dataLang={props.dataLang}
-                                                _OnChangeOption={_OnChangeOption.bind(
-                                                    this
-                                                )}
-                                                onDelete={_HandleDelete.bind(
-                                                    this
-                                                )}
+                                                _OnChangeOption={_OnChangeOption.bind(this)}
+                                                onDelete={handleQueryId}
                                             >
                                                 <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
                                             </FormContactInfo>
                                         ))}
-                                        <ButtoonAdd
-                                            onClick={_HandleAddNew.bind(this)}
-                                        >
+                                        <ButtoonAdd onClick={_HandleAddNew.bind(this)}>
                                             <IconAdd className="animate-bounce" />
-                                            {
-                                                props.dataLang
-                                                    ?.client_popup_addcontact
-                                            }
+                                            {props.dataLang?.client_popup_addcontact}
                                         </ButtoonAdd>
                                     </div>
                                 </ScrollArea>
@@ -915,26 +897,15 @@ const Popup_dskh = (props) => {
                                                 key={e.id?.toString()}
                                                 optionDelivery={e}
                                                 dataLang={props.dataLang}
-                                                _OnChangeOptionDelivery={_OnChangeOptionDelivery.bind(
-                                                    this
-                                                )}
-                                                onDelete={_HandleDeleteDelivery.bind(
-                                                    this
-                                                )}
+                                                _OnChangeOptionDelivery={_OnChangeOptionDelivery.bind(this)}
+                                                onDelete={handleQueryId}
                                             >
                                                 <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
                                             </FormContactDelivery>
                                         ))}
-                                        <ButtoonAdd
-                                            onClick={_HandleAddNewDelivery.bind(
-                                                this
-                                            )}
-                                        >
+                                        <ButtoonAdd onClick={_HandleAddNewDelivery.bind(this)}>
                                             <IconAdd className="animate-bounce" />
-                                            {
-                                                props.dataLang
-                                                    ?.client_popup_devivelyAdd
-                                            }
+                                            {props.dataLang?.client_popup_devivelyAdd}
                                         </ButtoonAdd>
                                     </div>
                                 </ScrollArea>
@@ -958,6 +929,15 @@ const Popup_dskh = (props) => {
                     </form>
                 </div>
             </PopupEdit>
+            <PopupConfim
+                type="warning"
+                dataLang={props.dataLang}
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={_HandleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </>
     );
 };

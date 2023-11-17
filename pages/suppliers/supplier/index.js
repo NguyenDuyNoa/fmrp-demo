@@ -1,15 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import { NumericFormat } from "react-number-format";
-import ReactExport from "react-data-export";
-
-import Swal from "sweetalert2";
+import React, { useState, useEffect } from "react";
 
 import {
     Edit as IconEdit,
@@ -17,55 +8,56 @@ import {
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    LocationTick,
-    User,
-    ArrowCircleDown,
-    Refresh2,
 } from "iconsax-react";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import { useDispatch, useSelector } from "react-redux";
+
+import { components } from "react-select";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import TabClient from "./(tab)/tab";
 import Popup_dsncc from "./(popup)/popup";
 import Popup_chitiet from "./(popup)/detail";
-import TabClient from "./(tab)/tab";
-import TabFilter from "components/UI/TabFilter";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
+
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const trangthaiExprired = useStatusExprired();
+
     const router = useRouter();
+
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const tabPage = router.query?.tab;
-    const dispatch = useDispatch();
 
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [totalItem, sTotalItems] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [data, sData] = useState({});
+
     const [data_ex, sData_ex] = useState([]);
+
     const [listDs, sListDs] = useState();
 
     const [listSelectCt, sListSelectCt] = useState();
@@ -76,12 +68,14 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : 0 },
         });
     }, []);
+
     const _ServerFetching = () => {
         const id = Number(tabPage);
         Axios(
@@ -107,7 +101,9 @@ const Index = (props) => {
             }
         );
     };
+
     const [listBr, sListBr] = useState();
+
     const _ServerFetching_brand = () => {
         Axios(
             "GET",
@@ -128,13 +124,17 @@ const Index = (props) => {
     };
 
     const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+
     const [idBranch, sIdBranch] = useState(null);
+
     const onchang_filterBr = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
         }
     };
+
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
+
     const options = listBr_filter?.filter((x) => !hiddenOptions.includes(x.value));
 
     const _ServerFetching_group = () => {
@@ -200,50 +200,70 @@ const Index = (props) => {
             sOnFetching(true);
         }, 500);
     };
+
     useEffect(() => {
         (onFetching && _ServerFetching()) ||
             (onFetching && _ServerFetching_group()) ||
             (onFetching && _ServerFetching_selectct()) ||
             (onFetching && _ServerFetching_brand());
     }, [onFetching]);
+
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) ||
             (keySearch && sOnFetching(true)) ||
             (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, router.query?.tab, idBranch]);
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/api_supplier/supplier/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang[message],
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: dataLang[message],
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                    _ServerFetching_group();
-                });
+
+    const handleDelete = async () => {
+        Axios("DELETE", `/api_web/api_supplier/supplier/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    isShow("success", dataLang[message]);
+                } else {
+                    isShow("success", dataLang[message]);
+                }
             }
+            _ServerFetching();
+
+            _ServerFetching_group();
         });
+
+        handleQueryId({ status: false });
     };
+    // const handleDelete = (event) => {
+    //     Swal.fire({
+    //         title: `${dataLang?.aler_ask}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#296dc1",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: `${dataLang?.aler_yes}`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const id = event;
+    //             Axios("DELETE", `/api_web/api_supplier/supplier/${id}?csrf_protection=true`, {}, (err, response) => {
+    //                 if (!err) {
+    //                     var { isSuccess, message } = response.data;
+    //                     if (isSuccess) {
+    //                         Toast.fire({
+    //                             icon: "success",
+    //                             title: dataLang[message],
+    //                         });
+    //                     } else {
+    //                         Toast.fire({
+    //                             icon: "error",
+    //                             title: dataLang[message],
+    //                         });
+    //                     }
+    //                 }
+    //                 _ServerFetching();
+    //                 _ServerFetching_group();
+    //             });
+    //         }
+    //     });
+    // };
 
     //excel
     const multiDataSet = [
@@ -346,11 +366,6 @@ const Index = (props) => {
             ]),
         },
     ];
-
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
-    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>
@@ -575,7 +590,9 @@ const Index = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                                 <button
-                                                                    onClick={() => handleDelete(e.id)}
+                                                                    onClick={() =>
+                                                                        handleQueryId({ id: e.id, status: true })
+                                                                    }
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -621,6 +638,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

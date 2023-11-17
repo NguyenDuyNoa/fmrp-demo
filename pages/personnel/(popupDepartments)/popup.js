@@ -1,33 +1,36 @@
+import Select from "react-select";
 import React, { useEffect, useState, useRef } from "react";
-import Select, { components } from "react-select";
 import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
 import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
-import Swal from "sweetalert2";
+import useToast from "@/hooks/useToast";
+import PopupEdit from "@/components/UI/popup";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 const Popup_phongban = (props) => {
     const [open, sOpen] = useState(false);
+
+    const isShow = useToast();
+
     const _ToggleModal = (e) => sOpen(e);
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
     const [onSending, sOnSending] = useState(false);
+
     const [brandpOpt, sListBrand] = useState([]);
+
     const [name, sName] = useState("");
+
     const [email, sEmail] = useState("");
+
     const [errInput, sErrInput] = useState(false);
 
     const [errInputBr, sErrInputBr] = useState(false);
+
     const [valueBr, sValueBr] = useState([]);
 
     useEffect(() => {
@@ -69,9 +72,11 @@ const Popup_phongban = (props) => {
         );
         // sValueBr(props.sValueBr ? props.listBr && [...props.sValueBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
     }, [open]);
+
     const branch_id = valueBr?.map((e) => {
         return e?.value;
     });
+
     const _HandleChangeInput = (type, value) => {
         if (type == "name") {
             sName(value.target?.value);
@@ -85,6 +90,7 @@ const Popup_phongban = (props) => {
     useEffect(() => {
         sErrInput(false);
     }, [name.length > 0]);
+
     useEffect(() => {
         sErrInputBr(false);
     }, [branch_id?.length > 0]);
@@ -113,10 +119,7 @@ const Popup_phongban = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", props.dataLang[message]);
                         sErrInput(false);
                         sName("");
                         sEmail("");
@@ -125,10 +128,7 @@ const Popup_phongban = (props) => {
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -139,15 +139,13 @@ const Popup_phongban = (props) => {
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
+
     const _HandleSubmit = (e) => {
         e.preventDefault();
         if (name.length == 0 || branch_id?.length == 0) {
             name?.length == 0 && sErrInput(true);
             branch_id?.length == 0 && sErrInputBr(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
             // sErrInput(false)
             sOnSending(true);

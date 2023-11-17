@@ -17,9 +17,6 @@ const deca = Lexend_Deca({
 const PopupConfim = (props) => {
     return (
         <React.Fragment>
-            <button onClick={props.onClickOpen}>
-                <IconDelete color="red" />
-            </button>
             <Popup
                 open={props.isOpen}
                 closeOnDocumentClick={false}
