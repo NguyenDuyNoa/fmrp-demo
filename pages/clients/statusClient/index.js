@@ -17,7 +17,7 @@ import "react-phone-input-2/lib/style.css";
 import Popup_status from "./(popup)/popup";
 
 import Loading from "@/components/UI/loading";
-import Pagination from "/@/components/UI/pagination";
+import Pagination from "@/components/UI/pagination";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
