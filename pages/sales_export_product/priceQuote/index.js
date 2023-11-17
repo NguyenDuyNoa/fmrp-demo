@@ -1,68 +1,86 @@
-import vi from "date-fns/locale/vi";
-import React, { useState } from "react";
-import Select from "react-select";
-import PopupDetailQuote from "./(PopupDetail)/PopupDetailQuote";
-import BtnAction from "../../../components/UI/BtnAction";
-import TabFilter from "../../../components/UI/TabFilter";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
-import Swal from "sweetalert2";
-import ReactExport from "react-data-export";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-import moment from "moment/moment";
-import Datepicker from "react-tailwindcss-datepicker";
-import { useRouter } from "next/router";
-import { registerLocale } from "react-datepicker";
-import { _ServerInstance as Axios } from "/services/axios";
-import { useEffect } from "react";
+import Select from "react-select";
 import { debounce } from "lodash";
+import vi from "date-fns/locale/vi";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
+import PopupDetailQuote from "./(PopupDetail)/PopupDetailQuote";
+
+import moment from "moment/moment";
+import ReactExport from "react-data-export";
+import { registerLocale } from "react-datepicker";
+import Datepicker from "react-tailwindcss-datepicker";
+import { _ServerInstance as Axios } from "/services/axios";
 import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSelector } from "react-redux";
-import OnResetData from "components/UI/btnResetData/btnReset";
+
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import TabFilter from "@/components/UI/TabFilter";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
+    const isShow = useToast();
+
+    const { isOpen, isId, isIdChild: statusQuote, handleQueryId } = useToggle();
+
     const [data, sData] = useState([]);
+
     const [dataExcel, sDataExcel] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
+
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
+
     const [listBr, sListBr] = useState([]);
+
     const [listQuoteCode, sListQuoteCode] = useState([]);
+
     const [listCustomer, sListCustomer] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [idQuoteCode, sIdQuoteCode] = useState(null);
+
     const [idCustomer, sIdCustomer] = useState(null);
+
     const [listTabStatus, sListTabStatus] = useState();
+
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null,
     });
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
+    const trangthaiExprired = useStatusExprired();
 
     const [loading, setLoading] = useState(false);
-    const [onSending, sOnSending] = useState(null);
 
-    const [action, sAction] = useState("price_quote");
+    const [onSending, sOnSending] = useState(null);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -375,58 +393,77 @@ const Index = (props) => {
     ];
 
     // chuyen doi trang thai don bao gia
-    const _ToggleStatus = (id) => {
-        const index = data.findIndex((x) => x.id === id);
 
-        Swal.fire({
-            title: `${"Thay đổi trạng thái"}`,
-            icon: "warning",
-            showCancelButton: true,
-            showDenyButton: true,
-            confirmButtonColor: "#0F4F9E",
-            denyButtonColor: "#d33",
-            cancelButtonColor: "gray",
-            confirmButtonText: `${
-                data[index].status === "confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved
-            }`,
-            denyButtonText: `${
-                data[index].status === "no_confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_no_approved
-            }`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-            didOpen: () => {
-                const confirmButton = document.querySelector(".swal2-confirm");
-                confirmButton.classList.add("w-32");
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let newStatus = "";
-
-                if (data[index].status === "not_confirmed") {
-                    newStatus = "confirmed";
-                } else if (data[index].status === "confirmed") {
-                    newStatus = "not_confirmed";
-                } else if (data[index].status === "no_confirmed") {
-                    newStatus = "confirmed";
-                }
-
-                _ServerPostStatus(id, newStatus);
-            }
-            if (result.isDenied) {
-                const newStatus = data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
-
-                _ServerPostStatus(id, newStatus);
-            }
-        });
+    const handleDelete = () => {
+        const index = data.findIndex((x) => x.id === isId);
+        let newStatus = "";
+        if (data[index].status === "not_confirmed") {
+            newStatus = "confirmed";
+        } else if (data[index].status === "confirmed") {
+            newStatus = "not_confirmed";
+        } else if (data[index].status === "no_confirmed") {
+            newStatus = "confirmed";
+        }
+        _ServerPostStatus(isId, newStatus);
+        handleQueryId({ status: false });
     };
+
+    const handleNoconfim = () => {
+        const index = data.findIndex((x) => x.id === isId);
+        const newStatus = data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
+        _ServerPostStatus(isId, newStatus);
+        handleQueryId({ status: false });
+    };
+
+    // const handleDelete = (id) => {
+    //     const index = data.findIndex((x) => x.id === id);
+
+    //     Swal.fire({
+    //         title: `${"Thay đổi trạng thái"}`,
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         showDenyButton: true,
+    //         confirmButtonColor: "#0F4F9E",
+    //         denyButtonColor: "#d33",
+    //         cancelButtonColor: "gray",
+    //         confirmButtonText: `${
+    //             data[index].status === "confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved
+    //         }`,
+    //         denyButtonText: `${
+    //             data[index].status === "no_confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_no_approved
+    //         }`,
+    //         cancelButtonText: `${dataLang?.aler_cancel}`,
+    //         didOpen: () => {
+    //             const confirmButton = document.querySelector(".swal2-confirm");
+    //             confirmButton.classList.add("w-32");
+    //         },
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             let newStatus = "";
+
+    //             if (data[index].status === "not_confirmed") {
+    //                 newStatus = "confirmed";
+    //             } else if (data[index].status === "confirmed") {
+    //                 newStatus = "not_confirmed";
+    //             } else if (data[index].status === "no_confirmed") {
+    //                 newStatus = "confirmed";
+    //             }
+
+    //             _ServerPostStatus(id, newStatus);
+    //         }
+    //         if (result.isDenied) {
+    //             const newStatus = data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
+
+    //             _ServerPostStatus(id, newStatus);
+    //         }
+    //     });
+    // };
 
     const handleToggleOrdered = (id) => {
         const index = data.findIndex((x) => x.id === id);
 
         if (data[index].status === "ordered") {
-            Toast.fire({
-                icon: "error",
-                title: `${dataLang?.no_change_status_when_order || "no_change_status_when_order"}`,
-            });
+            isShow("error", `${dataLang?.no_change_status_when_order || "no_change_status_when_order"}`);
         }
     };
 
@@ -448,10 +485,7 @@ const Index = (props) => {
                     var { isSuccess } = response.data;
 
                     if (isSuccess !== false) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang?.change_status_when_order || "change_status_when_order"}`,
-                        });
+                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
                     }
                     sOnSending(false);
                     _ServerFetching();
@@ -885,7 +919,13 @@ const Index = (props) => {
                                                                     {(e?.status === "confirmed" && (
                                                                         <div
                                                                             className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 text-green-500 hover:bg-green-500  transition-all duration-300 ease-in-out hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
-                                                                            onClick={() => _ToggleStatus(e?.id)}
+                                                                            onClick={() =>
+                                                                                handleQueryId({
+                                                                                    id: e?.id,
+                                                                                    status: true,
+                                                                                    idChild: "confirmed",
+                                                                                })
+                                                                            }
                                                                         >
                                                                             Đã Duyệt
                                                                             <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
@@ -894,7 +934,13 @@ const Index = (props) => {
                                                                         (e?.status === "not_confirmed" && (
                                                                             <div
                                                                                 className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white border  transition-all duration-300 ease-in-out border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
-                                                                                onClick={() => _ToggleStatus(e?.id)}
+                                                                                onClick={() =>
+                                                                                    handleQueryId({
+                                                                                        id: e?.id,
+                                                                                        status: true,
+                                                                                        idChild: "not_confirmed",
+                                                                                    })
+                                                                                }
                                                                             >
                                                                                 Chưa Duyệt{" "}
                                                                                 <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
@@ -903,7 +949,13 @@ const Index = (props) => {
                                                                         (e?.status === "no_confirmed" && (
                                                                             <div
                                                                                 className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-sky-500 text-sky-500 hover:bg-sky-500  transition-all duration-300 ease-in-out hover:text-white border px-0.5 py-1 rounded-md font-normal flex justify-center items-center gap-1 "
-                                                                                onClick={() => _ToggleStatus(e?.id)}
+                                                                                onClick={() =>
+                                                                                    handleQueryId({
+                                                                                        id: e?.id,
+                                                                                        status: true,
+                                                                                        idChild: "no_confirmed",
+                                                                                    })
+                                                                                }
                                                                             >
                                                                                 Không Duyệt
                                                                                 <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
@@ -1005,6 +1057,18 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                countButton={"priceQuote"}
+                title={TITLE_STATUS}
+                statusQuote={statusQuote}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleDelete}
+                handleNoconfim={handleNoconfim}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

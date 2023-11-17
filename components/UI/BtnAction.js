@@ -1,22 +1,31 @@
-import { useRouter } from "next/dist/client/router";
-import React, { useEffect, useState, useRef } from "react";
-import Popup from "reactjs-popup";
-import { ArrowDown2, Box1 } from "iconsax-react";
 import Swal from "sweetalert2";
+import Popup from "reactjs-popup";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/dist/client/router";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import FilePDF from "./FilePDF";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { BiEdit } from "react-icons/bi";
-import ToatstNotifi from "./alerNotification/alerNotification";
-import PopupEdit from "/components/UI/popup";
+import pdfMake from "pdfmake/build/pdfmake";
 import { VscFilePdf } from "react-icons/vsc";
-import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { ArrowDown2, Box1 } from "iconsax-react";
+import { RiDeleteBin6Line } from "react-icons/ri";
+
+import FilePDF from "./FilePDF";
 import { routerInternalPlan } from "./router/internalPlan";
+import ToatstNotifi from "./alerNotification/alerNotification";
+import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
+
+import PopupConfim from "./popupConfim/popupConfim";
 import Popup_KeepStock from "pages/sales_export_product/salesOrder/(PopupDetail)/PopupKeepStock";
 import Popup_DetailKeepStock from "pages/sales_export_product/salesOrder/(PopupDetail)/PopupDetailKeepStock";
+
+import PopupEdit from "@/components/UI/popup";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -31,60 +40,53 @@ const Toast = Swal.mixin({
 const BtnAction = React.memo((props) => {
     const router = useRouter();
 
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const [openAction, setOpenAction] = useState(false);
+
     const [dataCompany, setDataCompany] = useState();
+
     const [data, setData] = useState();
+
     const _ToggleModal = (e) => {
         setOpenAction(e);
     };
-    const handleDelete = (id) => {
+
+    const handleDelete = () => {
         if (props?.id && props?.type === "price_quote") {
             if (props?.status !== "ordered") {
-                Swal.fire({
-                    title: `${props.dataLang?.aler_ask} `,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${props.dataLang?.aler_yes} `,
-                    cancelButtonText: `${props.dataLang?.aler_cancel} `,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Axios(
-                            "DELETE",
-                            `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`,
-                            {},
-                            (err, response) => {
-                                if (response && response.data) {
-                                    var { isSuccess, message } = response.data;
-                                    if (isSuccess) {
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: props.dataLang[message],
-                                        });
-                                        props.onRefresh && props.onRefresh();
-                                    } else {
-                                        Toast.fire({
-                                            icon: "error",
-                                            title: props.dataLang[message],
-                                        });
-                                    }
-                                } else {
+                Axios(
+                    "DELETE",
+                    `/api_web/Api_quotation/quotation/${isId}?csrf_protection=true`,
+                    {},
+                    (err, response) => {
+                        if (!err) {
+                            if (response && response.data) {
+                                var { isSuccess, message } = response.data;
+                                if (isSuccess) {
                                     Toast.fire({
-                                        icon: "error",
-                                        title: `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`,
+                                        icon: "success",
+                                        title: props.dataLang[message],
                                     });
+                                    isShow("success", props.dataLang[message]);
+                                    props.onRefresh && props.onRefresh();
+                                } else {
+                                    isShow("error", props.dataLang[message]);
                                 }
+                            } else {
+                                isShow("error", `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`);
                             }
-                        );
+                        }
                     }
-                });
+                );
+
+                handleQueryId({ status: false });
             }
             if (props?.status === "ordered") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${props?.dataLang?.po_imported_cant_delete || "po_imported_cant_delete"} `,
-                });
+                handleQueryId({ status: false });
+                isShow("error", `${props?.dataLang?.po_imported_cant_delete || "po_imported_cant_delete"}`);
             }
         }
 
@@ -460,7 +462,7 @@ const BtnAction = React.memo((props) => {
                         {props.type == "sales_product" && <Popup_KeepStock {...props} />}
                         {props.type == "sales_product" && <Popup_DetailKeepStock {...props} />}
                         <button
-                            onClick={() => handleDelete(props?.id)}
+                            onClick={() => handleQueryId({ id: props?.id, status: true })}
                             className={`group transition-all ease-in-out flex items-center ${
                                 props.type == "sales_product" ? "" : "justify-center"
                             } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
@@ -476,6 +478,15 @@ const BtnAction = React.memo((props) => {
                     </div>
                 </div>
             </Popup>
+            <PopupConfim
+                dataLang={props.dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </div>
     );
 });

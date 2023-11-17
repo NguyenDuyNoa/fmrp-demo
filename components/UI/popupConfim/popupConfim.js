@@ -23,7 +23,11 @@ const PopupConfim = (props) => {
                 onClose={props.onClose}
                 className={`${props.className} popup-edit`}
             >
-                <div className="3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px]">
+                <div
+                    className={`3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px] ${
+                        props.countButton == "priceQuote" && "min-w-[500px]"
+                    }`}
+                >
                     <div className={`${deca.className} bg-[#ffffff] p-4 shadow-xl rounded-xl flex flex-col gap-3`}>
                         <div className="relative inline-block">
                             {props.type == "warning" ? (
@@ -51,18 +55,47 @@ const PopupConfim = (props) => {
                             {props.subtitle}
                         </h1>
                         <div className="flex items-center justify-between gap-4">
-                            <button
-                                onClick={props.cancel}
-                                className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                            >
-                                Loại bỏ
-                            </button>
-                            <button
-                                onClick={props.save}
-                                className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                            >
-                                Lưu thay đổi
-                            </button>
+                            {props.countButton == "priceQuote" ? (
+                                <>
+                                    <button
+                                        onClick={props.cancel}
+                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                    >
+                                        Loại bỏ
+                                    </button>{" "}
+                                    <button
+                                        onClick={props.save}
+                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                    >
+                                        {props.statusQuote === "confirmed"
+                                            ? props.dataLang?.aler_not_yet_approved
+                                            : props.dataLang?.aler_approved}
+                                    </button>
+                                    <button
+                                        onClick={props.handleNoconfim}
+                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                    >
+                                        {props.statusQuote === "no_confirmed"
+                                            ? props.dataLang?.aler_not_yet_approved
+                                            : props.dataLang?.aler_no_approved}
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={props.cancel}
+                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                    >
+                                        Loại bỏ
+                                    </button>
+                                    <button
+                                        onClick={props.save}
+                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                    >
+                                        Lưu thay đổi
+                                    </button>
+                                </>
+                            )}
                         </div>
                         {/* {props.children} */}
                     </div>
