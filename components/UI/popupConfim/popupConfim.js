@@ -61,7 +61,7 @@ const PopupConfim = (props) => {
                                         onClick={props.cancel}
                                         className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
                                     >
-                                        Loại bỏ
+                                        Hủy
                                     </button>{" "}
                                     <button
                                         onClick={props.save}
@@ -86,7 +86,7 @@ const PopupConfim = (props) => {
                                         onClick={props.cancel}
                                         className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
                                     >
-                                        Loại bỏ
+                                        Hủy
                                     </button>
                                     <button
                                         onClick={props.save}
