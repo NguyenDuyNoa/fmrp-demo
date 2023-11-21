@@ -1,9 +1,7 @@
-import React, { useRef, useState } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
 import Link from "next/link";
-import ModalImage from "react-modal-image";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 
 import {
@@ -19,40 +17,32 @@ import {
 
 import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
 
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
 import Popup from "reactjs-popup";
 import moment from "moment/moment";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
 import Swal from "sweetalert2";
 
 import ReactExport from "react-data-export";
 import { useEffect } from "react";
-import { data } from "autoprefixer";
 import Popup_chitietThere from "../detailThere";
 import FilePDF from "../FilePDF";
-import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/popup";
 import Popup_TableValidateEdit from "./(popup)/validateEdit";
 import Popup_TableValidateDelete from "./(popup)/validateDelete";
-import { useSelector } from "react-redux";
-import { routerOrder } from "components/UI/router/buyImportGoods";
+
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import Pagination from "@/components/UI/pagination";
+import { routerOrder } from "@/components/UI/router/buyImportGoods";
+
 import useStatusExprired from "@/hooks/useStatusExprired";
+
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -66,37 +56,60 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const [data, sData] = useState([]);
+
     const [dataExcel, sDataExcel] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
+
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
+
     const [listBr, sListBr] = useState([]);
+
     const [lisCode, sListCode] = useState([]);
+
     const [listSupplier, sListSupplier] = useState([]);
+
     const [listOrderType, sListOrderType] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [idCode, sIdCode] = useState(null);
+
     const [idSupplier, sIdSupplier] = useState(null);
+
     const [idOrderType, sIdOrderType] = useState(null);
+
     const [listDs, sListDs] = useState();
+
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null,
     });
 
+    const _HandleFresh = () => sOnFetching(true);
+
+    const trangthaiExprired = useStatusExprired();
+
     const [dateRange, sDateRange] = useState([]);
+
     const formatDate = (date) => {
         const day = date?.getDate().toString().padStart(2, "0");
         const month = (date?.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed
         const year = date?.getFullYear();
         return `${year}-${month}-${day}`;
     };
-    const formattedDateRange = dateRange.map((date) => formatDate(date));
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -125,8 +138,6 @@ const Index = (props) => {
                     "filter[status_bar]": tabPage ?? null,
                     "filter[supplier_id]": idSupplier ? idSupplier.value : null,
                     "filter[order_type]": idOrderType ? idOrderType.value : null,
-                    // "filter[start_date]":  formattedDateRange[0] == "undefined-NaN-undefined" ? null : formattedDateRange[0],
-                    // "filter[end_date]":  formattedDateRange[1] == "undefined-NaN-undefined" ? null : formattedDateRange[1],
                     "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
                     "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
@@ -176,18 +187,21 @@ const Index = (props) => {
                 sListBr(rResult);
             }
         });
+
         Axios("GET", `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
                 sListCode(rResult);
             }
         });
+
         Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var db = response.data.rResult;
                 sListSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
             }
         });
+
         Axios("GET", "/api_web/Api_purchase_order/order_type_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var data = response.data;
@@ -199,15 +213,18 @@ const Index = (props) => {
                 );
             }
         });
+
         sOnFetching_filter(false);
     };
 
     useEffect(() => {
         (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
+
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
+
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) ||
             (keySearch && sOnFetching(true)) ||
@@ -230,7 +247,9 @@ const Index = (props) => {
     ]);
 
     const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+
     const listCode_filter = lisCode ? lisCode?.map((e) => ({ label: e.code, value: e.id })) : [];
+
     const onchang_filter = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
@@ -272,24 +291,11 @@ const Index = (props) => {
         }, 500);
     };
 
-    // const formatNumber = (number) => {
-    //   const integerPart = Math.floor(number).toString();
-    //   return integerPart;
-    // }
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
         const integerPart = Math.floor(number);
         return integerPart.toLocaleString("en");
     };
-    // const formatNumberWithCommas = (number) => {
-    //   return number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    //   // return number
-    // }
-    // const formatNumber = (number) => {
-    //   const formattedNumber = formatNumberWithCommas(number)
-    //   return formattedNumber;
-    //   // return number
-    // }
 
     const multiDataSet = [
         {
@@ -433,8 +439,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired =useStatusExprired()
 
     return (
         <React.Fragment>
@@ -998,7 +1002,17 @@ const Index = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
-                                                                <BtnTacVu
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    id={e?.id}
+                                                                    status={e?.import_status}
+                                                                    status_pay={e?.status_pay}
+                                                                    type="order"
+                                                                    data={e}
+                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                                />
+                                                                {/* <BtnTacVu
                                                                     type="order"
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     dataLang={dataLang}
@@ -1007,7 +1021,7 @@ const Index = (props) => {
                                                                     data={e}
                                                                     id={e?.id}
                                                                     className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
-                                                                />
+                                                                /> */}
                                                                 {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
                                                             </div>
                                                         </div>
@@ -1101,14 +1115,19 @@ const TabClient = React.memo((props) => {
 
 const BtnTacVu = React.memo((props) => {
     const [openTacvu, sOpenTacvu] = useState(false);
+
     const _ToggleModal = (e) => sOpenTacvu(e);
 
     const [open, sOpen] = useState(false);
+
     const [openEdit, sOpenEdit] = useState(false);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [data, sData] = useState({});
 
     const [dataPDF, setData] = useState();
+
     const [dataCompany, setDataCompany] = useState();
 
     const fetchDataSettingsCompany = () => {
@@ -1134,6 +1153,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
     };
+
     useEffect(() => {
         openTacvu && fetchDataSettingsCompany();
     }, [openTacvu]);
@@ -1244,6 +1264,7 @@ const BtnTacVu = React.memo((props) => {
                 arrow={false}
                 position="bottom right"
                 className={`dropdown-edit `}
+                â
                 keepTooltipInside={props.keepTooltipInside}
                 closeOnDocumentClick
                 nested

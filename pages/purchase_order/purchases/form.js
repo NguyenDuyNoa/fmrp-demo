@@ -1,80 +1,82 @@
-import React, { useRef, useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { _ServerInstance as Axios } from "/services/axios";
+import { useRouter } from "next/router";
+import React, { useRef, useState, useEffect } from "react";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import dynamic from "next/dynamic";
-import Select, { components } from "react-select";
+import Select from "react-select";
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    LocationTick,
-    User,
     Image as IconImage,
     Add,
     Minus,
 } from "iconsax-react";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
-import { NumericFormat } from "react-number-format";
-import Link from "next/link";
+
 import moment from "moment/moment";
-import ModalImage from "react-modal-image";
+import { NumericFormat } from "react-number-format";
 
 import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
-import { useSelector } from "react-redux";
-import { routerPurchases } from "components/UI/router/buyImportGoods";
+import { BsCalendarEvent } from "react-icons/bs";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import { routerPurchases } from "@/components/UI/router/buyImportGoods";
+
+import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 const Index = (props) => {
     const router = useRouter();
+
     const id = router.query?.id;
 
     const dataLang = props.dataLang;
+
+    const isShow = useToast();
+
     const scrollAreaRef = useRef(null);
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
-    };
+
     const trangthaiExprired = useStatusExprired();
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
 
     const [data, sData] = useState([]);
+
     const [listBr, sListBr] = useState();
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [code, sCode] = useState("");
+
     const [selectedDate, setSelectedDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+
     const [namePromis, sNamePromis] = useState("Yêu cầu mua hàng (PR)");
+
     const [note, sNote] = useState();
 
     const [totalSoluong, setTotalSoluong] = useState(0);
+
     const [totalQty, setTotalQty] = useState(0);
 
     const [startDate, sStartDate] = useState(new Date());
+
     const [effectiveDate, sEffectiveDate] = useState(null);
 
     const [errName, sErrName] = useState(false);
+
     const [errCode, sErrCode] = useState(false);
+
     const [errDate, sErrDate] = useState(false);
+
     const [errBranch, sErrBranch] = useState(false);
+
     const [onSending, sOnSending] = useState(false);
+
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrName(false);
@@ -97,13 +99,15 @@ const Index = (props) => {
         },
     ]);
     const slicedArr = option.slice(1);
+
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
+
     sortedArr.unshift(option[0]);
 
     const _ServerFetching = () => {
         Axios("GET", "/api_web/api_product/searchItemsVariant?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { result } = response.data.data;
+                let { result } = response.data.data;
                 sData(
                     result?.map((e) => ({
                         label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
@@ -111,7 +115,6 @@ const Index = (props) => {
                         e,
                     }))
                 );
-                // const options = data?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e}))
             }
         });
         Axios(
@@ -124,7 +127,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    let { rResult } = response.data;
                     sListBr(rResult);
                 }
             }
@@ -134,7 +137,7 @@ const Index = (props) => {
     const _ServerFetchingDetail = () => {
         Axios("GET", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var rResult = response.data;
+                let rResult = response.data;
                 sCode(rResult?.code);
                 sNamePromis(rResult?.name);
                 // setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
@@ -176,13 +179,7 @@ const Index = (props) => {
     const branch_id = idBranch?.value;
     const _HandleDelete = (id) => {
         if (id === option[0].id) {
-            return Toast.fire({
-                title: `${"Mặc định hệ thống, không xóa"}`,
-                icon: "error",
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-            });
+            return isShow("error", `${"Mặc định hệ thống, không xóa"}`);
         }
         const newOption = option.filter((x) => x.id !== id); // loại bỏ phần tử cần xóa
         const newTotal = newOption.slice(1).reduce((total, item) => total + item.soluong, 0); // tính toán lại tổng số lượng bắt đầu từ phần tử thứ 2
@@ -222,19 +219,11 @@ const Index = (props) => {
         if (type == "mathang") {
             const hasSelectedOption = option.some((o) => o.mathang?.value === value.value);
             if (hasSelectedOption) {
-                return Toast.fire({
-                    title: `${"Mặt hàng này đã được chọn "}`,
-                    icon: "error",
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                });
+                return isShow("error", `${"Mặt hàng này đã được chọn "}`);
             } else {
                 if (option[index].mathang) {
                     option[index].mathang = value;
-                    // console.log(value)
                     option[index].donvitinh = value?.e?.unit_name;
-                    // option[index].ghichu = value.ghichu
                 } else {
                     const newData = {
                         id: Date.now(),
@@ -258,7 +247,6 @@ const Index = (props) => {
                 if (!isNaN(item.soluong)) {
                     return total + parseInt(item.soluong);
                 } else {
-                    // console.log(`Value of item.soluong is not a number: ${item.soluong}`);
                     return total;
                 }
             }, 0);
@@ -285,13 +273,7 @@ const Index = (props) => {
             setTotalSoluong(totalSoluong - 1);
             sOption([...option]);
         } else {
-            return Toast.fire({
-                title: `${"Số lượng tối thiểu"}`,
-                icon: "error",
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-            });
+            return isShow("error", `${"Số lượng tối thiểu"}`);
         }
     };
     const _HandleSubmit = (e) => {
@@ -300,10 +282,7 @@ const Index = (props) => {
             namePromis?.length == 0 && sErrName(true);
             selectedDate?.length == 0 && sErrDate(true);
             branch_id == null && sErrBranch(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", `${props.dataLang?.required_field_null}`);
         } else {
             sOnSending(true);
         }
@@ -316,7 +295,6 @@ const Index = (props) => {
         };
     });
     const newDataOption = dataOption?.filter((e) => e?.data !== undefined);
-    const readOnlyFirst = true;
 
     const _ServerSending = () => {
         var formData = new FormData();
@@ -345,14 +323,9 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", `${props.dataLang[message]}`);
                         sCode("");
                         sNamePromis("Yêu cầu mua hàng (PR)");
-                        // setSelectedDate(new Date().toISOString().slice(0, 10))
-                        // setSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
                         sStartDate(new Date());
                         sNote("");
                         sIdBranch(null);
@@ -374,15 +347,9 @@ const Index = (props) => {
                         router.push(routerPurchases.home);
                     } else {
                         if (totalQty == 0) {
-                            Toast.fire({
-                                icon: "error",
-                                title: `Chưa nhập thông tin mặt hàng`,
-                            });
+                            isShow("success", `Chưa nhập thông tin mặt hàng`);
                         } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: `${props.dataLang[message]}`,
-                            });
+                            isShow("error", `${props.dataLang[message]}`);
                         }
                     }
                 }
@@ -450,19 +417,6 @@ const Index = (props) => {
         id && sOnFetchingDetail(true);
     }, []);
 
-    // useEffect(() => {
-
-    //   sFetchingSuccess(false)
-    // }, [fetchingSuccess]);
-
-    // const formatNumber = (num) => {
-    //   if (!num && num !== 0) return 0;
-    //   const roundedNum = parseFloat(num.toFixed(2));
-    //   return roundedNum.toLocaleString("en", {
-    //     minimumFractionDigits: 2,
-    //     maximumFractionDigits: 2,
-    //     useGrouping: true
-    //   });
     // };
     const formatNumber = (number) => {
         const integerPart = Math.floor(number);

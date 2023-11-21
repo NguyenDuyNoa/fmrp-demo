@@ -37,11 +37,7 @@ const Toast = Swal.mixin({
 const Popup_TableValidateEdit = (props) => {
     const router = useRouter();
     const [onFetching, sOnFetching] = useState(false);
-    const _ToggleModal = (e) => props.setOpen(e);
-    // useEffect(() => {
-    //     props.isOpen && handleClick();
-    // }, [props.isOpen]);
-    // console.log(props);
+    const _ToggleModal = (e) => props.sIsOpenValidate(e);
     const handleClick = () => {
         if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
             Toast.fire({
@@ -52,7 +48,6 @@ const Popup_TableValidateEdit = (props) => {
                 }`,
             });
         } else {
-            // router.push(`/purchase_order/order/form?id=${props.id}`);
             router.push(`${routerOrder.form}?id=${props.id}`);
         }
     };
@@ -67,7 +62,7 @@ const Popup_TableValidateEdit = (props) => {
                     </button>
                 }
                 onClickOpen={_ToggleModal.bind(this, true)}
-                open={props.isOpen && props.data?.payment_code?.length > 0}
+                open={props.isOpenValidate && props.data?.payment_code?.length > 0}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props?.className}
             >

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import moment from "moment/moment";
 
@@ -14,38 +13,28 @@ import {
     TickCircle,
     ArrowCircleDown,
     Image as IconImage,
-    Refresh,
     Refresh2,
 } from "iconsax-react";
 
 import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
 
 import Select from "react-select";
 import Popup from "reactjs-popup";
-import { useRef } from "react";
 import { useRouter } from "next/router";
 
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import vi from "date-fns/locale/vi";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
-import ModalImage from "react-modal-image";
+
+import { _ServerInstance as Axios } from "/services/axios";
 
 dayjs.locale("vi");
 
 import Swal from "sweetalert2";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+
 const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -56,49 +45,80 @@ const Toast = Swal.mixin({
 
 import ReactExport from "react-data-export";
 import FilePDF from "../FilePDF";
-import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/popup";
-import { useSelector } from "react-redux";
-import { routerPurchases } from "components/UI/router/buyImportGoods";
+
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import { routerPurchases } from "@/components/UI/router/buyImportGoods";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import BtnAction from "@/components/UI/BtnAction";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
+    const formatNumber = (number) => {
+        const integerPart = Math.floor(number);
+        return integerPart.toLocaleString("en");
+    };
+
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
+    const _HandleFresh = () => sOnFetching(true);
+
+    const trangthaiExprired = useStatusExprired();
+
     const [data, sData] = useState([]);
+
     const [dataExcel, sDataExcel] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onnFetching_filter, sOnFetching_filter] = useState(false);
+
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [listDs, sListDs] = useState();
+
     const tabPage = router.query?.tab;
 
     const [listBr, sListBr] = useState();
+
     const [listCode, sListCode] = useState();
+
     const [listUser, sListUser] = useState();
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [idCode, sIdCode] = useState(null);
+
     const [idUser, sIdUser] = useState(null);
-    const [status, sStatus] = useState("");
+
     const [active, sActive] = useState(null);
+
     const [onSending, sOnSending] = useState(false);
-    const [dateRange, setDateRange] = useState([]);
+
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null,
     });
-
-    const formatDate = (date) => {
-        const day = date?.getDate().toString().padStart(2, "0");
-        const month = (date?.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed
-        const year = date?.getFullYear();
-        return `${year}-${month}-${day}`;
-    };
-    const formattedDateRange = dateRange?.map((date) => formatDate(date));
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -113,7 +133,6 @@ const Index = (props) => {
         });
     }, []);
     const _ServerFetching = () => {
-        const id = Number(tabPage);
         Axios(
             "GET",
             "/api_web/Api_purchases/purchases/?csrf_protection=true",
@@ -123,19 +142,16 @@ const Index = (props) => {
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                    // "filter[status]": tabPage !== "" ? (tabPage !== "1" ? id : 1) : null ,
                     "filter[status]": tabPage,
                     "filter[id]": idCode?.value,
                     "filter[staff_id]": idUser?.value,
-                    // "filter[start_date]": formattedDateRange[0],
-                    // "filter[end_date]": formattedDateRange[1],
                     "filter[start_date]": valueDate?.startDate,
                     "filter[end_date]": valueDate?.endDate,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { output, rResult } = response.data;
+                    let { output, rResult } = response.data;
                     sData(rResult);
                     sDataExcel(rResult);
                     sTotalItems(output);
@@ -148,27 +164,32 @@ const Index = (props) => {
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sListBr(rResult);
             }
         });
+
         Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sListCode(rResult);
             }
         });
+
         Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sListUser(rResult);
             }
         });
+
         sOnFetching_filter(false);
     };
 
     const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+
     const listCode_filter = listCode ? listCode?.map((e) => ({ label: e.code, value: e.id })) : [];
+
     const listUser_filter = listUser ? listUser?.map((e) => ({ label: e.name, value: e.staffid })) : [];
 
     const onchang_filter = (type, value) => {
@@ -179,7 +200,6 @@ const Index = (props) => {
         } else if (type == "user") {
             sIdUser(value);
         } else if (type == "date") {
-            // setDateRange(value)
             sValueDate(value);
         }
     };
@@ -201,7 +221,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sListDs(data);
                 }
                 sOnFetching(false);
@@ -221,12 +241,14 @@ const Index = (props) => {
 
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
+
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
+
         setTimeout(() => {
             if (!value) {
                 sOnFetching(true);
@@ -234,12 +256,15 @@ const Index = (props) => {
             sOnFetching(true);
         }, 500);
     };
+
     useEffect(() => {
         (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
+
     useEffect(() => {
         onnFetching_filter && _ServerFetching_filter();
     }, [onnFetching_filter]);
+
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) ||
             (keySearch && sOnFetching(true)) ||
@@ -260,52 +285,18 @@ const Index = (props) => {
         valueDate.startDate,
     ]);
 
-    // const _ToggleStatus = (id,db) => {
-    //       Swal.fire({
-    //          title: `${"Thay đổi trạng thái"}`,
-    //          icon: 'warning',
-    //          showCancelButton: true,
-    //          confirmButtonColor: '#296dc1',
-    //          cancelButtonColor: '#d33',
-    //          confirmButtonText: `${dataLang?.aler_yes}`,
-    //          cancelButtonText:`${dataLang?.aler_cancel}`
-    //        }).then((result) => {
-    //          if (result.isConfirmed) {
-    //             sStatus(id)
-    //             var index = data.findIndex(x => x.id === id);
-    //             console.log(data[index]?.status);
-    //            if (index !== -1 && data[index].status === "0") {
-    //               sActive(data[index].status = "1")
-    //            }else if (index !== -1 && data[index].status === "1") {
-    //               sActive(data[index].status = "0")
-    //             }
-    //            sData([...data])
-    //          }
-    //        })
-    //      }
-    const _ToggleStatus = (id) => {
-        Swal.fire({
-            title: `${"Thay đổi trạng thái"}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Xác định trạng thái mới
-                const index = data.findIndex((x) => x.id === id);
-                const newStatus = data[index].status === "0" ? "1" : "0";
-                // Gửi yêu cầu cập nhật trạng thái lên server
-                _ServerSending(id, newStatus);
-                sActive(newStatus);
-                // Không cần cập nhật trạng thái trên giao diện ngay tại đây
-            }
-        });
+    const _ToggleStatus = () => {
+        const index = data.findIndex((x) => x.id === isId);
+        const newStatus = data[index].status === "0" ? "1" : "0";
+
+        _ServerSending(isId, newStatus);
+
+        sActive(newStatus);
+
+        handleQueryId({ status: false });
     };
+
     const _ServerSending = (id, newStatus) => {
-        // let id = status
         Axios(
             "POST",
             `${`/api_web/Api_purchases/updateStatus/${id}/${newStatus}?csrf_protection=true`}`,
@@ -314,38 +305,27 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    let { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", `${dataLang[message]}`);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("error", `${dataLang[message]}`);
                     }
                 }
+
                 sOnSending(false);
+
                 _ServerFetching();
+
                 _ServerFetching_group();
             }
         );
     };
 
-    // useEffect(() => {
-    //     onSending && _ServerSending()
-    // }, [onSending]);
     useEffect(() => {
         active != null && sOnSending(true);
     }, [active != null]);
-    // useEffect(()=>{
-    //   stt != undefined && sOnSending(true)
-    // },[stt])
-    // useEffect(()=>{
-    //    sOnSending(true)
-    // },[status])
+
     const multiDataSet = [
         {
             columns: [
@@ -463,13 +443,6 @@ const Index = (props) => {
             ]),
         },
     ];
-
-    const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
-    };
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>
@@ -853,7 +826,7 @@ const Index = (props) => {
                                                 {e?.status == "1" ? (
                                                     <div
                                                         className="border border-green-500 px-2 py-1 rounded text-green-500 hover:bg-green-500 hover:text-white font-normal flex justify-center  items-center gap-1 3xl:text-[16px] 2xl:text-[14px] xl:text-[10px] text-[8px]  transition-all duration-300 ease-in-out"
-                                                        onClick={() => _ToggleStatus(e?.id)}
+                                                        onClick={() => handleQueryId({ id: e?.id, status: true })}
                                                     >
                                                         Đã duyệt{" "}
                                                         <TickCircle
@@ -865,7 +838,7 @@ const Index = (props) => {
                                                 ) : (
                                                     <div
                                                         className="border border-red-500 3xl:px-2 px-0 py-1 rounded text-red-500 hover:bg-red-500 hover:text-white  font-normal flex justify-center items-center gap-1 3xl:text-[16px] 2xl:text-[13px] xl:text-[10px] text-[8px]   transition-all duration-300 ease-in-out "
-                                                        onClick={() => _ToggleStatus(e?.id)}
+                                                        onClick={() => handleQueryId({ id: e?.id, status: true })}
                                                     >
                                                         Chưa duyệt <TickCircle size={22} />
                                                     </div>
@@ -909,18 +882,15 @@ const Index = (props) => {
                                                 </div>
                                             </h6>
                                             <div className="pl-2 py-2.5 col-span-1 flex space-x-2 justify-center">
-                                                <BtnTacVu
-                                                    type="purchases"
-                                                    order={e?.order_status}
+                                                <BtnAction
+                                                    onRefresh={_ServerFetching.bind(this)}
                                                     onRefreshGroup={_ServerFetching_group.bind(this)}
                                                     dataLang={dataLang}
-                                                    id={e.id}
-                                                    name={e.name}
-                                                    code={e.code}
-                                                    onRefresh={_ServerFetching.bind(this)}
+                                                    id={e?.id}
+                                                    order={e?.order_status}
                                                     status={e?.status}
-                                                    keepTooltipInside=".tooltipBoundary"
-                                                    className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px] hover:scale-x-105 hover:bg-slate-200 transition-all ease-in-out"
+                                                    type="purchases"
+                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                 />
                                             </div>
                                         </div>
@@ -955,9 +925,19 @@ const Index = (props) => {
                     </div>
                 )}
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_STATUS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={_ToggleStatus}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };
+
 const TabStatus = React.memo((props) => {
     const router = useRouter();
     return (
@@ -977,151 +957,6 @@ const TabStatus = React.memo((props) => {
                 {props?.total > 0 && props?.total}
             </span>
         </button>
-    );
-});
-const BtnTacVu = React.memo((props) => {
-    const [openTacvu, sOpenTacvu] = useState(false);
-    const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [openDetail, sOpenDetail] = useState(false);
-    const router = useRouter();
-
-    const [openAction, setOpenAction] = useState(false);
-    const [dataCompany, setDataCompany] = useState();
-    const [data, setData] = useState();
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: props.dataLang[message],
-                            });
-                            props.onRefresh && props.onRefresh();
-                            props.onRefreshGroup && props.onRefreshGroup();
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: props.dataLang[message],
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    };
-    const handleClick = () => {
-        if (props?.order?.status != "purchase_ordered") {
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.purchases_ordered_cant_edit}`,
-            });
-        } else if (props?.status === "1") {
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.confirmed_cant_edit}`,
-            });
-        } else {
-            // router.push(`/purchase_order/purchases/form?id=${props.id}`);
-            router.push(`${routerPurchases.form}?id=${props.id}`);
-        }
-    };
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    setData(db);
-                }
-            });
-        }
-    };
-    useEffect(() => {
-        openTacvu && fetchDataSettingsCompany();
-    }, [openTacvu]);
-
-    return (
-        <div>
-            <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className}>
-                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
-                        <IconDown size={12} />
-                    </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit `}
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-                // open={open || openDetail || openBom}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        {/* <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
-                        <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
-                        <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" /> */}
-                        <button
-                            onClick={handleClick}
-                            className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <BiEdit
-                                size={20}
-                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-sky-500">
-                                {props.dataLang?.purchase_editVoites || "purchase_editVoites"}
-                            </p>
-                        </button>
-                        <FilePDF
-                            props={props}
-                            openAction={openTacvu}
-                            setOpenAction={sOpenTacvu}
-                            dataCompany={dataCompany}
-                            data={data}
-                            // type="purchases"
-                        />
-
-                        <button
-                            onClick={_HandleDelete.bind(this, props.id)}
-                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <RiDeleteBin6Line
-                                size={20}
-                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}
-                            </p>
-                        </button>
-                    </div>
-                </div>
-            </Popup>
-        </div>
     );
 });
 

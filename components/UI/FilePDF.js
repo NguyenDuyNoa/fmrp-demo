@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import moment from "moment";
-import { upperCase } from "lodash";
+
 import {
     bottomForm,
     styleMarginChild,
@@ -41,14 +41,16 @@ const FilePDF = ({
 
     // In hoa chữ cái đầu
     const words = data?.total_amount_word?.split(" ");
+
     const capitalizedWords = words?.map((word) => {
         if (word.length > 0) {
             return word?.charAt(0)?.toUpperCase() + word?.slice(1);
         }
         return word;
     });
-    const capitalizedTotalAmountWord = capitalizedWords?.join(" ");
 
+    const capitalizedTotalAmountWord = capitalizedWords?.join(" ");
+    //Báo giá, đơn hàng bán
     const docDefinition = {
         info: {
             title: `${
@@ -123,12 +125,6 @@ const FilePDF = ({
                             (props?.type === "price_quote" && uppercaseText("bảng báo giá", "contentTitle")) ||
                             (props?.type === "sales_product" && uppercaseText("đơn hàng bán", "contentTitle")),
                     },
-                    // {
-                    //     text:
-                    //         (props?.type === "price_quote" && `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`) ||
-                    //         (props?.type === "sales_product" && `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`),
-                    //     style: "contentDate",
-                    // },
                 ],
                 margin: [0, 8, 0, 0],
             },
@@ -472,7 +468,7 @@ const FilePDF = ({
             },
         },
     };
-
+    ///phiếu giao hàng
     const docDefinitionDeliveryFull = {
         info: {
             title: `${props?.type === "deliveryReceipt" && `Phiếu Giao Hàng - ${data?.reference_no}`}`,
@@ -2277,6 +2273,7 @@ const FilePDF = ({
         },
     };
 
+    ///kế hoạch nội bộ
     const docDefinitionInternalPlan = {
         pageOrientation: "portrait",
         info: {
@@ -2495,79 +2492,949 @@ const FilePDF = ({
         },
     };
 
-    const handlePrintPdf = (type) => {
-        if (
-            (props?.type == "sales_product" || props?.type == "price_quote") &&
-            data !== undefined &&
-            dataCompany !== undefined
-        ) {
-            const pdfGenerator = pdfMake.createPdf(docDefinition);
-            pdfGenerator.open((blob) => {
-                const url = URL.createObjectURL(blob);
-                setUrl(url);
-            });
-            setOpenAction(false);
-        }
-        if (
-            type == "fullStyle" &&
-            data !== undefined &&
-            dataCompany !== undefined &&
-            props?.type == "deliveryReceipt"
-        ) {
-            const pdfGenerator = pdfMake.createPdf(docDefinitionDeliveryFull);
-            pdfGenerator.open((blob) => {
-                const url = URL.createObjectURL(blob);
-                setUrl(url);
-            });
-            setOpenAction(false);
-        }
-        if (type == "noprice" && data !== undefined && dataCompany !== undefined && props?.type == "deliveryReceipt") {
-            const pdfGenerator = pdfMake.createPdf(docDefinitionDeliveryNoPrice);
-            console.log(data);
-            pdfGenerator.open((blob) => {
-                const url = URL.createObjectURL(blob);
-                setUrl(url);
-            });
-            setOpenAction(false);
-        }
+    /// yêu cầu mua hàng
+    const docDefinitionPurchases = {
+        info: {
+            title: `${
+                props?.type === "purchases" && `${props.dataLang?.purchase_title || "purchase_title"} - ${data?.code}`
+            }`,
+            author: "Foso",
+            subject: "Quotation",
+            keywords: "PDF",
+        },
+        pageOrientation: "portrait",
+        content: [
+            {
+                columns: [
+                    {
+                        width: "30%",
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100],
+                            },
+                        ],
+                    },
+                    {
+                        width: "70%",
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: "headerInfo",
+                            },
+                            {
+                                text: dataCompany?.company_address
+                                    ? `${props.dataLang?.PDF_adress || "PDF_adress"} : ${dataCompany?.company_address}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: dataCompany?.company_phone_number
+                                    ? `${props.dataLang?.PDF_tel || "PDF_tel"}: ${dataCompany?.company_phone_number}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : "",
+                                        style: "headerInfoText",
+                                    },
+                                    "    ",
+                                    {
+                                        text: dataCompany?.company_website
+                                            ? `Website: ${dataCompany?.company_website}`
+                                            : "",
+                                        style: "headerInfoText",
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0],
+                            },
+                        ],
+                        margin: [0, -20, 0, 5],
+                    },
+                ],
+                columnGap: 10,
+            },
+            {
+                canvas: [
+                    {
+                        type: "line",
+                        x1: 0,
+                        y1: 0,
+                        x2: 520,
+                        y2: 0,
+                        lineWidth: 1,
+                        color: "#e2e8f0",
+                    },
+                ],
+            },
+            {
+                stack: [
+                    {
+                        text:
+                            props?.type === "purchases" &&
+                            uppercaseText(`${props.dataLang?.purchase_title || "purchase_title"}`, "contentTitle"),
+                    },
+                ],
+                margin: [0, 8, 0, 0],
+            },
+            {
+                columns: [
+                    {
+                        text: "",
+                        width: "80%",
+                    },
+                    {
+                        width: "20%",
+                        stack: [
+                            {
+                                text: [
+                                    {
+                                        text:
+                                            props?.type === "purchases" &&
+                                            `${props.dataLang?.purchase_code + ": " || "purchase_code"}`,
 
-        ///Trả lại hàng bán
-        if (type == "fullStyle" && data !== undefined && dataCompany !== undefined && props?.type == "returnSales") {
-            const pdfGenerator = pdfMake.createPdf(docDefinitionReturnSalesFull);
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: props?.type === "purchases" && `${data?.code}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 10, 0, 2],
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: "Ngày chứng từ: ",
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 2, 0, 2],
+                            },
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+            {
+                text: [
+                    {
+                        text:
+                            props?.type === "purchases"
+                                ? `${props.dataLang?.purchase_planNumber + ": " || "purchase_planNumber"}`
+                                : "",
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text:
+                            props?.type === "purchases"
+                                ? `${data?.reference_no != null ? data?.reference_no : ""}`
+                                : "",
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 0, 0, 2],
+            },
+
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.purchase_note + ": " || "purchase_note"}`,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10],
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths: ["auto", "auto", "auto", "auto", "auto", "*"],
+                    // widths: props?.type== "purchases" && [17, 200,30,50,'*'],
+                    body: [
+                        // Header row
+                        props?.type == "purchases" && [
+                            uppercaseTextHeaderTabel("STT", "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_items || "purchase_items"}`,
+                                "headerTable",
+                                "left"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_variant || "purchase_variant"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(`${"SL"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_note || "purchase_note"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                        ],
+                        // Data rows
+
+                        ...(data && props?.type == "purchases" && data?.items?.length > 0
+                            ? data?.items.map((item, index) => {
+                                  return [
+                                      {
+                                          text: `${index + 1}`,
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.item?.name ? item?.item?.name : "",
+                                          fontSize: 11,
+                                          noWrap: true,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.item?.product_variation
+                                              ? ` ${item?.item?.product_variation}`
+                                              : "",
+                                          fontSize: 10,
+                                          noWrap: true,
+                                          alignment: "left",
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.note ? `${item?.note}` : "",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                  ];
+                              })
+                            : ""),
+
+                        props?.type == "purchases"
+                            ? [
+                                  {
+                                      text: `${props.dataLang?.purchase_totalItem || "purchase_totalItem"}`,
+                                      bold: true,
+                                      colSpan: 2,
+                                      fontSize: 10,
+                                      margin: styleMarginChildTotal,
+                                  },
+                                  "",
+                                  {
+                                      text: `${formatNumber(data?.total_item)}`,
+                                      bold: true,
+                                      alignment: "right",
+                                      colSpan: 4,
+                                      fontSize: 10,
+                                      margin: styleMarginChildTotal,
+                                  },
+                                  "",
+                                  "",
+                                  "",
+                              ]
+                            : ["", ""],
+                        props?.type == "purchases"
+                            ? [
+                                  {
+                                      text: `${props.dataLang?.purchase_totalCount || "purchase_totalCount"}`,
+                                      bold: true,
+                                      colSpan: 2,
+                                      margin: styleMarginChildTotal,
+                                      fontSize: 10,
+                                  },
+                                  "",
+                                  {
+                                      text: `${formatNumber(data?.total_item_quantity)}`,
+                                      bold: true,
+                                      alignment: "right",
+                                      colSpan: 4,
+                                      fontSize: 10,
+                                      margin: styleMarginChildTotal,
+                                  },
+                                  "",
+                                  "",
+                                  "",
+                              ]
+                            : ["", ""],
+                    ],
+                },
+            },
+            {
+                columns: [
+                    {
+                        text: "",
+                        width: "50%",
+                    },
+                    {
+                        width: "50%",
+                        stack: [
+                            {
+                                text: currentDate,
+                                style: "dateText",
+                                alignment: "center",
+                                fontSize: 10,
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_userMaker || "PDF_userMaker"}`,
+                                style: "signatureText",
+                                alignment: "center",
+                                fontSize: 10,
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: "signatureText",
+                                alignment: "center",
+                                fontSize: 10,
+                            },
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+        ],
+        styles: styles,
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`,
+            },
+        },
+    };
+
+    ///Đơn đặt hàng po
+    const docDefinitionOrder = {
+        info: {
+            title: `${`${props.dataLang?.purchase_order || "purchase_order"} - ${data?.code}`}`,
+            author: "Foso",
+            subject: "Quotation",
+            keywords: "PDF",
+        },
+        pageOrientation: "portrait",
+        content: [
+            {
+                columns: [
+                    {
+                        width: "30%",
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100],
+                            },
+                        ],
+                    },
+                    {
+                        width: "70%",
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: "headerInfo",
+                            },
+                            {
+                                text: dataCompany?.company_address
+                                    ? `${props.dataLang?.PDF_adress || "PDF_adress"} : ${dataCompany?.company_address}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: dataCompany?.company_phone_number
+                                    ? `${props.dataLang?.PDF_tel || "PDF_tel"}: ${dataCompany?.company_phone_number}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : "",
+                                        style: "headerInfoText",
+                                    },
+                                    "    ",
+                                    {
+                                        text: dataCompany?.company_website
+                                            ? `Website: ${dataCompany?.company_website}`
+                                            : "",
+                                        style: "headerInfoText",
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0],
+                            },
+                        ],
+                        margin: [0, -20, 0, 5],
+                    },
+                ],
+                columnGap: 10,
+            },
+            {
+                canvas: [
+                    {
+                        type: "line",
+                        x1: 0,
+                        y1: 0,
+                        x2: 520,
+                        y2: 0,
+                        lineWidth: 1,
+                        color: "#e2e8f0",
+                    },
+                ],
+            },
+            {
+                stack: [
+                    {
+                        text: uppercaseText(`${props.dataLang?.purchase_order || "purchase_order"}`, "contentTitle"),
+                    },
+                ],
+                margin: [0, 8, 0, 0],
+            },
+
+            {
+                columns: [
+                    {
+                        text: "",
+                        width: "80%",
+                    },
+                    {
+                        width: "20%",
+                        stack: [
+                            {
+                                text: [
+                                    {
+                                        text: `${props.dataLang?.purchase_code + ": " || "purchase_code"}`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${data?.code}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 10, 0, 2],
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: `${
+                                            props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            "purchase_order_table_dayvoucers"
+                                        }`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 2, 0, 2],
+                            },
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+            {
+                text: [
+                    {
+                        text:
+                            props?.type === "order"
+                                ? `${
+                                      props.dataLang?.purchase_order_table_supplier + ": " ||
+                                      "purchase_order_table_supplier"
+                                  }`
+                                : "",
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: props?.type === "order" ? `${data?.supplier_name}` : "",
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
+            {
+                text: [
+                    {
+                        text: `${
+                            props.dataLang?.purchase_order_detail_delivery_date + ": " ||
+                            "purchase_order_detail_delivery_date"
+                        }`,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${moment(data?.delivery_date).format("DD/MM/YYYY")}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 0, 0, 2],
+            },
+
+            {
+                text: [
+                    {
+                        text:
+                            props?.type === "order"
+                                ? `${
+                                      props.dataLang?.purchase_order_table_number + ": " ||
+                                      "purchase_order_table_number"
+                                  }`
+                                : "",
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: props?.type === "order" ? `${data?.purchases?.map((e) => e.code).join(", ")}` : "",
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
+
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.purchase_order_note + ": " || "purchase_order_note"} `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10],
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    // widths:  props?.type== "order" &&  [17,70,27,'*','auto',17,'auto',27,65,"*"],
+                    // widths:  props?.type== "order" &&  ['auto','*','auto','auto','auto','auto','auto','auto','auto','*'],
+                    widths: props?.type == "order" && [
+                        "auto",
+                        "auto",
+                        // "auto",
+                        "auto",
+                        "auto",
+                        "auto",
+                        "auto",
+                        "auto",
+                        "auto",
+                        "*",
+                    ],
+                    // widths: props?.type== "purchases" && [17, 200,30,50,173],
+
+                    body: [
+                        // Header row
+                        [
+                            uppercaseTextHeaderTabel("STT", "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_items || "purchase_items"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_variant || "purchase_variant"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel("ĐVT", "headerTable", "center"),
+                            uppercaseTextHeaderTabel("SL", "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${
+                                    props.dataLang?.purchase_order_detail_unit_price ||
+                                    "purchase_order_detail_unit_price"
+                                }`,
+                                "headerTable",
+                                "center"
+                            ),
+                            // uppercaseTextHeaderTabel(
+                            //     "% CK",
+                            //     "headerTable",
+                            //     "center"
+                            // ),
+                            // uppercaseTextHeaderTabel(
+                            //     "ĐGSCK",
+                            //     "headerTable",
+                            //     "center"
+                            // ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${
+                                    props.dataLang?.purchase_order_detail_into_money ||
+                                    "purchase_order_detail_into_money"
+                                }`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_order_note || "purchase_order_note"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                        ],
+
+                        // Data rows
+                        ...(data && props?.type == "order" && data?.item.length > 0
+                            ? data?.item.map((item, index) => {
+                                  return [
+                                      {
+                                          text: `${index + 1}`,
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.item?.name ? item?.item?.name : "",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.item?.product_variation
+                                              ? ` ${item?.item?.product_variation}`
+                                              : "",
+                                          fontSize: 9,
+                                          italics: false,
+                                          //   margin: [0, 5, 0, 0],
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.price_after_discount
+                                              ? `${formatNumber(item?.price_after_discount)}`
+                                              : "",
+                                          alignment: "right",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      //   {
+                                      //       text: item?.discount_percent
+                                      //           ? `${
+                                      //                 item?.discount_percent + "%"
+                                      //             }`
+                                      //           : "",
+                                      //       alignment: "center",
+                                      //       fontSize: 10,
+                                      //       margin: styleMarginChild,
+                                      //   },
+                                      //   {
+                                      //       text: item?.price_after_discount
+                                      //           ? `${formatNumber(
+                                      //                 item?.price_after_discount
+                                      //             )}`
+                                      //           : "",
+                                      //       alignment: "right",
+                                      //       fontSize: 10,
+                                      //       margin: styleMarginChild,
+                                      //   },
+                                      {
+                                          text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.amount ? `${formatNumber(item?.amount)}` : "",
+                                          alignment: "right",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.note ? `${item?.note}` : "",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                  ];
+                              })
+                            : ""),
+                        [
+                            {
+                                text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_price)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"
+                                }`,
+                                bold: true,
+                                margin: styleMarginChildTotal,
+                                colSpan: 2,
+                                fontSize: 10,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_discount)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    "purchase_order_detail_money_after_discount"
+                                }`,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_price_after_discount)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"
+                                }`,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_tax)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_into_money ||
+                                    "purchase_order_detail_into_money"
+                                }`,
+                                bold: true,
+                                margin: styleMarginChildTotal,
+                                colSpan: 2,
+                                fontSize: 10,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_amount)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                    ],
+                },
+            },
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.PDF_price || "PDF_price"} : `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: capitalizedTotalAmountWord,
+                        fontSize: 10,
+                        bold: true,
+                    },
+                ],
+                margin: [0, 5, 0, 0],
+            },
+            {
+                columns: [
+                    {
+                        text: "",
+                        width: "50%",
+                    },
+                    {
+                        width: "50%",
+                        stack: [
+                            {
+                                text: currentDate,
+                                style: "dateText",
+                                alignment: "center",
+                                fontSize: 10,
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_userMaker || "PDF_userMaker"}`,
+                                style: "signatureText",
+                                alignment: "center",
+                                fontSize: 10,
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: "signatureText",
+                                alignment: "center",
+                                fontSize: 10,
+                            },
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+        ],
+        styles: styles,
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`,
+            },
+        },
+    };
+
+    const handlePrintPdf = (type) => {
+        const data = {
+            fullTitle: {
+                sales_product: docDefinition,
+                price_quote: docDefinition,
+                deliveryReceipt: docDefinitionDeliveryFull,
+                returnSales: docDefinitionReturnSalesFull,
+                internal_plan: docDefinitionInternalPlan,
+                purchases: docDefinitionPurchases,
+                order: docDefinitionOrder,
+                serviceVoucher: "",
+            },
+
+            noprice: {
+                deliveryReceipt: docDefinitionDeliveryNoPrice,
+                returnSales: docDefinitionReturnSalesNoPrice,
+            },
+        };
+
+        const dataKeys = Object.keys(data);
+
+        if (dataKeys.includes(type) && data !== undefined && dataCompany !== undefined) {
+            const pdfGenerator = pdfMake.createPdf(data[type][props?.type]);
+
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);
+
                 setUrl(url);
             });
-            setOpenAction(false);
-        }
-        if (type == "noprice" && data !== undefined && dataCompany !== undefined && props?.type == "returnSales") {
-            const pdfGenerator = pdfMake.createPdf(docDefinitionReturnSalesNoPrice);
-            pdfGenerator.open((blob) => {
-                const url = URL.createObjectURL(blob);
-                setUrl(url);
-            });
-            setOpenAction(false);
-        }
-        if (data !== undefined && dataCompany !== undefined && props?.type == "internal_plan") {
-            const pdfGenerator = pdfMake.createPdf(docDefinitionInternalPlan);
-            pdfGenerator.open((blob) => {
-                const url = URL.createObjectURL(blob);
-                setUrl(url);
-            });
+
             setOpenAction(false);
         }
     };
+
+    const fullTitle = ["sales_product", "price_quote", "purchases", "internal_plan", "order", "serviceVoucher"];
+
+    const doubleAction = ["deliveryReceipt", "returnSales"];
+
     return (
         <>
-            {/* <button
-                onClick={handlePrintPdf}
-                className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded w-full"
-            >
-                {props?.dataLang?.btn_table_print || "btn_table_print"}
-            </button> */}
-            {props?.type == "sales_product" && (
+            {fullTitle.includes(props?.type) && (
                 <button
-                    onClick={handlePrintPdf}
+                    onClick={() => handlePrintPdf("fullTitle")}
                     className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full"
                 >
                     <VscFilePdf
@@ -2579,21 +3446,7 @@ const FilePDF = ({
                     </p>
                 </button>
             )}
-            {props?.type == "price_quote" && (
-                <button
-                    onClick={handlePrintPdf}
-                    className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full"
-                >
-                    <VscFilePdf
-                        size={20}
-                        className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
-                    />
-                    <p className="group-hover:text-[#65a30d]">
-                        {props?.dataLang?.btn_table_print || "btn_table_print"}
-                    </p>
-                </button>
-            )}
-            {props?.type == "deliveryReceipt" && (
+            {doubleAction.includes(props?.type) && (
                 <React.Fragment>
                     <div className="flex justify-center items-center my-3">
                         <button
@@ -2605,7 +3458,7 @@ const FilePDF = ({
                             </span>
                         </button>
                         <button
-                            onClick={() => handlePrintPdf("fullStyle")}
+                            onClick={() => handlePrintPdf("fullTitle")}
                             className="relative hover:-translate-y-[3px] transition-all ease-linear inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
                         >
                             <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
@@ -2614,42 +3467,6 @@ const FilePDF = ({
                         </button>
                     </div>
                 </React.Fragment>
-            )}
-            {props?.type == "returnSales" && (
-                <React.Fragment>
-                    <div className="flex justify-center items-center my-3">
-                        <button
-                            onClick={() => handlePrintPdf("noprice")}
-                            className="relative hover:-translate-y-[3px] transition-all ease-linear inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
-                        >
-                            <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                                {props.dataLang?.option_prin_notprice || "option_prin_notprice"}
-                            </span>
-                        </button>
-                        <button
-                            onClick={() => handlePrintPdf("fullStyle")}
-                            className="relative hover:-translate-y-[3px] transition-all ease-linear inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
-                        >
-                            <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                                {props.dataLang?.option_prin_price || "option_prin_price"}
-                            </span>
-                        </button>
-                    </div>
-                </React.Fragment>
-            )}
-            {props?.type == "internal_plan" && (
-                <button
-                    onClick={handlePrintPdf}
-                    className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full"
-                >
-                    <VscFilePdf
-                        size={20}
-                        className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
-                    />
-                    <p className="group-hover:text-[#65a30d]">
-                        {props?.dataLang?.btn_table_print || "btn_table_print"}
-                    </p>
-                </button>
             )}
         </>
     );

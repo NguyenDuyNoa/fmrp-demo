@@ -1,11 +1,8 @@
-import React, { useRef, useState } from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import ModalImage from "react-modal-image";
+import React, { useState, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { NumericFormat } from "react-number-format";
 import {
     Grid6 as IconExcel,
     Filter as IconFilter,
@@ -13,9 +10,7 @@ import {
     SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
     ArrowCircleDown,
-    Minus,
     Edit as IconEdit,
-    Add,
     Trash as IconDelete,
     TickCircle,
     Refresh2,
@@ -25,20 +20,13 @@ import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
 
-import DatePicker, { registerLocale } from "react-datepicker";
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
+import { registerLocale } from "react-datepicker";
 
 import Popup from "reactjs-popup";
 import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import Pagination from "/components/UI/pagination";
@@ -46,51 +34,57 @@ import Pagination from "/components/UI/pagination";
 import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
-import Swal from "sweetalert2";
-import { v4 as uuidv4 } from "uuid";
 import ReactExport from "react-data-export";
-import { useEffect } from "react";
+
 import FilePDF from "../FilePDF";
-import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/detail";
 import Popup_servie from "./(popup)/popup";
-import { useSelector } from "react-redux";
+
+import useStatusExprired from "@/hooks/useStatusExprired";
+
+import useToast from "@/hooks/useToast";
+import BtnAction from "@/components/UI/BtnAction";
+
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const isShow = useToast();
+
     const router = useRouter();
 
     const [data, sData] = useState([]);
+
     const [dataExcel, sDataExcel] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
 
-    const [onSending, sOnSending] = useState(false);
+    const _HandleFresh = () => sOnFetching(true);
+
+    const trangthaiExprired = useStatusExprired();
 
     const [totalItems, sTotalItems] = useState([]);
+
     const [total, sTotal] = useState({});
 
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
 
     const [listBr, sListBr] = useState([]);
 
     const [listDs, sListDs] = useState();
+
     const [dataCode, sDataCode] = useState([]);
 
     const [idCode, sIdCode] = useState(null);
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null,
@@ -102,6 +96,7 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -128,7 +123,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
+                    let { rResult, output, rTotal } = response.data;
                     sData(rResult);
                     sTotalItems(output);
                     sTotal(rTotal);
@@ -152,19 +147,19 @@ const Index = (props) => {
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
+                let { isSuccess, result } = response.data;
                 sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
             }
         });
         Axios("GET", `/api_web/Api_service/serviceCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
+                let { isSuccess, result } = response.data;
                 sDataCode(result?.map((e) => ({ label: e?.code, value: e?.id })));
             }
         });
         Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sListUser(rResult);
             }
         });
@@ -186,7 +181,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, result } = response?.data;
+                    let { isSuccess, result } = response?.data;
                     sDataCode(result?.map((e) => ({ label: e?.code, value: e?.id })));
                 }
             }
@@ -209,7 +204,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sListDs(data);
                 }
                 sOnFetching(false);
@@ -371,8 +366,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     return (
         <React.Fragment>
@@ -774,7 +767,7 @@ const Index = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
-                                                                <BtnTacVu
+                                                                {/* <BtnTacVu
                                                                     type="serviceVoucher"
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGr={_ServerFetching_group.bind(this)}
@@ -782,6 +775,15 @@ const Index = (props) => {
                                                                     status_pay={e?.status_pay}
                                                                     id={e?.id}
                                                                     className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
+                                                                /> */}
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGr={_ServerFetching_group.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    status_pay={e?.status_pay}
+                                                                    type="serviceVoucher"
+                                                                    id={e?.id}
+                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
                                                             </div>
                                                         </div>
@@ -885,7 +887,7 @@ const BtnTacVu = React.memo((props) => {
         if (props?.id) {
             Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
                 if (!err) {
-                    var { data } = response.data;
+                    let { data } = response.data;
                     setDataCompany(data);
                 }
             });
@@ -893,7 +895,7 @@ const BtnTacVu = React.memo((props) => {
         if (props?.id) {
             Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
                 if (!err) {
-                    var db = response.data;
+                    let db = response.data;
                     setData(db);
                 }
             });
@@ -916,7 +918,7 @@ const BtnTacVu = React.memo((props) => {
             if (result.isConfirmed) {
                 Axios("DELETE", `/api_web/Api_service/service/${id}?csrf_protection=true`, {}, (err, response) => {
                     if (!err) {
-                        var { isSuccess, message } = response.data;
+                        let { isSuccess, message } = response.data;
                         if (isSuccess) {
                             Toast.fire({
                                 icon: "success",
