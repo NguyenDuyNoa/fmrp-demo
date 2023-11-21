@@ -1,38 +1,47 @@
-import React, { useState } from "react";
 import Select from "react-select";
-import BtnAction from "../../../components/UI/BtnAction";
-import TabFilter from "../../../components/UI/TabFilter";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
-import Swal from "sweetalert2";
-import ReactExport from "react-data-export";
+import React, { useState, useEffect } from "react";
+
 import Head from "next/head";
 import Link from "next/link";
-import moment from "moment/moment";
-import Datepicker from "react-tailwindcss-datepicker";
-import { useRouter } from "next/router";
-import { _ServerInstance as Axios } from "/services/axios";
-import { useEffect } from "react";
 import { debounce } from "lodash";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import moment from "moment/moment";
+import { useRouter } from "next/router";
+import ReactExport from "react-data-export";
+import Datepicker from "react-tailwindcss-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSelector } from "react-redux";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ModalImage from "react-modal-image";
-import ImageErrors from "components/UI/imageErrors";
-import PopupDetail from "./(popupDetail)/PopupDetail";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import { routerReturnSales } from "components/UI/router/sellingGoods";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
 import Popup_status from "./(popupDetail)/popupStatus";
-import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
+import PopupDetail from "./(popupDetail)/PopupDetail";
+
+import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
+
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import TabFilter from "@/components/UI/TabFilter";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { routerReturnSales } from "@/components/UI/router/sellingGoods";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const tabPage = router.query?.tab;
+
     const initsArr = {
         data: [],
         dataExcel: [],
@@ -41,6 +50,7 @@ const Index = (props) => {
         listClient: [],
         listStatus: [],
     };
+
     const initsId = {
         idBranch: null,
         idCode: null,
@@ -50,14 +60,26 @@ const Index = (props) => {
             endDate: null,
         },
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
+
+    const isShow = useToast();
+
     const [idFillter, sIdFillter] = useState(initsId);
+
     const [listData, sListData] = useState(initsArr);
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
+
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
 
     const _HandleSelectTab = (e) => {
@@ -66,6 +88,7 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -93,7 +116,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
+                    let { rResult, output, rTotal } = response?.data;
                     sListData((e) => ({
                         ...e,
                         data: rResult,
@@ -389,35 +412,32 @@ const Index = (props) => {
     const [onSending, sOnSending] = useState(false);
     const [data_export, sData_export] = useState([]);
 
-    const _HandleChangeInput = (id, checkedUn, type, value) => {
-        if (type === "browser") {
-            Swal.fire({
-                title: `${"Thay đổi trạng thái"}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText: `${dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const checked = value.target.checked;
-                    const warehousemanId = value.target.value;
-                    const dataChecked = {
-                        checked: checked,
-                        warehousemanId: warehousemanId,
-                        id: id,
-                        checkedpost: checkedUn,
-                    };
-                    sCheckedWare(dataChecked);
-                }
-                sListData((e) => ({ ...e, data: [...e.data] }));
-            });
+    const handleSaveStatus = () => {
+        if (isKeyState?.type === "browser") {
+            const checked = isKeyState.value.target.checked;
+            const warehousemanId = isKeyState.value.target.value;
+            const dataChecked = {
+                checked: checked,
+                warehousemanId: warehousemanId,
+                id: isKeyState?.id,
+                checkedpost: isKeyState?.checkedUn,
+            };
+            sCheckedWare(dataChecked);
+            sListData((e) => ({ ...e, data: [...e.data] }));
         }
+
+        handleQueryId({ status: false });
+    };
+
+    const _HandleChangeInput = (id, checkedUn, type, value) => {
+        handleQueryId({
+            status: true,
+            initialKey: { id, checkedUn, type, value },
+        });
     };
 
     const _ServerSending = () => {
-        var data = new FormData();
+        let data = new FormData();
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
         Axios(
@@ -429,14 +449,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message, alert_type, data_export } = response.data;
+                    let { isSuccess, message, alert_type, data_export } = response.data;
                     if (isSuccess) {
-                        ToatstNotifi(alert_type, dataLang[message]);
+                        isShow(alert_type, dataLang[message]);
                         setTimeout(() => {
                             sOnFetching(true);
                         }, 300);
                     } else {
-                        ToatstNotifi("error", dataLang[message]);
+                        isShow("error", dataLang[message]);
                     }
                     if (data_export?.length > 0) {
                         sData_export(data_export);
@@ -1034,6 +1054,16 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"returnSales"}
+                title={TITLE_STATUS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleSaveStatus}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

@@ -1,33 +1,32 @@
-import React, { useRef, useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { _ServerInstance as Axios } from "/services/axios";
-import { v4 as uuidv4 } from "uuid";
-import dynamic from "next/dynamic";
-import Loading from "components/UI/loading";
-
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
-import DatePicker from "react-datepicker";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import Select, { components, MenuListProps } from "react-select";
-
-import { Add, Trash as IconDelete, Image as IconImage, MaximizeCircle, Minus, TableDocument } from "iconsax-react";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
-import { NumericFormat } from "react-number-format";
-import Link from "next/link";
-import moment from "moment/moment";
 import Popup from "reactjs-popup";
-import { useSelector } from "react-redux";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import { routerReturnSales } from "components/UI/router/sellingGoods";
+import moment from "moment/moment";
+import Select from "react-select";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/router";
+import { MdClear } from "react-icons/md";
+import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
+import React, { useState, useEffect } from "react";
+import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import { NumericFormat } from "react-number-format";
+
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { routerReturnSales } from "@/components/UI/router/sellingGoods";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
 
 const Index = (props) => {
     const router = useRouter();
+
     const id = router.query?.id;
 
     const initsFetching = {
@@ -42,6 +41,7 @@ const Index = (props) => {
         onSending: false,
         load: false,
     };
+
     const initsErors = {
         errClient: false,
         errTreatment: false,
@@ -52,6 +52,7 @@ const Index = (props) => {
         errPrice: false,
         errSurvivePrice: false,
     };
+
     const initsArr = {
         dataBranch: [],
         dataItems: [],
@@ -60,6 +61,7 @@ const Index = (props) => {
         dataTreatmentr: [],
         dataWarehouse: [],
     };
+
     const initsValue = {
         code: "",
         date: new Date(),
@@ -68,22 +70,35 @@ const Index = (props) => {
         idTreatment: null,
         note: "",
     };
+
     const dataLang = props?.dataLang;
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
+    const isShow = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
+    const trangthaiExprired = useStatusExprired();
+
     const [fetChingData, sFetchingData] = useState(initsFetching);
+
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
+
     const [generalTax, sGeneralTax] = useState();
+
     const [generalDiscount, sGeneralD] = useState(0);
+
     const [dataSelect, sDataSelect] = useState(initsArr);
+
     const [idChange, sIdChange] = useState(initsValue);
+
     const [errors, sErrors] = useState(initsErors);
+
     const [listData, sListData] = useState([]);
-    const [initsId, sInitsId] = useState({
-        idParentAdd: null,
-        idChildAdd: null,
-    });
+
     const resetAllStates = () => {
         sIdChange(initsValue);
         sErrors(initsErors);
@@ -95,9 +110,10 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         sFetchingData((e) => ({ ...e, onLoading: true }));
+
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { result } = response.data;
+                let { result } = response.data;
                 sDataSelect((e) => ({
                     ...e,
                     dataBranch: result?.map((e) => ({ label: e.name, value: e.id })),
@@ -105,9 +121,10 @@ const Index = (props) => {
                 sFetchingData((e) => ({ ...e, onLoading: false }));
             }
         });
+
         Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sDataSelect((e) => ({
                     ...e,
                     dataTasxes: rResult?.map((e) => ({
@@ -119,13 +136,14 @@ const Index = (props) => {
                 sFetchingData((e) => ({ ...e, onLoading: false }));
             }
         });
+
         Axios(
             "GET",
             "/api_web/Api_return_order/comboboxHandlingSolution/?csrf_protection=true",
             {},
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sDataSelect((e) => ({
                         ...e,
                         dataTreatmentr: data?.map((e) => ({
@@ -137,6 +155,7 @@ const Index = (props) => {
                 }
             }
         );
+
         sFetchingData((e) => ({ ...e, onFetching: false }));
     };
 
@@ -147,11 +166,15 @@ const Index = (props) => {
     const _ServerFetchingCondition = () => {
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
+                let data = response.data;
+
                 sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+
                 sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+
                 sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
+
             sFetchingData((e) => ({
                 ...e,
                 onFetchingCondition: true,
@@ -188,7 +211,7 @@ const Index = (props) => {
     const options = dataSelect.dataItems?.map((e) => ({
         label: `${e.name}
             <span style={{display: none}}>${e.code}</span>
-            <span style={{display: none}}>${e.product_variation} </span>
+            <span style={{display: none}}>${e.product_letiation} </span>
             <span style={{display: none}}>${e.serial} </span>
             <span style={{display: none}}>${e.lot} </span>
             <span style={{display: none}}>${e.expiration_date} </span>
@@ -201,6 +224,7 @@ const Index = (props) => {
         Axios("GET", `/api_web/Api_return_order/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let rResult = response.data;
+
                 sListData(
                     rResult?.items.map((e) => {
                         const child = e?.child.map((ce) => ({
@@ -236,7 +260,7 @@ const Index = (props) => {
                             matHang: {
                                 e: e?.item,
                                 label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                    e.item?.code + e.item?.product_letiation + e.item?.text_type + e.item?.unit_name
                                 }</span>`,
                                 value: e.item?.id,
                             },
@@ -294,7 +318,8 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
+                    let { result } = response.data.data;
+
                     sDataSelect((e) => ({
                         ...e,
                         dataItems: result,
@@ -302,11 +327,13 @@ const Index = (props) => {
                 }
             }
         );
+
         sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
     };
 
     const _ServerFetching_Client = () => {
         sFetchingData((e) => ({ ...e, onLoading: true }));
+
         Axios(
             "GET",
             "/api_web/api_client/client_option/?csrf_protection=true",
@@ -317,7 +344,8 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    let { rResult } = response.data;
+
                     sDataSelect((e) => ({
                         ...e,
                         dataClient: rResult?.map((e) => ({ label: e.name, value: e.id })),
@@ -340,7 +368,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var result = response.data.rResult;
+                    let result = response.data.rResult;
                     sDataSelect((e) => ({
                         ...e,
                         dataWarehouse: result?.map((e) => ({
@@ -355,24 +383,30 @@ const Index = (props) => {
         sFetchingData((e) => ({ ...e, onFetchingWarehouser: false }));
     };
 
+    const handleSaveStatus = () => {
+        isKeyState?.sDataSelect((e) => ({ ...e, dataItems: [] }));
+        isKeyState?.sListData([]);
+        isKeyState?.sId(isKeyState?.value);
+        isKeyState?.idEmty && isKeyState?.idEmty(null);
+        handleQueryId({ status: false });
+    };
+
+    const handleCancleStatus = () => {
+        isKeyState?.sId({ ...isKeyState?.id });
+        handleQueryId({ status: false });
+    };
+
     const checkListData = (value, sDataSelect, sListData, sId, id, idEmty) => {
-        return Swal.fire({
-            title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sDataSelect((e) => ({ ...e, dataItems: [] }));
-                sListData([]);
-                sId(value);
-                idEmty && idEmty(null);
-            } else {
-                sId({ ...id });
-            }
+        handleQueryId({
+            status: true,
+            initialKey: {
+                value,
+                sDataSelect,
+                sListData,
+                sId,
+                id,
+                idEmty,
+            },
         });
     };
 
@@ -380,28 +414,39 @@ const Index = (props) => {
         const sIdClient = (e) => {
             sIdChange((list) => ({ ...list, idClient: e }));
         };
+
         const sIdBranch = (e) => {
             sIdChange((list) => ({ ...list, idBranch: e }));
         };
+
         const onChange = {
             code: () => sIdChange((e) => ({ ...e, code: value.target.value })),
+
             date: () => sIdChange((e) => ({ ...e, date: moment(value).format("YYYY-MM-DD HH:mm:ss") })),
+
             startDate: () => sIdChange((e) => ({ ...e, date: new Date() })),
+
             idClient: () => {
                 if (idChange.idClient != value)
                     if (listData?.length > 0) {
                         checkListData(value, sDataSelect, sListData, sIdClient, idChange.idClient);
                     } else {
                         sIdChange((e) => ({ ...e, idClient: value }));
+
                         sFetchingData((e) => ({ ...e, onFetchingItemsAll: true }));
+
                         if (value == null) {
                             sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
+
                             sDataSelect((e) => ({ ...e, dataItems: [] }));
                         }
                     }
             },
+
             treatment: () => sIdChange((e) => ({ ...e, idTreatment: value })),
+
             note: () => sIdChange((e) => ({ ...e, note: value.target.value })),
+
             branch: () => {
                 if (idChange.idBranch != value)
                     if (listData?.length > 0) {
@@ -416,8 +461,10 @@ const Index = (props) => {
                         }
                     }
             },
+
             generalTax: () => {
                 sGeneralTax(value);
+
                 if (listData?.length > 0) {
                     const newData = listData.map((e) => {
                         const newChild = e?.child.map((ce) => ({ ...ce, tax: value }));
@@ -426,6 +473,7 @@ const Index = (props) => {
                     sListData(newData);
                 }
             },
+
             generalDiscount: () => {
                 sGeneralD(value?.value);
                 if (listData?.length > 0) {
@@ -437,6 +485,7 @@ const Index = (props) => {
                 }
             },
         };
+
         onChange[type] && onChange[type]();
     };
 
@@ -446,7 +495,9 @@ const Index = (props) => {
 
     useEffect(() => {
         if (idChange.idBranch !== null) sErrors((prevErrors) => ({ ...prevErrors, errBranch: false }));
+
         if (idChange.idClient !== null) sErrors((prevErrors) => ({ ...prevErrors, errClient: false }));
+
         if (idChange.idTreatment !== null) sErrors((prevErrors) => ({ ...prevErrors, errTreatment: false }));
     }, [idChange.idBranch, idChange.idClient, idChange.idTreatment]);
 
@@ -511,8 +562,8 @@ const Index = (props) => {
     };
 
     const _HandleAddChild = (parentId, value) => {
-        console.log("Value", value);
         const { newChild } = _DataValueItem(value);
+
         const newData = listData?.map((e) => {
             if (e?.id == parentId) {
                 return {
@@ -524,17 +575,7 @@ const Index = (props) => {
             }
         });
         sListData(newData);
-        // const newChildId = newChild.id;
-        // sInitsId({
-        //     idParentAdd: parentId,
-        //     idChildAdd: newChildId,
-        // });
     };
-    console.log("hi", listData);
-
-    // useEffect(() => {
-    //     validateQuantity(initsId.idParentAdd, initsId.idChildAdd);
-    // }, [initsId]);
 
     const _HandleAddParent = (value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
@@ -542,7 +583,7 @@ const Index = (props) => {
             const { parent } = _DataValueItem(value);
             sListData([parent, ...listData]);
         } else {
-            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
@@ -556,6 +597,7 @@ const Index = (props) => {
                 return e;
             })
             .filter((e) => e.child?.length > 0);
+
         sListData([...newData]);
     };
 
@@ -569,6 +611,7 @@ const Index = (props) => {
                 return e;
             })
             .filter((e) => e.child?.length > 0);
+
         sListData([...newData]);
     };
 
@@ -580,23 +623,33 @@ const Index = (props) => {
                 switch (type) {
                     case "quantity":
                         sErrors((e) => ({ ...e, errSurvive: false }));
+
                         ce.quantity = Number(value?.value);
+
                         validateQuantity(parentId, childId, type);
+
                         break;
                     case "increase":
                         sErrors((e) => ({ ...e, errSurvive: false }));
+
                         ce.quantity = Number(ce?.quantity) + 1;
+
                         validateQuantity(parentId, childId, type);
+
                         break;
 
                     case "decrease":
                         sErrors((e) => ({ ...e, errSurvive: false }));
+
                         ce.quantity = Number(ce?.quantity) - 1;
+
                         break;
 
                     case "price":
                         sErrors((e) => ({ ...e, errSurvivePrice: false }));
+
                         ce.price = Number(value?.value);
+
                         break;
 
                     case "discount":
@@ -634,7 +687,7 @@ const Index = (props) => {
         if (!ce) return;
 
         const checkMsg = (mssg) => {
-            ToatstNotifi("error", `${mssg}`);
+            isShow("error", `${mssg}`);
             ce.quantity = "";
             HandTimeout();
         };
@@ -669,7 +722,7 @@ const Index = (props) => {
             });
             sListData([...newData]);
         } else {
-            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
@@ -703,7 +756,7 @@ const Index = (props) => {
                                 {option.e?.code}
                             </h5>
                             <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                {option.e?.product_variation}
+                                {option.e?.product_letiation}
                             </h5>
                         </div>
                         <div className="flex items-center gap-1">
@@ -766,7 +819,9 @@ const Index = (props) => {
         };
 
         const hasNullWarehouse = checkPropertyRecursive(listData, "warehouse");
+
         const hasNullQuantity = checkPropertyRecursive(listData, "quantity");
+
         const hasNullPrice = checkPropertyRecursive(listData, "price");
 
         const isEmpty = listData?.length == 0;
@@ -790,14 +845,14 @@ const Index = (props) => {
                 errPrice: hasNullPrice,
             }));
             if (!idChange.idClient || !idChange.idTreatment || !idChange.idBranch) {
-                ToatstNotifi("error", `${dataLang?.required_field_null}`);
+                isShow("error", `${dataLang?.required_field_null}`);
             } else if (isEmpty) {
-                ToatstNotifi("error", `Chưa nhập thông tin mặt hàng`);
+                isShow("error", `Chưa nhập thông tin mặt hàng`);
             } else if (hasNullPrice) {
                 sErrSurvivePrice(true);
-                ToatstNotifi("error", `${"Vui lòng nhập đơn giá"}`);
+                isShow("error", `${"Vui lòng nhập đơn giá"}`);
             } else {
-                ToatstNotifi("error", `${dataLang?.required_field_null}`);
+                isShow("error", `${dataLang?.required_field_null}`);
             }
         } else {
             sFetchingData((e) => ({ ...e, onSending: true }));
@@ -805,7 +860,9 @@ const Index = (props) => {
     };
     const _ServerSending = async () => {
         let formData = new FormData();
+
         formData.append("code", idChange.code ? idChange.code : "");
+
         formData.append(
             "date",
             moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
@@ -845,16 +902,21 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    let { isSuccess, message } = response.data;
+
                     if (isSuccess) {
-                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        isShow("success", `${dataLang[message] || message}`);
+
                         resetAllStates();
+
                         sListData([]);
+
                         router.push(routerReturnSales.home);
                     } else {
-                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message] || message}`);
                     }
                 }
+
                 sFetchingData((e) => ({ ...e, onSending: false }));
             }
         );
@@ -1509,7 +1571,7 @@ const Index = (props) => {
                                                                                 const { value } = values;
                                                                                 const newValue = +value;
                                                                                 if (newValue > +ce?.quantityLeft) {
-                                                                                    ToatstNotifi(
+                                                                                    isShow(
                                                                                         "error",
                                                                                         `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                                                                             +ce?.quantityLeft
@@ -1619,7 +1681,7 @@ const Index = (props) => {
                                                                         isAllowed={(values) => {
                                                                             const { value } = values;
                                                                             if (+value > 100) {
-                                                                                ToatstNotifi(
+                                                                                isShow(
                                                                                     "error",
                                                                                     " % Chiết khấu chỉ được bé hơn hoặc bằng 100%"
                                                                                 );
@@ -1947,33 +2009,18 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"returnSales"}
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleSaveStatus}
+                cancel={handleCancleStatus}
+            />
         </React.Fragment>
     );
-};
-const MoreSelectedBadge = ({ items }) => {
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-    // const label = ``;
-
-    return (
-        <div className="ml-auto bg-sky-500 rounded-md text-xs px-1 py-1 order-[99] text-white" title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 0;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
 };
 
 export default Index;

@@ -1361,10 +1361,10 @@ const Index = (props) => {
                                                         if (!values.value) return true;
                                                         const { floatValue } = values;
                                                         if (floatValue >= 100) {
-                                                            Toast.fire({
-                                                                icon: "error",
-                                                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`,
-                                                            });
+                                                            isShow(
+                                                                "error",
+                                                                `Vui lòng nhập số % chiết khấu nhỏ hơn 101`
+                                                            );
                                                         }
                                                         return floatValue <= 100;
                                                     }}
@@ -1501,10 +1501,7 @@ const Index = (props) => {
                                         if (!values.value) return true;
                                         const { floatValue } = values;
                                         if (floatValue >= 100) {
-                                            Toast.fire({
-                                                icon: "error",
-                                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`,
-                                            });
+                                            isShow("error", `Vui lòng nhập số % chiết khấu nhỏ hơn 101`);
                                         }
                                         return floatValue <= 100;
                                     }}

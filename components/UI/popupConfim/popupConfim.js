@@ -25,7 +25,7 @@ const PopupConfim = (props) => {
             >
                 <div
                     className={`3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px] ${
-                        props.countButton == "priceQuote" && "min-w-[500px]"
+                        props.nameModel == "priceQuote" && "min-w-[500px]"
                     }`}
                 >
                     <div className={`${deca.className} bg-[#ffffff] p-4 shadow-xl rounded-xl flex flex-col gap-3`}>
@@ -55,7 +55,7 @@ const PopupConfim = (props) => {
                             {props.subtitle}
                         </h1>
                         <div className="flex items-center justify-between gap-4">
-                            {props.countButton == "priceQuote" ? (
+                            {props.nameModel == "priceQuote" && (
                                 <>
                                     <button
                                         onClick={props.cancel}
@@ -67,7 +67,7 @@ const PopupConfim = (props) => {
                                         onClick={props.save}
                                         className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
                                     >
-                                        {props.statusQuote === "confirmed"
+                                        {props.status === "confirmed"
                                             ? props.dataLang?.aler_not_yet_approved
                                             : props.dataLang?.aler_approved}
                                     </button>
@@ -75,12 +75,31 @@ const PopupConfim = (props) => {
                                         onClick={props.handleNoconfim}
                                         className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
                                     >
-                                        {props.statusQuote === "no_confirmed"
+                                        {props.status === "no_confirmed"
                                             ? props.dataLang?.aler_not_yet_approved
                                             : props.dataLang?.aler_no_approved}
                                     </button>
                                 </>
-                            ) : (
+                            )}
+                            {props.nameModel == "salesOrder" && (
+                                <>
+                                    <button
+                                        onClick={props.cancel}
+                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                    >
+                                        Hủy
+                                    </button>{" "}
+                                    <button
+                                        onClick={props.save}
+                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                    >
+                                        {props.status === "approved"
+                                            ? props.dataLang?.aler_not_yet_approved
+                                            : props.dataLang?.aler_approved}
+                                    </button>
+                                </>
+                            )}
+                            {!["priceQuote", "salesOrder"].includes(props.nameModel) && (
                                 <>
                                     <button
                                         onClick={props.cancel}

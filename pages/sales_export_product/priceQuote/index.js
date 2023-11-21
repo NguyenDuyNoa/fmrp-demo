@@ -39,7 +39,7 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const { isOpen, isId, isIdChild: statusQuote, handleQueryId } = useToggle();
+    const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
 
     const [data, sData] = useState([]);
 
@@ -1060,9 +1060,9 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                countButton={"priceQuote"}
+                nameModel={"priceQuote"}
                 title={TITLE_STATUS}
-                statusQuote={statusQuote}
+                status={status}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={handleDelete}

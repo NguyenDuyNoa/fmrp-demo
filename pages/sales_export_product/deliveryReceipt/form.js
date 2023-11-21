@@ -1,110 +1,146 @@
-import React, { useRef, useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { _ServerInstance as Axios } from "/services/axios";
+import Popup from "reactjs-popup";
+import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
-import dynamic from "next/dynamic";
-import Loading from "components/UI/loading";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
+
+import { _ServerInstance as Axios } from "/services/axios";
 
 import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import Select, { components, MenuListProps } from "react-select";
-
-import { Add, Trash as IconDelete, Image as IconImage, MaximizeCircle, Minus, TableDocument } from "iconsax-react";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
-import { NumericFormat } from "react-number-format";
-import Link from "next/link";
-import moment from "moment/moment";
-import Popup from "reactjs-popup";
-import { useSelector } from "react-redux";
-import PopupAddress from "./(popupAddress)/PopupAddress";
+import { BsCalendarEvent } from "react-icons/bs";
 import { AiFillPlusCircle } from "react-icons/ai";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import { routerDeliveryReceipt } from "components/UI/router/sellingGoods";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import Select, { components } from "react-select";
+
+import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
+import { NumericFormat } from "react-number-format";
+
+import PopupAddress from "./(popupAddress)/PopupAddress";
+
+import Loading from "@/components/UI/loading";
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import { routerDeliveryReceipt } from "@/components/UI/router/sellingGoods";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
 
     const dataLang = props?.dataLang;
-    const scrollAreaRef = useRef(null);
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
-    };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
+    const isShow = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
+    const trangthaiExprired = useStatusExprired();
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
+
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+
     const [onFetchingClient, sOnFetchingClient] = useState(false);
+
     const [onFetchingContactPerson, sOnFetchingContactPerson] = useState(false);
+
     const [onFetchingStaff, sOnFetchingStaff] = useState(false);
+
     const [onFetchingProductOrder, sOnFetchingProductOrder] = useState(false);
+
     const [onFetchingAddress, sOnFetchingAddress] = useState(false);
+
     const [openPopupAddress, sOpenPopupAddress] = useState(false);
+
     const [onLoading, sOnLoading] = useState(false);
+
     const [onLoadingChild, sOnLoadingChild] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
+
     const [generalTax, sThuetong] = useState();
+
     const [generalDiscount, sChietkhautong] = useState(0);
+
     const [code, sCode] = useState("");
+
     const [startDate, sStartDate] = useState(new Date());
+
     const [effectiveDate, sEffectiveDate] = useState(null);
 
     const [note, sNote] = useState("");
+
     const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+
     const [dataClient, sDataClient] = useState([]);
+
     const [dataContactPerson, sDataContactPerson] = useState([]);
+
     const [dataStaff, sDataStaff] = useState([]);
+
     const [dataBranch, sDataBranch] = useState([]);
+
     const [dataProductOrder, sDataProductOrder] = useState([]);
+
     const [dataAddress, sDataAddress] = useState([]);
+
     const [dataItems, sDataItems] = useState([]);
+
     const [dataTasxes, sDataTasxes] = useState([]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
 
     const [listData, sListData] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
+
     const [idClient, sIdClient] = useState(null);
+
     const [idContactPerson, sIdContactPerson] = useState(null);
+
     const [idStaff, sIdStaff] = useState(null);
+
     const [idProductOrder, sIdProductOrder] = useState(null);
+
     const [idAddress, sIdAddress] = useState(null);
+
     const [itemAll, sItemAll] = useState([]);
 
     const [load, sLoad] = useState(false);
 
     const [errClient, sErrClient] = useState(false);
+
     const [errStaff, sErrStaff] = useState(false);
+
     const [errProductOrder, sErrProductOrder] = useState(false);
+
     const [errDate, sErrDate] = useState(false);
+
     const [errAddress, sErrAddress] = useState(false);
+
     const [errBranch, sErrBranch] = useState(false);
+
     const [errWarehouse, sErrWarehouse] = useState(false);
+
     const [errQuantity, sErrQuantity] = useState(false);
+
     const [errSurvive, sErrSurvive] = useState(false);
+
     const [errPrice, sErrPrice] = useState(false);
+
     const [errSurvivePrice, sErrSurvivePrice] = useState(false);
 
     const _HandleClosePopupAddress = (e) => {
@@ -141,14 +177,14 @@ const Index = (props) => {
         sOnLoading(true);
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { result } = response.data;
+                let { result } = response.data;
                 sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
                 sOnLoading(false);
             }
         });
         Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sDataTasxes(
                     rResult?.map((e) => ({
                         label: e.name,
@@ -170,7 +206,7 @@ const Index = (props) => {
     const _ServerFetchingCondition = () => {
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
+                let data = response.data;
                 sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
                 sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
                 sDataProductSerial(data.find((x) => x.code == "product_serial"));
@@ -201,7 +237,7 @@ const Index = (props) => {
     const options = dataItems?.map((e) => ({
         label: `${e.name}
             <span style={{display: none}}>${e.code}</span>
-            <span style={{display: none}}>${e.product_variation} </span>
+            <span style={{display: none}}>${e.product_letiation} </span>
             <span style={{display: none}}>${e.serial} </span>
             <span style={{display: none}}>${e.lot} </span>
             <span style={{display: none}}>${e.expiration_date} </span>
@@ -213,7 +249,7 @@ const Index = (props) => {
     const _ServerFetchingDetailPage = () => {
         Axios("GET", `/api_web/Api_delivery/getDeliveryDetail/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var rResult = response.data;
+                let rResult = response.data;
                 sListData(
                     rResult?.items.map((e) => {
                         const child = e?.child.map((ce) => ({
@@ -261,7 +297,7 @@ const Index = (props) => {
                             matHang: {
                                 e: e?.item,
                                 label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                    e.item?.code + e.item?.product_letiation + e.item?.text_type + e.item?.unit_name
                                 }</span>`,
                                 value: e.item?.id,
                             },
@@ -290,7 +326,6 @@ const Index = (props) => {
             sOnFetchingDetail(false);
         });
     };
-    console.log("lisss", listData);
 
     useEffect(() => {
         onFetchingDetail && _ServerFetchingDetailPage();
@@ -320,7 +355,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
+                    let { result } = response.data.data;
                     sDataItems(result);
                 }
             }
@@ -340,7 +375,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    let { rResult } = response.data;
                     sDataClient(rResult?.map((e) => ({ label: e.name, value: e.id })));
                     sOnLoading(false);
                 }
@@ -348,6 +383,7 @@ const Index = (props) => {
         );
         sOnFetchingClient(false);
     };
+
     const _ServerFetching_ContactPerson = () => {
         sOnLoading(true);
         Axios(
@@ -360,7 +396,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    let { rResult } = response.data;
                     sDataContactPerson(rResult?.map((e) => ({ label: e.full_name, value: e.id })));
                     sOnLoading(false);
                 }
@@ -368,6 +404,7 @@ const Index = (props) => {
         );
         sOnFetchingContactPerson(false);
     };
+
     const _ServerFetching_Staff = () => {
         sOnLoading(true);
         Axios(
@@ -380,7 +417,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    let { rResult } = response.data;
                     sDataStaff(rResult?.map((e) => ({ label: e.name, value: e.staffid })));
                     sOnLoading(false);
                 }
@@ -390,7 +427,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_ProductOrder = () => {
-        var data = new FormData();
+        let data = new FormData();
         data.append("branch_id", idBranch !== null ? +idBranch.value : null);
         data.append("client_id", idClient !== null ? +idClient.value : null);
         id && data.append("filter[delivery_id]", id ? id : "");
@@ -403,7 +440,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { results } = response?.data;
+                    let { results } = response?.data;
                     sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })));
                 }
             }
@@ -412,7 +449,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_Address = () => {
-        var data = new FormData();
+        let data = new FormData();
         data.append("client_id", idClient !== null ? +idClient.value : null);
         Axios(
             "POST",
@@ -423,7 +460,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var rResult = response?.data;
+                    let rResult = response?.data;
                     sDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })));
                 }
             }
@@ -435,25 +472,32 @@ const Index = (props) => {
         idBranch === null && sDataClient([]);
     }, []);
 
+    const handleSaveStatus = () => {
+        isKeyState?.sDataItems([]);
+        isKeyState?.sListData([]);
+        isKeyState?.sId(isKeyState?.value);
+        isKeyState?.sIdStaff && isKeyState?.sIdStaff(null);
+        isKeyState?.idEmty && isKeyState?.idEmty(null);
+        handleQueryId({ status: false });
+    };
+
+    const handleCancleStatus = () => {
+        isKeyState?.sId({ ...isKeyState?.id });
+        handleQueryId({ status: false });
+    };
+
     const checkListData = (value, sDataItems, sListData, sId, id, idEmty, sIdStaff) => {
-        return Swal.fire({
-            title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sDataItems([]);
-                sListData([]);
-                sId(value);
-                sIdStaff && sIdStaff(null);
-                idEmty && idEmty(null);
-            } else {
-                sId({ ...id });
-            }
+        return handleQueryId({
+            status: true,
+            initialKey: {
+                value,
+                sDataItems,
+                sListData,
+                sId,
+                id,
+                idEmty,
+                sIdStaff,
+            },
         });
     };
 
@@ -750,7 +794,7 @@ const Index = (props) => {
                     case "increase":
                         sErrSurvive(false);
                         if (+ce.quantity === +ce?.warehouse?.qty) {
-                            ToatstNotifi(
+                            isShow(
                                 "error",
                                 `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                     +ce?.warehouse?.qty
@@ -758,13 +802,13 @@ const Index = (props) => {
                                 3000
                             );
                         } else if (+ce.quantity === quantityAmount) {
-                            ToatstNotifi(
+                            isShow(
                                 "error",
                                 `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
                                 3000
                             );
                         } else if (+ce.quantity > +ce?.warehouse?.qty) {
-                            ToatstNotifi(
+                            isShow(
                                 "error",
                                 `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                     +ce?.warehouse?.qty
@@ -772,7 +816,7 @@ const Index = (props) => {
                                 3000
                             );
                         } else if (+ce.quantity > quantityAmount) {
-                            ToatstNotifi(
+                            isShow(
                                 "error",
                                 `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
                                 3000
@@ -803,7 +847,7 @@ const Index = (props) => {
 
                     case "warehouse":
                         if (!checkWarehouse && +ce?.quantity > +value?.qty) {
-                            ToatstNotifi(
+                            isShow(
                                 "error",
                                 `Số lượng chưa giao vượt quá ${formatNumber(+value?.qty)} số lượng tồn kho`
                             );
@@ -814,7 +858,7 @@ const Index = (props) => {
                             FunCheckQuantity(parentId, childId);
                             ce.warehouse = value;
                         } else if (checkWarehouse) {
-                            ToatstNotifi("error", `Kho - vị trí kho đã được chọn`);
+                            isShow("error", `Kho - vị trí kho đã được chọn`);
                         } else {
                             ce.warehouse = value;
                         }
@@ -847,13 +891,14 @@ const Index = (props) => {
         const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive;
 
         if (checkChild > quantityAmount) {
-            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`);
+            isShow("error", `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`);
+
             ce.quantity = "";
             HandTimeout();
             sErrQuantity(true);
         }
         if (checkChild > +ce?.warehouse?.qty) {
-            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(+ce?.warehouse?.qty)} số lượng tồn`);
+            isShow("error", `Tổng số lượng vượt quá ${formatNumber(+ce?.warehouse?.qty)} số lượng tồn`);
             ce.quantity = "";
             sErrQuantity(true);
             HandTimeout();
@@ -882,7 +927,7 @@ const Index = (props) => {
             });
             sListData([...newData]);
         } else {
-            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
@@ -957,7 +1002,7 @@ const Index = (props) => {
                                 {option.e?.code} :
                             </h5>
                             <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-                                {option.e?.product_variation}
+                                {option.e?.product_letiation}
                             </h5>
                         </div>
                         <div className="flex 3xl:gap-3 2xl:gap-3 xl:gap-3 gap-1">
@@ -1056,21 +1101,20 @@ const Index = (props) => {
             hasNullQuantity && sErrQuantity(true);
             hasNullPrice && sErrPrice(true);
             if (isEmpty) {
-                ToatstNotifi("error", `Chưa nhập thông tin mặt hàng`);
+                isShow("error", `Chưa nhập thông tin mặt hàng`);
             } else if (isTotalExceeded) {
                 sErrSurvive(true);
-                ToatstNotifi("error", `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`);
+                isShow("error", `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`);
             } else if (hasNullPrice) {
                 sErrSurvivePrice(true);
-                ToatstNotifi("error", `${"Vui lòng nhập đơn giá"}`);
+                isShow("error", `${"Vui lòng nhập đơn giá"}`);
             } else {
-                ToatstNotifi("error", `${dataLang?.required_field_null}`);
+                isShow("error", `${dataLang?.required_field_null}`);
             }
         } else {
             sOnSending(true);
         }
     };
-    console.log("listData", listData);
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code ? code : "");
@@ -1114,14 +1158,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    let { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        isShow("success", `${dataLang[message] || message}`);
                         resetAllStates();
                         sListData([]);
                         router.push(routerDeliveryReceipt.home);
                     } else {
-                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message] || message}`);
                     }
                 }
                 sOnSending(false);
@@ -2067,7 +2111,7 @@ const Index = (props) => {
                                                                                     +ce?.quantityDelive;
 
                                                                                 if (newValue > +ce?.warehouse?.qty) {
-                                                                                    ToatstNotifi(
+                                                                                    isShow(
                                                                                         "error",
                                                                                         `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                                                                             +ce?.warehouse?.qty
@@ -2075,7 +2119,7 @@ const Index = (props) => {
                                                                                     );
                                                                                     return;
                                                                                 } else if (newValue > quantityAmount) {
-                                                                                    ToatstNotifi(
+                                                                                    isShow(
                                                                                         "error",
                                                                                         `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                                                                             quantityAmount
@@ -2191,7 +2235,7 @@ const Index = (props) => {
                                                                         isAllowed={(values) => {
                                                                             const { value } = values;
                                                                             if (+value > 100) {
-                                                                                ToatstNotifi(
+                                                                                isShow(
                                                                                     "error",
                                                                                     " % Chiết khấu chỉ được bé hơn hoặc bằng 100%"
                                                                                 );
@@ -2526,6 +2570,16 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"deliveryReceipt"}
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleSaveStatus}
+                cancel={handleCancleStatus}
+            />
         </React.Fragment>
     );
 };

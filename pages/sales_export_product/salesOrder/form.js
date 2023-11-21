@@ -1,74 +1,110 @@
 import Head from "next/head";
-import Swal from "sweetalert2";
 import moment from "moment";
-import DatePicker from "react-datepicker";
-import React, { useState, useEffect } from "react";
-import Select, { components } from "react-select";
+import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { MdClear } from "react-icons/md";
+import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import { Trash as IconDelete, Add, Minus } from "iconsax-react";
-import { _ServerInstance as Axios } from "/services/axios";
+import React, { useState, useEffect } from "react";
+import Select, { components } from "react-select";
 import { NumericFormat } from "react-number-format";
-import { v4 as uuidv4 } from "uuid";
-import Loading from "components/UI/loading";
-import { useSelector } from "react-redux";
+import { Trash as IconDelete, Add, Minus } from "iconsax-react";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { _ServerInstance as Axios } from "/services/axios";
+
+import useToast from "@/hooks/useToast";
+import Loading from "@/components/UI/loading";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
+
 const Index = (props) => {
     const router = useRouter();
+
     const id = router.query?.id;
+
     const dataLang = props?.dataLang;
+
+    const isShow = useToast();
+
+    const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
+
     const [onFetching, setOnFetching] = useState(false);
+
     const [onFetchingItemsAll, setOnFetchingItemsAll] = useState(false);
+
     const [onFetchingItem, setOnFetchingItem] = useState(false);
+
     const [onFetchingDetail, setOnFetchingDetail] = useState(false);
+
     const [onFetchingCustomer, setOnFetchingCustomer] = useState(false);
+
     const [onFetchingStaff, setOnFetchingStaff] = useState(false);
+
     const [onFetchingQuote, setOnFetchingQuote] = useState(false);
+
     const [onFetchingContactPerson, setOnFetchingContactPerson] = useState(false);
+
     const [onSending, setOnSending] = useState(false);
+
     const [option, setOption] = useState([]);
 
     const [dataCustomer, setDataCustomer] = useState([]);
+
     const [dataPersonContact, setDataContactPerson] = useState([]);
+
     const [dataStaffs, setDataStaffs] = useState([]);
+
     const [dataQuotes, setDataQuotes] = useState([]);
+
     const [dataItems, setDataItems] = useState([]);
+
     const [dataTasxes, setDataTasxes] = useState([]);
+
     const [dataBranch, setDataBranch] = useState([]);
 
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const trangthaiExprired = useStatusExprired();
 
     const [note, setNote] = useState("");
+
     const [codeProduct, setCodeProduct] = useState("");
+
     const [totalTax, setTotalTax] = useState();
+
     const [totalDiscount, setTotalDiscount] = useState(0);
 
     const [startDate, setStartDate] = useState(new Date());
+
     const [deliveryDate, setDeliveryDate] = useState(null);
 
     const [customer, setCustomer] = useState(null);
+
     const [contactPerson, setContactPerson] = useState(null);
+
     const [staff, setStaff] = useState(null);
+
     const [quote, setQuote] = useState(null);
+
     const [branch, setBranch] = useState(null);
 
     const [errDate, setErrDate] = useState(false);
+
     const [errCustomer, sErrCustomer] = useState(false);
+
     const [errStaff, setErrStaff] = useState(false);
+
     const [errQuote, setErrQuote] = useState(false);
+
     const [errDeliveryDate, setErrDeliveryDate] = useState(false);
+
     const [errBranch, setErrBranch] = useState(false);
 
     const [hidden, setHidden] = useState(false);
+
     const [typeOrder, setTypeOrder] = useState("0");
+
     const [itemsAll, setItemsAll] = useState([]);
 
     const [tongTienState, setTongTienState] = useState({
@@ -98,7 +134,6 @@ const Index = (props) => {
         Axios("GET", `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var rResult = response.data;
-                console.log("ress edit :", rResult);
 
                 const items = rResult?.items?.map((e) => ({
                     price_quote_order_item_id: e?.id,
@@ -120,7 +155,6 @@ const Index = (props) => {
                     total_amount: +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
                     delivery_date: moment(e?.delivery_date).toDate(),
                 }));
-                console.log("item : ", items);
 
                 setOption(items);
                 setCodeProduct(rResult?.code);
@@ -585,32 +619,58 @@ const Index = (props) => {
         return integerPart.toLocaleString("en");
     };
 
+    const resetValue = () => {
+        if (status == "customer") {
+            setCustomer(isId);
+            setDataContactPerson([]);
+            setContactPerson(null);
+            setDataQuotes([]);
+            setQuote(null);
+            setOption([]);
+
+            setOnFetchingItem(true);
+        }
+        if (status == "branch") {
+            setBranch(isId);
+            setOption([]);
+            setCustomer(null);
+            setDataCustomer([]);
+            setDataContactPerson([]);
+            setContactPerson(null);
+            setDataStaffs([]);
+            setStaff(null);
+            setDataQuotes([]);
+            setQuote(null);
+        }
+        if (status == "typeOrder") {
+            setTypeOrder(isId);
+            setHidden(isId === "1");
+            setQuote(isId === "0" ? null : quote);
+
+            setOnFetchingItem(isId === "0" && true);
+            setOnFetchingItemsAll(isId === "1" && true);
+
+            // setDataItems([])
+            setTotalTax("");
+            setTotalDiscount("");
+            setOption([]);
+        }
+        if (status == "quote") {
+            setQuote(isId);
+            setOption([]);
+            setOnFetchingItemsAll(true);
+            setOnFetchingItem(true);
+        }
+        handleQueryId({ status: false });
+    };
+
     // onChange
     const handleOnChangeInput = (type, value) => {
         if (type === "codeProduct") {
             setCodeProduct(value.target.value);
         } else if (type === "customer") {
             if (option?.length >= 1) {
-                Swal.fire({
-                    title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục ?"}`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                    cancelButtonText: `${dataLang?.aler_cancel}`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setCustomer(value);
-                        setDataContactPerson([]);
-                        setContactPerson(null);
-                        setDataQuotes([]);
-                        setQuote(null);
-                        setOption([]);
-
-                        setOnFetchingItem(true);
-                    }
-                });
+                handleQueryId({ status: true, id: value, idChild: type });
             } else {
                 setCustomer(value);
                 setDataContactPerson([]);
@@ -622,28 +682,7 @@ const Index = (props) => {
             }
         } else if (type === "branch") {
             if (option?.length >= 1) {
-                Swal.fire({
-                    title: `${"Mặt hàng đã chọn sẽ bị xóa, bạn có muốn tiếp tục?"}`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                    cancelButtonText: `${dataLang?.aler_cancel}`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setBranch(value);
-                        setOption([]);
-                        setCustomer(null);
-                        setDataCustomer([]);
-                        setDataContactPerson([]);
-                        setContactPerson(null);
-                        setDataStaffs([]);
-                        setStaff(null);
-                        setDataQuotes([]);
-                        setQuote(null);
-                    }
-                });
+                handleQueryId({ status: true, id: value, idChild: type });
             } else if (value !== branch) {
                 setBranch(value);
                 setCustomer(null);
@@ -661,48 +700,10 @@ const Index = (props) => {
         } else if (type === "staff") {
             setStaff(value);
         } else if (type === "typeOrder") {
-            Swal.fire({
-                title: `${"Mặt hàng đã chọn trước đó sẽ bị xóa, bạn có muốn tiếp tục?"}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText: `${dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    setTypeOrder(value.target.value);
-                    setHidden(value.target.value === "1");
-                    setQuote(value.target.value === "0" ? null : quote);
-
-                    setOnFetchingItem(value.target.value === "0" && true);
-                    setOnFetchingItemsAll(value.target.value === "1" && true);
-
-                    // setDataItems([])
-                    setTotalTax("");
-                    setTotalDiscount("");
-                    setOption([]);
-                }
-            });
+            handleQueryId({ status: true, idChild: type, id: value.target.value });
         } else if (type === "quote") {
             if (option?.length >= 1) {
-                Swal.fire({
-                    title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục ?"}`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                    cancelButtonText: `${dataLang?.aler_cancel}`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setQuote(value);
-                        setOption([]);
-
-                        setOnFetchingItemsAll(true);
-                        setOnFetchingItem(true);
-                    }
-                });
+                handleQueryId({ status: true, idChild: type, id: value });
             } else {
                 setQuote(value);
                 setOnFetchingItem(true);
@@ -787,10 +788,7 @@ const Index = (props) => {
 
                     setOption([...newData]);
                 } else if (typeOrder === "1" && quote === null) {
-                    Toast.fire({
-                        icon: "error",
-                        title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`,
-                    });
+                    isShow("error", `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`);
                 }
             }
         }
@@ -849,16 +847,10 @@ const Index = (props) => {
                 };
                 setOption([newData, ...option]);
             } else if (typeOrder === "1" && quote === null) {
-                Toast.fire({
-                    icon: "error",
-                    title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`,
-                });
+                isShow("error", `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`);
             }
         } else {
-            Toast.fire({
-                title: `${"Mặt hàng đã được chọn"}`,
-                icon: "error",
-            });
+            isShow("error", `Mặt hàng đã được chọn`);
         }
     };
 
@@ -977,24 +969,12 @@ const Index = (props) => {
             }
             setOption([...option]);
         } else {
-            return Toast.fire({
-                title: `${"Số lượng tối thiểu là 1 không thể giảm!"}`,
-                icon: "error",
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-            });
+            return isShow("error", `${"Số lượng tối thiểu là 1 không thể giảm !"}`);
         }
     };
     const _HandleDelete = (id, type) => {
         if (type === "default") {
-            return Toast.fire({
-                title: `${"Mặc định của hệ thống, không thể xóa!"}`,
-                icon: "error",
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-            });
+            return isShow("error", `${"Mặc định của hệ thống, không thể xóa"}`);
         }
         const newOption = option.filter((x) => x.id !== id); // loại bỏ phần tử cần xóa
         setOption(newOption); // cập nhật lại mảng
@@ -1032,10 +1012,7 @@ const Index = (props) => {
             });
             setOption([...newData]);
         } else {
-            Toast.fire({
-                title: `${"Mặt hàng đã được chọn"}`,
-                icon: "error",
-            });
+            isShow("error", `${"Mặt hàng đã được chọn"}`);
         }
     };
 
@@ -1118,10 +1095,7 @@ const Index = (props) => {
                 staff?.value == null && setErrStaff(true);
                 deliveryDateInOption === true && setErrDeliveryDate(true);
                 // deliveryDate == null && setErrDeliveryDate(true)
-                Toast.fire({
-                    icon: "error",
-                    title: `${dataLang?.required_field_null}`,
-                });
+                isShow("error", `${dataLang?.required_field_null}`);
             } else {
                 setOnSending(true);
             }
@@ -1142,10 +1116,7 @@ const Index = (props) => {
                 quote?.value == null && setErrQuote(true);
                 // deliveryDate == null && setErrDeliveryDate(true)
 
-                Toast.fire({
-                    icon: "error",
-                    title: `${dataLang?.required_field_null}`,
-                });
+                isShow("error", `${dataLang?.required_field_null}`);
             } else {
                 setOnSending(true);
             }
@@ -1199,10 +1170,7 @@ const Index = (props) => {
                     console.log("response", response);
 
                     if (response && response.data && response?.data?.isSuccess === true && router.isReady) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[response?.data?.message]}`,
-                        });
+                        isShow("success", `${dataLang[response?.data?.message]}`);
                         setCodeProduct("");
                         setStartDate(new Date());
                         setDeliveryDate(new Date());
@@ -1220,25 +1188,20 @@ const Index = (props) => {
                         setErrQuote(false);
                         setOption([]);
                         router.push("/sales_export_product/salesOrder?tab=all");
-                        console.log("1");
                     }
                     if (response && response.data && response?.data?.isSuccess === false) {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[response?.data?.message]}`,
-                        });
+                        isShow("error", `${dataLang[response?.data?.message]}`);
                     }
                     setOnSending(false);
                 }
             );
         } else {
-            Toast.fire({
-                icon: "error",
-                title:
-                    newDataOption?.length === 0
-                        ? `Chưa chọn thông tin mặt hàng!`
-                        : "Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!",
-            });
+            isShow(
+                "error",
+                newDataOption?.length === 0
+                    ? `Chưa chọn thông tin mặt hàng!`
+                    : "Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!"
+            );
             setOnSending(false);
         }
     };
@@ -1417,10 +1380,7 @@ const Index = (props) => {
                 }))
             );
         } else if (typeOrder === "1" && quote === null) {
-            Toast.fire({
-                icon: "error",
-                title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`,
-            });
+            isShow("error", `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`);
         }
     };
 
@@ -2435,10 +2395,7 @@ const Index = (props) => {
                                                     if (!values.value) return true;
                                                     const { floatValue } = values;
                                                     if (floatValue > 101) {
-                                                        Toast.fire({
-                                                            icon: "error",
-                                                            title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`,
-                                                        });
+                                                        isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
                                                     }
                                                     return floatValue < 101;
                                                 }}
@@ -2593,10 +2550,7 @@ const Index = (props) => {
                                         if (!values.value) return true;
                                         const { floatValue } = values;
                                         if (floatValue > 101) {
-                                            Toast.fire({
-                                                icon: "error",
-                                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`,
-                                            });
+                                            isShow("error", `Vui lòng nhập số % chiết khấu nhỏ hơn 101`);
                                         }
                                         return floatValue < 101;
                                     }}
@@ -2765,6 +2719,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={resetValue}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

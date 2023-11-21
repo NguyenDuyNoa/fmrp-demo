@@ -1,42 +1,45 @@
-import vi from "date-fns/locale/vi";
-import React, { useState } from "react";
 import Select from "react-select";
-import PopupDetailQuote from "../priceQuote/(PopupDetail)/PopupDetailQuote";
-import PopupDetailProduct from "./(PopupDetail)/PopupDetailProduct";
-import BtnAction from "../../../components/UI/BtnAction";
-import TabFilter from "../../../components/UI/TabFilter";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
-import Swal from "sweetalert2";
-import ReactExport from "react-data-export";
+import vi from "date-fns/locale/vi";
+import React, { useState, useEffect } from "react";
+
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-import moment from "moment/moment";
-import Datepicker from "react-tailwindcss-datepicker";
-import { useRouter } from "next/router";
-import { registerLocale } from "react-datepicker";
-import { _ServerInstance as Axios } from "/services/axios";
-import { useEffect } from "react";
 import { debounce } from "lodash";
+import moment from "moment/moment";
+import { useRouter } from "next/router";
+import ReactExport from "react-data-export";
+import { registerLocale } from "react-datepicker";
+import Datepicker from "react-tailwindcss-datepicker";
+import { _ServerInstance as Axios } from "/services/axios";
 import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
-import { IoIosArrowDropright } from "react-icons/io";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSelector } from "react-redux";
-import OnResetData from "components/UI/btnResetData/btnReset";
 registerLocale("vi", vi);
-import { motion } from "framer-motion";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import Zoom from "components/UI/zoomElement/zoomElement";
-import HeaderTable from "components/UI/headerTable/headerTable";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+
+import PopupDetailProduct from "./(PopupDetail)/PopupDetailProduct";
+import PopupDetailQuote from "../priceQuote/(PopupDetail)/PopupDetailQuote";
+
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import TabFilter from "@/components/UI/TabFilter";
+import Pagination from "@/components/UI/pagination";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const initialValue = {
         idBranch: null,
         idQuoteCode: null,
@@ -54,15 +57,32 @@ const Index = (props) => {
         listCustomer: [],
         listTabStatus: [],
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
+    const isShow = useToast();
+
+    const trangthaiExprired = useStatusExprired();
+
+    const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
+
     const [initData, sInitData] = useState(initialData);
+
     const [valueChange, sValueChange] = useState(initialValue);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
+
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, setTotal] = useState({});
+
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleShowAll = () => setIsExpanded(!isExpanded);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -205,9 +225,7 @@ const Index = (props) => {
         valueChange.valueDate.startDate,
     ]);
 
-    const onChangeFilter = (type) => (event) => {
-        sValueChange((e) => ({ ...e, [type]: event }));
-    };
+    const onChangeFilter = (type) => (event) => sValueChange((e) => ({ ...e, [type]: event }));
 
     const paginate = (pageNumber) => {
         router.push({
@@ -365,39 +383,20 @@ const Index = (props) => {
         },
     ];
 
-    // chuyen doi trang thai don bao gia
-    const toggleStatus = (id) => {
-        const index = initData.data.findIndex((x) => x.id === id);
+    const toggleStatus = () => {
+        const index = initData.data.findIndex((x) => x.id === isId);
 
-        Swal.fire({
-            title: `${"Thay đổi trạng thái"}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#0F4F9E",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${
-                initData.data[index].status === "approved" ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved
-            }`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-            didOpen: () => {
-                const confirmButton = document.querySelector(".swal2-confirm");
-                confirmButton.classList.add("w-32");
-                const cancelButton = document.querySelector(".swal2-cancel");
-                cancelButton.classList.add("w-32");
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let newStatus = "";
+        let newStatus = "";
 
-                if (initData.data[index].status === "approved") {
-                    newStatus = "un_approved";
-                } else if (initData.data[index].status === "un_approved") {
-                    newStatus = "approved";
-                }
+        if (initData.data[index].status === "approved") {
+            newStatus = "un_approved";
+        } else if (initData.data[index].status === "un_approved") {
+            newStatus = "approved";
+        }
 
-                handlePostStatus(id, newStatus);
-            }
-        });
+        handlePostStatus(isId, newStatus);
+
+        handleQueryId({ status: false });
     };
 
     const handlePostStatus = (id, newStatus) => {
@@ -417,9 +416,9 @@ const Index = (props) => {
                     let { isSuccess, message } = response.data;
 
                     if (isSuccess !== false) {
-                        ToatstNotifi("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
+                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
                     } else {
-                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message] || message}`);
                     }
                     _ServerFetching();
                     _ServerFetching_group();
@@ -428,33 +427,6 @@ const Index = (props) => {
         );
     };
 
-    // toggle show process product
-    // const handleToggleShowProcessProduct = (id) => {
-    //     const newData = data.map((e) => {
-    //         if (e?.id == id) {
-    //             return { ...e, show: !e.show };
-    //         }
-    //         return e;
-    //     });
-    //     setData([...newData]);
-    // };
-    const dataHeader = [
-        { name: dataLang?.sales_product_date || "sales_product_date", colspan: 1 },
-        { name: dataLang?.sales_product_code || "sales_product_code", colspan: 1 },
-        { name: dataLang?.customer || "customer", colspan: 1 },
-        { name: dataLang?.sales_product_type_order || "sales_product_type_order", colspan: 1 },
-        { name: dataLang?.sales_product_total_into_money || "sales_product_total_into_money", colspan: 1 },
-        { name: dataLang?.sales_product_status || "sales_product_status", colspan: 1 },
-        { name: dataLang?.sales_product_statusTT || "sales_product_statusTT", colspan: 1 },
-        { name: dataLang?.branch || "branch", colspan: 1 },
-        { name: dataLang?.sales_product_order_process || "sales_product_order_process", colspan: 4 },
-        { name: dataLang?.sales_product_action || "sales_product_action", colspan: 1 },
-    ];
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    const toggleShowAll = () => {
-        setIsExpanded(!isExpanded);
-    };
     return (
         <React.Fragment>
             <Head>
@@ -746,7 +718,7 @@ const Index = (props) => {
                                 {/* table */}
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        {/* <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
+                                        <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center whitespace-nowrap">
                                                 {dataLang?.sales_product_date || "sales_product_date"}
                                             </h4>
@@ -778,8 +750,7 @@ const Index = (props) => {
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_action || "sales_product_action"}
                                             </h4>
-                                        </div> */}
-                                        <HeaderTable dataHeader={dataHeader} dataLang={dataLang} gridCol={13} />
+                                        </div>
                                         {/* {loading ? */}
                                         {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
@@ -852,7 +823,13 @@ const Index = (props) => {
                                                                         {(e?.status === "approved" && (
                                                                             <div
                                                                                 className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 transition-all duration-300 ease-in-out text-green-500 hover:bg-green-500 hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
-                                                                                onClick={() => toggleStatus(e?.id)}
+                                                                                onClick={() =>
+                                                                                    handleQueryId({
+                                                                                        id: e?.id,
+                                                                                        status: true,
+                                                                                        idChild: "approved",
+                                                                                    })
+                                                                                }
                                                                             >
                                                                                 Đã Duyệt
                                                                                 <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
@@ -861,7 +838,13 @@ const Index = (props) => {
                                                                             (e?.status === "un_approved" && (
                                                                                 <div
                                                                                     className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 transition-all duration-300 ease-in-out hover:text-white border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
-                                                                                    onClick={() => toggleStatus(e?.id)}
+                                                                                    onClick={() =>
+                                                                                        handleQueryId({
+                                                                                            id: e?.id,
+                                                                                            status: true,
+                                                                                            idChild: "un_approved",
+                                                                                        })
+                                                                                    }
                                                                                 >
                                                                                     Chưa Duyệt
                                                                                     <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
@@ -1101,6 +1084,17 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"salesOrder"}
+                title={TITLE_STATUS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                status={status}
+                save={toggleStatus}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

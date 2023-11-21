@@ -5,24 +5,22 @@ import { useRouter } from "next/dist/client/router";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { BiEdit } from "react-icons/bi";
+import { ArrowDown2 } from "iconsax-react";
 import pdfMake from "pdfmake/build/pdfmake";
 import { VscFilePdf } from "react-icons/vsc";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { ArrowDown2, Box1 } from "iconsax-react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
 import FilePDF from "./FilePDF";
 import { routerInternalPlan } from "./router/internalPlan";
-import ToatstNotifi from "./alerNotification/alerNotification";
 import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
 
 import PopupConfim from "./popupConfim/popupConfim";
 import Popup_KeepStock from "pages/sales_export_product/salesOrder/(PopupDetail)/PopupKeepStock";
 import Popup_DetailKeepStock from "pages/sales_export_product/salesOrder/(PopupDetail)/PopupDetailKeepStock";
 
-import PopupEdit from "@/components/UI/popup";
-
 import useToast from "@/hooks/useToast";
+import PopupEdit from "@/components/UI/popup";
 import { useToggle } from "@/hooks/useToggle";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -55,6 +53,7 @@ const BtnAction = React.memo((props) => {
     };
 
     const handleDelete = () => {
+        //Báo giá
         if (props?.id && props?.type === "price_quote") {
             if (props?.status !== "ordered") {
                 Axios(
@@ -64,12 +63,8 @@ const BtnAction = React.memo((props) => {
                     (err, response) => {
                         if (!err) {
                             if (response && response.data) {
-                                var { isSuccess, message } = response.data;
+                                let { isSuccess, message } = response.data;
                                 if (isSuccess) {
-                                    Toast.fire({
-                                        icon: "success",
-                                        title: props.dataLang[message],
-                                    });
                                     isShow("success", props.dataLang[message]);
                                     props.onRefresh && props.onRefresh();
                                 } else {
@@ -90,196 +85,123 @@ const BtnAction = React.memo((props) => {
             }
         }
 
+        ///Đơn hàng bán
         if (props?.id && props?.type === "sales_product") {
             if (props?.status !== "approved") {
-                Swal.fire({
-                    title: `${props.dataLang?.aler_ask} `,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${props.dataLang?.aler_yes} `,
-                    cancelButtonText: `${props.dataLang?.aler_cancel} `,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Axios(
-                            "DELETE",
-                            `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`,
-                            {},
-                            (err, response) => {
-                                if (response && response.data) {
-                                    var { isSuccess, message } = response.data;
-                                    if (isSuccess) {
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: props.dataLang[message],
-                                        });
-                                        props.onRefresh && props.onRefresh();
-                                    } else {
-                                        Toast.fire({
-                                            icon: "error",
-                                            title: props.dataLang[message],
-                                        });
-                                    }
-                                } else {
-                                    Toast.fire({
-                                        icon: "error",
-                                        title: `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`,
-                                    });
-                                }
+                Axios(
+                    "DELETE",
+                    `/api_web/Api_sale_order/saleOrder/${isId}?csrf_protection=true`,
+                    {},
+                    (err, response) => {
+                        if (response && response.data) {
+                            let { isSuccess, message } = response.data;
+                            if (isSuccess) {
+                                isShow("success", props.dataLang[message]);
+                                props.onRefresh && props.onRefresh();
+                            } else {
+                                isShow("error", props.dataLang[message]);
                             }
-                        );
+                        } else {
+                            isShow("error", `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`);
+                        }
                     }
-                });
+                );
+                handleQueryId({ status: false });
             }
             if (props?.status === "approved") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${props?.dataLang?.sales_product_cant_delete || "sales_product_cant_delete"} `,
-                });
+                handleQueryId({ status: false });
+                isShow("error", `${props?.dataLang?.sales_product_cant_delete || "sales_product_cant_delete"} `);
             }
         }
+
         if (props?.id && props?.type === "deliveryReceipt") {
-            Swal.fire({
-                title: `${props.dataLang?.aler_ask}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${props.dataLang?.aler_yes}`,
-                cancelButtonText: `${props.dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Axios(
-                        "DELETE",
-                        `/api_web/api_delivery/delete/${props?.id}?csrf_protection=true`,
-                        {},
-                        (err, response) => {
-                            if (!err) {
-                                var { isSuccess, message } = response.data;
-                                if (isSuccess) {
-                                    ToatstNotifi("success", props.dataLang[message] || message);
-                                    props.onRefresh && props.onRefresh();
-                                    props.onRefreshGroup && props.onRefreshGroup();
-                                } else {
-                                    ToatstNotifi("error", props.dataLang[message] || message);
-                                }
-                            }
-                        }
-                    );
+            Axios("DELETE", `/api_web/api_delivery/delete/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    let { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        isShow("success", props.dataLang[message] || message);
+                        props.onRefresh && props.onRefresh();
+                        props.onRefreshGroup && props.onRefreshGroup();
+                    } else {
+                        isShow("error", props.dataLang[message] || message);
+                    }
                 }
             });
+            handleQueryId({ status: false });
         }
         if (props?.id && props?.type === "returnSales") {
-            Swal.fire({
-                title: `${props.dataLang?.aler_ask}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${props.dataLang?.aler_yes}`,
-                cancelButtonText: `${props.dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Axios(
-                        "DELETE",
-                        `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
-                        {},
-                        (err, response) => {
-                            if (!err) {
-                                var { isSuccess, message } = response.data;
-                                if (isSuccess) {
-                                    ToatstNotifi("success", props.dataLang[message] || message);
-                                    props.onRefresh && props.onRefresh();
-                                    props.onRefreshGroup && props.onRefreshGroup();
-                                } else {
-                                    ToatstNotifi("error", props.dataLang[message] || message);
-                                }
-                            }
+            Axios(
+                "DELETE",
+                `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
+                {},
+                (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            isShow("success", props.dataLang[message] || message);
+                            props.onRefresh && props.onRefresh();
+                            props.onRefreshGroup && props.onRefreshGroup();
+                        } else {
+                            isShow("error", props.dataLang[message] || message);
                         }
-                    );
+                    }
                 }
-            });
+            );
+            handleQueryId({ status: false });
         }
 
         ///Kế hoạc nội bộ internal_plan
         if (props?.id && props?.type === "internal_plan") {
-            Swal.fire({
-                title: `${props.dataLang?.aler_ask}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${props.dataLang?.aler_yes}`,
-                cancelButtonText: `${props.dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Axios(
-                        "DELETE",
-                        `/api_web/api_internal_plan/deleteInternalPlan/${props?.id}?csrf_protection=true`,
-                        {},
-                        (err, response) => {
-                            if (!err) {
-                                var { isSuccess, message } = response.data;
-                                if (isSuccess) {
-                                    ToatstNotifi("success", props.dataLang[message] || message);
-                                    props.onRefresh && props.onRefresh();
-                                } else {
-                                    ToatstNotifi("error", props.dataLang[message] || message);
-                                }
-                            }
+            Axios(
+                "DELETE",
+                `/api_web/api_internal_plan/deleteInternalPlan/${props?.id}?csrf_protection=true`,
+                {},
+                (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            isShow("success", props.dataLang[message] || message);
+                            props.onRefresh && props.onRefresh();
+                        } else {
+                            isShow("error", props.dataLang[message] || message);
                         }
-                    );
+                    }
                 }
-            });
+            );
+            handleQueryId({ status: false });
         }
     };
 
     const handleClick = () => {
         if (props?.id && props?.type === "price_quote") {
-            console.log(props?.status);
             if (props?.status === "ordered") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${props?.dataLang?.po_imported_cant_edit || "po_imported_cant_edit"} `,
-                });
+                isShow("error", `${props?.dataLang?.po_imported_cant_edit || "po_imported_cant_edit"}`);
             } else if (props?.status === "confirmed") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${
-                        props?.dataLang?.po_imported_cant_edit_with_confirm || "po_imported_cant_edit_with_confirm"
-                    } `,
-                });
+                isShow(
+                    "error",
+                    `${props?.dataLang?.po_imported_cant_edit_with_confirm || "po_imported_cant_edit_with_confirm"}`
+                );
             } else {
                 router.push(`/sales_export_product/priceQuote/form?id=${props.id}`);
             }
         }
         if (props?.id && props?.type === "sales_product") {
             if (props?.status === "approved") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${props?.dataLang?.sales_product_cant_edit || "sales_product_cant_edit"} `,
-                });
+                isShow("error", `${props?.dataLang?.sales_product_cant_edit || "sales_product_cant_edit"}`);
             } else {
                 router.push(`/sales_export_product/salesOrder/form?id=${props.id}`);
             }
         }
         if (props?.id && props?.type === "deliveryReceipt") {
             if (props?.warehouseman_id != "0") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
-                });
+                isShow("error", `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`);
             } else {
                 router.push(`${routerDeliveryReceipt.form}?id=${props.id}`);
             }
         }
         if (props?.id && props?.type === "returnSales") {
             if (props?.warehouseman_id != "0") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
-                });
+                isShow("error", `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`);
             } else {
                 router.push(`${routerReturnSales.form}?id=${props.id}`);
             }
