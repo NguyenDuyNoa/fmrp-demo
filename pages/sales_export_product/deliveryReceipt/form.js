@@ -2573,7 +2573,6 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"deliveryReceipt"}
                 title={TITLE_DELETE_ITEMS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}

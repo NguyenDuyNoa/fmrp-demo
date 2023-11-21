@@ -479,6 +479,7 @@ const Index = (props) => {
                 if (listData?.length > 0) {
                     const newData = listData.map((e) => {
                         const newChild = e?.child.map((ce) => ({ ...ce, discount: value?.value }));
+
                         return { ...e, child: newChild };
                     });
                     sListData(newData);
@@ -2012,7 +2013,6 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"returnSales"}
                 title={TITLE_DELETE_ITEMS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
