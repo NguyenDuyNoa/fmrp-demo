@@ -371,13 +371,13 @@ const BtnAction = React.memo((props) => {
                                     className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                                 />
                                 <Popup_servie
-                                    {...shareProps}
                                     status_pay={props?.status_pay}
                                     onRefreshGr={props.onRefreshGr}
                                     onClick={() => handleClick()}
                                     onRefresh={props.onRefresh}
                                     dataLang={props.dataLang}
                                     id={props?.id}
+                                    shareProps={shareProps}
                                     className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5"
                                 >
                                     {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
@@ -401,17 +401,17 @@ const BtnAction = React.memo((props) => {
                         )}
                         {["deliveryReceipt", "returnSales", "import", "returns"].includes(props?.type) ? (
                             <Popup_Pdf
-                                {...shareProps}
                                 dataLang={props.dataLang}
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
                                 dataCompany={dataCompany}
                                 data={data}
+                                shareProps={shareProps}
                             />
                         ) : (
                             <FilePDF
-                                {...shareProps}
+                                shareProps={shareProps}
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
@@ -420,8 +420,8 @@ const BtnAction = React.memo((props) => {
                             />
                         )}
 
-                        {props.type == "sales_product" && <Popup_KeepStock {...props} {...shareProps} />}
-                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && <Popup_KeepStock {...props} shareProps={shareProps} />}
+                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} shareProps={shareProps} />}
                         {props.type == "order" ? (
                             <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                 <RiDeleteBin6Line
@@ -429,7 +429,7 @@ const BtnAction = React.memo((props) => {
                                     className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                                 />
                                 <Popup_TableValidateDelete
-                                    {...shareProps}
+                                    shareProps={shareProps}
                                     isOpen={isOpen}
                                     handleQueryId={handleQueryId}
                                     {...props}

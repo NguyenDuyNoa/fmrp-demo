@@ -1045,7 +1045,7 @@ const Index = (props) => {
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
-                save={handleSaveStatus}
+                save={() => handleSaveStatus()}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>
