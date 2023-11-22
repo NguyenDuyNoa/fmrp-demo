@@ -14,15 +14,9 @@ import { VscFilePdf } from "react-icons/vsc";
 import { lineHeght, titleFooter, titleHeader } from "./stylePdf/receiptsEndPayment";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const FilePDF = ({
-    props,
-    dataCompany,
-    data,
-    setOpenAction,
-    dataMaterialExpiry,
-    dataProductExpiry,
-    dataProductSerial,
-}) => {
+const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = shareProps;
+
     const [url, setUrl] = useState(null);
     // uppercase text header table
     const uppercaseText = (text, style, alignment) => {
@@ -4465,7 +4459,9 @@ const FilePDF = ({
                                                   },
                                                   {
                                                       text:
-                                                          item.serial == null || item.serial == "" ? "-" : item.serial,
+                                                          item?.item.serial == null || item?.item.serial == ""
+                                                              ? "-"
+                                                              : item?.item.serial,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -4486,7 +4482,10 @@ const FilePDF = ({
                                                       italics: true,
                                                   },
                                                   {
-                                                      text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                      text:
+                                                          item?.item.lot == null || item?.item.lot == ""
+                                                              ? "-"
+                                                              : item?.item.lot,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -4500,8 +4499,10 @@ const FilePDF = ({
                                                               italics: true,
                                                           },
                                                           {
-                                                              text: item.expiration_date
-                                                                  ? moment(item.expiration_date).format("DD/MM/YYYY")
+                                                              text: item?.item.expiration_date
+                                                                  ? moment(item?.item.expiration_date).format(
+                                                                        "DD/MM/YYYY"
+                                                                    )
                                                                   : "-",
                                                               fontSize: 8.5,
                                                               italics: true,
@@ -4971,7 +4972,9 @@ const FilePDF = ({
                                                   },
                                                   {
                                                       text:
-                                                          item.serial == null || item.serial == "" ? "-" : item.serial,
+                                                          item?.item.serial == null || item?.item.serial == ""
+                                                              ? "-"
+                                                              : item?.item.serial,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -4992,7 +4995,10 @@ const FilePDF = ({
                                                       italics: true,
                                                   },
                                                   {
-                                                      text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                      text:
+                                                          item?.item.lot == null || item?.item.lot == ""
+                                                              ? "-"
+                                                              : item?.item.lot,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -5005,8 +5011,10 @@ const FilePDF = ({
                                                               italics: true,
                                                           },
                                                           {
-                                                              text: item.expiration_date
-                                                                  ? moment(item.expiration_date).format("DD/MM/YYYY")
+                                                              text: item?.item.expiration_date
+                                                                  ? moment(item?.item.expiration_date).format(
+                                                                        "DD/MM/YYYY"
+                                                                    )
                                                                   : "-",
                                                               fontSize: 8.5,
                                                               italics: true,

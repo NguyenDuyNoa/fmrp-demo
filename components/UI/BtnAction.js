@@ -40,7 +40,7 @@ const BtnAction = React.memo((props) => {
 
     const isShow = useToast();
 
-    const { isOpen, isId, handleQueryId } = useToggle();
+    const { isOpen, handleQueryId } = useToggle();
 
     const { isData, updateData } = useSetData();
 
@@ -55,10 +55,10 @@ const BtnAction = React.memo((props) => {
     const _ToggleModal = (e) => setOpenAction(e);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
 
-    const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial };
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+
+    const [dataProductSerial, sDataProductSerial] = useState({});
 
     const confimDelete = (url) => {
         Axios("DELETE", url, {}, (err, response) => {
@@ -221,7 +221,6 @@ const BtnAction = React.memo((props) => {
                 router.push(`${routerImport.form}?id=${props.id}`);
             }
         }
-
         //Trả hàng
         if (props?.id && props?.type === "returns") {
             if (props?.warehouseman_id != "0") {
@@ -239,7 +238,6 @@ const BtnAction = React.memo((props) => {
             }
         }
         ///Xuất kho sản xuất
-
         if (props?.id && props?.type === "production_warehouse") {
             if (props?.warehouseman_id != "0") {
                 isShow("error", `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`);
@@ -324,6 +322,11 @@ const BtnAction = React.memo((props) => {
         props.type == "order" && openAction && _ServerFetching_ValidatePayment();
     }, [openAction]);
 
+    const shareProps = {
+        dataMaterialExpiry: dataMaterialExpiry,
+        dataProductExpiry: dataProductExpiry,
+        dataProductSerial: dataProductSerial,
+    };
     return (
         <div>
             <Popup
@@ -353,7 +356,7 @@ const BtnAction = React.memo((props) => {
                                 />
                                 <Popup_TableValidateEdit
                                     {...props}
-                                    {...shareProps}
+                                    shareProps={shareProps}
                                     isOpenValidate={isOpenValidate}
                                     sIsOpenValidate={sIsOpenValidate}
                                     data={isData}
@@ -371,7 +374,7 @@ const BtnAction = React.memo((props) => {
                                     {...shareProps}
                                     status_pay={props?.status_pay}
                                     onRefreshGr={props.onRefreshGr}
-                                    onClick={handleClick}
+                                    onClick={() => handleClick()}
                                     onRefresh={props.onRefresh}
                                     dataLang={props.dataLang}
                                     id={props?.id}
@@ -384,7 +387,7 @@ const BtnAction = React.memo((props) => {
 
                         {!["order", "serviceVoucher"].includes(props.type) && (
                             <button
-                                onClick={handleClick}
+                                onClick={() => handleClick()}
                                 className="group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                             >
                                 <BiEdit
@@ -458,17 +461,14 @@ const BtnAction = React.memo((props) => {
                 title={TITLE_DELETE}
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
-                save={handleDelete}
+                save={() => handleDelete()}
                 cancel={() => handleQueryId({ status: false })}
             />
         </div>
     );
 });
-
 const Popup_Pdf = (props) => {
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-
+    const { isOpen, handleOpen } = useToggle(false);
     return (
         <>
             <PopupEdit
@@ -488,9 +488,9 @@ const Popup_Pdf = (props) => {
                         </div>
                     </div>
                 }
-                onClickOpen={_ToggleModal.bind(this, true)}
-                open={open}
-                onClose={_ToggleModal.bind(this, false)}
+                onClickOpen={() => handleOpen(true)}
+                open={isOpen}
+                onClose={() => handleOpen(false)}
                 classNameBtn={props?.className}
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
@@ -498,7 +498,7 @@ const Popup_Pdf = (props) => {
                     <div>
                         <div className="w-[400px]">
                             <FilePDF
-                                {...props.shareProps}
+                                shareProps={props}
                                 props={props.props}
                                 openAction={props.openAction}
                                 setOpenAction={props.setOpenAction}
