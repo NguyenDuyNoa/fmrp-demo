@@ -392,7 +392,7 @@ const Index = (props) => {
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Popup_servie
-                                        onRefreshGr={_ServerFetching_group.bind(this)}
+                                        onRefreshGroup={_ServerFetching_group.bind(this)}
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -776,7 +776,7 @@ const Index = (props) => {
                                                                 /> */}
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
-                                                                    onRefreshGr={_ServerFetching_group.bind(this)}
+                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
                                                                     dataLang={dataLang}
                                                                     status_pay={e?.status_pay}
                                                                     type="serviceVoucher"

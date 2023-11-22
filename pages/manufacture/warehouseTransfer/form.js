@@ -18,12 +18,12 @@ import { NumericFormat } from "react-number-format";
 
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { routerWarehouseTransfer } from "routers/manufacture";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { routerWarehouseTransfer } from "routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 

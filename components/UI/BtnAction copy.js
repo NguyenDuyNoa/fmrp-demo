@@ -105,13 +105,10 @@ const BtnAction = React.memo((props) => {
             warehouseTransfer: `/api_web/Api_transfer/transfer/${props.id}?csrf_protection=true`,
             production_warehouse: `/api_web/Api_stock/exportProduction/${props.id}?csrf_protection=true`,
         };
-        ///báo giá
-
-        const typeConfig = initialApiDelete[props.type];
 
         if (props?.id && props?.type === "price_quote") {
             if (props?.status !== "ordered") {
-                confimDelete(typeConfig);
+                confimDelete(initialApiDelete[props?.type]);
             }
             if (props?.status === "ordered") {
                 handleQueryId({ status: false });
@@ -121,15 +118,245 @@ const BtnAction = React.memo((props) => {
         ///Đơn hàng bán
         else if (props?.id && props?.type === "sales_product") {
             if (props?.status !== "approved") {
-                confimDelete(typeConfig);
+                confimDelete(initialApiDelete[props?.type]);
             }
             if (props?.status === "approved") {
                 handleQueryId({ status: false });
                 isShow("error", `${props?.dataLang?.sales_product_cant_delete || "sales_product_cant_delete"} `);
             }
         } else {
-            confimDelete(typeConfig);
+            confimDelete(initialApiDelete[props?.type]);
         }
+        // //Báo giá
+        // if (props?.id && props?.type === "price_quote") {
+        //     if (props?.status !== "ordered") {
+        //         Axios(
+        //             "DELETE",
+        //             `/api_web/Api_quotation/quotation/${isId}?csrf_protection=true`,
+        //             {},
+        //             (err, response) => {
+        //                 if (!err) {
+        //                     if (response && response.data) {
+        //                         let { isSuccess, message } = response.data;
+        //                         if (isSuccess) {
+        //                             isShow("success", props.dataLang[message]);
+        //                             props.onRefresh && props.onRefresh();
+        //                         } else {
+        //                             isShow("error", props.dataLang[message]);
+        //                         }
+        //                     } else {
+        //                         isShow("error", `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`);
+        //                     }
+        //                 }
+        //             }
+        //         );
+        //     }
+        //     if (props?.status === "ordered") {
+        //         handleQueryId({ status: false });
+        //         isShow("error", `${props?.dataLang?.po_imported_cant_delete || "po_imported_cant_delete"}`);
+        //     }
+        // }
+        // ///Đơn hàng bán
+        // if (props?.id && props?.type === "sales_product") {
+        //     if (props?.status !== "approved") {
+        //         Axios(
+        //             "DELETE",
+        //             `/api_web/Api_sale_order/saleOrder/${isId}?csrf_protection=true`,
+        //             {},
+        //             (err, response) => {
+        //                 if (response && response.data) {
+        //                     let { isSuccess, message } = response.data;
+        //                     if (isSuccess) {
+        //                         isShow("success", props.dataLang[message]);
+        //                         props.onRefresh && props.onRefresh();
+        //                     } else {
+        //                         isShow("error", props.dataLang[message]);
+        //                     }
+        //                 } else {
+        //                     isShow("error", `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`);
+        //                 }
+        //             }
+        //         );
+        //     }
+        //     if (props?.status === "approved") {
+        //         handleQueryId({ status: false });
+        //         isShow("error", `${props?.dataLang?.sales_product_cant_delete || "sales_product_cant_delete"} `);
+        //     }
+        // }
+        // //phiếu giao hàng
+        // if (props?.id && props?.type === "deliveryReceipt") {
+        //     Axios("DELETE", `/api_web/api_delivery/delete/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+        //         if (!err) {
+        //             let { isSuccess, message } = response.data;
+        //             if (isSuccess) {
+        //                 isShow("success", props.dataLang[message] || message);
+        //                 props.onRefresh && props.onRefresh();
+        //                 props.onRefreshGroup && props.onRefreshGroup();
+        //             } else {
+        //                 isShow("error", props.dataLang[message] || message);
+        //             }
+        //         }
+        //     });
+        // }
+        // ///trả lại hàng bán
+        // if (props?.id && props?.type === "returnSales") {
+        //     Axios(
+        //         "DELETE",
+        //         `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
+        //         {},
+        //         (err, response) => {
+        //             if (!err) {
+        //                 var { isSuccess, message } = response.data;
+        //                 if (isSuccess) {
+        //                     isShow("success", props.dataLang[message] || message);
+        //                     props.onRefresh && props.onRefresh();
+        //                     props.onRefreshGroup && props.onRefreshGroup();
+        //                 } else {
+        //                     isShow("error", props.dataLang[message] || message);
+        //                 }
+        //             }
+        //         }
+        //     );
+        // }
+        // ///Kế hoạc nội bộ internal_plan
+        // if (props?.id && props?.type === "internal_plan") {
+        //     Axios(
+        //         "DELETE",
+        //         `/api_web/api_internal_plan/deleteInternalPlan/${props?.id}?csrf_protection=true`,
+        //         {},
+        //         (err, response) => {
+        //             if (!err) {
+        //                 var { isSuccess, message } = response.data;
+        //                 if (isSuccess) {
+        //                     isShow("success", props.dataLang[message] || message);
+        //                     props.onRefresh && props.onRefresh();
+        //                 } else {
+        //                     isShow("error", props.dataLang[message] || message);
+        //                 }
+        //             }
+        //         }
+        //     );
+        // }
+        // /// yêu cầu mua hàng
+        // if (props?.id && props?.type === "purchases") {
+        //     Axios("DELETE", `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`, {}, (err, response) => {
+        //         if (!err) {
+        //             let { isSuccess, message } = response.data;
+        //             if (isSuccess) {
+        //                 isShow("success", props.dataLang[message]);
+        //                 props.onRefresh && props.onRefresh();
+        //                 props.onRefreshGroup && props.onRefreshGroup();
+        //             } else {
+        //                 isShow("error", props.dataLang[message]);
+        //             }
+        //         }
+        //     });
+        // }
+        // ///Đơn đặt hàng PO
+        // if (props?.id && props?.type === "order") {
+        //     Axios(
+        //         "DELETE",
+        //         `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
+        //         {},
+        //         (err, response) => {
+        //             if (!err) {
+        //                 var { isSuccess, message } = response.data;
+        //                 if (isSuccess) {
+        //                     isShow("success", props.dataLang[message]);
+        //                     props.onRefresh && props.onRefresh();
+        //                 } else {
+        //                     isShow("error", props.dataLang[message]);
+        //                 }
+        //             }
+        //         }
+        //     );
+        // }
+        // //phiếu dịch vụ
+        // if (props?.id && props?.type === "serviceVoucher") {
+        //     Axios("DELETE", `/api_web/Api_service/service/${props.id}?csrf_protection=true`, {}, (err, response) => {
+        //         if (!err) {
+        //             let { isSuccess, message } = response.data;
+        //             if (isSuccess) {
+        //                 isShow("success", props.dataLang[message]);
+        //                 props.onRefresh && props.onRefresh();
+        //                 props.onRefreshGr && props.onRefreshGr();
+        //             } else {
+        //                 isShow("error", props.dataLang[message]);
+        //             }
+        //         }
+        //     });
+        // }
+        // //Nhập hàng
+        // if (props?.id && props?.type === "import") {
+        //     Axios("DELETE", `/api_web/Api_import/import/${props.id}?csrf_protection=true`, {}, (err, response) => {
+        //         if (!err) {
+        //             let { isSuccess, message } = response.data;
+        //             if (isSuccess) {
+        //                 isShow("success", props.dataLang[message]);
+        //                 props.onRefresh && props.onRefresh();
+        //                 props.onRefreshGr && props.onRefreshGr();
+        //             } else {
+        //                 isShow("error", props.dataLang[message]);
+        //             }
+        //         }
+        //     });
+        // }
+        // // Trả hàng
+        // if (props?.id && props?.type === "returns") {
+        //     Axios(
+        //         "DELETE",
+        //         `/api_web/Api_return_supplier/returnSupplier/${props.id}?csrf_protection=true`,
+        //         {},
+        //         (err, response) => {
+        //             if (!err) {
+        //                 let { isSuccess, message } = response.data;
+        //                 if (isSuccess) {
+        //                     isShow("success", props.dataLang[message]);
+        //                     props.onRefresh && props.onRefresh();
+        //                     props.onRefreshGr && props.onRefreshGr();
+        //                 } else {
+        //                     isShow("error", props.dataLang[message]);
+        //                 }
+        //             }
+        //         }
+        //     );
+        // }
+        // //Chuyển kho
+        // if (props?.id && props?.type === "warehouseTransfer") {
+        //     Axios("DELETE", `/api_web/Api_transfer/transfer/${props.id}?csrf_protection=true`, {}, (err, response) => {
+        //         if (!err) {
+        //             let { isSuccess, message } = response.data;
+        //             if (isSuccess) {
+        //                 isShow("success", props.dataLang[message]);
+        //                 props.onRefresh && props.onRefresh();
+        //                 props.onRefreshGr && props.onRefreshGr();
+        //             } else {
+        //                 isShow("error", props.dataLang[message]);
+        //             }
+        //         }
+        //     });
+        // }
+        // //Xuất kho sản xuất
+        // if (props?.id && props?.type === "production_warehouse") {
+        //     Axios(
+        //         "DELETE",
+        //         `/api_web/Api_stock/exportProduction/${props.id}?csrf_protection=true`,
+        //         {},
+        //         (err, response) => {
+        //             if (!err) {
+        //                 let { isSuccess, message } = response.data;
+        //                 if (isSuccess) {
+        //                     isShow("success", props.dataLang[message]);
+        //                     props.onRefresh && props.onRefresh();
+        //                     props.onRefreshGr && props.onRefreshGr();
+        //                 } else {
+        //                     isShow("error", props.dataLang[message]);
+        //                 }
+        //             }
+        //         }
+        //     );
+        // }
+
         handleQueryId({ status: false });
     };
 

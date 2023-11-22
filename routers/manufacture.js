@@ -13,5 +13,10 @@ const routerWarehouseTransfer = {
     home: `${url}/warehouseTransfer`,
     form: `${url}/warehouseTransfer/form`,
 };
+///Xuất kho sản xuất
+const routerProductionWarehouse = {
+    home: `${url}/production_warehouse`,
+    form: `${url}/production_warehouse/form`,
+};
 
-export { routerInternalPlan, routerWarehouseTransfer };
+export { routerInternalPlan, routerWarehouseTransfer, routerProductionWarehouse };

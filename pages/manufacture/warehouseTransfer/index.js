@@ -1102,67 +1102,6 @@ const Index = (props) => {
                                                                 </h6>
                                                             </h6>
                                                             <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
-                                                                {/* <div
-                                                                    className={`${
-                                                                        e?.warehouseman_id == "0"
-                                                                            ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
-                                                                            : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "
-                                                                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
-                                                                >
-                                                                    <label
-                                                                        className="relative flex cursor-pointer items-center rounded-full p-2"
-                                                                        htmlFor={e.id}
-                                                                        data-ripple-dark="true"
-                                                                    >
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            className={`${
-                                                                                e?.warehouseman_id == "0"
-                                                                                    ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500"
-                                                                                    : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"
-                                                                            }before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
-                                                                            id={e.id}
-                                                                            value={e.warehouseman_id}
-                                                                            checked={
-                                                                                e.warehouseman_id != "0" ? true : false
-                                                                            }
-                                                                            onChange={_HandleChangeInput.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                e?.warehouseman_id,
-                                                                                "browser"
-                                                                            )}
-                                                                        />
-                                                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                            <svg
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                className="h-3.5 w-3.5"
-                                                                                viewBox="0 0 20 20"
-                                                                                fill="currentColor"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1"
-                                                                            >
-                                                                                <path
-                                                                                    fill-rule="evenodd"
-                                                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                    clip-rule="evenodd"
-                                                                                ></path>
-                                                                            </svg>
-                                                                        </div>
-                                                                    </label>
-                                                                    <label
-                                                                        htmlFor={e.id}
-                                                                        className={`${
-                                                                            e?.warehouseman_id == "0"
-                                                                                ? "text-[#6366f1]"
-                                                                                : "text-lime-500"
-                                                                        }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
-                                                                    >
-                                                                        {e?.warehouseman_id == "0"
-                                                                            ? "Chưa duyệt kho"
-                                                                            : "Đã duyệt kho"}
-                                                                    </label>
-                                                                </div> */}
                                                                 <ButtonWarehouse
                                                                     warehouseman_id={e?.warehouseman_id}
                                                                     _HandleChangeInput={_HandleChangeInput}
