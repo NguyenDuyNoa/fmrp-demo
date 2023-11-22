@@ -1,4 +1,4 @@
-import configSelectFillter from "../configs/configSelectFillter";
+import configSelectFillter from "configs/configSelectFillter";
 import Select from "react-select";
 const SelectComponent = ({
     options,

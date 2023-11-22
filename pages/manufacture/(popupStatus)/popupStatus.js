@@ -25,7 +25,7 @@ import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { useEffect } from "react";
-import randomColor from "components/UI/radomColor/radomcolor";
+import randomColor from "@/hooks/radomcolor";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
@@ -49,26 +49,15 @@ const Popup_status = (props) => {
     };
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
-                sOnFetching(false);
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-        );
+            sOnFetching(false);
+        });
     };
     useEffect(() => {
         onFetching && _ServerFetching();
@@ -107,28 +96,23 @@ const Popup_status = (props) => {
                             className={`grid-cols-8   grid sticky top-0 bg-white shadow items-center z-10 divide-x rounded`}
                         >
                             <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-semibold  whitespace-nowrap col-span-1  text-center">
-                                {props.dataLang?.inventory_dayvouchers ||
-                                    "inventory_dayvouchers"}
+                                {props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
                             </h4>
                             <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang?.inventory_vouchercode ||
-                                    "inventory_vouchercode"}
+                                {props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}
                             </h4>
                             <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang?.import_ballot ||
-                                    "import_ballot"}
+                                {props.dataLang?.import_ballot || "import_ballot"}
                             </h4>
                             <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-2 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang
-                                    ?.purchase_order_purchase_from_item ||
+                                {props.dataLang?.purchase_order_purchase_from_item ||
                                     "purchase_order_purchase_from_item"}
                             </h4>
                             <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-2 font-semibold text-center whitespace-nowrap">
                                 {props.dataLang?.PDF_house || "PDF_house"}
                             </h4>
                             <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang?.purchase_quantity ||
-                                    "purchase_quantity"}
+                                {props.dataLang?.purchase_quantity || "purchase_quantity"}
                             </h4>
                         </div>
                         {onFetching ? (
@@ -137,14 +121,10 @@ const Popup_status = (props) => {
                             <>
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px] mt-2 ">
                                     {data?.map((e) => (
-                                        <div
-                                            className={`grid-cols-8  grid hover:bg-slate-50 items-center`}
-                                        >
+                                        <div className={`grid-cols-8  grid hover:bg-slate-50 items-center`}>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center">
                                                 {e?.date_coupon != null
-                                                    ? moment(
-                                                          e?.date_coupon
-                                                      ).format("DD/MM/YYYY")
+                                                    ? moment(e?.date_coupon).format("DD/MM/YYYY")
                                                     : ""}
                                             </h6>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center cursor-pointer text-blue-600 font-semibold">
@@ -160,31 +140,19 @@ const Popup_status = (props) => {
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-2   hover:font-normal cursor-pointer">
                                                 <div className="">
                                                     <div className="flex flex-col">
+                                                        <h4 className="text-[13px] w-[full] ">{e?.name}</h4>
                                                         <h4 className="text-[13px] w-[full] ">
-                                                            {e?.name}
-                                                        </h4>
-                                                        <h4 className="text-[13px] w-[full] ">
-                                                            {
-                                                                e?.product_variation
-                                                            }
+                                                            {e?.product_variation}
                                                         </h4>
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        {(props.type ==
-                                                            "productsWarehouse" ||
-                                                            props.type ==
-                                                                "warehouseTransfer") &&
-                                                        dataProductSerial.is_enable ===
-                                                            "1" ? (
+                                                        {(props.type == "productsWarehouse" ||
+                                                            props.type == "warehouseTransfer") &&
+                                                        dataProductSerial.is_enable === "1" ? (
                                                             <div className="flex gap-1 items-center italic font-normal text-[12px]">
-                                                                <h6>
-                                                                    Serial:{" "}
-                                                                </h6>
+                                                                <h6>Serial: </h6>
                                                                 <h6 className="px-2 w-[full] text-center">
-                                                                    {e.serial ==
-                                                                        null ||
-                                                                    e.serial ==
-                                                                        ""
+                                                                    {e.serial == null || e.serial == ""
                                                                         ? "-"
                                                                         : e.serial}
                                                                 </h6>
@@ -192,41 +160,24 @@ const Popup_status = (props) => {
                                                         ) : (
                                                             ""
                                                         )}
-                                                        {props.type ==
-                                                            "productsWarehouse" ||
-                                                        (props.type ==
-                                                            "warehouseTransfer" &&
-                                                            dataProductExpiry.is_enable ===
-                                                                "1") ||
-                                                        props.type ==
-                                                            "recall" ||
-                                                        (props.type ==
-                                                            "warehouseTransfer" &&
-                                                            dataMaterialExpiry.is_enable ===
-                                                                "1") ? (
+                                                        {props.type == "productsWarehouse" ||
+                                                        (props.type == "warehouseTransfer" &&
+                                                            dataProductExpiry.is_enable === "1") ||
+                                                        props.type == "recall" ||
+                                                        (props.type == "warehouseTransfer" &&
+                                                            dataMaterialExpiry.is_enable === "1") ? (
                                                             <div className="flex">
                                                                 <div className="flex gap-1 items-center italic font-normal text-[12px]">
-                                                                    <h6>
-                                                                        Lot:{" "}
-                                                                    </h6>
+                                                                    <h6>Lot: </h6>
                                                                     <h6 className=" px-1 w-[full] text-center">
-                                                                        {e.lot ==
-                                                                            null ||
-                                                                        e.lot ==
-                                                                            ""
-                                                                            ? "-"
-                                                                            : e.lot}
+                                                                        {e.lot == null || e.lot == "" ? "-" : e.lot}
                                                                     </h6>
                                                                 </div>
                                                                 <div className="flex gap-1 items-center italic font-normal text-[12px]">
-                                                                    <h6>
-                                                                        Date:{" "}
-                                                                    </h6>
+                                                                    <h6>Date: </h6>
                                                                     <h6 className="px-1 w-[full] text-center">
                                                                         {e.expiration_date
-                                                                            ? moment(
-                                                                                  e.expiration_date
-                                                                              ).format(
+                                                                            ? moment(e.expiration_date).format(
                                                                                   "DD/MM/YYYY"
                                                                               )
                                                                             : "-"}
@@ -242,18 +193,11 @@ const Popup_status = (props) => {
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-2 text-left hover:font-normal cursor-pointer">
                                                 <div className="flex items-center gap-1">
                                                     <div>
-                                                        <House
-                                                            size="30"
-                                                            color="#4f46e5"
-                                                        />
+                                                        <House size="30" color="#4f46e5" />
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="">
-                                                            {e?.warehouse_name}
-                                                        </span>
-                                                        <span className="">
-                                                            {e?.local_name}
-                                                        </span>
+                                                        <span className="">{e?.warehouse_name}</span>
+                                                        <span className="">{e?.local_name}</span>
                                                     </div>
                                                 </div>
                                             </h6>

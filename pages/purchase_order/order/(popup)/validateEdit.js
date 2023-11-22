@@ -24,7 +24,7 @@ import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
 
 import { useEffect } from "react";
-import { routerOrder } from "components/UI/router/buyImportGoods";
+import { routerOrder } from "routers/buyImportGoods";
 
 const Toast = Swal.mixin({
     toast: true,

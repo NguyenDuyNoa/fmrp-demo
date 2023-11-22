@@ -1,8 +1,6 @@
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
-import "react-datepicker/dist/react-datepicker.css";
 import {
     Grid6 as IconExcel,
     Filter as IconFilter,
@@ -15,35 +13,33 @@ import {
     TickCircle,
     Refresh2,
 } from "iconsax-react";
-import Select from "react-select";
 
+import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
 
-import { registerLocale } from "react-datepicker";
-
 import Popup from "reactjs-popup";
+import Select from "react-select";
 import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
-
 import { BiEdit } from "react-icons/bi";
+import ReactExport from "react-data-export";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
-import ReactExport from "react-data-export";
+import { _ServerInstance as Axios } from "/services/axios";
 
 import FilePDF from "../FilePDF";
-import Popup_chitiet from "./(popup)/detail";
 import Popup_servie from "./(popup)/popup";
+import Popup_chitiet from "./(popup)/detail";
 
-import useStatusExprired from "@/hooks/useStatusExprired";
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import Pagination from "@/components/UI/pagination";
 
 import useToast from "@/hooks/useToast";
-import BtnAction from "@/components/UI/BtnAction";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -147,19 +143,21 @@ const Index = (props) => {
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let { isSuccess, result } = response.data;
+                let { result } = response?.data;
                 sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
             }
         });
+
         Axios("GET", `/api_web/Api_service/serviceCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let { isSuccess, result } = response.data;
+                let { result } = response?.data;
                 sDataCode(result?.map((e) => ({ label: e?.code, value: e?.id })));
             }
         });
+
         Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let { rResult } = response.data;
+                let { rResult } = response?.data;
                 sListUser(rResult);
             }
         });

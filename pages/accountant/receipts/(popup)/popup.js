@@ -19,7 +19,7 @@ import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import formatNumber from "components/UI/formanumber/formanumber";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import configSelectPopup from "components/UI/configs/configSelectPopup";
+import configSelectPopup from "configs/configSelectPopup";
 import {
     getListBranch,
     getListLisObject,

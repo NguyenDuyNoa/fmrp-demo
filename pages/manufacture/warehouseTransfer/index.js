@@ -1,9 +1,7 @@
-import React, { useRef, useState } from "react";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import Link from "next/link";
-import ModalImage from "react-modal-image";
-import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 import {
     Grid6 as IconExcel,
@@ -13,33 +11,42 @@ import {
     ArrowDown2 as IconDown,
     Refresh2,
 } from "iconsax-react";
-
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import Select from "react-select";
+import { BiEdit } from "react-icons/bi";
+import ModalImage from "react-modal-image";
+import "react-datepicker/dist/react-datepicker.css";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
+
 import Popup from "reactjs-popup";
 import moment from "moment/moment";
+import ReactExport from "react-data-export";
 
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
 import Swal from "sweetalert2";
 
-import ReactExport from "react-data-export";
-import { useEffect } from "react";
 import FilePDF from "../FilePDF";
 import Popup_chitiet from "./(popup)/pupup";
-import Popup_status from "../(popupStatus)/popupStatus";
-import ImageErrors from "components/UI/imageErrors";
-import { useSelector } from "react-redux";
-import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
 import TabStatus from "../(filterTab)/filterTab";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
+import Popup_status from "../(popupStatus)/popupStatus";
+import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
+
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import Pagination from "@/components/UI/pagination";
+import ImageErrors from "@/components/UI/imageErrors";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { routerWarehouseTransfer } from "routers/manufacture";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -54,39 +61,63 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
 
+    const trangthaiExprired = useStatusExprired();
+
+    const isShow = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     const [data, sData] = useState([]);
+
     const [dataExcel, sDataExcel] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
 
     const [listBr, sListBr] = useState([]);
+
     const [lisCode, sListCode] = useState([]);
+
     const [idExportWarehouse, sIdExportWarehouse] = useState(null);
+
     const [idReceivingWarehouse, sIdReceivingWarehouse] = useState(null);
+
     const [dataWarehouse, sDataWarehouse] = useState([]);
+
     const [dataReceivingWarehouse, sDataReceivingWarehouse] = useState([]);
 
     const [listDs, sListDs] = useState();
 
     const [idCode, sIdCode] = useState(null);
+
     const [idSupplier, sIdSupplier] = useState(null);
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null,
     });
 
-    const trangthaiExprired = useStatusExprired();
+    const [checkedWare, sCheckedWare] = useState({});
+
+    const [data_export, sData_export] = useState([]);
+
+    const _HandleFresh = () => sOnFetching(true);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -94,6 +125,7 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -122,7 +154,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
+                    let { rResult, output, rTotal } = response.data;
                     sData(rResult);
 
                     sTotalItems(output);
@@ -152,7 +184,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sListDs(data);
                 }
                 sOnFetching(false);
@@ -163,13 +195,13 @@ const Index = (props) => {
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { result } = response.data;
+                let { result } = response.data;
                 sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
             }
         });
         Axios("GET", "/api_web/Api_transfer/TransferCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { result } = response?.data;
+                let { result } = response?.data;
                 sListCode(
                     result?.map((e) => ({
                         label: `${e.code}`,
@@ -184,7 +216,7 @@ const Index = (props) => {
             {},
             (err, response) => {
                 if (!err) {
-                    var data = response?.data;
+                    let data = response?.data;
                     const db = data?.map((e) => ({
                         label: e?.warehouse_name,
                         value: e?.id,
@@ -215,7 +247,7 @@ const Index = (props) => {
                     },
                     (err, response) => {
                         if (!err) {
-                            var { result } = response?.data;
+                            let { result } = response?.data;
                             sListCode(
                                 result?.map((e) => ({
                                     label: `${e.code}`,
@@ -308,10 +340,6 @@ const Index = (props) => {
         } else if (type == "idReceivingWarehouse") {
             sIdReceivingWarehouse(value);
         }
-    };
-
-    const _HandleFresh = () => {
-        sOnFetching(true);
     };
 
     const multiDataSet = [
@@ -445,34 +473,33 @@ const Index = (props) => {
         },
     ];
 
-    const [checkedWare, sCheckedWare] = useState({});
-    const [data_export, sData_export] = useState([]);
+    const handleSaveStatus = () => {
+        if (isKeyState?.type === "browser") {
+            const checked = isKeyState.value.target.checked;
+            const warehousemanId = isKeyState.value.target.value;
+            const dataChecked = {
+                checked: checked,
+                warehousemanId: warehousemanId,
+                id: isKeyState?.id,
+                checkedpost: isKeyState?.checkedUn,
+            };
+            sCheckedWare(dataChecked);
+            sData([...data]);
+        }
+
+        handleQueryId({ status: false });
+    };
 
     const _HandleChangeInput = (id, checkedUn, type, value) => {
-        if (type === "browser") {
-            Swal.fire({
-                title: `${"Thay đổi trạng thái"}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText: `${dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const checked = value.target.checked;
-                    const warehousemanId = value.target.value;
-                    const dataChecked = {
-                        checked: checked,
-                        warehousemanId: warehousemanId,
-                        id: id,
-                        checkedpost: checkedUn,
-                    };
-                    sCheckedWare(dataChecked);
-                }
-                sData([...data]);
-            });
-        }
+        handleQueryId({
+            status: true,
+            initialKey: {
+                id,
+                checkedUn,
+                type,
+                value,
+            },
+        });
     };
 
     const _ServerSending = () => {
@@ -488,14 +515,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message, alert_type, data_export } = response.data;
+                    let { isSuccess, message, alert_type, data_export } = response.data;
                     if (isSuccess) {
-                        ToatstNotifi(alert_type, dataLang[message] || message);
+                        isShow(alert_type, dataLang[message] || message);
                         setTimeout(() => {
                             sOnFetching(true);
                         }, 300);
                     } else {
-                        ToatstNotifi("error", dataLang[message] || message);
+                        isShow("error", dataLang[message] || message);
                     }
                     if (data_export?.length > 0) {
                         sData_export(data_export);
@@ -553,7 +580,7 @@ const Index = (props) => {
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/manufacture/warehouseTransfer/form"
+                                        href={routerWarehouseTransfer.form}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E]  via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.purchase_order_new || "purchase_order_new"}
@@ -1148,7 +1175,7 @@ const Index = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
-                                                                <BtnTacVu
+                                                                {/* <BtnTacVu
                                                                     type="warehouseTransfer"
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -1157,6 +1184,16 @@ const Index = (props) => {
                                                                     status_pay={e?.status_pay}
                                                                     id={e?.id}
                                                                     className="bg-slate-100 hover:scale-105 transition-all ease-linear hover:bg-gray-200 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
+                                                                /> */}
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    warehouseman_id={e?.warehouseman_id}
+                                                                    status_pay={e?.status_pay}
+                                                                    id={e?.id}
+                                                                    type="warehouseTransfer"
+                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1210,6 +1247,16 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"warehouseTransfer"}
+                title={TITLE_STATUS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleSaveStatus}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

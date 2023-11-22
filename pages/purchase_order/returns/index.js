@@ -1,9 +1,8 @@
-import React, { useRef, useState } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
 import Link from "next/link";
-import ModalImage from "react-modal-image";
+import { useRouter } from "next/router";
+import React, { useRef, useEffect, useState } from "react";
+
 import "react-datepicker/dist/react-datepicker.css";
 
 import {
@@ -12,7 +11,6 @@ import {
     Calendar as IconCalendar,
     SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
-    TickCircle,
     ArrowCircleDown,
     Refresh2,
 } from "iconsax-react";
@@ -24,33 +22,32 @@ import { VscFilePdf } from "react-icons/vsc";
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
+
 import Popup from "reactjs-popup";
 import moment from "moment/moment";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
 import Swal from "sweetalert2";
 
 import ReactExport from "react-data-export";
-import { useEffect } from "react";
-import Popup_chitietThere from "../detailThere";
+
 import FilePDF from "../FilePDF";
-import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/pupup";
-import { useSelector } from "react-redux";
-import { routerReturns } from "components/UI/router/buyImportGoods";
-import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { routerReturns } from "routers/buyImportGoods";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -65,34 +62,51 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
 
+    const isShow = useToast();
+
     const [data, sData] = useState([]);
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     const [dataExcel, sDataExcel] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
 
     const [listBr, sListBr] = useState([]);
+
     const [lisCode, sListCode] = useState([]);
+
     const [listSupplier, sListSupplier] = useState([]);
 
     const [listDs, sListDs] = useState();
 
     const [idCode, sIdCode] = useState(null);
+
     const [idSupplier, sIdSupplier] = useState(null);
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null,
     });
+
+    const [checkedWare, sCheckedWare] = useState({});
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -271,6 +285,7 @@ const Index = (props) => {
     };
 
     const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+
     const listCode_filter = lisCode ? lisCode?.map((e) => ({ label: `${e.code}`, value: e.id })) : [];
 
     const onchang_filter = (type, value) => {
@@ -407,33 +422,28 @@ const Index = (props) => {
         },
     ];
 
-    const [errOpen, sErrOpen] = useState(false);
-    const [checkedWare, sCheckedWare] = useState({});
-    const _HandleChangeInput = (id, checkedUn, type, value) => {
-        if (type === "browser") {
-            Swal.fire({
-                title: `${"Thay đổi trạng thái"}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText: `${dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const checked = value.target.checked;
-                    const warehousemanId = value.target.value;
-                    const dataChecked = {
-                        checked: checked,
-                        warehousemanId: warehousemanId,
-                        id: id,
-                        checkedpost: checkedUn,
-                    };
-                    sCheckedWare(dataChecked);
-                }
-                sData([...data]);
-            });
+    const handleSaveStatus = () => {
+        if (isKeyState?.type === "browser") {
+            const checked = isKeyState.value.target.checked;
+            const warehousemanId = isKeyState.value.target.value;
+            const dataChecked = {
+                checked: checked,
+                warehousemanId: warehousemanId,
+                id: isKeyState?.id,
+                checkedpost: isKeyState?.checkedUn,
+            };
+            sCheckedWare(dataChecked);
+            sData([...data]);
         }
+
+        handleQueryId({ status: false });
+    };
+
+    const _HandleChangeInput = (id, checkedUn, type, value) => {
+        handleQueryId({
+            status: true,
+            initialKey: { id, checkedUn, type, value },
+        });
     };
     const _ServerSending = () => {
         var data = new FormData();
@@ -448,26 +458,21 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message, data_export } = response.data;
+                    let { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", `${dataLang[message]}`);
                         setTimeout(() => {
                             sOnFetching(true);
                         }, 300);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("error", `${dataLang[message]}`);
                     }
                 }
                 sOnSending(false);
             }
         );
     };
+
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
@@ -475,6 +480,7 @@ const Index = (props) => {
     useEffect(() => {
         checkedWare.id != null && sOnSending(true);
     }, [checkedWare]);
+
     useEffect(() => {
         checkedWare.id != null && sOnSending(true);
     }, [checkedWare.id != null]);
@@ -877,135 +883,63 @@ const Index = (props) => {
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {data?.map(
-                                                        (e) => (
-                                                            <div
-                                                                className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                                key={e.id.toString()}
-                                                            >
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
-                                                                    {e?.date != null
-                                                                        ? moment(e?.date).format("DD/MM/YYYY")
-                                                                        : ""}
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
-                                                                    <Popup_chitiet
-                                                                        dataLang={dataLang}
-                                                                        className="text-left"
-                                                                        name={e?.code}
-                                                                        id={e?.id}
-                                                                    />
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                    {e.supplier_name}
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                    {formatNumber(e.total_price)}
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                    {formatNumber(e.total_tax_price)}
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                    {formatNumber(e.total_amount)}
-                                                                </h6>
-                                                                <h6 className="col-span-1 mx-auto">
-                                                                    {(e?.treatment_methods === "1" && (
-                                                                        <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2">
-                                                                            {dataLang?.pay_down || "pay_down"}
-                                                                        </div>
-                                                                    )) ||
-                                                                        (e?.treatment_methods === "2" && (
-                                                                            <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2">
-                                                                                {dataLang?.debt_reduction ||
-                                                                                    "debt_reduction"}
-                                                                            </div>
-                                                                        ))}
-                                                                </h6>
-                                                                <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
-                                                                    {/* <div
-                                                                        className={`${
-                                                                            e?.warehouseman_id == "0"
-                                                                                ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
-                                                                                : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "
-                                                                        } rounded-lg cursor-pointer hover:font-semibold `}
-                                                                    >
-                                                                        <div
-                                                                            className={`${
-                                                                                e?.warehouseman_id == "0"
-                                                                                    ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
-                                                                                    : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "
-                                                                            } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
-                                                                        >
-                                                                            <label
-                                                                                className="relative flex cursor-pointer items-center rounded-full p-2"
-                                                                                htmlFor={e.id}
-                                                                                data-ripple-dark="true"
-                                                                            >
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    className={`${
-                                                                                        e?.warehouseman_id == "0"
-                                                                                            ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500"
-                                                                                            : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"
-                                                                                    }before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
-                                                                                    id={e.id}
-                                                                                    value={e.warehouseman_id}
-                                                                                    checked={
-                                                                                        e.warehouseman_id != "0"
-                                                                                            ? true
-                                                                                            : false
-                                                                                    }
-                                                                                    onChange={_HandleChangeInput.bind(
-                                                                                        this,
-                                                                                        e?.id,
-                                                                                        e?.warehouseman_id,
-                                                                                        "browser"
-                                                                                    )}
-                                                                                />
-                                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                                    <svg
-                                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                                        className="h-3.5 w-3.5"
-                                                                                        viewBox="0 0 20 20"
-                                                                                        fill="currentColor"
-                                                                                        stroke="currentColor"
-                                                                                        stroke-width="1"
-                                                                                    >
-                                                                                        <path
-                                                                                            fill-rule="evenodd"
-                                                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                            clip-rule="evenodd"
-                                                                                        ></path>
-                                                                                    </svg>
-                                                                                </div>
-                                                                            </label>
-                                                                            <label
-                                                                                htmlFor={e.id}
-                                                                                className={`${
-                                                                                    e?.warehouseman_id == "0"
-                                                                                        ? "text-[#6366f1]"
-                                                                                        : "text-lime-500"
-                                                                                }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
-                                                                            >
-                                                                                {e?.warehouseman_id == "0"
-                                                                                    ? "Chưa duyệt kho"
-                                                                                    : "Đã duyệt kho"}
-                                                                            </label>
-                                                                        </div>
-                                                                    </div> */}
-                                                                    <ButtonWarehouse
-                                                                        warehouseman_id={e?.warehouseman_id}
-                                                                        _HandleChangeInput={_HandleChangeInput}
-                                                                        id={e?.id}
-                                                                    />
-                                                                </h6>
-                                                                <h6 className="col-span-1 w-fit mx-auto">
-                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                        {e?.branch_name}
+                                                    {data?.map((e) => (
+                                                        <div
+                                                            className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                            key={e.id.toString()}
+                                                        >
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                                {e?.date != null
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
+                                                                    : ""}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
+                                                                <Popup_chitiet
+                                                                    dataLang={dataLang}
+                                                                    className="text-left"
+                                                                    name={e?.code}
+                                                                    id={e?.id}
+                                                                />
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                {e.supplier_name}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                                {formatNumber(e.total_price)}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                                {formatNumber(e.total_tax_price)}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                                {formatNumber(e.total_amount)}
+                                                            </h6>
+                                                            <h6 className="col-span-1 mx-auto">
+                                                                {(e?.treatment_methods === "1" && (
+                                                                    <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2">
+                                                                        {dataLang?.pay_down || "pay_down"}
                                                                     </div>
-                                                                </h6>
-                                                                <div className="col-span-1 flex justify-center">
-                                                                    <BtnTacVu
+                                                                )) ||
+                                                                    (e?.treatment_methods === "2" && (
+                                                                        <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2">
+                                                                            {dataLang?.debt_reduction ||
+                                                                                "debt_reduction"}
+                                                                        </div>
+                                                                    ))}
+                                                            </h6>
+                                                            <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
+                                                                <ButtonWarehouse
+                                                                    warehouseman_id={e?.warehouseman_id}
+                                                                    _HandleChangeInput={_HandleChangeInput}
+                                                                    id={e?.id}
+                                                                />
+                                                            </h6>
+                                                            <h6 className="col-span-1 w-fit mx-auto">
+                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                    {e?.branch_name}
+                                                                </div>
+                                                            </h6>
+                                                            <div className="col-span-1 flex justify-center">
+                                                                {/* <BtnTacVu
                                                                         type="returns"
                                                                         onRefresh={_ServerFetching.bind(this)}
                                                                         onRefreshGroup={_ServerFetching_group.bind(
@@ -1016,35 +950,20 @@ const Index = (props) => {
                                                                         status_pay={e?.status_pay}
                                                                         id={e?.id}
                                                                         className="bg-slate-100 hover:scale-105 transition-all ease-linear hover:bg-gray-200 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
-                                                                    />
-                                                                </div>
+                                                                    /> */}
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    warehouseman_id={e?.warehouseman_id}
+                                                                    status_pay={e?.status_pay}
+                                                                    id={e?.id}
+                                                                    type="returns"
+                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                                />
                                                             </div>
-                                                        )
-
-                                                        // <div className='relative grid grid-cols-10 items-center py-1.5 px-2 hover:bg-slate-100/40' key={e.id.toString()}>
-
-                                                        //       <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-left h-60px truncate '>
-                                                        //           {e?.note}
-                                                        //       </h6>
-
-                                                        //       <h6 className='col-span-1 w-fit '>
-                                                        //           <div className='cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase'>
-                                                        //               {e?.total_price}
-                                                        //           </div>
-                                                        //       </h6>
-
-                                                        //       <div className='col-span-1 flex justify-center'>
-                                                        //           {/* <BtnAction
-                                                        //               onRefresh={_ServerFetching.bind(this)}
-                                                        //               dataLang={dataLang}
-                                                        //               status={e?.status}
-                                                        //               id={e?.id}
-                                                        //               type='price_quote'
-                                                        //               className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                        //           /> */}
-                                                        //       </div>
-                                                        //   </div>
-                                                    )}
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </>
                                         ) : (
@@ -1104,6 +1023,16 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"returnSales"}
+                title={TITLE_STATUS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleSaveStatus}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

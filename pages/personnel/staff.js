@@ -58,12 +58,13 @@ const CustomSelectOption = ({ value, label, level, code }) => (
         <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 );
+
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const isShow = useToast();
 
-    const { isOpen, isId, isIdChild, handleQueryId } = useToggle();
+    const { isOpen, isId, isKeyState, handleQueryId } = useToggle();
 
     const router = useRouter();
 
@@ -237,9 +238,9 @@ const Index = (props) => {
     const [active, sActive] = useState("");
 
     const handleDelete = async () => {
-        if (isIdChild) {
-            sStatus(isIdChild);
-            var index = data.findIndex((x) => x.id === isIdChild);
+        if (isKeyState) {
+            sStatus(isKeyState);
+            var index = data.findIndex((x) => x.id === isKeyState);
             if (index !== -1 && data[index].active === "0") {
                 sActive((data[index].active = "1"));
             } else if (index !== -1 && data[index].active === "1") {
@@ -692,7 +693,7 @@ const Index = (props) => {
                                                                         // onChange={_ToggleStatus.bind(this, e.id)}
                                                                         onChange={() =>
                                                                             handleQueryId({
-                                                                                idChild: e.id,
+                                                                                initialKey: e.id,
                                                                                 status: true,
                                                                             })
                                                                         }
@@ -795,8 +796,8 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                title={isIdChild ? TITLE_STATUS : TITLE_DELETE}
-                subtitle={isIdChild ? CONFIRMATION_OF_CHANGES : CONFIRM_DELETION}
+                title={isKeyState ? TITLE_STATUS : TITLE_DELETE}
+                subtitle={isKeyState ? CONFIRMATION_OF_CHANGES : CONFIRM_DELETION}
                 isOpen={isOpen}
                 save={handleDelete}
                 cancel={() => handleQueryId({ status: false })}

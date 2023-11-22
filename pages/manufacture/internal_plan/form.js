@@ -13,7 +13,7 @@ import Select, { components } from "react-select";
 import { NumericFormat } from "react-number-format";
 import React, { useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-import { routerInternalPlan } from "@/components/UI/router/internalPlan";
+import { routerInternalPlan } from "routers/manufacture";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 import useStatusExprired from "@/hooks/useStatusExprired";
@@ -47,7 +47,7 @@ const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
     const dataLang = props?.dataLang;
-    const trangthaiExprired = useStatusExprired()
+    const trangthaiExprired = useStatusExprired();
     const [fetChingData, sFetchingData] = useState(initsFetching);
     const [dataSelect, sDataSelect] = useState(initsArr);
     const [idChange, sIdChange] = useState(initsValue);

@@ -16,7 +16,7 @@ import { NumericFormat } from "react-number-format";
 
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { routerReturnSales } from "@/components/UI/router/sellingGoods";
+import { routerReturnSales } from "routers/sellingGoods";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";

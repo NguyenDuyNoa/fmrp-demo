@@ -39,7 +39,7 @@ import Popup_TableValidateDelete from "./(popup)/validateDelete";
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import Pagination from "@/components/UI/pagination";
-import { routerOrder } from "@/components/UI/router/buyImportGoods";
+import { routerOrder } from "routers/buyImportGoods";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
 

@@ -1,15 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import React, { useState, useRef, useEffect } from "react";
 
-import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import ReactExport from "react-data-export";
 
 import Swal from "sweetalert2";
+import ReactExport from "react-data-export";
+import Select, { components } from "react-select";
 
 import {
     Edit as IconEdit,
@@ -17,20 +18,21 @@ import {
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    LocationTick,
-    User,
     House2,
 } from "iconsax-react";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import formatNumber from "components/UI/formanumber/formanumber";
-import { useSelector } from "react-redux";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import formatNumber from "@/components/UI/formanumber/formanumber";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -45,13 +47,30 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
+    const isShow = useToast();
+
+    const trangthaiExprired = useStatusExprired();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [totalItem, sTotalItems] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [data, sData] = useState({});
+
     const [data_ex, sData_ex] = useState([]);
+
+    const [listBr, sListBr] = useState();
+
+    const [idBranch, sIdBranch] = useState(null);
 
     const _ServerFetching = () => {
         Axios(
@@ -76,7 +95,7 @@ const Index = (props) => {
             }
         );
     };
-    const [listBr, sListBr] = useState();
+
     const _ServerFetching_brand = () => {
         Axios(
             "GET",
@@ -97,24 +116,27 @@ const Index = (props) => {
     };
 
     const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
-    const [idBranch, sIdBranch] = useState(null);
+
     const onchang_filterBr = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
         }
     };
+
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
+
     const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
     const paginate = (pageNumber) => {
         router.push({
-            pathname: "/warehouses/warehouse",
+            pathname: router.route,
             query: { page: pageNumber },
         });
     };
+
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
-        router.replace("/warehouses/warehouse");
+        router.replace(router.route);
         setTimeout(() => {
             if (!value) {
                 sOnFetching(true);
@@ -122,43 +144,28 @@ const Index = (props) => {
             sOnFetching(true);
         }, 500);
     };
+
     useEffect(() => {
         (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_brand());
     }, [onFetching]);
+
     useEffect(() => {
         sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, idBranch]);
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang?.aler_success_delete,
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: dataLang[message],
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
+
+    const handleDelete = () => {
+        Axios("DELETE", `/api_web/api_warehouse/warehouse/${isId}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, message } = response?.data;
+                if (isSuccess) {
+                    isShow("success", dataLang?.aler_success_delete);
+                } else {
+                    isShow("error", dataLang[message]);
+                }
             }
+            _ServerFetching();
         });
+        handleQueryId({ status: false });
     };
     //excel
     const multiDataSet = [
@@ -241,7 +248,7 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useStatusExprired();
+
     return (
         <React.Fragment>
             <Head>
@@ -472,7 +479,10 @@ const Index = (props) => {
                                                                                 <div>
                                                                                     <button
                                                                                         onClick={() =>
-                                                                                            handleDelete(e.id)
+                                                                                            handleQueryId({
+                                                                                                id: e.id,
+                                                                                                status: true,
+                                                                                            })
                                                                                         }
                                                                                         className="xl:text-base text-xs "
                                                                                     >
@@ -524,31 +534,54 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };
 const Popup_kho = (props) => {
     const [open, sOpen] = useState(false);
+
+    const isShow = useToast();
+
     const _ToggleModal = (e) => sOpen(e);
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
     const [onSending, sOnSending] = useState(false);
+
     const [brandpOpt, sListBrand] = useState([]);
+
     const [name, sName] = useState("");
+
     const [code, sCode] = useState("");
+
     const [address, sAddress] = useState("");
+
     const [note, sNote] = useState("");
 
     const [errInputCode, sErrInputCode] = useState(false);
+
     const [errInputName, sErrInputName] = useState(false);
+
     const [errInputAddress, sErrInputAddress] = useState(false);
+
     const [errInputBr, sErrInputBr] = useState(false);
+
     const [valueBr, sValueBr] = useState([]);
-    // const branch = valueBr.map(e => e.value)
+
     useEffect(() => {
         sErrInputBr(false);
         sErrInputCode(false);
@@ -641,10 +674,7 @@ const Popup_kho = (props) => {
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", `${props.dataLang[message]}`);
                     }
                 }
                 sOnSending(false);
@@ -655,35 +685,36 @@ const Popup_kho = (props) => {
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
+
     const _HandleSubmit = (e) => {
-        console.log(branch_id);
         e.preventDefault();
         if (code.length == 0 || branch_id == null || name.length == 0 || address.length == 0) {
             code?.length == 0 && sErrInputCode(true);
             name?.length == 0 && sErrInputName(true);
             address?.length == 0 && sErrInputAddress(true);
             branch_id == null && sErrInputBr(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+            isShow("error", `${props.dataLang?.required_field_null}`);
         } else {
-            // sErrInput(false)
             sOnSending(true);
         }
     };
+
     useEffect(() => {
         sErrInputCode(false);
     }, [code.length > 0]);
+
     useEffect(() => {
         sErrInputName(false);
     }, [name.length > 0]);
+
     useEffect(() => {
         sErrInputAddress(false);
     }, [address.length > 0]);
+
     useEffect(() => {
         sErrInputBr(false);
     }, [branch_id != null]);
+
     return (
         <>
             <PopupEdit

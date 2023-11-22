@@ -24,7 +24,7 @@ import ImageErrors from "@/components/UI/imageErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import { routerDeliveryReceipt } from "@/components/UI/router/sellingGoods";
+import { routerDeliveryReceipt } from "routers/sellingGoods";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";

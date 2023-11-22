@@ -15,6 +15,10 @@ import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import formatNumber from "@/components/UI/formanumber/formanumber";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
 const Popup_EditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
@@ -26,13 +30,23 @@ const Popup_EditDetail = (props) => {
     };
 
     const [data, sData] = useState({});
+
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const [open, sOpen] = useState(false);
+
     const [isKeySearch, sIsKeySearch] = useState("");
+
     const [isFetching, sIsFetching] = useState(initialFetch);
+
     const [errorQuantity, sErrorQuantity] = useState(false);
 
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
+
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
     const _ToggleModal = (e) => sOpen(e);
@@ -89,30 +103,6 @@ const Popup_EditDetail = (props) => {
                     return e;
                 });
                 break;
-            case "deleteItem":
-                const shouldDelete = await handleDeleteItem();
-
-                if (shouldDelete) {
-                    // let hasDelivery = false;
-
-                    // data.items?.forEach((e) => {
-                    //     if (e.quantity_delivery > 0) {
-                    //         hasDelivery = true;
-                    //     }
-                    // });
-                    // if (hasDelivery) {
-                    //     ToatstNotifi("error", "Mặt hàng đã giao không thể xóa");
-                    //     newData = data.items;
-                    // } else {
-                    //     newData = data.items?.filter((e) => e.id !== idParent);
-                    //     ToatstNotifi("success", "Xóa mặt hàng thành công");
-                    // }
-                    newData = deleteItem(idParent);
-                } else {
-                    newData = data.items;
-                }
-                break;
-
             default:
                 newData = data;
         }
@@ -120,17 +110,17 @@ const Popup_EditDetail = (props) => {
         sData({ ...data, items: newData });
     };
 
-    const deleteItem = (idParent) => {
-        let hasDelivery = data.items?.some((e) => idParent == e.id && e.quantity_delivery > 0);
-
+    const handleDeleteItem = () => {
+        let hasDelivery = data.items?.some((e) => isId == e.id && e.quantity_delivery > 0);
+        handleQueryId({ status: false });
         if (hasDelivery) {
-            ToatstNotifi("error", "Mặt hàng đã giao không thể xóa");
+            isShow("error", "Mặt hàng đã giao không thể xóa");
             return data.items;
         }
 
-        ToatstNotifi("success", "Xóa mặt hàng thành công");
-
-        return data.items?.filter((e) => e.id !== idParent);
+        isShow("success", "Xóa mặt hàng thành công");
+        const newItem = data.items?.filter((e) => e.id !== isId);
+        sData({ ...data, items: newItem });
     };
 
     const handleSearch = (inputValue) => {
@@ -155,20 +145,6 @@ const Popup_EditDetail = (props) => {
         }
     };
 
-    const handleDeleteItem = async () => {
-        const result = await Swal.fire({
-            title: `Bạn có muốn xóa mặt hàng`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        });
-
-        return result.isConfirmed;
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -176,7 +152,7 @@ const Popup_EditDetail = (props) => {
 
         if (checkErrorQuantity) {
             checkErrorQuantity && sErrorQuantity(true);
-            ToatstNotifi("error", `${dataLang?.required_field_null}`);
+            isShow("error", `${dataLang?.required_field_null}`);
         } else {
             setIsFetch({ onSending: true });
         }
@@ -201,11 +177,13 @@ const Popup_EditDetail = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        isShow("success", `${dataLang[message] || message}`);
+
                         sIsFetchingParent({ onFetching: true });
+
                         sOpen(false);
                     } else {
-                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message] || message}`);
                     }
                 }
                 setIsFetch({ onSending: false });
@@ -427,7 +405,7 @@ const Popup_EditDetail = (props) => {
                                                 <button
                                                     type="button"
                                                     title="Xóa"
-                                                    onClick={(event) => handleChange("deleteItem", event, e.id)}
+                                                    onClick={(event) => handleQueryId({ id: e.id, status: true })}
                                                     className="group col-span-1 transition h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
                                                 >
                                                     <IconDelete
@@ -478,6 +456,16 @@ const Popup_EditDetail = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"salesOrder"}
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDeleteItem}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </PopupEdit>
     );
 };

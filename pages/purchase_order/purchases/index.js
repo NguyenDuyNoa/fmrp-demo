@@ -49,7 +49,7 @@ import Popup_chitiet from "./(popup)/popup";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
-import { routerPurchases } from "@/components/UI/router/buyImportGoods";
+import { routerPurchases } from "routers/buyImportGoods";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";

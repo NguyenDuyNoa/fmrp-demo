@@ -1,58 +1,76 @@
-import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
+import dynamic from "next/dynamic";
+import moment from "moment/moment";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import { _ServerInstance as Axios } from "/services/axios";
+import React, { useState, useRef, useEffect } from "react";
+
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import ReactExport from "react-data-export";
 
-import Swal from "sweetalert2";
-
+import Select, { components } from "react-select";
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    LocationTick,
-    User,
-    House2,
     Refresh2,
 } from "iconsax-react";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { useSelector } from "react-redux";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const [keySearch, sKeySearch] = useState("");
+
+    const isShow = useToast();
+
+    const { isOpen, isId, isKeyState, handleQueryId } = useToggle();
+
+    const trangthaiExprired = useStatusExprired();
+
     const [limit, sLimit] = useState(15);
+
     const [totalItem, sTotalItems] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [data, sData] = useState({});
+
     const [data_ex, sData_ex] = useState([]);
+
     const [idKho, sIdKho] = useState(null);
+
     const [onSending, sOnSending] = useState(false);
+
+    const [listKho, sListKho] = useState();
+
+    const [status, sStatus] = useState(null);
+
+    const [active, sActive] = useState(null);
+
+    const _HandleFresh = () => sOnFetching(true);
+
     const _ServerFetching = () => {
         Axios(
             "GET",
@@ -78,7 +96,6 @@ const Index = (props) => {
             }
         );
     };
-    const [listKho, sListKho] = useState();
     const _ServerFetching_kho = () => {
         Axios(
             "GET",
@@ -99,9 +116,8 @@ const Index = (props) => {
         );
     };
 
-    const listKho_filter = listKho
-        ? listKho?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
+    const listKho_filter = listKho ? listKho?.map((e) => ({ label: e.name, value: e.id })) : [];
+
     const onchang_filterKho = (type, value) => {
         if (type == "kho") {
             sIdKho(value);
@@ -109,84 +125,48 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_kho());
+        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_kho());
     }, [onFetching]);
-    useEffect(() => {
-        sOnFetching(true) ||
-            (keySearch && sOnFetching(true)) ||
-            (idKho && sOnFetching(true));
-    }, [limit, router.query?.page, idKho]);
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios(
-                    "DELETE",
-                    `/api_web/api_warehouse/location/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var isSuccess = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang?.aler_success_delete,
-                                });
-                            }
-                        }
-                        _ServerFetching();
-                    }
-                );
-            }
-        });
-    };
 
-    const [status, sStatus] = useState(null);
-    const [active, sActive] = useState(null);
+    useEffect(() => {
+        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idKho && sOnFetching(true));
+    }, [limit, router.query?.page, idKho]);
 
     // 1true 0 fal
-    const _ToggleStatus = (id) => {
-        Swal.fire({
-            title: `${"Thay đổi trạng thái"}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sActive(id);
-                var index = data.findIndex((x) => x.id === id);
-                if (index !== -1 && data[index].status === "0") {
-                    sStatus((data[index].status = "1"));
-                } else if (index !== -1 && data[index].status === "1") {
-                    sStatus((data[index].status = "0"));
-                }
-                _ServerSending();
-                // sData([...data]);
+    const handleDelete = async () => {
+        if (isKeyState) {
+            sActive(isKeyState);
+            let index = data.findIndex((x) => x.id === isKeyState);
+
+            if (index !== -1 && data[index].status === "0") {
+                sStatus((data[index].status = "1"));
+            } else if (index !== -1 && data[index].status === "1") {
+                sStatus((data[index].status = "0"));
             }
-        });
+            _ServerSending();
+
+            handleQueryId({ status: false });
+        } else {
+            Axios("DELETE", `/api_web/api_warehouse/location/${isId}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    let isSuccess = response.data;
+                    if (isSuccess) {
+                        isShow("success", dataLang?.aler_success_delete);
+                    }
+                }
+                _ServerFetching();
+            });
+            handleQueryId({ status: false });
+        }
     };
+
     const _ServerSending = async () => {
         let id = active;
-        var data = new FormData();
+        let data = new FormData();
         data.append("status", status);
         await Axios(
             "POST",
-            `${
-                id &&
-                `/api_web/api_warehouse/locationStatus/${id}?csrf_protection=true`
-            }`,
+            `${id && `/api_web/api_warehouse/locationStatus/${id}?csrf_protection=true`}`,
             {
                 data: {
                     status: status,
@@ -195,17 +175,11 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    let { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", `${dataLang[message]}`);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("error", `${dataLang[message]}`);
                     }
                 }
                 _ServerFetching(true);
@@ -224,15 +198,22 @@ const Index = (props) => {
     useEffect(() => {
         sOnSending(true);
     }, [active]);
+
     const paginate = (pageNumber) => {
         router.push({
-            pathname: "/warehouses/localtion",
+            pathname: router.route,
             query: { page: pageNumber },
         });
     };
+
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
-        router.replace("/warehouses/localtion");
+        router.replace({
+            pathname: router.route,
+            query: {
+                page: router.query?.page,
+            },
+        });
         setTimeout(() => {
             if (!value) {
                 sOnFetching(true);
@@ -253,10 +234,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_localtion_ware ||
-                        "warehouses_localtion_ware"
-                    }`,
+                    title: `${dataLang?.warehouses_localtion_ware || "warehouses_localtion_ware"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -264,10 +242,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_localtion_code ||
-                        "warehouses_localtion_code"
-                    }`,
+                    title: `${dataLang?.warehouses_localtion_code || "warehouses_localtion_code"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -275,10 +250,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_localtion_NAME ||
-                        "warehouses_localtion_NAME"
-                    }`,
+                    title: `${dataLang?.warehouses_localtion_NAME || "warehouses_localtion_NAME"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -286,10 +258,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_localtion_status ||
-                        "warehouses_localtion_status"
-                    }`,
+                    title: `${dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -297,10 +266,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouses_localtion_date ||
-                        "warehouses_localtion_date"
-                    }`,
+                    title: `${dataLang?.warehouses_localtion_date || "warehouses_localtion_date"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -314,22 +280,13 @@ const Index = (props) => {
                 { value: `${e.code ? e.code : ""}` },
                 { value: `${e.name ? e.name : ""}` },
                 {
-                    value: `${
-                        e.status
-                            ? e.status == "1"
-                                ? "Đang sử dụng"
-                                : "Không sử dụng"
-                            : ""
-                    }`,
+                    value: `${e.status ? (e.status == "1" ? "Đang sử dụng" : "Không sử dụng") : ""}`,
                 },
                 { value: `${e.date_create ? e.date_create : ""}` },
             ]),
         },
     ];
-    const trangthaiExprired = useStatusExprired()
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
+
     return (
         <React.Fragment>
             <Head>
@@ -340,9 +297,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.warehouses_localtion_title}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.warehouses_localtion_title}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.warehouses_localtion_title}</h6>
                     </div>
@@ -364,135 +319,38 @@ const Index = (props) => {
                                     />
                                 </div>
                             </div>
-
-                            {/* <div className='ml-1 w-[20%]'>
-                <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{"Kho"}</h6>
-                <Select 
-                    options={listKho_filter}
-                    onChange={onchang_filterKho.bind(this, "kho")}
-                    value={idKho}
-                    hideSelectedOptions={false}
-                    isClearable={true}
-                    placeholder={"Chọn kho"} 
-                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                    isSearchable={true}
-                    noOptionsMessage={() => "Không có dữ liệu"}
-                    components={{ MultiValue }}
-                    closeMenuOnSelect={false}
-                    isMulti
-                    theme={(theme) => ({
-                        ...theme,
-                        colors: {
-                            ...theme.colors,
-                            primary25: '#EBF5FF',
-                            primary50: '#92BFF7',
-                            primary: '#0F4F9E',
-                        },
-                    })}
-                   />
-                </div> */}
                             <div className="space-y-2 2xl:h-[100%] h-[75%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
                                         <div className="col-span-5 grid grid-cols-5 ">
-                                            <div className="col-span-1 mr-2">
-                                                <form className="flex items-center relative">
-                                                    <IconSearch
-                                                        size={20}
-                                                        className="absolute left-3 z-10 text-[#cccccc]"
-                                                    />
-                                                    <input
-                                                        className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
-                                                        type="text"
-                                                        onChange={_HandleOnChangeKeySearch.bind(
-                                                            this
-                                                        )}
-                                                        placeholder={
-                                                            dataLang?.branch_search
-                                                        }
-                                                    />
-                                                </form>
-                                            </div>
-                                            <div className="ml-1 col-span-1">
-                                                <Select
-                                                    placeholder={"Chọn kho"}
-                                                    menuPlacement="auto"
-                                                    aria-label={"Chọn kho"}
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label: "Chọn kho",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...listKho_filter,
-                                                    ]}
-                                                    onChange={onchang_filterKho.bind(
-                                                        this,
-                                                        "kho"
-                                                    )}
-                                                    value={idKho}
-                                                    hideSelectedOptions={false}
-                                                    // isMulti
-                                                    isClearable={true}
-                                                    className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
-                                                    isSearchable={true}
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
-                                                    components={{ MultiValue }}
-                                                    // closeMenuOnSelect={false}
-                                                    menuPosition="fixed"
-                                                    style={{
-                                                        border: "none",
-                                                        boxShadow: "none",
-                                                        outline: "none",
-                                                    }}
-                                                    theme={(theme) => ({
-                                                        ...theme,
-                                                        colors: {
-                                                            ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
-                                                            primary: "#0F4F9E",
-                                                        },
-                                                    })}
-                                                    styles={{
-                                                        placeholder: (
-                                                            base,
-                                                            state
-                                                        ) => ({
-                                                            ...base,
-                                                            color: "#cbd5e1",
-                                                        }),
-                                                        menu: (base) => ({
-                                                            ...base,
-                                                            marginTop: "8px", // Khoảng cách giữa placeholder và option
-                                                        }),
-                                                        control: (
-                                                            base,
-                                                            state
-                                                        ) => ({
-                                                            ...base,
-                                                            border: "none",
-                                                            outline: "none",
-                                                            boxShadow: "none",
-                                                            ...(state.isFocused && {
-                                                                boxShadow:
-                                                                    "0 0 0 1.5px #0F4F9E",
-                                                            }),
-                                                        }),
-                                                    }}
-                                                ></Select>
-                                            </div>
+                                            <SearchComponent
+                                                colSpan={1}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                dataLang={dataLang}
+                                            />
+                                            <SelectComponent
+                                                placeholder={"Chọn kho"}
+                                                colSpan={1}
+                                                onChange={onchang_filterKho.bind(this, "kho")}
+                                                value={idKho}
+                                                components={{ MultiValue }}
+                                                aria-label={"Chọn kho"}
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: "Chọn kho",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...listKho_filter,
+                                                ]}
+                                                isClearable={true}
+                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                            />
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex space-x-2 items-center justify-end">
                                                 <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
+                                                    onClick={_HandleFresh.bind(this)}
                                                     type="button"
                                                     className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                                 >
@@ -503,79 +361,15 @@ const Index = (props) => {
                                                     />
                                                 </button>
                                                 {data_ex?.length > 0 && (
-                                                    <ExcelFile
+                                                    <ExcelFileComponent
                                                         filename="Vị trí kho"
                                                         title="Vtk"
-                                                        element={
-                                                            <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                <IconExcel
-                                                                    size={18}
-                                                                />
-                                                                <span>
-                                                                    {
-                                                                        dataLang?.client_list_exportexcel
-                                                                    }
-                                                                </span>
-                                                            </button>
-                                                        }
-                                                    >
-                                                        <ExcelSheet
-                                                            dataSet={
-                                                                multiDataSet
-                                                            }
-                                                            data={multiDataSet}
-                                                            name="Organization"
-                                                        />
-                                                    </ExcelFile>
+                                                        dataSet={multiDataSet}
+                                                        data={multiDataSet}
+                                                        dataLang={dataLang}
+                                                    />
                                                 )}
-                                                <div className="">
-                                                    <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">
-                                                        {dataLang?.display}
-                                                    </div>
-                                                    <select
-                                                        className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) =>
-                                                            sLimit(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        value={limit}
-                                                    >
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                                            disabled
-                                                        >
-                                                            {limit == -1
-                                                                ? "Tất cả"
-                                                                : limit}
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={15}
-                                                        >
-                                                            15
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={20}
-                                                        >
-                                                            20
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={40}
-                                                        >
-                                                            40
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={60}
-                                                        >
-                                                            60
-                                                        </option>
-                                                        {/* <option value={-1}>Tất cả</option> */}
-                                                    </select>
-                                                </div>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
                                     </div>
@@ -584,41 +378,26 @@ const Index = (props) => {
                                     <div className="pr-2 w-[100%] lx:w-[115%] ">
                                         <div className="flex items-center sticky top-0 bg-white p-2 z-10">
                                             <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">
-                                                {
-                                                    dataLang?.warehouses_localtion_ware
-                                                }
+                                                {dataLang?.warehouses_localtion_ware}
                                             </h4>
                                             <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">
-                                                {
-                                                    dataLang?.warehouses_localtion_code
-                                                }
+                                                {dataLang?.warehouses_localtion_code}
                                             </h4>
                                             <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">
-                                                {
-                                                    dataLang?.warehouses_localtion_NAME
-                                                }
+                                                {dataLang?.warehouses_localtion_NAME}
                                             </h4>
                                             <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">
-                                                {
-                                                    dataLang?.warehouses_localtion_status
-                                                }
+                                                {dataLang?.warehouses_localtion_status}
                                             </h4>
                                             <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">
-                                                {
-                                                    dataLang?.warehouses_localtion_date
-                                                }
+                                                {dataLang?.warehouses_localtion_date}
                                             </h4>
                                             <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">
-                                                {
-                                                    dataLang?.branch_popup_properties
-                                                }
+                                                {dataLang?.branch_popup_properties}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
@@ -628,9 +407,7 @@ const Index = (props) => {
                                                             key={e?.id?.toString()}
                                                         >
                                                             <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
-                                                                {
-                                                                    e.warehouse_name
-                                                                }
+                                                                {e.warehouse_name}
                                                             </h6>
                                                             <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
                                                                 {e.code}
@@ -640,31 +417,22 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-center">
                                                                 <label
-                                                                    htmlFor={
-                                                                        e.id
-                                                                    }
+                                                                    htmlFor={e.id}
                                                                     className="relative inline-flex items-center cursor-pointer"
                                                                 >
                                                                     <input
                                                                         type="checkbox"
                                                                         className="sr-only peer"
-                                                                        value={
-                                                                            e.status
-                                                                        }
-                                                                        id={
-                                                                            e.id
-                                                                        }
+                                                                        value={e.status}
+                                                                        id={e.id}
                                                                         // defaultChecked
-                                                                        checked={
-                                                                            e.status ==
-                                                                            "0"
-                                                                                ? false
-                                                                                : true
+                                                                        checked={e.status == "0" ? false : true}
+                                                                        onChange={() =>
+                                                                            handleQueryId({
+                                                                                initialKey: e.id,
+                                                                                status: true,
+                                                                            })
                                                                         }
-                                                                        onChange={_ToggleStatus.bind(
-                                                                            this,
-                                                                            e.id
-                                                                        )}
                                                                     />
 
                                                                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
@@ -672,11 +440,8 @@ const Index = (props) => {
                                                             </h6>
                                                             {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.email}</h6>                 */}
                                                             <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
-                                                                {e?.date_create !=
-                                                                null
-                                                                    ? moment(
-                                                                          e.date_create
-                                                                      ).format(
+                                                                {e?.date_create != null
+                                                                    ? moment(e.date_create).format(
                                                                           "DD/MM/YYYY, h:mm:ss"
                                                                       )
                                                                     : ""}
@@ -684,36 +449,20 @@ const Index = (props) => {
 
                                                             <div className="space-x-2 w-[10%] text-center">
                                                                 <Popup_Vitrikho
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
+                                                                    onRefresh={_ServerFetching.bind(this)}
                                                                     valuekho={e}
-                                                                    warehouse_name={
-                                                                        e.warehouse_name
-                                                                    }
-                                                                    warehouse_id={
-                                                                        e.warehouse_id
-                                                                    }
-                                                                    listKho={
-                                                                        listKho
-                                                                    }
+                                                                    warehouse_name={e.warehouse_name}
+                                                                    warehouse_id={e.warehouse_id}
+                                                                    listKho={listKho}
                                                                     className="xl:text-base text-xs "
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
-                                                                    name={
-                                                                        e.name
-                                                                    }
-                                                                    code={
-                                                                        e.code
-                                                                    }
+                                                                    dataLang={dataLang}
+                                                                    name={e.name}
+                                                                    code={e.code}
                                                                     id={e?.id}
                                                                 />
                                                                 <button
                                                                     onClick={() =>
-                                                                        handleDelete(
-                                                                            e.id
-                                                                        )
+                                                                        handleQueryId({ status: true, id: e.id })
                                                                     }
                                                                     className="xl:text-base text-xs "
                                                                 >
@@ -744,16 +493,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItem?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among} {totalItem?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItem?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -762,27 +507,48 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={isKeyState ? TITLE_STATUS : TITLE_DELETE}
+                subtitle={isKeyState ? CONFIRMATION_OF_CHANGES : CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };
 const Popup_Vitrikho = (props) => {
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
+    const isShow = useToast();
+
     const [onSending, sOnSending] = useState(false);
+
     const [khoOpt, sListkho] = useState([]);
+
     const [name, sName] = useState("");
+
     const [code, sCode] = useState("");
 
     const [errInputCode, sErrInputCode] = useState(false);
+
     const [errInputName, sErrInputName] = useState(false);
+
     const [errInputKho, sErrInputKho] = useState(false);
+
     const [valuekho, sValuekho] = useState([]);
+
     useEffect(() => {
         sErrInputKho(false);
         sErrInputCode(false);
@@ -812,6 +578,7 @@ const Popup_Vitrikho = (props) => {
     }, [open]);
 
     const kho_id = valuekho?.value || valuekho?.map((e) => e.value);
+
     const _HandleChangeInput = (type, value) => {
         if (type == "name") {
             sName(value.target?.value);
@@ -823,7 +590,7 @@ const Popup_Vitrikho = (props) => {
     };
     const _ServerSending = () => {
         const id = props.id;
-        var data = new FormData();
+        let data = new FormData();
         data.append("name", name);
         data.append("code", code);
         data.append("warehouse_id", kho_id);
@@ -840,12 +607,9 @@ const Popup_Vitrikho = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    let { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("success", `${props.dataLang[message]}`);
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                         sErrInputCode(false);
@@ -855,10 +619,7 @@ const Popup_Vitrikho = (props) => {
                         sCode("");
                         sValuekho([]);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", `${props.dataLang[message]}`);
                     }
                 }
                 sOnSending(false);
@@ -870,30 +631,28 @@ const Popup_Vitrikho = (props) => {
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
+
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (
-            code.length == 0 ||
-            valuekho?.length == 0 ||
-            name.length == 0 ||
-            valuekho == null
-        ) {
+        if (code.length == 0 || valuekho?.length == 0 || name.length == 0 || valuekho == null) {
             code?.length == 0 && sErrInputCode(true);
+
             name?.length == 0 && sErrInputName(true);
+
             valuekho?.length == 0 && sErrInputKho(true);
+
             valuekho == null && sErrInputKho(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+
+            isShow("error", `${props.dataLang?.required_field_null}`);
         } else {
-            // sErrInput(false)
             sOnSending(true);
         }
     };
+
     useEffect(() => {
         sErrInputCode(false);
     }, [code?.length > 0]);
+
     useEffect(() => {
         sErrInputName(false);
     }, [name?.length > 0]);
@@ -901,6 +660,7 @@ const Popup_Vitrikho = (props) => {
     useEffect(() => {
         sErrInputKho(false);
     }, [valuekho?.length > 0, valuekho != null]);
+
     return (
         <>
             <PopupEdit
@@ -909,13 +669,7 @@ const Popup_Vitrikho = (props) => {
                         ? `${props.dataLang?.warehouses_localtion_edit}`
                         : `${props.dataLang?.warehouses_localtion_add}`
                 }
-                button={
-                    props.id ? (
-                        <IconEdit />
-                    ) : (
-                        `${props.dataLang?.branch_popup_create_new}`
-                    )
-                }
+                button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
@@ -934,24 +688,13 @@ const Popup_Vitrikho = (props) => {
                                     <div className="w-full">
                                         <div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.warehouses_localtion_code
-                                                }
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.warehouses_localtion_code}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 value={code}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "code"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.warehouses_localtion_code
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "code")}
+                                                placeholder={props.dataLang?.warehouses_localtion_code}
                                                 name="fname"
                                                 type="text"
                                                 className={`${
@@ -962,33 +705,19 @@ const Popup_Vitrikho = (props) => {
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.warehouses_localtion_errCode
-                                                    }
+                                                    {props.dataLang?.warehouses_localtion_errCode}
                                                 </label>
                                             )}
                                         </div>
                                         <div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.warehouses_localtion_NAME
-                                                }
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.warehouses_localtion_NAME}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 value={name}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "name"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.warehouses_localtion_NAME
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "name")}
+                                                placeholder={props.dataLang?.warehouses_localtion_NAME}
                                                 name="fname"
                                                 type="text"
                                                 className={`${
@@ -999,38 +728,22 @@ const Popup_Vitrikho = (props) => {
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.warehouses_localtion_errName
-                                                    }
+                                                    {props.dataLang?.warehouses_localtion_errName}
                                                 </label>
                                             )}
                                         </div>
 
                                         <div>
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                                {
-                                                    props.dataLang
-                                                        ?.warehouses_localtion_ware
-                                                }{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.warehouses_localtion_ware}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <Select
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.warehouses_localtion_ware
-                                                }
+                                                placeholder={props.dataLang?.warehouses_localtion_ware}
                                                 options={khoOpt}
                                                 isSearchable={true}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "valuekho"
-                                                )}
-                                                noOptionsMessage={() =>
-                                                    "Không có dữ liệu"
-                                                }
+                                                onChange={_HandleChangeInput.bind(this, "valuekho")}
+                                                noOptionsMessage={() => "Không có dữ liệu"}
                                                 value={valuekho}
                                                 maxMenuHeight="200px"
                                                 isClearable={true}
@@ -1062,17 +775,12 @@ const Popup_Vitrikho = (props) => {
                                                     }),
                                                 }}
                                                 className={`${
-                                                    errInputKho
-                                                        ? "border-red-500"
-                                                        : "border-transparent"
+                                                    errInputKho ? "border-red-500" : "border-transparent"
                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             />
                                             {errInputKho && (
                                                 <label className="mb-2  text-[14px] text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.warehouses_localtion_errWare
-                                                    }
+                                                    {props.dataLang?.warehouses_localtion_errWare}
                                                 </label>
                                             )}
                                         </div>

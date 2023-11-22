@@ -23,7 +23,7 @@ import { BsCalendarEvent } from "react-icons/bs";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { routerPurchases } from "@/components/UI/router/buyImportGoods";
+import { routerPurchases } from "routers/buyImportGoods";
 
 import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";

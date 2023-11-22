@@ -1,29 +1,29 @@
-import React, { useRef, useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { _ServerInstance as Axios } from "/services/axios";
-import { v4 as uuidv4 } from "uuid";
-import dynamic from "next/dynamic";
-import Loading from "components/UI/loading";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import Select, { components, MenuListProps } from "react-select";
-
-import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 import Swal from "sweetalert2";
-import { useEffect } from "react";
-import { NumericFormat } from "react-number-format";
-import Link from "next/link";
 import moment from "moment/moment";
-import { useSelector } from "react-redux";
-import { routerImport } from "components/UI/router/buyImportGoods";
+import { v4 as uuidv4 } from "uuid";
+import Select, { components } from "react-select";
+import { NumericFormat } from "react-number-format";
+import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import Loading from "@/components/UI/loading";
+import { routerImport } from "routers/buyImportGoods";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -35,70 +35,92 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const router = useRouter();
+
     const id = router.query?.id;
 
     const dataLang = props?.dataLang;
-    const scrollAreaRef = useRef(null);
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
-    };
+
+    const isShow = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     const [onFetching, sOnFetching] = useState(false);
+
+    const trangthaiExprired = useStatusExprired();
+
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+
     const [onFetchingTheOrder, sOnFetchingTheOrder] = useState(false);
+
     const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
+
     const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
+
     const [thuetong, sThuetong] = useState();
+
     const [chietkhautong, sChietkhautong] = useState(0);
 
     const [code, sCode] = useState("");
 
     const [startDate, sStartDate] = useState(new Date());
+
     const [effectiveDate, sEffectiveDate] = useState(null);
 
     const [note, sNote] = useState("");
+
     const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+
     const [dataSupplier, sDataSupplier] = useState([]);
+
     const [dataThe_order, sDataThe_order] = useState([]);
+
     const [dataBranch, sDataBranch] = useState([]);
+
     const [dataItems, sDataItems] = useState([]);
+
     const [warehouse, sDataWarehouse] = useState([]);
+
     const [dataTasxes, sDataTasxes] = useState([]);
 
-    // const [option, sOption] = useState([{id: Date.now(), mathang: null, serial: '', lot: '', date: null, khohang: null, donvitinh: "", soluong: 1, dongia: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
-    // const slicedArr = option.slice(1);
-    // const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
-    // sortedArr.unshift(option[0]);
-
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
 
     //new
     const [listData, sListData] = useState([]);
 
     const [idSupplier, sIdSupplier] = useState(null);
+
     const [idTheOrder, sIdTheOrder] = useState(null);
+
     const [idBranch, sIdBranch] = useState(null);
 
     const [errSupplier, sErrSupplier] = useState(false);
+
     const [errDate, sErrDate] = useState(false);
+
     const [errDateList, sErrDateList] = useState(false);
+
     const [errTheOrder, sErrTheOrder] = useState(false);
+
     const [errBranch, sErrBranch] = useState(false);
+
     const [errWarehouse, sErrWarehouse] = useState(false);
+
     const [errLot, sErrLot] = useState(false);
     const [errSerial, sErrSerial] = useState(false);
-    const [mathangAll, sMathangAll] = useState([]);
-    const [khotong, sKhotong] = useState(null);
 
-    const [cutTomStyle, sCustomStyle] = useState(null);
+    const [mathangAll, sMathangAll] = useState([]);
+
+    const [khotong, sKhotong] = useState(null);
 
     useEffect(() => {
         router.query && sErrDate(false);
@@ -109,73 +131,19 @@ const Index = (props) => {
         router.query && sErrLot(false);
         router.query && sErrDateList(false);
         router.query && sStartDate(new Date());
-        // router.query && sErrWarehouse(false)
-        // router.query && sDate(moment().format('YYYY-MM-DD HH:mm:ss'))
         router.query && sNote("");
     }, [router.query]);
-
-    const _ServerFetchingDetail = () => {
-        Axios("GET", `/api_web/Api_import/import/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var rResult = response.data;
-                const itemlast = [{ mathang: null }];
-                const item = itemlast?.concat(
-                    rResult?.items?.map((e) => ({
-                        purchases_order_item_id: e?.item?.purchase_order_item_id,
-                        id: e.id,
-                        mathang: {
-                            e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${
-                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
-                            value: e.item?.id,
-                        },
-                        khohang: {
-                            label: e?.location_name,
-                            value: e?.location_warehouses_id,
-                            warehouse_name: e?.warehouse_name,
-                        },
-                        soluong: Number(e?.quantity),
-                        dongia: Number(e?.price),
-                        chietkhau: Number(e?.discount_percent),
-                        thue: { tax_rate: e?.tax_rate, value: e?.tax_id },
-                        donvitinh: e.item?.unit_name,
-                        dongiasauck: Number(e?.price_after_discount),
-                        ghichu: e?.note,
-                        thanhtien:
-                            Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
-                    }))
-                );
-                sCode(rResult?.code);
-                sIdBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
-                });
-                sIdSupplier({
-                    label: rResult?.supplier_name,
-                    value: rResult?.supplier_id,
-                });
-                sIdTheOrder({
-                    label: rResult?.purchase_order_code,
-                    value: rResult?.purchase_order_id,
-                });
-                sDate(moment(rResult?.date).format("YYYY-MM-DD HH:mm:ss"));
-                sNote(rResult?.note);
-            }
-            sOnFetchingDetail(false);
-        });
-    };
 
     const _ServerFetching = () => {
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
+                let { result } = response.data;
                 sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
             }
         });
         Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sDataTasxes(
                     rResult?.map((e) => ({
                         label: e.name,
@@ -196,7 +164,7 @@ const Index = (props) => {
     const _ServerFetchingCondition = () => {
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
+                let data = response.data;
                 sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
                 sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
                 sDataProductSerial(data.find((x) => x.code == "product_serial"));
@@ -227,7 +195,7 @@ const Index = (props) => {
     const _ServerFetchingDetailPage = () => {
         Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var rResult = response.data;
+                let rResult = response.data;
                 sListData(
                     rResult?.items.map((e) => ({
                         id: e?.item?.id,
@@ -356,52 +324,30 @@ const Index = (props) => {
         (idBranch === null && sDataSupplier([])) || sIdSupplier(null);
     }, []);
 
+    const resetValue = () => {
+        if (isKeyState?.type === "supplier") {
+            sDataItems([]);
+            sDataWarehouse([]);
+            sListData([]);
+            sIdSupplier(isKeyState?.value);
+            sIdTheOrder(null);
+        }
+        if (isKeyState?.type === "theorder") {
+            sDataItems([]);
+            sDataWarehouse([]);
+            sListData([]);
+            sIdTheOrder(isKeyState?.value);
+        }
+        if (isKeyState?.type === "branch") {
+            sDataItems([]);
+            sDataWarehouse([]);
+            sListData([]);
+            sIdBranch(value);
+        }
+        handleQueryId({ status: false });
+    };
+
     const _HandleChangeInput = (type, value) => {
-        // if(listData?.length > 0){
-        //   if(type ==="branch" && idBranch != value || type === "supplier" && idSupplier != value || type === "theorder" && idTheOrder != value){
-        //     Swal.fire({
-        //       title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
-        //       icon: 'warning',
-        //       showCancelButton: true,
-        //       confirmButtonColor: '#296dc1',
-        //       cancelButtonColor: '#d33',
-        //       confirmButtonText: `${dataLang?.aler_yes}`,
-        //       cancelButtonText:`${dataLang?.aler_cancel}`
-        //   }).then((result) => {
-        //     if (result.isConfirmed) {
-        //       //  sOption([{id: Date.now(), mathang: null}])
-        //         sDataItems([])
-        //         sDataWarehouse([])
-        //         if(type == "branch"){
-        //           sIdBranch(value)
-        //           sIdTheOrder(null)
-        //           sIdSupplier(null)
-        //           sKhotong(null)
-        //           if(value == null){
-        //             sDataSupplier([])
-        //             sDataThe_order([])
-        //           }
-        //         }
-        //       else  if(type == "supplier"){
-        //           sIdSupplier(value)
-        //           sIdTheOrder(null)
-        //         }else if(type =="theorder"){
-        //           sIdTheOrder(value)
-        //           sIdSupplier({...idSupplier})
-        //         }
-        //         sKhotong(null)
-        //         sListData([])
-        //     }else{
-        //       sIdTheOrder({...idTheOrder})
-        //       sIdSupplier({...idSupplier})
-        //       // sIdBranch(value)
-        //       // sIdPurchases(null)
-        //       sListData([...listData])
-        //       // sOption([{id: Date.now(), mathang: null, serial: '', lot: '', date: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
-        //     }
-        //   })
-        //   }
-        // }
         if (type == "code") {
             sCode(value.target.value);
         } else if (type === "date") {
@@ -409,25 +355,7 @@ const Index = (props) => {
         } else if (type === "supplier" && idSupplier != value) {
             if (listData?.length > 0) {
                 if (type === "supplier" && idSupplier != value) {
-                    Swal.fire({
-                        title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#296dc1",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: `${dataLang?.aler_yes}`,
-                        cancelButtonText: `${dataLang?.aler_cancel}`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            sDataItems([]);
-                            sDataWarehouse([]);
-                            sListData([]);
-                            sIdSupplier(value);
-                            sIdTheOrder(null);
-                        } else {
-                            sIdSupplier({ ...idSupplier });
-                        }
-                    });
+                    handleQueryId({ status: true, initialKey: { type, value } });
                 }
             } else {
                 sIdTheOrder(null);
@@ -450,24 +378,7 @@ const Index = (props) => {
         } else if (type === "theorder") {
             if (listData?.length > 0) {
                 if (type === "theorder" && idTheOrder != value) {
-                    Swal.fire({
-                        title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#296dc1",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: `${dataLang?.aler_yes}`,
-                        cancelButtonText: `${dataLang?.aler_cancel}`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            sDataItems([]);
-                            sDataWarehouse([]);
-                            sListData([]);
-                            sIdTheOrder(value);
-                        } else {
-                            sIdTheOrder({ ...idTheOrder });
-                        }
-                    });
+                    handleQueryId({ status: true, initialKey: { type, value } });
                 }
             }
             if (listData.length == 0) {
@@ -481,24 +392,7 @@ const Index = (props) => {
         } else if (type == "branch" && idBranch != value) {
             if (listData?.length > 0) {
                 if (type === "branch" && idBranch != value) {
-                    Swal.fire({
-                        title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#296dc1",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: `${dataLang?.aler_yes}`,
-                        cancelButtonText: `${dataLang?.aler_cancel}`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            sDataItems([]);
-                            sDataWarehouse([]);
-                            sListData([]);
-                            sIdBranch(value);
-                        } else {
-                            sIdBranch({ ...idBranch });
-                        }
-                    });
+                    handleQueryId({ status: true, initialKey: { type, value } });
                 }
             } else {
                 sIdBranch(value);
@@ -672,10 +566,7 @@ const Index = (props) => {
             hasNullLot && sErrLot(true);
             hasNullSerial && sErrSerial(true);
             hasNullDate && sErrDateList(true);
-            Toast.fire({
-                icon: "error",
-                title: `${dataLang?.required_field_null}`,
-            });
+            isShow("error", `${dataLang?.required_field_null}`);
         } else {
             sErrWarehouse(false);
             sErrLot(false);
@@ -1191,10 +1082,8 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", `${dataLang[message]}`);
+
                         sCode("");
                         sStartDate(new Date());
                         sIdSupplier(null);
@@ -1211,15 +1100,9 @@ const Index = (props) => {
                         router.push(routerImport.home);
                     } else {
                         if (tongTienState.tongTien == 0) {
-                            Toast.fire({
-                                icon: "error",
-                                title: `Chưa nhập thông tin mặt hàng`,
-                            });
+                            isShow("success", `Chưa nhập thông tin mặt hàng`);
                         } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: `${dataLang[message]}`,
-                            });
+                            isShow("success", `${dataLang[message]}`);
                         }
                     }
                 }
@@ -1398,16 +1281,7 @@ const Index = (props) => {
         sListData([...newData]);
     };
 
-    const handleQuantityError = (e) => {
-        Toast.fire({
-            title: e,
-            icon: "error",
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: dataLang?.aler_yes,
-            timer: 3000,
-        });
-    };
+    const handleQuantityError = (e) => isShow("error", e);
 
     const _HandleChangeValue = (parentId, value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
@@ -1462,10 +1336,7 @@ const Index = (props) => {
             });
             sListData([...newData]);
         } else {
-            Toast.fire({
-                title: `${"Mặt hàng đã được chọn"}`,
-                icon: "error",
-            });
+            isShow("error", `${"Mặt hàng đã được chọn"}`);
         }
     };
 
@@ -1491,8 +1362,6 @@ const Index = (props) => {
                 }
             );
     };
-
-    const trangthaiExprired = useStatusExprired()
 
     return (
         <React.Fragment>
@@ -2994,6 +2863,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={resetValue}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

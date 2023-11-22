@@ -1,101 +1,129 @@
-import React, { useRef, useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { _ServerInstance as Axios } from "/services/axios";
-import { v4 as uuidv4 } from "uuid";
-import dynamic from "next/dynamic";
-import Loading from "components/UI/loading";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import Select, { components, MenuListProps } from "react-select";
-
-import { Add, Trash as IconDelete, Image as IconImage, MaximizeCircle, Minus, TableDocument } from "iconsax-react";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
-import { NumericFormat } from "react-number-format";
-import Link from "next/link";
-import moment from "moment/moment";
 import Popup from "reactjs-popup";
-import { useSelector } from "react-redux";
-import { routerReturns } from "components/UI/router/buyImportGoods";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import moment from "moment/moment";
+import { v4 as uuidv4 } from "uuid";
+import Select, { components } from "react-select";
+import { NumericFormat } from "react-number-format";
+import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { routerReturns } from "routers/buyImportGoods";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
 const Index = (props) => {
     const router = useRouter();
+
+    const isShow = useToast();
+
     const id = router.query?.id;
 
     const dataLang = props?.dataLang;
-    const scrollAreaRef = useRef(null);
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
-    };
-    const trangthaiExprired = useStatusExprired()
+
+    const trangthaiExprired = useStatusExprired();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
+
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+
     const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
+
     const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
+
     const [onLoading, sOnLoading] = useState(false);
+
     const [onLoadingChild, sOnLoadingChild] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
+
     const [thuetong, sThuetong] = useState();
+
     const [chietkhautong, sChietkhautong] = useState(0);
+
     const [code, sCode] = useState("");
+
     const [startDate, sStartDate] = useState(new Date());
+
     const [effectiveDate, sEffectiveDate] = useState(null);
 
     const [note, sNote] = useState("");
+
     const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+
     const [dataSupplier, sDataSupplier] = useState([]);
+
     const [data_Treatmentr, sData_Treatmentr] = useState([]);
+
     const [dataBranch, sDataBranch] = useState([]);
+
     const [dataItems, sDataItems] = useState([]);
+
     const [warehouse, sDataWarehouse] = useState([]);
+
     const [dataTasxes, sDataTasxes] = useState([]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
     //new
     const [listData, sListData] = useState([]);
+
     const [idParen, sIdParent] = useState(null);
+
     const [qtyHouse, sQtyHouse] = useState(null);
+
     const [survive, sSurvive] = useState(null);
 
     const [idSupplier, sIdSupplier] = useState(null);
+
     const [idTreatment, sIdTreatment] = useState(null);
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [load, sLoad] = useState(false);
 
     const [errSupplier, sErrSupplier] = useState(false);
+
     const [errDate, sErrDate] = useState(false);
+
     const [errDateList, sErrDateList] = useState(false);
+
     const [errTreatment, sErrTreatment] = useState(false);
+
     const [errBranch, sErrBranch] = useState(false);
+
     const [errWarehouse, sErrWarehouse] = useState(false);
+
     const [errAmount, sErrAmount] = useState(false);
+
     const [errSurvive, sErrSurvive] = useState(false);
+
     const [errLot, sErrLot] = useState(false);
+
     const [errSerial, sErrSerial] = useState(false);
+
     const [khotong, sKhotong] = useState(null);
 
     useEffect(() => {
@@ -194,6 +222,7 @@ const Index = (props) => {
         value: e.id,
         e,
     }));
+
     const _ServerFetchingDetailPage = () => {
         Axios("GET", `/api_web/Api_return_supplier/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
@@ -332,6 +361,23 @@ const Index = (props) => {
         (idBranch === null && sDataSupplier([])) || sIdSupplier(null);
     }, []);
 
+    const resetValue = () => {
+        if (isKeyState?.type === "supplier") {
+            sDataItems([]);
+            sDataWarehouse([]);
+            sListData([]);
+            sIdSupplier(isKeyState?.value);
+        }
+        if (isKeyState?.type === "branch") {
+            sDataItems([]);
+            sDataWarehouse([]);
+            sListData([]);
+            sIdSupplier(null);
+            sIdBranch(isKeyState?.value);
+        }
+        handleQueryId({ status: false });
+    };
+
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -340,24 +386,7 @@ const Index = (props) => {
         } else if (type === "supplier" && idSupplier != value) {
             if (listData?.length > 0) {
                 if (type === "supplier" && idSupplier != value) {
-                    Swal.fire({
-                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#296dc1",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: `${dataLang?.aler_yes}`,
-                        cancelButtonText: `${dataLang?.aler_cancel}`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            sDataItems([]);
-                            sDataWarehouse([]);
-                            sListData([]);
-                            sIdSupplier(value);
-                        } else {
-                            sIdSupplier({ ...idSupplier });
-                        }
-                    });
+                    handleQueryId({ status: true, initialKey: { type, value } });
                 }
             } else {
                 sIdSupplier(null);
@@ -373,25 +402,7 @@ const Index = (props) => {
         } else if (type == "branch" && idBranch != value) {
             if (listData?.length > 0) {
                 if (type === "branch" && idBranch != value) {
-                    Swal.fire({
-                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#296dc1",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: `${dataLang?.aler_yes}`,
-                        cancelButtonText: `${dataLang?.aler_cancel}`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            sDataItems([]);
-                            sDataWarehouse([]);
-                            sListData([]);
-                            sIdSupplier(null);
-                            sIdBranch(value);
-                        } else {
-                            sIdBranch({ ...idBranch });
-                        }
-                    });
+                    handleQueryId({ status: true, initialKey: { type, value } });
                 }
             } else {
                 sIdBranch(value);
@@ -477,21 +488,12 @@ const Index = (props) => {
             hasNullKho && sErrWarehouse(true);
             hasNullAmount && sErrAmount(true);
             if (isEmpty) {
-                Toast.fire({
-                    icon: "error",
-                    title: `Chưa nhập thông tin mặt hàng`,
-                });
+                isShow("error", `Chưa nhập thông tin mặt hàng`);
             } else if (isTotalExceeded) {
                 sErrSurvive(true);
-                Toast.fire({
-                    icon: "error",
-                    title: `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`,
-                });
+                isShow("error", `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`);
             } else {
-                Toast.fire({
-                    icon: "error",
-                    title: `${dataLang?.required_field_null}`,
-                });
+                isShow("error", `${dataLang?.required_field_null}`);
             }
         } else {
             sErrSurvive(false);
@@ -696,10 +698,7 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", `${dataLang[message]}`);
                         sCode("");
                         sStartDate(new Date());
                         sIdSupplier(null);
@@ -720,11 +719,8 @@ const Index = (props) => {
                         //     icon: 'error',
                         //     title: `Chưa nhập thông tin mặt hàng`
                         // })
+                        isShow("error", `${dataLang[message]}`);
                         //  }
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message]}`,
-                        });
                     }
                 }
                 sOnSending(false);
@@ -815,10 +811,7 @@ const Index = (props) => {
             };
             sListData([newData, ...listData]);
         } else {
-            Toast.fire({
-                title: `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`,
-                icon: "error",
-            });
+            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
@@ -860,7 +853,7 @@ const Index = (props) => {
         console.log("ce.amount", ce.amount);
         console.log("qtyHouse", qtyHouse);
         if (checkChild > qtyHouse) {
-            ToatstNotifi("error", `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`);
+            isShow("error", `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`);
             ce.amount = "";
             setTimeout(() => {
                 sLoad(true);
@@ -920,52 +913,36 @@ const Index = (props) => {
                             const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
 
                             if (ce?.id === childId && totalSoLuong == qtyHouse) {
-                                Toast.fire({
-                                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                        qtyHouse
-                                    )} số lượng còn lại`,
-                                    icon: "error",
-                                    confirmButtonColor: "#296dc1",
-                                    cancelButtonColor: "#d33",
-                                    confirmButtonText: dataLang?.aler_yes,
-                                    timer: 3000,
-                                });
+                                isShow(
+                                    "error",
+                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`
+                                );
+
                                 return { ...ce };
                             } else if (ce?.id === childId && totalSoLuong == Number(ce?.kho?.qty)) {
-                                Toast.fire({
-                                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                isShow(
+                                    "error",
+                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                         Number(ce?.kho?.qty)
-                                    )} số lượng còn lại`,
-                                    icon: "error",
-                                    confirmButtonColor: "#296dc1",
-                                    cancelButtonColor: "#d33",
-                                    confirmButtonText: dataLang?.aler_yes,
-                                    timer: 3000,
-                                });
+                                    )} số lượng còn lại`
+                                );
+
                                 return { ...ce };
                             } else if (ce?.id === childId && totalSoLuong > Number(ce?.kho?.qty)) {
-                                Toast.fire({
-                                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                isShow(
+                                    "error",
+                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                         Number(ce?.kho?.qty)
-                                    )} số lượng tồn`,
-                                    icon: "error",
-                                    confirmButtonColor: "#296dc1",
-                                    cancelButtonColor: "#d33",
-                                    confirmButtonText: dataLang?.aler_yes,
-                                    timer: 3000,
-                                });
+                                    )} số lượng tồn`
+                                );
+
                                 return { ...ce };
                             } else if (ce?.id === childId && totalSoLuong > qtyHouse) {
-                                Toast.fire({
-                                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                        qtyHouse
-                                    )} số lượng tồn`,
-                                    icon: "error",
-                                    confirmButtonColor: "#296dc1",
-                                    cancelButtonColor: "#d33",
-                                    confirmButtonText: dataLang?.aler_yes,
-                                    timer: 3000,
-                                });
+                                isShow(
+                                    "error",
+                                    `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng tồn`
+                                );
+
                                 return { ...ce };
                             } else {
                                 return {
@@ -992,10 +969,7 @@ const Index = (props) => {
                             sSurvive(Number(value?.qty));
                             sErrSurvive(false);
                             if (checkKho) {
-                                Toast.fire({
-                                    title: `${dataLang?.returns_err_Warehouse || "returns_err_Warehouse"}`,
-                                    icon: "error",
-                                });
+                                isShow("error", `${dataLang?.returns_err_Warehouse || "returns_err_Warehouse"}`);
                                 return { ...ce };
                             } else {
                                 return { ...ce, kho: value };
@@ -1068,10 +1042,7 @@ const Index = (props) => {
             });
             sListData([...newData]);
         } else {
-            Toast.fire({
-                title: `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`,
-                icon: "error",
-            });
+            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
@@ -1883,16 +1854,16 @@ const Index = (props) => {
                                                                                     floatValue > ce?.soluongcl ||
                                                                                     floatValue > qtyHouse
                                                                                 ) {
-                                                                                    Toast.fire({
-                                                                                        icon: "error",
-                                                                                        title: `${
+                                                                                    isShow(
+                                                                                        "error",
+                                                                                        `${
                                                                                             props.dataLang
                                                                                                 ?.returns_err_Qty ||
                                                                                             "returns_err_Qty"
                                                                                         } ${ce?.soluongcl?.toLocaleString(
                                                                                             "en"
-                                                                                        )}`,
-                                                                                    });
+                                                                                        )}`
+                                                                                    );
                                                                                 }
                                                                                 return floatValue <= ce?.soluongcl;
                                                                             }}
@@ -2315,6 +2286,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={resetValue}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

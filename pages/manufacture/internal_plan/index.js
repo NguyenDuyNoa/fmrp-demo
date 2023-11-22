@@ -16,7 +16,7 @@ import Pagination from "@/components/UI/pagination";
 import ImageErrors from "@/components/UI/imageErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { routerInternalPlan } from "@/components/UI/router/internalPlan";
+import { routerInternalPlan } from "routers/manufacture";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";

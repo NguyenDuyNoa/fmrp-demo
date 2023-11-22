@@ -21,7 +21,7 @@ import PopupAddress from "./(popupAddress)/PopupAddress";
 
 import Loading from "@/components/UI/loading";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
-import { routerDeliveryReceipt } from "@/components/UI/router/sellingGoods";
+import { routerDeliveryReceipt } from "routers/sellingGoods";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";

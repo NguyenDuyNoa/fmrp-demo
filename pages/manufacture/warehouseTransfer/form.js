@@ -1,33 +1,32 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { _ServerInstance as Axios } from "/services/axios";
+import { useRouter } from "next/router";
+
+import React, { useState, useEffect } from "react";
+
 import { v4 as uuidv4 } from "uuid";
-import Loading from "components/UI/loading";
-
 import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
-
+import { BsCalendarEvent } from "react-icons/bs";
 import Select, { components } from "react-select";
 
+import { _ServerInstance as Axios } from "/services/axios";
+
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
-import { NumericFormat } from "react-number-format";
-import Link from "next/link";
+
 import moment from "moment/moment";
-import { useSelector } from "react-redux";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import { NumericFormat } from "react-number-format";
+
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { routerWarehouseTransfer } from "routers/manufacture";
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+
 /// Hậu viết API
 const Index = (props) => {
     const router = useRouter();
@@ -35,47 +34,76 @@ const Index = (props) => {
 
     const dataLang = props?.dataLang;
 
+    const isShow = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
+
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+
     const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] = useState(false);
+
     const [onFetchingReceivingLocation, sOnFetchingReceivingLocation] = useState(false);
 
     const [onLoading, sOnLoading] = useState(false);
+
     const [onLoadingChild, sOnLoadingChild] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
+
     const [code, sCode] = useState("");
+
     const [startDate, sStartDate] = useState(new Date());
+
     const [effectiveDate, sEffectiveDate] = useState(null);
 
     const [note, sNote] = useState("");
+
     const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
 
     const [dataBranch, sDataBranch] = useState([]);
+
     const [dataItems, sDataItems] = useState([]);
+
     const [dataWarehouse, sDataWarehouse] = useState([]);
+
     const [dataReceiveWarehouse, sDataReceiveWarehouse] = useState([]);
+
     const [dataReceivingLocation, sDataReceivingLocation] = useState([]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
     //new
     const [listData, sListData] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
+
     const [idExportWarehouse, sIdExportWarehouse] = useState(null);
+
     const [idReceiveWarehouse, sIdReceiveWarehouse] = useState(null);
+
     const [load, sLoad] = useState(false);
 
     const [errDate, sErrDate] = useState(false);
+
     const [errBranch, sErrBranch] = useState(false);
+
     const [errExportWarehouse, sErrExportWarehouse] = useState(false);
+
     const [errReceiveWarehouse, sErrReceiveWarehouse] = useState(false);
+
     const [errWarehouse, sErrWarehouse] = useState(false);
+
     const [errReceivingLocation, sErrReceivingLocation] = useState(false);
+
     const [errQty, sErrQty] = useState(false);
 
     useEffect(() => {
@@ -94,7 +122,7 @@ const Index = (props) => {
         sOnLoading(true);
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { result } = response.data;
+                let { result } = response.data;
                 sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
                 sOnLoading(false);
             }
@@ -105,7 +133,7 @@ const Index = (props) => {
             {},
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sDataReceiveWarehouse(
                         data?.map((e) => ({
                             label: e?.warehouse_name,
@@ -125,7 +153,7 @@ const Index = (props) => {
     const _ServerFetchingCondition = () => {
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
+                let data = response.data;
                 sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
                 sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
                 sDataProductSerial(data.find((x) => x.code == "product_serial"));
@@ -173,7 +201,7 @@ const Index = (props) => {
             {},
             (err, response) => {
                 if (!err) {
-                    var rResult = response.data;
+                    let rResult = response.data;
                     sIdBranch({
                         label: rResult?.branch_name_id,
                         value: rResult?.branch_id,
@@ -277,7 +305,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
+                    let { result } = response.data.data;
                     sDataItems(result);
                 }
             }
@@ -296,7 +324,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sDataWarehouse(
                         data?.map((e) => ({
                             label: e?.warehouse_name,
@@ -319,7 +347,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sDataReceivingLocation(
                         data?.map((e) => ({
                             label: e?.location_name,
@@ -357,7 +385,7 @@ const Index = (props) => {
                     },
                     (err, response) => {
                         if (!err) {
-                            var { result } = response.data.data;
+                            let { result } = response.data.data;
                             sDataItems(result);
                         }
                     }
@@ -365,6 +393,34 @@ const Index = (props) => {
             }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
         }
     };
+
+    const resetValue = () => {
+        if (isKeyState?.type === "branch") {
+            sDataItems([]);
+            sListData([]);
+            sIdBranch(isKeyState?.value);
+            sIdExportWarehouse(null);
+        }
+        if (isKeyState?.type === "idExportWarehouse") {
+            sDataItems([]);
+            sListData([]);
+            sIdExportWarehouse(isKeyState?.value);
+        }
+        if (isKeyState?.type == "idReceiveWarehouse") {
+            sIdReceiveWarehouse(isKeyState?.value);
+            sListData((prevOption) => {
+                const newOption = prevOption.map((item) => {
+                    const newChild = item.child?.map((e) => {
+                        return { ...e, receivingLocation: null };
+                    });
+                    return { ...item, child: newChild };
+                });
+                return newOption;
+            });
+        }
+        handleQueryId({ status: false });
+    };
+
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -375,25 +431,7 @@ const Index = (props) => {
         } else if (type == "branch" && idBranch != value) {
             if (listData?.length > 0) {
                 if (type === "branch" && idBranch != value) {
-                    Swal.fire({
-                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#296dc1",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: `${dataLang?.aler_yes}`,
-                        cancelButtonText: `${dataLang?.aler_cancel}`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            sDataItems([]);
-                            sListData([]);
-                            sIdBranch(value);
-                            sIdExportWarehouse(null);
-                        } else {
-                            sIdBranch({ ...idBranch });
-                            sIdExportWarehouse({ ...idExportWarehouse });
-                        }
-                    });
+                    handleQueryId({ status: true, initialKey: { type, value } });
                 }
             } else {
                 sIdExportWarehouse(idBranch != value && null);
@@ -403,55 +441,19 @@ const Index = (props) => {
         } else if (type == "idExportWarehouse" && idExportWarehouse != value) {
             if (listData?.length > 0) {
                 if (type === "idExportWarehouse" && idBranch != value) {
-                    Swal.fire({
-                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#296dc1",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: `${dataLang?.aler_yes}`,
-                        cancelButtonText: `${dataLang?.aler_cancel}`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            sDataItems([]);
-                            sListData([]);
-                            sIdExportWarehouse(value);
-                        } else {
-                            sIdExportWarehouse(idExportWarehouse);
-                        }
-                    });
+                    handleQueryId({ status: true, initialKey: { type, value } });
                 }
             } else {
                 sIdExportWarehouse(value);
             }
         } else if (type == "idReceiveWarehouse" && idReceiveWarehouse != value) {
             if (listData?.length > 0) {
-                Swal.fire({
-                    title: `${"Thay đổi sẽ thay đổi vị trí nhận"}`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                    cancelButtonText: `${dataLang?.aler_cancel}`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        sIdReceiveWarehouse(value);
-                        sListData((prevOption) => {
-                            const newOption = prevOption.map((item) => {
-                                const newChild = item.child?.map((e) => {
-                                    return { ...e, receivingLocation: null };
-                                });
-                                return { ...item, child: newChild };
-                            });
-                            return newOption;
-                        });
-                    } else {
-                        sIdReceiveWarehouse(idReceiveWarehouse);
-                    }
-                });
+                if (type === "idReceiveWarehouse" && idBranch != value) {
+                    handleQueryId({ status: true, initialKey: { type, value } });
+                }
+            } else {
+                sIdReceiveWarehouse(value);
             }
-            sIdReceiveWarehouse(value);
         }
     };
     const handleClearDate = (type) => {
@@ -462,9 +464,8 @@ const Index = (props) => {
             sStartDate(new Date());
         }
     };
-    const handleTimeChange = (date) => {
-        sStartDate(date);
-    };
+
+    const handleTimeChange = (date) => sStartDate(date);
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
@@ -522,8 +523,11 @@ const Index = (props) => {
 
     //Tham chiếu đến hàm rồi xử lý
     useClearErrorEffect(sErrDate, date != null);
+
     useClearErrorEffect(sErrBranch, idBranch != null);
+
     useClearErrorEffect(sErrExportWarehouse, idExportWarehouse != null);
+
     useClearErrorEffect(sErrReceiveWarehouse, idReceiveWarehouse != null);
 
     useEffect(() => {
@@ -546,6 +550,7 @@ const Index = (props) => {
         idExportWarehouse != null && sOnFetchingItemsAll(true);
         idExportWarehouse == null && sDataItems([]);
     }, [idExportWarehouse]);
+
     useEffect(() => {
         idReceiveWarehouse != null && sOnFetchingReceivingLocation(true);
     }, [idReceiveWarehouse]);
@@ -594,7 +599,7 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message, item } = response.data;
                     if (isSuccess) {
-                        ToatstNotifi("success", dataLang[message]);
+                        isShow("success", dataLang[message]);
                         sCode("");
                         sStartDate(new Date());
                         sIdBranch(null);
@@ -606,7 +611,7 @@ const Index = (props) => {
                         sErrReceiveWarehouse(false);
                         sErrDate(false);
                         sListData([]);
-                        router.push("/manufacture/warehouseTransfer?tab=all");
+                        router.push(routerWarehouseTransfer.home);
                     } else {
                         handleCheckError(
                             `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
@@ -625,6 +630,7 @@ const Index = (props) => {
     //new
     const _HandleAddChild = (parentId, value) => {
         sOnLoadingChild(true);
+
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
                 const newChild = {
@@ -652,6 +658,7 @@ const Index = (props) => {
                 return e;
             }
         });
+
         setTimeout(() => {
             sOnLoadingChild(false);
         }, 500);
@@ -660,7 +667,9 @@ const Index = (props) => {
 
     const _HandleAddParent = (value) => {
         sOnLoadingChild(true);
+
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
+
         if (!checkData) {
             const newData = {
                 id: Date.now(),
@@ -697,6 +706,7 @@ const Index = (props) => {
             handleCheckError(dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect");
         }
     };
+
     const _HandleDeleteChild = (parentId, childId) => {
         const newData = listData
             .map((e) => {
@@ -794,9 +804,8 @@ const Index = (props) => {
     };
 
     const handleQuantityError = (e) => {
-        ToatstNotifi("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(e)} số lượng tồn`, 3000);
+        isShow("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(e)} số lượng tồn`, 3000);
     };
-
     const timeOut = () => {
         setTimeout(() => {
             sLoad(true);
@@ -859,9 +868,7 @@ const Index = (props) => {
         }
     };
 
-    const handleCheckError = (e) => {
-        ToatstNotifi("error", e);
-    };
+    const handleCheckError = (e) => isShow("error", e);
 
     return (
         <React.Fragment>
@@ -897,7 +904,7 @@ const Index = (props) => {
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() => router.push("/manufacture/warehouseTransfer?tab=all")}
+                                onClick={() => router.push(routerWarehouseTransfer.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
@@ -1813,7 +1820,7 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() => router.push("/manufacture/warehouseTransfer?tab=all")}
+                                onClick={() => router.push(routerWarehouseTransfer.home)}
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
@@ -1829,6 +1836,17 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={
+                    isKeyState?.type == "idReceiveWarehouse" ? "Thay đổi sẽ thay đổi vị trí nhận" : TITLE_DELETE_ITEMS
+                }
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={resetValue}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

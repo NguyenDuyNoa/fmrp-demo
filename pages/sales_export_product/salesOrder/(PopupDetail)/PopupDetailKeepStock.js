@@ -1,7 +1,6 @@
 // Danh sách dữ kho
 
 import moment from "moment";
-import Swal from "sweetalert2";
 import { v4 as uuid } from "uuid";
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
@@ -11,9 +10,13 @@ import { SearchNormal1 as IconSearch, Trash as IconDelete, BoxSearch } from "ico
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
@@ -46,6 +49,10 @@ const Popup_DetailKeepStock = (props) => {
     const [data, sData] = useState({});
 
     let dataClone = { ...data };
+
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
 
     const [open, sOpen] = useState(false);
 
@@ -120,36 +127,25 @@ const Popup_DetailKeepStock = (props) => {
         setIsFetch({ onFetchingFilter: false });
     };
 
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_transfer/deletetransferKeep/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            let { isSuccess, message } = response.data;
+    const handleDeleteItem = () => {
+        Axios(
+            "DELETE",
+            `/api_web/Api_transfer/deletetransferKeep/${isId}?csrf_protection=true`,
+            {},
+            (err, response) => {
+                if (!err) {
+                    let { isSuccess, message } = response.data;
 
-                            if (isSuccess) {
-                                ToatstNotifi("success", props.dataLang[message]);
-                                sIsFetching({ onFetching: true });
-                            } else {
-                                ToatstNotifi("error", props.dataLang[message]);
-                            }
-                        }
+                    if (isSuccess) {
+                        isShow("success", props.dataLang[message]);
+                        sIsFetching({ onFetching: true });
+                    } else {
+                        isShow("error", props.dataLang[message]);
                     }
-                );
+                }
             }
-        });
+        );
+        handleQueryId({ status: false });
     };
 
     useEffect(() => {
@@ -409,7 +405,9 @@ const Popup_DetailKeepStock = (props) => {
                                                             <button
                                                                 type="button"
                                                                 title="Xóa"
-                                                                onClick={(event) => _HandleDelete(e?.id)}
+                                                                onClick={(event) =>
+                                                                    handleQueryId({ id: e?.id, status: true })
+                                                                }
                                                                 className="group transition h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
                                                             >
                                                                 <IconDelete
@@ -456,6 +454,16 @@ const Popup_DetailKeepStock = (props) => {
                         </div>
                     </div>
                 </div>
+                <PopupConfim
+                    dataLang={dataLang}
+                    type="warning"
+                    nameModel={"salesOrder"}
+                    title={TITLE_DELETE}
+                    subtitle={CONFIRM_DELETION}
+                    isOpen={isOpen}
+                    save={handleDeleteItem}
+                    cancel={() => handleQueryId({ status: false })}
+                />
             </PopupEdit>
         </>
     );

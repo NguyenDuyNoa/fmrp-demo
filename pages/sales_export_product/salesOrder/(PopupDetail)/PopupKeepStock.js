@@ -13,9 +13,15 @@ import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } fr
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import formatNumber from "@/components/UI/formanumber/formanumber";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+
 const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
         onSending: false,
@@ -24,15 +30,28 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         onFetchingCondition: false,
     };
 
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const [data, sData] = useState({});
+
     const [open, sOpen] = useState(false);
+
     const [dataClone, sDataClone] = useState({});
+
     const [dataWarehouse, sDataWarehouse] = useState([]);
+
     const [isIdWarehouse, sIsIdWarehouse] = useState(null);
+
     const [errorQuantity, sErrorQuantity] = useState(false);
+
     const [isFetching, sIsFetching] = useState(initialFetch);
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
+
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
     const _ToggleModal = (e) => {
@@ -134,18 +153,14 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         });
     };
 
-    const handleDeleteParent = async () => {
-        const result = await Swal.fire({
-            title: `Bạn có muốn xóa mặt hàng`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        });
+    const handleDeleteItem = async () => {
+        isShow("success", "Xóa mặt hàng thành công");
 
-        return result.isConfirmed;
+        handleQueryId({ status: false });
+
+        const newItem = data.items?.filter((e) => e.id !== isId);
+
+        sData({ ...data, items: newItem });
     };
 
     const validateQuantity = (newData, idParent, idChild) => {
@@ -159,7 +174,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         );
 
         if (quantityCount > +db.quantity_had_condition) {
-            ToatstNotifi(
+            isShow(
                 "error",
                 `Tổng số lượng không được lớn hơn ${formatNumber(db.quantity_had_condition)} số lượng cần giữ`
             );
@@ -194,17 +209,6 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                 await validateQuantity(newData, idParent, idChild);
 
                 break;
-            case "deleteParent":
-                const shouldDelete = await handleDeleteParent();
-
-                if (shouldDelete) {
-                    newData = data.items?.filter((e) => e.id !== idParent);
-                    ToatstNotifi("success", "Xóa mặt hàng thành công");
-                } else {
-                    newData = data.items;
-                }
-
-                break;
             default:
                 newData = data.items;
         }
@@ -222,7 +226,8 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
 
         if (checkPropertyRecursive) {
             checkPropertyRecursive && sErrorQuantity(true);
-            ToatstNotifi("error", `${dataLang?.required_field_null}`);
+
+            isShow("error", `${dataLang?.required_field_null}`);
         } else {
             setIsFetch({ onSending: true });
         }
@@ -232,15 +237,19 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         let formData = new FormData();
 
         formData.append("idOrder", data?.id);
+
         formData.append("warehouse_id", isIdWarehouse?.value ? isIdWarehouse?.value : "");
 
         data?.items.forEach((e, index) => {
             formData.append(`items[${index}][order_item_id]`, e?.id ? e?.id : "");
+
             formData.append(`items[${index}][item]`, e?.item_complex_id ? e?.item_complex_id : "");
+
             if (e?.item?.warehouse_location?.length > 0) {
                 e?.item?.warehouse_location.forEach((i, _) => {
                     if (i.show) {
                         formData.append(`items[${index}][warehouse_location][${_}][id]`, i?.id ? i?.id : "");
+
                         formData.append(
                             `items[${index}][warehouse_location][${_}][quantity_export]`,
                             i?.quantity_export ? i?.quantity_export : ""
@@ -263,10 +272,11 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        isShow("success", `${dataLang[message] || message}`);
+
                         sOpen(false);
                     } else {
-                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message] || message}`);
                     }
                 }
                 setIsFetch({ onSending: false });
@@ -625,7 +635,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                     } = values;
                                                                                     const newValue = +value;
                                                                                     if (newValue > +i.quantity) {
-                                                                                        ToatstNotifi(
+                                                                                        isShow(
                                                                                             "error",
                                                                                             "Số lượng vượt quá số tồn kho."
                                                                                         );
@@ -635,7 +645,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                         newValue >
                                                                                         +e?.quantity_had_condition
                                                                                     ) {
-                                                                                        ToatstNotifi(
+                                                                                        isShow(
                                                                                             "error",
                                                                                             `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                                                                                 e?.quantity_had_condition
@@ -659,7 +669,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                     <div className="col-span-1 flex items-center justify-center">
                                                         <button
                                                             onClick={(event) =>
-                                                                handleChange("deleteParent", event, e.id)
+                                                                handleQueryId({ id: e.id, status: true })
                                                             }
                                                             type="button"
                                                             title="Xóa"
@@ -719,6 +729,16 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                         </div>
                     </div>
                 </div>
+                <PopupConfim
+                    dataLang={dataLang}
+                    type="warning"
+                    nameModel={"salesOrder"}
+                    title={TITLE_DELETE}
+                    subtitle={CONFIRM_DELETION}
+                    isOpen={isOpen}
+                    save={handleDeleteItem}
+                    cancel={() => handleQueryId({ status: false })}
+                />
             </PopupEdit>
         </>
     );

@@ -1,4 +1,3 @@
-import Swal from "sweetalert2";
 import Popup from "reactjs-popup";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/dist/client/router";
@@ -12,8 +11,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
 import FilePDF from "./FilePDF";
-import { routerInternalPlan } from "./router/internalPlan";
-import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
+import { routerInternalPlan, routerWarehouseTransfer } from "../../routers/manufacture";
+import { routerDeliveryReceipt, routerReturnSales } from "../../routers/sellingGoods";
 
 import PopupConfim from "./popupConfim/popupConfim";
 import Popup_KeepStock from "@/pages/sales_export_product/salesOrder/(PopupDetail)/PopupKeepStock";
@@ -27,7 +26,7 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { useSetData } from "@/hooks/useSetData";
 
-import { routerOrder, routerPurchases } from "./router/buyImportGoods";
+import { routerImport, routerOrder, routerPurchases, routerReturns } from "../../routers/buyImportGoods";
 
 import PopupEdit from "@/components/UI/popup";
 
@@ -55,6 +54,16 @@ const BtnAction = React.memo((props) => {
 
     const _ToggleModal = (e) => setOpenAction(e);
 
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState({});
+
+    const shareProps = {
+        dataMaterialExpiry,
+        dataProductExpiry,
+        dataProductSerial,
+    };
+
     const handleDelete = () => {
         //Báo giá
         if (props?.id && props?.type === "price_quote") {
@@ -79,7 +88,6 @@ const BtnAction = React.memo((props) => {
                         }
                     }
                 );
-
                 handleQueryId({ status: false });
             }
             if (props?.status === "ordered") {
@@ -108,7 +116,6 @@ const BtnAction = React.memo((props) => {
                         }
                     }
                 );
-                handleQueryId({ status: false });
             }
             if (props?.status === "approved") {
                 handleQueryId({ status: false });
@@ -129,7 +136,6 @@ const BtnAction = React.memo((props) => {
                     }
                 }
             });
-            handleQueryId({ status: false });
         }
         ///trả lại hàng bán
         if (props?.id && props?.type === "returnSales") {
@@ -150,7 +156,6 @@ const BtnAction = React.memo((props) => {
                     }
                 }
             );
-            handleQueryId({ status: false });
         }
         ///Kế hoạc nội bộ internal_plan
         if (props?.id && props?.type === "internal_plan") {
@@ -170,7 +175,6 @@ const BtnAction = React.memo((props) => {
                     }
                 }
             );
-            handleQueryId({ status: false });
         }
         /// yêu cầu mua hàng
         if (props?.id && props?.type === "purchases") {
@@ -186,7 +190,6 @@ const BtnAction = React.memo((props) => {
                     }
                 }
             });
-            handleQueryId({ status: false });
         }
         ///Đơn đặt hàng PO
         if (props?.id && props?.type === "order") {
@@ -206,7 +209,6 @@ const BtnAction = React.memo((props) => {
                     }
                 }
             );
-            handleQueryId({ status: false });
         }
         //phiếu dịch vụ
         if (props?.id && props?.type === "serviceVoucher") {
@@ -222,8 +224,59 @@ const BtnAction = React.memo((props) => {
                     }
                 }
             });
-            handleQueryId({ status: false });
         }
+        //Nhập hàng
+        if (props?.id && props?.type === "import") {
+            Axios("DELETE", `/api_web/Api_import/import/${props.id}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    let { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        isShow("success", props.dataLang[message]);
+                        props.onRefresh && props.onRefresh();
+                        props.onRefreshGr && props.onRefreshGr();
+                    } else {
+                        isShow("error", props.dataLang[message]);
+                    }
+                }
+            });
+        }
+        // Trả hàng
+        if (props?.id && props?.type === "returns") {
+            Axios(
+                "DELETE",
+                `/api_web/Api_return_supplier/returnSupplier/${props.id}?csrf_protection=true`,
+                {},
+                (err, response) => {
+                    if (!err) {
+                        let { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            isShow("success", props.dataLang[message]);
+                            props.onRefresh && props.onRefresh();
+                            props.onRefreshGr && props.onRefreshGr();
+                        } else {
+                            isShow("error", props.dataLang[message]);
+                        }
+                    }
+                }
+            );
+        }
+        //Chuyển kho
+        if (props?.id && props?.type === "warehouseTransfer") {
+            Axios("DELETE", `/api_web/Api_transfer/transfer/${props.id}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    let { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        isShow("success", props.dataLang[message]);
+                        props.onRefresh && props.onRefresh();
+                        props.onRefreshGr && props.onRefreshGr();
+                    } else {
+                        isShow("error", props.dataLang[message]);
+                    }
+                }
+            });
+        }
+
+        handleQueryId({ status: false });
     };
 
     const handleClick = () => {
@@ -295,12 +348,40 @@ const BtnAction = React.memo((props) => {
         //phiếu dịch vụ
         if (props?.id && props?.type === "serviceVoucher") {
             if (props?.status_pay != "not_spent") {
-                Toast.fire({
-                    icon: "error",
-                    title: `${"Phiếu dịch vụ đã chi. Không thể sửa"}`,
-                });
+                isShow("error", `${"Phiếu dịch vụ đã chi. Không thể sửa"}`);
             } else {
                 // router.push(`/purchase_order/order/form?id=${props.id}`);
+            }
+        }
+        //Nhập hàng
+        if (props?.id && props?.type === "import") {
+            if (props?.warehouseman_id != "0" || props?.status_pay != "not_spent") {
+                isShow(
+                    "error",
+                    `${
+                        (props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit) ||
+                        (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
+                    }`
+                );
+            } else {
+                router.push(`${routerImport.form}?id=${props.id}`);
+            }
+        }
+
+        //Trả hàng
+        if (props?.id && props?.type === "returns") {
+            if (props?.warehouseman_id != "0") {
+                isShow("error", `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`);
+            } else {
+                router.push(`${routerReturns.form}?id=${props.id}`);
+            }
+        }
+        ///chuyển kho
+        if (props?.id && props?.type === "warehouseTransfer") {
+            if (props?.warehouseman_id != "0") {
+                isShow("error", `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`);
+            } else {
+                router.push(`${routerWarehouseTransfer.form}?id=${props.id}`);
             }
         }
     };
@@ -312,6 +393,15 @@ const BtnAction = React.memo((props) => {
                     if (response && response.data) {
                         let res = response.data.data;
                         setDataCompany(res);
+                    }
+                });
+
+                Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+                    if (!err) {
+                        let data = response.data;
+                        sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                        sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                        sDataProductSerial(data.find((x) => x.code == "product_serial"));
                     }
                 });
             } catch (err) {
@@ -328,6 +418,9 @@ const BtnAction = React.memo((props) => {
             purchases: `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
             order: `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
             serviceVoucher: `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
+            import: `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
+            returns: `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
+            warehouseTransfer: `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`,
         };
 
         try {
@@ -396,6 +489,7 @@ const BtnAction = React.memo((props) => {
                                 />
                                 <Popup_TableValidateEdit
                                     {...props}
+                                    {...shareProps}
                                     isOpenValidate={isOpenValidate}
                                     sIsOpenValidate={sIsOpenValidate}
                                     data={isData}
@@ -410,6 +504,7 @@ const BtnAction = React.memo((props) => {
                                     className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                                 />
                                 <Popup_servie
+                                    {...shareProps}
                                     status_pay={props?.status_pay}
                                     onRefreshGr={props.onRefreshGr}
                                     onClick={handleClick}
@@ -422,6 +517,7 @@ const BtnAction = React.memo((props) => {
                                 </Popup_servie>
                             </div>
                         )}
+
                         {!["order", "serviceVoucher"].includes(props.type) && (
                             <button
                                 onClick={handleClick}
@@ -436,8 +532,9 @@ const BtnAction = React.memo((props) => {
                                 </p>
                             </button>
                         )}
-                        {["deliveryReceipt", "returnSales"].includes(props?.type) ? (
+                        {["deliveryReceipt", "returnSales", "import", "returns"].includes(props?.type) ? (
                             <Popup_Pdf
+                                {...shareProps}
                                 dataLang={props.dataLang}
                                 props={props}
                                 openAction={openAction}
@@ -447,6 +544,7 @@ const BtnAction = React.memo((props) => {
                             />
                         ) : (
                             <FilePDF
+                                {...shareProps}
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
@@ -455,8 +553,8 @@ const BtnAction = React.memo((props) => {
                             />
                         )}
 
-                        {props.type == "sales_product" && <Popup_KeepStock {...props} />}
-                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} />}
+                        {props.type == "sales_product" && <Popup_KeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} {...shareProps} />}
                         {props.type == "order" ? (
                             <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                 <RiDeleteBin6Line
@@ -464,6 +562,7 @@ const BtnAction = React.memo((props) => {
                                     className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                                 />
                                 <Popup_TableValidateDelete
+                                    {...shareProps}
                                     isOpen={isOpen}
                                     handleQueryId={handleQueryId}
                                     {...props}
@@ -535,6 +634,7 @@ const Popup_Pdf = (props) => {
                     <div>
                         <div className="w-[400px]">
                             <FilePDF
+                                {...props.shareProps}
                                 props={props.props}
                                 openAction={props.openAction}
                                 setOpenAction={props.setOpenAction}
