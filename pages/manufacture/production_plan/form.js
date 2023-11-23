@@ -1,12 +1,16 @@
 import Head from "next/head";
-import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 
 import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
+
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const InFo = dynamic(() => import("./(form)/info"), { ssr: false });
 const Table = dynamic(() => import("./(form)/table"), { ssr: false });
@@ -18,6 +22,8 @@ const FormAdd = (props) => {
     const dataLang = props.dataLang;
 
     const showToat = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     const [data, sData] = useState([]);
 
@@ -68,48 +74,32 @@ const FormAdd = (props) => {
 
     ///Xóa từng button dấu X
     const handleRemoveBtn = (id) => {
-        Swal.fire({
-            title: `Xóa đơn hàng`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                getFreshData(data.filter((e) => e.id != id));
-            }
-        });
+        handleQueryId({ status: true, initialKey: { id } });
     };
 
     ///Xóa từng item ở table
-    const handleRemoveItem = useMemo(() => {
-        return (idParen, id) => {
-            Swal.fire({
-                title: `Xóa đơn hàng`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText: `${dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const newData = data
-                        .map((e) => {
-                            if (e.id == idParen) {
-                                return { ...e, listProducts: e.listProducts.filter((i) => i.id != id) };
-                            }
-                            return e;
-                        })
-                        .flat()
-                        .filter((i) => i.listProducts?.length > 0);
-                    getFreshData(newData);
-                }
-            });
-        };
-    }, [data]);
+    const handleRemoveItem = (idParen, id) => {
+        handleQueryId({ status: true, initialKey: { idParen, id } });
+    };
+
+    const handleConfim = () => {
+        if (isKeyState?.idParen && isKeyState?.id) {
+            const newData = data
+                .map((e) => {
+                    if (e.id == isKeyState?.idParen) {
+                        return { ...e, listProducts: e.listProducts.filter((i) => i.id != isKeyState?.id) };
+                    }
+                    return e;
+                })
+                .flat()
+                .filter((i) => i.listProducts?.length > 0);
+            getFreshData(newData);
+        } else {
+            getFreshData(data.filter((e) => e.id != isKeyState?.id));
+        }
+
+        handleQueryId({ status: false });
+    };
 
     const backPage = () => {
         showToat("error", "Không có đơn hàng. Vui lòng thêm đơn hàng !", 3000);
@@ -161,6 +151,15 @@ const FormAdd = (props) => {
                 <InFo {...shareProps} />
                 <Table {...shareProps} />
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleConfim}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </>
     );
 };

@@ -1,11 +1,16 @@
 import Image from "next/image";
-import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
 import { v4 as uddid } from "uuid";
 import { SearchNormal1 } from "iconsax-react";
 import React, { useEffect, useState } from "react";
+
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 
@@ -1365,10 +1370,18 @@ const MainTable = ({ dataLang }) => {
         };
     });
 
+    const isShow = useToast();
+
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const [dataTable, sDataTable] = useState(newData);
+
     const [findDataTable, sFindDataTable] = useState({});
+
     const [filterItem, sFilterItem] = useState({});
+
     const [isTab, sIsTab] = useState("item");
+
     const [isFetching, sIsFetChing] = useState(false);
 
     const updateListData = (listData, showList) => {
@@ -1475,25 +1488,18 @@ const MainTable = ({ dataLang }) => {
         }));
     };
 
-    const handDeleteItem = (id) => {
-        Swal.fire({
-            title: `Xóa kế hoạch NVL`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sFilterItem((e) => ({
-                    ...e,
-                    listData: filterItem.listData.filter((e) => e.id != id),
-                }));
-                ToatstNotifi("success", "Xóa kế hoạch NVL thành công");
-            }
-        });
+    const handleConfim = () => {
+        sFilterItem((e) => ({
+            ...e,
+            listData: filterItem.listData.filter((e) => e.id != isId),
+        }));
+
+        isShow("success", "Xóa kế hoạch NVL thành công");
+
+        handleQueryId({ status: false });
     };
+
+    const handDeleteItem = (id) => handleQueryId({ status: true, id: id });
 
     const shareProps = { filterItem, handShowItem, handDeleteItem, isFetching };
 
@@ -1657,6 +1663,15 @@ const MainTable = ({ dataLang }) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleConfim}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

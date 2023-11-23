@@ -1,69 +1,73 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import ReactExport from "react-data-export";
-import { _ServerInstance as Axios } from "/services/axios";
 import moment from "moment/moment";
 import Popup from "reactjs-popup";
 import Pagination from "/components/UI/pagination";
-import Swal from "sweetalert2";
-import Select, { components } from "react-select";
+import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-import ModalImage from "react-modal-image";
 
 import {
     SearchNormal1 as IconSearch,
     Grid6 as IconExcel,
     ArrowDown2 as IconDown,
     Trash as IconDelete,
-    Flag,
-    TickCircle,
     Refresh2,
 } from "iconsax-react";
 
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import { useRef } from "react";
+import { _ServerInstance as Axios } from "/services/axios";
+
 import Popup_chitiet from "./(popup)/popupDetail";
 import Popup_status from "./(popup)/popupStatus";
-import { useSelector } from "react-redux";
+
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
 
     const [data, sData] = useState([]);
+
+    const isShow = useToast();
+
+    const trangthaiExprired = useStatusExprired();
+    const { isOpen, isId, handleQueryId } = useToggle();
+
     const [dataExcel, sDataExcel] = useState([]);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
+
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [listBr, sListBr] = useState([]);
+
     const [idBranch, sIdBranch] = useState(null);
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
+
+    const [valueDate, sValueDate] = useState({ startDate: null, endDate: null });
+
+    const [data_export, sData_export] = useState([]);
+
+    const _HandleFresh = () => sOnFetching(true);
 
     const _ServerFetching = () => {
         Axios(
@@ -81,7 +85,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { output, rResult } = response.data;
+                    let { output, rResult } = response.data;
                     sData(rResult);
                     sDataExcel(rResult);
                     sTotalItems(output);
@@ -90,41 +94,25 @@ const Index = (props) => {
             }
         );
     };
-    const [data_export, sData_export] = useState([]);
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/api_inventory/inventory/${id}`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message, data_export } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang[message],
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: dataLang[message],
-                            });
-                            if (data_export?.length > 0) {
-                                sData_export(data_export);
-                            }
-                        }
+
+    const handleDelete = () => {
+        Axios("DELETE", `/api_web/api_inventory/inventory/${isId}`, {}, (err, response) => {
+            if (!err) {
+                let { isSuccess, message, data_export } = response?.data;
+                if (isSuccess) {
+                    isShow("success", dataLang[message] || message);
+                } else {
+                    isShow("error", dataLang[message] || message);
+
+                    if (data_export?.length > 0) {
+                        sData_export(data_export);
                     }
-                    _ServerFetching();
-                });
+                }
             }
+            _ServerFetching();
         });
+
+        handleQueryId({ status: false });
     };
 
     const onchang_filter = (type, value) => {
@@ -283,8 +271,6 @@ const Index = (props) => {
         },
     ];
 
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useStatusExprired();
     return (
         <>
             <Head>
@@ -565,7 +551,9 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-center">
                                                                 <button
-                                                                    onClick={() => handleDelete(e.id)}
+                                                                    onClick={() =>
+                                                                        handleQueryId({ id: e.id, status: true })
+                                                                    }
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -616,6 +604,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE}
+                subtitle={CONFIRM_DELETION}
+                isOpen={isOpen}
+                save={handleDelete}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </>
     );
 };

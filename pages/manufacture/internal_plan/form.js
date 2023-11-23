@@ -1,22 +1,28 @@
 import Head from "next/head";
-import Link from "next/link";
-import Swal from "sweetalert2";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
-import { useSelector } from "react-redux";
-import Loading from "@/components/UI/loading";
 import { BsCalendarEvent } from "react-icons/bs";
 import Select, { components } from "react-select";
 import { NumericFormat } from "react-number-format";
 import React, { useState, useEffect } from "react";
+
 import { _ServerInstance as Axios } from "/services/axios";
-import { routerInternalPlan } from "routers/manufacture";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
+
+import { useToggle } from "@/hooks/useToggle";
+import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
+
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { routerInternalPlan } from "routers/manufacture";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
 const Index = (props) => {
     const initsFetching = {
@@ -29,13 +35,16 @@ const Index = (props) => {
         onSending: false,
         load: false,
     };
+
     const initsErors = {
         errBranch: false,
         errQuantity: false,
         errPlan: false,
         errDate: false,
     };
+
     const initsArr = { dataBranch: [], dataItems: [] };
+
     const initsValue = {
         code: "",
         date: new Date(),
@@ -45,14 +54,27 @@ const Index = (props) => {
         dateAll: null,
     };
     const router = useRouter();
+
     const id = router.query?.id;
+
     const dataLang = props?.dataLang;
+
     const trangthaiExprired = useStatusExprired();
+
+    const isShow = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     const [fetChingData, sFetchingData] = useState(initsFetching);
+
     const [dataSelect, sDataSelect] = useState(initsArr);
+
     const [idChange, sIdChange] = useState(initsValue);
+
     const [errors, sErrors] = useState(initsErors);
+
     const [listData, sListData] = useState([]);
+
     const resetAllStates = () => {
         sIdChange(initsValue);
         sErrors(initsErors);
@@ -64,16 +86,20 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         sFetchingData((e) => ({ ...e, onLoading: true }));
+
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                let { result } = response.data;
+                let { result } = response?.data;
+
                 sDataSelect((e) => ({
                     ...e,
                     dataBranch: result?.map(({ name, id }) => ({ label: name, value: id })),
                 }));
+
                 sFetchingData((e) => ({ ...e, onLoading: false }));
             }
         });
+
         sFetchingData((e) => ({ ...e, onFetching: false }));
     };
 
@@ -184,23 +210,28 @@ const Index = (props) => {
         }
     };
 
+    const handleSaveStatus = () => {
+        isKeyState?.sDataSelect((e) => ({ ...e, dataItems: [] }));
+        isKeyState?.sListData([]);
+        isKeyState?.sId(isKeyState?.value);
+        handleQueryId({ status: false });
+    };
+
+    const handleCancleStatus = () => {
+        isKeyState?.sId({ ...isKeyState?.id });
+        handleQueryId({ status: false });
+    };
+
     const checkListData = (value, sDataSelect, sListData, sId, id) => {
-        return Swal.fire({
-            title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sDataSelect((e) => ({ ...e, dataItems: [] }));
-                sListData([]);
-                sId(value);
-            } else {
-                sId({ ...id });
-            }
+        handleQueryId({
+            status: true,
+            initialKey: {
+                value,
+                sDataSelect,
+                sListData,
+                sId,
+                id,
+            },
         });
     };
 
@@ -308,9 +339,10 @@ const Index = (props) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
             const { parent } = _DataValueItem(value);
+
             sListData([parent, ...listData]);
         } else {
-            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
@@ -358,7 +390,7 @@ const Index = (props) => {
             });
             sListData([...newData]);
         } else {
-            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
@@ -406,7 +438,9 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
+
         const hasNullQuantity = listData.some((e) => e.quantity == "" || e.quantity == null || e.quantity == 0);
+
         const hasNullDate = listData.some((e) => e.date == null || e.date == "");
 
         const isEmpty = listData?.length == 0;
@@ -420,11 +454,11 @@ const Index = (props) => {
                 errDate: hasNullDate,
             }));
             if (!idChange.idBranch || !idChange.namePlan) {
-                ToatstNotifi("error", `${dataLang?.required_field_null}`);
+                isShow("error", `${dataLang?.required_field_null}`);
             } else if (isEmpty) {
-                ToatstNotifi("error", `Chưa nhập thông tin mặt hàng`);
+                isShow("error", `Chưa nhập thông tin mặt hàng`);
             } else {
-                ToatstNotifi("error", `${dataLang?.required_field_null}`);
+                isShow("error", `${dataLang?.required_field_null}`);
             }
         } else {
             sFetchingData((e) => ({ ...e, onSending: true }));
@@ -440,13 +474,20 @@ const Index = (props) => {
                 : ""
         );
         formData.append("branch_id", idChange.idBranch?.value ? idChange.idBranch?.value : "");
+
         formData.append("plan_name", idChange.namePlan ? idChange.namePlan : "");
+
         formData.append("note", idChange.note ? idChange.note : "");
+
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
+
             formData.append(`items[${index}][item_id]`, item?.matHang?.value);
+
             formData.append(`items[${index}][quantity]`, item?.quantity ? item?.quantity : "");
+
             formData.append(`items[${index}][date_needed]`, item?.date ? moment(item?.date).format("DD/MM/YYYY") : "");
+
             formData.append(`items[${index}][note_item]`, item?.note ? item?.note : "");
         });
         await Axios(
@@ -462,14 +503,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    let { isSuccess, message } = response.data;
+                    let { isSuccess, message } = response?.data;
                     if (isSuccess) {
-                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        isShow("success", `${dataLang[message] || message}`);
                         resetAllStates();
                         sListData([]);
                         router.push(routerInternalPlan.home);
                     } else {
-                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message] || message}`);
                     }
                 }
                 sFetchingData((e) => ({ ...e, onSending: false }));
@@ -506,7 +547,11 @@ const Index = (props) => {
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">{dataLang?.internal_plan_add || "internal_plan_add"}</h2>
+                        <h2 className="xl:text-2xl text-xl ">
+                            {id
+                                ? dataLang?.internal_plan_edit || "internal_plan_edit"
+                                : dataLang?.internal_plan_add || "internal_plan_add"}
+                        </h2>
                         <div className="flex justify-end items-center">
                             <button
                                 onClick={() => router.push(routerInternalPlan.home)}
@@ -991,6 +1036,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleSaveStatus}
+                cancel={handleCancleStatus}
+            />
         </React.Fragment>
     );
 };

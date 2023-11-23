@@ -1,10 +1,9 @@
-import React, { useRef, useState } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
+import React, { useEffect, useState } from "react";
 
 import {
     Grid6 as IconExcel,
@@ -12,93 +11,97 @@ import {
     Calendar as IconCalendar,
     SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
-    TickCircle,
-    ArrowCircleDown,
     Refresh2,
 } from "iconsax-react";
-
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
 
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from "reactjs-popup";
+import { registerLocale } from "react-datepicker";
 import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
 import Swal from "sweetalert2";
-
 import ReactExport from "react-data-export";
-import { useEffect } from "react";
-import FilePDF from "../FilePDF";
-import ExpandableContent from "components/UI/more";
+
 import Popup_chitiet from "./(popup)/pupup";
-import ImageErrors from "components/UI/imageErrors";
-import { useSelector } from "react-redux";
-// import Popup_status from "./(popup)/popupStatus";
 import Popup_status from "../(popupStatus)/popupStatus";
 import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
 import TabStatus from "../(filterTab)/filterTab";
-import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
+
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import Pagination from "@/components/UI/pagination";
+import ImageErrors from "@/components/UI/imageErrors";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
+
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
+
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const isShow = useToast();
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     const router = useRouter();
 
     const [data, sData] = useState([]);
+
     const [dataExcel, sDataExcel] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
 
     const [listBr, sListBr] = useState([]);
+
     const [lisCode, sListCode] = useState([]);
+
     const [lisObject, sListObject] = useState([]);
+
     const [listDs, sListDs] = useState();
+
     const [dataWarehouse, sDataWarehouse] = useState([]);
 
     const [idCode, sIdCode] = useState(null);
+
     const [idRecallWarehouse, sIdRecallWarehouse] = useState(null);
+
     const [idSupplier, sIdSupplier] = useState(null);
+
     const [idBranch, sIdBranch] = useState(null);
+
     const [idObject, sIdObject] = useState(null);
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
+
+    const [valueDate, sValueDate] = useState({ startDate: null, endDate: null });
+
     const trangthaiExprired = useStatusExprired();
+
+    const [data_export, sData_export] = useState([]);
+
+    const [checkedWare, sCheckedWare] = useState({});
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -106,6 +109,7 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -134,7 +138,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
+                    let { rResult, output, rTotal } = response.data;
                     sData(rResult);
 
                     sTotalItems(output);
@@ -164,7 +168,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
+                    let data = response.data;
                     sListDs(data);
                 }
                 sOnFetching(false);
@@ -175,13 +179,13 @@ const Index = (props) => {
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
+                let { isSuccess, result } = response.data;
                 sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
             }
         });
         Axios("GET", "/api_web/Api_export_other/exportOtherCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response?.data;
+                let { isSuccess, result } = response?.data;
                 sListCode(
                     result?.map((e) => ({
                         label: e?.code,
@@ -192,7 +196,7 @@ const Index = (props) => {
         });
         Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response?.data;
+                let data = response?.data;
                 sDataWarehouse(
                     data?.map((e) => ({
                         label: e?.warehouse_name,
@@ -203,7 +207,7 @@ const Index = (props) => {
         });
         Axios("GET", "/api_web/Api_export_other/object/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response?.data;
+                let data = response?.data;
                 sListObject(
                     data?.map((e) => ({
                         label: dataLang[e?.name],
@@ -227,7 +231,7 @@ const Index = (props) => {
                 },
                 (err, response) => {
                     if (!err) {
-                        var { isSuccess, result } = response?.data;
+                        let { isSuccess, result } = response?.data;
 
                         sListCode(
                             result?.map((e) => ({
@@ -306,13 +310,6 @@ const Index = (props) => {
         });
     };
 
-    // const listBr_filter = listBr
-    //     ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-    //     : [];
-    // const listCode_filter = lisCode
-    //     ? lisCode?.map((e) => ({ label: `${e.code}`, value: e.id }))
-    //     : [];
-
     const onchang_filter = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
@@ -329,9 +326,7 @@ const Index = (props) => {
         }
     };
 
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
+    const _HandleFresh = () => sOnFetching(true);
 
     const multiDataSet = [
         {
@@ -448,37 +443,39 @@ const Index = (props) => {
         },
     ];
 
-    const [data_export, sData_export] = useState([]);
-    const [checkedWare, sCheckedWare] = useState({});
-    const _HandleChangeInput = (id, checkedUn, type, value) => {
-        if (type === "browser") {
-            Swal.fire({
-                title: `${"Thay đổi trạng thái"}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText: `${dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const checked = value.target.checked;
-                    const warehousemanId = value.target.value;
-                    const dataChecked = {
-                        checked: checked,
-                        warehousemanId: warehousemanId,
-                        id: id,
-                        checkedpost: checkedUn,
-                    };
-                    sCheckedWare(dataChecked);
-                }
-                sData([...data]);
-            });
+    const handleSaveStatus = () => {
+        if (isKeyState?.type === "browser") {
+            const checked = isKeyState.value.target.checked;
+            const warehousemanId = isKeyState.value.target.value;
+            const dataChecked = {
+                checked: checked,
+                warehousemanId: warehousemanId,
+                id: isKeyState?.id,
+                checkedpost: isKeyState?.checkedUn,
+            };
+            sCheckedWare(dataChecked);
+            sData([...data]);
         }
+
+        handleQueryId({ status: false });
+    };
+
+    const _HandleChangeInput = (id, checkedUn, type, value) => {
+        handleQueryId({
+            status: true,
+            initialKey: {
+                id,
+                checkedUn,
+                type,
+                value,
+            },
+        });
     };
     const _ServerSending = () => {
         var data = new FormData();
+
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
+
         data.append("id", checkedWare?.id);
         Axios(
             "POST",
@@ -490,20 +487,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message, data_export } = response.data;
+                    let { isSuccess, message, data_export } = response?.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", dataLang[message] || message);
                         setTimeout(() => {
                             sOnFetching(true);
                         }, 300);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("error", dataLang[message] || message);
                     }
                     if (data_export?.length > 0) {
                         sData_export(data_export);
@@ -1142,67 +1133,6 @@ const Index = (props) => {
                                                                 </h6>
                                                             </h6>
                                                             <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
-                                                                {/* <div
-                                                                    className={`${
-                                                                        e?.warehouseman_id == "0"
-                                                                            ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
-                                                                            : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "
-                                                                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
-                                                                >
-                                                                    <label
-                                                                        className="relative flex cursor-pointer items-center rounded-full p-2"
-                                                                        htmlFor={e.id}
-                                                                        data-ripple-dark="true"
-                                                                    >
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            className={`${
-                                                                                e?.warehouseman_id == "0"
-                                                                                    ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500"
-                                                                                    : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"
-                                                                            }before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
-                                                                            id={e.id}
-                                                                            value={e.warehouseman_id}
-                                                                            checked={
-                                                                                e.warehouseman_id != "0" ? true : false
-                                                                            }
-                                                                            onChange={_HandleChangeInput.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                e?.warehouseman_id,
-                                                                                "browser"
-                                                                            )}
-                                                                        />
-                                                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                            <svg
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                className="h-3.5 w-3.5"
-                                                                                viewBox="0 0 20 20"
-                                                                                fill="currentColor"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1"
-                                                                            >
-                                                                                <path
-                                                                                    fill-rule="evenodd"
-                                                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                    clip-rule="evenodd"
-                                                                                ></path>
-                                                                            </svg>
-                                                                        </div>
-                                                                    </label>
-                                                                    <label
-                                                                        htmlFor={e.id}
-                                                                        className={`${
-                                                                            e?.warehouseman_id == "0"
-                                                                                ? "text-[#6366f1]"
-                                                                                : "text-lime-500"
-                                                                        }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
-                                                                    >
-                                                                        {e?.warehouseman_id == "0"
-                                                                            ? "Chưa duyệt kho"
-                                                                            : "Đã duyệt kho"}
-                                                                    </label>
-                                                                </div> */}
                                                                 <ButtonWarehouse
                                                                     warehouseman_id={e?.warehouseman_id}
                                                                     _HandleChangeInput={_HandleChangeInput}
@@ -1215,15 +1145,15 @@ const Index = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
-                                                                <BtnTacVu
-                                                                    type="exportToOther"
+                                                                <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGroup={_ServerFetching_group.bind(this)}
                                                                     dataLang={dataLang}
                                                                     warehouseman_id={e?.warehouseman_id}
                                                                     status_pay={e?.status_pay}
                                                                     id={e?.id}
-                                                                    className="bg-slate-100 hover:scale-105 transition-all ease-linear hover:bg-gray-200 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
+                                                                    type="exportToOther"
+                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1278,168 +1208,18 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"exportToOther"}
+                title={TITLE_STATUS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleSaveStatus}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };
-
-const BtnTacVu = React.memo((props) => {
-    const [openTacvu, sOpenTacvu] = useState(false);
-    const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [openDetail, sOpenDetail] = useState(false);
-    const router = useRouter();
-    const [data, sData] = useState({});
-
-    const [dataPDF, setData] = useState();
-    const [dataCompany, setDataCompany] = useState();
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_export_other/exportOther/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                                props.onRefresh && props.onRefresh();
-                                props.onRefreshGroup && props.onRefreshGroup();
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
-                        }
-                    }
-                );
-            }
-        });
-    };
-
-    const handleClick = () => {
-        if (props?.warehouseman_id != "0") {
-            Toast.fire({
-                icon: "error",
-                title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
-            });
-        } else {
-            router.push(`/manufacture/exportToOther/form?id=${props.id}`);
-        }
-    };
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
-                }
-            );
-        }
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-        });
-    };
-    useEffect(() => {
-        openTacvu && fetchDataSettingsCompany();
-    }, [openTacvu]);
-
-    return (
-        <div>
-            <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className}>
-                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
-                        <IconDown size={12} />
-                    </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit `}
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <button
-                            onClick={handleClick}
-                            className="group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <BiEdit
-                                size={20}
-                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-sky-500">
-                                {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                            </p>
-                        </button>
-                        <FilePDF
-                            props={props}
-                            openAction={openTacvu}
-                            setOpenAction={sOpenTacvu}
-                            dataCompany={dataCompany}
-                            dataProductExpiry={dataProductExpiry}
-                            dataProductSerial={dataProductSerial}
-                            dataMaterialExpiry={dataMaterialExpiry}
-                            data={dataPDF}
-                        />
-                        <button
-                            onClick={_HandleDelete.bind(this, props.id)}
-                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <RiDeleteBin6Line
-                                size={20}
-                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                            </p>
-                        </button>
-                    </div>
-                </div>
-            </Popup>
-        </div>
-    );
-});
 
 export default Index;

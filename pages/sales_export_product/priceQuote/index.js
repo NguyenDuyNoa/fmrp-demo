@@ -27,6 +27,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { routerPriceQuote } from "@/routers/sellingGoods";
 registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -523,7 +524,7 @@ const Index = (props) => {
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/sales_export_product/priceQuote/form"
+                                        href={routerPriceQuote.form}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.btn_new || "btn_new"}

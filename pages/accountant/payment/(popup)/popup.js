@@ -69,13 +69,18 @@ const CustomSelectOption = ({ value, label, level, code }) => (
 
 const Popup_dspc = (props) => {
     let id = props?.id;
+
     const dataLang = props.dataLang;
+
     const scrollAreaRef = useRef(null);
+
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
 
     const inistFetch = {
@@ -88,6 +93,7 @@ const Popup_dspc = (props) => {
         onFetchingDetail: false,
         onFetchingTable: false,
     };
+
     const inistArrr = {
         dataBranch: [],
         dataObject: [],
@@ -98,6 +104,7 @@ const Popup_dspc = (props) => {
         dataListCost: [],
         dataTable: [],
     };
+
     const inistError = {
         errBranch: false,
         errObject: false,
@@ -108,19 +115,33 @@ const Popup_dspc = (props) => {
         errCosts: false,
         errSotien: false,
     };
+
     const [error, sError] = useState(inistError);
+
     const [data, sData] = useState(inistArrr);
+
     const [fetch, sFetch] = useState(inistFetch);
+
     const [date, sDate] = useState(new Date());
+
     const [code, sCode] = useState(null);
+
     const [branch, sBranch] = useState(null);
+
     const [object, sObject] = useState(null);
+
     const [listObject, sListObject] = useState(null);
+
     const [typeOfDocument, sTypeOfDocument] = useState(null);
+
     const [listTypeOfDocument, sListTypeOfDocument] = useState([]);
+
     const [price, sPrice] = useState(null);
+
     const [method, sMethod] = useState(null);
+
     const [note, sNote] = useState("");
+
     const [option, sOption] = useState([
         {
             id: Date.now(),
@@ -128,8 +149,11 @@ const Popup_dspc = (props) => {
             sotien: null,
         },
     ]);
+
     const slicedArr = option.slice(1);
+
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
+
     sortedArr.unshift(option[0]);
 
     const initstialState = () => {
@@ -146,8 +170,6 @@ const Popup_dspc = (props) => {
         sNote("");
         sError(inistError);
         sOption([{ id: Date.now(), chiphi: "", sotien: null }]);
-        // sFetch((e) => ({ ...e, onFetching: true, onFetching_LisObject: true }));
-        // sFetch((e) => ({ ...e, onFetching: true }));
         sData(inistArrr);
     };
 
@@ -163,7 +185,7 @@ const Popup_dspc = (props) => {
             {},
             (err, response) => {
                 if (!err) {
-                    var db = response.data;
+                    let db = response.data;
                     sDate(moment(db?.date).toDate());
                     sCode(db?.code);
                     sBranch({ label: db?.branch_name, value: db?.branch_id });
@@ -223,13 +245,13 @@ const Popup_dspc = (props) => {
     const _ServerFetching = () => {
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
+                let { isSuccess, result } = response.data;
                 sData((e) => ({ ...e, dataBranch: result?.map((e) => ({ label: e.name, value: e.id })) }));
             }
         });
         Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
+                let data = response.data;
                 sData((e) => ({
                     ...e,
                     dataObject: data?.map((e) => ({
@@ -241,7 +263,7 @@ const Popup_dspc = (props) => {
         });
         Axios("GET", "/api_web/Api_payment_method/payment_method/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sData((e) => ({
                     ...e,
                     dataMethod: rResult?.map((e) => ({ label: e?.name, value: e?.id })),
@@ -266,7 +288,7 @@ const Popup_dspc = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, rResult } = response.data;
+                    let { isSuccess, rResult } = response.data;
                     sData((e) => ({
                         ...e,
                         dataList_Object: rResult?.map((e) => ({ label: e?.name, value: e?.id })),
@@ -491,7 +513,7 @@ const Popup_dspc = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    let { rResult } = response.data;
                     sData((e) => ({
                         ...e,
                         dataListCost: rResult.map((x) => ({
@@ -523,7 +545,7 @@ const Popup_dspc = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var db = response.data;
+                    let db = response.data;
                     sData((e) => ({
                         ...e,
                         dataTable: db,

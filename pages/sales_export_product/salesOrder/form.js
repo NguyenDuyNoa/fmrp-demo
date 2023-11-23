@@ -19,6 +19,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
+import { routerSalesOrder } from "@/routers/sellingGoods";
 
 const Index = (props) => {
     const router = useRouter();
@@ -1187,7 +1188,7 @@ const Index = (props) => {
                         setErrStaff(false);
                         setErrQuote(false);
                         setOption([]);
-                        router.push("/sales_export_product/salesOrder?tab=all");
+                        router.push(routerSalesOrder.home);
                     }
                     if (response && response.data && response?.data?.isSuccess === false) {
                         isShow("error", `${dataLang[response?.data?.message]}`);
@@ -1516,7 +1517,7 @@ const Index = (props) => {
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() => router.push("/sales_export_product/salesOrder?tab=all")}
+                                onClick={() => router.push(routerSalesOrder.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 3xl:py-1.5 2xl:py-2.5 xl:py-1.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.btn_back || "btn_back"}
@@ -2703,7 +2704,7 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() => router.back()}
+                                onClick={() => router.push(routerSalesOrder.home)}
                                 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px] button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {dataLang?.btn_back || "btn_back"}

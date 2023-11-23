@@ -19,4 +19,30 @@ const routerProductionWarehouse = {
     form: `${url}/production_warehouse/form`,
 };
 
-export { routerInternalPlan, routerWarehouseTransfer, routerProductionWarehouse };
+/// Nhập kho thành phẩm
+const routerProductsWarehouse = {
+    home: `${url}/productsWarehouse`,
+    form: `${url}/productsWarehouse/form`,
+};
+
+/// Thu hồi nguyên vật liệu
+const routerRecall = {
+    home: `${url}/recall`,
+    form: `${url}/recall/form`,
+};
+
+// Xuất kho khác
+
+const routerExportToOther = {
+    home: `${url}/exportToOther`,
+    form: `${url}/exportToOther/form`,
+};
+
+export {
+    routerInternalPlan,
+    routerWarehouseTransfer,
+    routerProductionWarehouse,
+    routerProductsWarehouse,
+    routerRecall,
+    routerExportToOther,
+};

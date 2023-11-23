@@ -11,4 +11,15 @@ const routerDeliveryReceipt = {
     home: `${url}/deliveryReceipt`,
     form: `${url}/deliveryReceipt/form`,
 };
-export { routerReturnSales, routerDeliveryReceipt };
+// báo giá
+const routerPriceQuote = {
+    home: `${url}/priceQuote`,
+    form: `${url}/priceQuote/form`,
+};
+
+const routerSalesOrder = {
+    home: `${url}/salesOrder`,
+    form: `${url}/salesOrder/form`,
+};
+
+export { routerReturnSales, routerDeliveryReceipt, routerPriceQuote, routerSalesOrder };

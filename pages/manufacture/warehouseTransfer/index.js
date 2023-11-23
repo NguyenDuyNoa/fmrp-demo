@@ -12,22 +12,16 @@ import {
     Refresh2,
 } from "iconsax-react";
 import Select from "react-select";
-import { BiEdit } from "react-icons/bi";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
 
-import Popup from "reactjs-popup";
 import moment from "moment/moment";
 import ReactExport from "react-data-export";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Swal from "sweetalert2";
-
-import FilePDF from "../FilePDF";
 import Popup_chitiet from "./(popup)/pupup";
 import TabStatus from "../(filterTab)/filterTab";
 import Popup_status from "../(popupStatus)/popupStatus";
@@ -39,7 +33,6 @@ import Pagination from "@/components/UI/pagination";
 import ImageErrors from "@/components/UI/imageErrors";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
@@ -50,14 +43,6 @@ import { routerWarehouseTransfer } from "routers/manufacture";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -1114,16 +1099,6 @@ const Index = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
-                                                                {/* <BtnTacVu
-                                                                    type="warehouseTransfer"
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    warehouseman_id={e?.warehouseman_id}
-                                                                    status_pay={e?.status_pay}
-                                                                    id={e?.id}
-                                                                    className="bg-slate-100 hover:scale-105 transition-all ease-linear hover:bg-gray-200 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
-                                                                /> */}
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -1199,148 +1174,5 @@ const Index = (props) => {
         </React.Fragment>
     );
 };
-
-const BtnTacVu = React.memo((props) => {
-    const [openTacvu, sOpenTacvu] = useState(false);
-    const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [openDetail, sOpenDetail] = useState(false);
-    const router = useRouter();
-    const [data, sData] = useState({});
-
-    const [dataPDF, setData] = useState();
-    const [dataCompany, setDataCompany] = useState();
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/Api_transfer/transfer/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            ToatstNotifi("success", props.dataLang[message]);
-                            props.onRefresh && props.onRefresh();
-                            props.onRefreshGroup && props.onRefreshGroup();
-                        } else {
-                            ToatstNotifi("error", props.dataLang[message]);
-                        }
-                    }
-                });
-            }
-        });
-    };
-
-    const handleClick = () => {
-        if (props?.warehouseman_id != "0") {
-            Toast.fire({
-                icon: "error",
-                title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
-            });
-        } else {
-            router.push(`/manufacture/warehouseTransfer/form?id=${props.id}`);
-        }
-    };
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    setData(db);
-                }
-            });
-            Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                    sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                    sDataProductSerial(data.find((x) => x.code == "product_serial"));
-                }
-            });
-        }
-    };
-    useEffect(() => {
-        openTacvu && fetchDataSettingsCompany();
-    }, [openTacvu]);
-    return (
-        <div>
-            <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className}>
-                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
-                        <IconDown size={12} />
-                    </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit `}
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <button
-                            onClick={handleClick}
-                            className="group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <BiEdit
-                                size={20}
-                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-sky-500">
-                                {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                            </p>
-                        </button>
-                        <FilePDF
-                            props={props}
-                            openAction={openTacvu}
-                            setOpenAction={sOpenTacvu}
-                            dataCompany={dataCompany}
-                            data={dataPDF}
-                            dataProductExpiry={dataProductExpiry}
-                            dataProductSerial={dataProductSerial}
-                            dataMaterialExpiry={dataMaterialExpiry}
-                        />
-                        <button
-                            onClick={_HandleDelete.bind(this, props.id)}
-                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <RiDeleteBin6Line
-                                size={20}
-                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                            </p>
-                        </button>
-                    </div>
-                </div>
-            </Popup>
-        </div>
-    );
-});
 
 export default Index;
