@@ -13,14 +13,14 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 
-import { useToggle } from "@/hooks/useToggle";
 import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import { routerInternalPlan } from "routers/manufacture";
+import { routerInternalPlan } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
@@ -53,6 +53,7 @@ const Index = (props) => {
         note: "",
         dateAll: null,
     };
+
     const router = useRouter();
 
     const id = router.query?.id;
@@ -467,12 +468,14 @@ const Index = (props) => {
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("reference_no", idChange.code ? idChange.code : "");
+
         formData.append(
             "date",
             moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
                 ? moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
                 : ""
         );
+
         formData.append("branch_id", idChange.idBranch?.value ? idChange.idBranch?.value : "");
 
         formData.append("plan_name", idChange.namePlan ? idChange.namePlan : "");
@@ -506,8 +509,11 @@ const Index = (props) => {
                     let { isSuccess, message } = response?.data;
                     if (isSuccess) {
                         isShow("success", `${dataLang[message] || message}`);
+
                         resetAllStates();
+
                         sListData([]);
+
                         router.push(routerInternalPlan.home);
                     } else {
                         isShow("error", `${dataLang[message] || message}`);

@@ -3,11 +3,13 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
+
 import { _ServerInstance as Axios } from "/services/axios";
+
 import React, { useState, useEffect, useTransition } from "react";
+
 import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -16,30 +18,45 @@ import Pagination from "@/components/UI/pagination";
 import ImageErrors from "@/components/UI/imageErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { routerInternalPlan } from "routers/manufacture";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { routerInternalPlan } from "routers/manufacture";
+
 const PopupDetail = dynamic(() => import("./(popupDetail)/PopupDetail"), { ssr: false });
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
+
     const initsArr = { data: [], dataExcel: [], listBr: [] };
+
     const initsId = {
         idBranch: null,
         valueDate: { startDate: null, endDate: null },
     };
+
     const trangthaiExprired = useStatusExprired();
+
     const [listData, sListData] = useState(initsArr);
+
     const [idFillter, sIdFillter] = useState(initsId);
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
+
     const [keySearch, sKeySearch] = useState("");
+
     const [totalItems, sTotalItems] = useState([]);
+
     const [isEvent, startEvent] = useTransition();
 
     useEffect(() => {

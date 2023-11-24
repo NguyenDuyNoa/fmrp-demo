@@ -10,21 +10,15 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 
-const TabItem = dynamic(() => import("./tabItem"), {
-    ssr: false,
-});
+const TabItem = dynamic(() => import("./tabItem"), { ssr: false });
 
-const TabPlan = dynamic(() => import("./tabPlan"), {
-    ssr: false,
-});
+const TabPlan = dynamic(() => import("./tabPlan"), { ssr: false });
 
-const TabKeepStock = dynamic(() => import("./tabKeepStock"), {
-    ssr: false,
-});
+const TabKeepStock = dynamic(() => import("./tabKeepStock"), { ssr: false });
+
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const MainTable = ({ dataLang }) => {
     const arrButton = [
@@ -1351,9 +1345,9 @@ const MainTable = ({ dataLang }) => {
 
     const newData = initstialData.map((e) => {
         const newArrDataTab = e.arrDataTab.map((i) => {
-            const newListData = i.listData.map((o) => {
+            const newListData = i.listData.map((s) => {
                 return {
-                    ...o,
+                    ...s,
                     showList: true,
                     showChild: true,
                 };
@@ -1385,8 +1379,8 @@ const MainTable = ({ dataLang }) => {
     const [isFetching, sIsFetChing] = useState(false);
 
     const updateListData = (listData, showList) => {
-        return listData.map((o) => ({
-            ...o,
+        return listData.map((i) => ({
+            ...i,
             showList: showList,
             showChild: true,
         }));
@@ -1400,7 +1394,7 @@ const MainTable = ({ dataLang }) => {
     };
 
     const handleFindDataTable = (id) => {
-        const updatedData = dataTable.map((e) => {
+        const updatedData = dataTable.map((e, index) => {
             const showParent = e.id === id ? !e.showParent : false;
             return {
                 ...e,
@@ -1408,8 +1402,11 @@ const MainTable = ({ dataLang }) => {
                 arrDataTab: updateArrDataTab(e.arrDataTab, showParent),
             };
         });
+
         fetchingData();
-        sFindDataTable(updatedData.find((e) => e.id === id));
+
+        sFindDataTable(updatedData.find((e) => e.id == id));
+
         sDataTable(updatedData);
     };
 
@@ -1466,11 +1463,13 @@ const MainTable = ({ dataLang }) => {
 
     const handleActiveTab = (e) => {
         sIsTab(e);
+
         fetchingData();
     };
 
     const fetchingData = () => {
         sIsFetChing(true);
+
         setTimeout(() => {
             sIsFetChing(false);
         }, 1500);
@@ -1506,7 +1505,7 @@ const MainTable = ({ dataLang }) => {
     return (
         <React.Fragment>
             <div className="!mt-[14px]">
-                <h1 className="text-[#141522] font-medium text-sm my-2">Tổng số kế hoạch NVL: {dataTable.length}</h1>
+                <h1 className="text-[#141522] font-medium text-sm my-2">Tổng số kế hoạch NVL: {dataTable?.length}</h1>
                 <div className="flex ">
                     <div className="w-[25%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">

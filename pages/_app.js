@@ -1,23 +1,22 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useSelector, Provider, useDispatch } from "react-redux";
 import Head from "next/head";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import React, { useState, useEffect } from "react";
+import { useSelector, Provider, useDispatch } from "react-redux";
 
-import Layout from "../components/layout";
 import store from "/services/redux";
+import Layout from "@/components/layout";
 import { _ServerInstance as Axios } from "/services/axios";
 
+import "../styles/globals.scss";
 import "sweetalert2/src/sweetalert2.scss";
 import "react-datepicker/dist/react-datepicker.css";
-import "../styles/globals.scss";
 
 import Swal from "sweetalert2";
 import Popup from "reactjs-popup";
-import { More as IconMore, Eye as IconEye, EyeSlash as IconEyeSlash } from "iconsax-react";
-import { Lexend_Deca } from "@next/font/google";
 import { useRouter } from "next/router";
-import PopupModelTime from "../components/UI/modelTime";
+import { Lexend_Deca } from "@next/font/google";
+import { More as IconMore, Eye as IconEye, EyeSlash as IconEyeSlash } from "iconsax-react";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],

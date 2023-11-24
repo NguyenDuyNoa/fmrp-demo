@@ -4,14 +4,16 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useMemo, useEffect, useState } from "react";
 
-import Loading from "@/components/UI/loading";
+
 import Pagination from "@/components/UI/pagination";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
+import { useMoment } from "utils/moment/useMoment";
+
+
 import useTab from "@/hooks/useTab";
 import useToast from "@/hooks/useToast";
-import { useMoment } from "@/hooks/useMoment";
 import { useToggle } from "@/hooks/useToggle";
 import { useSetData } from "@/hooks/useSetData";
 import usePagination from "@/hooks/usePagination";

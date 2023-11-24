@@ -1,11 +1,8 @@
-import { useRouter } from "next/dist/client/router";
-import React, { useEffect, useRef, useState } from "react";
-import Popup from "reactjs-popup";
-import { ArrowDown2 } from "iconsax-react";
-import { _ServerInstance as Axios } from "/services/axios";
+import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
+import ModalImage from "react-modal-image";
+import React, { useEffect, useState } from "react";
+
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
@@ -15,24 +12,35 @@ import {
     SearchNormal1 as IconSearch,
     Add as IconAdd,
 } from "iconsax-react";
-import dynamic from "next/dynamic";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import ModalImage from "react-modal-image";
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import ExpandableContent from "@/components/UI/more";
+import ImageErrors from "@/components/UI/imageErrors";
+
+import { useToggle } from "@/hooks/useToggle";
+import { useSetData } from "@/hooks/useSetData";
 
 const Popup_chitietThere = (props) => {
-    const scrollAreaRef = useRef(null);
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-    const [data, sData] = useState();
+    const { isOpen, handleOpen } = useToggle();
+
+    const { isData: data, updateData } = useSetData();
+
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+
+    const [dataProductSerial, sDataProductSerial] = useState({});
+
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [onFetching, sOnFetching] = useState(false);
 
     useEffect(() => {
         props?.id && sOnFetching(true);
-    }, [open]);
+    }, [isOpen]);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -51,23 +59,20 @@ const Popup_chitietThere = (props) => {
         typePo: `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
         order: `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
     };
+
     const _ServerFetching_detailThere = () => {
         Axios("GET", `${api[props?.type]}`, {}, (err, response) => {
             if (!err) {
-                var db = response.data;
-
-                sData(db);
+                let db = response?.data;
+                updateData(db);
             }
             sOnFetching(false);
         });
     };
+
     useEffect(() => {
         (onFetching && _ServerFetching_detailThere()) || (onFetching && _ServerFetching());
-    }, [open]);
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    }, [isOpen]);
 
     const _ServerFetching = () => {
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
@@ -80,31 +85,32 @@ const Popup_chitietThere = (props) => {
             sOnFetching(false);
         });
     };
+
     let listQty = data?.items;
+
     let totalQuantity = 0;
+
     for (let i = 0; i < listQty?.length; i++) {
         totalQuantity += parseInt(listQty[i].quantity);
     }
+
+    const checkKeys = {
+        import: props.dataLang?.import_detail_title || "import_detail_title",
+        service: props.dataLang?.serviceVoucher_service_voucher_details || "serviceVoucher_service_voucher_details",
+        deposit: props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title",
+        1: props.dataLang?.purchase_detail_title || "purchase_detail_title",
+        typePo: props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title",
+        order: props.dataLang?.sales_product_popup_detail_title || "sales_product_popup_detail_title",
+    };
+
     return (
         <>
             <PopupEdit
-                title={
-                    (props?.type == "import" && (props.dataLang?.import_detail_title || "import_detail_title")) ||
-                    (props?.type == "service" &&
-                        (props.dataLang?.serviceVoucher_service_voucher_details ||
-                            "serviceVoucher_service_voucher_details")) ||
-                    (props?.type == "deposit" &&
-                        (props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title")) ||
-                    (props?.type == "1" && (props.dataLang?.purchase_detail_title || "purchase_detail_title")) ||
-                    (props?.type == "typePo" &&
-                        (props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title")) ||
-                    (props?.type == "order" &&
-                        (props.dataLang?.sales_product_popup_detail_title || "sales_product_popup_detail_title"))
-                }
+                title={checkKeys[props.type]}
                 button={props?.name}
-                onClickOpen={_ToggleModal.bind(this, true)}
-                open={open}
-                onClose={_ToggleModal.bind(this, false)}
+                onClickOpen={() => handleOpen(true)}
+                open={isOpen}
+                onClose={() => handleOpen(false)}
                 classNameBtn={props?.className}
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>

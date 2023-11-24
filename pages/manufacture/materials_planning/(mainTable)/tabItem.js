@@ -1,10 +1,13 @@
 import Image from "next/image";
+
 import dynamic from "next/dynamic";
+
 import Loading from "@/components/UI/loading";
+
 import NoData from "@/components/UI/noData/nodata";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+
 const TabItem = ({ filterItem, handShowItem, isFetching }) => {
     return (
         <>

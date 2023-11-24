@@ -1,6 +1,6 @@
 import Popup from "reactjs-popup";
-import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 import { _ServerInstance as Axios } from "services/axios";
 
@@ -287,7 +287,7 @@ const BtnAction = React.memo((props) => {
                     }
                 });
 
-                Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+                await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
                     if (!err) {
                         let data = response.data;
                         sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
@@ -352,11 +352,8 @@ const BtnAction = React.memo((props) => {
         props.type == "order" && openAction && _ServerFetching_ValidatePayment();
     }, [openAction]);
 
-    const shareProps = {
-        dataMaterialExpiry: dataMaterialExpiry,
-        dataProductExpiry: dataProductExpiry,
-        dataProductSerial: dataProductSerial,
-    };
+    const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial };
+
     return (
         <div>
             <Popup
@@ -386,7 +383,7 @@ const BtnAction = React.memo((props) => {
                                 />
                                 <Popup_TableValidateEdit
                                     {...props}
-                                    shareProps={shareProps}
+                                    {...shareProps}
                                     isOpenValidate={isOpenValidate}
                                     sIsOpenValidate={sIsOpenValidate}
                                     data={isData}
@@ -407,7 +404,7 @@ const BtnAction = React.memo((props) => {
                                     onRefresh={props.onRefresh}
                                     dataLang={props.dataLang}
                                     id={props?.id}
-                                    shareProps={shareProps}
+                                    {...shareProps}
                                     className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5"
                                 >
                                     {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
@@ -473,11 +470,11 @@ const BtnAction = React.memo((props) => {
                                 setOpenAction={setOpenAction}
                                 dataCompany={dataCompany}
                                 data={data}
-                                shareProps={shareProps}
+                                {...shareProps}
                             />
                         ) : (
                             <FilePDF
-                                shareProps={shareProps}
+                                {...shareProps}
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
@@ -486,8 +483,8 @@ const BtnAction = React.memo((props) => {
                             />
                         )}
 
-                        {props.type == "sales_product" && <Popup_KeepStock {...props} shareProps={shareProps} />}
-                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} shareProps={shareProps} />}
+                        {props.type == "sales_product" && <Popup_KeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} {...shareProps} />}
                         {props.type == "order" ? (
                             <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                 <RiDeleteBin6Line
@@ -495,7 +492,7 @@ const BtnAction = React.memo((props) => {
                                     className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                                 />
                                 <Popup_TableValidateDelete
-                                    shareProps={shareProps}
+                                    {...shareProps}
                                     isOpen={isOpen}
                                     handleQueryId={handleQueryId}
                                     {...props}
@@ -536,6 +533,12 @@ const BtnAction = React.memo((props) => {
 });
 const Popup_Pdf = (props) => {
     const { isOpen, handleOpen } = useToggle(false);
+
+    const shareProps = {
+        dataMaterialExpiry: props?.dataMaterialExpiry,
+        dataProductExpiry: props?.dataProductExpiry,
+        dataProductSerial: props?.dataProductSerial,
+    };
     return (
         <>
             <PopupEdit
@@ -565,7 +568,7 @@ const Popup_Pdf = (props) => {
                     <div>
                         <div className="w-[400px]">
                             <FilePDF
-                                shareProps={props}
+                                {...shareProps}
                                 props={props.props}
                                 openAction={props.openAction}
                                 setOpenAction={props.setOpenAction}

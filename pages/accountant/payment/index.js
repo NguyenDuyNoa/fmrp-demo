@@ -1,23 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import ReactExport from "react-data-export";
-
-import Swal from "sweetalert2";
-import { NumericFormat } from "react-number-format";
-import { v4 as uuidv4 } from "uuid";
-
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import ModalImage from "react-modal-image";
+import React, { useState, useEffect } from "react";
 
 import {
     Edit as IconEdit,
@@ -28,64 +11,65 @@ import {
     Add as IconAdd,
 } from "iconsax-react";
 
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
-
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import Popup from "reactjs-popup";
-import { useDispatch, useSelector } from "react-redux";
-import Popup_chitietThere from "../detailThere";
-import FilePDF from "../FilePDF";
-import Popup_chitiet from "./(popup)/detail";
-import Popup_dspc from "./(popup)/popup";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import HeaderTable from "components/UI/headerTable/headerTable";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import useStatusExprired from "@/hooks/useStatusExprired";
+import ModalImage from "react-modal-image";
+import "react-datepicker/dist/react-datepicker.css";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import Popup_dspc from "./(popup)/popup";
+import Popup_chitiet from "./(popup)/detail";
+import Popup_chitietThere from "../detailThere";
+
+import { _ServerInstance as Axios } from "/services/axios";
+
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+
+import { useSetData } from "@/hooks/useSetData";
+import usePagination from "@/hooks/usePagination";
+import { useChangeValue } from "@/hooks/useChangeValue";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const initialValue = {
+        idBranch: null,
+        idObject: null,
+        idMethod: null,
+        valueDate: { startDate: null, endDate: null },
+    };
+
+    const initialData = { data: [], data_ex: [], dataMethod: [], dataObject: [], listBr: [] };
+
     const router = useRouter();
-    const tabPage = router.query?.tab;
-    const dispatch = useDispatch();
-    const trangthaiExprired = useStatusExprired();
-    const [keySearch, sKeySearch] = useState("");
-    const [limit, sLimit] = useState(15);
-    const [totalItem, sTotalItems] = useState([]);
+
+    const { paginate } = usePagination();
+
     const [total, sTotal] = useState({});
 
-    const [onFetching, sOnFetching] = useState(false);
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
-    const [data, sData] = useState({});
-    const [data_ex, sData_ex] = useState([]);
-    const [dataMethod, sDataMethod] = useState([]);
-    const [dataObject, sDataObject] = useState([]);
+    const [keySearch, sKeySearch] = useState("");
 
-    const [listBr, sListBr] = useState([]);
-    const [idBranch, sIdBranch] = useState(null);
-    const [idObject, sIdObject] = useState(null);
-    const [idMethod, sIdMethod] = useState(null);
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
+    const trangthaiExprired = useStatusExprired();
+
+    const [onFetching, sOnFetching] = useState(false);
+
+    const { isData, updateData } = useSetData(initialData);
+
+    const { isValue, onChangeValue } = useChangeValue(initialValue);
+
+    const [onFetching_filter, sOnFetching_filter] = useState(false);
+
+    const { data, data_ex, dataMethod, dataObject, listBr } = isData;
+
+    const { limit, totalItems: totalItem, updateLimit, updateTotalItems } = useLimitAndTotalItems(15, {});
 
     useEffect(() => {
         router.push({
@@ -102,22 +86,25 @@ const Index = (props) => {
                 params: {
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
-                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
-                    "filter[payment_mode]": idMethod != null ? idMethod.value : null,
-                    "filter[objects]": idObject != null ? idObject.value : null,
+                    "filter[branch_id]": isValue?.idBranch != null ? isValue?.idBranch.value : null,
+                    "filter[start_date]": isValue?.valueDate?.startDate != null ? isValue?.valueDate?.startDate : null,
+                    "filter[end_date]": isValue?.valueDate?.endDate != null ? isValue?.valueDate?.endDate : null,
+                    "filter[payment_mode]": isValue?.idMethod != null ? isValue?.idMethod.value : null,
+                    "filter[objects]": isValue?.idObject != null ? isValue?.idObject.value : null,
                     "filter[search]": keySearch,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                    sData_ex(rResult);
+                    let { rResult, output, rTotal } = response.data;
+
+                    updateData({ data: rResult, data_ex: rResult });
+
+                    updateTotalItems(output);
+
                     sTotal(rTotal);
                 }
+
                 sOnFetching(false);
             }
         );
@@ -126,27 +113,28 @@ const Index = (props) => {
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
-                sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
+                let { result } = response.data;
+
+                updateData({ listBr: result?.map(({ name, id }) => ({ label: name, value: id })) });
             }
         });
+
         Axios("GET", "/api_web/Api_payment_method/payment_method/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
-                sDataMethod(rResult?.map((e) => ({ label: e?.name, value: e?.id })));
+                let { rResult } = response.data;
+
+                updateData({ dataMethod: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
             }
         });
+
         Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
-                sDataObject(
-                    data?.map((e) => ({
-                        label: dataLang[e?.name],
-                        value: e?.id,
-                    }))
-                );
+                let data = response.data;
+
+                updateData({ dataObject: data?.map(({ name, id }) => ({ label: dataLang[name] || name, value: id })) });
             }
         });
+
         sOnFetching_filter(false);
     };
 
@@ -154,26 +142,16 @@ const Index = (props) => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
 
-    const onchang_filter = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        } else if (type == "date") {
-            sValueDate(value);
-        } else if (type == "method") {
-            sIdMethod(value);
-        } else if (type == "object") {
-            sIdObject(value);
-        }
-    };
-
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
+
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
+
         setTimeout(() => {
             if (!value) {
                 sOnFetching(true);
@@ -182,31 +160,9 @@ const Index = (props) => {
         }, 500);
     };
 
-    // const paginate = pageNumber => {
-    //   router.push({
-    //     pathname: router.route,
-    //     query: {
-    //       tab: router.query?.tab,
-    //       page: pageNumber
-    //     }
-    //   })
-    // }
-
-    const paginate = (pageNumber) => {
-        const queryParams = { ...router.query, page: pageNumber };
-        router.push({
-            pathname: router.route,
-            query: queryParams,
-        });
-    };
-
     useEffect(() => {
         onFetching && _ServerFetching();
     }, [onFetching]);
-
-    //   useEffect(() => {
-    //       router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) ||valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) || idMethod != null && sOnFetching(true) || idObject != null && sOnFetching(true)
-    // }, [limit,router.query?.page, router.query?.tab, idBranch, valueDate.endDate, valueDate.startDate, idMethod, idObject]);
 
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) ||
@@ -216,10 +172,10 @@ const Index = (props) => {
 
     useEffect(() => {
         if (
-            idBranch != null ||
-            (valueDate.startDate != null && valueDate.endDate != null) ||
-            idMethod != null ||
-            idObject != null
+            isValue?.idBranch != null ||
+            (isValue?.valueDate.startDate != null && isValue?.valueDate.endDate != null) ||
+            isValue?.idMethod != null ||
+            isValue?.idObject != null
         ) {
             router.push({
                 pathname: router.route,
@@ -228,15 +184,21 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idBranch != null && sOnFetching(true)) ||
-                    (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-                    (idMethod != null && sOnFetching(true)) ||
-                    (idObject != null && sOnFetching(true));
+                (isValue?.idBranch != null && sOnFetching(true)) ||
+                    (isValue?.valueDate.startDate != null && isValue?.valueDate.endDate != null && sOnFetching(true)) ||
+                    (isValue?.idMethod != null && sOnFetching(true)) ||
+                    (isValue?.idObject != null && sOnFetching(true));
             }, 300);
         } else {
             sOnFetching(true);
         }
-    }, [idBranch, valueDate.endDate, valueDate.startDate, idMethod, idObject]);
+    }, [
+        isValue?.idBranch,
+        isValue?.valueDate.endDate,
+        isValue?.valueDate.startDate,
+        isValue?.idMethod,
+        isValue?.idObject,
+    ]);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -388,22 +350,6 @@ const Index = (props) => {
         },
     ];
 
-    const dataHeader = [
-        { name: dataLang?.payment_date || "payment_date", colspan: 1 },
-        { name: dataLang?.payment_code || "payment_code", colspan: 1 },
-        { name: dataLang?.payment_obType || "payment_obType", colspan: 1 },
-        { name: dataLang?.payment_ob || "payment_ob", colspan: 1 },
-        { name: dataLang?.payment_typeOfDocument || "payment_typeOfDocument", colspan: 1 },
-        { name: dataLang?.payment_voucherCode || "payment_voucherCode", colspan: 1 },
-        { name: "PTTT", colspan: 1 },
-        { name: dataLang?.payment_costs || "payment_costs", colspan: 1 },
-        { name: dataLang?.payment_amountOfMoney || "payment_amountOfMoney", colspan: 1 },
-        { name: dataLang?.payment_creator || "payment_creator", colspan: 1 },
-        { name: dataLang?.payment_branch || "payment_branch", colspan: 1 },
-        { name: dataLang?.payment_note || "payment_note", colspan: 1 },
-        { name: dataLang?.payment_action || "payment_action", colspan: 1 },
-    ];
-
     return (
         <React.Fragment>
             <Head>
@@ -456,8 +402,9 @@ const Index = (props) => {
                                                         },
                                                         ...listBr,
                                                     ]}
-                                                    onChange={onchang_filter.bind(this, "branch")}
-                                                    value={idBranch}
+                                                    isClearable={true}
+                                                    onChange={onChangeValue("idBranch")}
+                                                    value={isValue?.idBranch}
                                                     placeholder={dataLang?.client_list_filterbrand}
                                                     colSpan={2}
                                                 />
@@ -470,8 +417,9 @@ const Index = (props) => {
                                                         },
                                                         ...dataMethod,
                                                     ]}
-                                                    onChange={onchang_filter.bind(this, "method")}
-                                                    value={idMethod}
+                                                    isClearable={true}
+                                                    onChange={onChangeValue("idMethod")}
+                                                    value={isValue?.idMethod}
                                                     placeholder={dataLang?.payment_TT_method || "payment_TT_method"}
                                                     colSpan={2}
                                                 />
@@ -484,15 +432,16 @@ const Index = (props) => {
                                                         },
                                                         ...dataObject,
                                                     ]}
-                                                    onChange={onchang_filter.bind(this, "object")}
-                                                    value={idObject}
+                                                    isClearable={true}
+                                                    onChange={onChangeValue("idObject")}
+                                                    value={isValue?.idObject}
                                                     placeholder={dataLang?.payment_ob || "payment_ob"}
                                                     colSpan={2}
                                                 />
                                                 <DatepickerComponent
                                                     colSpan={2}
-                                                    value={valueDate}
-                                                    onChange={onchang_filter.bind(this, "date")}
+                                                    value={isValue?.valueDate}
+                                                    onChange={onChangeValue("valueDate")}
                                                 />
                                             </div>
                                         </div>
@@ -511,7 +460,11 @@ const Index = (props) => {
                                                     )}
                                                 </div>
                                                 <div className="">
-                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                                    <DropdowLimit
+                                                        sLimit={updateLimit}
+                                                        limit={limit}
+                                                        dataLang={dataLang}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -519,7 +472,47 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                        <HeaderTable dataHeader={dataHeader} dataLang={dataLang} gridCol={13} />
+                                        <div className="grid grid-cols-13 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_date || "payment_date"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_code || "payment_code"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_obType || "payment_obType"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_ob || "payment_ob"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_voucherCode || "payment_voucherCode"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {"PTTT"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_costs || "payment_costs"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_creator || "payment_creator"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_branch || "payment_branch"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_note || "payment_note"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.payment_action || "payment_action"}
+                                            </h4>
+                                        </div>
                                         {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
@@ -587,20 +580,19 @@ const Index = (props) => {
                                                                         ))}
                                                                 </div>
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out px-2 py-1  rounded-md text-center text-[#0F4F9E]">
-                                                                {e?.voucher?.map((code, index) => (
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]   transition-all ease-in-out px-2 py-1  rounded-md text-center text-[#0F4F9E]">
+                                                                {e?.voucher?.map((code) => (
                                                                     <React.Fragment key={code.id}>
                                                                         <Popup_chitietThere
                                                                             key={code?.id}
                                                                             dataLang={dataLang}
-                                                                            className="text-left"
+                                                                            className="text-left hover:text-blue-600"
                                                                             type={code.voucher_type}
                                                                             id={code.id}
                                                                             name={code?.code}
                                                                         >
                                                                             {code?.code}
                                                                         </Popup_chitietThere>
-                                                                        {/* {index !== e.voucher.length - 1 && ', '} */}
                                                                     </React.Fragment>
                                                                 ))}
                                                             </h6>
@@ -633,7 +625,6 @@ const Index = (props) => {
                                                                         }
                                                                         className="h-6 w-6 rounded-full object-cover "
                                                                     />
-                                                                    {/* <img className='h-6 w-6 rounded-full object-cover' src={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} alt=''></img> */}
                                                                     <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
                                                                         <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
                                                                             <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
@@ -642,7 +633,6 @@ const Index = (props) => {
                                                                 </div>
                                                                 <h6 className="capitalize">{e?.staff_name}</h6>
                                                             </h6>
-                                                            {/* <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> */}
                                                             <h6 className="col-span-1 w-fit mx-auto">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
                                                                     {e?.branch_name}
@@ -652,12 +642,12 @@ const Index = (props) => {
                                                                 {e?.note}
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
-                                                                <BtnTacVu
-                                                                    type="payment"
+                                                                <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     dataLang={dataLang}
                                                                     id={e?.id}
-                                                                    className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
+                                                                    type="payment"
+                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
                                                             </div>
                                                         </div>
@@ -712,214 +702,6 @@ const Index = (props) => {
                 </div>
             </div>
         </React.Fragment>
-    );
-};
-
-const BtnTacVu = React.memo((props) => {
-    const [openTacvu, sOpenTacvu] = useState(false);
-    const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [dataCompany, setDataCompany] = useState();
-    const [data, setData] = useState();
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
-                }
-            );
-        }
-    };
-    useEffect(() => {
-        openTacvu && fetchDataSettingsCompany();
-    }, [openTacvu]);
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                                props.onRefresh && props.onRefresh();
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
-                        }
-                    }
-                );
-            }
-        });
-    };
-
-    return (
-        <div>
-            <Popup
-                trigger={
-                    <button type="button" className={`flex space-x-1 items-center ` + props.className}>
-                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
-                        <IconDown size={12} />
-                    </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit `}
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-                open={openTacvu}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
-                            <BiEdit
-                                size={20}
-                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <Popup_dspc
-                                onRefresh={props.onRefresh}
-                                dataLang={props.dataLang}
-                                id={props?.id}
-                                className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
-                            >
-                                {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                            </Popup_dspc>
-                        </div>
-                        <div className=" transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full">
-                            <VscFilePdf
-                                size={20}
-                                className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <Popup_Pdf
-                                type={props.type}
-                                props={props}
-                                id={props.id}
-                                dataLang={props.dataLang}
-                                className="group-hover:text-[#65a30d] "
-                            />
-                        </div>
-                        <button
-                            onClick={_HandleDelete.bind(this, props.id)}
-                            className="group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <RiDeleteBin6Line
-                                size={20}
-                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}
-                            </p>
-                        </button>
-                    </div>
-                </div>
-            </Popup>
-        </div>
-    );
-});
-
-const Popup_Pdf = (props) => {
-    const scrollAreaRef = useRef(null);
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-    const [data, sData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-
-    const [dataPDF, setData] = useState();
-    const [dataCompany, setDataCompany] = useState();
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
-                }
-            );
-        }
-    };
-    useEffect(() => {
-        open && fetchDataSettingsCompany();
-    }, [open]);
-
-    return (
-        <>
-            <PopupEdit
-                title={props.dataLang?.option_prin || "option_prin"}
-                button={props.dataLang?.btn_table_print || "btn_table_print"}
-                onClickOpen={_ToggleModal.bind(this, true)}
-                open={open}
-                onClose={_ToggleModal.bind(this, false)}
-                classNameBtn={props?.className}
-            >
-                <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                <div className="space-x-5 w-[400px] h-auto">
-                    <div>
-                        <div className="w-[400px]">
-                            <FilePDF
-                                props={props}
-                                openAction={open}
-                                setOpenAction={sOpen}
-                                dataCompany={dataCompany}
-                                data={dataPDF}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </PopupEdit>
-        </>
     );
 };
 

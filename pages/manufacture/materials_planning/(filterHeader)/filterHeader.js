@@ -1,10 +1,13 @@
 import dynamic from "next/dynamic";
-const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), {
-    ssr: false,
-});
-import { ArrowDown2 } from "iconsax-react";
+
+import vi from "date-fns/locale/vi";
+
 import DatePicker from "react-datepicker";
-import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
+
+import { ArrowDown2 } from "iconsax-react";
+
+const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), { ssr: false });
+
 const FilterHeader = () => {
     const renderMonthContent = (month, shortMonth, longMonth) => {
         const tooltipText = `Tooltip for month: ${longMonth}`;

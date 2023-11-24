@@ -1,86 +1,71 @@
-import React, { useState } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import "react-datepicker/dist/react-datepicker.css";
+import React, { useState, useEffect } from "react";
 
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
+import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 
-import Select from "react-select";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
-
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
-import Swal from "sweetalert2";
+import moment from "moment";
 
-import ReactExport from "react-data-export";
-import { useEffect } from "react";
 import Popup_chitietPhatsinh from "./(popup)/details_arises";
 import Popup_chitietDauki from "./(popup)/details_first";
-import moment from "moment";
-import { useSelector } from "react-redux";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import styleDatePicker from "configs/configDatePicker";
-import configSelectFillter from "configs/configSelectFillter";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import OnResetData from "components/UI/btnResetData/btnReset";
+
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+
+import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
 
     const [data, sData] = useState([]);
+
+    const trangthaiExprired = useStatusExprired();
+
     const [dataExcel, sDataExcel] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
+
     const [keySearch, sKeySearch] = useState("");
+
     const [limit, sLimit] = useState(15);
+
     const [total, sTotal] = useState({});
 
     const [listBr, sListBr] = useState([]);
-    const [lisCode, sListCode] = useState([]);
+
     const [listSupplier, sListSupplier] = useState([]);
 
-    const [idCode, sIdCode] = useState(null);
-    const [idSupplier, sIdSupplier] = useState(null);
-    const [idBranch, sIdBranch] = useState(null);
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
-    const trangthaiExprired = useStatusExprired();
+    const pastDays = 30;
 
-    const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: router.route,
-            query: { tab: e },
-        });
+    const today = new Date();
+
+    const pastDate = new Date(today);
+
+    pastDate.setDate(today.getDate() - pastDays);
+
+    const inistialValue = {
+        idCode: null,
+        idSupplier: null,
+        idBranch: null,
+        valueDate: { startDate: pastDate, endDate: today },
     };
+
+    const { isValue, onChangeValue } = useChangeValue(inistialValue);
 
     useEffect(() => {
         router.push({
@@ -98,17 +83,21 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                    "filter[supplier_id]": idSupplier ? idSupplier.value : null,
+                    "filter[branch_id]": isValue?.idBranch != null ? isValue?.idBranch.value : null,
+                    "filter[supplier_id]": isValue?.idSupplier ? isValue?.idSupplier.value : null,
                     "filter[start_date]":
-                        valueDate?.startDate != null ? moment(valueDate?.startDate).format("YYYY-MM-DD") : null,
+                        isValue?.valueDate?.startDate != null
+                            ? moment(isValue?.valueDate?.startDate).format("YYYY-MM-DD")
+                            : null,
                     "filter[end_date]":
-                        valueDate?.endDate != null ? moment(valueDate?.endDate).format("YYYY-MM-DD") : null,
+                        isValue?.valueDate?.endDate != null
+                            ? moment(isValue?.valueDate?.endDate).format("YYYY-MM-DD")
+                            : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
+                    let { rResult, output, rTotal } = response.data;
                     sData(rResult);
                     sTotalItems(output);
                     sDataExcel(rResult);
@@ -122,13 +111,13 @@ const Index = (props) => {
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
+                let { result } = response?.data;
                 sListBr(result);
             }
         });
         await Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var db = response.data.rResult;
+                let db = response.data.rResult;
                 sListSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
             }
         });
@@ -148,19 +137,19 @@ const Index = (props) => {
         (router.query.tab && sOnFetching(true)) ||
             (keySearch && sOnFetching(true)) ||
             (router.query?.tab && sOnFetching_filter(true)) ||
-            (idBranch != null && sOnFetching(true)) ||
-            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-            (idSupplier != null && sOnFetching(true)) ||
-            (idCode != null && sOnFetching(true));
+            (isValue?.idBranch != null && sOnFetching(true)) ||
+            (isValue?.valueDate.startDate != null && isValue?.valueDate.endDate != null && sOnFetching(true)) ||
+            (isValue?.idSupplier != null && sOnFetching(true)) ||
+            (isValue?.idCode != null && sOnFetching(true));
     }, [
         limit,
         router.query?.page,
         router.query?.tab,
-        idBranch,
-        valueDate.endDate,
-        valueDate.startDate,
-        idSupplier,
-        idCode,
+        isValue?.idBranch,
+        isValue?.valueDate.endDate,
+        isValue?.valueDate.startDate,
+        isValue?.idSupplier,
+        isValue?.idCode,
     ]);
 
     const formatNumber = (number) => {
@@ -200,21 +189,6 @@ const Index = (props) => {
 
     const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
 
-    const onchang_filter = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        } else if (type == "date") {
-            sValueDate(value);
-        } else if (type == "supplier") {
-            sIdSupplier(value);
-        } else if (type == "code") {
-            sIdCode(value);
-        }
-    };
-
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
     const multiDataSet = [
         {
             columns: [
@@ -304,34 +278,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    // useEffect(() => {
-    //   // Set the default value to the current month
-    //   const today = new Date();
-    //   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    //   const lastDayOfMonth = new Date(
-    //     today.getFullYear(),
-    //     today.getMonth() + 1,
-    //     0
-    //   );
-
-    //   sValueDate({
-    //     startDate: firstDayOfMonth,
-    //     endDate: lastDayOfMonth,
-    //   });
-    // }, []);
-
-    useEffect(() => {
-        // Calculate the past period (e.g., 30 days ago)
-        const pastDays = 30;
-        const today = new Date();
-        const pastDate = new Date(today);
-        pastDate.setDate(today.getDate() - pastDays);
-
-        sValueDate({
-            startDate: pastDate,
-            endDate: today,
-        });
-    }, []);
     return (
         <React.Fragment>
             <Head>
@@ -371,15 +317,15 @@ const Index = (props) => {
                                                         {
                                                             value: "",
                                                             label:
-                                                                dataLang?.purchase_order_branch ||
-                                                                "purchase_order_branch",
+                                                                dataLang?.purchase_order_table_branch ||
+                                                                "purchase_order_table_branch",
                                                             isDisabled: true,
                                                         },
                                                         ...listBr_filter,
                                                     ]}
                                                     isClearable={true}
-                                                    value={idBranch}
-                                                    onChange={onchang_filter.bind(this, "branch")}
+                                                    value={isValue.idBranch}
+                                                    onChange={onChangeValue("idBranch")}
                                                     placeholder={
                                                         dataLang?.purchase_order_table_branch ||
                                                         "purchase_order_table_branch"
@@ -390,23 +336,23 @@ const Index = (props) => {
                                                         {
                                                             value: "",
                                                             label:
-                                                                dataLang?.purchase_order_branch ||
-                                                                "purchase_order_branch",
+                                                                dataLang?.purchase_order_table_supplier ||
+                                                                "purchase_order_table_supplier",
                                                             isDisabled: true,
                                                         },
-                                                        ...listBr_filter,
+                                                        ...listSupplier,
                                                     ]}
                                                     isClearable={true}
-                                                    value={idSupplier}
-                                                    onChange={onchang_filter.bind(this, "supplier")}
+                                                    value={isValue?.idSupplier}
+                                                    onChange={onChangeValue("idSupplier")}
                                                     placeholder={
                                                         dataLang?.purchase_order_table_supplier ||
                                                         "purchase_order_table_supplier"
                                                     }
                                                 />
                                                 <DatepickerComponent
-                                                    value={valueDate}
-                                                    onChange={onchang_filter.bind(this, "date")}
+                                                    value={isValue?.valueDate}
+                                                    onChange={onChangeValue("valueDate")}
                                                 />
                                             </div>
                                         </div>
@@ -508,10 +454,10 @@ const Index = (props) => {
                                                                             }
                                                                             id={e?.id}
                                                                             type={"no_start"}
-                                                                            date={valueDate}
+                                                                            date={isValue.valueDate}
                                                                             supplier_name={e.name}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            idBranch={isValue?.idBranch}
+                                                                            idSupplier={isValue?.idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>
@@ -527,12 +473,12 @@ const Index = (props) => {
                                                                                     ? "-"
                                                                                     : formatNumber(e.chi_start)
                                                                             }
-                                                                            date={valueDate}
+                                                                            date={isValue.valueDate}
                                                                             supplier_name={e.name}
                                                                             id={e?.id}
                                                                             type={"chi_start"}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            idBranch={isValue?.idBranch}
+                                                                            idSupplier={isValue?.idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>
@@ -552,10 +498,10 @@ const Index = (props) => {
                                                                                     : formatNumber(e.no_debt)
                                                                             }
                                                                             id={e?.id}
-                                                                            date={valueDate}
+                                                                            date={isValue.valueDate}
                                                                             type={"no_debt"}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            idBranch={isValue?.idBranch}
+                                                                            idSupplier={isValue?.idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>
@@ -574,10 +520,10 @@ const Index = (props) => {
                                                                                     : formatNumber(e.chi_debt)
                                                                             }
                                                                             id={e?.id}
-                                                                            date={valueDate}
+                                                                            date={isValue.valueDate}
                                                                             type={"chi_debt"}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            idBranch={isValue?.idBranch}
+                                                                            idSupplier={isValue?.idSupplier}
                                                                         />
                                                                     )}
                                                                 </h4>

@@ -1,7 +1,10 @@
+import moment from "moment";
 import React, { useState } from "react";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import moment from "moment";
+import { VscFilePdf } from "react-icons/vsc";
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import {
     bottomForm,
@@ -10,7 +13,7 @@ import {
     styles,
     uppercaseTextHeaderTabel,
 } from "./stylePdf/style";
-import { VscFilePdf } from "react-icons/vsc";
+
 import {
     lineHeght,
     styleForm,
@@ -21,11 +24,16 @@ import {
     titleHeader,
     titleValue,
 } from "./stylePdf/receiptsEndPayment";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = shareProps;
-
+const FilePDF = ({
+    props,
+    dataCompany,
+    data,
+    setOpenAction,
+    dataMaterialExpiry,
+    dataProductExpiry,
+    dataProductSerial,
+}) => {
     const [url, setUrl] = useState(null);
     // uppercase text header table
     const uppercaseText = (text, style, alignment) => {
@@ -1374,7 +1382,9 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
                                                   },
                                                   {
                                                       text:
-                                                          item.serial == null || item.serial == "" ? "-" : item.serial,
+                                                          item?.item?.serial == null || item?.item?.serial == ""
+                                                              ? "-"
+                                                              : item?.item?.serial,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -1395,7 +1405,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
                                                       italics: true,
                                                   },
                                                   {
-                                                      text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                      text:
+                                                          item?.item?.lot == null || item?.item?.lot == ""
+                                                              ? "-"
+                                                              : item?.item?.lot,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -1412,8 +1425,8 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
                                                       italics: true,
                                                   },
                                                   {
-                                                      text: item.expiration_date
-                                                          ? moment(item.expiration_date).format("DD/MM/YYYY")
+                                                      text: item?.item?.expiration_date
+                                                          ? moment(item?.item?.expiration_date).format("DD/MM/YYYY")
                                                           : "-",
                                                       fontSize: 8.5,
                                                       italics: true,
@@ -1804,7 +1817,9 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
                                                   },
                                                   {
                                                       text:
-                                                          item.serial == null || item.serial == "" ? "-" : item.serial,
+                                                          item?.item?.serial == null || item?.item?.serial == ""
+                                                              ? "-"
+                                                              : item?.item?.serial,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -1825,7 +1840,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
                                                       italics: true,
                                                   },
                                                   {
-                                                      text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                      text:
+                                                          item?.item?.lot == null || item?.item?.lot == ""
+                                                              ? "-"
+                                                              : item?.item?.lot,
                                                       fontSize: 9,
                                                       italics: true,
                                                       margin: [0, 5, 0, 0],
@@ -1842,8 +1860,8 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
                                                       italics: true,
                                                   },
                                                   {
-                                                      text: item.expiration_date
-                                                          ? moment(item.expiration_date).format("DD/MM/YYYY")
+                                                      text: item?.item.expiration_date
+                                                          ? moment(item?.item.expiration_date).format("DD/MM/YYYY")
                                                           : "-",
                                                       fontSize: 8.5,
                                                       italics: true,
@@ -4480,7 +4498,6 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
                                       ];
                                       stackBt.push(serialStack);
                                   }
-
                                   if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                       const subStack = [
                                           {
@@ -6179,6 +6196,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
             },
         },
     };
+
     //Nhập kho thành phẩm
     const docDefinitionProductionWarehouse = {
         info: {
@@ -6624,7 +6642,6 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
     };
 
     /// Thu hồi NVL
-
     const docDefinitionRecall = {
         info: {
             title: `${`${props.dataLang?.recall_title || "recall_title"} - ${data?.code}`}`,
@@ -7126,6 +7143,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
             },
         },
     };
+
     ///Xuất kho khác
     const docDefinitionexportToOther = {
         info: {
@@ -7789,7 +7807,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction, shareProps }) => {
         "exportToOther",
     ];
 
-    // kiểm tra xem có phải model có 2 loại in hay không
+    // model có 2 loại in
     const doubleAction = ["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"];
 
     return (

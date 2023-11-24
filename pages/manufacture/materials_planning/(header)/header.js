@@ -1,8 +1,7 @@
-import dynamic from "next/dynamic";
 import Image from "next/image";
-const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), {
-    ssr: false,
-});
+import dynamic from "next/dynamic";
+
+const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
 const Header = ({}) => {
     return (
         <>

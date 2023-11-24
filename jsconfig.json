@@ -7,7 +7,8 @@
             "@/constants/*": ["constants/*"],
             "@/pages/*": ["pages/*"],
             "@/configs/*": ["configs/*"],
-            "@/routers/*": ["routers/*"]
+            "@/routers/*": ["routers/*"],
+            "@/utils/*": ["utils/*"]
         }
     }
 }
