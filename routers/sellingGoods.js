@@ -1,5 +1,8 @@
-// Trả lại hàng bán
+//bán xuất hàng
 const url = "/sales_export_product";
+
+// Trả lại hàng bán
+
 const routerReturnSales = {
     home: `${url}/returnSales`,
     form: `${url}/returnSales/form`,
@@ -17,6 +20,7 @@ const routerPriceQuote = {
     form: `${url}/priceQuote/form`,
 };
 
+//đơn hàng bán
 const routerSalesOrder = {
     home: `${url}/salesOrder`,
     form: `${url}/salesOrder/form`,

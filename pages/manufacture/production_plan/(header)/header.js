@@ -37,7 +37,12 @@ const Header = (props) => {
                                     if (isCheck) {
                                         router.push(routerPproductionPlan.form);
                                     } else {
-                                        showToat("error", "Vui lòng chọn ít nhất một đơn hàng");
+                                        showToat(
+                                            "error",
+                                            router.query?.tab == "plan"
+                                                ? "Vui lòng chọn ít nhất một KHNB"
+                                                : "Vui lòng chọn ít nhất một đơn hàng"
+                                        );
                                     }
                                 }}
                                 className="bg-[#0F4F9E] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"

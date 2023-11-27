@@ -5,5 +5,5 @@ export const useChangeValue = (initialValue) => {
 
     const onChangeValue = (key) => (event) => sIsValue((prev) => ({ ...prev, [key]: event }));
 
-    return { isValue, onChangeValue };
+    return { isValue, sIsValue, onChangeValue };
 };

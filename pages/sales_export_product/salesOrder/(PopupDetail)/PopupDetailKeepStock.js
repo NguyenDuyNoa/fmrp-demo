@@ -1,11 +1,11 @@
 // Danh sách dữ kho
 
-import moment from "moment";
 import { v4 as uuid } from "uuid";
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-import { SearchNormal1 as IconSearch, Trash as IconDelete, BoxSearch } from "iconsax-react";
+
+import { SearchNormal1 as IconSearch, Trash as IconDelete, BoxSearch, ArrowRight2 } from "iconsax-react";
 
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
@@ -16,7 +16,14 @@ import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecompon
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import { useChangeValue } from "@/hooks/useChangeValue";
+
+import { formatMoment } from "@/utils/helpers/formatMoment";
+
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import ModalImage from "react-modal-image";
+import formatNumber from "@/utils/helpers/formatnumber";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
@@ -29,6 +36,7 @@ const Popup_DetailKeepStock = (props) => {
         onFetching: false,
         onFetchingFilter: false,
         onFetchingWarehouse: false,
+        onFetchingCondition: false,
     };
 
     const initialValues = {
@@ -50,23 +58,29 @@ const Popup_DetailKeepStock = (props) => {
 
     let dataClone = { ...data };
 
-    const isShow = useToast();
+    const { isMoment } = formatMoment();
 
-    const { isOpen, isId, handleQueryId } = useToggle();
+    const isShow = useToast();
 
     const [open, sOpen] = useState(false);
 
-    const [isValue, sIsValue] = useState(initialValues);
+    const { isOpen, isId, handleQueryId } = useToggle();
 
     const [isFetching, sIsFetching] = useState(initialFetchs);
 
     const [dataFilter, sDataFilter] = useState(initialDataFilters);
 
+    const { isValue, sIsValue, onChangeValue } = useChangeValue(initialValues);
+
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+
+    const [dataProductSerial, sDataProductSerial] = useState({});
+
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const _ToggleModal = (e) => sOpen(e);
 
     const setIsFetch = (e) => sIsFetching((prev) => ({ ...prev, ...e }));
-
-    const onChangeValue = (key) => (event) => sIsValue((prev) => ({ ...prev, [key]: event }));
 
     useEffect(() => {
         open && sIsValue(initialValues);
@@ -87,14 +101,49 @@ const Popup_DetailKeepStock = (props) => {
             (err, response) => {
                 if (!err) {
                     let db = response?.data;
-
-                    sData(db);
+                    const newDb = {
+                        order: db.order,
+                        transfer: db.transfer.map((e) => {
+                            return {
+                                ...e,
+                                isShow: false,
+                            };
+                        }),
+                    };
+                    sData(newDb);
                 }
 
                 setIsFetch({ onFetching: false });
             }
         );
     };
+
+    useEffect(() => {
+        JSON.stringify(dataMaterialExpiry) === "{}" &&
+            JSON.stringify(dataProductExpiry) === "{}" &&
+            JSON.stringify(dataProductSerial) === "{}" &&
+            setIsFetch({ onFetchingCondition: true });
+    }, [
+        JSON.stringify(dataMaterialExpiry) === "{}",
+        JSON.stringify(dataProductExpiry) === "{}",
+        JSON.stringify(dataProductSerial) === "{}",
+    ]);
+
+    const _ServerFetchingCondition = () => {
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                let data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
+            }
+            setIsFetch({ onFetchingCondition: false });
+        });
+    };
+
+    useEffect(() => {
+        id && open && isFetching.onFetchingCondition && _ServerFetchingCondition();
+    }, [isFetching.onFetchingCondition, open]);
 
     const _ServerFetching_filter = () => {
         Axios("GET", "/api_web/Api_transfer/TransferCombobox/?csrf_protection=true", {}, (err, response) => {
@@ -147,6 +196,23 @@ const Popup_DetailKeepStock = (props) => {
         );
         handleQueryId({ status: false });
     };
+
+    const handleShowItem = (id) => {
+        const newDb = {
+            order: dataClone.order,
+            transfer: dataClone.transfer.map((e) => {
+                if (e.id == id) {
+                    return {
+                        ...e,
+                        isShow: !e.isShow,
+                    };
+                }
+                return e;
+            }),
+        };
+        sData({ ...newDb });
+    };
+    console.log(data);
 
     useEffect(() => {
         isFetching.onFetching && handleFetching();
@@ -352,6 +418,7 @@ const Popup_DetailKeepStock = (props) => {
                             ) : dataClone?.transfer?.length > 0 ? (
                                 <>
                                     <ScrollArea
+                                        stopScrollPropagation={true}
                                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
                                         speed={1}
                                         smoothScrolling={true}
@@ -359,64 +426,255 @@ const Popup_DetailKeepStock = (props) => {
                                         <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
                                             {dataClone?.transfer?.map((e) => {
                                                 return (
-                                                    <div
-                                                        className="grid grid-cols-10 hover:bg-slate-50 items-center border-b"
-                                                        key={e.id?.toString()}
-                                                    >
-                                                        <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
-                                                            {moment(e?.date).format("DD/MM/YYYY")}
-                                                        </h6>
-                                                        <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
-                                                            {e?.code}
-                                                        </h6>
-                                                        <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
-                                                            {dataClone?.order.code}
-                                                        </h6>
-                                                        <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
-                                                            {e?.warehouses_id_name}
-                                                        </h6>
-                                                        <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
-                                                            {e?.warehouses_to_name}
-                                                        </h6>
-                                                        <h6
-                                                            className={`text-[12px] ${
-                                                                e?.warehouseman_id == "0"
-                                                                    ? "bg-blue-200 text-blue-700 px-1.5"
-                                                                    : " bg-green-200 text-green-700 px-3"
-                                                            } py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
+                                                    <>
+                                                        <div
+                                                            className="grid grid-cols-10 hover:bg-slate-50 items-center border-b"
+                                                            key={e.id?.toString()}
                                                         >
-                                                            {`${
-                                                                e?.warehouseman_id == "0"
-                                                                    ? "Chưa duyệt kho"
-                                                                    : "Đã duyệt kho"
-                                                            }`}
-                                                        </h6>
-                                                        <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
-                                                            {e?.note}
-                                                        </h6>
-
-                                                        <h6 className="text-[13px] flex items-center justify-center gap-4 py-2 col-span-1 font-medium text-center break-words">
-                                                            <Popup_EditDetail
-                                                                {...props}
-                                                                id={e.id}
-                                                                sIsFetchingParent={sIsFetching}
-                                                                dataClone={dataClone}
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                title="Xóa"
-                                                                onClick={(event) =>
-                                                                    handleQueryId({ id: e?.id, status: true })
-                                                                }
-                                                                className="group transition h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                                                            >
-                                                                <IconDelete
-                                                                    size={23}
-                                                                    className="group-hover:text-red-500 group-hover:scale-110 group-hover:shadow-md "
+                                                            <h6 className="text-[13px] flex items-center  px-2 py-2 col-span-1 text-center break-words">
+                                                                <ArrowRight2
+                                                                    onClick={() => handleShowItem(e.id)}
+                                                                    size="22"
+                                                                    color="red"
+                                                                    variant="Bold"
+                                                                    className={`${
+                                                                        e.isShow
+                                                                            ? "rotate-90 transition-all duration-200 ease-linear"
+                                                                            : ""
+                                                                    } cursor-pointer`}
                                                                 />
-                                                            </button>
-                                                        </h6>
-                                                    </div>
+                                                                {isMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
+                                                                {e?.code}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
+                                                                {dataClone?.order.code}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
+                                                                {e?.warehouses_id_name}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
+                                                                {e?.warehouses_to_name}
+                                                            </h6>
+                                                            <h6
+                                                                className={`text-[12px] ${
+                                                                    e?.warehouseman_id == "0"
+                                                                        ? "bg-blue-200 text-blue-700 px-1.5"
+                                                                        : " bg-green-200 text-green-700 px-3"
+                                                                } py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
+                                                            >
+                                                                {`${
+                                                                    e?.warehouseman_id == "0"
+                                                                        ? "Chưa duyệt kho"
+                                                                        : "Đã duyệt kho"
+                                                                }`}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
+                                                                {e?.note}
+                                                            </h6>
+                                                            <h6 className="text-[13px] flex items-center justify-center gap-4 py-2 col-span-1 font-medium text-center break-words">
+                                                                <Popup_EditDetail
+                                                                    {...props}
+                                                                    id={e.id}
+                                                                    sIsFetchingParent={sIsFetching}
+                                                                    dataClone={dataClone}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    title="Xóa"
+                                                                    onClick={(event) =>
+                                                                        handleQueryId({ id: e?.id, status: true })
+                                                                    }
+                                                                    className="group transition h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                                                >
+                                                                    <IconDelete
+                                                                        size={23}
+                                                                        className="group-hover:text-red-500 group-hover:scale-110 group-hover:shadow-md "
+                                                                    />
+                                                                </button>
+                                                            </h6>
+                                                            {e.isShow && (
+                                                                <>
+                                                                    <div className="col-span-10 grid  grid-cols-9 mx-5 border-t border-b">
+                                                                        <h6 className="text-[13px]   py-2 col-span-1 text-center break-words">
+                                                                            STT
+                                                                        </h6>
+                                                                        <h6 className="text-[13px]   py-2 col-span-2 text-center break-words">
+                                                                            Mặt hàng
+                                                                        </h6>
+                                                                        <h6 className="text-[13px]   py-2 col-span-1 text-center break-words">
+                                                                            ĐVT
+                                                                        </h6>
+                                                                        <h6 className="text-[13px]   py-2 col-span-2 text-center break-words">
+                                                                            Vị trí nhận
+                                                                        </h6>
+                                                                        <h6 className="text-[13px]   py-2 col-span-2 text-center break-words">
+                                                                            Vị trí chuyển
+                                                                        </h6>
+                                                                        <h6 className="text-[13px]   py-2 col-span-1 text-center break-words">
+                                                                            Số lượng
+                                                                        </h6>
+                                                                    </div>
+
+                                                                    <ScrollArea
+                                                                        stopScrollPropagation={true}
+                                                                        className="min-h-[90px] mx-5  max-h-[170px] col-span-10 2xl:max-h-[250px] overflow-hidden"
+                                                                        speed={1}
+                                                                        smoothScrolling={true}
+                                                                    >
+                                                                        <div className="max-h-[300px] col-span-10 grid grid-cols-10 items-center ">
+                                                                            {e?.items?.map((e, index) => (
+                                                                                <div
+                                                                                    className={`col-span-10 ${
+                                                                                        index == 0
+                                                                                            ? "border-t-0"
+                                                                                            : "border-t"
+                                                                                    }  overflow-hidden grid grid-cols-9  hover:bg-slate-50 items-center`}
+                                                                                    key={e.id}
+                                                                                >
+                                                                                    <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
+                                                                                        {index + 1}
+                                                                                    </h6>
+                                                                                    <h6 className="text-[13px]  px-2 py-2 col-span-2 text-left ">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <div>
+                                                                                                {e?.item?.images !=
+                                                                                                null ? (
+                                                                                                    <ModalImage
+                                                                                                        small={
+                                                                                                            e?.item
+                                                                                                                ?.images
+                                                                                                        }
+                                                                                                        large={
+                                                                                                            e?.item
+                                                                                                                ?.images
+                                                                                                        }
+                                                                                                        alt="Product Image"
+                                                                                                        className="custom-modal-image object-cover rounded w-[40px] h-[50px] mx-auto"
+                                                                                                    />
+                                                                                                ) : (
+                                                                                                    <div className="w-[40px] h-[50px] object-cover  mx-auto">
+                                                                                                        <ModalImage
+                                                                                                            small="/no_img.png"
+                                                                                                            large="/no_img.png"
+                                                                                                            className="w-full h-full rounded object-contain p-1"
+                                                                                                        ></ModalImage>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                                                    {e?.item?.name}
+                                                                                                </h6>
+                                                                                                <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                                                    {
+                                                                                                        e?.item
+                                                                                                            ?.product_variation
+                                                                                                    }
+                                                                                                </h6>
+                                                                                                <div className="flex items-center font-oblique flex-wrap">
+                                                                                                    {dataProductSerial.is_enable ===
+                                                                                                    "1" ? (
+                                                                                                        <div className="flex gap-0.5">
+                                                                                                            <h6 className="text-[12px]">
+                                                                                                                Serial:
+                                                                                                            </h6>
+                                                                                                            <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                                                {e?.item
+                                                                                                                    ?.serial ==
+                                                                                                                    null ||
+                                                                                                                e?.item
+                                                                                                                    ?.serial ==
+                                                                                                                    ""
+                                                                                                                    ? "-"
+                                                                                                                    : e
+                                                                                                                          ?.item
+                                                                                                                          ?.serial}
+                                                                                                            </h6>
+                                                                                                        </div>
+                                                                                                    ) : (
+                                                                                                        ""
+                                                                                                    )}
+                                                                                                    {dataMaterialExpiry.is_enable ===
+                                                                                                        "1" ||
+                                                                                                    dataProductExpiry.is_enable ===
+                                                                                                        "1" ? (
+                                                                                                        <>
+                                                                                                            <div className="flex gap-0.5">
+                                                                                                                <h6 className="text-[12px]">
+                                                                                                                    Lot:
+                                                                                                                </h6>{" "}
+                                                                                                                <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                                                    {e
+                                                                                                                        ?.item
+                                                                                                                        ?.lot ==
+                                                                                                                        null ||
+                                                                                                                    e
+                                                                                                                        ?.item
+                                                                                                                        ?.lot ==
+                                                                                                                        ""
+                                                                                                                        ? "-"
+                                                                                                                        : e
+                                                                                                                              ?.item
+                                                                                                                              ?.lot}
+                                                                                                                </h6>
+                                                                                                            </div>
+                                                                                                            <div className="flex gap-0.5">
+                                                                                                                <h6 className="text-[12px]">
+                                                                                                                    Date:
+                                                                                                                </h6>{" "}
+                                                                                                                <h6 className="text-[12px]  px-2   w-[full] text-center ">
+                                                                                                                    {e
+                                                                                                                        ?.item
+                                                                                                                        ?.expiration_date
+                                                                                                                        ? isMoment(
+                                                                                                                              e
+                                                                                                                                  ?.item
+                                                                                                                                  ?.expiration_date,
+                                                                                                                              "DD/MM/YYYY"
+                                                                                                                          )
+                                                                                                                        : "-"}
+                                                                                                                </h6>
+                                                                                                            </div>
+                                                                                                        </>
+                                                                                                    ) : (
+                                                                                                        ""
+                                                                                                    )}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </h6>
+                                                                                    <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
+                                                                                        {e?.item.unit_name}
+                                                                                    </h6>
+                                                                                    <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
+                                                                                        <h6 className="font-medium">
+                                                                                            {
+                                                                                                e?.warehouse_location
+                                                                                                    ?.location_name
+                                                                                            }
+                                                                                        </h6>
+                                                                                    </h6>
+                                                                                    <h6 className="text-[13px]    py-2 col-span-2 text-center break-words">
+                                                                                        <h6 className="font-medium">
+                                                                                            {
+                                                                                                e?.warehouse_location_to
+                                                                                                    ?.location_name
+                                                                                            }
+                                                                                        </h6>
+                                                                                    </h6>
+                                                                                    <h6 className="text-[13px]   py-2 pl-3 col-span-1 font-medium text-center break-words">
+                                                                                        {formatNumber(e?.quantity)}
+                                                                                    </h6>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </ScrollArea>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    </>
                                                 );
                                             })}
                                         </div>

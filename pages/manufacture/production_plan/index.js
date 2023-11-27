@@ -587,7 +587,11 @@ const Index = (props) => {
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `/api_web/api_manufactures/getProductionPlan?csrf_protection=true`,
+            `${
+                router.query?.tab == "plan"
+                    ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true"
+                    : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"
+            }`,
             {
                 params: {
                     page: router.query?.page || 1,
@@ -804,7 +808,6 @@ const Index = (props) => {
                 if (e.id === idParent) {
                     const newListProducts = e.listProducts.map((i) => {
                         if (i.id === idChild) {
-                            console.log(!i.checked);
                             return { ...i, checked: !i.checked };
                         }
 
@@ -860,6 +863,7 @@ const Index = (props) => {
     }, [router.query.page, router.query?.tab, isValue]);
 
     useEffect(() => {
+        handleTab("order");
         localStorage.removeItem("arrData");
     }, []);
 

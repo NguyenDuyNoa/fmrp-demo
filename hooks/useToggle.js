@@ -2,8 +2,11 @@ import { useState } from "react";
 
 export const useToggle = (initialValue = false) => {
     const [isOpen, sIsOpen] = useState(initialValue);
+
     const [isId, sIsId] = useState(null);
+
     const [isIdChild, sIsIdChild] = useState(null);
+
     const [isKeyState, sIsKeyState] = useState(null);
 
     const handleToggle = () => sIsOpen((prev) => !prev);

@@ -102,7 +102,11 @@ const FormAdd = (props) => {
     };
 
     const backPage = () => {
-        showToat("error", "Không có đơn hàng. Vui lòng thêm đơn hàng !", 3000);
+        showToat(
+            "error",
+            tab == "plan" ? "Không có KHNB. Vui lòng thêm đơn hàng !" : "Không có đơn hàng. Vui lòng thêm đơn hàng !",
+            3000
+        );
 
         setTimeout(() => {
             router.push("/manufacture/production_plan");
@@ -116,7 +120,7 @@ const FormAdd = (props) => {
 
         sIsCheckRemove(true);
 
-        showToat("success", "Xóa đơn hàng thành công");
+        showToat("success", tab == "plan" ? "Xóa KHNB thành công" : "Xóa đơn hàng thành công");
     };
 
     const checkLoading = () => {
