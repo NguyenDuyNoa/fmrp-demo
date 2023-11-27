@@ -14,8 +14,8 @@ import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import formatNumber from "@/components/UI/formanumber/formanumber";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import formatNumber from "@/utils/helpers/formatnumber";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 

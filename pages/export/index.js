@@ -11,7 +11,7 @@ import Loading from "components/UI/loading";
 import ReactExport from "react-data-export";
 import Client from "./(client)/client";
 import TitleHeader from "./(children)/titleHeader/titleHeader";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 import Supplier from "./(supplier)/supplier";
 import Materials from "./(materials)/materials";
 import Products from "./(products)/products";
@@ -39,7 +39,7 @@ const Index = (props) => {
         page: 1,
         limit: 100,
     };
-    const trangthaiExprired =useStatusExprired()
+    const trangthaiExprired = useStatusExprired();
 
     const scrollAreaRef = useRef(null);
 

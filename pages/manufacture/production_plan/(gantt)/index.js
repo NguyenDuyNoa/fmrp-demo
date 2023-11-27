@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import ModalImage from "react-modal-image";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-import formatNumber from "@/components/UI/formanumber/formanumber";
+import formatNumber from "@/utils/helpers/formatnumber";
 
 const BodyGantt = ({
     handleShowSub,

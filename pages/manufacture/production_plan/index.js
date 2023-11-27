@@ -4,13 +4,11 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useMemo, useEffect, useState } from "react";
 
-
 import Pagination from "@/components/UI/pagination";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { useMoment } from "utils/moment/useMoment";
-
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 import useTab from "@/hooks/useTab";
 import useToast from "@/hooks/useToast";
@@ -566,11 +564,13 @@ const Index = (props) => {
 
     const showToast = useToast();
 
+    const { isMoment } = formatMoment();
+
     const { paginate } = usePagination();
 
     const { handleTab } = useTab("order");
 
-    const {isOpen, handleToggle} = useToggle(false);
+    const { isOpen, handleToggle } = useToggle(false);
 
     const [isFetching, sIsFetching] = useState(false);
 
@@ -582,7 +582,7 @@ const Index = (props) => {
 
     const [data, sData] = useState([]);
 
-    const { limit, totalItems, updateLimit, updateTotalItems } = useLimitAndTotalItems(15, {});
+    const { limit, totalItems, updateTotalItems } = useLimitAndTotalItems(15, {});
 
     const _ServerFetching = () => {
         Axios(
@@ -592,8 +592,8 @@ const Index = (props) => {
                 params: {
                     page: router.query?.page || 1,
                     limit: limit,
-                    date_start: isValue.startDate ? useMoment(isValue.startDate, "DD/MM/YYYY") : "",
-                    date_end: isValue.endDate ? useMoment(isValue.endDate, "DD/MM/YYYY") : "",
+                    date_start: isValue.startDate ? isMoment(isValue.startDate, "DD/MM/YYYY") : "",
+                    date_end: isValue.endDate ? isMoment(isValue.endDate, "DD/MM/YYYY") : "",
                     customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
                     category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
                     product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,

@@ -1,7 +1,8 @@
-import useToast from "@/hooks/useToast";
-import dynamic from "next/dynamic";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+import useToast from "@/hooks/useToast";
 import { useRouter } from "next/router";
+import { routerPproductionPlan } from "@/routers/manufacture";
 
 const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
 
@@ -34,7 +35,7 @@ const Header = (props) => {
                                 type="button"
                                 onClick={() => {
                                     if (isCheck) {
-                                        router.push("/manufacture/production_plan/form");
+                                        router.push(routerPproductionPlan.form);
                                     } else {
                                         showToat("error", "Vui lòng chọn ít nhất một đơn hàng");
                                     }

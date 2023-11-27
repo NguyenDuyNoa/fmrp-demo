@@ -9,7 +9,7 @@ import {
     uppercaseTextHeaderTabel,
     styles,
     columns,
-} from "components/UI/stylePdf/style";
+} from "@/configs/stylePdf/style";
 
 import moment from "moment";
 import { upperCase } from "lodash";

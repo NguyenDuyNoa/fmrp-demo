@@ -1,5 +1,12 @@
 //Kho && sản xuất
 const url = "/manufacture";
+
+// Kế hoạch sản xuất
+const routerPproductionPlan = {
+    home: `${url}/production_plan`,
+    form: `${url}/production_plan/form`,
+};
+
 // Kế hoạch nội bộ
 
 const routerInternalPlan = {
@@ -39,6 +46,7 @@ const routerExportToOther = {
 };
 
 export {
+    routerPproductionPlan,
     routerInternalPlan,
     routerWarehouseTransfer,
     routerProductionWarehouse,

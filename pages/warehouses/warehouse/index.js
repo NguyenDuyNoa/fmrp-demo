@@ -26,7 +26,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
-import formatNumber from "@/components/UI/formanumber/formanumber";
+import formatNumber from "@/utils/helpers/formatnumber";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";

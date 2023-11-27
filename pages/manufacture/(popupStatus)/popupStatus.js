@@ -25,7 +25,7 @@ import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { useEffect } from "react";
-import randomColor from "@/hooks/radomcolor";
+import randomColor from "@/utils/helpers/radomcolor";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;

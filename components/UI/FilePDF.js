@@ -12,7 +12,7 @@ import {
     styleMarginChildTotal,
     styles,
     uppercaseTextHeaderTabel,
-} from "./stylePdf/style";
+} from "../../configs/stylePdf/style";
 
 import {
     lineHeght,
@@ -23,7 +23,7 @@ import {
     titleFooter,
     titleHeader,
     titleValue,
-} from "./stylePdf/receiptsEndPayment";
+} from "../../configs/stylePdf/receiptsEndPayment";
 
 const FilePDF = ({
     props,

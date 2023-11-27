@@ -13,8 +13,8 @@ import { SearchNormal1 as IconSearch, Trash as IconDelete, SearchNormal1 } from 
 
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
-import formatNumber from "@/components/UI/formanumber/formanumber";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import formatNumber from "@/utils/helpers/formatnumber";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";

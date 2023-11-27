@@ -1,5 +1,5 @@
 import moment from "moment";
-import formatNumber from "../formanumber/formanumber";
+import formatNumber from "../../utils/helpers/formatnumber";
 import { uppercaseTextHeaderTabel } from "./style";
 ///css 1 liên
 export const styleForm = () => {

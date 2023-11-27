@@ -1,5 +1,6 @@
-import configSelectFillter from "configs/configSelectFillter";
 import Select from "react-select";
+import configSelectFillter from "@/configs/configSelectFillter";
+
 const SelectComponent = ({
     options,
     value,
@@ -12,7 +13,6 @@ const SelectComponent = ({
     closeMenuOnSelect,
     formatOptionLabel,
     classNamePrefix,
-    classNames,
     maxMenuHeight,
     isClearable,
     menuPortalTarget,

@@ -4,62 +4,56 @@ import DatePicker from "react-datepicker";
 import { ArrowDown2 } from "iconsax-react";
 import { components } from "react-select";
 
-const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), {
-    ssr: false,
-});
+const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), { ssr: false });
 
 const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options, dataLang }) => {
     return (
         <>
             <div className="grid grid-cols-12 items-center gap-2 ">
                 <div className="col-span-2">
-                    <div class="">
-                        <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                            Ngày bắt đầu
-                        </label>
-                        <div className="w-full relative">
-                            <DatePicker
-                                id="start"
-                                calendarClassName="rasta-stripes"
-                                clearButtonClassName="text"
-                                selected={isValue.startDate}
-                                onChange={onChangeValue("startDate")}
-                                dateFormat={"dd/MM/yyyy"}
-                                isClearable
-                                placeholderText="Ngày bắt đầu"
-                                className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
-                            />
-                            <ArrowDown2
-                                size="11"
-                                color="#6b7280"
-                                className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                            />
-                        </div>
+                    <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
+                        Ngày bắt đầu
+                    </label>
+                    <div className="w-full relative">
+                        <DatePicker
+                            id="start"
+                            calendarClassName="rasta-stripes"
+                            clearButtonClassName="text"
+                            selected={isValue.startDate}
+                            onChange={onChangeValue("startDate")}
+                            dateFormat={"dd/MM/yyyy"}
+                            isClearable
+                            placeholderText="Ngày bắt đầu"
+                            className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
+                        />
+                        <ArrowDown2
+                            size="11"
+                            color="#6b7280"
+                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                        />
                     </div>
                 </div>
                 <div className="col-span-2">
-                    <div class="">
-                        <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                            Ngày kết thúc
-                        </label>
-                        <div className="w-full relative">
-                            <DatePicker
-                                id="start"
-                                calendarClassName="rasta-stripes"
-                                clearButtonClassName="text"
-                                selected={isValue.endDate}
-                                onChange={onChangeValue("endDate")}
-                                isClearable
-                                dateFormat={"dd/MM/yyyy"}
-                                placeholderText="Ngày kết thúc"
-                                className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
-                            />
-                            <ArrowDown2
-                                size="11"
-                                color="#6b7280"
-                                className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                            />
-                        </div>
+                    <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
+                        Ngày kết thúc
+                    </label>
+                    <div className="w-full relative">
+                        <DatePicker
+                            id="start"
+                            calendarClassName="rasta-stripes"
+                            clearButtonClassName="text"
+                            selected={isValue.endDate}
+                            onChange={onChangeValue("endDate")}
+                            isClearable
+                            dateFormat={"dd/MM/yyyy"}
+                            placeholderText="Ngày kết thúc"
+                            className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
+                        />
+                        <ArrowDown2
+                            size="11"
+                            color="#6b7280"
+                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                        />
                     </div>
                 </div>
                 <div className="col-span-2">
@@ -81,7 +75,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         options={[{ label: "Nhóm thành phẩm", value: "", isDisabled: true }, ...isData.productGroup]}
                         formatOptionLabel={({ level, label }) => {
                             return (
-                                <div className="flex space-x-2 truncate">
+                                <div className="flex gap-2 truncate">
                                     {level == 1 && <span>--</span>}
                                     {level == 2 && <span>----</span>}
                                     {level == 3 && <span>------</span>}
@@ -104,39 +98,47 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         onInputChange={_HandleSeachApi.bind(this)}
                         components={{ MultiValue }}
                         isMulti={true}
-                        options={options}
+                        options={[{ label: "Thành phẩm", value: "", isDisabled: true }, ...options]}
                         closeMenuOnSelect={false}
-                        formatOptionLabel={(option) => (
-                            <div className="">
-                                <div className="flex items-center gap-2">
-                                    <div className="custom-none max-w-[30px] w-[30px] h-[30px] max-h-[30px]">
-                                        {option.e?.images != null ? (
-                                            <img
-                                                src={option.e?.images}
-                                                alt="Product Image"
-                                                className="max-max-w-[30px] w-[30px] h-[30px] max-h-[30px] text-[8px] object-cover rounded"
-                                            />
-                                        ) : (
-                                            <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
-                                                <img
-                                                    src="/no_img.png"
-                                                    alt="Product Image"
-                                                    className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
-                                                />
+                        formatOptionLabel={(option) => {
+                            return (
+                                <div className="">
+                                    {option?.isDisabled ? (
+                                        <div className="custom-text">
+                                            <h3 className="font-medium text-base">{option.label}</h3>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <div className="custom-none max-w-[30px] w-[30px] h-[30px] max-h-[30px]">
+                                                {option.e?.images != null ? (
+                                                    <img
+                                                        src={option.e?.images}
+                                                        alt="Product Image"
+                                                        className="max-max-w-[30px] w-[30px] h-[30px] max-h-[30px] text-[8px] object-cover rounded"
+                                                    />
+                                                ) : (
+                                                    <div className=" max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover  flex items-center justify-center rounded">
+                                                        <img
+                                                            src="/no_img.png"
+                                                            alt="Product Image"
+                                                            className="max-w-[30px] w-[30px] h-[30px] max-h-[30px] object-cover rounded"
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className="custom-text">
-                                        <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                            {option.e?.item_name}
-                                        </h3>
-                                        <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
-                                            {option.e?.product_variation}
-                                        </h5>
-                                    </div>
+                                            <div className="custom-text">
+                                                <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                    {option.e?.item_name}
+                                                </h3>
+                                                <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
+                                                    {option.e?.product_variation}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        )}
+                            );
+                        }}
                         styles={{
                             multiValueLabel: (provided) => ({
                                 ...provided,

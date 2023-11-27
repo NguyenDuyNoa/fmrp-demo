@@ -9,7 +9,7 @@ import {
     styleMarginChildTotal,
     styles,
     uppercaseTextHeaderTabel,
-} from "./stylePdf/style";
+} from "../../configs/stylePdf/style";
 import { VscFilePdf } from "react-icons/vsc";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 

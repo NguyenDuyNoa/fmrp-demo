@@ -17,8 +17,8 @@ import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import formatNumber from "components/UI/formanumber/formanumber";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import formatNumber from "@/utils/helpers/formatnumber";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 import configSelectPopup from "configs/configSelectPopup";
 import {
     getListBranch,

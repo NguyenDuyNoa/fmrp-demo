@@ -17,7 +17,7 @@ import Loading from "components/UI/loading";
 import PopupAddress from "./(popupAddress)/PopupAddress";
 import { useSelector } from "react-redux";
 import ButtonSubmit from "components/UI/buttonSubmit/buttonSubmit";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 
 const Toast = Swal.mixin({
     toast: true,

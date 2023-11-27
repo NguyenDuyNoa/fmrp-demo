@@ -4,9 +4,8 @@ const ReferenceComponent = ({ content, maxChar }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const maxChars = maxChar;
-    const toggleExpand = () => {
-        setIsExpanded(!isExpanded);
-    };
+
+    const toggleExpand = () => setIsExpanded(!isExpanded);
 
     return (
         <div>

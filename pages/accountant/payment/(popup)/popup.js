@@ -44,7 +44,7 @@ import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
 import CreatableSelect from "react-select/creatable";
 import formatNumber from "components/UI/formanumber/formanumber";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;

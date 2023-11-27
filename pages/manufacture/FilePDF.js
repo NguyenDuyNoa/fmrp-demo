@@ -6,12 +6,7 @@ import { upperCase } from "lodash";
 import { saveAs } from "file-saver";
 
 import { VscFilePdf } from "react-icons/vsc";
-import {
-    styleMarginChild,
-    styleMarginChildTotal,
-    styles,
-    uppercaseTextHeaderTabel,
-} from "components/UI/stylePdf/style";
+import { styleMarginChild, styleMarginChildTotal, styles, uppercaseTextHeaderTabel } from "@/configs/stylePdf/style";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // dataCompany:db header
 const FilePDF = ({

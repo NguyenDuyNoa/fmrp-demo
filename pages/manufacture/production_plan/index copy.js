@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import React, { useMemo, useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 
 import { useToggle } from "@/hooks/useToggle";
 import { useSetData } from "@/hooks/useSetData";

@@ -20,7 +20,7 @@ import { NumericFormat } from "react-number-format";
 import PopupAddress from "./(popupAddress)/PopupAddress";
 
 import Loading from "@/components/UI/loading";
-import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { routerDeliveryReceipt } from "routers/sellingGoods";
 
 import useToast from "@/hooks/useToast";
