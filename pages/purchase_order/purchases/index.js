@@ -44,7 +44,6 @@ const Toast = Swal.mixin({
 });
 
 import ReactExport from "react-data-export";
-import FilePDF from "../FilePDF";
 import Popup_chitiet from "./(popup)/popup";
 
 import Loading from "@/components/UI/loading";

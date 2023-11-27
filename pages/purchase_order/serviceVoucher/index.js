@@ -30,7 +30,6 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import FilePDF from "../FilePDF";
 import Popup_servie from "./(popup)/popup";
 import Popup_chitiet from "./(popup)/detail";
 
