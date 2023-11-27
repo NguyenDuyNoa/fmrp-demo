@@ -16,7 +16,7 @@ import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
 
 import PopupDetailProduct from "./(PopupDetail)/PopupDetailProduct";
-import PopupDetailQuote from "../priceQuote/(PopupDetail)/PopupDetailQuote";
+import PopupDetailQuote from "../price_quote/(PopupDetail)/PopupDetailQuote";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";

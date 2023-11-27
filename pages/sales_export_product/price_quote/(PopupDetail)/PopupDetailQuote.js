@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
-import PopupEdit from "../../../../components/UI/popup";
+import PopupEdit from "@/components/UI/popup";
 
 import {
     Grid6 as IconExcel,
@@ -28,7 +28,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupDetailQuote = (props) => {

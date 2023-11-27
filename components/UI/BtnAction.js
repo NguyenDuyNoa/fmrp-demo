@@ -26,8 +26,8 @@ import {
 } from "@/routers/manufacture";
 
 import PopupConfim from "./popupConfim/popupConfim";
-import Popup_KeepStock from "@/pages/sales_export_product/salesOrder/(PopupDetail)/PopupKeepStock";
-import Popup_DetailKeepStock from "@/pages/sales_export_product/salesOrder/(PopupDetail)/PopupDetailKeepStock";
+import Popup_KeepStock from "@/pages/sales_export_product/sales_order/(PopupDetail)/PopupKeepStock";
+import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/(PopupDetail)/PopupDetailKeepStock";
 
 ///Đơn đặt hàng PO
 import Popup_TableValidateEdit from "@/pages/purchase_order/order/(popup)/validateEdit";

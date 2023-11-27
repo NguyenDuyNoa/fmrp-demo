@@ -14,7 +14,7 @@ import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 import PopupDetail from "./(popupDetail)/PopupDetail";
-import PopupDetailProduct from "../salesOrder/(PopupDetail)/PopupDetailProduct";
+import PopupDetailProduct from "../sales_order/(PopupDetail)/PopupDetailProduct";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";

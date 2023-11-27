@@ -18,6 +18,7 @@ import usePagination from "@/hooks/usePagination";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import Loading from "@/components/UI/loading";
 
 const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
 
@@ -562,7 +563,7 @@ const Index = (props) => {
         planStatus: null,
     };
 
-    const showToast = useToast();
+    const isToast = useToast();
 
     const { isMoment } = formatMoment();
 
@@ -574,7 +575,7 @@ const Index = (props) => {
 
     const [isFetching, sIsFetching] = useState(false);
 
-    const [isAscending, sIsAscending] = useState(true); // Trạng thái sắp xếp
+    const [isSort, sIsSort] = useState("");
 
     const { isData, updateData } = useSetData(initialData);
 
@@ -596,6 +597,7 @@ const Index = (props) => {
                 params: {
                     page: router.query?.page || 1,
                     limit: limit,
+                    sort: isSort,
                     date_start: isValue.startDate ? isMoment(isValue.startDate, "DD/MM/YYYY") : "",
                     date_end: isValue.endDate ? isMoment(isValue.endDate, "DD/MM/YYYY") : "",
                     customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
@@ -605,8 +607,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    let { data } = response?.data;
-
+                    let { data, message } = response?.data;
                     updateData({
                         listOrder: data?.rResult?.map((i) => ({
                             id: i.id,
@@ -827,28 +828,7 @@ const Index = (props) => {
         };
     }, [data]);
 
-    const handleSort = useMemo(() => {
-        return () => {
-            const updatedData = [...data];
-
-            updatedData.sort((a, b) => {
-                if (isAscending) {
-                    return a.nameOrder.localeCompare(b.nameOrder); // Sắp xếp từ nhỏ đến lớn
-                } else {
-                    return b.nameOrder.localeCompare(a.nameOrder); // Sắp xếp từ lớn đến nhỏ
-                }
-            });
-
-            showToast(
-                "success",
-                router.query?.tab == "plan" ? "Sắp xếp KHNB thành công" : "Sắp xếp đơn hàng thành công"
-            );
-
-            sData(updatedData);
-
-            sIsAscending(!isAscending); // Đảo ngược trạng thái sắp xếp
-        };
-    }, [data]);
+    const handleSort = () => sIsSort(isSort == "reference_no" ? "-reference_no" : "reference_no");
 
     useEffect(() => {
         const istOrders = updateListOrder(isData.listOrder);
@@ -863,7 +843,7 @@ const Index = (props) => {
     useEffect(() => {
         sIsFetching(true);
         _ServerFetching_filter();
-    }, [router.query.page, router.query?.tab, isValue]);
+    }, [router.query.page, isSort, router.query?.tab, isValue]);
 
     useEffect(() => {
         handleTab("order");
@@ -889,6 +869,7 @@ const Index = (props) => {
             <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {trangthaiExprired ? <div className="p-4"></div> : <Header {...shareProps} />}
                 <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
+
                 <BodyGantt
                     handleToggle={handleToggle}
                     {...shareProps}
@@ -896,9 +877,10 @@ const Index = (props) => {
                     handleSort={handleSort}
                     data={data}
                     timeLine={isData.timeLine}
-                    isAscending={isAscending}
+                    isSort={isSort == "reference_no" ? false : true}
                     handleCheked={handleCheked}
                 />
+
                 {data?.length > 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6 className="">
