@@ -4,26 +4,26 @@ const url = "/sales_export_product";
 // Trả lại hàng bán
 
 const routerReturnSales = {
-    home: `${url}/returnSales`,
-    form: `${url}/returnSales/form`,
+    home: `${url}/return_sales`,
+    form: `${url}/return_sales/form`,
 };
 
 // Phiếu giao hàng
 
 const routerDeliveryReceipt = {
-    home: `${url}/deliveryReceipt`,
-    form: `${url}/deliveryReceipt/form`,
+    home: `${url}/delivery_receipt`,
+    form: `${url}/delivery_receipt/form`,
 };
 // báo giá
 const routerPriceQuote = {
-    home: `${url}/priceQuote`,
-    form: `${url}/priceQuote/form`,
+    home: `${url}/price_quote`,
+    form: `${url}/price_quote/form`,
 };
 
 //đơn hàng bán
 const routerSalesOrder = {
-    home: `${url}/salesOrder`,
-    form: `${url}/salesOrder/form`,
+    home: `${url}/sales_order`,
+    form: `${url}/sales_order/form`,
 };
 
 export { routerReturnSales, routerDeliveryReceipt, routerPriceQuote, routerSalesOrder };

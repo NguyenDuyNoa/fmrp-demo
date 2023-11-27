@@ -110,11 +110,11 @@ const Header = () => {
                     items: [
                         {
                             name: "Báo giá",
-                            link: "/sales_export_product/priceQuote",
+                            link: "/sales_export_product/price_quote",
                         },
                         {
                             name: "Đơn hàng bán",
-                            link: "/sales_export_product/salesOrder",
+                            link: "/sales_export_product/sales_order",
                         },
                     ],
                 },
@@ -129,11 +129,11 @@ const Header = () => {
                     items: [
                         {
                             name: "Phiếu giao hàng",
-                            link: "/sales_export_product/deliveryReceipt",
+                            link: "/sales_export_product/delivery_receipt",
                         },
                         {
                             name: "Trả lại hàng bán",
-                            link: "/sales_export_product/returnSales",
+                            link: "/sales_export_product/return_sales",
                         },
                     ],
                 },
@@ -197,7 +197,7 @@ const Header = () => {
                 {
                     title: "Chuyển kho",
                     img: "/icon/header/kho/chuyenkho.png",
-                    link: "/manufacture/warehouseTransfer",
+                    link: "/manufacture/warehouse_transfer",
                 },
                 {
                     title: "Xuất kho sản xuất",
@@ -207,7 +207,7 @@ const Header = () => {
                 {
                     title: "Nhập kho thành phẩm",
                     img: "/icon/header/kho/nhapkho.png",
-                    link: "/manufacture/productsWarehouse",
+                    link: "/manufacture/products_warehouse",
                 },
                 {
                     title: "Thu hồi nguyên vật liệu",
@@ -217,7 +217,7 @@ const Header = () => {
                 {
                     title: "Xuất kho khác",
                     img: "/icon/header/kho/xuatkho.png",
-                    link: "/manufacture/exportToOther",
+                    link: "/manufacture/export_to_other",
                 },
                 {
                     title: "Kiểm kê kho",

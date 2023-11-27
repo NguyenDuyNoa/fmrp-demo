@@ -44,6 +44,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { routerExportToOther } from "@/routers/manufacture";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -583,7 +584,7 @@ const Index = (props) => {
                                 </h2>
                                 <div className="flex justify-end items-center ">
                                     <Link
-                                        href="/manufacture/exportToOther/form"
+                                        href={routerExportToOther.form}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E]  via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.purchase_order_new || "purchase_order_new"}

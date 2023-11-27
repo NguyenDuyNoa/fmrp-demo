@@ -17,8 +17,8 @@ const routerInternalPlan = {
 // chuyển kho
 
 const routerWarehouseTransfer = {
-    home: `${url}/warehouseTransfer`,
-    form: `${url}/warehouseTransfer/form`,
+    home: `${url}/warehouse_transfer`,
+    form: `${url}/warehouse_transfer/form`,
 };
 ///Xuất kho sản xuất
 const routerProductionWarehouse = {
@@ -28,8 +28,8 @@ const routerProductionWarehouse = {
 
 /// Nhập kho thành phẩm
 const routerProductsWarehouse = {
-    home: `${url}/productsWarehouse`,
-    form: `${url}/productsWarehouse/form`,
+    home: `${url}/products_warehouse`,
+    form: `${url}/products_warehouse/form`,
 };
 
 /// Thu hồi nguyên vật liệu
@@ -41,8 +41,8 @@ const routerRecall = {
 // Xuất kho khác
 
 const routerExportToOther = {
-    home: `${url}/exportToOther`,
-    form: `${url}/exportToOther/form`,
+    home: `${url}/export_to_other`,
+    form: `${url}/export_to_other/form`,
 };
 
 export {

@@ -839,7 +839,10 @@ const Index = (props) => {
                 }
             });
 
-            showToast("success", "Sắp xếp đơn hàng thành công");
+            showToast(
+                "success",
+                router.query?.tab == "plan" ? "Sắp xếp KHNB thành công" : "Sắp xếp đơn hàng thành công"
+            );
 
             sData(updatedData);
 

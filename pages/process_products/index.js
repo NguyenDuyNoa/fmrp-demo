@@ -6,6 +6,7 @@ import { ArrowRight2 as IconRight } from "iconsax-react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";
 
 const Index = () => {
     const trangthaiExprired = useStatusExprired();
@@ -50,7 +51,7 @@ const Index = () => {
 
                                 <button
                                     type="button"
-                                    onClick={() => router.push("/sales_export_product/priceQuote?tab=all")}
+                                    onClick={() => router.push(routerPriceQuote.home)}
                                     className="hover:scale-[1.03] transition-all ease-in-out 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[100px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative"
                                 >
                                     <h5>Báo giá </h5>
@@ -73,7 +74,7 @@ const Index = () => {
                                     </h5> */}
                                     <button
                                         type="button"
-                                        onClick={() => router.push("/sales_export_product/salesOrder?tab=all")}
+                                        onClick={() => router.push(routerSalesOrder.home)}
                                         className="group-hover:scale-[1.03] transition-all ease-in-out 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center"
                                     >
                                         <h5>Tạo đơn hàng</h5>
@@ -145,7 +146,7 @@ const Index = () => {
                                 <div className="group 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative">
                                     <button
                                         type="button"
-                                        onClick={() => router.push("/sales_export_product/deliveryReceipt?tab=all")}
+                                        onClick={() => router.push(routerDeliveryReceipt.home)}
                                         className="group-hover:scale-[1.03] transition-all ease-in-out 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center"
                                     >
                                         <h5>Xuất kho giao hàng</h5>
@@ -230,7 +231,7 @@ const Index = () => {
 
                                     <button
                                         type="button"
-                                        onClick={() => router.push("/sales_export_product/returnSales?tab=all")}
+                                        onClick={() => router.push(routerReturnSales.home)}
                                         className="hover:scale-[1.03] transition-all ease-in-out flex border rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[78px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] 3xl:top-[160%] 3xl:right-[2%] 2xl:top-[160%] 2xl:left-[-6%] xl:top-[170%] xl:left-[-10%] lg:top-[175%] lg:-right-[2%]  items-center justify-center absolute  bg-[#FDE7AE]"
                                     >
                                         <h5 className="3xl:max-w-[180px] 2xl:max-w-[170px] xl:max-w-[80px] lg:max-w-[90px] text-center">
