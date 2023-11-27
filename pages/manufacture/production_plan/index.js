@@ -846,7 +846,6 @@ const Index = (props) => {
     }, [router.query.page, isSort, router.query?.tab, isValue]);
 
     useEffect(() => {
-        handleTab("order");
         localStorage.removeItem("arrData");
     }, []);
 
