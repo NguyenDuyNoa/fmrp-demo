@@ -15,13 +15,9 @@ import {
     Refresh2,
 } from "iconsax-react";
 
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-import Popup from "reactjs-popup";
 import moment from "moment/moment";
 
 import { _ServerInstance as Axios } from "/services/axios";
@@ -32,8 +28,6 @@ import ReactExport from "react-data-export";
 import { useEffect } from "react";
 import Popup_chitietThere from "../detailThere";
 import Popup_chitiet from "./(popup)/popup";
-import Popup_TableValidateEdit from "./(popup)/validateEdit";
-import Popup_TableValidateDelete from "./(popup)/validateDelete";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -1011,17 +1005,6 @@ const Index = (props) => {
                                                                     data={e}
                                                                     className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
-                                                                {/* <BtnTacVu
-                                                                    type="order"
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    status={e?.import_status}
-                                                                    status_pay={e?.status_pay}
-                                                                    data={e}
-                                                                    id={e?.id}
-                                                                    className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
-                                                                /> */}
-                                                                {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
                                                             </div>
                                                         </div>
                                                     ))}
@@ -1037,9 +1020,7 @@ const Index = (props) => {
                                                         {dataLang?.purchase_order_table_item_not_found ||
                                                             "purchase_order_table_item_not_found"}
                                                     </h1>
-                                                    <div className="flex items-center justify-around mt-6 ">
-                                                        {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                                    </div>
+                                                    <div className="flex items-center justify-around mt-6 "></div>
                                                 </div>
                                             </div>
                                         )}
@@ -1109,218 +1090,6 @@ const TabClient = React.memo((props) => {
                 {props?.total > 0 && props?.total}
             </span>
         </button>
-    );
-});
-
-const BtnTacVu = React.memo((props) => {
-    const [openTacvu, sOpenTacvu] = useState(false);
-
-    const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [open, sOpen] = useState(false);
-
-    const [openEdit, sOpenEdit] = useState(false);
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [data, sData] = useState({});
-
-    const [dataPDF, setData] = useState();
-
-    const [dataCompany, setDataCompany] = useState();
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
-                }
-            );
-        }
-    };
-
-    useEffect(() => {
-        openTacvu && fetchDataSettingsCompany();
-    }, [openTacvu]);
-
-    const _ServerFetching_ValidatePayment = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_purchase_order/paymentStatus/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching_ValidatePayment();
-    }, [onFetching]);
-
-    useEffect(() => {
-        open && sOnFetching(true);
-    }, [open]);
-    // useEffect(() => {
-    //     props?.id && sOnFetching(true);
-    // }, [props?.id]);
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                                props.onRefresh && props.onRefresh();
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
-                        }
-                    }
-                );
-            }
-        });
-    };
-    //   console.log("data",data);
-
-    //   const handleClick = () => {
-    //     if(props?.status != "not_stocked" || data?.status_pay != "not_spent"){
-    //       Toast.fire({
-    //         icon: 'error',
-    //         title: `${props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa" || data?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")}`
-    //       })
-    //       sStatus(true)
-    //     }
-    //       else {
-    //         router.push(`/purchase_order/order/form?id=${props.id}`);
-    //       }
-    //     };
-    // const handleClick = () => {
-    //     if (
-    //         props?.status_pay != "not_spent" ||
-    //         props?.status != "not_stocked"
-    //     ) {
-    //         Toast.fire({
-    //             icon: "error",
-    //             title: `${
-    //                 (props?.status_pay != "not_spent" &&
-    //                     (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-    //                 (props?.status != "not_stocked" &&
-    //                     "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
-    //             }`,
-    //         });
-    //     } else {
-    //         router.push(`/purchase_order/order/form?id=${props.id}`);
-    //     }
-    // };
-    return (
-        <div>
-            <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className}>
-                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
-                        <IconDown size={12} />
-                    </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit `}
-                â
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-                open={open || openEdit}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        {/* <button
-                          onClick={handleClick}
-                          className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                         >{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</button>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button> */}
-                        <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded">
-                            <BiEdit
-                                size={20}
-                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <Popup_TableValidateEdit
-                                status={props?.status}
-                                data={data}
-                                setOpen={sOpenEdit}
-                                // onClick={handleClick.bind(this)}
-                                isOpen={openEdit}
-                                dataLang={props?.dataLang}
-                                id={props?.id}
-                                status_pay={props?.status_pay}
-                                className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
-                            />
-                        </div>
-                        <FilePDF
-                            props={props}
-                            openAction={openTacvu}
-                            setOpenAction={sOpenTacvu}
-                            dataCompany={dataCompany}
-                            data={dataPDF}
-                        />
-                        <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
-                            <RiDeleteBin6Line
-                                size={20}
-                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <Popup_TableValidateDelete
-                                onRefresh={props?.onRefresh}
-                                setOpen={sOpen}
-                                data={data}
-                                isOpen={open}
-                                dataLang={props?.dataLang}
-                                id={props?.id}
-                                className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </Popup>
-        </div>
     );
 });
 

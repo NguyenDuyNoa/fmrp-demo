@@ -416,50 +416,6 @@ const Index = (props) => {
         handleQueryId({ status: false });
     };
 
-    // const handleDelete = (id) => {
-    //     const index = data.findIndex((x) => x.id === id);
-
-    //     Swal.fire({
-    //         title: `${"Thay đổi trạng thái"}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         showDenyButton: true,
-    //         confirmButtonColor: "#0F4F9E",
-    //         denyButtonColor: "#d33",
-    //         cancelButtonColor: "gray",
-    //         confirmButtonText: `${
-    //             data[index].status === "confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved
-    //         }`,
-    //         denyButtonText: `${
-    //             data[index].status === "no_confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_no_approved
-    //         }`,
-    //         cancelButtonText: `${dataLang?.aler_cancel}`,
-    //         didOpen: () => {
-    //             const confirmButton = document.querySelector(".swal2-confirm");
-    //             confirmButton.classList.add("w-32");
-    //         },
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             let newStatus = "";
-
-    //             if (data[index].status === "not_confirmed") {
-    //                 newStatus = "confirmed";
-    //             } else if (data[index].status === "confirmed") {
-    //                 newStatus = "not_confirmed";
-    //             } else if (data[index].status === "no_confirmed") {
-    //                 newStatus = "confirmed";
-    //             }
-
-    //             _ServerPostStatus(id, newStatus);
-    //         }
-    //         if (result.isDenied) {
-    //             const newStatus = data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
-
-    //             _ServerPostStatus(id, newStatus);
-    //         }
-    //     });
-    // };
-
     const handleToggleOrdered = (id) => {
         const index = data.findIndex((x) => x.id === id);
 

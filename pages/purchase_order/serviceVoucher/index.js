@@ -24,9 +24,7 @@ import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-import { BiEdit } from "react-icons/bi";
 import ReactExport from "react-data-export";
-import { RiDeleteBin6Line } from "react-icons/ri";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -37,7 +35,6 @@ import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import Pagination from "@/components/UI/pagination";
 
-import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -45,8 +42,6 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const dataLang = props.dataLang;
-
-    const isShow = useToast();
 
     const router = useRouter();
 
@@ -752,7 +747,6 @@ const Index = (props) => {
                                                                                 {"Đã chi đủ"}
                                                                             </span>
                                                                         ))}
-                                                                    {/* <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[100px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{"Chưa chi"}</span> */}
                                                                 </div>
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate ">
@@ -764,15 +758,6 @@ const Index = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
-                                                                {/* <BtnTacVu
-                                                                    type="serviceVoucher"
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    onRefreshGr={_ServerFetching_group.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    status_pay={e?.status_pay}
-                                                                    id={e?.id}
-                                                                    className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
-                                                                /> */}
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -869,143 +854,6 @@ const TabStatus = React.memo((props) => {
                 {props?.total > 0 && props?.total}
             </span>
         </button>
-    );
-});
-
-const BtnTacVu = React.memo((props) => {
-    // const [open, sOpen] = useState(false);
-    const [openTacvu, sOpenTacvu] = useState(false);
-    const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [dataPDF, setData] = useState();
-    const [dataCompany, setDataCompany] = useState();
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    let { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    let db = response.data;
-                    setData(db);
-                }
-            });
-        }
-    };
-    useEffect(() => {
-        openTacvu && fetchDataSettingsCompany();
-    }, [openTacvu]);
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText: `${props.dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/api_web/Api_service/service/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        let { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: props.dataLang[message],
-                            });
-                            props.onRefresh && props.onRefresh();
-                            props.onRefreshGr && props.onRefreshGr();
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: props.dataLang[message],
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    };
-
-    const handleClick = () => {
-        if (props?.status_pay != "not_spent") {
-            Toast.fire({
-                icon: "error",
-                title: `${"Phiếu dịch vụ đã chi. Không thể sửa"}`,
-            });
-        } else {
-            // router.push(`/purchase_order/order/form?id=${props.id}`);
-        }
-    };
-    return (
-        <div>
-            <Popup
-                trigger={
-                    <button type="button" className={`flex space-x-1 items-center ` + props.className}>
-                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
-                        <IconDown size={12} />
-                    </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit `}
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-                open={openTacvu}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full">
-                            <BiEdit
-                                size={20}
-                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <Popup_servie
-                                status_pay={props?.status_pay}
-                                onRefreshGr={props.onRefreshGr}
-                                onClick={handleClick}
-                                onRefresh={props.onRefresh}
-                                dataLang={props.dataLang}
-                                id={props?.id}
-                                className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5"
-                            >
-                                {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                            </Popup_servie>
-                        </div>
-                        <FilePDF
-                            props={props}
-                            openAction={openTacvu}
-                            setOpenAction={sOpenTacvu}
-                            dataCompany={dataCompany}
-                            data={dataPDF}
-                        />
-                        <button
-                            onClick={_HandleDelete.bind(this, props.id)}
-                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
-                        >
-                            <RiDeleteBin6Line
-                                size={20}
-                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                            />
-                            <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                            </p>
-                        </button>
-                    </div>
-                </div>
-            </Popup>
-        </div>
     );
 });
 

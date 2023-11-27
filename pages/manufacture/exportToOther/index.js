@@ -1035,48 +1035,6 @@ const Index = (props) => {
                                                                 />
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate">
-                                                                {/* <div className="mx-auto">
-                                                                    {(e?.object ===
-                                                                        "client" && (
-                                                                        <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {dataLang[
-                                                                                e
-                                                                                    ?.object
-                                                                            ] ||
-                                                                                e?.object}
-                                                                        </span>
-                                                                    )) ||
-                                                                        (e?.object ===
-                                                                            "supplier" && (
-                                                                            <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.object
-                                                                                ] ||
-                                                                                    e?.object}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (e?.object ===
-                                                                            "other" && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.object
-                                                                                ] ||
-                                                                                    e?.object}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (e?.object ===
-                                                                            "staff" && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-rose-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.object
-                                                                                ] ||
-                                                                                    e?.object}
-                                                                            </span>
-                                                                        ))}
-                                                                </div> */}
                                                                 <div className="mx-auto">
                                                                     <RenderColoredSpan
                                                                         objectType={e.object}
