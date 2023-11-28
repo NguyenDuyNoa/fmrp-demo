@@ -10,6 +10,7 @@ import {
 } from "iconsax-react";
 import { Lexend_Deca } from "@next/font/google";
 import Image from "next/image";
+import Zoom from "../zoomElement/zoomElement";
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
@@ -57,62 +58,76 @@ const PopupConfim = (props) => {
                         <div className="flex items-center justify-between gap-4">
                             {props.nameModel == "priceQuote" && (
                                 <>
-                                    <button
-                                        onClick={props.cancel}
-                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                    >
-                                        Hủy
-                                    </button>{" "}
-                                    <button
-                                        onClick={props.save}
-                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                    >
-                                        {props.status === "confirmed"
-                                            ? props.dataLang?.aler_not_yet_approved
-                                            : props.dataLang?.aler_approved}
-                                    </button>
-                                    <button
-                                        onClick={props.handleNoconfim}
-                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                    >
-                                        {props.status === "no_confirmed"
-                                            ? props.dataLang?.aler_not_yet_approved
-                                            : props.dataLang?.aler_no_approved}
-                                    </button>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.cancel}
+                                            className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            Hủy
+                                        </button>
+                                    </Zoom>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.save}
+                                            className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            {props.status === "confirmed"
+                                                ? props.dataLang?.aler_not_yet_approved
+                                                : props.dataLang?.aler_approved}
+                                        </button>
+                                    </Zoom>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.handleNoconfim}
+                                            className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            {props.status === "no_confirmed"
+                                                ? props.dataLang?.aler_not_yet_approved
+                                                : props.dataLang?.aler_no_approved}
+                                        </button>
+                                    </Zoom>
                                 </>
                             )}
                             {props.nameModel == "salesOrder" && (
                                 <>
-                                    <button
-                                        onClick={props.cancel}
-                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                    >
-                                        Hủy
-                                    </button>{" "}
-                                    <button
-                                        onClick={props.save}
-                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                    >
-                                        {props.status === "approved"
-                                            ? props.dataLang?.aler_not_yet_approved
-                                            : props.dataLang?.aler_approved}
-                                    </button>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.cancel}
+                                            className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            Hủy
+                                        </button>
+                                    </Zoom>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.save}
+                                            className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            {props.status === "approved"
+                                                ? props.dataLang?.aler_not_yet_approved
+                                                : props.dataLang?.aler_approved}
+                                        </button>
+                                    </Zoom>
                                 </>
                             )}
                             {!["priceQuote", "salesOrder"].includes(props.nameModel) && (
                                 <>
-                                    <button
-                                        onClick={props.cancel}
-                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                    >
-                                        Hủy
-                                    </button>
-                                    <button
-                                        onClick={props.save}
-                                        className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-1/2  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                    >
-                                        Lưu thay đổi
-                                    </button>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.cancel}
+                                            className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            Hủy
+                                        </button>
+                                    </Zoom>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.save}
+                                            className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            Xác nhận
+                                        </button>
+                                    </Zoom>
                                 </>
                             )}
                         </div>

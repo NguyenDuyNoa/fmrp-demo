@@ -2044,6 +2044,13 @@ const Index = (props) => {
         listOrder: [],
         client: [],
         productGroup: [],
+        product: [],
+        planStatus: [
+            { id: uuid(), value: "outDate", label: "Đã quá hạn" },
+            { id: uuid(), value: "processing", label: "Đang thực hiện" },
+            { id: uuid(), value: "sussces", label: "Hoàn thành" },
+            { id: uuid(), value: "unfulfilled", label: "Chưa thực hiện" },
+        ],
     };
 
     const initialValues = {

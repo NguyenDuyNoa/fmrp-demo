@@ -4,21 +4,22 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useMemo, useEffect, useState } from "react";
 
-import Pagination from "@/components/UI/pagination";
-
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { formatMoment } from "@/utils/helpers/formatMoment";
-
 import useTab from "@/hooks/useTab";
-import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { useSetData } from "@/hooks/useSetData";
 import usePagination from "@/hooks/usePagination";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import Loading from "@/components/UI/loading";
+
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
 const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
 
@@ -563,27 +564,29 @@ const Index = (props) => {
         planStatus: null,
     };
 
-    const isToast = useToast();
-
     const { isMoment } = formatMoment();
 
     const { paginate } = usePagination();
 
     const { handleTab } = useTab("order");
 
-    const { isOpen, handleToggle } = useToggle(false);
+    const [isSort, sIsSort] = useState("");
+
+    const { setItem, removeItem } = FnlocalStorage();
 
     const [isFetching, sIsFetching] = useState(false);
 
-    const [isSort, sIsSort] = useState("");
+    const [arrIdChecked, sArrIdChecked] = useState([]);
 
     const { isData, updateData } = useSetData(initialData);
 
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     const { isValue, onChangeValue } = useChangeValue(initialValues);
 
-    const [data, sData] = useState([]);
-
     const { limit, totalItems, updateTotalItems } = useLimitAndTotalItems(15, {});
+
+    const [data, sData] = useState([]);
 
     const _ServerFetching = () => {
         Axios(
@@ -609,24 +612,30 @@ const Index = (props) => {
                 if (!err) {
                     let { data, message } = response?.data;
                     updateData({
-                        listOrder: data?.rResult?.map((i) => ({
-                            id: i.id,
-                            nameOrder: i.nameOrder,
-                            status: i.status,
-                            process: i.process,
-                            processDefault: i.processDefault,
-                            listProducts: i.listProducts.map((s) => ({
-                                id: s.id,
-                                name: s.name,
-                                images: s.images,
-                                desription: s.desription,
-                                status: s.status,
-                                quantity: s.quantity,
-                                actions: s.actions,
-                                processArr: s.processArr,
-                                unitName: s.unit_name,
-                            })),
-                        })),
+                        listOrder: data?.rResult?.map((i) => {
+                            return {
+                                id: i.id,
+                                nameOrder: i.nameOrder,
+                                status: i.status,
+                                process: i.process,
+                                processDefault: i.processDefault,
+                                listProducts: i.listProducts.map((s) => {
+                                    const check = arrIdChecked.includes(s.id);
+                                    return {
+                                        id: s.id,
+                                        name: s.name,
+                                        images: s.images,
+                                        desription: s.desription,
+                                        status: s.status,
+                                        quantity: s.quantity,
+                                        actions: s.actions,
+                                        processArr: s.processArr,
+                                        unitName: s.unit_name,
+                                        checked: check,
+                                    };
+                                }),
+                            };
+                        }),
                     });
 
                     updateTotalItems({
@@ -752,17 +761,18 @@ const Index = (props) => {
     };
 
     const updateListProducts = (order) => {
-        return order.listProducts.map((product) => {
+        const newDb = order.listProducts.map((product) => {
             const newArrMonth = product.processArr?.length > 0 ? sortArrayByMonth(product.processArr) : [];
 
             const newArrDays = sortArrayByDay(newArrMonth);
-
+            const check = arrIdChecked.includes(product.id);
             return {
                 ...product,
-                checked: false,
+                checked: check || product.checked,
                 processArr: newArrDays,
             };
         });
+        return newDb;
     };
 
     const updateProcessDefault = (order) => {
@@ -777,7 +787,6 @@ const Index = (props) => {
         return (listOrder) => {
             return listOrder?.map((order) => {
                 const updatedListProducts = updateListProducts(order);
-
                 const processDefaultUpdate = updateProcessDefault(order);
 
                 return {
@@ -799,40 +808,65 @@ const Index = (props) => {
                     order.show = !order.show;
                 }
             });
+
             sData(updatedData);
         };
     }, [data]);
 
-    const handleCheked = useMemo(() => {
-        return (idParent, idChild) => {
-            const updatedData = data.map((e) => {
-                if (e.id === idParent) {
-                    const newListProducts = e.listProducts.map((i) => {
-                        if (i.id === idChild) {
-                            return { ...i, checked: !i.checked };
-                        }
+    const handleCheked = (idParent, idChild) => {
+        const updatedData = data.map((e) => {
+            if (e.id === idParent) {
+                const newListProducts = e.listProducts.map((i) => {
+                    if (i.id === idChild) {
+                        const checkedState = !i.checked;
 
-                        return i;
-                    });
+                        const updatedArrId = checkedState
+                            ? [...arrIdChecked, idChild]
+                            : arrIdChecked.filter((s) => s != idChild);
 
-                    return { ...e, listProducts: newListProducts };
+                        sArrIdChecked(updatedArrId);
+
+                        return { ...i, checked: checkedState };
+                    }
+
+                    return i;
+                });
+
+                return { ...e, listProducts: newListProducts };
+            }
+
+            return e;
+        });
+
+        sData([...updatedData]);
+    };
+
+    const handleChekedAll = () => {
+        const updatedData = [...data];
+
+        let updatedArrId = [...arrIdChecked];
+
+        updatedData.forEach((e) => {
+            e.listProducts.forEach((i) => {
+                const checkedState = !i.checked;
+                if (checkedState) {
+                    updatedArrId = [...updatedArrId, i.id];
+                } else {
+                    updatedArrId = updatedArrId.filter((s) => s != i.id);
                 }
-
-                return e;
+                i.checked = checkedState;
             });
+        });
 
-            localStorage.setItem("arrData", JSON.stringify(updatedData));
-            localStorage.setItem("tab", router.query?.tab);
+        sArrIdChecked(updatedArrId);
 
-            sData([...updatedData]);
-        };
-    }, [data]);
+        sData(updatedData);
+    };
 
     const handleSort = () => sIsSort(isSort == "reference_no" ? "-reference_no" : "reference_no");
 
     useEffect(() => {
         const istOrders = updateListOrder(isData.listOrder);
-
         sData(istOrders);
     }, [isData.listOrder]);
 
@@ -846,17 +880,39 @@ const Index = (props) => {
     }, [router.query.page, isSort, router.query?.tab, isValue]);
 
     useEffect(() => {
-        localStorage.removeItem("arrData");
+        removeItem("arrData");
     }, []);
+
+    useEffect(() => {
+        const check = data.some((e) => e.listProducts.some((i) => i.checked == true));
+        if (check) {
+            setItem("arrData", JSON.stringify(data));
+
+            setItem("tab", router.query?.tab);
+        }
+    }, [data]);
+
+    const handleConfimTab = () => {
+        arrIdChecked?.length > 0 && sArrIdChecked([]);
+        removeItem("arrData");
+
+        handleTab(isKeyState);
+
+        handleQueryId({ status: false });
+    };
 
     const shareProps = {
         dataLang,
         isData,
+        data,
         isValue,
         isFetching,
         options,
         _HandleSeachApi,
+        handleQueryId,
         handleTab,
+        arrIdChecked,
+        handleChekedAll,
         router: router.query?.tab,
     };
 
@@ -870,7 +926,6 @@ const Index = (props) => {
                 <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
 
                 <BodyGantt
-                    handleToggle={handleToggle}
                     {...shareProps}
                     handleShowSub={handleShowSub}
                     handleSort={handleSort}
@@ -895,6 +950,15 @@ const Index = (props) => {
                     </div>
                 )}
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={handleConfimTab}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </>
     );
 };

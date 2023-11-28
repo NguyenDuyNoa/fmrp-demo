@@ -9,13 +9,9 @@ const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { 
 const Header = (props) => {
     const router = useRouter();
 
-    const getLocalStorage = () => (localStorage.getItem("arrData") ? JSON.parse(localStorage.getItem("arrData")) : []);
-
     const showToat = useToast();
 
-    const dataLocals = getLocalStorage();
-
-    const isCheck = dataLocals?.some((order) => order.listProducts.some((product) => product.checked));
+    const isCheck = props.data?.some((order) => order.listProducts.some((product) => product.checked));
 
     return (
         <>

@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Popup from "reactjs-popup";
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ModalImage from "react-modal-image";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
-import Zoom from "@/components/UI/zoomElement/zoomElement";
-import formatNumber from "@/utils/helpers/formatnumber";
+
 import Loading from "@/components/UI/loading";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+
+import formatNumber from "@/utils/helpers/formatnumber";
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
 const BodyGantt = ({
     handleShowSub,
@@ -16,13 +19,18 @@ const BodyGantt = ({
     timeLine,
     handleToggle,
     dataLang,
-    handleTab,
+    handleQueryId,
     router,
     isFetching,
+    handleTab,
+    arrIdChecked,
+    handleChekedAll,
 }) => {
     const container1Ref = useRef();
     const container2Ref = useRef();
     const container3Ref = useRef();
+
+    const { getItem } = FnlocalStorage();
 
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
@@ -38,13 +46,21 @@ const BodyGantt = ({
         container3Ref.current.scrollTop = e.target.scrollTop;
     };
 
+    const tab = getItem("tab");
+
+    const [checkCkecked, sCheckCkecked] = useState(false);
+
+    useEffect(() => {
+        sCheckCkecked(false);
+    }, [router]);
+
     return (
         <React.Fragment>
             {data?.length > 0 ? (
                 <div className="flex flex-col ">
                     <div className="flex items-end  border-t overflow-hidden border-b">
                         <div className={`min-w-[35%]  w-[35%]`}>
-                            <div className="flex items-center gap-5 pb-1 pl-2">
+                            <div className="flex items-center gap-2 pb-1 pl-2">
                                 {[
                                     { name: " Đơn hàng bán", tab: "order" },
                                     { name: "Kế hoạch nội bộ", tab: "plan" },
@@ -52,7 +68,11 @@ const BodyGantt = ({
                                     <Zoom className="w-fit">
                                         <button
                                             key={e.tab}
-                                            onClick={() => handleTab(e.tab)}
+                                            onClick={() =>
+                                                arrIdChecked?.length > 0
+                                                    ? handleQueryId({ status: true, initialKey: e.tab })
+                                                    : handleTab(e.tab)
+                                            }
                                             type="button"
                                             className={`${
                                                 router == e.tab ? "bg-sky-200 text-sky-600" : "bg-sky-50 text-sky-500"
@@ -63,38 +83,101 @@ const BodyGantt = ({
                                     </Zoom>
                                 ))}
                             </div>
-                            <div className="flex items-center  gap-2  px-1 ">
-                                <div onClick={() => handleSort()} className="flex-col flex gap-1 cursor-pointer w-[2%]">
-                                    <Image
-                                        alt={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                        width={7}
-                                        height={4}
-                                        src={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                        className={`${
-                                            isSort ? "" : "rotate-180"
-                                        } object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                    />
-                                    <Image
-                                        alt={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                        width={7}
-                                        height={4}
-                                        src={isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"}
-                                        className={`${
-                                            !isSort ? "rotate-180" : ""
-                                        } object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                    />
+                            <div className="flex items-center  gap-2">
+                                <div className="w-[6%] flex items-center gap-1">
+                                    <div className="mr-1">
+                                        {/* <button
+                                            type="button"
+                                            onClick={() => handleChekedAll()}
+                                            className={`min-w-4 w-4 max-w-4 relative min-h-4 max-h-4  h-4 rounded-full cursor-pointer outline-none focus:outline-none   flex justify-center items-center ${
+                                                arrIdChecked?.length > 0
+                                                    ? "bg-blue-500 before:w-2 before:h-2 before:rounded-full before:border-gray-300 before:border before:bg-white border border-gray-100"
+                                                    : "bg-white border border-gray-300 "
+                                            }`}
+                                        ></button> */}
+                                        <label
+                                            className="relative flex items-center  cursor-pointer rounded-[4px] "
+                                            htmlFor={"checkbox"}
+                                        >
+                                            <input
+                                                id="checkbox"
+                                                type="checkbox"
+                                                checked={checkCkecked}
+                                                className="peer relative h-[15px] w-[15px] cursor-pointer appearance-none rounded-[4px] border border-blue-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
+                                                onChange={() => {
+                                                    handleChekedAll();
+                                                    sCheckCkecked(!checkCkecked);
+                                                }}
+                                            />
+                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-3 w-3"
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                    stroke="currentColor"
+                                                    stroke-width="1"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                        clip-rule="evenodd"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div onClick={() => handleSort()} className="flex-col flex gap-1 cursor-pointer ">
+                                        <Image
+                                            alt={
+                                                !isSort
+                                                    ? "/productionPlan/Shapedow.png"
+                                                    : "/productionPlan/Shapedrop.png"
+                                            }
+                                            width={7}
+                                            height={4}
+                                            src={
+                                                !isSort
+                                                    ? "/productionPlan/Shapedow.png"
+                                                    : "/productionPlan/Shapedrop.png"
+                                            }
+                                            className={`${
+                                                isSort ? "" : "rotate-180"
+                                            } object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                        />
+                                        <Image
+                                            alt={
+                                                isSort
+                                                    ? "/productionPlan/Shapedow.png"
+                                                    : "/productionPlan/Shapedrop.png"
+                                            }
+                                            width={7}
+                                            height={4}
+                                            src={
+                                                isSort
+                                                    ? "/productionPlan/Shapedow.png"
+                                                    : "/productionPlan/Shapedrop.png"
+                                            }
+                                            className={`${
+                                                !isSort ? "rotate-180" : ""
+                                            } object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="grid grid-cols-12 w-full">
+                                <div className="grid grid-cols-11 w-full">
                                     <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
                                         Đơn hàng
                                     </div>
-                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                    <div className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
                                         Trạng thái
                                     </div>
-                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
-                                        Số lượng
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                        SL
                                     </div>
-                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                        SL đã lập KHSX
+                                    </div>
+                                    <div className="text-[#52575E] text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
                                         Action
                                     </div>
                                 </div>
@@ -167,7 +250,7 @@ const BodyGantt = ({
                                                                     e.show ? "rotate-0 t" : "-rotate-90 "
                                                                 } object-cover duration-500  transition-all ease-in-out`}
                                                             />
-                                                            <div className="grid grid-cols-12 w-full items-center gap-4">
+                                                            <div className="grid grid-cols-11 w-full items-center gap-4">
                                                                 <h2
                                                                     className={`text-[#52575E] ${
                                                                         (outDate && "group-hover:text-[#EE1E1E]") ||
@@ -178,7 +261,7 @@ const BodyGantt = ({
                                                                 >
                                                                     {e.nameOrder}
                                                                 </h2>
-                                                                <div className="flex items-center gap-1 col-span-3">
+                                                                <div className="flex items-center gap-1 col-span-2">
                                                                     <h2
                                                                         className={`${
                                                                             (outDate && "text-[#EE1E1E]") ||
@@ -216,7 +299,7 @@ const BodyGantt = ({
                                                             <label
                                                                 key={i.id}
                                                                 htmlFor={i.id}
-                                                                className={`cursor-pointer grid grid-cols-12 items-center my-2`}
+                                                                className={`cursor-pointer grid grid-cols-11 items-center my-2`}
                                                             >
                                                                 <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
                                                                     <div>
@@ -251,8 +334,8 @@ const BodyGantt = ({
                                                                             className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                                         ></ModalImage>
                                                                     )}
-                                                                    <div className="flex flex-col">
-                                                                        <h1 className="text-[#000000] font-semibold 3xl:text-xs  xxl:text-[11px] 2xl:text-[10px] xl:text-[9px] lg:text-[9px] text-[11px]">
+                                                                    <div className="flex flex-col ">
+                                                                        <h1 className="text-[#000000] font-semibold 3xl:text-xs  xxl:text-[11px] 2xl:text-[10px] xl:text-[9px] lg:text-[9px] text-[11px] ">
                                                                             {i.name}
                                                                         </h1>
                                                                         <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
@@ -265,16 +348,19 @@ const BodyGantt = ({
                                                                         (i.status == "outDate" && "text-[#EE1E1E]") ||
                                                                         (i.status == "sussces" && "text-[#0BAA2E]") ||
                                                                         (i.status == "unfulfilled" && "text-[#FF8F0D]")
-                                                                    } font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3  px-4`}
+                                                                    } font-medium 3xl:text-sm whitespace-nowrap  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2  px-4`}
                                                                 >
                                                                     {i.status == "outDate" && "Đã quá hạn"}
                                                                     {i.status == "sussces" && "Hoàn thành"}
                                                                     {i.status == "unfulfilled" && "Chưa thực hiện"}
                                                                 </h3>
-                                                                <h3 className="text-[#52575E] pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                                                <h3 className="text-[#52575E] pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
                                                                     {formatNumber(i.quantity)}
                                                                 </h3>
-                                                                <h3 className="text-[#667085] border-b w-fit font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3 ">
+                                                                <h3 className="text-[#52575E] pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                                                    {formatNumber(0)}
+                                                                </h3>
+                                                                <h3 className="text-[#667085] border-b w-fit font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2 ">
                                                                     {i.actions}
                                                                 </h3>
                                                             </label>

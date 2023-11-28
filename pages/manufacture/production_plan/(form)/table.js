@@ -2,6 +2,9 @@ import Image from "next/image";
 import ModalImage from "react-modal-image";
 import { NumericFormat } from "react-number-format";
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 import React from "react";
 import PopupEditer from "./popup";
 
@@ -54,7 +57,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                         SL CẦN
                     </h3>
                     <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
-                        SL DỰ PHÒNG
+                        Timeline sản xuất
                     </h3>
                     <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs uppercase">
                         DỰ KIẾN GIAO
@@ -64,7 +67,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                     </h3>
                 </div>
             </div>
-            <div className="3xl:h-[34vh] xxl:h-[24vh] 2xl:h-[26vh] xl:h-[22vh] lg:h-[22vh] h-[30vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
+            <div className="3xl:h-[44vh] xxl:h-[22vh] 2xl:h-[30vh] xl:h-[24vh] lg:h-[24vh] h-[30vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
                 {isLoading ? (
                     <Loading className="h-80" color="#0f4f9e" />
                 ) : dataNew?.length > 0 ? (
@@ -110,6 +113,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                     <SelectComponent
                                         classNamePrefix={"productionSmoothing"}
                                         placeholder={"BOM"}
+                                        isClearable={true}
                                         menuPortalTarget={document.body}
                                         options={[{ label: "test", value: 1 }]}
                                         formatOptionLabel={(options) => {
@@ -153,6 +157,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                     <SelectComponent
                                         classNamePrefix={"productionSmoothing"}
                                         placeholder={"Công đoạn"}
+                                        isClearable={true}
                                         options={[{ label: "test", value: 1 }]}
                                         menuPortalTarget={document.body}
                                         formatOptionLabel={(options) => {
@@ -210,7 +215,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                     />
                                 </h3>
                                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
-                                    <NumericFormat
+                                    {/* <NumericFormat
                                         className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]
                                  focus:outline-none border border-[#D8DAE5] px-3 py-[7px] rounded-md"
                                         onValueChange={""}
@@ -223,9 +228,39 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                             const { floatValue } = values;
                                             return floatValue > 0;
                                         }}
-                                    />
+                                    /> */}
+                                    <div className="w-full relative">
+                                        <DatePicker
+                                            // selected={isValue.startDate}
+                                            // onChange={(dates) => {
+                                            //     const [start, end] = dates;
+                                            //     onChangeValue("startDate")(start);
+                                            //     onChangeValue("endDate")(end);
+                                            // }}
+                                            // startDate={isValue.startDate}
+                                            // endDate={isValue.endDate}
+                                            selectsRange
+                                            monthsShown={1}
+                                            shouldCloseOnSelect={false}
+                                            dateFormat={"dd/MM/yyyy"}
+                                            portalId="menu-time"
+                                            isClearable
+                                            clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
+                                            placeholderText="Ngày - Ngày"
+                                            className="py-[8px] px-4  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
+                            border-[#E1E1E1] focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999] "
+                                        />
+
+                                        <Image
+                                            alt=""
+                                            src={"/productionPlan/Union.png"}
+                                            width={12}
+                                            height={12}
+                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 opacity-60"
+                                        />
+                                    </div>
                                 </h3>
-                                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
+                                <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize px-2">
                                     <div className="flex flex-col items-start">
                                         <h2 className="text-[#141522] font-medium 3xl:text-sm text-xs">22/11/2023</h2>
                                         <h3 className="tex-[#9295A4] font-normal 3xl:text-xs text-[10px]">09:10:23</h3>

@@ -62,7 +62,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         isClearable={true}
                         value={isValue.idClient}
                         onChange={onChangeValue("idClient")}
-                        options={[{ label: "Khách hàng", value: "", isDisabled: true }, ...isData.client]}
+                        options={[{ label: "Khách hàng", value: "", isDisabled: true }, ...isData?.client]}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={"Khách hàng"}
                     />
@@ -72,7 +72,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                     <SelectComponent
                         value={isValue.idProductGroup}
                         isClearable={true}
-                        options={[{ label: "Nhóm thành phẩm", value: "", isDisabled: true }, ...isData.productGroup]}
+                        options={[{ label: "Nhóm thành phẩm", value: "", isDisabled: true }, ...isData?.productGroup]}
                         formatOptionLabel={({ level, label }) => {
                             return (
                                 <div className="flex gap-2 truncate">
@@ -173,7 +173,7 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         isClearable={true}
                         value={isValue.planStatus}
                         onChange={onChangeValue("planStatus")}
-                        options={[{ label: "Trạng thái kế hoạch", value: "", isDisabled: true }, ...isData.planStatus]}
+                        options={[{ label: "Trạng thái kế hoạch", value: "", isDisabled: true }, ...isData?.planStatus]}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={"Trạng thái kế hoạch"}
                     />

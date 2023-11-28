@@ -10,6 +10,10 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
+
+import { routerPproductionPlan } from "@/routers/manufacture";
+
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 const InFo = dynamic(() => import("./(form)/info"), { ssr: false });
@@ -23,24 +27,25 @@ const FormAdd = (props) => {
 
     const showToat = useToast();
 
-    const { isOpen, isKeyState, handleQueryId } = useToggle();
-
     const [data, sData] = useState([]);
+
+    const trangthaiExprired = useStatusExprired();
+
+    const { getItem, setItem } = FnlocalStorage();
 
     const [isLoading, sIsLoading] = useState(false);
 
     const [isCheckRemove, sIsCheckRemove] = useState(false);
 
-    const trangthaiExprired = useStatusExprired();
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
-    const getLocalStorage = () => (localStorage.getItem("arrData") ? JSON.parse(localStorage.getItem("arrData")) : []);
+    const getLocalStorageTab = () => getItem("tab");
 
-    const getLocalStorageTab = () => localStorage.getItem("tab");
+    const getLocalStorage = () => (getItem("arrData") ? JSON.parse(getItem("arrData")) : []);
 
     const tab = getLocalStorageTab();
 
     let dataLocals = getLocalStorage();
-
     const initialValue = {
         idBrach: null,
         date: new Date(),
@@ -109,12 +114,12 @@ const FormAdd = (props) => {
         );
 
         setTimeout(() => {
-            router.push("/manufacture/production_plan");
+            router.push(routerPproductionPlan.home);
         }, 3100);
     };
 
     const getFreshData = (data) => {
-        localStorage.setItem("arrData", JSON.stringify(data));
+        setItem("arrData", JSON.stringify(data));
 
         sData(data);
 
