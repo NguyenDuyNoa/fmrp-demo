@@ -8,7 +8,7 @@ import { v4 as uuid } from "uuid";
 import useStatusExprired from "@/hooks/useStatusExprired";
 const Index = (props) => {
     const dataLang = props.dataLang;
-    const trangthaiExprired = useStatusExprired()
+    const trangthaiExprired = useStatusExprired();
     const initialData = {
         data: [
             {

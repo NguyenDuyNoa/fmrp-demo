@@ -258,21 +258,21 @@ const Header = () => {
                         { name: "Lệnh sản xuất chi tiết" },
                     ],
                 },
-                {
-                    title: "Cảnh báo tồn kho",
-                    img: "/icon/header/kho/canhbao.png",
-                    link: "#",
-                },
+                // {
+                //     title: "Cảnh báo tồn kho",
+                //     img: "/icon/header/kho/canhbao.png",
+                //     link: "#",
+                // },
                 {
                     title: "Lịch sản xuất",
                     img: "/icon/header/kho/lich.png",
-                    link: "#",
+                    link: "/manufacture/production_schedule",
                 },
-                {
-                    title: "Năng suất sản lượng",
-                    img: "/icon/header/kho/nssl.png",
-                    link: "#",
-                },
+                // {
+                //     title: "Năng suất sản lượng",
+                //     img: "/icon/header/kho/nssl.png",
+                //     link: "#",
+                // },
             ],
         },
         {

@@ -274,7 +274,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                                             alt=""
                                             className="object-cover rounded-md cursor-pointer"
                                         /> */}
-                                    <PopupEditer isLoading={isLoading} />
+                                    {/* <PopupEditer isLoading={isLoading} /> */}
                                     <Zoom className="w-fit h-full">
                                         <Image
                                             onClick={() => handleRemoveItem(i.idParen, i.id)}
