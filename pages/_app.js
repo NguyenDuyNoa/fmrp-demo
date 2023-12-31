@@ -207,7 +207,7 @@ const LoginPage = React.memo((props) => {
                     } else {
                         Toast.fire({
                             icon: "error",
-                            title: `${message}`,
+                            title: `${message || "Đăng nhập thất bại"}`,
                         });
                     }
                 } else {
