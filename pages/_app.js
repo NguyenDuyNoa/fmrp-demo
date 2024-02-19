@@ -56,7 +56,7 @@ function MainPage({ Component, pageProps }) {
     const [data, sData] = useState();
 
     useEffect(() => {
-        var showLang = localStorage.getItem("LanguagesFMRP");
+        const showLang = localStorage.getItem("LanguagesFMRP");
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
 
@@ -87,7 +87,7 @@ function MainPage({ Component, pageProps }) {
             if (err) {
                 dispatch({ type: "auth/update", payload: false });
             } else {
-                var { isSuccess, info } = response.data;
+                const { isSuccess, info } = response?.data;
                 if (isSuccess) {
                     dispatch({ type: "auth/update", payload: info });
                 } else {
@@ -161,14 +161,8 @@ const LoginPage = React.memo((props) => {
 
     const [loadingRegester, sLoadingRegester] = useState(false);
 
-    const _HandleInputChange = (type, value) => {
-        if (type === "code") {
-            sCode(value.target?.value);
-        } else if (type === "name") {
-            sName(value.target?.value);
-        } else if (type === "password") {
-            sPassword(value.target?.value);
-        }
+    const showToat = (type, mssg) => {
+        return Toast.fire({ icon: `${type}`, title: `${mssg}` });
     };
     const _ServerSending = () => {
         Axios(
@@ -183,32 +177,26 @@ const LoginPage = React.memo((props) => {
             },
             (err, response) => {
                 if (response !== null) {
-                    var { isSuccess, message, token, database_app } = response.data;
+                    const { isSuccess, message, token, database_app } = response?.data;
                     if (isSuccess) {
-                        dispatch({
-                            type: "auth/update",
-                            payload: response.data?.data,
-                        });
+                        dispatch({ type: "auth/update", payload: response.data?.data });
+
                         localStorage.setItem("tokenFMRP", token);
                         localStorage.setItem("databaseappFMRP", database_app);
-                        Toast.fire({
-                            icon: "success",
-                            title: message,
-                        });
+
+                        showToat("success", message);
+
                         if (rememberMe) {
                             localStorage.setItem("usernameFMRP", name);
                             localStorage.setItem("usercodeFMRP", code);
                             localStorage.setItem("remembermeFMRP", rememberMe);
                         } else {
-                            localStorage.removeItem("usernameFMRP");
-                            localStorage.removeItem("usercodeFMRP");
-                            localStorage.removeItem("remembermeFMRP");
+                            ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) =>
+                                localStorage.removeItem(key)
+                            );
                         }
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${message || "Đăng nhập thất bại"}`,
-                        });
+                        showToat("error", `${message || "Đăng nhập thất bại"}`);
                     }
                 } else {
                     console.log("Lỗi");
@@ -225,10 +213,7 @@ const LoginPage = React.memo((props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         if ((name.length && code.length && password.length) === 0) {
-            Toast.fire({
-                icon: "error",
-                title: "Vui lòng điền đầy đủ thông tin",
-            });
+            showToat("error", "Vui lòng điền đầy đủ thông tin");
         } else {
             sOnSending(true);
         }
@@ -245,7 +230,7 @@ const LoginPage = React.memo((props) => {
     const _ServerFetching_Majior = () => {
         Axios("GET", "/api_web/Api_Login/get_list_data?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var result = response.data;
+                const result = response?.data;
                 sListMajor(result?.career);
                 sListPosition(result?.role_user);
             }
@@ -256,41 +241,19 @@ const LoginPage = React.memo((props) => {
         onFechingRegister && _ServerFetching_Majior();
     }, [onFechingRegister]);
 
-    // const listMajor = [
-    //     { id: 1, title: "May mặc", img: "/register/may.svg" },
-    //     { id: 2, title: "Gỗ nội, ngoại thất", img: "/register/go.svg" },
-    //     { id: 3, title: "Cơ khí - chế tạo", img: "/register/cokhi.svg" },
-    //     { id: 4, title: "Điện máy", img: "/register/dien.svg" },
-    //     { id: 5, title: "Nông nghiệp", img: "/register/nong.svg" },
-    //     { id: 6, title: "Sản xuất giấy", img: "/register/giay.svg" },
-    //     { id: 7, title: "Thực phẩm", img: "/register/thit.svg" },
-    //     { id: 8, title: "Sản xuất nhựa", img: "/register/nhua.svg" },
-    //     { id: 9, title: "Ngành khác", img: "/register/khac.svg" },
-    // ];
-
     const [stepRegister, sStepRegister] = useState(0);
     const _HandleSelectStep = (e) => {
         if (checkMajior) {
             sStepRegister(e);
         } else {
-            Toast.fire({
-                icon: "error",
-                title: `Vui lòng chọn ngành hàng của bạn`,
-            });
+            showToat("error", "Vui lòng chọn ngành hàng của bạn");
         }
     };
-
-    // const listPosition = [
-    //     { id: 1, title: "CEO / Founder / Chủ tịch" },
-    //     { id: 2, title: "Quản lý" },
-    //     { id: 3, title: "Nhân viên" },
-    //     { id: 4, title: "Vị trí khác" },
-    // ];
 
     const onSubmit = async (data) => {
         sLoadingRegester(true);
         sPassword(data?.password);
-        // /api_web/Api_Login/SignUpMain?csrf_protection=true
+
         const dataSubmit = new FormData();
 
         dataSubmit.append("career", data?.major);
@@ -311,12 +274,9 @@ const LoginPage = React.memo((props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message, code, email } = response.data;
+                    const { isSuccess, message, code, email } = response?.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${message}`,
-                        });
+                        showToat("success", message);
                         setTimeout(() => {
                             sCode(code);
                             sName(email);
@@ -324,10 +284,7 @@ const LoginPage = React.memo((props) => {
                             router.push("/");
                         }, 1000);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${message}`,
-                        });
+                        showToat("error", message);
                         sLoadingRegester(false);
                     }
                 }
@@ -379,7 +336,7 @@ const LoginPage = React.memo((props) => {
                                                 type="text"
                                                 placeholder="Mã công ty"
                                                 value={code}
-                                                onChange={_HandleInputChange.bind(this, "code")}
+                                                onChange={(e) => sCode(e.target.value)}
                                                 className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full"
                                             />
                                             <input
@@ -387,7 +344,7 @@ const LoginPage = React.memo((props) => {
                                                 placeholder={dataLang?.auth_user_name || "auth_user_name"}
                                                 value={name}
                                                 id="username"
-                                                onChange={_HandleInputChange.bind(this, "name")}
+                                                onChange={(e) => sName(e.target.value)}
                                                 className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full"
                                             />
                                             <div className="relative flex flex-col justify-center">
@@ -396,7 +353,7 @@ const LoginPage = React.memo((props) => {
                                                     placeholder={dataLang?.auth_password || "auth_password"}
                                                     value={password}
                                                     id="userpwd"
-                                                    onChange={_HandleInputChange.bind(this, "password")}
+                                                    onChange={(e) => sPassword(e.target.value)}
                                                     className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full"
                                                 />
                                                 <button
