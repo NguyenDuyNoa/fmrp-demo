@@ -142,7 +142,8 @@ const Index = (props) => {
                     item: {
                         e: e?.item,
                         label: `${e.item?.item_name} <span style={{display: none}}>${
-                            e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            // e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
                         }</span>`,
                         value: e.item?.id,
                     },
@@ -439,7 +440,7 @@ const Index = (props) => {
 
     const options = dataItems?.map((e) => {
         return {
-            label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+            label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
             value: e.id,
             e,
         };
@@ -573,43 +574,41 @@ const Index = (props) => {
     // search api
     const _HandleSeachApi = (inputValue) => {
         if (typeOrder === "1" && quote && +quote.value) {
-            inputValue != "" &&
-                Axios(
-                    "POST",
-                    `/api_web/Api_quotation/searchItemsVariant/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                        params: {
-                            "filter[quote_id]": quote ? +quote?.value : null,
-                        },
+            Axios(
+                "POST",
+                `/api_web/Api_quotation/searchItemsVariant/?csrf_protection=true`,
+                {
+                    data: {
+                        term: inputValue,
                     },
-                    (err, response) => {
-                        if (!err) {
-                            var { result } = response?.data.data;
-                            setDataItems(result);
-                        }
+                    params: {
+                        "filter[quote_id]": quote ? +quote?.value : null,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response?.data.data;
+                        setDataItems(result);
                     }
-                );
+                }
+            );
         }
         if (typeOrder === "0") {
-            inputValue != "" &&
-                Axios(
-                    "POST",
-                    `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
+            Axios(
+                "POST",
+                `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
+                {
+                    data: {
+                        term: inputValue,
                     },
-                    (err, response) => {
-                        if (!err) {
-                            var { result } = response?.data.data;
-                            setDataItems(result);
-                        }
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response?.data.data;
+                        setDataItems(result);
                     }
-                );
+                }
+            );
         }
     };
 
@@ -1491,9 +1490,10 @@ const Index = (props) => {
                         : dataLang?.sales_product_add_order || "sales_product_add_order"}
                 </title>
             </Head>
-            <div className="3xl:px-5 px-4 3xl:pt-[76px] 2xl:pt-[72px] xl:pt-16 pt-14 pb-3 3xl:space-y-1.5 space-y-1 flex flex-col justify-between">
+            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+                {/* <div className="3xl:px-5 px-4 3xl:pt-[76px] 2xl:pt-[72px] xl:pt-16 pt-14 pb-3 3xl:space-y-1.5 space-y-1 flex flex-col justify-between"> */}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
-                    {trangthaiExprired ? (
+                    {/* {trangthaiExprired ? (
                         <div className="p-5"></div>
                     ) : (
                         <div className="flex space-x-1 3xl:text-[13px] 2xl:text-[12px] xl:text-[14.5px] text-[12px]">
@@ -1507,9 +1507,9 @@ const Index = (props) => {
                                     : dataLang?.sales_product_add_order || "sales_product_add_order"}
                             </h6>
                         </div>
-                    )}
+                    )} */}
 
-                    <div className="flex justify-between items-center">
+                    {/* <div className="flex justify-between items-center">
                         <h2 className="3xl:text-[24px] 2xl:text-2xl xl:text-xl text-xl ">
                             {id
                                 ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
@@ -1519,6 +1519,38 @@ const Index = (props) => {
                             <button
                                 onClick={() => router.push(routerSalesOrder.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 3xl:py-1.5 2xl:py-2.5 xl:py-1.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                            >
+                                {dataLang?.btn_back || "btn_back"}
+                            </button>
+                        </div>
+                    </div> */}
+
+                    {trangthaiExprired ? (
+                        <div className="p-2"></div>
+                    ) : (
+                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                            <h6 className="text-[#141522]/40">
+                                {dataLang?.sales_product_list || "sales_product_list"}
+                            </h6>
+                            <span className="text-[#141522]/40">/</span>
+                            <h6 className="">
+                                {" "}
+                                {id
+                                    ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                                    : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                            </h6>
+                        </div>
+                    )}
+                    <div className="flex justify-between items-center">
+                        <h2 className="xl:text-2xl text-xl">
+                            {id
+                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                        </h2>
+                        <div className="flex justify-end items-center">
+                            <button
+                                onClick={() => router.push(routerSalesOrder.home)}
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.btn_back || "btn_back"}
                             </button>
@@ -1722,12 +1754,12 @@ const Index = (props) => {
                                         {startDate && (
                                             <>
                                                 <MdClear
-                                                    className="absolute 3xl:translate-x-[2600%] 3xl:-translate-y-[2%] translate-x-[2400%] translate-y-[4%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                    className="absolute 3xl:translate-x-[2800%] 3xl:-translate-y-[2%] translate-x-[2400%] translate-y-[4%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
                                                     onClick={() => handleClearDate("startDate")}
                                                 />
                                             </>
                                         )}
-                                        <BsCalendarEvent className="absolute left-0 3xl:translate-x-[2880%] 3xl:translate-y-[70%] translate-x-[2880%] translate-y-[80%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                                        <BsCalendarEvent className="absolute left-0 3xl:translate-x-[3280%] 3xl:translate-y-[70%] translate-x-[2880%] translate-y-[80%] text-[#CCCCCC] scale-110 cursor-pointer" />
                                     </div>
                                     {errDate && (
                                         <label className="text-sm text-red-500">

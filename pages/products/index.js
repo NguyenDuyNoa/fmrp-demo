@@ -155,6 +155,8 @@ const Index = (props) => {
                     page: router.query?.page || 1,
                     "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
                     "filter[type_products]": router.query?.tab === "all" ? 0 : router.query?.tab,
+                    "filter[category_id]": valueCategory?.value ? valueCategory?.value : "",
+                    "filter[id]": valueFinishedPro?.value ? valueFinishedPro?.value : "",
                 },
             },
             (err, response) => {
@@ -173,8 +175,12 @@ const Index = (props) => {
     }, [onFetching]);
 
     useEffect(() => {
-        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
-    }, [limit, router.query?.page, idBranch, router.query?.tab]);
+        sOnFetching(true) ||
+            (keySearch && sOnFetching(true)) ||
+            (idBranch?.length > 0 && sOnFetching(true)) ||
+            (valueCategory && sOnFetching(true)) ||
+            (valueFinishedPro && sOnFetching(true));
+    }, [limit, router.query?.page, idBranch, router.query?.tab, valueCategory, valueFinishedPro]);
 
     const paginate = (pageNumber) => {
         router.push({
@@ -739,6 +745,7 @@ const Index = (props) => {
                                 formatOptionLabel={CustomSelectOption}
                                 onChange={_HandleFilterOpt.bind(this, "category")}
                                 value={valueCategory}
+                                isClearable={true}
                                 placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
                             />
                             <SelectComponent
@@ -754,8 +761,9 @@ const Index = (props) => {
                                 value={valueFinishedPro}
                                 placeholder={dataLang?.product}
                                 colSpan={1}
-                                components={{ MultiValue }}
-                                isMulti={true}
+                                // components={{ MultiValue }}
+                                // isMulti={true}
+                                isClearable={true}
                                 closeMenuOnSelect={false}
                             />
                         </div>
