@@ -308,7 +308,7 @@ const LoginPage = React.memo((props) => {
                                             <h1 className="text-[#11315B] font-medium text-3xl text-center">
                                                 {dataLang?.auth_login || "auth_login"}
                                             </h1>
-                                            <div className="flex space-x-5 w-full">
+                                            {/* <div className="flex space-x-5 w-full">
                                                 <button
                                                     onClick={_HandleSelectTab.bind(this, 0)}
                                                     className={`${
@@ -329,7 +329,7 @@ const LoginPage = React.memo((props) => {
                                                 >
                                                     {dataLang?.auth_version_test || "auth_version_test"}
                                                 </button>
-                                            </div>
+                                            </div> */}
                                         </div>
                                         <div className="space-y-2">
                                             <input
@@ -565,9 +565,8 @@ const LoginPage = React.memo((props) => {
                                     <div className="w-full h-1.5 rounded-full bg-[#3276FA]" />
                                     <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] relative overflow-hidden">
                                         <div
-                                            className={`${
-                                                stepRegister == 0 ? "w-0" : "w-full"
-                                            } duration-300 bg-[#3276FA] transition-[width] h-full absolute`}
+                                            className={`${stepRegister == 0 ? "w-0" : "w-full"
+                                                } duration-300 bg-[#3276FA] transition-[width] h-full absolute`}
                                         />
                                     </div>
                                 </div>
@@ -629,11 +628,10 @@ const LoginPage = React.memo((props) => {
                                                     required: true,
                                                 })}
                                                 placeholder="Nhập họ và tên của bạn"
-                                                className={`${
-                                                    errors.fullName
+                                                className={`${errors.fullName
                                                         ? "border-red-500 border"
                                                         : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
                                                 <span className="text-red-500 text-[13px]">
@@ -653,11 +651,10 @@ const LoginPage = React.memo((props) => {
                                                     required: true,
                                                 })}
                                                 placeholder="Nhập tên công ty"
-                                                className={`${
-                                                    errors.companyName
+                                                className={`${errors.companyName
                                                         ? "border-red-500 border"
                                                         : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
                                                 <span className="text-red-500 text-[13px]">
@@ -682,11 +679,10 @@ const LoginPage = React.memo((props) => {
                                                         },
                                                     })}
                                                     placeholder="Nhập Email của bạn"
-                                                    className={`${
-                                                        errors.email
+                                                    className={`${errors.email
                                                             ? "border-red-500 border"
                                                             : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                        } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.email && (
                                                     <span className="text-red-500 text-[13px]" role="alert">
@@ -708,11 +704,10 @@ const LoginPage = React.memo((props) => {
                                                         maxLength: 16,
                                                     })}
                                                     placeholder="Nhập số điện thoại"
-                                                    className={`${
-                                                        errors.phone
+                                                    className={`${errors.phone
                                                             ? "border-red-500 border"
                                                             : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                        } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.phone && errors.phone.type === "required" && (
                                                     <span className="text-red-500 text-[13px]">
@@ -749,11 +744,10 @@ const LoginPage = React.memo((props) => {
                                                         minLength: 10,
                                                     })}
                                                     placeholder="Nhập mật khẩu"
-                                                    className={`${
-                                                        errors.password
+                                                    className={`${errors.password
                                                             ? "border-red-500 border"
                                                             : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
-                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
+                                                        } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.password && errors.password.type === "required" && (
                                                     <span className="text-red-500 text-[13px]">
@@ -788,9 +782,8 @@ const LoginPage = React.memo((props) => {
                                                         />
                                                         <label
                                                             htmlFor={`posiiton ${e?.id}`}
-                                                            className={`${
-                                                                errors.location ? "text-[#52575E]" : "text-[#52575E]"
-                                                            }  2xl:text-base text-sm cursor-pointer`}
+                                                            className={`${errors.location ? "text-[#52575E]" : "text-[#52575E]"
+                                                                }  2xl:text-base text-sm cursor-pointer`}
                                                         >
                                                             {e?.title}
                                                         </label>
@@ -839,9 +832,8 @@ const LoginPage = React.memo((props) => {
                                             type="button"
                                             onClick={handleSubmit(onSubmit)}
                                             disabled={loadingRegester}
-                                            className={`${
-                                                loadingRegester ? "relative" : ""
-                                            } w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
+                                            className={`${loadingRegester ? "relative" : ""
+                                                } w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                         >
                                             {loadingRegester ? (
                                                 <div>
