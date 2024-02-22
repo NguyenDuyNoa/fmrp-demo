@@ -14,19 +14,10 @@ const Expirred = () => {
     });
     const [checkDate, sCheckDate] = useState(false);
 
-    // const data = {
-    //     dateStart: moment(new Date()).format("DD/MM/YYYY"),
-    //     dateEnd: 10,
-    // };
     const dispatch = useDispatch();
-    // const startDate = new Date(data.dateStart);
-    // startDate.setDate(startDate.getDate() + data.dateEnd);
-
-    // const formattedEndDate = `${startDate.getDate()}/${
-    //     startDate.getMonth() + 1
-    // }/${startDate.getFullYear()}`;
 
     const data = useSelector((state) => state.auth);
+    console.log("data?.fail_expiration", data);
     useEffect(() => {
         sCheckDate(data?.fail_expiration);
         sDate({
@@ -35,33 +26,7 @@ const Expirred = () => {
             dateLimit: data?.day_expiration,
         });
     }, [data]);
-    // const _ServerLang = () => {
-    //     Axios(
-    //         "GET",
-    //         `/api_web/Api_Authentication/authentication?csrf_protection=true`,
-    //         {},
-    //         (err, response) => {
-    //             if (!err) {
-    //                 var data = response?.data?.info;
-    //                 sCheckDate(data?.fail_expiration);
-    //                 sDate({
-    //                     dateStart: moment(data?.start_date).format(
-    //                         "DD/MM/YYYY"
-    //                     ),
-    //                     dateEnd: moment(data?.expiration_date).format(
-    //                         "DD/MM/YYYY"
-    //                     ),
-    //                     dateLimit: data?.day_expiration,
-    //                 });
-    //             }
-    //         }
-    //     );
-    // };
-    // useEffect(() => {
-    //     _ServerLang();
-    // }, []);
 
-    const [extend, sExtend] = useState(false);
     const _HandleExtend = () => {
         router.push("/settings/service-information");
     };
