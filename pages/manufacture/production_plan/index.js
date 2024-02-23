@@ -886,7 +886,7 @@ const Index = (props) => {
     }, []);
 
     useEffect(() => {
-        const check = data.some((e) => e.listProducts.some((i) => i.checked == true));
+        const check = data?.some((e) => e.listProducts.some((i) => i.checked == true));
         if (check) {
             const converData = data.flatMap((e) => {
                 return e.listProducts

@@ -1408,6 +1408,7 @@ const MainTable = ({ dataLang }) => {
             (err, response) => {
                 if (!err) {
                     const { data } = response?.data
+
                     const item = data?.productionPlans?.map((e, index) => {
                         return {
                             id: e?.id,
@@ -1441,8 +1442,20 @@ const MainTable = ({ dataLang }) => {
                         }),
                         next: data?.next == 1
                     });
-                    if (isValue.search == "") {
+                    if (isValue.search == "" && arrayItem[0]?.id) {
                         fetchDataTableRight(arrayItem[0]?.id)
+                    }
+                    if (data?.productionPlans?.length == 0) {
+                        queryState({
+                            listDataRight: {
+                                ...dataTable.listDataRight,
+                                dataPPItems: [],
+                                dataBom: {
+                                    productsBom: [],
+                                    materialsBom: []
+                                },
+                            }
+                        })
                     }
                 }
             }
@@ -1450,7 +1463,9 @@ const MainTable = ({ dataLang }) => {
     }
 
     useEffect(() => {
-        fetchDataTable()
+        return () => {
+            fetchDataTable()
+        }
     }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.page]);
 
 
@@ -1466,7 +1481,7 @@ const MainTable = ({ dataLang }) => {
                                 idCommand: data?.productionPlan?.id,
                                 dataPPItems: data?.listPPItems?.map(e => {
                                     return {
-                                        id: e?.pp_id,
+                                        id: e?.object_id,
                                         title: e?.reference_no,
                                         showChild: true,
                                         arrListData: e?.items?.map(i => {
@@ -1517,7 +1532,6 @@ const MainTable = ({ dataLang }) => {
                                 },
                             },
                         })
-
                     }
                 }
             }
@@ -1572,7 +1586,6 @@ const MainTable = ({ dataLang }) => {
 
     useEffect(() => {
         return () => {
-            fetchDataTable();
             fetDataOrder()
             fetchDataPlan()
         }
@@ -1618,8 +1631,8 @@ const MainTable = ({ dataLang }) => {
         }, 1500);
     };
 
-    const handleConfim = () => {
-        Axios("DELETE", `/api_web/api_manufactures/deleteProductionPlans/${isId}?csrf_protection=true`, {},
+    const handleConfim = async () => {
+        await Axios("DELETE", `/api_web/api_manufactures/deleteProductionPlans/${isId}?csrf_protection=true`, {},
             (err, response) => {
                 if (!err) {
                     const { isSuccess, message } = response?.data
@@ -1629,11 +1642,13 @@ const MainTable = ({ dataLang }) => {
                     } else {
                         isShow("error", `${dataLang[message] || message}`);
                     }
-                    handleQueryId({ status: false });
+
                 }
             }
         );
+        handleQueryId({ status: false });
     }
+
 
     const handShowItem = (id) => {
         queryState({
@@ -1664,6 +1679,7 @@ const MainTable = ({ dataLang }) => {
         fetDataOrder,
         fetchDataPlan
     };
+    console.log("dataTable.listDataRight?.idCommand", dataTable.listDataRight?.idCommand);
     return (
         <React.Fragment>
             <FilterHeader {...shareProps} />
@@ -1785,7 +1801,11 @@ const MainTable = ({ dataLang }) => {
                                         <button
                                             className=" bg-[#F3F4F6] rounded-lg  outline-none focus:outline-none"
                                             onClick={() => {
+                                                if (+dataTable?.countAll == 0) {
+                                                    return isShow('error', 'Vui lòng thêm kế hoạch sản xuất')
+                                                }
                                                 if (e.id == 3) {
+                                                    queryValue({ page: 1, resetPage: true })
                                                     handleQueryId({ status: true, id: dataTable.listDataRight?.idCommand })
                                                 }
                                             }}
