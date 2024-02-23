@@ -3,6 +3,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useState, useRef, useEffect } from "react";
+import ModalImage from "react-modal-image";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -19,6 +20,7 @@ import {
     SearchNormal1 as IconSearch,
     Add as IconAdd,
     House2,
+    Refresh2,
 } from "iconsax-react";
 
 import { _ServerInstance as Axios } from "/services/axios";
@@ -33,6 +35,9 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import moment from "moment";
+
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -56,47 +61,41 @@ const Index = (props) => {
 
     const { isOpen, isId, handleQueryId } = useToggle();
 
-    const [keySearch, sKeySearch] = useState("");
-
-    const [limit, sLimit] = useState(15);
+    const [limit, sLimit] = useState(60);
 
     const [totalItem, sTotalItems] = useState([]);
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [data, sData] = useState({});
-
     const [data_ex, sData_ex] = useState([]);
 
-    const [listBr, sListBr] = useState();
+    const initialState = {
+        idWarehouse: "",
+        dataProductSerial: {},
+        dataMaterialExpiry: {},
+        dataProductExpiry: {},
+        dataWarehouse: [],
+        dataWarehouseDetail: [],
+        limitItemWarehouseDetail: 10,
+        totalItemWarehouseDetail: [],
+        dataWarehouseExcel: [],
 
-    const [idBranch, sIdBranch] = useState(null);
+        keySearchItem: "",
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_warehouse/warehouse/?csrf_protection=true`,
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult, output } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                    sData_ex(rResult);
-                }
-                sOnFetching(false);
-            }
-        );
-    };
+        listBranchWarehouse: [],
+        idBranch: null,
 
-    const _ServerFetching_brand = () => {
+        listLocationWarehouse: [],
+        idLocationWarehouse: null,
+        listVariant: [],
+        idVariantMain: null,
+        idVariantSub: null,
+        isLoading: false,
+    }
+
+    const [isState, setIsState] = useState(initialState)
+    const queryKeyIsState = (key) => setIsState((prev) => ({ ...prev, ...key }))
+
+    // fetch list chi nhánh kho
+    const fetchListBranchWarehouse = () => {
         Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
@@ -108,22 +107,194 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { rResult, output } = response.data;
-                    sListBr(rResult);
+                    queryKeyIsState({
+                        listBranchWarehouse: rResult,
+                    })
                 }
-                sOnFetching(false);
+            }
+        );
+    };
+    // fetch danh sách kho
+    const fetchDataListWarehouse = () => {
+        Axios(
+            "GET",
+            `/api_web/api_warehouse/warehouse/?csrf_protection=true`,
+            {
+                params: {
+                    limit: limit,
+                    page: router.query?.page || 1,
+                    "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
+                },
+            },
+            (err, response) => {
+                console.log('checkk err,response');
+                queryKeyIsState({
+                    isLoading: true
+                })
+                if (!err) {
+                    var { rResult, output } = response.data;
+                    if (rResult.length > 0) {
+                        queryKeyIsState({
+                            idWarehouse: rResult[0].id
+                        })
+                    } else {
+                        queryKeyIsState({
+                            idWarehouse: null,
+                            dataWarehouseDetail: [],
+                        })
+                    }
+                    queryKeyIsState({
+                        dataWarehouse: rResult,
+                    })
+                    sTotalItems(output);
+                    sData_ex(rResult);
+                    setTimeout(() => {
+                        queryKeyIsState({
+                            isLoading: false
+                        })
+                    }, 500);
+                } else {
+                    setTimeout(() => {
+                        queryKeyIsState({
+                            isLoading: false
+                        })
+                    }, 500);
+                }
+            }
+        );
+    }
+
+    useEffect(() => {
+        fetchListBranchWarehouse()
+        fetchDataListWarehouse()
+    }, [isState.idBranch])
+
+    // fetch data ẩn hiện cột trong table
+    const fetchDataOnOffCol = () => {
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                queryKeyIsState({
+                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
+                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
+                    dataProductSerial: data.find((x) => x.code == "product_serial"),
+                })
+            }
+        });
+    }
+
+    // fetch data chi tiết của kho
+    const fetchDataWarehouseDetail = async () => {
+        Axios(
+            "GET",
+            `/api_web/api_warehouse/warehouse_detail/${isState.idWarehouse}?csrf_protection=true`,
+            {
+                params: {
+                    search: isState.keySearchItem,
+                    limit: isState.limitItemWarehouseDetail,
+                    page: router.query?.page || 1,
+                    "filter[location_id]": isState.idLocationWarehouse?.value ? isState.idLocationWarehouse?.value : null,
+                    "filter[variation_option_id_1]": isState.idVariantMain?.value ? isState.idVariantMain?.value : null,
+                    "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
+                },
+            },
+            (err, response) => {
+                queryKeyIsState({
+                    isLoading: true
+                })
+                if (!err) {
+                    var { rResult, output } = response.data;
+                    queryKeyIsState({
+                        dataWarehouseDetail: rResult,
+                        dataWarehouseExcel: rResult,
+                        totalItemWarehouseDetail: output,
+                    })
+                    setTimeout(() => {
+                        queryKeyIsState({
+                            isLoading: false
+                        })
+                    }, 500);
+                } else {
+                    setTimeout(() => {
+                        queryKeyIsState({
+                            isLoading: false
+                        })
+                    }, 500);
+                }
+            }
+        );
+    }
+
+    // fetch list vị trí kho theo từng kho
+    const fetchFilterLocationWarehouse = () => {
+        Axios(
+            "GET",
+            `/api_web/api_warehouse/location/?csrf_protection=true&filter[warehouse_id]=${isState.idWarehouse}`,
+            {},
+            (err, response) => {
+
+                if (!err) {
+                    var { rResult } = response.data;
+                    queryKeyIsState({
+                        listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })),
+                    })
+                }
             }
         );
     };
 
-    const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
-
-    const onchang_filterBr = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        }
+    // fetch list biến thể
+    const fetchFilterVariationWarehouse = () => {
+        Axios("GET", `/api_web/Api_variation/variation?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                const { rResult } = response.data ?? {};
+                const options = rResult?.flatMap(({ option }) => option) ?? [];
+                queryKeyIsState({
+                    listVariant: options?.map(({ id, name }) => ({
+                        label: name,
+                        value: id,
+                    })),
+                })
+            }
+        });
     };
 
-    const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
+    useEffect(() => {
+        if (isState.idWarehouse) {
+            fetchDataWarehouseDetail()
+            fetchFilterLocationWarehouse()
+            fetchFilterVariationWarehouse()
+            fetchDataOnOffCol()
+        }
+    }, [isState.limitItemWarehouseDetail, isState.idWarehouse, isState.idLocationWarehouse, isState.idVariantSub, isState.idVariantMain, isState.keySearchItem, router.query?.page])
+
+    const listBr_filter = isState?.listBranchWarehouse?.map((e) => ({ label: e.name, value: e.id }));
+
+    const onChangeFilter = (type, value) => {
+        if (type == "branch") {
+            queryKeyIsState({
+                idBranch: value,
+            })
+        } else if (type == "location") {
+            queryKeyIsState({
+                idLocationWarehouse: value,
+            })
+        } else if (type == "MainVariation") {
+            queryKeyIsState({
+                idVariantMain: value,
+            })
+        } else if (type == "SubVariation") {
+            queryKeyIsState({
+                idVariantSub: value,
+            })
+        }
+        router.push({
+            pathname: router.route,
+            query: { page: 1 },
+        });
+    };
+
+    const hiddenOptions = isState?.idBranch?.length > 3 ? isState?.idBranch?.slice(0, 3) : [];
 
     const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
@@ -134,24 +305,10 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
-        sKeySearch(value);
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
+        queryKeyIsState({ keySearchItem: value })
         router.replace(router.route);
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
-
-    useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_brand());
-    }, [onFetching]);
-
-    useEffect(() => {
-        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
-    }, [limit, router.query?.page, idBranch]);
+    }, 500);
 
     const handleDelete = () => {
         Axios("DELETE", `/api_web/api_warehouse/warehouse/${isId}?csrf_protection=true`, {}, (err, response) => {
@@ -163,11 +320,100 @@ const Index = (props) => {
                     isShow("error", dataLang[message]);
                 }
             }
-            _ServerFetching();
+            fetchDataOnOffCol();
         });
         handleQueryId({ status: false });
     };
     //excel
+    // const multiDataSet = [
+    //     {
+    //         columns: [
+    //             {
+    //                 title: "ID",
+    //                 width: { wch: 4 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //             {
+    //                 title: `${dataLang?.Warehouse_code || "Warehouse_code"}`,
+    //                 width: { wpx: 100 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //             {
+    //                 title: `${dataLang?.Warehouse_poppup_name || "Warehouse_poppup_name"}`,
+    //                 width: { wpx: 100 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //             {
+    //                 title: `${dataLang?.Warehouse_total || "Warehouse_total"}`,
+    //                 width: { wch: 40 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //             {
+    //                 title: `${dataLang?.Warehouse_inventory || "Warehouse_inventory"}`,
+    //                 width: { wch: 40 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //             {
+    //                 title: `${dataLang?.Warehouse_poppup_address || "Warehouse_poppup_address"}`,
+    //                 width: { wch: 40 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //             {
+    //                 title: `${dataLang?.client_popup_note || "client_popup_note"}`,
+    //                 width: { wch: 40 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //             {
+    //                 title: `${dataLang?.Warehouse_factory || "Warehouse_factory"}`,
+    //                 width: { wch: 40 },
+    //                 style: {
+    //                     fill: { fgColor: { rgb: "C7DFFB" } },
+    //                     font: { bold: true },
+    //                 },
+    //             },
+    //         ],
+    //         data: data_ex?.map((e) => [
+    //             { value: `${e.id}`, style: { numFmt: "0" } },
+    //             { value: `${e.code ? e.code : ""}` },
+    //             { value: `${e.name ? e.name : ""}` },
+    //             { value: `${"Tổng mặt hàng "}` },
+    //             { value: `${"Tổng tồn kho"}` },
+    //             { value: `${e.address ? e.address : ""}` },
+    //             { value: `${e.note ? e.note : ""}` },
+    //             { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
+    //         ]),
+    //     },
+    // ];
+    const newResult = isState.dataWarehouseExcel?.map((item) => {
+        const detail = item.detail || [];
+        return detail.map((detailItem) => ({
+            ...item,
+            detail: detailItem,
+        }));
+    })
+        .flat();
+
     const multiDataSet = [
         {
             columns: [
@@ -180,7 +426,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.Warehouse_code || "Warehouse_code"}`,
+                    title: `${dataLang?.warehouses_detail_type || "warehouses_detail_type"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -188,7 +434,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.Warehouse_poppup_name || "Warehouse_poppup_name"}`,
+                    title: `${dataLang?.warehouses_detail_plu || "warehouses_detail_plu"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -196,65 +442,140 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.Warehouse_total || "Warehouse_total"}`,
-                    width: { wch: 40 },
+                    title: `${dataLang?.warehouses_detail_productname || "warehouses_detail_productname"}`,
+                    width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
                 {
-                    title: `${dataLang?.Warehouse_inventory || "Warehouse_inventory"}`,
-                    width: { wch: 40 },
+                    title: `${dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}`,
+                    width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
                 {
-                    title: `${dataLang?.Warehouse_poppup_address || "Warehouse_poppup_address"}`,
-                    width: { wch: 40 },
+                    title: `${dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}`,
+                    width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
                 {
-                    title: `${dataLang?.client_popup_note || "client_popup_note"}`,
-                    width: { wch: 40 },
+                    title: `${dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}`,
+                    width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
                 {
-                    title: `${dataLang?.Warehouse_factory || "Warehouse_factory"}`,
-                    width: { wch: 40 },
+                    title: `${"Serial"}`,
+                    width: { wpx: 100 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${"Lot"}`,
+                    width: { wpx: 100 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.warehouses_detail_date || "warehouses_detail_date"}`,
+                    width: { wpx: 100 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}`,
+                    width: { wpx: 100 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.warehouses_detail_value || "warehouses_detail_value"}`,
+                    width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
                         font: { bold: true },
                     },
                 },
             ],
-            data: data_ex?.map((e) => [
-                { value: `${e.id}`, style: { numFmt: "0" } },
-                { value: `${e.code ? e.code : ""}` },
-                { value: `${e.name ? e.name : ""}` },
-                { value: `${"Tổng mặt hàng "}` },
-                { value: `${"Tổng tồn kho"}` },
-                { value: `${e.address ? e.address : ""}` },
-                { value: `${e.note ? e.note : ""}` },
-                { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
+            data: newResult?.map((e) => [
+                { value: `${e.item_id}`, style: { numFmt: "0" } },
+                { value: `${e.item_type ? dataLang?.product : ""}` },
+                { value: `${e.item_code ? e.item_code : ""}` },
+                { value: `${e.item_name ? e.item_name : ""}` },
+                {
+                    value: `${e?.detail.location_name ? e?.detail.location_name : ""}`,
+                },
+                {
+                    value: `${e?.detail.option_name_1 ? e?.detail.option_name_1 : ""}`,
+                },
+                {
+                    value: `${e?.detail.option_name_2 ? e?.detail.option_name_2 : ""}`,
+                },
+                {
+                    value: `${isState?.dataProductSerial.is_enable === "1" ? (e?.detail.serial != null ? e?.detail.serial : "") : ""
+                        }`,
+                },
+                {
+                    value: `${isState?.dataMaterialExpiry.is_enable === "1" ? (e?.detail.lot != null ? e?.detail.lot : "") : ""
+                        }`,
+                },
+                {
+                    value: `${
+                        // dataProductExpiry.is_enable === "1"
+                        //     ? e?.detail.expiration_date != null
+                        //         ? e?.detail.expiration_date
+                        //         : ""
+                        //     : ""
+                        isState?.dataMaterialExpiry.is_enable === "1"
+                            ? e?.detail.expiration_date != null
+                                ? e?.detail.expiration_date
+                                : ""
+                            : ""
+                        }`,
+                },
+                {
+                    value: `${e?.detail.quantity != null ? e?.detail.quantity : ""}`,
+                },
+                {
+                    value: `${e?.detail.amount != null ? e?.detail.amount : ""}`,
+                },
             ]),
         },
     ];
+
+    const handleClickChooseWarehouse = (item) => {
+        queryKeyIsState({ idWarehouse: item.id })
+    }
+
+    const handleRefresh = () => {
+        fetchDataWarehouseDetail()
+        fetchDataOnOffCol()
+    };
+    console.log("check loading :", isState.isLoading);
 
     return (
         <React.Fragment>
             <Head>
                 <title>{dataLang?.Warehouse_title}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <div className="px-10 3xl:pt-24 xl:pt-[70px] lg:pt-[64px] pb-10 3xl:space-y-4 space-y-2 overflow-hidden h-screen">
                 {trangthaiExprired ? (
                     <div className="p-2"></div>
                 ) : (
@@ -267,36 +588,35 @@ const Index = (props) => {
 
                 <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-3 h-[96%] overflow-hidden">
+                        <div className="3xl:space-y-3 space-y-2 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.Warehouse_title}</h2>
                                 <div className="flex justify-end items-center">
                                     <Popup_kho
-                                        listBr={listBr}
-                                        onRefresh={_ServerFetching.bind(this)}
+                                        listBr={isState?.listBranchWarehouse}
+                                        onRefresh={fetchDataOnOffCol.bind(this)}
                                         dataLang={dataLang}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-2 2xl:h-[95%] h-[93%] overflow-hidden">
-                                <div className="xl:space-y-3 space-y-2">
+                            <div className="space-y-2 h-full overflow-hidden">
+                                {/* <div className="space-y-2 2xl:h-[95%] h-[93%] overflow-hidden"> */}
+                                <div className="3xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded flex justify-between items-center  xl:p-3 p-2">
                                         <div className="flex gap-2">
                                             <form className="flex items-center relative">
-                                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                                                <IconSearch className="3xl:w-[20px] 3xl:h-[20px] w-[18px] h-[18px] absolute left-3 z-10 text-[#cccccc]" />
                                                 <input
-                                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
+                                                    className="3xl:text-base text-sm relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 3xl:py-1.5 xxl:py-2 py-[9px] rounded-md 3xl:w-[400px] xxl:w-[260px] xl:w-[200px] w-[150px]"
                                                     type="text"
                                                     onChange={_HandleOnChangeKeySearch.bind(this)}
                                                     placeholder={dataLang?.branch_search}
                                                 />
                                             </form>
-                                            <div className="ml-1 w-[23vw]">
-                                                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
+                                            <div className="ml-1 3xl:w-[400px] xxl:w-[260px] w-[200px]">
                                                 <Select
-                                                    // options={options}
                                                     options={[
                                                         {
                                                             value: "",
@@ -305,13 +625,181 @@ const Index = (props) => {
                                                         },
                                                         ...options,
                                                     ]}
-                                                    onChange={onchang_filterBr.bind(this, "branch")}
-                                                    value={idBranch}
+                                                    onChange={onChangeFilter.bind(this, "branch")}
+                                                    value={isState.idBranch}
                                                     hideSelectedOptions={false}
                                                     isMulti
                                                     isClearable={true}
                                                     placeholder={dataLang?.client_list_filterbrand}
-                                                    className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
+                                                    className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                                    isSearchable={true}
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    components={{ MultiValue }}
+                                                    closeMenuOnSelect={false}
+                                                    style={{
+                                                        border: "none",
+                                                        boxShadow: "none",
+                                                        outline: "none",
+                                                    }}
+                                                    theme={(theme) => ({
+                                                        ...theme,
+                                                        colors: {
+                                                            ...theme.colors,
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
+                                                            primary: "#0F4F9E",
+                                                        },
+                                                    })}
+                                                    styles={{
+                                                        placeholder: (base) => ({
+                                                            ...base,
+                                                            color: "#cbd5e1",
+                                                        }),
+                                                        control: (base, state) => ({
+                                                            ...base,
+                                                            border: "none",
+                                                            outline: "none",
+                                                            boxShadow: "none",
+                                                            ...(state.isFocused && {
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
+                                                            }),
+                                                        }),
+                                                    }}
+                                                />
+                                            </div>
+                                            {/* chọn vị trí kho */}
+                                            <div className="ml-1 col-span-1">
+                                                <Select
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label:
+                                                                dataLang?.warehouses_detail_filterWare ||
+                                                                "warehouses_detail_filterWare",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...isState.listLocationWarehouse,
+                                                    ]}
+                                                    onChange={onChangeFilter.bind(this, "location")}
+                                                    value={isState.idLocationWarehouse}
+                                                    hideSelectedOptions={false}
+                                                    isClearable={true}
+                                                    placeholder={
+                                                        dataLang?.warehouses_detail_filterWare ||
+                                                        "warehouses_detail_filterWare"
+                                                    }
+                                                    className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                                    isSearchable={true}
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    components={{ MultiValue }}
+                                                    // closeMenuOnSelect={false}
+                                                    style={{
+                                                        border: "none",
+                                                        boxShadow: "none",
+                                                        outline: "none",
+                                                    }}
+                                                    theme={(theme) => ({
+                                                        ...theme,
+                                                        colors: {
+                                                            ...theme.colors,
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
+                                                            primary: "#0F4F9E",
+                                                        },
+                                                    })}
+                                                    styles={{
+                                                        placeholder: (base) => ({
+                                                            ...base,
+                                                            color: "#cbd5e1",
+                                                        }),
+                                                        control: (base, state) => ({
+                                                            ...base,
+                                                            border: "none",
+                                                            outline: "none",
+                                                            boxShadow: "none",
+                                                            ...(state.isFocused && {
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
+                                                            }),
+                                                        }),
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="ml-1 col-span-1">
+                                                <Select
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label:
+                                                                dataLang?.warehouses_detail_filterMain ||
+                                                                "warehouses_detail_filterMain",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...isState.listVariant,
+                                                    ]}
+                                                    onChange={onChangeFilter.bind(this, "MainVariation")}
+                                                    value={isState.idVariantMain}
+                                                    hideSelectedOptions={false}
+                                                    isClearable={true}
+                                                    placeholder={
+                                                        dataLang?.warehouses_detail_filterMain ||
+                                                        "warehouses_detail_filterMain"
+                                                    }
+                                                    className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
+                                                    isSearchable={true}
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    components={{ MultiValue }}
+                                                    style={{
+                                                        border: "none",
+                                                        boxShadow: "none",
+                                                        outline: "none",
+                                                    }}
+                                                    theme={(theme) => ({
+                                                        ...theme,
+                                                        colors: {
+                                                            ...theme.colors,
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
+                                                            primary: "#0F4F9E",
+                                                        },
+                                                    })}
+                                                    styles={{
+                                                        placeholder: (base) => ({
+                                                            ...base,
+                                                            color: "#cbd5e1",
+                                                        }),
+                                                        control: (base, state) => ({
+                                                            ...base,
+                                                            border: "none",
+                                                            outline: "none",
+                                                            boxShadow: "none",
+                                                            ...(state.isFocused && {
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
+                                                            }),
+                                                        }),
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="ml-1 col-span-1">
+                                                <Select
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label:
+                                                                dataLang?.warehouses_detail_filterSub ||
+                                                                "warehouses_detail_filterSub",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...isState.listVariant,
+                                                    ]}
+                                                    onChange={onChangeFilter.bind(this, "SubVariation")}
+                                                    value={isState.idVariantSub}
+                                                    hideSelectedOptions={false}
+                                                    isClearable={true}
+                                                    placeholder={
+                                                        dataLang?.warehouses_detail_filterSub ||
+                                                        "warehouses_detail_filterSub"
+                                                    }
+                                                    className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
                                                     isSearchable={true}
                                                     noOptionsMessage={() => "Không có dữ liệu"}
                                                     components={{ MultiValue }}
@@ -349,14 +837,25 @@ const Index = (props) => {
                                             </div>
                                         </div>
                                         <div className="flex space-x-2 items-center">
+                                            <button
+                                                onClick={handleRefresh.bind(this)}
+                                                type="button"
+                                                className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
+                                            >
+                                                <Refresh2
+                                                    className="3xl:w-[20px] 3xl:h-[20px] w-[18px] h-[18px] group-hover:-rotate-45 transition-all ease-in-out"
+                                                    color="green"
+                                                />
+                                            </button>
+
                                             {data_ex?.length > 0 && (
                                                 <ExcelFile
                                                     filename="Danh sách kho"
                                                     title="Dsk"
                                                     element={
-                                                        <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                            <IconExcel size={18} />
-                                                            <span>{dataLang?.client_list_exportexcel}</span>
+                                                        <button className="3xl:px-4 px-3 3xl:py-2 py-2 flex items-center xxl:space-x-2 space-x-1 bg-[#C7DFFB] rounded hover:scale-105 transition">
+                                                            <IconExcel className='3xl:w-[20px] 3xl:h-[20px] w-[18px] h-[18px]' />
+                                                            <span className='xl:text-sm text-xs'>{dataLang?.client_list_exportexcel}</span>
                                                         </button>
                                                     }
                                                 >
@@ -367,167 +866,293 @@ const Index = (props) => {
                                                     />
                                                 </ExcelFile>
                                             )}
-                                            <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                                             <select
-                                                className="outline-none"
-                                                onChange={(e) => sLimit(e.target.value)}
-                                                value={limit}
+                                                className="outline-none 3xl:text-base text-sm"
+                                                onChange={(e) => queryKeyIsState({ limitItemWarehouseDetail: e.target.value })}
+                                                value={isState.limitItemWarehouseDetail}
                                             >
                                                 <option disabled className="hidden">
-                                                    {limit == -1 ? "Tất cả" : limit}
+                                                    {isState.limitItemWarehouseDetail == -1 ? "Tất cả" : isState.limitItemWarehouseDetail}
                                                 </option>
-                                                <option value={15}>15</option>
-                                                <option value={20}>20</option>
-                                                <option value={40}>40</option>
-                                                <option value={60}>60</option>
-                                                <option value={-1}>Tất cả</option>
+                                                <option value={10} className='3xl:text-base text-sm'>10</option>
+                                                <option value={20} className='3xl:text-base text-sm'>20</option>
+                                                <option value={40} className='3xl:text-base text-sm'>40</option>
+                                                <option value={60} className='3xl:text-base text-sm'>60</option>
+                                                <option value={-1} className='3xl:text-base text-sm'>Tất cả</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[500px] 2xl:h-[88%] xl:h-[85%] h-[100%] max:h-[800px]] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2">
-                                        {onFetching ? (
-                                            <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
-                                            <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] max:h-[1000px] h-[100%] ">
-                                                    <div className="grid grid-cols-4 gap-5  p-1">
-                                                        {data?.map((e) => (
+
+                                <div className='grid grid-cols-10'>
+                                    <ul className='col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 xl:px-4 xl:py-2 px-2 py-1 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                                        {
+                                            isState.dataWarehouse && isState.dataWarehouse.map((item, index) => (
+                                                <li
+                                                    key={item.id}
+                                                    className={` ${isState.idWarehouse === item.id ? "bg-[#3276FA] text-white" : ""} capitalize flex gap-2 px-4 py-2 items-center justify-between w-full rounded-md cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
+                                                    onClick={() => handleClickChooseWarehouse(item)}
+                                                >
+                                                    <div className='flex w-[90%] max-w-[90%] items-center gap-2'>
+                                                        <div className='w-[6px] h-[6px] rounded-full bg-[#6C9AC4]' />
+                                                        <div className='w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs '>
+                                                            {item.name}
+                                                        </div>
+                                                    </div>
+                                                    <div className='w-[10%] max-w-[10%] bg-[#E1ECFC]/80 3xl:text-base xl:text-sm text-xs text-center rounded-md'>
+                                                        {item.totalItems}
+                                                    </div>
+                                                </li>
+                                            ))
+                                        }
+                                    </ul>
+
+                                    <div className="col-span-8 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                        <div className={`2xl:w-[100%] pr-2`}>
+                                            {/* header table */}
+                                            <div
+                                                className={`${isState.dataProductSerial.is_enable == "1"
+                                                    ? (isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable)
+                                                        ? "grid-cols-10"
+                                                        : isState.dataMaterialExpiry.is_enable == "1"
+                                                            ? "grid-cols-10" : "grid-cols-8"
+                                                    : isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
+                                                        ? "grid-cols-9" : isState.dataMaterialExpiry.is_enable == "1"
+                                                            ? "grid-cols-9" : "grid-cols-7"
+                                                    }  grid sticky top-0 bg-white shadow-lg p-2 divide-x z-10`}
+                                            >
+                                                <h4 className="col-span-2 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-left">
+                                                    {dataLang?.warehouses_detail_product || "warehouses_detail_product"}
+                                                </h4>
+                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                    {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
+                                                </h4>
+                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                    {dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}
+                                                </h4>
+                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                    {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
+                                                </h4>
+                                                {isState.dataProductSerial.is_enable === "1" && (
+                                                    <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                        {"Serial"}
+                                                    </h4>
+                                                )}
+                                                {isState.dataMaterialExpiry.is_enable === "1" ||
+                                                    isState.dataProductExpiry.is_enable === "1" ? (
+                                                    <>
+                                                        <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                            {"Lot"}
+                                                        </h4>
+                                                        <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                            {dataLang?.warehouses_detail_date || "warehouses_detail_date"}
+                                                        </h4>
+                                                    </>
+                                                ) : (
+                                                    ""
+                                                )}
+                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                    {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}
+                                                </h4>
+                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                    {dataLang?.warehouses_detail_value || "warehouses_detail_value"}
+                                                </h4>
+                                            </div>
+                                            {/* data table */}
+                                            {
+                                                isState.isLoading ? (
+                                                    <Loading className="3xl:max-h-[560px] 3xl:h-[560px] 2xl:max-h-[400px] 2xl:h-[400px] max-h-[400px] h-[400px]" color="#0f4f9e" />
+                                                ) : isState?.dataWarehouseDetail && isState?.dataWarehouseDetail?.length > 0 ? (
+                                                    <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
+                                                        {isState?.dataWarehouseDetail && isState?.dataWarehouseDetail?.map((e) => (
                                                             <div
-                                                                key={e?.id}
-                                                                className="bg-white flex flex-col justify-between   min-h-[250px] h-auto border-[0.5px] border-[#0F4F9E] hover:shadow-[0_0px_2px_0.5px_#0F4F9E]    rounded-2xl  overflow-hidden"
+                                                                className={`${isState?.dataProductSerial.is_enable == "1"
+                                                                    ? isState?.dataMaterialExpiry.is_enable != isState?.dataProductExpiry.is_enable
+                                                                        ? "grid-cols-10"
+                                                                        : isState?.dataMaterialExpiry.is_enable == "1" ? "grid-cols-10" : "grid-cols-8"
+                                                                    : isState?.dataMaterialExpiry.is_enable != isState?.dataProductExpiry.is_enable
+                                                                        ? "grid-cols-9"
+                                                                        : isState?.dataMaterialExpiry.is_enable == "1" ? "grid-cols-9" : "grid-cols-7"
+                                                                    }  grid hover:bg-slate-50 px-2`}
                                                             >
-                                                                <div className="">
-                                                                    <div className="flex items-center justify-between gap-2 p-2">
-                                                                        <div className="flex items-center gap-2 ">
-                                                                            <House2 size="32" color="#0F4F9E" />
-                                                                            <h3 className="text-[#0F4F9E] font-medium capitalize">
-                                                                                {e?.name}
-                                                                            </h3>
-                                                                        </div>
-                                                                        <div>
-                                                                            {e?.is_system === "1" && (
-                                                                                <h3 className="bg-[#EBFEF2] text-[#0BAA2E] rounded-lg font-normal p-1.5">
-                                                                                    {dataLang?.Warehouse_system}
-                                                                                </h3>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="">
-                                                                        <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {dataLang?.Warehouse_code}:{" "}
-                                                                            <span className=" text-[#0F4F9E] font-medium capitalize">
-                                                                                {e?.code}
-                                                                            </span>
-                                                                        </h3>
-                                                                        <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {dataLang?.Warehouse_total}:{" "}
-                                                                            <span className=" text-[#0F4F9E] font-medium capitalize">
-                                                                                {formatNumber(e?.totalItems)}
-                                                                            </span>
-                                                                        </h3>
-                                                                        <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {dataLang?.Warehouse_inventory}:{" "}
-                                                                            <span className=" text-[#0F4F9E] font-medium capitalize">
-                                                                                {formatNumber(e?.totalQuantity)}
-                                                                            </span>
-                                                                        </h3>
-                                                                        <h3 className="font-normal mt-2.5 ml-2.5">
-                                                                            {dataLang?.Warehouse_factory}{" "}
-                                                                            <span className="flex flex-wrap pt-2">
-                                                                                {e?.branch?.map((e) => {
-                                                                                    return (
-                                                                                        <span
-                                                                                            key={e?.id}
-                                                                                            className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px] capitalize"
-                                                                                        >
-                                                                                            {e.name}
-                                                                                        </span>
-                                                                                    );
-                                                                                })}
-                                                                            </span>
-                                                                        </h3>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex justify-between items-center p-2  mt-auto">
-                                                                    <Link
-                                                                        href={`/warehouses/warehouse/${e?.id}`}
-                                                                        className={`rounded-lg w-[80%]  p-2  cursor-pointer bg-[#e2f0fe] hover:bg-[#C7DFFB] text-center`}
-                                                                    >
-                                                                        {dataLang?.Warehouse_detail}
-                                                                    </Link>
-                                                                    <div>
-                                                                        {e?.is_system === "0" && (
-                                                                            <div className="flex  gap-2 w-[20%]">
-                                                                                <div className="">
-                                                                                    <Popup_kho
-                                                                                        listBr={listBr}
-                                                                                        sValueBr={e.branch}
-                                                                                        onRefresh={_ServerFetching.bind(
-                                                                                            this
-                                                                                        )}
-                                                                                        className="xl:text-base text-xs "
-                                                                                        dataLang={dataLang}
-                                                                                        name={e.name}
-                                                                                        code={e.code}
-                                                                                        address={e.address}
-                                                                                        note={e.note}
-                                                                                        id={e?.id}
+                                                                <div className={`${""} col-span-2 border-l flex justify-center items-center border-r border-b py-2`}>
+                                                                    <h6 className="xl:text-base text-xs w-full  ">
+                                                                        {e?.image == null ? (
+                                                                            <div className='flex gap-3 px-2 w-full'>
+                                                                                <div className='w-[25%] max-w-[25%]'>
+                                                                                    <ModalImage
+                                                                                        small="/no_image.png"
+                                                                                        large="/no_image.png"
+                                                                                        className="w-[70px] h-[70px] rounded object-contain"
                                                                                     />
                                                                                 </div>
-                                                                                <div>
-                                                                                    <button
-                                                                                        onClick={() =>
-                                                                                            handleQueryId({
-                                                                                                id: e.id,
-                                                                                                status: true,
-                                                                                            })
-                                                                                        }
-                                                                                        className="xl:text-base text-xs "
-                                                                                    >
-                                                                                        <IconDelete color="red" />
-                                                                                    </button>
+                                                                                <div className='w-[75%] max-w-[75%] flex flex-col gap-2'>
+                                                                                    <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                        {e.item_name == null ? "-" : e.item_name}
+                                                                                    </h6>
+
+                                                                                    <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                        {e.item_code == null ? "-" : e.item_code}
+                                                                                    </h6>
+
+                                                                                    <h6 className=" 3xl:items-center 3xl:text-base xl:text-sm lg:text-xs w-fit text-left ">
+                                                                                        <span
+                                                                                            className={`${e.item_type == "product"
+                                                                                                ? "text-lime-500  border-lime-500 "
+                                                                                                : " text-orange-500 border-orange-500"
+                                                                                                } border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl:text-base xl:text-sm lg:text-xs`}
+                                                                                        >
+                                                                                            {e.item_type ? dataLang[e?.item_type] : ""}
+                                                                                        </span>
+                                                                                    </h6>
+                                                                                </div>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className='flex gap-3 px-2 w-full'>
+                                                                                <div className='w-[25%] max-w-[25%]'>
+                                                                                    <ModalImage
+                                                                                        small={e?.image}
+                                                                                        large={e?.image}
+                                                                                        className="w-[70px] max-w-[70px] h-[70px] rounded-lg object-cover"
+                                                                                    />
+                                                                                </div>
+                                                                                <div className='w-[75%] max-w-[75%] flex flex-col gap-2'>
+                                                                                    <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                        {e.item_name == null ? "-" : e.item_name}
+                                                                                    </h6>
+
+                                                                                    <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                        {e.item_code == null ? "-" : e.item_code}
+                                                                                    </h6>
+
+                                                                                    <h6 className=" 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] w-fit text-left ">
+                                                                                        <span
+                                                                                            className={`${e.item_type == "product"
+                                                                                                ? "text-lime-500  border-lime-500 "
+                                                                                                : " text-orange-500 border-orange-500"
+                                                                                                } border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px]`}
+                                                                                        >
+                                                                                            {e.item_type ? dataLang[e?.item_type] : ""}
+                                                                                        </span>
+                                                                                    </h6>
+
                                                                                 </div>
                                                                             </div>
                                                                         )}
-                                                                    </div>
+                                                                    </h6>
+                                                                </div>
+
+                                                                <div
+                                                                    className={`border-l border-r grid ${isState.dataProductSerial.is_enable == "1"
+                                                                        ? isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
+                                                                            ? "col-span-8"
+                                                                            : isState.dataMaterialExpiry.is_enable == "1" ? "col-span-8" : "col-span-6"
+                                                                        : isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
+                                                                            ? "col-span-7"
+                                                                            : isState.dataMaterialExpiry.is_enable == "1" ? "col-span-7" : "col-span-5"
+                                                                        }`}
+                                                                >
+                                                                    {e?.detail.map((e) => (
+                                                                        <div
+                                                                            className={`grid ${isState.dataProductSerial.is_enable == "1"
+                                                                                ? isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
+                                                                                    ? "grid-cols-8"
+                                                                                    : isState.dataMaterialExpiry.is_enable == "1"
+                                                                                        ? "grid-cols-8" : "grid-cols-6"
+                                                                                : isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
+                                                                                    ? "grid-cols-7"
+                                                                                    : isState.dataMaterialExpiry.is_enable == "1"
+                                                                                        ? "grid-cols-7" : " grid-cols-5"
+                                                                                }`}
+                                                                        >
+                                                                            <div className="col-span-1 border-r border-b">
+                                                                                <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
+                                                                                    {" "}
+                                                                                    {e.location_name == null ? "-" : e.location_name}
+                                                                                </h6>
+                                                                            </div>
+                                                                            <div className=" col-span-1 border-r border-b">
+                                                                                <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
+                                                                                    {e.option_name_1 == null ? "-" : e.option_name_1}
+                                                                                </h6>
+                                                                            </div>
+                                                                            <div className=" col-span-1 border-r border-b">
+                                                                                <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
+                                                                                    {e.option_name_2 == null ? "-" : e.option_name_2}
+                                                                                </h6>
+                                                                            </div>
+                                                                            {isState.dataProductSerial.is_enable === "1" ? (
+                                                                                <div className=" col-span-1 border-r border-b">
+                                                                                    <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
+                                                                                        {e.serial == null || e.serial == "" ? "-" : e.serial}
+                                                                                    </h6>
+                                                                                </div>
+                                                                            ) : (
+                                                                                ""
+                                                                            )}
+                                                                            {isState.dataMaterialExpiry.is_enable === "1" || isState.dataProductExpiry.is_enable === "1" ? (
+                                                                                <>
+                                                                                    <div className=" col-span-1 border-r border-b ">
+                                                                                        <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
+                                                                                            {e.lot == null || e.lot == "" ? "-" : e.lot}
+                                                                                        </h6>
+                                                                                    </div>
+                                                                                    <div className=" col-span-1 border-r border-b ">
+                                                                                        <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
+                                                                                            {e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                        </h6>
+                                                                                    </div>
+                                                                                </>
+                                                                            ) : (
+                                                                                ""
+                                                                            )}
+                                                                            <div className=" col-span-1 border-r border-b ">
+                                                                                <h6 className="3xl:text-base xl:text-sm lg:text-xs  px-2 py-3  w-[full] text-red-500 font-medium text-center ">
+                                                                                    {e.quantity ? formatNumber(e?.quantity) : "-"}
+                                                                                </h6>
+                                                                            </div>
+                                                                            <div className=" col-span-1 border-b">
+                                                                                <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-right ">
+                                                                                    {e.amount ? formatNumber(e?.amount) : "-"}
+                                                                                </h6>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
                                                                 </div>
                                                             </div>
                                                         ))}
                                                     </div>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
+                                                ) : (
+                                                    <div className=" max-w-[352px] mt-24 mx-auto">
+                                                        <div className="text-center">
+                                                            <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
+                                                                <IconSearch />
+                                                            </div>
+                                                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">
+                                                                Không tìm thấy các mục
+                                                            </h1>
+                                                            <div className="flex items-center justify-around mt-6 "></div>
+                                                        </div>
                                                     </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        Không tìm thấy các mục
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 ">
-                                                        {/* <Popup_kho onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
+                                                )
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {data?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
-                                <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                        {isState?.dataWarehouse && isState?.dataWarehouse?.length != 0 && (
+                            <div className="flex space-x-5 items-center justify-end ">
+                                <h6 className='3xl:text-base text-sm'>
+                                    {dataLang?.display} {isState?.totalItemWarehouseDetail?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {isState?.totalItemWarehouseDetail?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
-                                    postsPerPage={limit}
-                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                    postsPerPage={isState.limitItemWarehouseDetail}
+                                    totalPosts={Number(isState?.totalItemWarehouseDetail?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
+                                    className='3xl:text-base text-sm'
                                 />
                             </div>
                         )}
@@ -594,22 +1219,22 @@ const Popup_kho = (props) => {
         sListBrand(
             props.listBr
                 ? props.listBr && [
-                      ...props.listBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
+                    ...props.listBr?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    })),
+                ]
                 : []
         );
 
         sValueBr(
             props.sValueBr
                 ? props.listBr && [
-                      ...props.sValueBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
+                    ...props.sValueBr?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    })),
+                ]
                 : []
         );
     }, [open]);
@@ -645,10 +1270,9 @@ const Popup_kho = (props) => {
         data.append("branch_id[]", branch_id);
         Axios(
             "POST",
-            `${
-                props.id
-                    ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`
-                    : "/api_web/api_warehouse/warehouse/?csrf_protection=true"
+            `${props.id
+                ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`
+                : "/api_web/api_warehouse/warehouse/?csrf_protection=true"
             }`,
             {
                 data: data,
@@ -749,11 +1373,10 @@ const Popup_kho = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_code}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputCode
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputCode
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -772,11 +1395,10 @@ const Popup_kho = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_name}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputName
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputName
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -795,11 +1417,10 @@ const Popup_kho = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_address}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputAddress
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputAddress
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputAddress && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -850,9 +1471,8 @@ const Popup_kho = (props) => {
                                                         },
                                                     }),
                                                 }}
-                                                className={`${
-                                                    errInputBr ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errInputBr ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             />
                                             {errInputBr && (
                                                 <label className="mb-2  text-[14px] text-red-500">
@@ -897,149 +1517,6 @@ const Popup_kho = (props) => {
         </>
     );
 };
-// const Popup_chitiet =(props)=>{
-//   const scrollAreaRef = useRef(null);
-//   const [open, sOpen] = useState(false);
-//   const _ToggleModal = (e) => sOpen(e);
-//   const [tab, sTab] = useState(0)
-//   const _HandleSelectTab = (e) => sTab(e)
-//   const [data,sData] =useState()
-//   const [onFetching, sOnFetching] = useState(false);
-//   useEffect(() => {
-//     props?.id && sOnFetching(true)
-//   }, [open]);
-//   const _ServerFetching_detailUser = () =>{
-//     Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-//     if(!err){
-//         var db =  response.data
-
-//         sData(db)
-//     }
-//     sOnFetching(false)
-//   })
-//   }
-//   useEffect(() => {
-//     onFetching && _ServerFetching_detailUser()
-//   }, [open]);
-// return (
-// <>
-//  <PopupEdit
-//     title={props.dataLang?.client_popup_detailUser}
-//     button={props?.name}
-//     onClickOpen={_ToggleModal.bind(this, true)}
-//     open={open} onClose={_ToggleModal.bind(this,false)}
-//     classNameBtn={props?.className}
-//   >
-//   <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
-//       <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_general}</button>
-//       <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_detailContact}</button>
-//   </div>
-//           <div className="mt-4 space-x-5 w-[930px] h-auto  ">
-//               {
-//                 tab === 0 &&(
-//                 <ScrollArea ref={scrollAreaRef}
-//                 className="h-[auto] overflow-hidden "
-//                 speed={1}
-//                 smoothScrolling={true}>
-//                   {onFetching ?
-//                   <Loading className="h-80"color="#0f4f9e" />
-//                   : data !="" &&(
-//                   <div className="flex gap-5 rounded-md ">
-//                     <div className='w-[50%] bg-slate-100/40 rounded-md'>
-//                       <div className='mb-4 h-[50px] flex justify-between items-center p-2'><span className='text-slate-400 text-sm w-[25%]'>{props.dataLang?.client_list_namecode}:</span> <span className='font-normal capitalize'>{data?.code}</span></div>
-//                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[25%]'>{props.dataLang?.client_list_name}:</span> <span className='font-normal capitalize'>{data?.name}</span></div>
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.client_list_repre}:</span> <span className='font-normal capitalize'>{data?.representative}</span></div>
-//                       <div className='mb-4 flex justify-between  items-center p-2'><span className='text-slate-400 text-sm  w-[25%]'>{props.dataLang?.client_popup_mail}:</span> <span className='font-normal'>{data?.email}</span></div>
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.client_popup_phone}:</span> <span className='font-normal capitalize'>{data?.phone_number}</span></div>
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.client_list_taxtcode}:</span> <span className='font-normal capitalize'>{data?.tax_code}</span></div>
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.client_popup_adress}:</span> <span className='font-normal capitalize'>{data?.address}</span></div>
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.client_popup_note}: </span> <span className='font-medium capitalize'>{data?.note}</span></div>
-
-//                     </div>
-//                     <div className='w-[50%] bg-slate-100/40'>
-
-//                       <div className='mb-4 min-h-[50px] max-h-[auto] flex  p-2 justify-between  items-center flex-wrap'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_char}:</span>
-//                       <span className='flex flex-wrap'>{data?.staff_charge?.map(e=>{ return (
-//                         <span className='font-normal capitalize   ml-1'>
-//                           <Popup className='dropdown-avt' key={e.id}
-//                                   trigger={open => (<img src={e.profile_image}  width={40} height={40} className="object-cover rounded-[100%]"></img>)}
-//                                   position="top center" on={['hover']} arrow={false}>
-//                             <span className='bg-[#0f4f9e] text-white rounded p-1.5'>{e.full_name} </span>
-//                           </Popup>
-//                         </span>)})}
-//                       </span>
-//                       </div>
-//                       <div className='mb-4 flex justify-between  p-2 items-center flex-wrap'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_brand}:</span> <span className='flex justify-between space-x-1'>{data?.branch?.map(e=>{ return (<span  className='last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px]'> {e.name}</span>)})}</span></div>
-//                       <div className='mb-4 justify-between  items-center p-2 flex space-x-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_group}:</span> <span className='flex justify-between space-x-1'>{data?.client_group?.map(e=>{ return (<span style={{ backgroundColor: `${e.color == "" ? "#e2f0fe" : e.color}`, color: `${e.color == "" ? "#0F4F9E" : "white"}`}} className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2   rounded-[5.5px]">{e.name} </span>)})}</span></div>
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_limit}:</span> <span className='font-normal capitalize'>{data?.debt_limit}</span></div>
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_days}:</span> <span className='font-normal capitalize'>{data?.debt_limit_day}</span></div>
-//                       {/* <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_date}:</span> <span className='font-normal capitalize'>{moment(data?.date_create).format("DD/MM/YYYY")}</span></div> */}
-//                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_city}:</span> <span className='font-normal capitalize'>{data?.city != "" ?(data?.city.type+" "+data?.city.name) :""}</span></div>
-//                       <div className='mb-4 flex justify-between p-2 items-center'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_district}: </span><span className='font-normal capitalize'>{data?.district != "" ?(data?.district.type+" "+data?.district.name):""}</span>,<span  className='text-slate-400 text-sm'>{props.dataLang?.client_popup_wards}:</span><span className='font-normal capitalize'>{data?.ward != "" ? (data?.ward.type+" "+data?.ward.name) :""}</span></div>
-
-//                     </div>
-//                   </div>)
-//                   }
-//                 </ScrollArea>
-//                 )
-//               }
-//        { tab === 1 && (
-//         <div>
-//            <div className='w-[930px]'>
-//              <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-//               <div className="pr-2 w-[100%] lx:w-[110%] ">
-//                 <div className="flex items-center sticky top-0 bg-slate-100 p-2 z-10">
-//                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-left">{props.dataLang?.client_popup_detailName}</h4>
-//                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">{props.dataLang?.client_popup_phone}</h4>
-//                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-left">{props.dataLang?.client_popup_mail}</h4>
-//                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[400] text-left">{props.dataLang?.client_popup_position}</h4>
-//                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-left">{props.dataLang?.client_popup_birthday}</h4>
-//                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-left">{props.dataLang?.client_popup_adress}</h4>
-//                 </div>
-//                 {onFetching ?
-//                   <Loading className="h-80"color="#0f4f9e" />
-//                   :
-//                   data?.contact?.length > 0 ?
-//                   (<>
-//                        <ScrollArea
-//                          className="min-h-[455px] max-h-[455px] overflow-hidden"  speed={1}  smoothScrolling={true}>
-//                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
-//                       {(data?.contact?.map((e) =>
-//                         <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
-//                           <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.full_name}</h6>
-//                           <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-center">{e.phone_number}</h6>
-//                           <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left break-words">{e.email}</h6>
-//                           <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-left break-words">{e.position}</h6>
-//                           <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : ""}</h6>
-//                           <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.address}</h6>
-//                         </div>
-//                       ))}
-//                     </div>
-//                       </ScrollArea>
-//                     </>
-//                   )  :
-//                   (
-//                     <div className=" max-w-[352px] mt-24 mx-auto" >
-//                       <div className="text-center">
-//                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-//                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
-//                         <div className="flex items-center justify-around mt-6 ">
-//                             {/* <Popup_kho onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   )}
-//               </div>
-//             </div>
-//           </div>
-
-//      </div>
-//     ) }
-//     </div>
-//   </PopupEdit>
-// </>
-// )
-// }
 const MoreSelectedBadge = ({ items }) => {
     const style = {
         marginLeft: "auto",
@@ -1062,7 +1539,7 @@ const MoreSelectedBadge = ({ items }) => {
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 3;
+    const maxToShow = 1;
     const overflow = getValue()
         .slice(maxToShow)
         .map((x) => x.label);
