@@ -1463,9 +1463,7 @@ const MainTable = ({ dataLang }) => {
     }
 
     useEffect(() => {
-        return () => {
-            fetchDataTable()
-        }
+        fetchDataTable()
     }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.page]);
 
 
@@ -1585,10 +1583,10 @@ const MainTable = ({ dataLang }) => {
     }, 500);
 
     useEffect(() => {
-        return () => {
-            fetDataOrder()
-            fetchDataPlan()
-        }
+
+        fetDataOrder()
+        fetchDataPlan()
+
     }, []);
 
     const handleShow = (id) => {
