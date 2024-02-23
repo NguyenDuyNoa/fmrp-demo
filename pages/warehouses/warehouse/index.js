@@ -562,6 +562,10 @@ const Index = (props) => {
 
     const handleClickChooseWarehouse = (item) => {
         queryKeyIsState({ idWarehouse: item.id })
+        router.push({
+            pathname: router.route,
+            query: { page: 1 },
+        });
     }
 
     const handleRefresh = () => {
