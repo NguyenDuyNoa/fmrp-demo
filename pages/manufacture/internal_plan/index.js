@@ -25,6 +25,10 @@ import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComp
 
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { routerInternalPlan } from "routers/manufacture";
+import { useToggle } from "@/hooks/useToggle";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import useToast from "@/hooks/useToast";
 
 const PopupDetail = dynamic(() => import("./(popupDetail)/PopupDetail"), { ssr: false });
 const Index = (props) => {
@@ -57,7 +61,11 @@ const Index = (props) => {
 
     const [totalItems, sTotalItems] = useState([]);
 
+    const isShow = useToast();
+
     const [isEvent, startEvent] = useTransition();
+
+    const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
 
     useEffect(() => {
         router.push({
@@ -166,6 +174,31 @@ const Index = (props) => {
             });
             sOnFetching(true);
         });
+    };
+
+    const toggleStatus = () => {
+        handlePostStatus(isId, status);
+    };
+
+    const handlePostStatus = (id, newStatus) => {
+        Axios(
+            "GET",
+            `/api_web/api_internal_plan/agree?id=${id}&status=${newStatus}&csrf_protection=true`,
+            {},
+            (err, response) => {
+                if (!err) {
+                    let { isSuccess, message } = response.data;
+                    console.log("response", response);
+                    if (isSuccess == 1) {
+                        isShow("success", `${dataLang[message] || message}`);
+                        handleQueryId({ status: false });
+                        _ServerFetching();
+                        return;
+                    }
+                    isShow("error", `${dataLang[message] || message}`);
+                }
+            }
+        );
     };
 
     // excel
@@ -355,6 +388,9 @@ const Index = (props) => {
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.internal_plan_status || "internal_plan_status"}
                                             </h4>
+                                            {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.internal_plan_status || "internal_plan_status"}
+                                            </h4> */}
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.internal_plan_creators || "internal_plan_creators"}
                                             </h4>
@@ -394,7 +430,39 @@ const Index = (props) => {
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
                                                                 {e.plan_name}
                                                             </h6>
-                                                            <h6 className="3xl:text-base mx-auto 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                            <h6 className="col-span-1 mx-auto">
+                                                                {e.status == "1" && (
+                                                                    <div
+                                                                        onClick={() =>
+                                                                            handleQueryId({
+                                                                                id: e?.id,
+                                                                                status: true,
+                                                                                idChild: "0",
+                                                                            })
+                                                                        }
+                                                                        className="cursor-pointer 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 transition-all duration-300 ease-in-out text-green-500 hover:bg-green-500 hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
+                                                                    >
+                                                                        Đã Duyệt
+                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
+                                                                    </div>
+                                                                )}
+                                                                {e.status == "0" && (
+                                                                    <div
+                                                                        onClick={() =>
+                                                                            handleQueryId({
+                                                                                id: e?.id,
+                                                                                status: true,
+                                                                                idChild: "1",
+                                                                            })
+                                                                        }
+                                                                        className="cursor-pointer 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 transition-all duration-300 ease-in-out hover:text-white border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
+                                                                    >
+                                                                        Chưa Duyệt
+                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
+                                                                    </div>
+                                                                )}
+                                                            </h6>
+                                                            {/* <h6 className="3xl:text-base mx-auto 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
                                                                 {index % 2 === 0 ? (
                                                                     <span className="block font-normal text-orange-500  rounded-xl py-[1px] px-2 w-fit min-w-[136px] bg-orange-200 text-center text-[13px]">
                                                                         {"Chưa lập KHNVL"}
@@ -409,7 +477,7 @@ const Index = (props) => {
                                                                         {"Đã lập KHNVL"}
                                                                     </span>
                                                                 )}
-                                                            </h6>
+                                                            </h6> */}
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
                                                                 <div className="relative">
@@ -461,6 +529,7 @@ const Index = (props) => {
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     dataLang={dataLang}
                                                                     id={e?.id}
+                                                                    status={e?.status}
                                                                     type="internal_plan"
                                                                     className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
@@ -493,6 +562,17 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                nameModel={"salesOrder"}
+                title={TITLE_STATUS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                status={status}
+                save={toggleStatus}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

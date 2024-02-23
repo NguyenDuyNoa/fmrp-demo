@@ -37,6 +37,16 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
         }),
     };
 
+    const newArray = data.dataProduction.reduce((acc, current) => {
+        const existingItem = acc.find((item) => item.idParent == current.idParent);
+
+        if (!existingItem) {
+            acc.push(current);
+        }
+
+        return acc;
+    }, []);
+
     return (
         <>
             <div className="bg-[#ECF0F4] font text-[#141522] font-medium 3xl:text-sm text-xs p-3 rounded">
@@ -73,9 +83,10 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                                 timeIntervals={15}
                                 isClearable
                                 clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
-                                placeholderText="13/02/2023 12:12:11"
-                                className="py-[8px] px-4 3xl:placeholder:text-sm  xxl:placeholder:text-xs 2xl:placeholder:text-[11px] xl:placeholder:text-[10px] lg:placeholder:text-[9px] text-sm placeholder:text-[#6b7280] text-sm w-full outline-none focus:outline-none 
-                                    border-[#E1E1E1] focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] "
+                                placeholderText="Chọn ngày"
+                                className={`py-[8px] px-4 3xl:placeholder:text-sm  xxl:placeholder:text-xs 2xl:placeholder:text-[11px] xl:placeholder:text-[10px] lg:placeholder:text-[9px] text-sm placeholder:text-[#6b7280] text-sm w-full outline-none focus:outline-none 
+                                ${isValue.date == null ? "border-red-500" : "border-[#E1E1E1]"
+                                    } focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] `}
                             />
                             <Image
                                 alt=""
@@ -92,14 +103,13 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                         </label>
                         <div className="w-full relative">
                             <DatePicker
-                                selected={isValue.startDate}
+                                selected={isValue.dateRange.startDate}
                                 onChange={(dates) => {
                                     const [start, end] = dates;
-                                    onChangeValue("startDate")(start);
-                                    onChangeValue("endDate")(end);
+                                    onChangeValue("dateRange")({ startDate: start, endDate: end });
                                 }}
-                                startDate={isValue.startDate}
-                                endDate={isValue.endDate}
+                                startDate={isValue.dateRange.startDate}
+                                endDate={isValue.dateRange.endDate}
                                 selectsRange
                                 monthsShown={2}
                                 shouldCloseOnSelect={false}
@@ -108,8 +118,11 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                                 isClearable
                                 clearButtonClassName="mr-6 hover:scale-150 transition-all duration-150 ease-linear"
                                 placeholderText="Ngày - Ngày"
-                                className="py-[8px] px-4 3xl:placeholder:text-sm  xxl:placeholder:text-xs 2xl:placeholder:text-[11px] xl:placeholder:text-[10px] lg:placeholder:text-[9px] text-sm placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
-                            border-[#E1E1E1] focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999] "
+                                className={`${isValue.dateRange.startDate == null && isValue.dateRange.endDate == null
+                                    ? "border-red-500"
+                                    : "border-[#E1E1E1]"
+                                    } py-[8px] px-4 3xl:placeholder:text-sm  xxl:placeholder:text-xs 2xl:placeholder:text-[11px] xl:placeholder:text-[10px] lg:placeholder:text-[9px] text-sm placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
+                                 focus:border-[#0F4F9E] focus:border-1 border  rounded-[6px] z-[999] `}
                             />
 
                             <Image
@@ -121,7 +134,7 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                             />
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                         <input
                             id="auto"
                             type="checkbox"
@@ -138,7 +151,7 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                     </div>
                     <div className="text-red-500 font-normal 3xl:text-base text-sm">
                         Ghi chú: chỉ lấy những phiếu đã duyệt
-                    </div>
+                    </div> */}
                 </div>
                 <div className="flex flex-col gap-2 col-span-6">
                     <div>
@@ -151,8 +164,9 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                             isClearable={true}
                             value={isValue.idBrach}
                             onChange={onChangeValue("idBrach")}
-                            options={[{ label: "hi", value: 1 }]}
-                            className={"w-full"}
+                            options={data.dataBrand}
+                            className={`${isValue.idBrach == null && "border-red-500 border rounded-md"
+                                } w-full z-[999] cursor-pointer`}
                             styles={isBreakpoint}
                         />
                     </div>
@@ -213,26 +227,26 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                     </div>
                     <div>
                         <label
-                            className={`${
-                                tab == "order" ? "bg-sky-200 text-sky-600" : "bg-green-200 text-green-600"
-                            } 3xl:text-sm text-xs font-normal ml-1 py-0.5 px-1 rounded-md`}
+                            className={`${tab == "order" ? "bg-sky-200 text-sky-600" : "bg-green-200 text-green-600"
+                                } 3xl:text-sm text-xs font-normal ml-1 py-0.5 px-1 rounded-md`}
                         >
                             {tab == "order" ? "Đơn hàng bán" : "Kế hoạch nội bộ"}
                         </label>
                         <div className="text-[#344054] font-normal 3xl:text-sm text-xs mt-0.5">
                             <ScrollArea
-                                className="3xl:h-[10.5vh] xxl:h-[8vh] 2xl:h-[12vh] xl:h-[10vh] lg:h-[9vh] h-[10vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
+                                className="3xl:max-h-[10.5vh] xxl:max-h-[8vh] 2xl:max-h-[12vh] xl:max-h-[10vh] lg:max-h-[9vh] max-h-[10vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
                                 speed={1}
                                 smoothScrolling={true}
                             >
-                                <div className="flex items-start justify-start gap-x-4 gap-y-2 flex-wrap">
-                                    {data?.map((e) => (
-                                        <Zoom className="w-fit h-full">
+                                <div className="flex items-center justify-start gap-x-4 gap-y-2 flex-wrap">
+                                    {newArray?.map((e) => (
+                                        <Zoom key={e.idParent} className="w-fit h-full">
                                             <button
-                                                key={e.id}
-                                                onClick={() => handleRemoveBtn(e.id)}
+                                                onClick={() => {
+                                                    handleRemoveBtn(e.idParent);
+                                                }}
                                                 type="button"
-                                                className="bg-[#F3F4F6] h-full rounded-lg outline-none focus:outline-none 3xl:py-2 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
+                                                className="bg-[#F3F4F6] h-full rounded-lg outline-none focus:outline-none 3xl:py-[7px] xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
                                             >
                                                 <div className="flex items-center gap-[10px]">
                                                     <span className="text-[#141522] font-normal 3xl:text-base text-sm">
@@ -249,6 +263,18 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                                             </button>
                                         </Zoom>
                                     ))}
+                                    {newArray?.length > 1 && (
+                                        <Zoom className="w-fit h-full bg-red-200 p-1.5 rounded">
+                                            <Image
+                                                onClick={() => handleRemoveBtn("deleteAll")}
+                                                src={"/productionPlan/trash-2.png"}
+                                                width={24}
+                                                height={24}
+                                                alt=""
+                                                className="object-cover rounded-md  cursor-pointer"
+                                            />
+                                        </Zoom>
+                                    )}
                                 </div>
                             </ScrollArea>
                         </div>

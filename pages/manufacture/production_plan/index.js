@@ -587,14 +587,12 @@ const Index = (props) => {
     const { limit, totalItems, updateTotalItems } = useLimitAndTotalItems(15, {});
 
     const [data, sData] = useState([]);
-
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `${
-                router.query?.tab == "plan"
-                    ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true"
-                    : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"
+            `${router.query?.tab == "plan"
+                ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true"
+                : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"
             }`,
             {
                 params: {
@@ -628,10 +626,13 @@ const Index = (props) => {
                                         desription: s.desription,
                                         status: s.status,
                                         quantity: s.quantity,
+                                        quantityRemaining: s.quantity_rest,
+                                        quantityPlan: s.quantity_plan,
                                         actions: s.actions,
                                         processArr: s.processArr,
                                         unitName: s.unit_name,
                                         checked: check,
+                                        productVariation: s.product_variation,
                                     };
                                 }),
                             };
@@ -647,7 +648,6 @@ const Index = (props) => {
             }
         );
     };
-
     const _ServerFetching_filter = () => {
         Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
@@ -848,13 +848,15 @@ const Index = (props) => {
 
         updatedData.forEach((e) => {
             e.listProducts.forEach((i) => {
-                const checkedState = !i.checked;
-                if (checkedState) {
-                    updatedArrId = [...updatedArrId, i.id];
-                } else {
-                    updatedArrId = updatedArrId.filter((s) => s != i.id);
+                if (i?.quantityRemaining > 0) {
+                    const checkedState = !i.checked;
+                    if (checkedState) {
+                        updatedArrId = [...updatedArrId, i.id];
+                    } else {
+                        updatedArrId = updatedArrId.filter((s) => s != i.id);
+                    }
+                    i.checked = checkedState;
                 }
-                i.checked = checkedState;
             });
         });
 
@@ -886,7 +888,13 @@ const Index = (props) => {
     useEffect(() => {
         const check = data.some((e) => e.listProducts.some((i) => i.checked == true));
         if (check) {
-            setItem("arrData", JSON.stringify(data));
+            const converData = data.flatMap((e) => {
+                return e.listProducts
+                    .filter((i) => i.checked)
+                    .map((i) => ({ ...i, idParent: e.id, nameOrder: e.nameOrder }));
+            });
+
+            setItem("arrData", JSON.stringify(converData));
 
             setItem("tab", router.query?.tab);
         }

@@ -17,7 +17,6 @@ const Expirred = () => {
     const dispatch = useDispatch();
 
     const data = useSelector((state) => state.auth);
-    console.log("data?.fail_expiration", data);
     useEffect(() => {
         sCheckDate(data?.fail_expiration);
         sDate({

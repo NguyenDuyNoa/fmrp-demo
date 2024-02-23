@@ -141,14 +141,24 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.internal_plan_status || "internal_plan_status"}
                                             </h3>
                                             <h3 className=" w-fit">
-                                                <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-0.5 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
+                                                {/* <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-0.5 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
                                                     <TickCircle
                                                         className="bg-lime-500 rounded-full"
                                                         color="white"
                                                         size={15}
                                                     />
                                                     {"Đã lập KHNVL"}
-                                                </span>
+                                                </span> */}
+                                                {data?.internalPlans.status == "1" && (
+                                                    <span className="border text-xs flex justify-center items-center rounded-2xl 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-[68px] 3xl:h-6 2xl:h-6 xl:h-5 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500">
+                                                        Đã Duyệt
+                                                    </span>
+                                                )}
+                                                {data?.internalPlans.status == "0" && (
+                                                    <span className="border text-xs flex justify-center items-center rounded-2xl 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-[68px] 3xl:h-6 2xl:h-6 xl:h-5 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
+                                                        Chưa duyệt
+                                                    </span>
+                                                )}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
