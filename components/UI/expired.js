@@ -14,17 +14,7 @@ const Expirred = () => {
     });
     const [checkDate, sCheckDate] = useState(false);
 
-    // const data = {
-    //     dateStart: moment(new Date()).format("DD/MM/YYYY"),
-    //     dateEnd: 10,
-    // };
     const dispatch = useDispatch();
-    // const startDate = new Date(data.dateStart);
-    // startDate.setDate(startDate.getDate() + data.dateEnd);
-
-    // const formattedEndDate = `${startDate.getDate()}/${
-    //     startDate.getMonth() + 1
-    // }/${startDate.getFullYear()}`;
 
     const data = useSelector((state) => state.auth);
     useEffect(() => {
@@ -35,33 +25,7 @@ const Expirred = () => {
             dateLimit: data?.day_expiration,
         });
     }, [data]);
-    // const _ServerLang = () => {
-    //     Axios(
-    //         "GET",
-    //         `/api_web/Api_Authentication/authentication?csrf_protection=true`,
-    //         {},
-    //         (err, response) => {
-    //             if (!err) {
-    //                 var data = response?.data?.info;
-    //                 sCheckDate(data?.fail_expiration);
-    //                 sDate({
-    //                     dateStart: moment(data?.start_date).format(
-    //                         "DD/MM/YYYY"
-    //                     ),
-    //                     dateEnd: moment(data?.expiration_date).format(
-    //                         "DD/MM/YYYY"
-    //                     ),
-    //                     dateLimit: data?.day_expiration,
-    //                 });
-    //             }
-    //         }
-    //     );
-    // };
-    // useEffect(() => {
-    //     _ServerLang();
-    // }, []);
 
-    const [extend, sExtend] = useState(false);
     const _HandleExtend = () => {
         router.push("/settings/service-information");
     };
@@ -79,17 +43,26 @@ const Expirred = () => {
                 <div className="rounded relative">
                     <div className="flex justify-between items-center bg-gray-100 p-1">
                         <div className="flex items-center gap-1">
-                            <h2 className="font-medium 3xl:text-[14px] 2xl:text-[14px] xl:text-[12px] text-[13px] px-2">
-                                Phiên bản dùng thử dành cho FOSO từ ngày
-                                <span className="mx-1">
-                                    {date?.dateStart} đến ngày {date?.dateEnd}
-                                </span>
-                                sẽ kết thúc sau
-                                <span className="mx-1 font-semibold px-2.5 py-1 bg-gray-200 rounded text-center">
-                                    {date?.dateLimit}
-                                </span>
-                                ngày. Một số tính năng của bạn sẽ bị đóng.
-                            </h2>
+                            {+date?.dateLimit > 0 ?
+                                <h2 className="font-medium 3xl:text-[14px] 2xl:text-[14px] xl:text-[12px] text-[13px] px-2">
+                                    Phiên bản dùng thử dành cho FOSO từ ngày
+                                    <span className="mx-1">
+                                        {date?.dateStart} đến ngày {date?.dateEnd}
+                                    </span>
+                                    sẽ kết thúc sau
+                                    <span className="mx-1 font-semibold px-2.5 py-1 bg-gray-200 rounded text-center">
+                                        {date?.dateLimit}
+                                    </span>
+                                    ngày. Một số tính năng của bạn sẽ bị đóng.
+                                </h2> :
+                                <h2 className="font-medium 3xl:text-[14px] 2xl:text-[14px] xl:text-[12px] text-[13px] px-2">
+                                    Phiên bản dùng thử dành cho FOSO từ ngày
+                                    <span className="mx-1">
+                                        {date?.dateStart} đến ngày {date?.dateEnd} đã hết hạn.
+                                    </span>
+
+                                </h2>
+                            }
                             <NotificationBing size="20" color="red" className="animate-bounce" />
                         </div>
                         <div>

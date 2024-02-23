@@ -144,7 +144,7 @@ const Index = (props) => {
                         label: `${e.item?.item_name} <span style={{display: none}}>${
                             // e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
                             e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
+                            }</span>`,
                         value: e.item?.id,
                     },
                     quantity: +e?.quantity,
@@ -163,9 +163,9 @@ const Index = (props) => {
                 setContactPerson(
                     rResult?.contact_name !== null && rResult?.contact_name !== "0"
                         ? {
-                              label: rResult?.contact_name,
-                              value: rResult?.contact_id,
-                          }
+                            label: rResult?.contact_name,
+                            value: rResult?.contact_id,
+                        }
                         : null
                 );
                 setBranch({
@@ -1157,10 +1157,9 @@ const Index = (props) => {
         ) {
             await Axios(
                 "POST",
-                `${
-                    id
-                        ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`
-                        : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"
+                `${id
+                    ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`
+                    : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"
                 }`,
                 {
                     data: formData,
@@ -1448,17 +1447,17 @@ const Index = (props) => {
                             </h5>
                         </div>
 
-                        <div className="flex flex-row 3xl:gap-8 2xl:gap-3 xl:gap-3 gap-1">
-                            <h5 className="text-gray-400 3xl:w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+                        <div className="flex 3xl:gap-4 2xl:gap-3 xl:gap-3 gap-1">
+                            <h5 className="text-gray-400 3xl:min-w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                 {dataLang[option.e?.text_type]}
                             </h5>
 
                             <div className="flex items-center">
-                                <h5 className="text-gray-400 font-normal 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+                                <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                     {dataLang?.purchase_survive || "purchase_survive"} :
                                 </h5>
 
-                                <h5 className=" font-normal 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+                                <h5 className=" font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                     {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
                                 </h5>
                             </div>
@@ -1590,9 +1589,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.select_branch || "select_branch"}
-                                        className={`${
-                                            errBranch ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                        className={`${errBranch ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         style={{
@@ -1639,9 +1637,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.select_customer || "select_customer"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errCustomer ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errCustomer ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1747,14 +1744,13 @@ const Index = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                         />
                                         {startDate && (
                                             <>
                                                 <MdClear
-                                                    className="absolute 3xl:translate-x-[2800%] 3xl:-translate-y-[2%] translate-x-[2400%] translate-y-[4%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                    className="absolute 3xl:translate-x-[2700%] 3xl:-translate-y-[2%] translate-x-[2400%] translate-y-[4%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
                                                     onClick={() => handleClearDate("startDate")}
                                                 />
                                             </>
@@ -1783,9 +1779,8 @@ const Index = (props) => {
                                         }
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errStaff ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errStaff ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1886,9 +1881,8 @@ const Index = (props) => {
                                             }
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${
-                                                errQuote && quote === null ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            className={`${errQuote && quote === null ? "border border-red-500 rounded-md" : ""
+                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -2450,12 +2444,12 @@ const Index = (props) => {
                                                 value={
                                                     e?.tax
                                                         ? {
-                                                              label: taxOptions.find(
-                                                                  (item) => item.value === e?.tax?.value
-                                                              )?.label,
-                                                              value: e?.tax?.value,
-                                                              tax_rate: e?.tax?.tax_rate,
-                                                          }
+                                                            label: taxOptions.find(
+                                                                (item) => item.value === e?.tax?.value
+                                                            )?.label,
+                                                            value: e?.tax?.value,
+                                                            tax_rate: e?.tax?.tax_rate,
+                                                        }
                                                         : null
                                                 }
                                                 placeholder={"% Thuế"}
@@ -2518,11 +2512,10 @@ const Index = (props) => {
                                                     onChange={(date) =>
                                                         handleOnChangeInputOption(e?.id, "delivery_date", date)
                                                     }
-                                                    className={`${
-                                                        errDeliveryDate && e?.delivery_date === null
-                                                            ? "border-red-500"
-                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
+                                                    className={`${errDeliveryDate && e?.delivery_date === null
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                        } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
                                                 />
                                                 {e?.delivery_date && (
                                                     <>

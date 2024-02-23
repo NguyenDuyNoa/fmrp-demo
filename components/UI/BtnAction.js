@@ -150,7 +150,16 @@ const BtnAction = React.memo((props) => {
             if (props?.status === "approved") {
                 isShow("error", `${props?.dataLang?.sales_product_cant_delete || "sales_product_cant_delete"} `);
             }
-        } else {
+        }
+        // kế hoạch nội bộ
+        else if (props?.id && props?.type === "internal_plan") {
+            if (props?.status !== "1") {
+                confimDelete(typeConfig);
+            } else {
+                isShow("error", `Kế hoạch nội bộ đã được duyệt, không thể xóa. Vui lòng bỏ duyệt để xóa`);
+            }
+        }
+        else {
             confimDelete(typeConfig);
         }
 
@@ -227,9 +236,8 @@ const BtnAction = React.memo((props) => {
             if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
                 isShow(
                     "error",
-                    `${
-                        (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-                        (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
+                    `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
+                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
                     }`
                 );
             } else {
@@ -241,11 +249,18 @@ const BtnAction = React.memo((props) => {
             if (props?.warehouseman_id != "0" || props?.status_pay != "not_spent") {
                 isShow(
                     "error",
-                    `${
-                        (props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit) ||
-                        (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
+                    `${(props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit) ||
+                    (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
                     }`
                 );
+            } else {
+                handleQueryPage();
+            }
+        }
+        // kế hoạch nội bộ
+        if (!!props?.id && props?.type === "internal_plan") {
+            if (props?.status == "1") {
+                isShow("error", `Kế hoạch nội bộ đã được duyệt. Không thể sửa`);
             } else {
                 handleQueryPage();
             }
@@ -260,7 +275,6 @@ const BtnAction = React.memo((props) => {
             "returns",
             "deliveryReceipt",
             "returnSales",
-            "internal_plan",
             "serviceVoucher",
         ];
 
@@ -502,9 +516,8 @@ const BtnAction = React.memo((props) => {
                         ) : (
                             <button
                                 onClick={() => handleQueryId({ id: props?.id, status: true })}
-                                className={`group transition-all ease-in-out flex items-center ${
-                                    props.type == "sales_product" ? "" : "justify-center"
-                                } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                className={`group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
+                                    } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                             >
                                 <RiDeleteBin6Line
                                     size={20}

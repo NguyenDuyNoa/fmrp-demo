@@ -3517,7 +3517,7 @@ const Popup_Bom = React.memo((props) => {
     const [tab, sTab] = useState(null);
 
     const [selectedList, sSelectedList] = useState(null);
-
+    console.log("selectedList", selectedList);
     const [dataTypeCd, sDataTypeCd] = useState([]);
     const [dataCd, sDataCd] = useState([]);
 
@@ -3724,35 +3724,40 @@ const Popup_Bom = React.memo((props) => {
         console.log("inputValue", inputValue);
         console.log("value", value);
         console.log("id", id);
-        Axios(
-            "POST",
-            `/api_web/api_product/searchItemsVariants?csrf_protection=true`,
-            {
-                data: {
-                    term: type,
-                    type: inputValue?.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var data = response?.data?.data.items;
-                    var getdata = data?.map((item) => ({
-                        label: item.name,
-                        value: item.id,
-                        product_variation: item?.product_variation,
-                    }));
-                    const newDb = dataSelectedVariant.map((e) => ({
-                        ...e,
-                        child: e.child.map((ce, ceIndex) => ({
-                            ...ce,
-                            dataName: ceIndex === childIndex ? getdata : ce.dataName,
-                        })),
-                    }));
+        setTimeout(() => {
+            type != "" &&
+                Axios(
+                    "POST",
+                    `/api_web/api_product/searchItemsVariants?csrf_protection=true`,
+                    {
+                        data: {
+                            term: type,
+                            type: inputValue?.value,
+                        },
+                    },
+                    (err, response) => {
+                        if (!err) {
+                            var data = response?.data?.data.items;
+                            var getdata = data?.map((item) => ({
+                                label: item.name,
+                                value: item.id,
+                                product_variation: item?.product_variation,
+                            }));
+                            console.log("dataSelectedVariant", dataSelectedVariant);
+                            const newDb = dataSelectedVariant.map((e) => ({
+                                ...e,
+                                child: e.child.map((ce, ceIndex) => ({
+                                    ...ce,
+                                    dataName: getdata,
+                                    // dataName: ceIndex === childIndex ? getdata : ce.dataName,
+                                })),
+                            }));
 
-                    sDataSelectedVariant(newDb);
-                }
-            }
-        );
+                            sDataSelectedVariant(newDb);
+                        }
+                    }
+                );
+        }, 500);
     };
     const _HandleChangeItemBOM = (parentId, childId, type, value) => {
         const newData = dataSelectedVariant.map((parent) => {

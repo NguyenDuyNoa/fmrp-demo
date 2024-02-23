@@ -1,48 +1,62 @@
-import React, {useState} from "react";
 import Head from "next/head";
+import React, { useEffect, useState } from "react";
 
 import { ListBtn_Setting } from "./information";
 
-import {Money2 as IconMoney, Refresh as IconRefresh, Clock as IconClock} from "iconsax-react"
+import { Money2 as IconMoney, Refresh as IconRefresh, Clock as IconClock } from "iconsax-react"
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
-    const listPackage = [
-        {
-            id: 1,
-            title: "Hạn mức",
-            package: "Start Up",
-            team: "Không giới hạn",
-            schedule: "Không giới hạn",
-            member: "Không giới hạn",
-            capacity: 3213211,
-            expDate: "12/12/2023"
-        },{
-            id: 2,
-            title: "đang dùng",
-            package: "Start Up",
-            team: "2",
-            schedule: "",
-            member: "",
-            capacity: 168,
-            expDate: "12/12/2023"
-        }
-    ]
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
-    return ( 
+    const { isMoment } = formatMoment()
+
+    const trangthaiExprired = useStatusExprired()
+
+    const auth = useSelector((state) => state?.auth);
+    console.log("auth", auth);
+
+    const initialPackage = {
+        title: "Dùng thử",
+        package: "Start Up",
+        idPackageService: 1,
+        idStatus: 1,
+        status: "Sắp hết hạn",
+        member: "10 người",
+        capacity: 3213211,
+        expDate: "12/12/2023"
+    }
+
+
+    const [listPackage, setListPackage] = useState(initialPackage);
+
+    useEffect(() => {
+        setListPackage({
+            title: auth?.trial == "1" ? 'Dùng thử' : "Có phí",
+            package: auth?.name_package_service,
+            idPackageService: +auth?.id_package_service,
+            status: auth?.status_active_package?.name,
+            idStatus: +auth?.status_active_package?.status,
+            member: auth?.number_of_users,
+            capacity: +auth?.memory_storage,
+            expDate: isMoment(auth?.expiration_date, 'DD/MM/YYYY')
+        })
+    }, [auth])
+
+    return (
         <>
             <Head>
                 <title>Thông tin dịch vụ FMRP</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 min-h-screen">
-            {trangthaiExprired ?<div className='p-2'></div>:
-                <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                    <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
-                    <span className="text-[#141522]/40">/</span>
-                    <h6>Thông Tin Dịch Vụ FMRP</h6>
-                </div>}
+                {trangthaiExprired ? <div className='p-2'></div> :
+                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>Thông Tin Dịch Vụ FMRP</h6>
+                    </div>}
                 <div className="grid grid-cols-9 gap-5 h-[99%]">
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
@@ -50,28 +64,30 @@ const Index = (props) => {
                     <div className="col-span-7">
                         <h2 className="text-2xl text-[#52575E]">Thông Tin Dịch Vụ FMRP</h2>
                         <h3 className='text-[15px] uppercase w-full p-3 rounded bg-[#ECF0F4] flex items-center space-x-3 mt-3'>Gói đang sử dụng</h3>
-                        <div className="grid grid-cols-7 py-3 mt-5 gap-5 border-b border-[#e7eaee]">
-                            <label className="col-start-2 uppercase text-[#667085] font-[400] text-center 2xl:text-base text-[13px]">gói</label>
-                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">team</label>
-                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">kế hoạch/team</label>
-                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">thành viên/team</label>
-                            <label className="uppercase text-[#667085] font-[400] text-right 2xl:text-base text-[13px]">dung lượng (mb)</label>
-                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">hạn sử dụng</label>
+                        <div className="grid grid-cols-6 py-3 mt-5 gap-5 border-b border-[#e7eaee]">
+                            <div className="col-span-1 uppercase text-[#667085] font-[400] 2xl:text-base text-[13px] text-center">Hình thức</div>
+                            <div className="col-start-2 uppercase text-[#667085] font-[400] 2xl:text-base text-[13px] text-center">gói</div>
+                            <div className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px] text-center">Trạng thái</div>
+                            <div className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px] text-center">thành viên/team</div>
+                            <div className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px] text-right">dung lượng (mb)</div>
+                            <div className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px] text-center">hạn sử dụng</div>
                         </div>
                         <div className="divide-y divide-[#e7eaee]">
-                            {listPackage?.map(e => 
-                                <div key={e?.id?.toString()} className="grid grid-cols-7 gap-5 py-3">
-                                    <label className="capitalize font-[400] pl-4">{e?.title}</label>
-                                    <div className="flex justify-center">
-                                        <label className="font-[400] w-fit px-3 py-0.5 border-2 border-[#5599EC] bg-[#EBF5FF] text-[#5599EC] rounded-lg">{e?.package}</label>
-                                    </div>
-                                    <label className=" font-[400]">{e?.team}</label>
-                                    <label className=" font-[400]">{e?.schedule?.length > 0 ? e?.schedule : "-"}</label>
-                                    <label className=" font-[400]">{e?.member?.length > 0 ? e?.schedule : "-"}</label>
-                                    <label className=" font-[400] text-right">{e?.capacity?.toLocaleString()}</label>
-                                    <label className=" font-[400] ">{e?.expDate}</label>
+                            <div className="grid grid-cols-6 gap-5 py-3">
+                                <div className="capitalize font-[400] text-center">{listPackage?.title}</div>
+                                <div className="flex justify-center">
+                                    <div className={`font-[400] w-fit px-3 py-0.5 border-2 
+                                    ${listPackage?.idPackageService == 1 && "border-[#5599EC] bg-[#EBF5FF] text-[#5599EC]" ||
+                                        listPackage?.idPackageService == 2 && "border-green-400 bg-green-200 text-green-500" ||
+                                        listPackage?.idPackageService == 3 && "border-orange-400 bg-orange-200 text-orange-500"} rounded-lg`}
+                                    >
+                                        {listPackage?.package}</div>
                                 </div>
-                            )}
+                                <div className={`${listPackage?.idStatus == 3 && "text-red-500" || listPackage?.idStatus == 1 && "text-green-500" || listPackage?.idStatus == 2 && "text-orange-500"} font-[400] text-center`}>{listPackage?.status ? listPackage?.status : "-"}</div>
+                                <div className=" font-[400] text-center">{listPackage?.member?.length > 0 ? listPackage?.member : "-"}</div>
+                                <div className=" font-[400] text-right">{listPackage?.capacity?.toLocaleString()}</div>
+                                <div className=" font-[400] text-center">{listPackage?.expDate}</div>
+                            </div>
                         </div>
                         <div className="flex space-x-4 mt-4">
                             <button className="px-5 py-3 rounded-md border border-[#d0d5dd] flex space-x-2">
@@ -89,7 +105,7 @@ const Index = (props) => {
                         </div>
                         <h3 className='mt-5 text-[15px] uppercase w-full p-3 rounded bg-gradient-to-r from-[#1556D9] to-[#8FE8FA] text-white flex items-center space-x-3'>bảng giá</h3>
                         <div className="mt-6 grid grid-cols-3">
-                            <PriceItem 
+                            <PriceItem
                                 title={<h4 className="text-white bg-[#5599EC] px-3.5 py-1.5 rounded-full w-fit">Start Up</h4>}
                                 price={"899.000"}
                                 minimum={"1 NĂM"}
@@ -119,7 +135,7 @@ const Index = (props) => {
                                     </ul>
                                 }
                             />
-                            <PriceItem 
+                            <PriceItem
                                 title={<h4 className="text-white bg-[#0BAA2E] px-3.5 py-1.5 rounded-full w-fit">Professional</h4>}
                                 price={"1.200.000"}
                                 minimum={"6 THÁNG"}
@@ -149,7 +165,7 @@ const Index = (props) => {
                                     </ul>
                                 }
                             />
-                            <PriceItem 
+                            <PriceItem
                                 title={<h4 className="text-white bg-[#FF8F0D] px-3.5 py-1.5 rounded-full w-fit">Premium</h4>}
                                 price={"1.600.000"}
                                 minimum={"6 THÁNG"}
@@ -308,27 +324,27 @@ const PriceItem = React.memo((props) => {
     const [onHover, sOnHover] = useState(false);
     const _OnHoverItem = (e) => sOnHover(e);
 
-    return(
-        <div onMouseLeave={_OnHoverItem.bind(this, false)} onMouseOver={_OnHoverItem.bind(this, true)} className={`${onHover ? "bg-[#48BDFF0F]/[0.06]" : "bg-white" } py-4 rounded-lg transition duration-200`}>
+    return (
+        <div onMouseLeave={_OnHoverItem.bind(this, false)} onMouseOver={_OnHoverItem.bind(this, true)} className={`${onHover ? "bg-[#48BDFF0F]/[0.06]" : "bg-white"} py-4 rounded-lg transition duration-200`}>
             <div className="flex justify-center">
                 {props.title}
             </div>
             <h5 className="mt-3 text-2xl text-[#0F4F9E] justify-center font-bold flex items-start">{props.price}<span className="text-sm">/tháng</span></h5>
-            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-3`} />
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]"} w-full h-1 border-t border-dashed mt-3`} />
             <h6 className="mt-4 text-[#52575E] font-[400] text-center">MUA TỐI THIỂU {props.minimum}</h6>
-            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-4`} />
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]"} w-full h-1 border-t border-dashed mt-4`} />
             {props.content1}
-            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-4`} />
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]"} w-full h-1 border-t border-dashed mt-4`} />
             <div className="mt-4 px-6">
                 <h6 className="text-[#5599EC] uppercase text-lg">tính năng phần mềm</h6>
                 {props.content2}
             </div>
-            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-5`} />
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]"} w-full h-1 border-t border-dashed mt-5`} />
             <div className="flex justify-center my-6">
-                <button className={`${onHover ? "border-transparent bg-[#0F4F9E] text-white" : "border-[#D0D5DD] bg-white text-[#344054]" } transition duration-200 w-[80%] py-3 border rounded-md`}>Mua ngay</button>
+                <button className={`${onHover ? "border-transparent bg-[#0F4F9E] text-white" : "border-[#D0D5DD] bg-white text-[#344054]"} transition duration-200 w-[80%] py-3 border rounded-md`}>Mua ngay</button>
             </div>
         </div>
     )
 })
- 
+
 export default Index;
