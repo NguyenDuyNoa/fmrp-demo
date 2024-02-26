@@ -521,13 +521,14 @@ const BodyGantt = ({
                                                                                                 (ci.active &&
                                                                                                     !ci.outDate &&
                                                                                                     "#bae6fd"),
+                                                                                            transform: "translateY(130%)",
                                                                                         }}
                                                                                         trigger={
                                                                                             <div
                                                                                                 className={`${ci.active && !ci.outDate
                                                                                                     ? "bg-[#5599EC] hover:bg-sky-200"
                                                                                                     : ""
-                                                                                                    }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
+                                                                                                    }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out`}
                                                                                             >
                                                                                                 {/* <div
                                                                                                 className={`${!ci.active && !ci.outDate
@@ -540,6 +541,7 @@ const BodyGantt = ({
                                                                                         }
                                                                                         position="top center"
                                                                                         on={["hover", "focus"]}
+
                                                                                     >
                                                                                         <div
                                                                                             className={`flex flex-col ${(!ci.active &&
@@ -548,7 +550,7 @@ const BodyGantt = ({
                                                                                                 (ci.active &&
                                                                                                     !ci.outDate &&
                                                                                                     "bg-sky-200")
-                                                                                                } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
+                                                                                                } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize -translate-y-[40%]`}
                                                                                         >
                                                                                             {ci.date}
                                                                                         </div>
