@@ -1449,6 +1449,7 @@ const MainTable = ({ dataLang }) => {
                         queryState({
                             listDataRight: {
                                 ...dataTable.listDataRight,
+                                title: "Không có kế hoạch NVL",
                                 dataPPItems: [],
                                 dataBom: {
                                     productsBom: [],
