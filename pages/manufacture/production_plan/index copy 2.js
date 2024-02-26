@@ -84,7 +84,10 @@ const Index = (props) => {
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `${router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"}`,
+            `${router.query?.tab == "plan"
+                ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true"
+                : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"
+            }`,
             {
                 params: {
                     page: router.query?.page || 1,
@@ -120,13 +123,15 @@ const Index = (props) => {
                                         quantityRemaining: s.quantity_rest,
                                         quantityPlan: s.quantity_plan,
                                         actions: s.actions,
-                                        processArr: s?.processArr?.items.map(j => {
-                                            return {
-                                                id: uuid(),
-                                                date: isMoment(j?.date, 'DD/MM/YYYY'),
-                                                active: j?.active,
-                                            }
-                                        }),
+                                        // processArr: s.processArr?.map(j => {
+                                        //     return {
+                                        //         month: isMoment(i?.month_year, 'MM'),
+                                        //         days: j?.days?.map(k => {
+                                        //             return { id: isMoment(k?.date, 'DD'), type: "t2", active: k?.active, outDate: k?.outDate }
+                                        //         })
+                                        //     }
+                                        // }),
+                                        processArr: [],
                                         unitName: s.unit_name,
                                         checked: check,
                                         productVariation: s.product_variation,
@@ -142,8 +147,8 @@ const Index = (props) => {
                                 days: e?.days?.map(i => {
                                     return {
                                         id: uuid(),
-                                        day: `${i?.day_name} ${isMoment(i?.date, 'DD')}`,
-                                        date: isMoment(i?.date, 'DD/MM/YYYY')
+                                        day: `${i?.day_name} ${i?.day_of_week}`,
+                                        type: i?.day_name,
                                     }
                                 })
                             }
@@ -163,6 +168,7 @@ const Index = (props) => {
         Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 let { rResult } = response?.data;
+
                 updateData({ client: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
             }
         });
@@ -170,6 +176,7 @@ const Index = (props) => {
         Axios("GET", "api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 let { rResult } = response?.data;
+
                 updateData({
                     productGroup: rResult.map((e) => ({
                         label: `${e.name + " " + "(" + e.code + ")"}`,
@@ -208,7 +215,8 @@ const Index = (props) => {
 
             searchTimeout = setTimeout(() => {
                 Axios(
-                    "POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+                    "POST",
+                    `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
                     {
                         params: {
                             "filter[branch_id]": 0,
@@ -237,18 +245,42 @@ const Index = (props) => {
         e,
     }));
 
-    const sortArrayByDay = (arr, timeLine) => {
-        return timeLine.flatMap((month) => {
-            return month.days.map((timelineDay) => {
-                const matchingDay = arr.find((day) => day.date === timelineDay.date);
-                return matchingDay ? matchingDay : { ...timelineDay, active: false };
-            });
+    const sortArrayByMonth = (arr) => {
+        return [...Array(12)].map((_, index) => {
+            const crrItem = arr.find((p) => p.month === index + 1);
+
+            if (crrItem) {
+                return crrItem;
+            }
+
+            return { month: index + 1 };
         });
     };
 
-    const updateListProducts = (order, timeLine) => {
+    const sortArrayByDay = (arr) => {
+        return arr.map((i) => {
+            const check = [...Array(7)].map((_, index) => {
+                const crrItem = i.days?.find((p) => p.id == index + 1);
+
+                if (crrItem) {
+                    return crrItem;
+                }
+
+                return { id: index + 1, active: false };
+            });
+
+            return {
+                ...i,
+                days: check,
+            };
+        });
+    };
+
+    const updateListProducts = (order) => {
         const newDb = order.listProducts.map((product) => {
-            const newArrDays = sortArrayByDay(product.processArr, timeLine);
+            const newArrMonth = product.processArr?.length > 0 ? sortArrayByMonth(product.processArr) : [];
+
+            const newArrDays = sortArrayByDay(newArrMonth);
             const check = arrIdChecked.includes(product.id);
             return {
                 ...product,
@@ -259,18 +291,19 @@ const Index = (props) => {
         return newDb;
     };
 
-    const updateProcessDefault = (order, timeLine) => {
+    const updateProcessDefault = (order) => {
+        const processDefault = sortArrayByMonth(order.processDefault);
 
-        const processDefaultUpdate = sortArrayByDay(order.processDefault, timeLine);
+        const processDefaultUpdate = sortArrayByDay(processDefault);
 
         return processDefaultUpdate;
     };
 
     const updateListOrder = useMemo(() => {
-        return (listOrder, timeLine) => {
+        return (listOrder) => {
             return listOrder?.map((order) => {
-                const updatedListProducts = updateListProducts(order, timeLine);
-                const processDefaultUpdate = updateProcessDefault(order, timeLine);
+                const updatedListProducts = updateListProducts(order);
+                const processDefaultUpdate = updateProcessDefault(order);
 
                 return {
                     ...order,
@@ -351,9 +384,9 @@ const Index = (props) => {
     const handleSort = () => sIsSort(isSort == "reference_no" ? "-reference_no" : "reference_no");
 
     useEffect(() => {
-        const istOrders = updateListOrder(isData.listOrder, isData.timeLine);
+        const istOrders = updateListOrder(isData.listOrder);
         sData(istOrders);
-    }, [isData.listOrder, isData.timeLine]);
+    }, [isData.listOrder]);
 
     useEffect(() => {
         isFetching && _ServerFetching();

@@ -33,6 +33,11 @@ const BodyGantt = ({
     const container2Ref = useRef();
     const container3Ref = useRef();
 
+    //chiều cao của mặt hàng 
+
+    const heightItems = useRef(null)
+
+
     const { getItem } = FnlocalStorage();
 
     const handleScroll = (e) => {
@@ -52,6 +57,10 @@ const BodyGantt = ({
     const tab = getItem("tab");
 
     const [checkCkecked, sCheckCkecked] = useState(false);
+
+
+    console.log("daaa", data);
+
 
     useEffect(() => {
         sCheckCkecked(false);
@@ -131,36 +140,25 @@ const BodyGantt = ({
                                     </div>
                                     <div onClick={() => handleSort()} className="flex-col flex gap-1 cursor-pointer ">
                                         <Image
-                                            alt={
-                                                !isSort
-                                                    ? "/productionPlan/Shapedow.png"
-                                                    : "/productionPlan/Shapedrop.png"
+                                            alt={!isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"
                                             }
                                             width={7}
                                             height={4}
                                             src={
-                                                !isSort
-                                                    ? "/productionPlan/Shapedow.png"
-                                                    : "/productionPlan/Shapedrop.png"
+                                                !isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"
                                             }
-                                            className={`${isSort ? "" : "rotate-180"
-                                                } object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                            className={`${isSort ? "" : "rotate-180"} object-cover hover:scale-110 transition-all ease-linear duration-200`}
                                         />
                                         <Image
                                             alt={
-                                                isSort
-                                                    ? "/productionPlan/Shapedow.png"
-                                                    : "/productionPlan/Shapedrop.png"
+                                                isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"
                                             }
                                             width={7}
                                             height={4}
                                             src={
-                                                isSort
-                                                    ? "/productionPlan/Shapedow.png"
-                                                    : "/productionPlan/Shapedrop.png"
+                                                isSort ? "/productionPlan/Shapedow.png" : "/productionPlan/Shapedrop.png"
                                             }
-                                            className={`${!isSort ? "rotate-180" : ""
-                                                } object-cover hover:scale-110 transition-all ease-linear duration-200`}
+                                            className={`${!isSort ? "rotate-180" : ""} object-cover hover:scale-110 transition-all ease-linear duration-200`}
                                         />
                                     </div>
                                 </div>
@@ -197,7 +195,7 @@ const BodyGantt = ({
                                                     </h1>
                                                     {iIndex == e.days.length - 1 ? (
                                                         <h1
-                                                            className={`bg-[#5599EC] my-0.5  px-1 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
+                                                            className={`bg-[#5599EC] my-0.5  px-2.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
                                                         >
                                                             {parts[1]}
                                                         </h1>
@@ -219,14 +217,14 @@ const BodyGantt = ({
                     {isFetching ? (
                         <Loading />
                     ) : (
-                        <div className="flex  items-center divide-x">
+                        <div className="flex divide-x">
                             <div
                                 ref={container3Ref}
                                 onScroll={handleScrollContainer2}
                                 className="flex-col min-w-[35%] w-[35%]  overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
-                            3xl:h-[60vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
+                            3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                             >
-                                {data?.map((e, eIndex) => {
+                                {data?.map((e) => {
                                     const outDate = ["outDate"].includes(e.status);
                                     const processing = ["processing"].includes(e.status);
                                     const sussces = ["sussces"].includes(e.status);
@@ -246,8 +244,7 @@ const BodyGantt = ({
                                                                 width={7}
                                                                 height={4}
                                                                 src={"/productionPlan/Shapedow.png"}
-                                                                className={`${e.show ? "rotate-0 t" : "-rotate-90 "
-                                                                    } object-cover duration-500 col-span-1 mx-auto  transition-all ease-in-out`}
+                                                                className={`${e.show ? "rotate-0 t" : "-rotate-90 "} object-cover duration-500 col-span-1 mx-auto  transition-all ease-in-out`}
                                                             />
                                                             <div className="grid grid-cols-11 col-span-11 w-full items-center gap-2">
                                                                 <h2
@@ -275,12 +272,9 @@ const BodyGantt = ({
                                                                     <h3
                                                                         className={`${(outDate &&
                                                                             "text-[#EE1E1E] border-[#EE1E1E] bg-[#FFEEF0]") ||
-                                                                            (processing &&
-                                                                                "text-[#3276FA] border-[#3276FA] bg-[#EBF5FF]") ||
-                                                                            (sussces &&
-                                                                                "text-[#0BAA2E] border-[#0BAA2E] bg-[#EBFEF2]") ||
-                                                                            (unfulfilled &&
-                                                                                "text-[#FF8F0D] border-[#FF8F0D] bg-[#fef3c7]")
+                                                                            (processing && "text-[#3276FA] border-[#3276FA] bg-[#EBF5FF]") ||
+                                                                            (sussces && "text-[#0BAA2E] border-[#0BAA2E] bg-[#EBFEF2]") ||
+                                                                            (unfulfilled && "text-[#FF8F0D] border-[#FF8F0D] bg-[#fef3c7]")
                                                                             } 3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal  py-0.5 px-2 rounded-lg border`}
                                                                     >
                                                                         {e.process}
@@ -292,10 +286,7 @@ const BodyGantt = ({
 
                                                     {e.show &&
                                                         e.listProducts.map((i, iIndex) => (
-                                                            <label
-                                                                key={i.id}
-                                                                htmlFor={i.id}
-                                                                className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2`}
+                                                            <label ref={heightItems} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-[50px]`}
                                                             >
                                                                 <div className="col-span-1 mx-auto">
                                                                     <button
@@ -303,11 +294,7 @@ const BodyGantt = ({
                                                                         id={i.id}
                                                                         onClick={async () => {
                                                                             if (i?.quantityRemaining == 0) {
-                                                                                showToast(
-                                                                                    "error",
-                                                                                    "Vui lòng chọn đơn hàng có số lượng còn lại lớn hơn 0",
-                                                                                    4000
-                                                                                );
+                                                                                showToast("error", "Vui lòng chọn đơn hàng có số lượng còn lại lớn hơn 0", 4000);
                                                                                 return;
                                                                             }
                                                                             await handleCheked(e.id, i.id);
@@ -376,17 +363,14 @@ const BodyGantt = ({
                             <div
                                 ref={container1Ref}
                                 onScroll={handleScroll}
-                                className="flex-col  overflow-x-auto  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
+                                className="flex-col w-full overflow-x-auto  overflow-y-auto scrollbar-thin   scrollbar-thumb-slate-300 scrollbar-track-slate-100
                              3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                             >
-                                {/* {data?.map((e, eIndex) => {
+                                {data?.map((e, eIndex) => {
                                     return (
-                                        <div key={e.id} className="">
-                                            <div
-                                                className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3
-                                                        ? "py-3"
-                                                        : "py-2"
-                                                    }  h-[41px]`}
+                                        <>
+                                            {/* <div
+                                                className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[41px]`}
                                             >
                                                 <div className="flex gap-1 items-center ">
                                                     <p className="text-[#11315B]  3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal">
@@ -405,17 +389,11 @@ const BodyGantt = ({
                                                     )}
                                                 </div>
                                                 <div className="flex items-center ">
-                                                    {e.processDefault.map((ce, ceIndex) => {
-                                                        return ce.days.map((ci, ciIndex) => {
+                                                    {e.processDefault.map((ce) => {
+                                                        return ce.days.map((ci) => {
                                                             return (
-                                                                <div
-                                                                    key={ci.id}
-                                                                    className={`w-[80px] flex items-center`}
-                                                                >
-                                                                    <div
-                                                                        className={`${ci.active ? "bg-[#D0D5DD]" : ""
-                                                                            } py-1 w-[80px] `}
-                                                                    ></div>
+                                                                <div key={ci.id} className={`w-[80px] flex items-center`}>
+                                                                    <div className={`${ci.active ? "bg-[#D0D5DD]" : ""} py-1 w-[80px] `}></div>
                                                                 </div>
                                                             );
                                                         });
@@ -428,54 +406,35 @@ const BodyGantt = ({
                                                     return (
                                                         <div
                                                             key={i.id}
-                                                            className={`${i.name?.split(" ")?.length > 3 ? "my-3" : "my-2"
-                                                                } flex  w-[65%] h-[35px] my-2`}
-                                                        >
-                                                            {i.processArr.map((ce, ceIndex) => {
-                                                                return ce.days.map((ci, ciIndex) => {
+                                                            className={`${i.name?.split(" ")?.length > 3 ? "mt-3" : "mt-2"} flex items-center  w-[65%] h-[40px]`}>
+                                                            {i.processArr.map((ce) => {
+                                                                return ce.days.map((ci) => {
                                                                     return (
-                                                                        <div key={ci.id} className={`w-[80px] `}>
+                                                                        <div key={ci.id} className={`w-[80px]`}>
                                                                             <Popup
                                                                                 className="popover-productionPlan"
                                                                                 arrow={true}
                                                                                 arrowStyle={{
-                                                                                    color:
-                                                                                        (ci.active &&
-                                                                                            !ci.outDate &&
-                                                                                            "#fecaca") ||
-                                                                                        (ci.active &&
-                                                                                            ci.outDate &&
-                                                                                            "#bae6fd"),
+                                                                                    color: (ci.active && !ci.outDate && "#fecaca") || (ci.active && ci.outDate && "#bae6fd"),
                                                                                 }}
                                                                                 trigger={
                                                                                     <div
                                                                                         className={`${ci.active && ci.outDate
-                                                                                                ? "bg-[#5599EC] hover:bg-sky-200"
-                                                                                                : ""
-                                                                                            }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
+                                                                                            ? "bg-[#5599EC] hover:bg-sky-200" : ""}  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
                                                                                     >
                                                                                         <div
-                                                                                            className={`${ci.active && !ci.outDate
-                                                                                                    ? "bg-[#EE1E1E] hover:bg-red-200"
-                                                                                                    : ""
-                                                                                                } 
-                                                                                 h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}
-                                                                                        ></div>
+                                                                                            className={`${ci.active && !ci.outDate ? "bg-[#EE1E1E] hover:bg-red-200" : ""} 
+                                                                                        h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}></div>
                                                                                     </div>
                                                                                 }
                                                                                 position="top center"
                                                                                 on={["hover", "focus"]}
                                                                             >
                                                                                 <div
-                                                                                    className={`flex flex-col ${(ci.active &&
-                                                                                            !ci.outDate &&
-                                                                                            "bg-red-200") ||
-                                                                                        (ci.active &&
-                                                                                            ci.outDate &&
-                                                                                            "bg-sky-200")
+                                                                                    className={`flex flex-col ${(ci.active && !ci.outDate && "bg-red-200") || (ci.active && ci.outDate && "bg-sky-200")
                                                                                         } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
                                                                                 >
-                                                                                    {ci.type}
+                                                                                    {ci.date}
                                                                                 </div>
                                                                             </Popup>
                                                                         </div>
@@ -484,10 +443,129 @@ const BodyGantt = ({
                                                             })}
                                                         </div>
                                                     );
-                                                })}
-                                        </div>
+                                                })} */}
+
+                                            <div key={e.id} className={``}>
+                                                <div className={`${!e.show ? "my-1" : "mt-1"}`}>
+                                                    <div
+                                                        className={`${e.listProducts[eIndex]?.name.split(" ")?.length > 3 ? "py-3" : "py-2"}  h-[37px]`}
+                                                    >
+                                                        {/* <div className="flex gap-1 items-center ">
+                                                            <p className="text-[#11315B]  3xl:text-xs  xxl:text-[9px] 2xl:text-[10px] xl:text-[10px] lg:text-[9px] text-[13px] font-normal">
+                                                                {e.nameOrder}
+                                                            </p>
+                                                            {e.status == "sussces" && (
+                                                                <div className="w-[18px] h-[18px]">
+                                                                    <Image
+                                                                        src={"/productionPlan/tick-circle.png"}
+                                                                        width={36}
+                                                                        height={36}
+                                                                        alt="hii"
+                                                                        className="object-cover w-full h-full"
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div> */}
+                                                        {/* <div className="flex items-center ">
+                                                            {e.processDefault.map((ce) => {
+                                                                <div key={ce.id} className={`w-[80px] flex items-center`}>
+                                                                    <div className={`${ce.active ? "bg-[#D0D5DD]" : ""} py-1 w-[80px] `}></div>
+                                                                </div>
+                                                            })}
+                                                        </div> */}
+                                                    </div>
+
+                                                    {e.show &&
+                                                        e.listProducts.map((i, iIndex) => {
+                                                            return (
+                                                                <div
+                                                                    key={i.id}
+                                                                    className={`flex items-center  w-[65%] my-2 h-[50px]`} id={`div-${i.id}`}>
+                                                                    {i.processArr.map((ci) => {
+                                                                        return (
+                                                                            <div key={ci?.id} className={`w-[80px]`}>
+                                                                                {/* <Popup
+                                                                                    className="popover-productionPlan"
+                                                                                    arrow={true}
+                                                                                    arrowStyle={{
+                                                                                        color: (!ci?.active && "#fecaca") || (ci?.active && "#bae6fd"),
+                                                                                    }}
+                                                                                    trigger={
+                                                                                        <div
+                                                                                            className={`${ci?.active ? "bg-[#5599EC] hover:bg-sky-200" : ""}  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
+                                                                                        >
+                                                                                            <div
+                                                                                                className={`${!ci?.active ? "bg-[#EE1E1E] hover:bg-red-200" : ""} 
+                                                                                        h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}></div>
+                                                                                        </div>
+                                                                                    }
+                                                                                    position="top center"
+                                                                                    on={["hover", "focus"]}
+                                                                                >
+                                                                                    <div
+                                                                                        className={`flex flex-col ${(!ci?.active && "bg-red-200") || (ci?.active && "bg-sky-200")
+                                                                                            } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
+                                                                                    >
+                                                                                        {ci?.date}
+                                                                                    </div>
+                                                                                </Popup> */}
+                                                                                {ci.active && !ci.outDate ?
+                                                                                    <Popup
+                                                                                        className="popover-productionPlan"
+                                                                                        arrow={true}
+                                                                                        arrowStyle={{
+                                                                                            color:
+                                                                                                (!ci.active &&
+                                                                                                    !ci.outDate &&
+                                                                                                    "#fecaca") ||
+                                                                                                (ci.active &&
+                                                                                                    !ci.outDate &&
+                                                                                                    "#bae6fd"),
+                                                                                        }}
+                                                                                        trigger={
+                                                                                            <div
+                                                                                                className={`${ci.active && !ci.outDate
+                                                                                                    ? "bg-[#5599EC] hover:bg-sky-200"
+                                                                                                    : ""
+                                                                                                    }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
+                                                                                            >
+                                                                                                {/* <div
+                                                                                                className={`${!ci.active && !ci.outDate
+                                                                                                    ? "bg-[#EE1E1E] hover:bg-red-200"
+                                                                                                    : ""
+                                                                                                    } 
+                                                                                 h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}
+                                                                                            ></div> */}
+                                                                                            </div>
+                                                                                        }
+                                                                                        position="top center"
+                                                                                        on={["hover", "focus"]}
+                                                                                    >
+                                                                                        <div
+                                                                                            className={`flex flex-col ${(!ci.active &&
+                                                                                                !ci.outDate &&
+                                                                                                "bg-red-200") ||
+                                                                                                (ci.active &&
+                                                                                                    !ci.outDate &&
+                                                                                                    "bg-sky-200")
+                                                                                                } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
+                                                                                        >
+                                                                                            {ci.date}
+                                                                                        </div>
+                                                                                    </Popup> : <div className="w-[80px] h-[20px]"></div>
+                                                                                }
+                                                                            </div>
+                                                                        );
+                                                                    })}
+
+                                                                </div>
+                                                            );
+                                                        })}
+                                                </div>
+                                            </div>
+                                        </>
                                     );
-                                })} */}
+                                })}
                             </div>
                         </div>
                     )}

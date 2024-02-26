@@ -276,13 +276,16 @@ const Header = () => {
             ],
         },
         {
-            title: "Xuất gia công",
+            title: "Gia công ngoài",
             sub: [
+                // {
+                //     title: "Xuất gia công",
+                //     img: "/icon/header/khac/xgc.png",
+                //     items: [{ name: "Xuất gia công" }, { name: "Nhập gia công" }],
+                // },
                 {
-                    title: "Xuất gia công",
-                    img: "/icon/header/khac/xgc.png",
                     items: [{ name: "Xuất gia công" }, { name: "Nhập gia công" }],
-                },
+                }
             ],
         },
         {
