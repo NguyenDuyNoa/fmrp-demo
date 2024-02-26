@@ -125,6 +125,7 @@ const Index = (props) => {
                                                 id: uuid(),
                                                 date: isMoment(j?.date, 'DD/MM/YYYY'),
                                                 active: j?.active,
+                                                outDate: j?.outDate
                                             }
                                         }),
                                         unitName: s.unit_name,
@@ -241,7 +242,7 @@ const Index = (props) => {
         return timeLine.flatMap((month) => {
             return month.days.map((timelineDay) => {
                 const matchingDay = arr.find((day) => day.date === timelineDay.date);
-                return matchingDay ? matchingDay : { ...timelineDay, active: false };
+                return matchingDay ? matchingDay : { ...timelineDay, active: false, outDate: false };
             });
         });
     };
