@@ -923,7 +923,7 @@ const Index = (props) => {
                                                     : isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
                                                         ? "grid-cols-9" : isState.dataMaterialExpiry.is_enable == "1"
                                                             ? "grid-cols-9" : "grid-cols-7"
-                                                    }  grid sticky top-0 bg-white shadow-lg p-2 divide-x z-10`}
+                                                    }  grid sticky top-0 bg-white px-2 pt-2 z-10 border-b`}
                                             >
                                                 <h4 className="col-span-2 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-left">
                                                     {dataLang?.warehouses_detail_product || "warehouses_detail_product"}
@@ -979,7 +979,7 @@ const Index = (props) => {
                                                                         : isState?.dataMaterialExpiry.is_enable == "1" ? "grid-cols-9" : "grid-cols-7"
                                                                     }  grid hover:bg-slate-50 px-2`}
                                                             >
-                                                                <div className={`${""} col-span-2 border-l flex justify-center items-center border-r border-b py-2`}>
+                                                                <div className={`${""} col-span-2 flex justify-center items-center border-b py-2`}>
                                                                     <h6 className="xl:text-base text-xs w-full  ">
                                                                         {e?.image == null ? (
                                                                             <div className='flex gap-3 px-2 w-full'>
@@ -1047,7 +1047,7 @@ const Index = (props) => {
                                                                 </div>
 
                                                                 <div
-                                                                    className={`border-l border-r grid ${isState.dataProductSerial.is_enable == "1"
+                                                                    className={` grid ${isState.dataProductSerial.is_enable == "1"
                                                                         ? isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
                                                                             ? "col-span-8"
                                                                             : isState.dataMaterialExpiry.is_enable == "1" ? "col-span-8" : "col-span-6"
@@ -1069,24 +1069,24 @@ const Index = (props) => {
                                                                                         ? "grid-cols-7" : " grid-cols-5"
                                                                                 }`}
                                                                         >
-                                                                            <div className="col-span-1 border-r border-b">
+                                                                            <div className="col-span-1 border-b">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                                     {" "}
                                                                                     {e.location_name == null ? "-" : e.location_name}
                                                                                 </h6>
                                                                             </div>
-                                                                            <div className=" col-span-1 border-r border-b">
+                                                                            <div className=" col-span-1 border-b">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
                                                                                     {e.option_name_1 == null ? "-" : e.option_name_1}
                                                                                 </h6>
                                                                             </div>
-                                                                            <div className=" col-span-1 border-r border-b">
+                                                                            <div className=" col-span-1 border-b">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
                                                                                     {e.option_name_2 == null ? "-" : e.option_name_2}
                                                                                 </h6>
                                                                             </div>
                                                                             {isState.dataProductSerial.is_enable === "1" ? (
-                                                                                <div className=" col-span-1 border-r border-b">
+                                                                                <div className=" col-span-1 border-b">
                                                                                     <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                                         {e.serial == null || e.serial == "" ? "-" : e.serial}
                                                                                     </h6>
@@ -1096,12 +1096,12 @@ const Index = (props) => {
                                                                             )}
                                                                             {isState.dataMaterialExpiry.is_enable === "1" || isState.dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
-                                                                                    <div className=" col-span-1 border-r border-b ">
+                                                                                    <div className=" col-span-1 border-b ">
                                                                                         <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                                             {e.lot == null || e.lot == "" ? "-" : e.lot}
                                                                                         </h6>
                                                                                     </div>
-                                                                                    <div className=" col-span-1 border-r border-b ">
+                                                                                    <div className=" col-span-1 border-b ">
                                                                                         <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
                                                                                             {e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY") : "-"}
                                                                                         </h6>
@@ -1110,7 +1110,7 @@ const Index = (props) => {
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            <div className=" col-span-1 border-r border-b ">
+                                                                            <div className=" col-span-1 border-b ">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs  px-2 py-3  w-[full] text-red-500 font-medium text-center ">
                                                                                     {e.quantity ? formatNumber(e?.quantity) : "-"}
                                                                                 </h6>
