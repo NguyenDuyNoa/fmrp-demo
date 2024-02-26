@@ -878,9 +878,9 @@ const Header = () => {
                                         position={dropdown.position}
                                         className={dropdown.className}
                                         style={dataPstWH}
-                                        // onClick={() =>
-                                        //   dispatch({ type: "trangthai", payload: true })
-                                        // }
+                                    // onClick={() =>
+                                    //   dispatch({ type: "trangthai", payload: true })
+                                    // }
                                     >
                                         {dropdown.title}
                                     </Dropdown>
@@ -1075,6 +1075,8 @@ const DropdownAvatar = React.memo(() => {
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
+
+
 
     const _HandleLogout = () => {
         sOnSending(true);

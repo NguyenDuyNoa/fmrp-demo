@@ -57,8 +57,22 @@ function MainPage({ Component, pageProps }) {
 
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
+
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
+
+
+    // kiểm tra khi chuyển tab trình duyệt nếu đăng xuất thì tất cả tab đăng xuất
+    if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                console.log('Tab không được nhìn thấy');
+            } else {
+                sOnChecking(true);
+            }
+        });
+    }
+
 
     const _ServerLang = async () => {
         await Axios("GET", `/api_web/Api_Lang/language/${langDefault}`, {}, (err, response) => {
@@ -105,6 +119,7 @@ function MainPage({ Component, pageProps }) {
     useEffect(() => {
         auth === null && sOnChecking(true);
     }, [auth]);
+
 
     if (auth == null) {
         return <LoadingPage />;
@@ -629,8 +644,8 @@ const LoginPage = React.memo((props) => {
                                                 })}
                                                 placeholder="Nhập họ và tên của bạn"
                                                 className={`${errors.fullName
-                                                        ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    ? "border-red-500 border"
+                                                    : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                     } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
@@ -652,8 +667,8 @@ const LoginPage = React.memo((props) => {
                                                 })}
                                                 placeholder="Nhập tên công ty"
                                                 className={`${errors.companyName
-                                                        ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    ? "border-red-500 border"
+                                                    : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                     } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
@@ -680,8 +695,8 @@ const LoginPage = React.memo((props) => {
                                                     })}
                                                     placeholder="Nhập Email của bạn"
                                                     className={`${errors.email
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                         } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.email && (
@@ -705,8 +720,8 @@ const LoginPage = React.memo((props) => {
                                                     })}
                                                     placeholder="Nhập số điện thoại"
                                                     className={`${errors.phone
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                         } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.phone && errors.phone.type === "required" && (
@@ -745,8 +760,8 @@ const LoginPage = React.memo((props) => {
                                                     })}
                                                     placeholder="Nhập mật khẩu"
                                                     className={`${errors.password
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                         } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.password && errors.password.type === "required" && (
