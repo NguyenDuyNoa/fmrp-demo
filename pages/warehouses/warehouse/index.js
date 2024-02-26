@@ -999,12 +999,12 @@ const Index = (props) => {
                                                                                         {e.item_code == null ? "-" : e.item_code}
                                                                                     </h6>
 
-                                                                                    <h6 className=" 3xl:items-center 3xl:text-base xl:text-sm lg:text-xs w-fit text-left ">
+                                                                                    <h6 className="w-fit text-left ">
                                                                                         <span
                                                                                             className={`${e.item_type == "product"
                                                                                                 ? "text-lime-500  border-lime-500 "
                                                                                                 : " text-orange-500 border-orange-500"
-                                                                                                } border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl:text-base xl:text-sm lg:text-xs`}
+                                                                                                } border rounded py-1 px-1.5 w-fit text-[10px]`}
                                                                                         >
                                                                                             {e.item_type ? dataLang[e?.item_type] : ""}
                                                                                         </span>
@@ -1029,12 +1029,12 @@ const Index = (props) => {
                                                                                         {e.item_code == null ? "-" : e.item_code}
                                                                                     </h6>
 
-                                                                                    <h6 className=" 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] w-fit text-left ">
+                                                                                    <h6 className="w-fit text-left ">
                                                                                         <span
                                                                                             className={`${e.item_type == "product"
                                                                                                 ? "text-lime-500  border-lime-500 "
                                                                                                 : " text-orange-500 border-orange-500"
-                                                                                                } border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px]`}
+                                                                                                } border rounded py-1 px-1.5 w-fit text-[10px]`}
                                                                                         >
                                                                                             {e.item_type ? dataLang[e?.item_type] : ""}
                                                                                         </span>
