@@ -398,7 +398,8 @@ const LoginPage = React.memo((props) => {
                                         </div>
                                         <button
                                             onClick={_HandleSubmit.bind(this)}
-                                            className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105"
+                                            className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0375f3] via-[#0375f3] via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105"
+                                        // className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105"
                                         >
                                             {dataLang?.auth_login || "auth_login"}
                                         </button>
@@ -469,7 +470,7 @@ const LoginPage = React.memo((props) => {
                                     <div className="pointer-events-none select-none">
                                         <Image
                                             alt=""
-                                            src="/logo_1.png"
+                                            src="/FMRP_Logo.png"
                                             width={200}
                                             height={70}
                                             quality={100}

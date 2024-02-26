@@ -785,7 +785,8 @@ const Header = () => {
     // }, [dataPstWH]);
     const currentDropdown = dropdowns[currentDropdownIndex];
     return (
-        <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
+        <header className="z-40 w-full bg-[#0375f3] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
+            {/* <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="3xl:mx-10 2xl:mx-10 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
                 <div className="flex justify-between items-center">
                     <div className="flex 3xl:space-x-6 2xl:space-x-4 xl:space-x-4 space-x-2 items-center">
