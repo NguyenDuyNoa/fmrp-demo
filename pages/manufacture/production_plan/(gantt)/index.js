@@ -195,7 +195,7 @@ const BodyGantt = ({
                                                     </h1>
                                                     {iIndex == e.days.length - 1 ? (
                                                         <h1
-                                                            className={`bg-[#5599EC] my-0.5  px-2.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
+                                                            className={`bg-[#5599EC] my-0.5  px-1.5 py-0.5 rounded-full text-white font-semibold 3xl:text-base text-sm`}
                                                         >
                                                             {parts[1]}
                                                         </h1>
