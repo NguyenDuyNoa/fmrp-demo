@@ -1530,9 +1530,9 @@ const Popup_ThanhPham = React.memo((props) => {
             if (item.variation_option_2?.length > 0) {
                 for (let j = 0; j < item.variation_option_2?.length; j++) {
                     var subItem = item.variation_option_2[j];
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem.id);
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem?.id);
                     formData.set(`variation_option_value[${i}][variation_option_2][${j}][id_primary]`, subItem?.id_primary || "0");
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][price]`, subItem.price || "");
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][price]`, subItem?.price || "");
                 }
             } else {
                 formData.set(`variation_option_value[${i}][price]`, item.price || "");
@@ -2392,26 +2392,28 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 {props.dataLang?.list_variant || "list_variant"}
                                             </h4>
                                             <div
-                                                className={`${dataTotalVariant[0]?.variation_option_2?.length > 0
-                                                    ? "grid-cols-9"
-                                                    : "grid-cols-7"
-                                                    } grid gap-5 p-1`}
+                                                className={`grid-cols-9 grid gap-5 py-1`}
                                             >
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400 col-span-2">
                                                     {props.dataLang?.avatar || "avatar"}
                                                 </h4>
-                                                <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
+                                                <h4 className="text-[15px] font-[300] text-slate-400 col-span-2  text-left">
                                                     {dataVariantSending[0]?.name}
                                                 </h4>
-                                                {dataTotalVariant[0]?.variation_option_2?.length > 0 && (
+                                                {/* {dataTotalVariant[0]?.variation_option_2?.length > 0 ? (
                                                     <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
                                                         {dataVariantSending[1]?.name}
                                                     </h4>
-                                                )}
+                                                )
+                                                    : <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
+                                                    </h4>} */}
+                                                <h4 className="text-[15px] font-[300] text-slate-400 col-span-2  text-left">
+                                                    {dataVariantSending[1]?.name}
+                                                </h4>
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400 col-span-2">
                                                     {"Giá"}
                                                 </h4>
-                                                <h4 className="text-[15px] text-center font-[300] text-slate-400">
+                                                <h4 className="text-[15px] text-left font-[300] text-slate-400">
                                                     {props.dataLang?.branch_popup_properties ||
                                                         "branch_popup_properties"}
                                                 </h4>
@@ -2420,14 +2422,11 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 <div className="space-y-0.5">
                                                     {dataTotalVariant?.map((e, index) => (
                                                         <div
-                                                            className={`${e?.variation_option_2?.length > 0
-                                                                ? "grid-cols-9"
-                                                                : "grid-cols-7"
-                                                                } grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
+                                                            className={`grid-cols-9 grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
                                                             key={e?.id ? e?.id.toString() : index + 1}
                                                         >
                                                             <div className="w-full h-full flex flex-col justify-center items-center col-span-2">
-                                                                <input
+                                                                {e?.id != null && <input
                                                                     onChange={_HandleChangeVariant.bind(
                                                                         this,
                                                                         e?.id,
@@ -2437,14 +2436,14 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                     id={`uploadImg+${e?.id}`}
                                                                     accept="image/png, image/jpeg"
                                                                     hidden
-                                                                />
+                                                                />}
                                                                 <label
                                                                     htmlFor={`uploadImg+${e?.id}`}
-                                                                    className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded"
+                                                                    className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}
                                                                 >
                                                                     {e.image == null ? (
                                                                         <React.Fragment>
-                                                                            <div className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded">
+                                                                            <div className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}>
                                                                                 <IconImage />
                                                                             </div>
                                                                         </React.Fragment>
@@ -2462,12 +2461,12 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                     )}
                                                                 </label>
                                                             </div>
-                                                            <div className=" col-span-2 truncate">{e.name}</div>
+                                                            <div className=" col-span-2 truncate  text-left">{e.name}</div>
                                                             {e?.variation_option_2?.length > 0 ? (
                                                                 <div className="col-span-5 grid grid-cols-5 gap-1 items-center">
                                                                     {e?.variation_option_2?.map((ce) => (
                                                                         <React.Fragment key={ce.id?.toString()}>
-                                                                            <div className="col-span-2 truncate">
+                                                                            <div className="col-span-2 truncate text-left">
                                                                                 {ce.name}
                                                                             </div>
                                                                             <NumericFormat
@@ -2482,7 +2481,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                                 className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                                             />
                                                                             <div className="flex justify-center">
-                                                                                <button
+                                                                                {e?.isDelete && <button
                                                                                     // onClick={_HandleDeleteVariant.bind(
                                                                                     //     this,
                                                                                     //     e.id,
@@ -2498,7 +2497,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                                     className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
                                                                                 >
                                                                                     <IconDelete size="22" />
-                                                                                </button>
+                                                                                </button>}
                                                                             </div>
                                                                         </React.Fragment>
                                                                     ))}

@@ -60,7 +60,15 @@ const BodyGantt = ({
 
 
     console.log("daaa", data);
+    const divRefs = useRef([]);
+    const [heights, setHeights] = useState([]);
 
+    console.log("heights", heights);
+
+    useEffect(() => {
+        const newHeights = divRefs.current.map(ref => ref?.offsetHeight);
+        setHeights(newHeights);
+    }, [data]);
 
     useEffect(() => {
         sCheckCkecked(false);
@@ -224,7 +232,7 @@ const BodyGantt = ({
                                 className="flex-col min-w-[35%] w-[35%]  overflow-y-auto scrollbar-thin  scrollbar-thumb-transparent scrollbar-track-transparent
                             3xl:h-[61vh] xxl:h-[51vh] 2xl:h-[52.5vh] xl:h-[48vh] lg:h-[46vh] h-[55vh]"
                             >
-                                {data?.map((e) => {
+                                {data?.map((e, eIndex) => {
                                     const outDate = ["outDate"].includes(e.status);
                                     const processing = ["processing"].includes(e.status);
                                     const sussces = ["sussces"].includes(e.status);
@@ -286,7 +294,7 @@ const BodyGantt = ({
 
                                                     {e.show &&
                                                         e.listProducts.map((i, iIndex) => (
-                                                            <label ref={heightItems} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-full`}
+                                                            <label ref={el => divRefs.current[eIndex + iIndex] = el} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-full`}
                                                             // <label ref={heightItems} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-[50px]`}
                                                             >
                                                                 <div className="col-span-1 mx-auto">
@@ -482,7 +490,8 @@ const BodyGantt = ({
                                                             return (
                                                                 <div
                                                                     key={i.id}
-                                                                    className={`flex items-center  w-[65%] my-2 h-[50px]`} id={`div-${i.id}`}>
+                                                                    style={{ height: heights[eIndex + iIndex] }}
+                                                                    className={`flex items-center  w-[65%] my-2`} id={`div-${i.id}`}>
                                                                     {i.processArr.map((ci) => {
                                                                         return (
                                                                             <div key={ci?.id} className={`w-[80px]`}>

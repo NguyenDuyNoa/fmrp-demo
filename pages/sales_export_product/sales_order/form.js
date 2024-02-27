@@ -593,6 +593,7 @@ const Index = (props) => {
 
     // search api
     const _HandleSeachApi = debounce((inputValue) => {
+        if (inputValue == "") return
         if (typeOrder === "1" && quote && +quote.value) {
             Axios(
                 "POST",
@@ -1960,7 +1961,7 @@ const Index = (props) => {
                             <Select
                                 onInputChange={_HandleSeachApi.bind(this)}
                                 options={typeOrder === "1" && quote === null ? [] : allItems}
-                                closeMenuOnSelect={false}
+                                // closeMenuOnSelect={false}
                                 onChange={(value) => handleOnChangeInput("itemAll", value)}
                                 value={itemsAll?.value ? itemsAll?.value : option?.map((e) => e?.item)}
                                 isMulti
