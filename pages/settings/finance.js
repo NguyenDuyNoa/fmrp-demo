@@ -19,6 +19,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -58,10 +59,9 @@ const Index = (props) => {
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `/api_web/${
-                (router.query?.tab === "taxes" && "Api_tax/tax?csrf_protection=true") ||
-                (router.query?.tab === "currencies" && "Api_currency/currency?csrf_protection=true") ||
-                (router.query?.tab === "paymentmodes" && "Api_payment_method/payment_method?csrf_protection=true")
+            `/api_web/${(router.query?.tab === "taxes" && "Api_tax/tax?csrf_protection=true") ||
+            (router.query?.tab === "currencies" && "Api_currency/currency?csrf_protection=true") ||
+            (router.query?.tab === "paymentmodes" && "Api_payment_method/payment_method?csrf_protection=true")
             }`,
             {
                 params: {
@@ -92,11 +92,10 @@ const Index = (props) => {
     const handleDelete = async () => {
         Axios(
             "DELETE",
-            `${
-                (router.query.tab === "taxes" && `/api_web/Api_tax/tax/${id}?csrf_protection=true`) ||
-                (router.query.tab === "currencies" && `/api_web/Api_currency/currency/${id}?csrf_protection=true`) ||
-                (router.query.tab === "paymentmodes" &&
-                    `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`)
+            `${(router.query.tab === "taxes" && `/api_web/Api_tax/tax/${id}?csrf_protection=true`) ||
+            (router.query.tab === "currencies" && `/api_web/Api_currency/currency/${id}?csrf_protection=true`) ||
+            (router.query.tab === "paymentmodes" &&
+                `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`)
             } `,
             {},
             (err, response) => {
@@ -124,7 +123,7 @@ const Index = (props) => {
             },
         });
     };
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: "/settings/finance",
@@ -132,13 +131,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     return (
         <React.Fragment>
@@ -165,31 +165,28 @@ const Index = (props) => {
                             <div className="flex space-x-3 items-center justify-start">
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "taxes")}
-                                    className={`${
-                                        router.query?.tab === "taxes"
+                                    className={`${router.query?.tab === "taxes"
                                             ? "text-[#0F4F9E] bg-[#e2f0fe]"
                                             : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
-                                    } rounded-lg px-4 py-2 outline-none`}
+                                        } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.branch_popup_finance_exchange_rate}
                                 </button>
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "currencies")}
-                                    className={`${
-                                        router.query?.tab === "currencies"
+                                    className={`${router.query?.tab === "currencies"
                                             ? "text-[#0F4F9E] bg-[#e2f0fe]"
                                             : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
-                                    } rounded-lg px-4 py-2 outline-none`}
+                                        } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.branch_popup_finance_unittitle}
                                 </button>
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "paymentmodes")}
-                                    className={`${
-                                        router.query?.tab === "paymentmodes"
+                                    className={`${router.query?.tab === "paymentmodes"
                                             ? "text-[#0F4F9E] bg-[#e2f0fe]"
                                             : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
-                                    } rounded-lg px-4 py-2 outline-none`}
+                                        } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.branch_popup_finance_payment}
                                 </button>
@@ -234,18 +231,16 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div
-                                        className={`${
-                                            router.query?.tab === "taxes" || router.query?.tab === "currencies"
+                                        className={`${router.query?.tab === "taxes" || router.query?.tab === "currencies"
                                                 ? "w-[100%]"
                                                 : "w-[110%]"
-                                        } 2xl:w-[100%] pr-2`}
+                                            } 2xl:w-[100%] pr-2`}
                                     >
                                         <div
-                                            className={`${
-                                                router.query?.tab === "taxes" || router.query?.tab === "currencies"
+                                            className={`${router.query?.tab === "taxes" || router.query?.tab === "currencies"
                                                     ? "grid-cols-6"
                                                     : "grid-cols-9"
-                                            } grid gap-5 sticky top-0 bg-white p-2 z-10`}
+                                                } grid gap-5 sticky top-0 bg-white p-2 z-10`}
                                         >
                                             {(router.query?.tab === "taxes" || router.query?.tab === "currencies") && (
                                                 <React.Fragment>
@@ -310,27 +305,26 @@ const Index = (props) => {
                                                     {data.map((e) => (
                                                         <div
                                                             key={e.id.toString()}
-                                                            className={`${
-                                                                router.query?.tab === "taxes" ||
-                                                                router.query?.tab === "currencies"
+                                                            className={`${router.query?.tab === "taxes" ||
+                                                                    router.query?.tab === "currencies"
                                                                     ? "grid-cols-6"
                                                                     : "grid-cols-9"
-                                                            } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
+                                                                } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
                                                         >
                                                             {(router.query?.tab === "taxes" ||
                                                                 router.query?.tab === "currencies") && (
-                                                                <React.Fragment>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-3">
-                                                                        {router.query?.tab === "taxes" && e?.name}
-                                                                        {router.query?.tab === "currencies" && e?.code}
-                                                                    </h6>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-2 text-center ">
-                                                                        {router.query?.tab === "taxes" && e?.tax_rate}
-                                                                        {router.query?.tab === "currencies" &&
-                                                                            e?.symbol}
-                                                                    </h6>
-                                                                </React.Fragment>
-                                                            )}
+                                                                    <React.Fragment>
+                                                                        <h6 className="xl:text-base text-xs px-2 col-span-3">
+                                                                            {router.query?.tab === "taxes" && e?.name}
+                                                                            {router.query?.tab === "currencies" && e?.code}
+                                                                        </h6>
+                                                                        <h6 className="xl:text-base text-xs px-2 col-span-2 text-center ">
+                                                                            {router.query?.tab === "taxes" && e?.tax_rate}
+                                                                            {router.query?.tab === "currencies" &&
+                                                                                e?.symbol}
+                                                                        </h6>
+                                                                    </React.Fragment>
+                                                                )}
                                                             {router.query?.tab === "paymentmodes" && (
                                                                 <React.Fragment>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-3">
@@ -339,7 +333,7 @@ const Index = (props) => {
                                                                     </h6>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-1">
                                                                         {router.query?.tab === "paymentmodes" &&
-                                                                        e?.cash_bank == "1"
+                                                                            e?.cash_bank == "1"
                                                                             ? dataLang?.paymethod_cash
                                                                             : dataLang?.paymethod_bank}
                                                                     </h6>
@@ -497,17 +491,15 @@ const Popup_TaiChinh = (props) => {
         Axios(
             "POST",
             id
-                ? `${
-                      (tabPage === "taxes" && `/api_web/Api_tax/tax/${id}?csrf_protection=true`) ||
-                      (tabPage === "currencies" && `/api_web/Api_currency/currency/${id}?csrf_protection=true`) ||
-                      (tabPage === "paymentmodes" &&
-                          `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`)
-                  } `
-                : `${
-                      (tabPage === "taxes" && `/api_web/Api_tax/tax?csrf_protection=true`) ||
-                      (tabPage === "currencies" && `/api_web/Api_currency/currency?csrf_protection=true`) ||
-                      (tabPage === "paymentmodes" && `/api_web/Api_payment_method/payment_method?csrf_protection=true`)
-                  } `,
+                ? `${(tabPage === "taxes" && `/api_web/Api_tax/tax/${id}?csrf_protection=true`) ||
+                (tabPage === "currencies" && `/api_web/Api_currency/currency/${id}?csrf_protection=true`) ||
+                (tabPage === "paymentmodes" &&
+                    `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`)
+                } `
+                : `${(tabPage === "taxes" && `/api_web/Api_tax/tax?csrf_protection=true`) ||
+                (tabPage === "currencies" && `/api_web/Api_currency/currency?csrf_protection=true`) ||
+                (tabPage === "paymentmodes" && `/api_web/Api_payment_method/payment_method?csrf_protection=true`)
+                } `,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -582,16 +574,14 @@ const Popup_TaiChinh = (props) => {
         <PopupEdit
             title={
                 props.data?.id
-                    ? `${
-                          (tabPage === "taxes" && props.dataLang?.branch_popup_finance_edit) ||
-                          (tabPage === "currencies" && props.dataLang?.branch_popup_finance_editunit) ||
-                          (tabPage === "paymentmodes" && props.dataLang?.branch_popup_payment_edit)
-                      }`
-                    : `${
-                          (tabPage === "taxes" && props.dataLang?.branch_popup_finance_addnew) ||
-                          (tabPage === "currencies" && props.dataLang?.branch_popup_finance_unit) ||
-                          (tabPage === "paymentmodes" && props.dataLang?.branch_popup_payment_addnew)
-                      }`
+                    ? `${(tabPage === "taxes" && props.dataLang?.branch_popup_finance_edit) ||
+                    (tabPage === "currencies" && props.dataLang?.branch_popup_finance_editunit) ||
+                    (tabPage === "paymentmodes" && props.dataLang?.branch_popup_payment_edit)
+                    }`
+                    : `${(tabPage === "taxes" && props.dataLang?.branch_popup_finance_addnew) ||
+                    (tabPage === "currencies" && props.dataLang?.branch_popup_finance_unit) ||
+                    (tabPage === "paymentmodes" && props.dataLang?.branch_popup_payment_addnew)
+                    }`
             }
             button={props.data?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -614,9 +604,8 @@ const Popup_TaiChinh = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "nameTax")}
                                         name="fname"
                                         type="text"
-                                        className={`${
-                                            errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
+                                        className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
                                     />
                                     {errInput && (
                                         <label className="mb-2 text-[14px] text-red-500">
@@ -656,9 +645,8 @@ const Popup_TaiChinh = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "codeCu")}
                                         name="fname"
                                         type="text"
-                                        className={`${
-                                            errInputCu ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
+                                        className={`${errInputCu ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
                                     />
                                     {errInputCu && (
                                         <label className="mb-2 text-[14px] text-red-500">
@@ -677,11 +665,10 @@ const Popup_TaiChinh = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "symbolCu")}
                                         name="symbol"
                                         type="text"
-                                        className={`${
-                                            errInputCusynm
+                                        className={`${errInputCusynm
                                                 ? "border-red-500"
                                                 : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
                                     />
                                     {errInputCusynm && (
                                         <label className=" mt-2 text-[14px] text-red-500">Vui lòng nhập kí hiệu</label>
@@ -702,9 +689,8 @@ const Popup_TaiChinh = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "nameMe")}
                                         name="fname"
                                         type="text"
-                                        className={`${
-                                            errInputMe ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
+                                        className={`${errInputMe ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
                                     />
                                     {errInputMe && (
                                         <label className="mb-2 text-[14px] text-red-500">

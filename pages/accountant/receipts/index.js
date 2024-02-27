@@ -25,6 +25,7 @@ import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComp
 import { useSetData } from "@/hooks/useSetData";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -121,7 +122,7 @@ const Index = (props) => {
         updateFetch({ onFetching_filter: false });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
 
         router.replace({
@@ -130,14 +131,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-
-        setTimeout(() => {
-            if (!value) {
-                updateFetch({ onFetching: true });
-            }
-            updateFetch({ onFetching: true });
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         updateFetch({ onFetching: true });
+        //     }
+        //     updateFetch({ onFetching: true });
+        // }, 500);
+        updateFetch({ onFetching: true });
+    }, 500)
 
     const paginate = (pageNumber) => {
         const queryParams = { ...router.query, page: pageNumber };

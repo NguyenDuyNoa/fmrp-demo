@@ -20,6 +20,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
 import { routerSalesOrder } from "@/routers/sellingGoods";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -225,21 +226,40 @@ const Index = (props) => {
     const handleFetchingCustomer = () => {
         Axios(
             "GET",
-            `/api_web/api_client/client_option/?csrf_protection=true`,
+            `/api_web/api_client/searchClients?csrf_protection=true`,
             {
                 params: {
-                    "filter[branch_id]": branch !== null ? branch?.value : null,
+                    search: "",
+                    "filter[branch_id]": branch !== null ? [branch?.value]?.map((e) => e) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var db = response.data.rResult;
-                    setDataCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
+                    var { data } = response.data
+                    setDataCustomer(data?.clients?.map((e) => ({ label: e.name, value: e.id })));
                 }
             }
         );
         setOnFetchingCustomer(false);
     };
+    // const handleFetchingCustomer = () => {
+    //     Axios(
+    //         "GET",
+    //         `/api_web/api_client/client_option/?csrf_protection=true`,
+    //         {
+    //             params: {
+    //                 "filter[branch_id]": branch !== null ? branch?.value : null,
+    //             },
+    //         },
+    //         (err, response) => {
+    //             if (!err) {
+    //                 var db = response.data.rResult;
+    //                 setDataCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
+    //             }
+    //         }
+    //     );
+    //     setOnFetchingCustomer(false);
+    // };
     // Contact person
     const handleFetchingContactPerson = () => {
         Axios(
@@ -572,7 +592,7 @@ const Index = (props) => {
     }, [staff != null]);
 
     // search api
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
         if (typeOrder === "1" && quote && +quote.value) {
             Axios(
                 "POST",
@@ -610,7 +630,7 @@ const Index = (props) => {
                 }
             );
         }
-    };
+    }, 500)
 
     // format number
     const formatNumber = (number) => {

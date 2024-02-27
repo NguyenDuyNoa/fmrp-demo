@@ -193,31 +193,24 @@ const Index = (props) => {
         sOnFetching_filter(false);
     };
 
-    let searchTimeout;
 
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") return;
-        else {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let { result } = response.data;
-                            sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
-                        }
-                    }
-                );
-            }, 500);
-        }
-    };
+    const _HandleSeachApi = debounce((inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
+            {
+                data: {
+                    term: inputValue,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response.data;
+                    sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
+                }
+            }
+        );
+    }, 500)
 
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();

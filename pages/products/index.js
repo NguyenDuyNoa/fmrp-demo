@@ -1178,7 +1178,7 @@ const Popup_ThanhPham = React.memo((props) => {
     const [dataTotalVariant, sDataTotalVariant] = useState([]);
 
     const [dataVariantSending, sDataVariantSending] = useState([]);
-
+    console.log("dataVariantSending", dataVariantSending, dataVariantSending);
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
         // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
@@ -1246,27 +1246,51 @@ const Popup_ThanhPham = React.memo((props) => {
             sOptSelectedVariantSub(updatedOptions);
         }
     };
-
+    console.log("dataTotalVariant", dataTotalVariant);
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
-            console.log("dataTotalVariant", dataTotalVariant);
+            console.log("ress", dataTotalVariant);
+            console.log("optSelectedVariantMain", optSelectedVariantMain);
             console.log("optSelectedVariantSub", optSelectedVariantSub);
-            sDataTotalVariant([...dataTotalVariant,
-            ...(optSelectedVariantMain?.length > 0
-                ? optSelectedVariantMain?.map((item1, index) => {
-                    const newdb = dataTotalVariant[index]?.variation_option_2
-                    return {
-                        ...item1,
-                        image: null,
-                        price: null,
-                        variation_option_2: optSelectedVariantSub?.map((item2, index2) => ({
+            const newData = optSelectedVariantMain?.map(e => {
+                const newViar = dataTotalVariant?.find(x => x?.id == e?.id)?.variation_option_2
+                return {
+                    ...e,
+                    variation_option_2: optSelectedVariantSub?.map((item2) => {
+                        const check = newViar?.find(x => x?.id == item2?.id)
+                        return {
                             ...item2,
-                            price: newdb[index2]?.price ? newdb[index2]?.price : "",
-                        }))
-                    }
-                })
-                : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
-            ]);
+                            price: check && check?.price ? check?.price : ""
+                        }
+                    })
+                }
+            })
+            console.log("newData", newData);
+            const newdb = [...dataTotalVariant, ...newData]
+            // Mảng chứa dữ liệu sau khi xử lý
+            const processedData = [];
+            // Tạo một đối tượng để theo dõi các phần tử theo id
+            const idMap = {};
+            // Duyệt qua mảng newdb
+            newdb.forEach(item => {
+                const id = item.id;
+                // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
+                if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+                    idMap[id] = item;
+                }
+            });
+            // Lấy các giá trị từ idMap và đưa vào mảng processedData
+            for (const id in idMap) {
+                processedData.push(idMap[id]);
+            }
+
+            console.log("processedData", processedData);
+            sDataTotalVariant(processedData.reverse());
+            // sDataTotalVariant([
+            //     ...(optSelectedVariantMain?.length > 0
+            //         ? newData
+            //         : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
+            // ]);
             // sDataTotalVariant([
             //     ...(optSelectedVariantMain?.length > 0
             //         ? optSelectedVariantMain?.map((item1) => {
@@ -1298,7 +1322,6 @@ const Popup_ThanhPham = React.memo((props) => {
         }
     };
     //////
-    console.log("ress", dataTotalVariant);
 
     const [errGroup, sErrGroup] = useState(false);
 
@@ -1502,11 +1525,13 @@ const Popup_ThanhPham = React.memo((props) => {
 
             formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
             formData.set(`variation_option_value[${i}][image]`, item.image || "");
+            formData.set(`variation_option_value[${i}][id_primary]`, item?.id_primary || "0");
 
             if (item.variation_option_2?.length > 0) {
                 for (let j = 0; j < item.variation_option_2?.length; j++) {
                     var subItem = item.variation_option_2[j];
                     formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem.id);
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id_primary]`, subItem?.id_primary || "0");
                     formData.set(`variation_option_value[${i}][variation_option_2][${j}][price]`, subItem.price || "");
                 }
             } else {
@@ -1746,8 +1771,7 @@ const Popup_ThanhPham = React.memo((props) => {
                         {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
                 </div>
-                <ScrollArea className="max-h-[350px]" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
-                    {/* <ScrollArea className="max-h-[580px]" speed={1} smoothScrolling={true} ref={scrollAreaRef}> */}
+                <ScrollArea className="max-h-[580px]" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
                     {onFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : (
@@ -2109,6 +2133,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
+                                                    isDisabled={dataVariantSending[0] ? true : false}
                                                     value={
                                                         variantMain
                                                             ? {
@@ -2231,6 +2256,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
+                                                    isDisabled={dataVariantSending[1] ? true : false}
                                                     value={
                                                         variantSub
                                                             ? {
@@ -2478,7 +2504,9 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                     ))}
                                                                 </div>
                                                             ) : (
-                                                                <React.Fragment>
+                                                                <div className="col-span-5 grid grid-cols-5">
+                                                                    <div className="col-span-2 truncate">
+                                                                    </div>
                                                                     <NumericFormat
                                                                         thousandSeparator=","
                                                                         value={e?.price}
@@ -2490,12 +2518,8 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                         placeholder="Giá"
                                                                         className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                                     />
-                                                                    <div className="flex justify-center">
+                                                                    <div className="flex justify-center col-span-1">
                                                                         <button
-                                                                            // onClick={_HandleDeleteVariantItems.bind(
-                                                                            //     this,
-                                                                            //     e.id
-                                                                            // )}
                                                                             onClick={() =>
                                                                                 handleQueryId({
                                                                                     id: e.id,
@@ -2507,7 +2531,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                             <IconDelete size="22" />
                                                                         </button>
                                                                     </div>
-                                                                </React.Fragment>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     ))}

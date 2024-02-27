@@ -206,7 +206,7 @@ const Index = (props) => {
     };
 
     const _HandleSeachApi = debounce((inputValue) => {
-        inputValue != "" &&
+  
             Axios(
                 "POST",
                 `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,

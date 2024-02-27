@@ -36,6 +36,7 @@ import usePagination from "@/hooks/usePagination";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -142,7 +143,7 @@ const Index = (props) => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
 
         router.replace({
@@ -151,14 +152,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     useEffect(() => {
         onFetching && _ServerFetching();
@@ -327,13 +328,12 @@ const Index = (props) => {
                 },
                 { value: `${e?.object_text ? e?.object_text : ""}` },
                 {
-                    value: `${
-                        e?.type_vouchers
-                            ? dataLang[e?.type_vouchers] != undefined
-                                ? dataLang[e?.type_vouchers]
-                                : ""
+                    value: `${e?.type_vouchers
+                        ? dataLang[e?.type_vouchers] != undefined
+                            ? dataLang[e?.type_vouchers]
                             : ""
-                    }`,
+                        : ""
+                        }`,
                 },
                 {
                     value: `${e?.voucher_code ? e?.voucher_code.join(", ") : ""}`,

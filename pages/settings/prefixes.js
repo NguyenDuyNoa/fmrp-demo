@@ -7,6 +7,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
+import useStatusExprired from "@/hooks/useStatusExprired";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
@@ -21,7 +22,7 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const dataLang = props.dataLang;
-
+    const trangthaiExprired = useStatusExprired()
     const [onFetching, sOnFetching] = useState(false);
     const [onSending, sOnSending] = useState(false);
     const [data, sData] = useState([]);
@@ -104,7 +105,7 @@ const Index = (props) => {
             sOnSending(true);
         }
     };
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     return (
         <React.Fragment>
             <Head>
@@ -156,10 +157,9 @@ const Index = (props) => {
                                                         e.id
                                                     )}
                                                     type="text"
-                                                    placeholder={`Nhập ${
-                                                        dataLang[e.type] ||
+                                                    placeholder={`Nhập ${dataLang[e.type] ||
                                                         e.type
-                                                    }`}
+                                                        }`}
                                                     className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-60 bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                                 />
                                             </div>

@@ -27,6 +27,7 @@ import { routerPurchases } from "routers/buyImportGoods";
 
 import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -310,10 +311,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`
-                    : `/api_web/Api_purchases/purchases/?csrf_protection=true`
+            `${id
+                ? `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`
+                : `/api_web/Api_purchases/purchases/?csrf_protection=true`
             }`,
             {
                 data: formData,
@@ -357,31 +357,29 @@ const Index = (props) => {
             }
         );
     };
-    const _HandleSeachApi = (inputValue) => {
-        inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
-                {
-                    data: {
-                        term: inputValue,
-                    },
+    const _HandleSeachApi = debounce((inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
+            {
+                data: {
+                    term: inputValue,
                 },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        sData(
-                            result?.map((e) => ({
-                                label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-                                value: e.id,
-                                e,
-                            }))
-                        );
-                    }
+            },
+            (err, response) => {
+                if (!err) {
+                    var { result } = response?.data.data;
+                    sData(
+                        result?.map((e) => ({
+                            label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                            value: e.id,
+                            e,
+                        }))
+                    );
                 }
-            );
-    };
-
+            }
+        );
+    }, 500)
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
@@ -506,9 +504,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -531,9 +528,8 @@ const Index = (props) => {
                                         name="fname"
                                         type="text"
                                         placeholder={dataLang?.purchase_name || "purchase_name"}
-                                        className={`${
-                                            errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                        className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                     />
                                     {errName && (
                                         <label className="text-sm text-red-500">
@@ -555,9 +551,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.client_list_filterbrand}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}

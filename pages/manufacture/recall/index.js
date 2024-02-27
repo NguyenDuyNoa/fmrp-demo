@@ -207,27 +207,26 @@ const Index = (props) => {
     };
 
     const _HandleSeachApi = debounce((inputValue) => {
-        inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`,
-                {
-                    data: {
-                        term: inputValue,
-                    },
+        Axios(
+            "POST",
+            `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`,
+            {
+                data: {
+                    term: inputValue,
                 },
-                (err, response) => {
-                    if (!err) {
-                        let { result } = response?.data;
-                        sListCode(
-                            result?.map((e) => ({
-                                label: `${e.code}`,
-                                value: e.id,
-                            }))
-                        );
-                    }
+            },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response?.data;
+                    sListCode(
+                        result?.map((e) => ({
+                            label: `${e.code}`,
+                            value: e.id,
+                        }))
+                    );
                 }
-            );
+            }
+        );
     }, 500)
 
     useEffect(() => {

@@ -24,6 +24,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { routerProductionWarehouse } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -187,9 +188,8 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
+                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                    }</span>`,
                                 value: e.item?.id,
                             },
                             child: e?.child.map((ce) => ({
@@ -202,15 +202,15 @@ const Index = (props) => {
                                     (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                                 location:
                                     ce?.warehouse_location?.location_name ||
-                                    ce?.warehouse_location?.id ||
-                                    ce?.warehouse_location?.warehouse_name ||
-                                    ce?.warehouse_location?.quantity
+                                        ce?.warehouse_location?.id ||
+                                        ce?.warehouse_location?.warehouse_name ||
+                                        ce?.warehouse_location?.quantity
                                         ? {
-                                              label: ce?.warehouse_location?.location_name || null,
-                                              value: ce?.warehouse_location?.id || null,
-                                              warehouse_name: ce?.warehouse_location?.warehouse_name || null,
-                                              qty: +ce?.warehouse_location?.quantity || null,
-                                          }
+                                            label: ce?.warehouse_location?.location_name || null,
+                                            value: ce?.warehouse_location?.id || null,
+                                            warehouse_name: ce?.warehouse_location?.warehouse_name || null,
+                                            qty: +ce?.warehouse_location?.quantity || null,
+                                        }
                                         : null,
                                 serial: ce?.serial == null ? "" : ce?.serial,
                                 lot: ce?.lot == null ? "" : ce?.lot,
@@ -257,8 +257,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
@@ -307,39 +307,66 @@ const Index = (props) => {
     };
 
     // Khai báo biến để theo dõi timeout
-    let searchTimeout;
 
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            // Hủy timeout cũ nếu có
-            clearTimeout(searchTimeout);
-
-            // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
-                    {
-                        params: {
-                            "filter[branch_id]": idBranch ? idBranch?.value : null,
-                        },
-
-                        data: {
-                            term: inputValue,
-                        },
+            Axios(
+                "POST",
+                `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+                {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
                     },
-                    (err, response) => {
-                        if (!err) {
-                            var { result } = response.data.data;
-                            sDataItems(result);
-                        }
+
+                    data: {
+                        term: inputValue,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response.data.data;
+                        sDataItems(result);
                     }
-                );
-            }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
+                }
+            );
         }
-    };
+    }, 500)
+    // // Khai báo biến để theo dõi timeout
+    // let searchTimeout;
+
+    // const _HandleSeachApi = (inputValue) => {
+    //     if (idBranch == null || idExportWarehouse == null || inputValue == "") {
+    //         return;
+    //     } else {
+    //         // Hủy timeout cũ nếu có
+    //         clearTimeout(searchTimeout);
+
+    //         // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
+    //         searchTimeout = setTimeout(() => {
+    //             Axios(
+    //                 "POST",
+    //                 `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+    //                 {
+    //                     params: {
+    //                         "filter[branch_id]": idBranch ? idBranch?.value : null,
+    //                     },
+
+    //                     data: {
+    //                         term: inputValue,
+    //                     },
+    //                 },
+    //                 (err, response) => {
+    //                     if (!err) {
+    //                         var { result } = response.data.data;
+    //                         sDataItems(result);
+    //                     }
+    //                 }
+    //             );
+    //         }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
+    //     }
+    // };
 
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
@@ -494,10 +521,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true`
-                    : `/api_web/Api_stock/exportProduction/?csrf_protection=true`
+            `${id
+                ? `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true`
+                : `/api_web/Api_stock/exportProduction/?csrf_protection=true`
             }`,
             {
                 data: formData,
@@ -880,9 +906,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -910,9 +935,8 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -972,9 +996,8 @@ const Index = (props) => {
                                             dataLang?.production_warehouse_expWarehouse ||
                                             "production_warehouse_expWarehouse"
                                         }
-                                        className={`${
-                                            errExportWarehouse ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1157,7 +1180,7 @@ const Index = (props) => {
                                                         </div>
                                                     )}
                                                     {dataMaterialExpiry.is_enable === "1" ||
-                                                    dataProductExpiry.is_enable === "1" ? (
+                                                        dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
@@ -1166,8 +1189,8 @@ const Index = (props) => {
                                                                 Date:{" "}
                                                                 {option.e?.expiration_date
                                                                     ? moment(option.e?.expiration_date).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                        "DD/MM/YYYY"
+                                                                    )
                                                                     : "-"}
                                                             </div>
                                                         </>
@@ -1340,7 +1363,7 @@ const Index = (props) => {
                                                                                 </div>
                                                                             )}
                                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                                dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
@@ -1352,9 +1375,9 @@ const Index = (props) => {
                                                                                         Date:{" "}
                                                                                         {option.e?.expiration_date
                                                                                             ? moment(
-                                                                                                  option.e
-                                                                                                      ?.expiration_date
-                                                                                              ).format("DD/MM/YYYY")
+                                                                                                option.e
+                                                                                                    ?.expiration_date
+                                                                                            ).format("DD/MM/YYYY")
                                                                                             : "-"}
                                                                                     </div>
                                                                                 </>
@@ -1449,16 +1472,15 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "location"
                                                                         )}
-                                                                        className={`${
-                                                                            errWarehouse && ce?.location == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        className={`${errWarehouse && ce?.location == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
                                                                                 ? ""
                                                                                 : dataLang?.production_warehouse_expLoca ||
-                                                                                  "production_warehouse_expLoca"
+                                                                                "production_warehouse_expLoca"
                                                                         }
                                                                         noOptionsMessage={() =>
                                                                             dataLang?.returns_nodata || "returns_nodata"
@@ -1525,11 +1547,10 @@ const Index = (props) => {
                                                                             dataLang?.production_warehouse_unit ||
                                                                             "production_warehouse_unit"
                                                                         }
-                                                                        className={`${
-                                                                            errUnit && ce?.unit == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
+                                                                        className={`${errUnit && ce?.unit == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
                                                                         menuPortalTarget={document.body}
                                                                         style={{
                                                                             border: "none",
@@ -1543,10 +1564,9 @@ const Index = (props) => {
                                                                                         "production_warehouse_unit"}
                                                                                     : {option?.label}
                                                                                 </h2>
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">{`${
-                                                                                    dataLang?.production_warehouse_exchange_value ||
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">{`${dataLang?.production_warehouse_exchange_value ||
                                                                                     "production_warehouse_exchange_value"
-                                                                                }: (${option?.coefficient})`}</h2>
+                                                                                    }: (${option?.coefficient})`}</h2>
                                                                             </div>
                                                                         )}
                                                                         theme={(theme) => ({
@@ -1586,14 +1606,13 @@ const Index = (props) => {
                                                                         disabled={
                                                                             ce?.location == null || ce?.unit == null
                                                                         }
-                                                                        className={`${
-                                                                            errQty &&
+                                                                        className={`${errQty &&
                                                                             (ce?.exportQuantity == null ||
                                                                                 ce?.exportQuantity == "" ||
                                                                                 ce?.exportQuantity == 0)
-                                                                                ? "border-red-500 border-b"
-                                                                                : ""
-                                                                        }  placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
+                                                                            ? "border-red-500 border-b"
+                                                                            : ""
+                                                                            }  placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
                                                                         onValueChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,

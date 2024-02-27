@@ -17,6 +17,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { routerPriceQuote } from "@/routers/sellingGoods";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -136,9 +137,8 @@ const Index = (props) => {
                         id: e.id,
                         mathang: {
                             e: e?.item,
-                            label: `${e.item?.item_name} <span style={{display: none}}>${
-                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                            label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
                             value: e.item?.id,
                         },
                         soluong: Number(e?.quantity),
@@ -486,7 +486,7 @@ const Index = (props) => {
     }, [idBranch != null]);
 
     // search
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
         Axios(
             "POST",
             `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
@@ -505,7 +505,7 @@ const Index = (props) => {
                 }
             }
         );
-    };
+    }, 500)
 
     // format number
     const formatNumber = (number) => {
@@ -744,10 +744,9 @@ const Index = (props) => {
         ) {
             Axios(
                 "POST",
-                `${
-                    id
-                        ? `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`
-                        : "/api_web/Api_quotation/quotation/?csrf_protection=true"
+                `${id
+                    ? `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`
+                    : "/api_web/Api_quotation/quotation/?csrf_protection=true"
                 }`,
                 {
                     data: formData,
@@ -888,9 +887,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.select_branch || "select_branch"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         style={{
@@ -941,9 +939,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.select_customer || "select_customer"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errCustomer ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errCustomer ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1056,9 +1053,8 @@ const Index = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -1089,11 +1085,10 @@ const Index = (props) => {
                                             placeholderText="DD/MM/YYYY"
                                             dateFormat="dd/MM/yyyy"
                                             onSelect={(date) => sEffectiveDate(date)}
-                                            className={`border ${
-                                                errEffectiveDate
+                                            className={`border ${errEffectiveDate
                                                     ? "border-red-500"
                                                     : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
                                         />
                                         {effectiveDate && (
                                             <>
@@ -1279,9 +1274,8 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-1 text-center flex items-center justify-center">
                                                 <h3
-                                                    className={`${
-                                                        index === 0 ? "cursor-default" : "cursor-text"
-                                                    } 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
+                                                        } 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                 >
                                                     {e?.donvitinh}
                                                 </h3>
@@ -1296,9 +1290,8 @@ const Index = (props) => {
                                                         <Minus size="16" />
                                                     </button>
                                                     <NumericFormat
-                                                        className={`${
-                                                            index === 0 ? "cursor-default" : "cursor-text"
-                                                        } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                        className={`${index === 0 ? "cursor-default" : "cursor-text"
+                                                            } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                         onValueChange={_HandleChangeInputOption.bind(
                                                             this,
                                                             e?.id,
@@ -1338,9 +1331,8 @@ const Index = (props) => {
                                                     readOnly={index === 0 ? readOnlyFirst : false}
                                                     decimalScale={0}
                                                     isNumericString={true}
-                                                    className={`${
-                                                        index === 0 ? "cursor-default" : "cursor-text"
-                                                    } appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
+                                                        } appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                                                     thousandSeparator=","
                                                 />
                                             </div>
@@ -1353,9 +1345,8 @@ const Index = (props) => {
                                                         "chietkhau",
                                                         index
                                                     )}
-                                                    className={`${
-                                                        index === 0 ? "cursor-default" : "cursor-text"
-                                                    } appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
+                                                        } appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
                                                     thousandSeparator=","
                                                     allowNegative={false}
                                                     isAllowed={(values) => {
@@ -1377,9 +1368,8 @@ const Index = (props) => {
 
                                             <div className="col-span-1 text-right flex items-center justify-end">
                                                 <h3
-                                                    className={`${
-                                                        index === 0 ? "cursor-default" : "cursor-text"
-                                                    } px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
+                                                        } px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                 >
                                                     {formatNumber(e?.dongiasauck)}
                                                 </h3>
@@ -1391,12 +1381,12 @@ const Index = (props) => {
                                                     value={
                                                         e?.thue
                                                             ? {
-                                                                  label: taxOptions.find(
-                                                                      (item) => item.value === e?.thue?.value
-                                                                  )?.label,
-                                                                  value: e?.thue?.value,
-                                                                  tax_rate: e?.thue?.tax_rate,
-                                                              }
+                                                                label: taxOptions.find(
+                                                                    (item) => item.value === e?.thue?.value
+                                                                )?.label,
+                                                                value: e?.thue?.value,
+                                                                tax_rate: e?.thue?.tax_rate,
+                                                            }
                                                             : null
                                                     }
                                                     placeholder={"% Thuế"}
@@ -1451,9 +1441,8 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-1 text-right flex items-center justify-end">
                                                 <h3
-                                                    className={`${
-                                                        index === 0 ? "cursor-default" : "cursor-text"
-                                                    } px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"
+                                                        } px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                 >
                                                     {formatNumber(e?.thanhtien)}
                                                 </h3>

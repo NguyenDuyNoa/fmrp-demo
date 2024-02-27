@@ -1395,6 +1395,7 @@ const MainTable = ({ dataLang }) => {
     const queryValue = (key) => sIsValue((prve) => ({ ...prve, ...key }));
 
     const [isFetching, sIsFetChing] = useState(false);
+
     const fetchDataTable = () => {
         Axios("POST", `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${isValue.page}&limit=${isValue.limit}`, {
             params: {
@@ -1462,10 +1463,10 @@ const MainTable = ({ dataLang }) => {
             }
         );
     }
-
     useEffect(() => {
         fetchDataTable()
     }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.page]);
+
 
 
     const fetchDataTableRight = async (id) => {
@@ -1584,10 +1585,8 @@ const MainTable = ({ dataLang }) => {
     }, 500);
 
     useEffect(() => {
-
         fetDataOrder()
         fetchDataPlan()
-
     }, []);
 
     const handleShow = (id) => {
@@ -1666,7 +1665,7 @@ const MainTable = ({ dataLang }) => {
         })
     }
 
-    const handleSearch = debounce((e) => {
+    const onChangeSearch = debounce((e) => {
         queryValue({ search: e.target.value, page: 1, resetPage: true })
     }, 500)
 
@@ -1682,6 +1681,8 @@ const MainTable = ({ dataLang }) => {
         fetDataOrder,
         fetchDataPlan
     };
+
+
     return (
         <React.Fragment>
             <FilterHeader {...shareProps} />
@@ -1696,8 +1697,8 @@ const MainTable = ({ dataLang }) => {
                                     className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
                                 />
                                 <input
-                                    value={isValue.search}
-                                    onChange={(e) => handleSearch(e)}
+                                    // value={isValue.search}
+                                    onChange={(e) => onChangeSearch(e)}
                                     className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                     type="text"
                                     placeholder="Tìm kế hoạch NVL"

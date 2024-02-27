@@ -222,28 +222,27 @@ const Index = (props) => {
     };
 
     const _HandleSeachApi = debounce((inputValue) => {
-        inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/Api_export_other/exportOtherCombobox/?csrf_protection=true`,
-                {
-                    data: {
-                        term: inputValue,
-                    },
+        Axios(
+            "POST",
+            `/api_web/Api_export_other/exportOtherCombobox/?csrf_protection=true`,
+            {
+                data: {
+                    term: inputValue,
                 },
-                (err, response) => {
-                    if (!err) {
-                        let { isSuccess, result } = response?.data;
+            },
+            (err, response) => {
+                if (!err) {
+                    let { isSuccess, result } = response?.data;
 
-                        sListCode(
-                            result?.map((e) => ({
-                                label: e?.code,
-                                value: e.id,
-                            }))
-                        );
-                    }
+                    sListCode(
+                        result?.map((e) => ({
+                            label: e?.code,
+                            value: e.id,
+                        }))
+                    );
                 }
-            );
+            }
+        );
     }, 500)
 
     useEffect(() => {

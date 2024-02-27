@@ -20,6 +20,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { debounce } from "lodash";
 
 const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
 
@@ -200,35 +201,55 @@ const Index = (props) => {
         );
     };
 
-    let searchTimeout;
+    const _HandleSeachApi = debounce((inputValue) => {
+        Axios(
+            "POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+            {
+                params: {
+                    "filter[branch_id]": 0,
+                },
+                data: {
+                    term: inputValue,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response.data.data;
 
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") return;
-        else {
-            clearTimeout(searchTimeout);
+                    updateData({ product: result });
+                }
+            }
+        );
+    }, 500)
+    // let searchTimeout;
 
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
-                    {
-                        params: {
-                            "filter[branch_id]": 0,
-                        },
-                        data: {
-                            term: inputValue,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let { result } = response.data.data;
+    // const _HandleSeachApi = (inputValue) => {
+    //     if (inputValue == "") return;
+    //     else {
+    //         clearTimeout(searchTimeout);
 
-                            updateData({ product: result });
-                        }
-                    }
-                );
-            }, 500);
-        }
-    };
+    //         searchTimeout = setTimeout(() => {
+    //             Axios(
+    //                 "POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+    //                 {
+    //                     params: {
+    //                         "filter[branch_id]": 0,
+    //                     },
+    //                     data: {
+    //                         term: inputValue,
+    //                     },
+    //                 },
+    //                 (err, response) => {
+    //                     if (!err) {
+    //                         let { result } = response.data.data;
+
+    //                         updateData({ product: result });
+    //                     }
+    //                 }
+    //             );
+    //         }, 500);
+    //     }
+    // };
 
     const options = isData?.product?.map((e) => ({
         label: `${e.name}

@@ -31,6 +31,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -166,9 +167,8 @@ const Index = (props) => {
                         id: e.purchases_order_item_id,
                         mathang: {
                             e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${
-                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
                             value: e.item?.id,
                         },
                         soluong: Number(e?.quantity),
@@ -685,8 +685,8 @@ const Index = (props) => {
         sErrPurchase(false);
     }, [idPurchases?.length > 0]);
 
-    const _HandleSeachApi = (inputValue) => {
-        if (loai === "0" && inputValue != "")
+    const _HandleSeachApi = debounce((inputValue) => {
+        if (loai === "0")
             Axios(
                 "POST",
                 `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
@@ -708,7 +708,7 @@ const Index = (props) => {
         else {
             return;
         }
-    };
+    }, 500)
 
     const hiddenOptions = idPurchases?.length > 3 ? idPurchases?.slice(0, 3) : [];
 
@@ -963,10 +963,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`
-                    : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`
+                : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -1092,9 +1091,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         style={{
@@ -1144,9 +1142,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.purchase_order_supplier || "purchase_order_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errSupplier ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}
@@ -1203,9 +1200,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.purchase_order_staff || "purchase_order_staff"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errStaff ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errStaff ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1269,9 +1265,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -1390,9 +1385,8 @@ const Index = (props) => {
                                             }
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${
-                                                errPurchase ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                            className={`${errPurchase ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -1695,12 +1689,12 @@ const Index = (props) => {
                                                     value={
                                                         e?.thue
                                                             ? {
-                                                                  label: taxOptions.find(
-                                                                      (item) => item.value === e?.thue?.value
-                                                                  )?.label,
-                                                                  value: e?.thue?.value,
-                                                                  tax_rate: e?.thue?.tax_rate,
-                                                              }
+                                                                label: taxOptions.find(
+                                                                    (item) => item.value === e?.thue?.value
+                                                                )?.label,
+                                                                value: e?.thue?.value,
+                                                                tax_rate: e?.thue?.tax_rate,
+                                                            }
                                                             : null
                                                     }
                                                     placeholder={"% Thuế"}
