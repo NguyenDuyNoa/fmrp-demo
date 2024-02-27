@@ -252,9 +252,9 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        if (!value) {
-            sOnFetching(true);
-        }
+        // if (!value) {
+        //     sOnFetching(true);
+        // }
         sOnFetching(true);
     }, 500);
 
@@ -377,14 +377,13 @@ const Index = (props) => {
                 // order status chưa
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
-                    value: `${
-                        e?.status
+                    value: `${e?.status
                             ? (e?.status === "not_confirmed" && "Chưa duyệt") ||
-                              (e?.status === "confirmed" && "Đã duyệt") ||
-                              (e?.status === "no_confirmed" && "Không duyệt") ||
-                              (e?.status === "ordered" && "Đã tạo đơn đặt hàng")
+                            (e?.status === "confirmed" && "Đã duyệt") ||
+                            (e?.status === "no_confirmed" && "Không duyệt") ||
+                            (e?.status === "ordered" && "Đã tạo đơn đặt hàng")
                             : ""
-                    }`,
+                        }`,
                 },
 
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },

@@ -58,6 +58,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import BtnAction from "@/components/UI/BtnAction";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -238,7 +239,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
 
         router.replace({
@@ -248,13 +249,14 @@ const Index = (props) => {
             },
         });
 
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     useEffect(() => {
         (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
@@ -426,16 +428,14 @@ const Index = (props) => {
                         e?.order_status?.status === "purchase_ordered"
                             ? dataLang[e?.order_status?.status]
                             : "" ||
-                              `${
-                                  e?.order_status.status === "purchase_portion"
-                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
-                                      : ""
-                              }` ||
-                              `${
-                                  e?.order_status.status === "purchase_enough"
-                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
-                                      : ""
-                              }`,
+                            `${e?.order_status.status === "purchase_portion"
+                                ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
+                                : ""
+                            }` ||
+                            `${e?.order_status.status === "purchase_enough"
+                                ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
+                                : ""
+                            }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -948,10 +948,9 @@ const TabStatus = React.memo((props) => {
             {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
             {props.children}
             <span
-                className={`${
-                    props?.total > 0 &&
+                className={`${props?.total > 0 &&
                     "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"
-                } `}
+                    } `}
             >
                 {props?.total > 0 && props?.total}
             </span>

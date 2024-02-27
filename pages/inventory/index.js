@@ -31,6 +31,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -142,16 +143,17 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/inventory");
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     useEffect(() => {
         onFetching && _ServerFetching();
@@ -252,15 +254,14 @@ const Index = (props) => {
                 { value: `${e?.waidname ? e?.waidname : ""}` },
                 { value: `${e?.total_item ? e?.total_item : ""}` },
                 {
-                    value: `${
-                        e?.adjusted
+                    value: `${e?.adjusted
                             ? e?.adjusted
-                                  ?.split("|||")
-                                  ?.map((item) => item?.split("--")[1])
-                                  ?.map((e) => e)
-                                  .join(", ")
+                                ?.split("|||")
+                                ?.map((item) => item?.split("--")[1])
+                                ?.map((e) => e)
+                                .join(", ")
                             : ""
-                    }`,
+                        }`,
                 },
                 {
                     value: `${e?.staff_create_name ? e?.staff_create_name : ""}`,
@@ -490,9 +491,9 @@ const Index = (props) => {
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 text-center">
                                                                 {e?.date != null
                                                                     ? moment(e?.date).format(
-                                                                          // "DD/MM/YYYY, h:mm:ss"
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                        // "DD/MM/YYYY, h:mm:ss"
+                                                                        "DD/MM/YYYY"
+                                                                    )
                                                                     : ""}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-linear cursor-pointer">

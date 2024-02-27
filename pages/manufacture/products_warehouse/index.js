@@ -41,6 +41,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { routerProductsWarehouse } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -212,7 +213,7 @@ const Index = (props) => {
         sOnFetching_filter(false);
     };
 
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
         inputValue != "" &&
             Axios(
                 "POST",
@@ -234,7 +235,7 @@ const Index = (props) => {
                     }
                 }
             );
-    };
+    }, 500)
 
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
@@ -274,7 +275,7 @@ const Index = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -282,13 +283,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const paginate = (pageNumber) => {
         router.push({

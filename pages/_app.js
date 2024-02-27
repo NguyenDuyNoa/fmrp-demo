@@ -36,7 +36,7 @@ const Default = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <link rel="shortcut icon" href="/favicon.ico" />
+                <link rel="shortcut icon" href="/faviconTitle.png" />
             </Head>
             <Provider store={store}>
                 <main className={deca.className}>

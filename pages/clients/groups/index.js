@@ -31,6 +31,7 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -45,6 +46,8 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const router = useRouter();
+
+    const trangthaiExprired = useStatusExprired();
 
     const dataLang = props.dataLang;
 
@@ -178,17 +181,18 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/clients/groups");
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
-
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500
+    )
     const multiDataSet = [
         {
             columns: [
@@ -238,7 +242,6 @@ const Index = (props) => {
     const _HandleFresh = () => {
         sOnFetching(true);
     };
-    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>

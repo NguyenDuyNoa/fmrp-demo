@@ -1666,6 +1666,10 @@ const MainTable = ({ dataLang }) => {
         })
     }
 
+    const handleSearch = debounce((e) => {
+        queryValue({ search: e.target.value, page: 1, resetPage: true })
+    }, 500)
+
     const shareProps = {
         dataTable,
         dataLang,
@@ -1678,7 +1682,6 @@ const MainTable = ({ dataLang }) => {
         fetDataOrder,
         fetchDataPlan
     };
-    console.log("dataTable.listDataRight?.idCommand", dataTable.listDataRight?.idCommand);
     return (
         <React.Fragment>
             <FilterHeader {...shareProps} />
@@ -1694,7 +1697,7 @@ const MainTable = ({ dataLang }) => {
                                 />
                                 <input
                                     value={isValue.search}
-                                    onChange={(e) => queryValue({ search: e.target.value, page: 1, resetPage: true })}
+                                    onChange={(e) => handleSearch(e)}
                                     className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                     type="text"
                                     placeholder="Tìm kế hoạch NVL"

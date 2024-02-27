@@ -286,7 +286,8 @@ const BodyGantt = ({
 
                                                     {e.show &&
                                                         e.listProducts.map((i, iIndex) => (
-                                                            <label ref={heightItems} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-[50px]`}
+                                                            <label ref={heightItems} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-full`}
+                                                            // <label ref={heightItems} key={i.id} htmlFor={i.id} className={`cursor-pointer grid grid-cols-12 gap-2 items-center my-2 h-[50px]`}
                                                             >
                                                                 <div className="col-span-1 mx-auto">
                                                                     <button
@@ -329,6 +330,7 @@ const BodyGantt = ({
                                                                             {i.name}
                                                                         </h1>
                                                                         <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
+                                                                            {/* {i.productVariation} */}
                                                                             {i.desription} - {i.productVariation}
                                                                         </h1>
                                                                     </div>
@@ -571,7 +573,7 @@ const BodyGantt = ({
                             </div>
                         </div>
                     )}
-                    <div className="w-full border-b flex flex-col">
+                    {/* <div className="w-full border-b flex flex-col">
                         <div className="border-b">
                             <button type="button" onClick={handleToggle} className="flex items-center gap-2 my-2">
                                 <Image
@@ -584,7 +586,7 @@ const BodyGantt = ({
                                 <h1 className="text-[#52575E] font-normal text-sm"> Thêm sản phẩm</h1>
                             </button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             ) : (
                 <div className=" flex flex-col justify-center items-center h-[70%] mx-auto">

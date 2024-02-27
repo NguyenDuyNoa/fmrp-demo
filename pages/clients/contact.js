@@ -27,6 +27,7 @@ import SelectComponent from "components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -147,7 +148,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -155,13 +156,14 @@ const Index = (props) => {
                 // tab: router.query?.page,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500);
     useEffect(() => {
         (onFetching && _ServerFetching()) ||
             (onFetching && _ServerFetching_brand()) ||
@@ -285,9 +287,8 @@ const Index = (props) => {
                 { value: `${e.position ? e.position : ""}` },
                 { value: `${e.email ? e.email : ""}` },
                 {
-                    value: `${
-                        e.birthday ? (e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "") : ""
-                    }`,
+                    value: `${e.birthday ? (e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "") : ""
+                        }`,
                 },
                 { value: `${e.address ? e.address : ""}` },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },

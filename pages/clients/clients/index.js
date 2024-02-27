@@ -34,6 +34,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { TITLE_DELETE, CONFIRM_DELETION } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -84,10 +85,9 @@ const Index = (props) => {
         const id = Number(tabPage);
         Axios(
             "GET",
-            `/api_web/${
-                tabPage === "0" || tabPage === "-1"
-                    ? "api_client/client?csrf_protection=true"
-                    : "api_client/client/?csrf_protection=true"
+            `/api_web/${tabPage === "0" || tabPage === "-1"
+                ? "api_client/client?csrf_protection=true"
+                : "api_client/client/?csrf_protection=true"
             }`,
             {
                 params: {
@@ -189,7 +189,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -197,13 +197,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     useEffect(() => {
         (onFetching && _ServerFetching()) ||
@@ -387,9 +388,8 @@ const Index = (props) => {
                                                     onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                                     total={e.count}
                                                     active={e.id}
-                                                    className={`${
-                                                        e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "
-                                                    }`}
+                                                    className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "
+                                                        }`}
                                                 >
                                                     {e.name}
                                                 </TabFilter>
@@ -507,23 +507,23 @@ const Index = (props) => {
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[18%]   rounded-md text-left flex object-cover  justify-start items-center flex-wrap gap-2">
                                                                 {e?.staff_charge
                                                                     ? e.staff_charge?.map((d) => {
-                                                                          return (
-                                                                              <>
-                                                                                  <Tooltip
-                                                                                      title={d.full_name}
-                                                                                      arrow
-                                                                                      theme="dark"
-                                                                                  >
-                                                                                      <ImageErrors
-                                                                                          src={d.profile_image}
-                                                                                          width={40}
-                                                                                          height={40}
-                                                                                          defaultSrc="/user-placeholder.jpg"
-                                                                                          alt="Image"
-                                                                                          className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                                                      />
-                                                                                  </Tooltip>
-                                                                                  {/* <Popup
+                                                                        return (
+                                                                            <>
+                                                                                <Tooltip
+                                                                                    title={d.full_name}
+                                                                                    arrow
+                                                                                    theme="dark"
+                                                                                >
+                                                                                    <ImageErrors
+                                                                                        src={d.profile_image}
+                                                                                        width={40}
+                                                                                        height={40}
+                                                                                        defaultSrc="/user-placeholder.jpg"
+                                                                                        alt="Image"
+                                                                                        className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                                    />
+                                                                                </Tooltip>
+                                                                                {/* <Popup
                                         className="dropdown-avt "
                                         key={d.id}
                                         trigger={(open) => (
@@ -550,9 +550,9 @@ const Index = (props) => {
                                           {d.full_name}
                                         </span>
                                       </Popup> */}
-                                                                              </>
-                                                                          );
-                                                                      })
+                                                                            </>
+                                                                        );
+                                                                    })
                                                                     : ""}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
@@ -561,16 +561,14 @@ const Index = (props) => {
                                                                         <span
                                                                             key={h.id}
                                                                             style={{
-                                                                                backgroundColor: `${
-                                                                                    h.color == "" || h.color == null
+                                                                                backgroundColor: `${h.color == "" || h.color == null
                                                                                         ? "#e2f0fe"
                                                                                         : h.color
-                                                                                }`,
-                                                                                color: `${
-                                                                                    h.color == "" || h.color == null
+                                                                                    }`,
+                                                                                color: `${h.color == "" || h.color == null
                                                                                         ? "#0F4F9E"
                                                                                         : "white"
-                                                                                }`,
+                                                                                    }`,
                                                                             }}
                                                                             className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}
                                                                         >

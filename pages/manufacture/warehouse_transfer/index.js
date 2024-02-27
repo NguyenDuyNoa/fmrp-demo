@@ -40,6 +40,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { routerWarehouseTransfer } from "routers/manufacture";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -216,7 +217,7 @@ const Index = (props) => {
 
     let searchTimeout;
 
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
         if (inputValue == "") {
             return;
         } else {
@@ -244,7 +245,7 @@ const Index = (props) => {
                 );
             }, 500);
         }
-    };
+    }, 500)
 
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
@@ -285,7 +286,7 @@ const Index = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -293,13 +294,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const paginate = (pageNumber) => {
         router.push({
@@ -371,9 +373,8 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"
-                    }`,
+                    title: `${dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"
+                        }`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -1035,11 +1036,10 @@ const Index = (props) => {
                                                             <h6 className="col-span-1 mx-auto">
                                                                 {
                                                                     <span
-                                                                        className={`${
-                                                                            e?.order_id != 0
+                                                                        className={`${e?.order_id != 0
                                                                                 ? "bg-orange-200 text-orange-500 px-4"
                                                                                 : "bg-red-200 text-red-500 px-2"
-                                                                        }  py-1 rounded-2xl font-medium text-xs`}
+                                                                            }  py-1 rounded-2xl font-medium text-xs`}
                                                                     >
                                                                         {e?.order_id != 0
                                                                             ? "Đã giữ kho"

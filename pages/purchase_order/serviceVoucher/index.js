@@ -36,6 +36,7 @@ import BtnAction from "@/components/UI/BtnAction";
 import Pagination from "@/components/UI/pagination";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -162,7 +163,7 @@ const Index = (props) => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
 
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
         Axios(
             "POST",
             `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
@@ -178,7 +179,7 @@ const Index = (props) => {
                 }
             }
         );
-    };
+    }, 500)
 
     const _ServerFetching_group = () => {
         Axios(
@@ -204,7 +205,7 @@ const Index = (props) => {
         );
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -212,13 +213,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const paginate = (pageNumber) => {
         router.push({
@@ -846,10 +848,9 @@ const TabStatus = React.memo((props) => {
             {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
             {props.children}
             <span
-                className={`${
-                    props?.total > 0 &&
+                className={`${props?.total > 0 &&
                     "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"
-                } `}
+                    } `}
             >
                 {props?.total > 0 && props?.total}
             </span>
