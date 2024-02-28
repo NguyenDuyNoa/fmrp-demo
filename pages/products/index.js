@@ -205,11 +205,11 @@ const Index = (props) => {
     const _ServerFetchingAnother = () => {
         Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
-                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
+                var { rResult } = response?.data;
+                sDataBranchOption(rResult?.map((e) => ({ label: e.name, value: e.id })));
                 dispatch({
                     type: "branch/update",
-                    payload: rResult.map((e) => ({
+                    payload: rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,
                     })),
@@ -219,10 +219,10 @@ const Index = (props) => {
 
         Axios("GET", "/api_web/api_product/productType/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
+                var data = response?.data;
                 dispatch({
                     type: "type_finishedProduct/update",
-                    payload: data.map((e) => ({
+                    payload: data?.map((e) => ({
                         label: dataLang[e.name],
                         value: e.code,
                     })),
@@ -232,10 +232,10 @@ const Index = (props) => {
 
         Axios("GET", "/api_web/Api_unit/unit/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                var { rResult } = response?.data;
                 dispatch({
                     type: "unit_finishedProduct/update",
-                    payload: rResult.map((e) => ({
+                    payload: rResult?.map((e) => ({
                         label: e.unit,
                         value: e.id,
                     })),
@@ -245,10 +245,10 @@ const Index = (props) => {
 
         Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                var { rResult } = response?.data;
                 dispatch({
                     type: "variant_NVL/update",
-                    payload: rResult.map((e) => ({
+                    payload: rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,
                         option: e.option,
@@ -1742,7 +1742,7 @@ const Popup_ThanhPham = React.memo((props) => {
         //     }
         // });
     };
-
+    console.log(dataTotalVariant);
     return (
         <PopupEdit
             title={
@@ -2135,7 +2135,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
-                                                    isDisabled={dataVariantSending[0] ? true : false}
+                                                    isDisabled={dataTotalVariant?.some(e => e.name != "" || e.name != null)}
                                                     value={
                                                         variantMain
                                                             ? {
@@ -2258,7 +2258,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
-                                                    isDisabled={dataVariantSending[1] ? true : false}
+                                                    isDisabled={dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x.name != "" || x.name != null))}
                                                     value={
                                                         variantSub
                                                             ? {

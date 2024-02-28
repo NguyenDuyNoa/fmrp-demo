@@ -98,8 +98,11 @@ function MainPage({ Component, pageProps }) {
     }, [changeLang]);
 
     useEffect(() => {
-        sChangeLang(true);
         FetchSetingServer()
+    }, [])
+
+    useEffect(() => {
+        sChangeLang(true);
     }, [langDefault]);
     ////
 
