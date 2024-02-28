@@ -1749,7 +1749,8 @@ const Popup_NVL = React.memo((props) => {
                                                             }
                                                             : null
                                                     }
-                                                    isDisabled={dataVariantSending[0] ? true : false}
+                                                    // isDisabled={dataVariantSending[0] ? true : false}
+                                                    isDisabled={dataVariantSending[0] && dataTotalVariant?.some(e => e?.id != "" || e?.id != null)}
                                                     onChange={_HandleChangeInput.bind(this, "variantMain")}
                                                     isClearable={true}
                                                     placeholder={
@@ -1876,7 +1877,8 @@ const Popup_NVL = React.memo((props) => {
                                                             }
                                                             : null
                                                     }
-                                                    isDisabled={dataVariantSending[1] ? true : false}
+                                                    // isDisabled={dataVariantSending[1] ? true : false}
+                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x?.id != "" || x?.id != null))}
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
                                                     placeholder={

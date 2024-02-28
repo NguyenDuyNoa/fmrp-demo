@@ -2135,7 +2135,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
-                                                    isDisabled={dataTotalVariant?.some(e => e.name != "" || e.name != null)}
+                                                    // isDisabled={false}
+                                                    isDisabled={dataVariantSending[0] && dataTotalVariant?.some(e => e?.id != "" || e?.id != null)}
+                                                    // isDisabled={dataVariantSending[0] ? true : false}
+
                                                     value={
                                                         variantMain
                                                             ? {
@@ -2258,7 +2261,9 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
-                                                    isDisabled={dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x.name != "" || x.name != null))}
+                                                    // isDisabled={dataVariantSending[1] ? true : false}
+                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x.id != "" || x.id != null))}
+                                                    // isDisabled={false}
                                                     value={
                                                         variantSub
                                                             ? {
