@@ -83,12 +83,23 @@ function MainPage({ Component, pageProps }) {
         });
     };
 
+    const FetchSetingServer = async () => {
+        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                const { settings } = response?.data
+                console.log("settings", settings);
+                dispatch({ type: "setings/server", payload: settings });
+            }
+        });
+    };
+
     useEffect(() => {
         changeLang && _ServerLang();
     }, [changeLang]);
 
     useEffect(() => {
         sChangeLang(true);
+        FetchSetingServer()
     }, [langDefault]);
     ////
 

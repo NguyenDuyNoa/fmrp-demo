@@ -14,13 +14,14 @@ import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import formatNumber from "@/utils/helpers/formatnumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
@@ -29,6 +30,10 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         onFetchingWarehouse: false,
         onFetchingCondition: false,
     };
+    const dataSeting = useSetingServer()
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    }
 
     const isShow = useToast();
 
@@ -310,9 +315,8 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                 classNameBtn={""}
                 button={
                     <button
-                        className={`${
-                            props.type == "sales_product" ? "" : "justify-center"
-                        } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                        className={`${props.type == "sales_product" ? "" : "justify-center"
+                            } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                     >
                         <Box1
                             size={20}
@@ -510,11 +514,10 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                         {formatNumber(e?.quantity_had_condition)}
                                                     </h6>
                                                     <h6
-                                                        className={`2xl:text-[13px] flex items-start ${
-                                                            e?.item?.warehouse_location?.length > 1
-                                                                ? "justify-start"
-                                                                : "justify-center"
-                                                        }  flex-wrap gap-2 xl:text-[12px] text-[11px] py-0.5 col-span-3  rounded-md  break-words`}
+                                                        className={`2xl:text-[13px] flex items-start ${e?.item?.warehouse_location?.length > 1
+                                                            ? "justify-start"
+                                                            : "justify-center"
+                                                            }  flex-wrap gap-2 xl:text-[12px] text-[11px] py-0.5 col-span-3  rounded-md  break-words`}
                                                     >
                                                         {e?.item?.warehouse_location?.length > 0 ? (
                                                             e?.item?.warehouse_location?.map((i) => {
@@ -548,14 +551,14 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                     </h3>
                                                                                     <div className="flex items-center font-oblique flex-wrap">
                                                                                         {dataProductSerial.is_enable ===
-                                                                                        "1" ? (
+                                                                                            "1" ? (
                                                                                             <div className="flex gap-0.5">
                                                                                                 <h6 className="text-[8px]">
                                                                                                     Serial:
                                                                                                 </h6>
                                                                                                 <h6 className="text-[9px] px-1  w-[full] text-left ">
                                                                                                     {i.serial == null ||
-                                                                                                    i.serial == ""
+                                                                                                        i.serial == ""
                                                                                                         ? "-"
                                                                                                         : i?.serial}
                                                                                                 </h6>
@@ -565,7 +568,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                         )}
                                                                                         {dataMaterialExpiry.is_enable ===
                                                                                             "1" ||
-                                                                                        dataProductExpiry.is_enable ===
+                                                                                            dataProductExpiry.is_enable ===
                                                                                             "1" ? (
                                                                                             <>
                                                                                                 <div className="flex gap-0.5">
@@ -575,7 +578,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                                     <h6 className="text-[9px] px-1  w-[full] text-left ">
                                                                                                         {i.lot ==
                                                                                                             null ||
-                                                                                                        i.lot == ""
+                                                                                                            i.lot == ""
                                                                                                             ? "-"
                                                                                                             : i?.lot}
                                                                                                     </h6>
@@ -587,10 +590,10 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                                     <h6 className="text-[9px] px-1  w-[full] text-center ">
                                                                                                         {i?.expiration_date
                                                                                                             ? moment(
-                                                                                                                  i?.expiration_date
-                                                                                                              ).format(
-                                                                                                                  "DD/MM/YYYY"
-                                                                                                              )
+                                                                                                                i?.expiration_date
+                                                                                                            ).format(
+                                                                                                                "DD/MM/YYYY"
+                                                                                                            )
                                                                                                             : "-"}
                                                                                                     </h6>
                                                                                                 </div>
@@ -604,15 +607,14 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                         </Zoom>
                                                                         {i.show && (
                                                                             <NumericFormat
-                                                                                className={`${
-                                                                                    i.show &&
+                                                                                className={`${i.show &&
                                                                                     errorQuantity &&
                                                                                     (i.quantity_export == "" ||
                                                                                         i.quantity_export == 0 ||
                                                                                         i.quantity_export == "0")
-                                                                                        ? "border-red-500 focus:border-red-500"
-                                                                                        : "border-gray-300 focus:border-blue-400"
-                                                                                } py-1 px-2 my-1   border outline-none rounded-3xl w-full`}
+                                                                                    ? "border-red-500 focus:border-red-500"
+                                                                                    : "border-gray-300 focus:border-blue-400"
+                                                                                    } py-1 px-2 my-1   border outline-none rounded-3xl w-full`}
                                                                                 onValueChange={(event) =>
                                                                                     handleChange(
                                                                                         "quantity_export",

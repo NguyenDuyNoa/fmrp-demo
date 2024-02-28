@@ -32,6 +32,9 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { routerSalesOrder } from "@/routers/sellingGoods";
+import formatMoney from "@/utils/helpers/formatMoney";
+import { useSelector } from "react-redux";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -60,6 +63,8 @@ const Index = (props) => {
     };
 
     const isShow = useToast();
+
+    const datatSetingFomart = useSetingServer()
 
     const trangthaiExprired = useStatusExprired();
 
@@ -189,7 +194,11 @@ const Index = (props) => {
     }, [onFetching_filter]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
+        sOnFetching_filter(true)
+    }, [])
+
+    useEffect(() => {
+        (router.query.tab && sOnFetching(true))
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
@@ -250,9 +259,8 @@ const Index = (props) => {
     }, 500);
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        const money = formatMoney(+number, datatSetingFomart)
+        return money
     };
     // excel
     const multiDataSet = [
@@ -370,11 +378,10 @@ const Index = (props) => {
                 },
                 { value: `${e?.staff_name ? e?.staff_name : ""}` },
                 {
-                    value: `${
-                        e?.status
-                            ? (e?.status === "un_approved" && "Chưa duyệt") || (e?.status === "approved" && "Đã duyệt")
-                            : ""
-                    }`,
+                    value: `${e?.status
+                        ? (e?.status === "un_approved" && "Chưa duyệt") || (e?.status === "approved" && "Đã duyệt")
+                        : ""
+                        }`,
                 },
                 { value: `${e?.process ? e?.process : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -857,33 +864,33 @@ const Index = (props) => {
                                                                     {(["payment_unpaid"].includes(
                                                                         e?.status_payment
                                                                     ) && (
-                                                                        <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
-                                                                            {dataLang[e?.status_payment] ||
-                                                                                e?.status_payment}
-                                                                        </span>
-                                                                    )) ||
-                                                                        (["payment_partially_paid"].includes(
-                                                                            e?.status_payment
-                                                                        ) && (
-                                                                            <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
-                                                                                {dataLang[e?.status_payment] ||
-                                                                                    e?.status_payment}{" "}
-                                                                                {`(${formatNumber(e?.total_payment)})`}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (["payment_paid"].includes(
-                                                                            e?.status_payment
-                                                                        ) && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                                <TickCircle
-                                                                                    className="bg-lime-500 rounded-full"
-                                                                                    color="white"
-                                                                                    size={15}
-                                                                                />
+                                                                            <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
                                                                                 {dataLang[e?.status_payment] ||
                                                                                     e?.status_payment}
                                                                             </span>
-                                                                        ))}
+                                                                        )) ||
+                                                                        (["payment_partially_paid"].includes(
+                                                                            e?.status_payment
+                                                                        ) && (
+                                                                                <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
+                                                                                    {dataLang[e?.status_payment] ||
+                                                                                        e?.status_payment}{" "}
+                                                                                    {`(${formatNumber(e?.total_payment)})`}
+                                                                                </span>
+                                                                            )) ||
+                                                                        (["payment_paid"].includes(
+                                                                            e?.status_payment
+                                                                        ) && (
+                                                                                <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
+                                                                                    <TickCircle
+                                                                                        className="bg-lime-500 rounded-full"
+                                                                                        color="white"
+                                                                                        size={15}
+                                                                                    />
+                                                                                    {dataLang[e?.status_payment] ||
+                                                                                        e?.status_payment}
+                                                                                </span>
+                                                                            ))}
                                                                 </h6>
                                                                 <h6 className="col-span-1 w-fit mx-auto">
                                                                     <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
@@ -915,63 +922,58 @@ const Index = (props) => {
                                                                                             "keep_stock",
                                                                                             "import_outsourcing",
                                                                                         ].includes(item?.code) && (
-                                                                                            <>
-                                                                                                <div className="flex items-center">
-                                                                                                    <div
-                                                                                                        className={`${
-                                                                                                            item?.active
+                                                                                                <>
+                                                                                                    <div className="flex items-center">
+                                                                                                        <div
+                                                                                                            className={`${item?.active
                                                                                                                 ? `h-2 w-2 rounded-full bg-green-500`
                                                                                                                 : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                        } `}
-                                                                                                    />
-                                                                                                    {!isValueDelivery && (
-                                                                                                        <div
-                                                                                                            className={`${
-                                                                                                                item?.active
+                                                                                                                } `}
+                                                                                                        />
+                                                                                                        {!isValueDelivery && (
+                                                                                                            <div
+                                                                                                                className={`${item?.active
                                                                                                                     ? `w-full bg-green-500 h-0.5 `
                                                                                                                     : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                            }`}
-                                                                                                        />
-                                                                                                    )}
-                                                                                                </div>
-                                                                                                <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
-                                                                                                    <div
-                                                                                                        className={`${
-                                                                                                            item?.active
+                                                                                                                    }`}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </div>
+                                                                                                    <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
+                                                                                                        <div
+                                                                                                            className={`${item?.active
                                                                                                                 ? "text-green-500"
                                                                                                                 : "text-slate-500"
-                                                                                                        } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                    >
-                                                                                                        <div className="flex justify-center items-center w-full gap-1">
-                                                                                                            <h6>
-                                                                                                                {
-                                                                                                                    dataLang[
+                                                                                                                } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                                                                                        >
+                                                                                                            <div className="flex justify-center items-center w-full gap-1">
+                                                                                                                <h6>
+                                                                                                                    {
+                                                                                                                        dataLang[
                                                                                                                         item
                                                                                                                             ?.name
-                                                                                                                    ]
-                                                                                                                }
-                                                                                                            </h6>
-                                                                                                            {isValueDelivery && (
-                                                                                                                <h6
-                                                                                                                    className={`${
-                                                                                                                        item?.active &&
-                                                                                                                        isValueDelivery
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                </h6>
+                                                                                                                {isValueDelivery && (
+                                                                                                                    <h6
+                                                                                                                        className={`${item?.active &&
+                                                                                                                            isValueDelivery
                                                                                                                             ? "text-green-500"
                                                                                                                             : "text-orange-500"
-                                                                                                                    } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
-                                                                                                                >{`(${
-                                                                                                                    dataLang[
+                                                                                                                            } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                                                                                    >{`(${dataLang[
                                                                                                                         item
                                                                                                                             ?.status
                                                                                                                     ] ||
-                                                                                                                    item?.status
-                                                                                                                })`}</h6>
-                                                                                                            )}
+                                                                                                                        item?.status
+                                                                                                                        })`}</h6>
+                                                                                                                )}
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                            </>
-                                                                                        )}
+                                                                                                </>
+                                                                                            )}
                                                                                         <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
                                                                                             {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
                                                                                             {isValue &&
@@ -981,8 +983,8 @@ const Index = (props) => {
                                                                                                         0,
                                                                                                         isExpanded
                                                                                                             ? item
-                                                                                                                  ?.reference
-                                                                                                                  .length
+                                                                                                                ?.reference
+                                                                                                                .length
                                                                                                             : 2
                                                                                                     )
                                                                                                     .map(
@@ -1001,7 +1003,7 @@ const Index = (props) => {
                                                                                                     )}
                                                                                             {item?.reference &&
                                                                                                 item?.reference.length >
-                                                                                                    2 && (
+                                                                                                2 && (
                                                                                                     <button
                                                                                                         onClick={
                                                                                                             toggleShowAll

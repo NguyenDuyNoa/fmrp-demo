@@ -23,7 +23,9 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import ModalImage from "react-modal-image";
-import formatNumber from "@/utils/helpers/formatnumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
@@ -78,6 +80,8 @@ const Popup_DetailKeepStock = (props) => {
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
+    const dataSeting = useSetingServer()
+
     const _ToggleModal = (e) => sOpen(e);
 
     const setIsFetch = (e) => sIsFetching((prev) => ({ ...prev, ...e }));
@@ -86,6 +90,10 @@ const Popup_DetailKeepStock = (props) => {
         open && sIsValue(initialValues);
         open && setIsFetch({ onFetching: true, onFetchingFilter: true });
     }, [open]);
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    }
 
     const handleFetching = () => {
         Axios(
@@ -437,11 +445,10 @@ const Popup_DetailKeepStock = (props) => {
                                                                     size="22"
                                                                     color="red"
                                                                     variant="Bold"
-                                                                    className={`${
-                                                                        e.isShow
-                                                                            ? "rotate-90 transition-all duration-200 ease-linear"
-                                                                            : ""
-                                                                    } cursor-pointer`}
+                                                                    className={`${e.isShow
+                                                                        ? "rotate-90 transition-all duration-200 ease-linear"
+                                                                        : ""
+                                                                        } cursor-pointer`}
                                                                 />
                                                                 {isMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                                             </h6>
@@ -458,17 +465,15 @@ const Popup_DetailKeepStock = (props) => {
                                                                 {e?.warehouses_to_name}
                                                             </h6>
                                                             <h6
-                                                                className={`text-[12px] ${
-                                                                    e?.warehouseman_id == "0"
-                                                                        ? "bg-blue-200 text-blue-700 px-1.5"
-                                                                        : " bg-green-200 text-green-700 px-3"
-                                                                } py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
+                                                                className={`text-[12px] ${e?.warehouseman_id == "0"
+                                                                    ? "bg-blue-200 text-blue-700 px-1.5"
+                                                                    : " bg-green-200 text-green-700 px-3"
+                                                                    } py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
                                                             >
-                                                                {`${
-                                                                    e?.warehouseman_id == "0"
-                                                                        ? "Chưa duyệt kho"
-                                                                        : "Đã duyệt kho"
-                                                                }`}
+                                                                {`${e?.warehouseman_id == "0"
+                                                                    ? "Chưa duyệt kho"
+                                                                    : "Đã duyệt kho"
+                                                                    }`}
                                                             </h6>
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
                                                                 {e?.note}
@@ -526,11 +531,10 @@ const Popup_DetailKeepStock = (props) => {
                                                                         <div className="max-h-[300px] col-span-10 grid grid-cols-10 items-center ">
                                                                             {e?.items?.map((e, index) => (
                                                                                 <div
-                                                                                    className={`col-span-10 ${
-                                                                                        index == 0
-                                                                                            ? "border-t-0"
-                                                                                            : "border-t"
-                                                                                    }  overflow-hidden grid grid-cols-9  hover:bg-slate-50 items-center`}
+                                                                                    className={`col-span-10 ${index == 0
+                                                                                        ? "border-t-0"
+                                                                                        : "border-t"
+                                                                                        }  overflow-hidden grid grid-cols-9  hover:bg-slate-50 items-center`}
                                                                                     key={e.id}
                                                                                 >
                                                                                     <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
@@ -540,7 +544,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                         <div className="flex items-center gap-2">
                                                                                             <div>
                                                                                                 {e?.item?.images !=
-                                                                                                null ? (
+                                                                                                    null ? (
                                                                                                     <ModalImage
                                                                                                         small={
                                                                                                             e?.item
@@ -575,7 +579,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                 </h6>
                                                                                                 <div className="flex items-center font-oblique flex-wrap">
                                                                                                     {dataProductSerial.is_enable ===
-                                                                                                    "1" ? (
+                                                                                                        "1" ? (
                                                                                                         <div className="flex gap-0.5">
                                                                                                             <h6 className="text-[12px]">
                                                                                                                 Serial:
@@ -584,13 +588,13 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                                 {e?.item
                                                                                                                     ?.serial ==
                                                                                                                     null ||
-                                                                                                                e?.item
-                                                                                                                    ?.serial ==
+                                                                                                                    e?.item
+                                                                                                                        ?.serial ==
                                                                                                                     ""
                                                                                                                     ? "-"
                                                                                                                     : e
-                                                                                                                          ?.item
-                                                                                                                          ?.serial}
+                                                                                                                        ?.item
+                                                                                                                        ?.serial}
                                                                                                             </h6>
                                                                                                         </div>
                                                                                                     ) : (
@@ -598,7 +602,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                     )}
                                                                                                     {dataMaterialExpiry.is_enable ===
                                                                                                         "1" ||
-                                                                                                    dataProductExpiry.is_enable ===
+                                                                                                        dataProductExpiry.is_enable ===
                                                                                                         "1" ? (
                                                                                                         <>
                                                                                                             <div className="flex gap-0.5">
@@ -610,14 +614,14 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                                         ?.item
                                                                                                                         ?.lot ==
                                                                                                                         null ||
-                                                                                                                    e
-                                                                                                                        ?.item
-                                                                                                                        ?.lot ==
+                                                                                                                        e
+                                                                                                                            ?.item
+                                                                                                                            ?.lot ==
                                                                                                                         ""
                                                                                                                         ? "-"
                                                                                                                         : e
-                                                                                                                              ?.item
-                                                                                                                              ?.lot}
+                                                                                                                            ?.item
+                                                                                                                            ?.lot}
                                                                                                                 </h6>
                                                                                                             </div>
                                                                                                             <div className="flex gap-0.5">
@@ -629,11 +633,11 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                                         ?.item
                                                                                                                         ?.expiration_date
                                                                                                                         ? isMoment(
-                                                                                                                              e
-                                                                                                                                  ?.item
-                                                                                                                                  ?.expiration_date,
-                                                                                                                              "DD/MM/YYYY"
-                                                                                                                          )
+                                                                                                                            e
+                                                                                                                                ?.item
+                                                                                                                                ?.expiration_date,
+                                                                                                                            "DD/MM/YYYY"
+                                                                                                                        )
                                                                                                                         : "-"}
                                                                                                                 </h6>
                                                                                                             </div>

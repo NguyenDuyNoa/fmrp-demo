@@ -7,7 +7,7 @@ import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
 import Select, { components } from "react-select";
-import { NumericFormat } from "react-number-format";
+import { NumberFormatBase, NumericFormat } from "react-number-format";
 import { Trash as IconDelete, Add, Minus } from "iconsax-react";
 
 import { _ServerInstance as Axios } from "/services/axios";
@@ -21,9 +21,13 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
 import { routerSalesOrder } from "@/routers/sellingGoods";
 import { debounce } from "lodash";
-
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
 const Index = (props) => {
     const router = useRouter();
+
+    const dataSeting = useSetingServer()
 
     const id = router.query?.id;
 
@@ -128,7 +132,7 @@ const Index = (props) => {
         router.query && setNote("");
 
         router.query && setOnFetching(true);
-        router.query && setOnFetchingItemsAll(true);
+        // router.query && setOnFetchingItemsAll(true);
     }, [id, router.query]);
 
     // Fetch edit
@@ -230,7 +234,7 @@ const Index = (props) => {
             {
                 params: {
                     search: "",
-                    "filter[branch_id]": branch !== null ? [branch?.value]?.map((e) => e) : null,
+                    "branch_id": branch !== null ? [branch?.value]?.map((e) => e) : null,
                 },
             },
             (err, response) => {
@@ -264,19 +268,19 @@ const Index = (props) => {
     const handleFetchingContactPerson = () => {
         Axios(
             "GET",
-            `/api_web/api_client/contactCombobox/?csrf_protection=true`,
+            `/api_web/api_client/searchContact?csrf_protection=true`,
             {
                 params: {
-                    "filter[client_id]": customer != null ? customer.value : null,
+                    "client_id": customer != null ? customer.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    const { data } = response.data;
                     setDataContactPerson(
-                        rResult?.map((e) => ({
-                            label: e.full_name,
-                            value: e.id,
+                        data?.contacts.map((e) => ({
+                            label: e?.full_name,
+                            value: e?.id,
                         }))
                     );
                 }
@@ -284,24 +288,47 @@ const Index = (props) => {
         );
         setOnFetchingContactPerson(false);
     };
+    // const handleFetchingContactPerson = () => {
+    //     Axios(
+    //         "GET",
+    //         `/api_web/api_client/contactCombobox/?csrf_protection=true`,
+    //         {
+    //             params: {
+    //                 "filter[client_id]": customer != null ? customer.value : null,
+    //             },
+    //         },
+    //         (err, response) => {
+    //             if (!err) {
+    //                 var { rResult } = response.data;
+    //                 setDataContactPerson(
+    //                     rResult?.map((e) => ({
+    //                         label: e.full_name,
+    //                         value: e.id,
+    //                     }))
+    //                 );
+    //             }
+    //         }
+    //     );
+    //     setOnFetchingContactPerson(false);
+    // };
 
     // Staff
     const handleFetchingStaff = () => {
         Axios(
             "GET",
-            `/api_web/Api_staff/staffOption?csrf_protection=true`,
+            `/api_web/api_client/getStaffBranch?csrf_protection=true`,
             {
                 params: {
-                    "filter[branch_id]": branch !== null ? +branch?.value : null,
+                    "branch_id": branch != null ? [+branch?.value]?.map((e) => e) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response?.data;
+                    const { data } = response?.data;
                     setDataStaffs(
-                        rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.staffid,
+                        data?.staffs?.map((e) => ({
+                            label: e?.full_name,
+                            value: e?.staffid,
                         }))
                     );
                 }
@@ -309,6 +336,29 @@ const Index = (props) => {
         );
         setOnFetchingStaff(false);
     };
+    // const handleFetchingStaff = () => {
+    //     Axios(
+    //         "GET",
+    //         `/api_web/Api_staff/staffOption?csrf_protection=true`,
+    //         {
+    //             params: {
+    //                 "filter[branch_id]": branch !== null ? +branch?.value : null,
+    //             },
+    //         },
+    //         (err, response) => {
+    //             if (!err) {
+    //                 var { rResult } = response?.data;
+    //                 setDataStaffs(
+    //                     rResult?.map((e) => ({
+    //                         label: e.name,
+    //                         value: e.staffid,
+    //                     }))
+    //                 );
+    //             }
+    //         }
+    //     );
+    //     setOnFetchingStaff(false);
+    // };
 
     // Quote
     const handleFetchingQuote = () => {
@@ -338,27 +388,51 @@ const Index = (props) => {
 
     // fetch items
     const handleFetchingItemsAll = () => {
-        if (typeOrder === "1") {
-            Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    setDataItems(result);
-                }
-            });
-            setOnFetchingItemsAll(false);
+        let form = new FormData()
+        if (branch != null) {
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
         }
-        if (typeOrder === "0") {
-            Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    setDataItems(result);
-                }
-            });
-            setOnFetchingItemsAll(false);
-        }
+        Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
+            data: form,
+            headers: { "Content-Type": "multipart/form-data" },
+        }, (err, response) => {
+            if (!err) {
+                const { result } = response.data.data;
+                setDataItems(result);
+            }
+        });
+        setOnFetchingItemsAll(false);
+        // if (typeOrder === "1") {
+        //     Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
+        //         params: {
+        //             "branch_id": branch != null ? [+branch?.value]?.map((e) => e) : null,
+        //         },
+        //     }, (err, response) => {
+        //         if (!err) {
+        //             const { result } = response.data.data;
+        //             setDataItems(result);
+        //         }
+        //     });
+        //     setOnFetchingItemsAll(false);
+        // }
+        // if (typeOrder === "0") {
+        //     Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
+        //         params: {
+        //             "branch_id": branch != null ? [+branch?.value]?.map((e) => e) : null,
+        //         },
+        //     }, (err, response) => {
+        //         if (!err) {
+        //             const { result } = response.data.data;
+        //             setDataItems(result);
+        //         }
+        //     });
+        //     setOnFetchingItemsAll(false);
+        // }
     };
 
     const handleFetchingItem = async () => {
+        let form = new FormData()
+        form.append("branch_id", branch != null ? [+branch?.value]?.map((e) => e) : null)
         if (typeOrder === "1") {
             if (quote && quote.value !== null) {
                 await Axios(
@@ -371,7 +445,7 @@ const Index = (props) => {
                     },
                     (err, response) => {
                         if (!err) {
-                            var { result } = response.data.data;
+                            const { result } = response.data.data;
                             setDataItems(result);
                         }
                     }
@@ -381,10 +455,13 @@ const Index = (props) => {
                 await Axios(
                     "POST",
                     "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
-                    {},
+                    {
+                        data: form,
+                        headers: { "Content-Type": "multipart/form-data" },
+                    },
                     (err, response) => {
                         if (!err) {
-                            var { result } = response.data.data;
+                            const { result } = response.data.data;
                             setDataItems(result);
                         }
                     }
@@ -395,10 +472,13 @@ const Index = (props) => {
             await Axios(
                 "POST",
                 "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
-                {},
+                {
+                    data: form,
+                    headers: { "Content-Type": "multipart/form-data" },
+                },
                 (err, response) => {
                     if (!err) {
-                        var { result } = response.data.data;
+                        const { result } = response.data.data;
                         setDataItems(result);
                     }
                 }
@@ -440,7 +520,7 @@ const Index = (props) => {
     }, [onFetchingContactPerson]);
 
     useEffect(() => {
-        branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true));
+        branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true))
     }, [branch]);
 
     useEffect(() => {
@@ -451,8 +531,8 @@ const Index = (props) => {
     }, [quote]);
 
     useEffect(() => {
-        setOnFetchingItemsAll && handleFetchingItemsAll();
-    }, [setOnFetchingItemsAll]);
+        setOnFetchingItemsAll(true)
+    }, [branch]);
 
     useEffect(() => {
         onFetchingItem && handleFetchingItem();
@@ -593,7 +673,12 @@ const Index = (props) => {
 
     // search api
     const _HandleSeachApi = debounce((inputValue) => {
-        if (inputValue == "") return
+        if (inputValue == "" || branch == null) return
+        let form = new FormData()
+        if (branch != null) {
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+        }
+        form.append("term", inputValue)
         if (typeOrder === "1" && quote && +quote.value) {
             Axios(
                 "POST",
@@ -619,9 +704,8 @@ const Index = (props) => {
                 "POST",
                 `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
                 {
-                    data: {
-                        term: inputValue,
-                    },
+                    data: form,
+                    headers: { "Content-Type": "multipart/form-data" },
                 },
                 (err, response) => {
                     if (!err) {
@@ -635,10 +719,15 @@ const Index = (props) => {
 
     // format number
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        // if (!number && number !== 0) return 0;
+        // const integerPart = Math.floor(number);
+        // return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
+
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    }
 
     const resetValue = () => {
         if (status == "customer") {
@@ -2191,15 +2280,20 @@ const Index = (props) => {
                                             <NumericFormat
                                                 className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 value={1}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                readOnly={true}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                isAllowed={(values) => {
-                                                    const { floatValue } = values;
-                                                    return floatValue > 0;
+                                                // isAllowed={(values) => {
+                                                //     const { floatValue } = values;
+                                                //     return floatValue > 0;
+                                                // }}
+                                                isAllowed={({ floatValue }) => {
+                                                    if (floatValue == 0) {
+                                                        showToast("error", `Số lượng phải lớn hơn 0.`);
+                                                        return false;
+                                                    } else {
+                                                        return true;
+                                                    }
                                                 }}
+                                                allowNegative={false}
+                                                thousandSeparator=","
                                             />
                                             <button
                                                 disabled={true}
@@ -2394,20 +2488,21 @@ const Index = (props) => {
                                                 >
                                                     <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
                                                 </button>
-                                                <NumericFormat
+                                                <NumberFormatBase
                                                     className={`cursor-text appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                    onValueChange={(value) =>
-                                                        handleOnChangeInputOption(e?.id, "quantity", value)
-                                                    }
-                                                    value={e?.quantity || 1}
-                                                    thousandSeparator=","
-                                                    allowNegative={false}
-                                                    decimalScale={0}
-                                                    isNumericString={true}
-                                                    isAllowed={(values) => {
-                                                        const { floatValue } = values;
-                                                        return floatValue > 0;
-                                                    }}
+                                                    // onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
+                                                    // value={e?.quantity}
+                                                    // format={formatNumber}
+                                                    // isAllowed={({ floatValue, value, formattedValue }) => {
+                                                    //     return true
+                                                    // }}
+                                                    // format={(value) => value}
+                                                    format={(value) => value}
+                                                    removeFormatting={(value, changeMeta) => value}
+                                                    getCaretBoundary={(value) => value.split('').map(() => true)}
+                                                    type="text"
+                                                // format={(value) =>
+                                                //     console.log("value", value)}
                                                 />
                                                 <button
                                                     onClick={() => handleIncrease(e.id)}
@@ -2517,7 +2612,7 @@ const Index = (props) => {
                                             <h3
                                                 className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                             >
-                                                {formatNumber(e?.total_amount)}
+                                                {formatMoney(e?.total_amount)}
                                             </h3>
                                         </div>
                                         <div className="col-span-1 ">
@@ -2710,7 +2805,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.price_quote_total || "price_quote_total"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2718,7 +2813,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.sales_product_discount || "sales_product_discount"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalDiscountPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalDiscountPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2729,7 +2824,7 @@ const Index = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalDiscountAfterPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalDiscountAfterPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2737,7 +2832,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.sales_product_total_tax || "sales_product_total_tax"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalTax)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalTax)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2745,7 +2840,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalAmount)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalAmount)}</h3>
                             </div>
                         </div>
                         <div className="space-x-2">

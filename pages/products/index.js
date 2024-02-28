@@ -1246,20 +1246,22 @@ const Popup_ThanhPham = React.memo((props) => {
             sOptSelectedVariantSub(updatedOptions);
         }
     };
-    console.log("dataTotalVariant", dataTotalVariant);
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
-            console.log("ress", dataTotalVariant);
-            console.log("optSelectedVariantMain", optSelectedVariantMain);
-            console.log("optSelectedVariantSub", optSelectedVariantSub);
             const newData = optSelectedVariantMain?.map(e => {
-                const newViar = dataTotalVariant?.find(x => x?.id == e?.id)?.variation_option_2
+                const newViar = dataTotalVariant?.find(x => x?.id == e?.id)
+                console.log("newViar", newViar);
                 return {
                     ...e,
+                    id_primary: newViar?.id_primary ? newViar?.id_primary : e?.id_primary,
+                    isDelete: newViar?.isDelete,
                     variation_option_2: optSelectedVariantSub?.map((item2) => {
-                        const check = newViar?.find(x => x?.id == item2?.id)
+                        const check = newViar?.variation_option_2.find(x => x?.id == item2?.id)
+                        console.log("check", check);
                         return {
                             ...item2,
+                            isDelete: check?.isDelete,
+                            id_primary: check && check?.id_primary ? check?.id_primary : item2?.id_primary,
                             price: check && check?.price ? check?.price : ""
                         }
                     })
@@ -1520,7 +1522,7 @@ const Popup_ThanhPham = React.memo((props) => {
         branch.forEach((e) => formData.append("branch_id[]", e.value));
         formData.append("images", thumbFile);
         console.log("dataTotalVariant", dataTotalVariant);
-        for (let i = 0; i < dataTotalVariant.length; i++) {
+        for (let i = 0; i < dataTotalVariant?.length; i++) {
             var item = dataTotalVariant[i];
 
             formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
@@ -1539,8 +1541,8 @@ const Popup_ThanhPham = React.memo((props) => {
             }
         }
 
-        for (let i = 0; i < dataVariantSending.length; i++) {
-            for (let j = 0; j < dataVariantSending[i].option.length; j++) {
+        for (let i = 0; i < dataVariantSending?.length; i++) {
+            for (let j = 0; j < dataVariantSending[i].option?.length; j++) {
                 formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
             }
         }
@@ -1559,11 +1561,11 @@ const Popup_ThanhPham = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
+                        isShow("success", props.dataLang[message] || message);
                         props.setOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
-                        isShow("error", props.dataLang[message]);
+                        isShow("error", props.dataLang[message] || message);
                     }
                     sOnSending(false);
                 }
@@ -2481,7 +2483,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                                 className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                                             />
                                                                             <div className="flex justify-center">
-                                                                                {e?.isDelete && <button
+                                                                                {ce?.isDelete && <button
                                                                                     // onClick={_HandleDeleteVariant.bind(
                                                                                     //     this,
                                                                                     //     e.id,
@@ -2497,7 +2499,29 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                                     className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
                                                                                 >
                                                                                     <IconDelete size="22" />
-                                                                                </button>}
+                                                                                </button>
+                                                                                }
+                                                                                {ce?.isDelete == undefined && <button
+                                                                                    // onClick={_HandleDeleteVariant.bind(
+                                                                                    //     this,
+                                                                                    //     e.id,
+                                                                                    //     ce.id
+                                                                                    // )}
+                                                                                    onClick={() =>
+                                                                                        handleQueryId({
+                                                                                            id: e.id,
+                                                                                            status: true,
+                                                                                            idChild: ce.id,
+                                                                                        })
+                                                                                    }
+                                                                                    className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                                >
+                                                                                    <IconDelete size="22" />
+                                                                                </button>
+                                                                                }
+
+
+
                                                                             </div>
                                                                         </React.Fragment>
                                                                     ))}

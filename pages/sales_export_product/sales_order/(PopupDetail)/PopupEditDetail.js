@@ -13,12 +13,13 @@ import { SearchNormal1 as IconSearch, Trash as IconDelete, SearchNormal1 } from 
 
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
-import formatNumber from "@/utils/helpers/formatnumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 const Popup_EditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
@@ -28,6 +29,12 @@ const Popup_EditDetail = (props) => {
         onLoading: false,
         onFetchingCondition: false,
     };
+
+    const dataSeting = useSetingServer()
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    }
 
     const [data, sData] = useState({});
 
@@ -303,7 +310,7 @@ const Popup_EditDetail = (props) => {
                                                                         <h6 className="text-[12px]">Serial:</h6>
                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                             {e?.item?.serial == null ||
-                                                                            e?.item?.serial == ""
+                                                                                e?.item?.serial == ""
                                                                                 ? "-"
                                                                                 : e?.item?.serial}
                                                                         </h6>
@@ -312,13 +319,13 @@ const Popup_EditDetail = (props) => {
                                                                     ""
                                                                 )}
                                                                 {dataMaterialExpiry.is_enable === "1" ||
-                                                                dataProductExpiry.is_enable === "1" ? (
+                                                                    dataProductExpiry.is_enable === "1" ? (
                                                                     <>
                                                                         <div className="flex gap-0.5">
                                                                             <h6 className="text-[12px]">Lot:</h6>{" "}
                                                                             <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                 {e?.item?.lot == null ||
-                                                                                e?.item?.lot == ""
+                                                                                    e?.item?.lot == ""
                                                                                     ? "-"
                                                                                     : e?.item?.lot}
                                                                             </h6>
@@ -328,8 +335,8 @@ const Popup_EditDetail = (props) => {
                                                                             <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                 {e?.item?.expiration_date
                                                                                     ? moment(
-                                                                                          e?.item?.expiration_date
-                                                                                      ).format("DD/MM/YYYY")
+                                                                                        e?.item?.expiration_date
+                                                                                    ).format("DD/MM/YYYY")
                                                                                     : "-"}
                                                                             </h6>
                                                                         </div>
@@ -356,14 +363,13 @@ const Popup_EditDetail = (props) => {
                                                 </h6>
                                                 <h6 className="text-[13px]   py-2 col-span-1 font-medium break-words">
                                                     <NumericFormat
-                                                        className={`${
-                                                            errorQuantity &&
+                                                        className={`${errorQuantity &&
                                                             (e?.quantity == 0 ||
                                                                 e?.quantity == "" ||
                                                                 e?.quantity == "0")
-                                                                ? "border-b-red-500"
-                                                                : "border-b-gray-300"
-                                                        } appearance-none bg-transparent  text-center focus:border-b-blue-400 py-1 px-2 my-1   border-b outline-none  w-full`}
+                                                            ? "border-b-red-500"
+                                                            : "border-b-gray-300"
+                                                            } appearance-none bg-transparent  text-center focus:border-b-blue-400 py-1 px-2 my-1   border-b outline-none  w-full`}
                                                         onValueChange={(event) => handleChange("quantity", event, e.id)}
                                                         value={e?.quantity}
                                                         allowNegative={false}

@@ -18,6 +18,7 @@ const adminState = {
     unit_finishedProduct: null,
     congdoan_finishedProduct: null,
     vitrikho_kiemke: null,
+    setings: {}
 };
 
 function adminReducer(state = adminState, action) {
@@ -50,6 +51,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, trangthai: action.payload };
         case "trangthaiExprired":
             return { ...state, trangthaiExprired: action.payload };
+        case "setings/server":
+            return { ...state, setings: action.payload };
         default:
             return state;
     }
