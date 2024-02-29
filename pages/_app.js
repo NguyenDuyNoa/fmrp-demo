@@ -36,7 +36,7 @@ const Default = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <link rel="shortcut icon" href="/faviconTitle.png" />
+                <link rel="shortcut icon" href="/Favicon.png" />
             </Head>
             <Provider store={store}>
                 <main className={deca.className}>
@@ -54,7 +54,7 @@ function MainPage({ Component, pageProps }) {
     const langDefault = useSelector((state) => state.lang);
     const [changeLang, sChangeLang] = useState(false);
     const [data, sData] = useState();
-
+    const [onSeting, sOnSeting] = useState(false)
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
 
@@ -91,6 +91,18 @@ function MainPage({ Component, pageProps }) {
                 dispatch({ type: "setings/server", payload: settings });
             }
         });
+        await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                const data = response?.data;
+                const newData = {
+                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
+                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
+                    dataProductSerial: data.find((x) => x.code == "product_serial"),
+                }
+                dispatch({ type: "setings/feature", payload: newData });
+            }
+        });
+        sOnSeting(false)
     };
 
     useEffect(() => {
@@ -98,8 +110,12 @@ function MainPage({ Component, pageProps }) {
     }, [changeLang]);
 
     useEffect(() => {
-        FetchSetingServer()
+        sOnSeting(true)
     }, [])
+
+    useEffect(() => {
+        onSeting && FetchSetingServer()
+    }, [onSeting])
 
     useEffect(() => {
         sChangeLang(true);
