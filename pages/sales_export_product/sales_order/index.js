@@ -35,6 +35,7 @@ import { routerSalesOrder } from "@/routers/sellingGoods";
 import formatMoney from "@/utils/helpers/formatMoney";
 import { useSelector } from "react-redux";
 import useSetingServer from "@/hooks/useConfigNumber";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -901,8 +902,7 @@ const Index = (props) => {
                                                                 <h6 className="px-2 col-span-1 flex items-center justify-center text-center ">
                                                                     <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                                         {(e?.status === "approved" && (
-                                                                            <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-[#00aa59] transition-all duration-300 ease-in-out text-[#00aa59] hover:bg-[#00aa59] hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
+                                                                            <BtnStatusApproved
                                                                                 onClick={() =>
                                                                                     handleQueryId({
                                                                                         id: e?.id,
@@ -910,14 +910,11 @@ const Index = (props) => {
                                                                                         idChild: "approved",
                                                                                     })
                                                                                 }
-                                                                            >
-                                                                                Đã Duyệt
-                                                                                <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
-                                                                            </div>
+                                                                                type="1"
+                                                                            />
                                                                         )) ||
                                                                             (e?.status === "un_approved" && (
-                                                                                <div
-                                                                                    className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 transition-all duration-300 ease-in-out hover:text-white border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
+                                                                                <BtnStatusApproved
                                                                                     onClick={() =>
                                                                                         handleQueryId({
                                                                                             id: e?.id,
@@ -925,10 +922,9 @@ const Index = (props) => {
                                                                                             idChild: "un_approved",
                                                                                         })
                                                                                     }
-                                                                                >
-                                                                                    Chưa Duyệt
-                                                                                    <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
-                                                                                </div>
+                                                                                    type="0"
+                                                                                />
+
                                                                             ))}
                                                                     </h6>
                                                                 </h6>

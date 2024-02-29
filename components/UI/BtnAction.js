@@ -46,6 +46,7 @@ import Popup_dspt from "@/pages/accountant/receipts/(popup)/popup";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -75,6 +76,7 @@ const BtnAction = React.memo((props) => {
     const [dataProductExpiry, sDataProductExpiry] = useState({});
 
     const [dataProductSerial, sDataProductSerial] = useState({});
+    const dataSeting = useSetingServer()
 
     const confimDelete = (url) => {
         Axios("DELETE", url, {}, (err, response) => {
@@ -308,37 +310,37 @@ const BtnAction = React.memo((props) => {
             }
         }
 
-        const initialApi = {
-            price_quote: `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`,
-            sales_product: `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
-            deliveryReceipt: `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`,
-            returnSales: `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
-            internal_plan: `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
-            purchases: `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
-            order: `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
-            serviceVoucher: `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
-            import: `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
-            returns: `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
-            warehouseTransfer: `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`,
-            production_warehouse: `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
-            productsWarehouse: `/api_web/Api_product_receipt/productReceipt/${props?.id}?csrf_protection=true`,
-            recall: `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
-            exportToOther: `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
-            receipts: `/api_web/Api_expense_payslips/expenseCoupon/${props?.id}?csrf_protection=true`,
-            payment: `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-        };
+        // const initialApi = {
+        //     price_quote: `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`,
+        //     sales_product: `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
+        //     deliveryReceipt: `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`,
+        //     returnSales: `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
+        //     internal_plan: `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
+        //     purchases: `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
+        //     order: `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
+        //     serviceVoucher: `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
+        //     import: `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
+        //     returns: `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
+        //     warehouseTransfer: `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`,
+        //     production_warehouse: `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
+        //     productsWarehouse: `/api_web/Api_product_receipt/productReceipt/${props?.id}?csrf_protection=true`,
+        //     recall: `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
+        //     exportToOther: `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
+        //     receipts: `/api_web/Api_expense_payslips/expenseCoupon/${props?.id}?csrf_protection=true`,
+        //     payment: `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
+        // };
 
-        try {
-            await Axios("GET", initialApi[props.type], {}, (err, response) => {
-                if (response && response.data) {
-                    let db = props.type == "internal_plan" ? response.data.data : response.data;
+        // try {
+        //     await Axios("GET", initialApi[props.type], {}, (err, response) => {
+        //         if (response && response.data) {
+        //             let db = props.type == "internal_plan" ? response.data.data : response.data;
 
-                    setData(db);
-                }
-            });
-        } catch (err) {
-            console.log(err);
-        }
+        //             setData(db);
+        //         }
+        //     });
+        // } catch (err) {
+        //     console.log(err);
+        // }
     };
 
     const _ServerFetching_ValidatePayment = () => {
@@ -364,11 +366,12 @@ const BtnAction = React.memo((props) => {
     }, [feature]);
 
     useEffect(() => {
-        openAction && fetchDataSettingsCompany();
+        // openAction && fetchDataSettingsCompany();
         props.type == "order" && openAction && _ServerFetching_ValidatePayment();
     }, [openAction]);
 
-    const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial };
+
+    const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial, dataSeting };
 
     return (
         <div>

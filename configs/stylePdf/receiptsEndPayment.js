@@ -1,6 +1,5 @@
 import moment from "moment";
 import { uppercaseTextHeaderTabel } from "./style";
-import useSetingServer from "@/hooks/useConfigNumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 ///css 1 liên
 export const styleForm = () => {
@@ -389,8 +388,7 @@ export const titleDateTwo = (props, data, title) => {
 };
 
 ///value và dữ liệu
-export const titleValue = (props, data, capitalizedTotalAmountWord) => {
-    const dataSeting = useSetingServer()
+export const titleValue = (props, data, capitalizedTotalAmountWord, dataSeting) => {
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting)
     }

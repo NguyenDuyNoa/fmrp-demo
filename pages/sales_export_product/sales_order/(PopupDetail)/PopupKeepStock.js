@@ -22,6 +22,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useFeature from "@/hooks/useConfigFeature";
 
 const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
@@ -36,6 +37,8 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     }
 
     const isShow = useToast();
+
+    const feature = useFeature()
 
     const { isOpen, isId, handleQueryId } = useToggle();
 
@@ -68,36 +71,39 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const setIsFetch = (e) => sIsFetching((prev) => ({ ...prev, ...e }));
 
     useEffect(() => {
-        id && open && setIsFetch({ onFetching: true, onFetchingWarehouse: true });
+        // id && open && setIsFetch({ onFetching: true, onFetchingWarehouse: true });
+        sDataMaterialExpiry(feature?.dataMaterialExpiry);
+        sDataProductExpiry(feature?.dataProductExpiry);
+        sDataProductSerial(feature?.dataProductSerial);
         sIsIdWarehouse(null);
     }, [open]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            setIsFetch({ onFetchingCondition: false });
-        });
-    };
+    // const _ServerFetchingCondition = () => {
+    //     Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+    //         if (!err) {
+    //             var data = response.data;
+    //             sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+    //             sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+    //             sDataProductSerial(data.find((x) => x.code == "product_serial"));
+    //         }
+    //         setIsFetch({ onFetchingCondition: false });
+    //     });
+    // };
 
-    useEffect(() => {
-        isFetching.onFetchingCondition && _ServerFetchingCondition();
-    }, [isFetching.onFetchingCondition]);
+    // useEffect(() => {
+    //     isFetching.onFetchingCondition && _ServerFetchingCondition();
+    // }, [isFetching.onFetchingCondition]);
 
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            setIsFetch({ onFetchingCondition: true });
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
+    // useEffect(() => {
+    //     JSON.stringify(dataMaterialExpiry) === "{}" &&
+    //         JSON.stringify(dataProductExpiry) === "{}" &&
+    //         JSON.stringify(dataProductSerial) === "{}" &&
+    //         setIsFetch({ onFetchingCondition: true });
+    // }, [
+    //     JSON.stringify(dataMaterialExpiry) === "{}",
+    //     JSON.stringify(dataProductExpiry) === "{}",
+    //     JSON.stringify(dataProductSerial) === "{}",
+    // ]);
 
     const handleFetching = () => {
         Axios(
@@ -298,12 +304,16 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     }, [isFetching.onSending]);
 
     useEffect(() => {
-        isFetching.onFetching && handleFetching();
-    }, [isFetching.onFetching]);
+        isFetching.onFetching && open && handleFetching();
+    }, [isFetching.onFetching, open]);
 
     useEffect(() => {
-        isFetching.onFetchingWarehouse && handleFetchingWarehouse();
-    }, [isFetching.onFetchingWarehouse]);
+        isFetching.onFetchingWarehouse && open && handleFetchingWarehouse();
+    }, [isFetching.onFetchingWarehouse, open]);
+
+    useEffect(() => {
+        open && setIsFetch({ onFetchingWarehouse: true });
+    }, [open]);
 
     return (
         <>

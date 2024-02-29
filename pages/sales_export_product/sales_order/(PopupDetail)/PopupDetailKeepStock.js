@@ -25,6 +25,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import ModalImage from "react-modal-image";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useFeature from "@/hooks/useConfigFeature";
 
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
@@ -95,6 +96,8 @@ const Popup_DetailKeepStock = (props) => {
         return formatNumberConfig(+number, dataSeting);
     }
 
+    const feature = useFeature()
+
     const handleFetching = () => {
         Axios(
             "GET",
@@ -126,32 +129,39 @@ const Popup_DetailKeepStock = (props) => {
         );
     };
 
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            setIsFetch({ onFetchingCondition: true });
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
+    // useEffect(() => {
+    //     JSON.stringify(dataMaterialExpiry) === "{}" &&
+    //         JSON.stringify(dataProductExpiry) === "{}" &&
+    //         JSON.stringify(dataProductSerial) === "{}" &&
+    //         setIsFetch({ onFetchingCondition: true });
+    // }, [
+    //     JSON.stringify(dataMaterialExpiry) === "{}",
+    //     JSON.stringify(dataProductExpiry) === "{}",
+    //     JSON.stringify(dataProductSerial) === "{}",
+    // ]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            setIsFetch({ onFetchingCondition: false });
-        });
-    };
+    // const _ServerFetchingCondition = () => {
+    //     Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+    //         if (!err) {
+    //             let data = response.data;
+    //             sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+    //             sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+    //             sDataProductSerial(data.find((x) => x.code == "product_serial"));
+    //         }
+    //         setIsFetch({ onFetchingCondition: false });
+    //     });
+    // };
 
+    // useEffect(() => {
+    //     id && open && isFetching.onFetchingCondition && _ServerFetchingCondition();
+    // }, [isFetching.onFetchingCondition, open]);
+    console.log("feature", feature);
     useEffect(() => {
-        id && open && isFetching.onFetchingCondition && _ServerFetchingCondition();
-    }, [isFetching.onFetchingCondition, open]);
+        sDataMaterialExpiry(feature?.dataMaterialExpiry);
+        sDataProductExpiry(feature?.dataProductExpiry);
+        sDataProductSerial(feature?.dataProductSerial);
+    }, [isFetching.onFetchingCondition, open, feature]);
+
 
     const _ServerFetching_filter = () => {
         Axios("GET", "/api_web/Api_transfer/TransferCombobox/?csrf_protection=true", {}, (err, response) => {
@@ -231,7 +241,7 @@ const Popup_DetailKeepStock = (props) => {
     }, [isFetching.onFetchingFilter]);
 
     useEffect(() => {
-        isValue && setIsFetch({ onFetching: true });
+        isValue && open && setIsFetch({ onFetching: true });
     }, [isValue]);
 
     const selectArray = [
