@@ -24,6 +24,7 @@ import { debounce } from "lodash";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 const Index = (props) => {
     const router = useRouter();
 
@@ -246,24 +247,6 @@ const Index = (props) => {
         );
         setOnFetchingCustomer(false);
     };
-    // const handleFetchingCustomer = () => {
-    //     Axios(
-    //         "GET",
-    //         `/api_web/api_client/client_option/?csrf_protection=true`,
-    //         {
-    //             params: {
-    //                 "filter[branch_id]": branch !== null ? branch?.value : null,
-    //             },
-    //         },
-    //         (err, response) => {
-    //             if (!err) {
-    //                 var db = response.data.rResult;
-    //                 setDataCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
-    //             }
-    //         }
-    //     );
-    //     setOnFetchingCustomer(false);
-    // };
     // Contact person
     const handleFetchingContactPerson = () => {
         Axios(
@@ -288,30 +271,6 @@ const Index = (props) => {
         );
         setOnFetchingContactPerson(false);
     };
-    // const handleFetchingContactPerson = () => {
-    //     Axios(
-    //         "GET",
-    //         `/api_web/api_client/contactCombobox/?csrf_protection=true`,
-    //         {
-    //             params: {
-    //                 "filter[client_id]": customer != null ? customer.value : null,
-    //             },
-    //         },
-    //         (err, response) => {
-    //             if (!err) {
-    //                 var { rResult } = response.data;
-    //                 setDataContactPerson(
-    //                     rResult?.map((e) => ({
-    //                         label: e.full_name,
-    //                         value: e.id,
-    //                     }))
-    //                 );
-    //             }
-    //         }
-    //     );
-    //     setOnFetchingContactPerson(false);
-    // };
-
     // Staff
     const handleFetchingStaff = () => {
         Axios(
@@ -336,29 +295,6 @@ const Index = (props) => {
         );
         setOnFetchingStaff(false);
     };
-    // const handleFetchingStaff = () => {
-    //     Axios(
-    //         "GET",
-    //         `/api_web/Api_staff/staffOption?csrf_protection=true`,
-    //         {
-    //             params: {
-    //                 "filter[branch_id]": branch !== null ? +branch?.value : null,
-    //             },
-    //         },
-    //         (err, response) => {
-    //             if (!err) {
-    //                 var { rResult } = response?.data;
-    //                 setDataStaffs(
-    //                     rResult?.map((e) => ({
-    //                         label: e.name,
-    //                         value: e.staffid,
-    //                     }))
-    //                 );
-    //             }
-    //         }
-    //     );
-    //     setOnFetchingStaff(false);
-    // };
 
     // Quote
     const handleFetchingQuote = () => {
@@ -402,32 +338,6 @@ const Index = (props) => {
             }
         });
         setOnFetchingItemsAll(false);
-        // if (typeOrder === "1") {
-        //     Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
-        //         params: {
-        //             "branch_id": branch != null ? [+branch?.value]?.map((e) => e) : null,
-        //         },
-        //     }, (err, response) => {
-        //         if (!err) {
-        //             const { result } = response.data.data;
-        //             setDataItems(result);
-        //         }
-        //     });
-        //     setOnFetchingItemsAll(false);
-        // }
-        // if (typeOrder === "0") {
-        //     Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
-        //         params: {
-        //             "branch_id": branch != null ? [+branch?.value]?.map((e) => e) : null,
-        //         },
-        //     }, (err, response) => {
-        //         if (!err) {
-        //             const { result } = response.data.data;
-        //             setDataItems(result);
-        //         }
-        //     });
-        //     setOnFetchingItemsAll(false);
-        // }
     };
 
     const handleFetchingItem = async () => {
@@ -487,56 +397,6 @@ const Index = (props) => {
         }
     };
 
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetail();
-    }, [onFetchingDetail]);
-
-    useEffect(() => {
-        id && setOnFetchingDetail(true);
-    }, []);
-
-    useEffect(() => {
-        (branch === null && setDataCustomer([])) ||
-            setCustomer(null) ||
-            setDataContactPerson([]) ||
-            setContactPerson(null) ||
-            setDataStaffs([]) ||
-            setStaff(null);
-    }, []);
-
-    useEffect(() => {
-        onFetchingCustomer && handleFetchingCustomer();
-    }, [onFetchingCustomer]);
-    useEffect(() => {
-        onFetchingStaff && handleFetchingStaff();
-    }, [onFetchingStaff]);
-
-    useEffect(() => {
-        onFetchingQuote && handleFetchingQuote();
-    }, [onFetchingQuote]);
-
-    useEffect(() => {
-        onFetchingContactPerson && handleFetchingContactPerson();
-    }, [onFetchingContactPerson]);
-
-    useEffect(() => {
-        branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true))
-    }, [branch]);
-
-    useEffect(() => {
-        customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true));
-    }, [customer]);
-    useEffect(() => {
-        quote !== null && setOnFetchingItem(true);
-    }, [quote]);
-
-    useEffect(() => {
-        setOnFetchingItemsAll(true)
-    }, [branch]);
-
-    useEffect(() => {
-        onFetchingItem && handleFetchingItem();
-    }, [onFetchingItem]);
 
     const options = dataItems?.map((e) => {
         return {
@@ -612,11 +472,12 @@ const Index = (props) => {
     }, []);
 
     useEffect(() => {
-        onFetchingCustomer && handleFetchingCustomer();
-    }, [onFetchingCustomer]);
-    useEffect(() => {
         onFetchingStaff && handleFetchingStaff();
     }, [onFetchingStaff]);
+
+    useEffect(() => {
+        onFetchingCustomer && handleFetchingCustomer();
+    }, [onFetchingCustomer]);
 
     useEffect(() => {
         onFetchingQuote && handleFetchingQuote();
@@ -628,11 +489,14 @@ const Index = (props) => {
 
     useEffect(() => {
         branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true));
+        branch !== null && setOnFetchingItemsAll(true)
+        branch == null && setItemsAll([]);
     }, [branch]);
 
     useEffect(() => {
-        customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true));
+        customer !== null && setOnFetchingContactPerson(true)
     }, [customer]);
+
     useEffect(() => {
         quote !== null && setOnFetchingItem(true);
     }, [quote]);
@@ -648,11 +512,6 @@ const Index = (props) => {
     useEffect(() => {
         onFetching && handleFetchingBranch();
     }, [onFetching]);
-
-    // useEffect(() => {
-    //   router.query && setOnFetching(true)
-    //   router.query && setOnFetchingItemsAll(true)
-    // }, [router.query]);
 
     useEffect(() => {
         setErrDate(false);
@@ -673,7 +532,7 @@ const Index = (props) => {
 
     // search api
     const _HandleSeachApi = debounce((inputValue) => {
-        if (inputValue == "" || branch == null) return
+        if (branch == null) return
         let form = new FormData()
         if (branch != null) {
             [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
@@ -756,7 +615,7 @@ const Index = (props) => {
             setTypeOrder(isId);
             setHidden(isId === "1");
             setQuote(isId === "0" ? null : quote);
-
+            isId == 1 && setOnFetchingQuote(true)
             setOnFetchingItem(isId === "0" && true);
             setOnFetchingItemsAll(isId === "1" && true);
 
@@ -1279,7 +1138,7 @@ const Index = (props) => {
                     console.log("response", response);
 
                     if (response && response.data && response?.data?.isSuccess === true && router.isReady) {
-                        isShow("success", `${dataLang[response?.data?.message]}`);
+                        isShow("success", `${dataLang[response?.data?.message]}` || response?.data?.message);
                         setCodeProduct("");
                         setStartDate(new Date());
                         setDeliveryDate(new Date());
@@ -1299,7 +1158,7 @@ const Index = (props) => {
                         router.push(routerSalesOrder.home);
                     }
                     if (response && response.data && response?.data?.isSuccess === false) {
-                        isShow("error", `${dataLang[response?.data?.message]}`);
+                        isShow("error", `${dataLang[response?.data?.message]}` || response?.data?.message);
                     }
                     setOnSending(false);
                 }
@@ -2277,21 +2136,9 @@ const Index = (props) => {
                                             >
                                                 <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75 " />
                                             </button>
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 value={1}
-                                                // isAllowed={(values) => {
-                                                //     const { floatValue } = values;
-                                                //     return floatValue > 0;
-                                                // }}
-                                                isAllowed={({ floatValue }) => {
-                                                    if (floatValue == 0) {
-                                                        showToast("error", `Số lượng phải lớn hơn 0.`);
-                                                        return false;
-                                                    } else {
-                                                        return true;
-                                                    }
-                                                }}
                                                 allowNegative={false}
                                                 thousandSeparator=","
                                             />
@@ -2303,7 +2150,7 @@ const Index = (props) => {
                                             </button>
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={1}
                                                 allowNegative={false}
                                                 readOnly={true}
@@ -2314,14 +2161,13 @@ const Index = (props) => {
                                             />
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={0}
                                                 className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
                                                 thousandSeparator=","
                                                 allowNegative={false}
                                                 readOnly={true}
-                                                isNumericString={true}
-                                            />
+                                                isNumericString={true} />
                                         </div>
                                         <div className="col-span-1 text-right flex items-center justify-end">
                                             <h3
@@ -2488,21 +2334,18 @@ const Index = (props) => {
                                                 >
                                                     <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
                                                 </button>
-                                                <NumberFormatBase
-                                                    className={`cursor-text appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                    // onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
-                                                    // value={e?.quantity}
-                                                    // format={formatNumber}
-                                                    // isAllowed={({ floatValue, value, formattedValue }) => {
-                                                    //     return true
-                                                    // }}
-                                                    // format={(value) => value}
-                                                    format={(value) => value}
-                                                    removeFormatting={(value, changeMeta) => value}
-                                                    getCaretBoundary={(value) => value.split('').map(() => true)}
-                                                    type="text"
-                                                // format={(value) =>
-                                                //     console.log("value", value)}
+                                                <InPutNumericFormat
+                                                    value={e?.quantity}
+                                                    onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
+                                                    isAllowed={({ floatValue }) => {
+                                                        if (floatValue == 0) {
+                                                            return true;
+                                                        } else {
+                                                            return true;
+                                                        }
+                                                    }}
+                                                    allowNegative={false}
+                                                    className={`${e?.quantity == 0 && 'border-red-500' || e?.quantity == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                                 <button
                                                     onClick={() => handleIncrease(e.id)}
@@ -2513,20 +2356,22 @@ const Index = (props) => {
                                             </div>
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={e?.price}
-                                                onValueChange={(value) =>
-                                                    handleOnChangeInputOption(e?.id, "price", value)
-                                                }
+                                                onValueChange={(value) => handleOnChangeInputOption(e?.id, "price", value)}
+                                                isAllowed={({ floatValue }) => {
+                                                    if (floatValue == 0) {
+                                                        return true;
+                                                    } else {
+                                                        return true;
+                                                    }
+                                                }}
                                                 allowNegative={false}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                className={`cursor-text appearance-none 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                                                thousandSeparator=","
+                                                className={`${e?.price == 0 && 'border-red-500' || e?.price == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={e?.discount}
                                                 onValueChange={(value) =>
                                                     handleOnChangeInputOption(e?.id, "discount", value)
@@ -2683,7 +2528,7 @@ const Index = (props) => {
                                 {dataLang?.sales_product_discount || "sales_product_discount"}
                             </h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
-                                <NumericFormat
+                                <InPutNumericFormat
                                     value={totalDiscount}
                                     onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
                                     className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] text-center py-1 px-2 bg-transparent font-normal xl:w-20 w-24 focus:outline-none border-b-2 border-gray-300"
@@ -2697,9 +2542,10 @@ const Index = (props) => {
                                         return floatValue < 101;
                                     }}
                                     allowNegative={false}
-                                    decimalScale={0}
+                                    // decimalScale={0}
                                     isNumericString={true}
                                 />
+
                             </div>
                         </div>
                         <div className="col-span-3 flex items-center gap-2">

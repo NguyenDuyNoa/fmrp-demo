@@ -144,11 +144,11 @@ const Popup_dsnd = (props) => {
         sListBrand(
             props.listBr
                 ? props.listBr && [
-                      ...props.listBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
+                    ...props.listBr?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    })),
+                ]
                 : []
         );
         sRoom(props?.room ? props.room : []);
@@ -252,10 +252,9 @@ const Popup_dsnd = (props) => {
         data.append("manage ", manageV);
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/api_staff/staff/${id}?csrf_protection=true`
-                    : "/api_web/api_staff/staff/?csrf_protection=true"
+            `${id
+                ? `/api_web/api_staff/staff/${id}?csrf_protection=true`
+                : "/api_web/api_staff/staff/?csrf_protection=true"
             }`,
             {
                 data: {
@@ -280,11 +279,7 @@ const Popup_dsnd = (props) => {
                 if (!err) {
                     var { isSuccess, message, branch_name } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props?.dataLang[message]}`,
-                        });
-                        isShow("success", props?.dataLang[message]);
+                        isShow("success", props?.dataLang[message] || message);
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                         sErrInput(false);
@@ -301,7 +296,7 @@ const Popup_dsnd = (props) => {
                         sIdPos();
                         sValueManage([]);
                     } else {
-                        isShow("error", props.dataLang[message] + " " + branch_name);
+                        isShow("error", props.dataLang[message] + " " + branch_name || message);
                     }
                 }
                 sOnSending(false);
@@ -409,17 +404,15 @@ const Popup_dsnd = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_info}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${
-                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_power}
                     </button>
@@ -458,11 +451,10 @@ const Popup_dsnd = (props) => {
                                                     onChange={_HandleChangeInput.bind(this, "name")}
                                                     placeholder={props.dataLang?.personnels_staff_popup_name}
                                                     type="text"
-                                                    className={`${
-                                                        errInput
-                                                            ? "border-red-500"
-                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                    className={`${errInput
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                                 />
 
                                                 {errInput && (
@@ -510,9 +502,8 @@ const Popup_dsnd = (props) => {
                                                             position: "absolute",
                                                         }),
                                                     }}
-                                                    className={`${
-                                                        errInputBr ? "border-red-500" : "border-transparent"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                    className={`${errInputBr ? "border-red-500" : "border-transparent"
+                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 />
                                                 {errInputBr && (
                                                     <label className="mb-2  text-[14px] text-red-500">
@@ -595,11 +586,10 @@ const Popup_dsnd = (props) => {
                                                         value={password}
                                                         id="userpwd"
                                                         onChange={_HandleChangeInput.bind(this, "password")}
-                                                        className={`${
-                                                            errInputPas
-                                                                ? "border-red-500"
-                                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal py-2 pl-3 pr-12  border outline-none `}
+                                                        className={`${errInputPas
+                                                            ? "border-red-500"
+                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal py-2 pl-3 pr-12  border outline-none `}
                                                     />
                                                     <button
                                                         type="button"
@@ -697,31 +687,31 @@ const Popup_dsnd = (props) => {
                                                         defaultValue={
                                                             idPos == "0" || !idPos
                                                                 ? {
-                                                                      label: `${props.dataLang?.personnels_staff_position}`,
-                                                                  }
+                                                                    label: `${props.dataLang?.personnels_staff_position}`,
+                                                                }
                                                                 : {
-                                                                      label: dataOption.find(
-                                                                          (x) => x?.parent_id == idPos
-                                                                      )?.label,
-                                                                      code: dataOption.find(
-                                                                          (x) => x?.parent_id == idPos
-                                                                      )?.code,
-                                                                      value: idPos,
-                                                                  }
+                                                                    label: dataOption.find(
+                                                                        (x) => x?.parent_id == idPos
+                                                                    )?.label,
+                                                                    code: dataOption.find(
+                                                                        (x) => x?.parent_id == idPos
+                                                                    )?.code,
+                                                                    value: idPos,
+                                                                }
                                                         }
                                                         value={
                                                             idPos == "0" || !idPos
                                                                 ? {
-                                                                      label: props.dataLang?.personnels_staff_position,
-                                                                      code: props.dataLang?.personnels_staff_position,
-                                                                  }
+                                                                    label: props.dataLang?.personnels_staff_position,
+                                                                    code: props.dataLang?.personnels_staff_position,
+                                                                }
                                                                 : {
-                                                                      label: dataOption.find((x) => x?.value == idPos)
-                                                                          ?.label,
-                                                                      code: dataOption.find((x) => x?.value == idPos)
-                                                                          ?.code,
-                                                                      value: idPos,
-                                                                  }
+                                                                    label: dataOption.find((x) => x?.value == idPos)
+                                                                        ?.label,
+                                                                    code: dataOption.find((x) => x?.value == idPos)
+                                                                        ?.code,
+                                                                    value: idPos,
+                                                                }
                                                         }
                                                         onChange={valueIdPos.bind(this)}
                                                         isClearable={true}
@@ -779,11 +769,10 @@ const Popup_dsnd = (props) => {
                                                             },
                                                         }),
                                                     }}
-                                                    className={`${
-                                                        errInputBr
-                                                            ? "border-red-500"
-                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } placeholder:text-slate-300  text-[#52575E] font-normal border outline-none rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
+                                                    className={`${errInputBr
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                        } placeholder:text-slate-300  text-[#52575E] font-normal border outline-none rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
                                                 />
                                             </div>
                                         </div>

@@ -76,19 +76,26 @@ const Index = (props) => {
 
     const [onFetching, sOnFetching] = useState(false);
 
+    const [onFetchingGroup, sOnFetchingGroup] = useState(false);
+
     const [onFetching_filter, sOnFetching_filter] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const dataSeting = useSetingServer()
+
+    const [limit, sLimit] = useState(dataSeting?.tables_pagination_limit);
+
 
     const [total, setTotal] = useState({});
 
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleShowAll = () => setIsExpanded(!isExpanded);
+
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -103,6 +110,9 @@ const Index = (props) => {
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
     }, []);
+    useEffect(() => {
+        dataSeting?.tables_pagination_limit && sLimit(dataSeting?.tables_pagination_limit)
+    }, [dataSeting?.tables_pagination_limit]);
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
@@ -125,8 +135,8 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err && response && response.data) {
-                    let { rResult, output, rTotal } = response.data;
-                    sInitData((e) => ({ ...e, data: rResult.map((e) => ({ ...e, show: false })), dataExcel: rResult }));
+                    let { rResult, output, rTotal } = response?.data;
+                    sInitData((e) => ({ ...e, data: rResult?.map((e) => ({ ...e, show: false })), dataExcel: rResult }));
                     sTotalItems(output);
                     setTotal(rTotal);
                     sOnFetching(false);
@@ -151,7 +161,7 @@ const Index = (props) => {
                     let data = response.data;
                     sInitData((e) => ({ ...e, listTabStatus: data }));
                 }
-                sOnFetching(false);
+                sOnFetchingGroup(false);
             }
         );
     };
@@ -164,34 +174,94 @@ const Index = (props) => {
                 sInitData((e) => ({ ...e, listBr: rResult?.map(({ name, id }) => ({ label: name, value: id })) }));
             }
         });
-        await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
+        await Axios("GET", `/api_web/api_sale_order/searchOrders?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let { result } = response.data;
+                let { data } = response?.data;
                 sInitData((e) => ({
                     ...e,
-                    listQuoteCode: result?.map(({ code, id }) => ({ label: code, value: id })),
+                    listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id })),
                 }));
             }
         });
-        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
+        // await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
+        //     if (!err) {
+        //         let { result } = response.data;
+        //         sInitData((e) => ({
+        //             ...e,
+        //             listQuoteCode: result?.map(({ code, id }) => ({ label: code, value: id })),
+        //         }));
+        //     }
+        // });
+        await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                let { rResult } = response.data;
+                let { data } = response?.data;
                 sInitData((e) => ({
                     ...e,
-                    listCustomer: rResult?.map(({ name, id }) => ({ label: name, value: id })),
+                    listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
                 }));
+
             }
         });
+        // await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
+        //     if (!err) {
+        //         let { rResult } = response.data;
+        //         sInitData((e) => ({
+        //             ...e,
+        //             listCustomer: rResult?.map(({ name, id }) => ({ label: name, value: id })),
+        //         }));
+        //     }
+        // });
         sOnFetching_filter(false);
     };
 
+    const handleSearchApi = debounce((value) => {
+        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
+            params: {
+                search: value ? value : "",
+            },
+        }, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                sInitData((e) => ({
+                    ...e,
+                    listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
+                }));
+            }
+        }
+        )
+    }, 500)
+
+    const handleSearchApiOrders = debounce((value) => {
+        Axios("GET", `/api_web/api_sale_order/searchOrders?csrf_protection=true`, {
+            params: {
+                search: value ? value : "",
+            },
+        }, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                sInitData((e) => ({
+                    ...e,
+                    listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id })),
+                }));
+            }
+        });
+    }, 500)
+
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
+        (onFetching && _ServerFetching())
     }, [onFetching]);
 
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
+
+    useEffect(() => {
+        sOnFetchingGroup(true)
+    }, [valueChange.idBranch])
+
+    useEffect(() => {
+        onFetchingGroup && _ServerFetching_group()
+    }, [onFetchingGroup])
 
     useEffect(() => {
         sOnFetching_filter(true)
@@ -469,8 +539,8 @@ const Index = (props) => {
                             </div>
 
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {initData.listTabStatus &&
-                                    initData.listTabStatus.map((e) => {
+                                {initData?.listTabStatus &&
+                                    initData?.listTabStatus?.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -573,6 +643,7 @@ const Index = (props) => {
                                                             ...initData.listQuoteCode,
                                                         ]}
                                                         onChange={onChangeFilter("idQuoteCode")}
+                                                        onInputChange={handleSearchApiOrders}
                                                         value={valueChange.idQuoteCode}
                                                         placeholder={
                                                             dataLang?.sales_product_code || "sales_product_code"
@@ -623,6 +694,7 @@ const Index = (props) => {
                                                             },
                                                             ...initData.listCustomer,
                                                         ]}
+                                                        onInputChange={handleSearchApi}
                                                         onChange={onChangeFilter("idCustomer")}
                                                         value={valueChange.idCustomer}
                                                         placeholder={dataLang?.customer || "customer"}

@@ -227,8 +227,8 @@ const Index = (props) => {
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "units")}
                                     className={`${router.query?.tab === "units"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
                                         } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.category_unit}
@@ -236,8 +236,8 @@ const Index = (props) => {
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "stages")}
                                     className={`${router.query?.tab === "stages"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
                                         } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.settings_category_stages_title}
@@ -245,8 +245,8 @@ const Index = (props) => {
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "costs")}
                                     className={`${router.query?.tab === "costs"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
                                         } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.expense_costs || "expense_costs"}
@@ -297,10 +297,10 @@ const Index = (props) => {
                                     >
                                         <div
                                             className={`${router.query?.tab === "units"
-                                                    ? "grid-cols-6"
-                                                    : router.query?.tab === "stages"
-                                                        ? "grid-cols-9"
-                                                        : "grid-cols-11"
+                                                ? "grid-cols-6"
+                                                : router.query?.tab === "stages"
+                                                    ? "grid-cols-9"
+                                                    : "grid-cols-11"
                                                 } grid  sticky top-0 bg-white p-2 z-10`}
                                         >
                                             {router.query?.tab === "units" && (
@@ -377,10 +377,10 @@ const Index = (props) => {
                                                         <div
                                                             key={e.id.toString()}
                                                             className={`${router.query?.tab === "units"
-                                                                    ? "grid-cols-6"
-                                                                    : router.query?.tab === "stages"
-                                                                        ? "grid-cols-9"
-                                                                        : "grid-cols-11"
+                                                                ? "grid-cols-6"
+                                                                : router.query?.tab === "stages"
+                                                                    ? "grid-cols-9"
+                                                                    : "grid-cols-11"
                                                                 } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
                                                         >
                                                             {(router.query?.tab === "units" ||
@@ -885,16 +885,16 @@ const Popup_danhmuc = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         if (tabPage === "units") {
-            if (unit?.length == 0) {
-                unit?.length == 0 && sErrInput(true);
+            if (unit == "") {
+                unit == "" && sErrInput(true);
                 isShow("error", props.dataLang?.required_field_null);
             } else {
                 sOnSending(true);
             }
         } else if (tabPage === "stages") {
-            if (stages_name?.length == 0 || stages_code?.length == 0) {
-                stages_name?.length == 0 && sErrInputName(true);
-                stages_code?.length == 0 && sErrInputcode(true);
+            if (stages_name == "") {
+                stages_name == "" && sErrInputName(true);
+                stages_code == "" && sErrInputcode(true);
                 isShow("error", props.dataLang?.required_field_null);
             } else {
                 sOnSending(true);
@@ -983,7 +983,7 @@ const Popup_danhmuc = (props) => {
                         {tabPage === "stages" && (
                             <React.Fragment>
                                 <div className="flex flex-wrap justify-between">
-                                    <div className="w-full">
+                                    {/* <div className="w-full">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
                                             {props.dataLang?.settings_category_stages_codeAdd ||
                                                 "settings_category_stages_codeAdd"}
@@ -1002,25 +1002,37 @@ const Popup_danhmuc = (props) => {
                                                 className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="w-full">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                            {props.dataLang?.settings_category_stages_codenName ||
-                                                "settings_category_stages_codenName"}
+                                            {/* {props.dataLang?.settings_category_stages_codenName ||
+                                                "settings_category_stages_codenName"} */}
+                                            {props.dataLang?.settings_category_stages_codeAdd ||
+                                                "settings_category_stages_codeAdd"}
                                             <span className="text-red-500">*</span>
                                         </label>
                                         <div>
                                             <input
-                                                // value={stages_code}
-                                                // onChange={_HandleChangeInput.bind(this, "code")}
+                                                value={stages_code}
+                                                onChange={_HandleChangeInput.bind(this, "code")}
                                                 placeholder={
-                                                    props.dataLang?.settings_category_stages_codenName ||
-                                                    "settings_category_stages_codenName"
+                                                    // props.dataLang?.settings_category_stages_codenName ||
+                                                    // "settings_category_stages_codenName"
+                                                    props.dataLang?.settings_category_stages_codeAdd ||
+                                                    "settings_category_stages_codeAdd"
                                                 }
                                                 name="fname"
                                                 type="text"
-                                                className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputcode
+                                                    ? "border-red-500 border"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
+                                            {errInputcode && (
+                                                <label className="mb-4  text-[14px] text-red-500">
+                                                    {props.dataLang?.settings_category_stages_errCode}
+                                                </label>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="w-full">
@@ -1036,8 +1048,8 @@ const Popup_danhmuc = (props) => {
                                                 name="fname"
                                                 type="text"
                                                 className={`${errInputName
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                     } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (

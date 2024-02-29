@@ -23,6 +23,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
+import useToast from "@/hooks/useToast";
 
 const Index = (props) => {
     const router = useRouter();
@@ -30,6 +31,8 @@ const Index = (props) => {
     const { isOpen, isId, handleQueryId } = useToggle();
 
     const dataLang = props.dataLang;
+
+    const isShow = useToast()
 
     const trangthaiExprired = useStatusExprired();
 

@@ -47,6 +47,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
+import useFeature from "@/hooks/useConfigFeature";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -202,6 +203,9 @@ const Index = (props) => {
         sOnFetching(true);
     }, 500)
 
+    const feature = useFeature()
+    console.log("feature", feature);
+
     const _ServerFetchingAnother = () => {
         Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
@@ -298,12 +302,12 @@ const Index = (props) => {
             }
         });
 
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-            }
-        });
+        // Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+        //     if (!err) {
+        //         var data = response.data;
+        //         sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+        //     }
+        // });
         sOnFetchingAnother(false);
     };
 
@@ -313,6 +317,7 @@ const Index = (props) => {
 
     useEffect(() => {
         sOnFetchingAnother(true);
+        sDataProductExpiry(feature?.dataProductExpiry);
     }, []);
 
     const _HandleFilterOpt = (type, value) => {
@@ -961,7 +966,8 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phẩm
+                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
                         </h6>
                         <Pagination
                             postsPerPage={limit}
@@ -1248,6 +1254,8 @@ const Popup_ThanhPham = React.memo((props) => {
     };
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
+            console.log("optSelectedVariantSub", optSelectedVariantSub);
+            console.log("optSelectedVariantMain", optSelectedVariantMain);
             const newData = optSelectedVariantMain?.map(e => {
                 const newViar = dataTotalVariant?.find(x => x?.id == e?.id)
                 console.log("newViar", newViar);
@@ -1256,19 +1264,22 @@ const Popup_ThanhPham = React.memo((props) => {
                     id_primary: newViar?.id_primary ? newViar?.id_primary : e?.id_primary,
                     isDelete: newViar?.isDelete,
                     variation_option_2: optSelectedVariantSub?.map((item2) => {
-                        const check = newViar?.variation_option_2.find(x => x?.id == item2?.id)
-                        console.log("check", check);
+                        const check = newViar?.variation_option_2.find(x => x?.id == item2?.id);
+                        const checkItem = newViar?.variation_option_2?.find(x => x?.id_primary)
+                        console.log("checkItem", checkItem);
                         return {
                             ...item2,
                             isDelete: check?.isDelete,
                             id_primary: check && check?.id_primary ? check?.id_primary : item2?.id_primary,
-                            price: check && check?.price ? check?.price : ""
+                            price: check && check?.price ? check?.price : checkItem ? checkItem.price : ""
                         }
+
                     })
                 }
             })
             console.log("newData", newData);
             const newdb = [...dataTotalVariant, ...newData]
+
             // Mảng chứa dữ liệu sau khi xử lý
             const processedData = [];
             // Tạo một đối tượng để theo dõi các phần tử theo id
@@ -1277,14 +1288,27 @@ const Popup_ThanhPham = React.memo((props) => {
             newdb.forEach(item => {
                 const id = item.id;
                 // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
-                if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+                // if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+                //     idMap[id] = item;
+                // }
+                // Nếu id là null, giữ nguyên phần tử
+                if (id === null) {
                     idMap[id] = item;
+                } else {
+                    // Nếu id chưa được thêm vào idMap hoặc variation_option_2 có id, thì cập nhật idMap
+                    if (!idMap[id] || (item.variation_option_2 && item.variation_option_2.find(option => option.id))) {
+                        idMap[id] = item;
+                    }
                 }
             });
+
+            console.log("newdb", newdb);
             // Lấy các giá trị từ idMap và đưa vào mảng processedData
             for (const id in idMap) {
                 processedData.push(idMap[id]);
             }
+            console.log("Object.values(idMap)", Object.values(idMap));
+
 
             console.log("processedData", processedData);
             sDataTotalVariant(processedData.reverse());
@@ -2262,7 +2286,8 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 <Select
                                                     options={dataOptVariant}
                                                     // isDisabled={dataVariantSending[1] ? true : false}
-                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x.id != "" || x.id != null))}
+                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e.id && e?.variation_option_2?.length > 0)}
+                                                    // isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x.id != "" || x.id != null))}
                                                     // isDisabled={false}
                                                     value={
                                                         variantSub

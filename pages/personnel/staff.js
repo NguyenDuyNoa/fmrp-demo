@@ -355,10 +355,9 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", dataLang[message] || message);
+                    } else {
+                        isShow("error", dataLang[message] || message);
                     }
                 }
                 sOnSending(false);

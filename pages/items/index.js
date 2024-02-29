@@ -39,6 +39,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
+import useFeature from "@/hooks/useConfigFeature";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -66,6 +67,8 @@ const Index = (props) => {
     const isShow = useToast();
 
     const dispatch = useDispatch();
+
+    const feature = useFeature()
 
     const [data, sData] = useState([]);
 
@@ -124,16 +127,17 @@ const Index = (props) => {
                 sOnFetching(false);
             }
         );
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-            }
-        });
+        // Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+        //     if (!err) {
+        //         var data = response.data;
+        //         sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+        //     }
+        // });
     };
 
     useEffect(() => {
         onFetching && _ServerFetching();
+        sDataMaterialExpiry(feature?.dataProductSerial)
     }, [onFetching]);
 
     useEffect(() => {
@@ -232,9 +236,9 @@ const Index = (props) => {
             if (!err) {
                 var { isSuccess, message } = response.data;
                 if (isSuccess) {
-                    isShow("success", props.dataLang[message]);
+                    isShow("success", props.dataLang[message] || message);
                 } else {
-                    isShow("success", props.dataLang[message]);
+                    isShow("error", props.dataLang[message] || message);
                 }
             }
             _ServerFetching();
@@ -607,7 +611,8 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} nguyên vật liệu
+                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
                         </h6>
                         <Pagination
                             postsPerPage={limit}
@@ -838,7 +843,27 @@ const Popup_NVL = React.memo((props) => {
                     })
                 }
             })
+            // const newdb = [...dataTotalVariant, ...newData]
+            // // Mảng chứa dữ liệu sau khi xử lý
+            // const processedData = [];
+            // // Tạo một đối tượng để theo dõi các phần tử theo id
+            // const idMap = {};
+            // // Duyệt qua mảng newdb
+            // newdb.forEach(item => {
+            //     const id = item.id;
+            //     // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
+            //     if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+            //         idMap[id] = item;
+            //     }
+            // });
+            // // Lấy các giá trị từ idMap và đưa vào mảng processedData
+            // for (const id in idMap) {
+            //     processedData.push(idMap[id]);
+            // }
+            // sDataTotalVariant(processedData.reverse());
+            console.log("newData", newData);
             const newdb = [...dataTotalVariant, ...newData]
+
             // Mảng chứa dữ liệu sau khi xử lý
             const processedData = [];
             // Tạo một đối tượng để theo dõi các phần tử theo id
@@ -847,14 +872,29 @@ const Popup_NVL = React.memo((props) => {
             newdb.forEach(item => {
                 const id = item.id;
                 // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
-                if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+                // if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+                //     idMap[id] = item;
+                // }
+                // Nếu id là null, giữ nguyên phần tử
+                if (id === null) {
                     idMap[id] = item;
+                } else {
+                    // Nếu id chưa được thêm vào idMap hoặc variation_option_2 có id, thì cập nhật idMap
+                    if (!idMap[id] || (item.variation_option_2 && item.variation_option_2.find(option => option.id))) {
+                        idMap[id] = item;
+                    }
                 }
             });
+
+            console.log("newdb", newdb);
             // Lấy các giá trị từ idMap và đưa vào mảng processedData
             for (const id in idMap) {
                 processedData.push(idMap[id]);
             }
+            console.log("Object.values(idMap)", Object.values(idMap));
+
+
+            console.log("processedData", processedData);
             sDataTotalVariant(processedData.reverse());
             // sDataTotalVariant([
             //     ...(optSelectedVariantMain?.length > 0
@@ -1878,7 +1918,7 @@ const Popup_NVL = React.memo((props) => {
                                                             : null
                                                     }
                                                     // isDisabled={dataVariantSending[1] ? true : false}
-                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x?.id != "" || x?.id != null))}
+                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e.id && e?.variation_option_2?.length > 0)}
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
                                                     placeholder={

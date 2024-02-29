@@ -1,6 +1,7 @@
 import moment from "moment";
-import formatNumber from "../../utils/helpers/formatnumber";
 import { uppercaseTextHeaderTabel } from "./style";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 ///css 1 liên
 export const styleForm = () => {
     return {
@@ -353,6 +354,7 @@ const uppercaseText = (text, style, alignment) => {
 
 // header title 2 liên
 export const titleDateTwo = (props, data, title) => {
+
     return [
         {
             text: uppercaseText(`${title}`, "contentTitle"),
@@ -388,6 +390,10 @@ export const titleDateTwo = (props, data, title) => {
 
 ///value và dữ liệu
 export const titleValue = (props, data, capitalizedTotalAmountWord) => {
+    const dataSeting = useSetingServer()
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting)
+    }
     return [
         {
             text: [
@@ -414,8 +420,8 @@ export const titleValue = (props, data, capitalizedTotalAmountWord) => {
                 {
                     text: data?.type_vouchers
                         ? `${props.dataLang[data?.type_vouchers] || data?.type_vouchers} - ${data?.voucher
-                              ?.map((e) => e.code)
-                              .join(", ")}`
+                            ?.map((e) => e.code)
+                            .join(", ")}`
                         : "",
                     inline: true,
                     fontSize: 10,
@@ -457,7 +463,7 @@ export const titleValue = (props, data, capitalizedTotalAmountWord) => {
                     fontSize: 10,
                 },
                 {
-                    text: `${formatNumber(data?.total)}`,
+                    text: `${formatMoney(data?.total)}`,
                     fontSize: 10,
                     inline: true,
                 },

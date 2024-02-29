@@ -45,6 +45,7 @@ import Popup_dspc from "@/pages/accountant/payment/(popup)/popup";
 import Popup_dspt from "@/pages/accountant/receipts/(popup)/popup";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import useFeature from "@/hooks/useConfigFeature";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -66,6 +67,8 @@ const BtnAction = React.memo((props) => {
     const [data, setData] = useState();
 
     const _ToggleModal = (e) => setOpenAction(e);
+
+    const feature = useFeature()
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
@@ -300,15 +303,6 @@ const BtnAction = React.memo((props) => {
                         setDataCompany(res);
                     }
                 });
-
-                await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-                    if (!err) {
-                        let data = response.data;
-                        sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                        sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                        sDataProductSerial(data.find((x) => x.code == "product_serial"));
-                    }
-                });
             } catch (err) {
                 console.log(err);
             }
@@ -360,6 +354,14 @@ const BtnAction = React.memo((props) => {
             }
         );
     };
+
+
+
+    useEffect(() => {
+        sDataMaterialExpiry(feature?.dataMaterialExpiry);
+        sDataProductExpiry(feature?.dataProductExpiry);
+        sDataProductSerial(feature?.dataProductSerial);
+    }, [feature]);
 
     useEffect(() => {
         openAction && fetchDataSettingsCompany();
