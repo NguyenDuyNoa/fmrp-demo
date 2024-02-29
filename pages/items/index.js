@@ -1033,7 +1033,7 @@ const Popup_NVL = React.memo((props) => {
         formData.append("is_delete_image ", isDeleteThumb);
         branch_id.forEach((id) => formData.append("branch_id[]", id));
 
-        for (let i = 0; i < dataTotalVariant.length; i++) {
+        for (let i = 0; i < dataTotalVariant?.length; i++) {
             var item = dataTotalVariant[i];
 
             formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
@@ -1052,8 +1052,8 @@ const Popup_NVL = React.memo((props) => {
             }
         }
 
-        for (let i = 0; i < dataVariantSending.length; i++) {
-            for (let j = 0; j < dataVariantSending[i].option.length; j++) {
+        for (let i = 0; i < dataVariantSending?.length; i++) {
+            for (let j = 0; j < dataVariantSending[i].option?.length; j++) {
                 formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
             }
         }
@@ -1070,6 +1070,7 @@ const Popup_NVL = React.memo((props) => {
             },
             (err, response) => {
                 if (!err) {
+                    console.log("response", response);
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
                         isShow("success", props.dataLang[message] || message);
@@ -1098,6 +1099,7 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         onSending && _ServerSending();
+        console.log("sub mit");
     }, [onSending]);
 
     const _HandleSubmit = (e) => {
