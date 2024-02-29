@@ -902,7 +902,7 @@ const Index = (props) => {
                                                                     <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                                         {(e?.status === "approved" && (
                                                                             <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 transition-all duration-300 ease-in-out text-green-500 hover:bg-green-500 hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
+                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-[#166846] transition-all duration-300 ease-in-out text-[#166846] hover:bg-[#166846] hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
                                                                                 onClick={() =>
                                                                                     handleQueryId({
                                                                                         id: e?.id,

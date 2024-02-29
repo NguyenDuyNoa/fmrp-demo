@@ -1135,10 +1135,9 @@ const Index = (props) => {
                     headers: { "Content-Type": "multipart/form-data" },
                 },
                 (err, response) => {
-                    console.log("response", response);
-
-                    if (response && response.data && response?.data?.isSuccess === true && router.isReady) {
-                        isShow("success", `${dataLang[response?.data?.message]}` || response?.data?.message);
+                    const { isSuccess, message } = response?.data
+                    if (isSuccess) {
+                        isShow("success", `${dataLang[message]}` || message);
                         setCodeProduct("");
                         setStartDate(new Date());
                         setDeliveryDate(new Date());
@@ -1157,8 +1156,8 @@ const Index = (props) => {
                         setOption([]);
                         router.push(routerSalesOrder.home);
                     }
-                    if (response && response.data && response?.data?.isSuccess === false) {
-                        isShow("error", `${dataLang[response?.data?.message]}` || response?.data?.message);
+                    else {
+                        isShow("error", `${dataLang[message]}` || message);
                     }
                     setOnSending(false);
                 }
