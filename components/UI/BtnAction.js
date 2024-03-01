@@ -76,6 +76,7 @@ const BtnAction = React.memo((props) => {
     const [dataProductExpiry, sDataProductExpiry] = useState({});
 
     const [dataProductSerial, sDataProductSerial] = useState({});
+
     const dataSeting = useSetingServer()
 
     const confimDelete = (url) => {
@@ -556,6 +557,7 @@ const Popup_Pdf = (props) => {
         dataMaterialExpiry: props?.dataMaterialExpiry,
         dataProductExpiry: props?.dataProductExpiry,
         dataProductSerial: props?.dataProductSerial,
+        dataSeting: props?.dataSeting
     };
     return (
         <>

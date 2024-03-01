@@ -390,7 +390,7 @@ export const titleDateTwo = (props, data, title) => {
 ///value và dữ liệu
 export const titleValue = (props, data, capitalizedTotalAmountWord, dataSeting) => {
     const formatMoney = (number) => {
-        return formatMoneyConfig(+number, dataSeting)
+        return formatMoneyConfig(+number ? +number : 0, dataSeting)
     }
     return [
         {

@@ -65,13 +65,6 @@ const MultiValue = ({ index, getValue, ...props }) => {
     ) : null;
 };
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const CustomSelectOption = ({ value, label, level }) => (
     <div className="flex space-x-2 truncate">
@@ -113,6 +106,8 @@ const Index = (props) => {
     const [keySearch, sKeySearch] = useState("");
 
     const [limit, sLimit] = useState(15);
+
+
 
     const _ServerFetching = () => {
         Axios(
@@ -164,12 +159,6 @@ const Index = (props) => {
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 1500);
         sOnFetching(true);
     }, 500)
 
@@ -288,7 +277,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: data.map((e) => [
+            data: data?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.name}` },
                 { value: `${e.name}` },
@@ -386,7 +375,7 @@ const Index = (props) => {
                         <div className="col-span-2">
                             <div className="flex space-x-2 items-center justify-end">
                                 <OnResetData sOnFetching={sOnFetching} />
-                                {data.length != 0 && (
+                                {data?.length != 0 && (
                                     <ExcelFileComponent
                                         multiDataSet={multiDataSet}
                                         filename={
@@ -697,66 +686,108 @@ const Popup_ChucVu = React.memo((props) => {
 
     const dataOptPosition = useSelector((state) => state.position_staff);
 
-    const [open, sOpen] = useState(false);
-
     const isShow = useToast();
 
-    const _ToggleModal = (e) => sOpen(e);
+    const initalState = {
+        open: false,
+        dataOption: [],
+        onSending: false,
+        onFetching: false,
+        name: "",
+        position: "",
+        department: "",
+        valueBranch: [],
+        errBranch: false,
+        errName: false,
+        errDepartment: false,
+        tab: 0,
+        dataPower: []
+    }
 
-    const [dataOption, sDataOption] = useState([]);
+    const [isState, setIsState] = useState(initalState)
 
-    const [onSending, sOnSending] = useState(false);
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [name, sName] = useState("");
-
-    const [position, sPosition] = useState(null);
-
-    const [department, sDepartment] = useState(null);
-
-    const [branch, sBranch] = useState([]);
-
-    const branch_id = branch?.map((e) => e.value);
-
-    const [errBranch, sErrBranch] = useState(false);
-
-    const [errName, sErrName] = useState(false);
-
-    const [errDepartment, sErrDepartment] = useState(false);
+    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }))
 
     useEffect(() => {
-        open && sErrBranch(false);
-        open && sErrName(false);
-        open && sErrDepartment(false);
-        open && sName("");
-        open && sPosition(null);
-        open && sDepartment(null);
-        open && sBranch([]);
-        open && sDataOption([]);
-        open && props?.id && sOnFetching(true);
-    }, [open]);
+        isState.open && fetchDataPower()
+        isState.open && props?.id && queryState({ onFetching: true, open: true });
+    }, [isState.open]);
 
-    const _HandleChangeInput = (type, value) => {
-        if (type == "name") {
-            sName(value?.target.value);
-        } else if (type == "position") {
-            sPosition(value?.value);
-        } else if (type == "department") {
-            sDepartment(value?.value);
-        } else if (type == "branch") {
-            sBranch(value);
-        }
-    };
+    function transformData(data) {
+        const transformedData = {};
+        data.forEach(item => {
+            const { key, is_check, name, child } = item;
+            const transformedChild = {};
+
+            if (child) {
+                child.forEach(childItem => {
+                    const { key: childKey, name: childName, permissions } = childItem;
+                    const transformedPermissions = {};
+                    if (permissions) {
+                        permissions.forEach(permission => {
+                            transformedPermissions[permission.key] = {
+                                name: permission.name,
+                                is_check: permission.is_check
+                            };
+                        });
+                    }
+
+                    transformedChild[childKey] = {
+                        name: childName,
+                        permissions: transformedPermissions
+                    };
+                });
+            }
+            transformedData[key] = {
+                is_check,
+                name,
+                child: transformedChild
+            };
+        });
+
+        return transformedData;
+    }
+
+
+    const fetchDataPower = () => {
+        Axios("GET", props?.id ? `/api_web/api_staff/getPermissions/${props?.id}?csrf_protection=true` : `/api_web/api_staff/getPermissions?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                const { data, isSuccess, message } = response?.data;
+                if (isSuccess == 1) {
+                    const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
+                        key,
+                        ...value,
+                        child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
+                            key: childKey,
+                            ...childValue,
+                            permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
+                                key: permissionsKey,
+                                ...permissionsValue,
+                            }))
+                        }))
+                    }));
+                    queryState({ dataPower: permissionsArray })
+                }
+            } else {
+                {
+                    console.log("err", err);
+                }
+            }
+        });
+    }
 
     const _ServerSending = () => {
-        var formData = new FormData();
-
-        formData.append("name", name);
-        formData.append("position_parent_id", position);
-        formData.append("department_id", department);
-        branch_id.forEach((id) => formData.append("branch_id[]", id));
-
+        let formData = new FormData();
+        const transformedResult = transformData(isState.dataPower);
+        formData.append("name", isState.name ? isState.name : "");
+        formData.append("position_parent_id", isState.position?.value ? isState.position?.value : "");
+        formData.append("department_id", isState.department?.value ? isState.department?.value : "");
+        isState.valueBranch.forEach((e) => formData.append("branch_id[]", e?.value));
+        const utf8Bytes = JSON.stringify(transformedResult)
+        formData.append("permissions", utf8Bytes);
+        // Object.keys(transformedResult).forEach((key) => {
+        //     formData.append(key, transformedResult[key]);
+        // });
         Axios(
             "POST",
             `${props?.id
@@ -771,86 +802,152 @@ const Popup_ChucVu = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
-                        sOpen(false);
-                        sName("");
-                        sPosition(null);
-                        sDepartment(null);
-                        sBranch([]);
+                        isShow("success", props.dataLang[message] || message);
+                        setIsState(initalState)
                         props.onRefresh && props.onRefresh();
                         props.onRefreshSub && props.onRefreshSub();
                     } else {
-                        isShow("error", props.dataLang[message]);
+                        isShow("error", props.dataLang[message] || message);
                     }
-                    sOnSending(false);
+                    queryState({ onSending: false });
+                }
+                else {
+                    console.log("err", err);
                 }
             }
         );
     };
 
     useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
+        isState.onSending && _ServerSending();
+    }, [isState.onSending]);
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (name?.length == 0 || department == null || branch?.length == 0) {
-            name?.length == 0 && sErrName(true);
-            department == null && sErrDepartment(true);
-            branch?.length == 0 && sErrBranch(true);
+        if (isState.name == "" || isState.department == "" || isState.valueBranch?.length == 0) {
+            isState.name == "" && queryState({ errName: true });
+            isState.department == "" && queryState({ errDepartment: true });
+            isState.valueBranch?.length == 0 && queryState({ errBranch: true })
             isShow("error", props.dataLang?.required_field_null);
         } else {
-            sOnSending(true);
+            queryState({ onSending: true });
         }
     };
 
     useEffect(() => {
-        sErrName(false);
-    }, [name?.length > 0]);
+        queryState({ errName: false });
+    }, [isState.name != ""])
 
     useEffect(() => {
-        sErrBranch(false);
-    }, [branch?.length > 0]);
+        queryState({ errDepartment: false });
+    }, [isState.department != ""])
 
     useEffect(() => {
-        sErrDepartment(false);
-    }, [department != null]);
+        queryState({ errBranch: false });
+    }, [isState.valueBranch?.length > 0])
 
     const _ServerFetching = () => {
         Axios("GET", `/api_web/api_staff/position/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var list = response.data;
-                sName(list?.name);
-                sDepartment(list?.department_id);
-                sPosition(list?.position_parent_id);
-                sBranch(
-                    list?.branch.map((e) => ({
+                const list = response.data;
+                queryState({
+                    name: list?.name,
+                    department: { value: list?.department_id, label: list?.department_name },
+                    position: list?.position_parent_id == 0 ? null : { value: list?.position_parent_id, label: list?.position_parent_name },
+                    valueBranch: list?.branch.map((e) => ({
                         label: e.name,
                         value: e.id,
-                    }))
-                );
+                    })),
+                })
             }
         });
         Axios("GET", `/api_web/api_staff/positionOption/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
-                sDataOption(
-                    rResult.map((x) => ({
+                const { rResult } = response.data;
+                queryState({
+                    dataOption: rResult.map((x) => ({
                         label: x.name,
                         value: x.id,
                         level: x.level,
                     }))
-                );
+                })
             }
         });
-        sOnFetching(false);
+        queryState({ onFetching: false });
     };
 
     useEffect(() => {
         setTimeout(() => {
-            onFetching && _ServerFetching();
+            isState.onFetching && _ServerFetching();
         }, 500);
-    }, [onFetching]);
+    }, [isState.onFetching]);
+
+    const handleChange = (parent, child = null, permissions = null) => {
+        const newData = isState.dataPower?.map((e) => {
+            if (child == null && e?.key == parent?.key) {
+                return {
+                    ...e,
+                    child: e?.child?.map((x) => {
+                        return {
+                            ...x,
+                            permissions: x?.permissions?.map((y) => {
+                                return {
+                                    ...y,
+                                    is_check: parent.is_check == 0 ? 1 : 0
+                                };
+                            })
+                        };
+                    }),
+                    is_check: parent.is_check == 0 ? 1 : 0
+                };
+            } else if (child != null && e?.key == parent && e?.is_check == 1) {
+                return {
+                    ...e,
+                    child: e?.child?.map((x) => {
+                        if (x?.key == child) {
+                            return {
+                                ...x,
+                                permissions: x?.permissions?.map((y) => {
+                                    if (y?.key == permissions?.key) {
+                                        return {
+                                            ...y,
+                                            is_check: y.is_check === 0 ? 1 : 0
+                                        };
+                                    }
+                                    return y;
+                                })
+                            };
+                        }
+                        return x;
+                    })
+                };
+            }
+            return e;
+        });
+
+        queryState({ dataPower: newData });
+    };
+
+
+
+
+    const styleSelect = {
+        theme: (theme) => ({
+            ...theme,
+            colors: {
+                ...theme.colors,
+                primary25: "#EBF5FF",
+                primary50: "#92BFF7",
+                primary: "#0F4F9E",
+            },
+        }),
+        styles: {
+            placeholder: (base) => ({
+                ...base,
+                color: "#cbd5e1",
+            }),
+        }
+    }
 
     return (
         <PopupEdit
@@ -860,188 +957,249 @@ const Popup_ChucVu = React.memo((props) => {
                     : `${props.dataLang?.category_personnel_position_addnew || "category_personnel_position_addnew"}`
             }
             button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
-            onClickOpen={_ToggleModal.bind(this, true)}
-            open={open}
-            onClose={_ToggleModal.bind(this, false)}
+            onClickOpen={() => queryState({ open: true })}
+            open={isState.open}
+            onClose={() => queryState({ open: false, ...initalState })}
             classNameBtn={props.className}
         >
-            <div className="py-4 w-[600px] space-y-5">
-                {onFetching ? (
+            <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
+                <button
+                    onClick={() => queryState({ tab: 0 })}
+                    className={`${isState.tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        }  px-4 py-2 outline-none font-semibold`}
+                >
+                    {props.dataLang?.personnels_staff_popup_info}
+                </button>
+                <button
+                    onClick={() => queryState({ tab: 1 })}
+                    className={`${isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        }  px-4 py-2 outline-none font-semibold`}
+                >
+                    {props.dataLang?.personnels_staff_popup_power}
+                </button>
+            </div>
+            <div className="py-4 w-[600px]  space-y-4">
+                {isState.onFetching ? (
                     <Loading className="h-80" color="#0f4f9e" />
                 ) : (
+
                     <React.Fragment>
-                        <div className="space-y-1">
-                            <label className="text-[#344054] font-normal text-base">
-                                {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                                options={dataOptBranch}
-                                // formatOptionLabel={CustomSelectOption}
-                                value={branch}
-                                onChange={_HandleChangeInput.bind(this, "branch")}
-                                isClearable={true}
-                                placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
-                                isMulti
-                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                closeMenuOnSelect={false}
-                                className={`${errBranch ? "border-red-500" : "border-transparent"
-                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                            {errBranch && (
-                                <label className="text-sm text-red-500">
-                                    {props.dataLang?.client_list_bran || "client_list_bran"}
-                                </label>
-                            )}
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-[#344054] font-normal text-base">
-                                {props.dataLang?.category_personnel_position_department ||
-                                    "category_personnel_position_department"}{" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                                options={dataOptDepartment}
-                                value={
-                                    department
-                                        ? {
-                                            label: dataOptDepartment?.find((x) => x.value === department)?.label,
-                                            value: department,
+                        {isState.tab == 0 && (
+                            <div className="space-y-2">
+                                <div className="space-y-1">
+                                    <label className="text-[#344054] font-normal text-base">
+                                        {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <SelectComponent
+                                        classParent={"m-0"}
+                                        options={dataOptBranch}
+                                        value={isState.valueBranch}
+                                        onChange={(value) => queryState({ valueBranch: value })}
+                                        isClearable={true}
+                                        placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
+                                        isMulti
+                                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                        closeMenuOnSelect={false}
+                                        className={`${isState.errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border p-0`}
+                                        {...styleSelect}
+                                    />
+                                    {isState.errBranch && (
+                                        <label className="text-sm text-red-500">
+                                            {props.dataLang?.client_list_bran || "client_list_bran"}
+                                        </label>
+                                    )}
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[#344054] font-normal text-base">
+                                        {props.dataLang?.category_personnel_position_department ||
+                                            "category_personnel_position_department"}{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <SelectComponent
+                                        classParent={"m-0"}
+                                        options={dataOptDepartment}
+                                        value={isState.department}
+                                        onChange={(value) => queryState({ department: value })}
+                                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                        isClearable={true}
+                                        placeholder={
+                                            props.dataLang?.category_personnel_position_department ||
+                                            "category_personnel_position_department"
                                         }
-                                        : null
-                                }
-                                onChange={_HandleChangeInput.bind(this, "department")}
-                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                isClearable={true}
-                                placeholder={
-                                    props.dataLang?.category_personnel_position_department ||
-                                    "category_personnel_position_department"
-                                }
-                                className={`${errDepartment ? "border-red-500" : "border-transparent"
-                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                isSearchable={true}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                            {errDepartment && (
-                                <label className="text-sm text-red-500">
-                                    {props.dataLang?.category_personnel_position_err_department ||
-                                        "category_personnel_position_err_department"}
-                                </label>
-                            )}
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-[#344054] font-normal text-base">
-                                {props.dataLang?.category_personnel_position_name || "category_personnel_position_name"}{" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                value={name}
-                                onChange={_HandleChangeInput.bind(this, "name")}
-                                type="text"
-                                placeholder={props.dataLang?.category_material_group_name}
-                                className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
-                            />
-                            {errName && (
-                                <label className="text-sm text-red-500">
-                                    {props.dataLang?.category_personnel_position_err_name ||
-                                        "category_personnel_position_err_name"}
-                                </label>
-                            )}
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-[#344054] font-normal text-base">
-                                {props.dataLang?.category_personnel_position_manage_position ||
-                                    "category_personnel_position_manage_position"}
-                            </label>
-                            <Select
-                                options={props?.id ? dataOption : dataOptPosition}
-                                formatOptionLabel={CustomSelectOption}
-                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                // value={
-                                //     position ?
-                                //         (props?.id ?
-                                //             {label: dataOption.find(x => x.value === position)?.label, value: position, level: dataOption.find(x => x.value === position)?.level}
-                                //             :
-                                //             {label: dataOptPosition.find(x => x.value === position)?.label, value: position, level: dataOptPosition.find(x => x.value === position)?.level}
-                                //         )
-                                //     : null
-                                // }
-                                defaultValue={
-                                    position == "0" || !position
-                                        ? null
-                                        : {
-                                            label: dataOption.find((x) => x?.value == position)?.label,
-                                            value: position,
-                                            level: dataOption.find((x) => x.position_parent_id === position)?.level,
+                                        className={`${isState.errDepartment ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border p-0`}
+                                        isSearchable={true}
+                                        {...styleSelect}
+                                    />
+                                    {isState.errDepartment && (
+                                        <label className="text-sm text-red-500">
+                                            {props.dataLang?.category_personnel_position_err_department ||
+                                                "category_personnel_position_err_department"}
+                                        </label>
+                                    )}
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[#344054] font-normal text-base">
+                                        {props.dataLang?.category_personnel_position_name || "category_personnel_position_name"}{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        value={isState.name}
+                                        onChange={(e) => queryState({ name: e.target.value })}
+                                        type="text"
+                                        placeholder={props.dataLang?.category_material_group_name}
+                                        className={`${isState.errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-1.5 border outline-none `}
+                                    />
+                                    {isState.errName && (
+                                        <label className="text-sm text-red-500">
+                                            {props.dataLang?.category_personnel_position_err_name ||
+                                                "category_personnel_position_err_name"}
+                                        </label>
+                                    )}
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[#344054] font-normal text-base">
+                                        {props.dataLang?.category_personnel_position_manage_position ||
+                                            "category_personnel_position_manage_position"}
+                                    </label>
+                                    <SelectComponent
+                                        classParent={"m-0"}
+                                        options={props?.id ? isState.dataOption : dataOptPosition}
+                                        formatOptionLabel={CustomSelectOption}
+                                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                        defaultValue={isState.position}
+                                        value={isState.position}
+                                        onChange={(value) => queryState({ position: value })}
+                                        isClearable={true}
+                                        placeholder={
+                                            props.dataLang?.category_personnel_position_manage_position ||
+                                            "category_personnel_position_manage_position"
                                         }
-                                }
-                                value={
-                                    position == "0" || !position
-                                        ? null
-                                        : {
-                                            label: dataOptPosition.find((x) => x?.value == position)?.label,
-                                            value: position,
-                                            level: dataOptPosition.find((x) => x.value === position)?.level,
-                                        }
-                                }
-                                onChange={_HandleChangeInput.bind(this, "position")}
-                                isClearable={true}
-                                placeholder={
-                                    props.dataLang?.category_personnel_position_manage_position ||
-                                    "category_personnel_position_manage_position"
-                                }
-                                className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
-                                isSearchable={true}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                        </div>
+                                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none p-0"
+                                        isSearchable={true}
+                                        {...styleSelect}
+                                    />
+
+                                </div>
+                            </div>
+                        )}
+                        {isState.tab == 1 && (
+                            <div className="space-y-2 max-h-[500px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <div className={`grid grid-cols-1`}>
+                                    {isState.dataPower?.map((e) => {
+                                        return (
+                                            <div className="mt-2" key={e?.key}>
+                                                <div className="flex w-max items-center">
+                                                    <div className="inline-flex items-center">
+                                                        <label
+                                                            className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                            htmlFor={e?.key}
+                                                            data-ripple-dark="true"
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                id={e?.key}
+                                                                value={e?.name}
+                                                                checked={e?.is_check == 1 ? true : false}
+                                                                onChange={(value) => handleChange(e)}
+                                                            />
+                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    className="h-3.5 w-3.5"
+                                                                    viewBox="0 0 20 20"
+                                                                    fill="currentColor"
+                                                                    stroke="currentColor"
+                                                                    stroke-width="1"
+                                                                >
+                                                                    <path
+                                                                        fill-rule="evenodd"
+                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                        clip-rule="evenodd"
+                                                                    ></path>
+                                                                </svg>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    <label
+                                                        htmlFor={e?.key}
+                                                        className="text-[#344054] font-medium text-base cursor-pointer"
+                                                    >
+                                                        {e?.name}
+                                                    </label>
+                                                </div>
+                                                {e?.is_check == 1 && (
+                                                    <div className="">
+                                                        {e?.child?.map((i, index) => {
+                                                            return (
+                                                                <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
+                                                                    <div className="border-b p-2 text-sm">{i?.name}</div>
+                                                                    <div className="grid grid-cols-3 gap-1 ">
+                                                                        {i?.permissions?.map((s) => {
+                                                                            return (
+                                                                                <div key={s?.key} className="flex w-full items-center">
+                                                                                    <div className="inline-flex items-center">
+                                                                                        <label
+                                                                                            className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                                            htmlFor={s?.key + "" + i?.key}
+                                                                                            data-ripple-dark="true"
+                                                                                        >
+                                                                                            <input
+                                                                                                type="checkbox"
+                                                                                                className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                                                id={s?.key + "" + i?.key}
+                                                                                                value={s?.name}
+                                                                                                checked={s?.is_check == 1 ? true : false}
+                                                                                                onChange={(value) => {
+                                                                                                    handleChange(e?.key, i?.key, s)
+                                                                                                }}
+                                                                                            />
+                                                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                                                <svg
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    className="h-3.5 w-3.5"
+                                                                                                    viewBox="0 0 20 20"
+                                                                                                    fill="currentColor"
+                                                                                                    stroke="currentColor"
+                                                                                                    stroke-width="1"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill-rule="evenodd"
+                                                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                                        clip-rule="evenodd"
+                                                                                                    ></path>
+                                                                                                </svg>
+                                                                                            </div>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <label
+                                                                                        htmlFor={s?.key + "" + i?.key}
+                                                                                        className="text-[#344054] font-medium text-sm cursor-pointer"
+                                                                                    >
+                                                                                        {s?.name}
+                                                                                    </label>
+                                                                                </div>
+                                                                            )
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                         <div className="flex justify-end space-x-2">
                             <button
-                                onClick={_ToggleModal.bind(this, false)}
+                                onClick={() => queryState({ open: false, ...initalState })}
                                 className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
                             >
                                 {props.dataLang?.branch_popup_exit}

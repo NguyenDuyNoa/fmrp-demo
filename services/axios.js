@@ -40,6 +40,7 @@ const _ServerInstance = (method, url, dataObject, callback) => {
         headers: {
             "Content-Type": dataObject.headers?.["Content-Type"]
                 ? dataObject.headers?.["Content-Type"]
+                // : 'application/json; charset=utf-8',
                 : "application/json",
             Authorization: `Bearer ${token}`,
             "x-api-key": databaseApp,

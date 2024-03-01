@@ -42,50 +42,37 @@ const FilePDF = ({
 
 
     const [url, setUrl] = useState(null);
-    const [data, setData] = useState();
-    const [dataCompany, setDataCompany] = useState();
+
+    const [dataCompany, setDataCompany] = useState(dataSeting);
     // uppercase text header table
     const uppercaseText = (text, style, alignment) => {
         return { text: text.toUpperCase(), style: style, alignment: alignment };
     };
-    console.log("dataSeting", dataSeting);
 
     const formatMoney = (number) => {
-        console.log("money", number, typeof number);
+        if (typeof number == 'string') {
+            return formatMoneyConfig(+number ? +number : 0, dataSeting)
+        }
+        else if (typeof number == 'undefined') {
+            return formatMoneyConfig(0, dataSeting);
+        }
         return formatMoneyConfig(+number ? +number : 0, dataSeting)
     }
 
-    // format numberdocDefinitionPriceQuote
     const formatNumber = (number) => {
-        console.log("number", number, typeof number);
-        // if (!number && number !== 0) return 0;
-        // const integerPart = Math.floor(number);
-        // return integerPart.toLocaleString("en");
-        // return number
-        // return formatNumberConfig(+number ? +number : 0, dataSeting);
-        return formatNumberConfig(+number, dataSeting);
+        if (typeof number == 'string') {
+            return formatNumberConfig(+number ? +number : 0, dataSeting)
+        }
+        else if (typeof number == 'undefined') {
+            return formatNumberConfig(0, dataSeting);
+        }
+        return formatNumberConfig(number, dataSeting);
     };
 
 
-    // Ngày hiện tại
-    const currentDate = moment().format("[Ngày] DD [Tháng] MM [Năm] YYYY");
-
-    // In hoa chữ cái đầu
-    const words = data?.total_amount_word?.split(" ");
-
-    const capitalizedWords = words?.map((word) => {
-        if (word.length > 0) {
-            return word?.charAt(0)?.toUpperCase() + word?.slice(1);
-        }
-        return word;
-    });
-
-    const capitalizedTotalAmountWord = capitalizedWords?.join(" ");
-    //Báo giá, đơn hàng bán
-
     useEffect(() => {
-        setDataCompany(dataSeting)
-    }, [])
+        dataSeting && setDataCompany(dataSeting)
+    }, [dataSeting])
 
     const handlePrintPdf = async (type) => {
         const initialApi = {
@@ -175,7 +162,8 @@ const FilePDF = ({
                 };
 
                 const dataKeys = Object.keys(dataPDF);
-
+                console.log("dataCompany", dataCompany);
+                console.log("dataServer", db);
                 if (dataKeys.includes(type) && dataPDF !== undefined && dataCompany !== undefined) {
                     const pdfGenerator = pdfMake.createPdf(dataPDF[type][props?.type]);
                     pdfGenerator.open((blob) => {
@@ -184,22 +172,28 @@ const FilePDF = ({
                         setUrl(url);
                     });
                 }
+            } else {
+                console.log("err", err);
             }
         });
-        // if (dataKeys.includes(type) && dataPDF !== undefined && dataCompany !== undefined) {
-        //     const pdfGenerator = pdfMake.createPdf(dataPDF[type][props?.type]);
-        //     console.log("helo");
-        //     pdfGenerator.open((blob) => {
-        //         const url = URL.createObjectURL(blob);
 
-        //         setUrl(url);
-        //     });
-
-        //     setOpenAction(false);
-        // }
     };
 
     const handleUpdateData = (data) => {
+        // Ngày hiện tại
+        const currentDate = moment().format("[Ngày] DD [Tháng] MM [Năm] YYYY");
+        const words = data?.total_amount_word?.split(" ");
+
+        const capitalizedWords = words?.map((word) => {
+            if (word.length > 0) {
+                return word?.charAt(0)?.toUpperCase() + word?.slice(1);
+            }
+            return word;
+        });
+        const capitalizedTotalAmountWord = capitalizedWords?.join(" ");
+        //Báo giá, đơn hàng bán
+        // In hoa chữ cái đầu
+
         const contentColumns = {
             columns: [
                 {
