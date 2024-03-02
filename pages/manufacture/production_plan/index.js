@@ -117,9 +117,9 @@ const Index = (props) => {
                                         images: s.images,
                                         desription: s.desription,
                                         status: s.status,
-                                        quantity: s.quantity,
-                                        quantityRemaining: s.quantity_rest,
-                                        quantityPlan: s.quantity_plan,
+                                        quantity: +s.quantity,
+                                        quantityRemaining: +s.quantity_rest,
+                                        quantityPlan: +s.quantity_plan,
                                         actions: s.actions,
                                         processArr: s?.processArr?.items.map(j => {
                                             return {
