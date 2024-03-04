@@ -65,6 +65,8 @@ const Index = (props) => {
 
     const isShow = useToast();
 
+    const [idBranch, sIdBranch] = useState(null);
+
     const { isOpen, isId, isKeyState, handleQueryId } = useToggle();
 
     const router = useRouter();
@@ -78,6 +80,8 @@ const Index = (props) => {
     const [totalItem, sTotalItems] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
+
+    const [onFetchingRoom, sOnFetchingRoom] = useState(false);
 
     const [data, sData] = useState({});
 
@@ -101,7 +105,7 @@ const Index = (props) => {
                 var { rResult } = response.data;
                 sRoom(rResult);
             }
-            sOnFetching(false);
+            sOnFetchingRoom(false)
         });
     };
 
@@ -151,7 +155,6 @@ const Index = (props) => {
 
     const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
 
-    const [idBranch, sIdBranch] = useState(null);
 
     const onchang_filterBr = (type, value) => {
         if (type == "branch") {
@@ -186,9 +189,14 @@ const Index = (props) => {
     useEffect(() => {
         onFetchingOpt && _ServerFetchingOtp();
     }, [onFetchingOpt]);
+    useEffect(() => {
+        onFetchingRoom && _ServerFetching_room();
+        onFetchingRoom && _ServerFetching_brand()
+    }, [onFetchingRoom]);
 
     useEffect(() => {
         sOnFetchingOpt(true);
+        sOnFetchingRoom(true);
     }, []);
 
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
@@ -213,19 +221,11 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
         sOnFetching(true);
     }, 500)
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_brand()) ||
-            (onFetching && _ServerFetching_room());
+        onFetching && _ServerFetching()
     }, [onFetching]);
 
     useEffect(() => {
@@ -562,6 +562,7 @@ const Index = (props) => {
                                                         },
                                                         ...dataOption,
                                                     ]}
+                                                    isClearable={true}
                                                     formatOptionLabel={CustomSelectOption}
                                                     onChange={_HandleFilterOpt.bind(this, "pos")}
                                                     value={idPos}

@@ -148,6 +148,7 @@ const Popup_EditDetail = (props) => {
                 })
             );
 
+
             sData({ ...data, items: [...filteredItems] });
         }
     };

@@ -12,6 +12,7 @@ import {
     Trash as IconDelete,
     Edit as IconEdit,
     Grid6 as IconExcel,
+    SearchNormal1,
 } from "iconsax-react";
 import Select, { components } from "react-select";
 import Swal from "sweetalert2";
@@ -30,6 +31,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";
 import { debounce } from "lodash";
+import { MdClear } from "react-icons/md";
+import NoData from "@/components/UI/noData/nodata";
 
 const MoreSelectedBadge = ({ items }) => {
     const style = {
@@ -701,7 +704,8 @@ const Popup_ChucVu = React.memo((props) => {
         errName: false,
         errDepartment: false,
         tab: 0,
-        dataPower: []
+        dataPower: [],
+        valueSearch: ""
     }
 
     const [isState, setIsState] = useState(initalState)
@@ -713,7 +717,7 @@ const Popup_ChucVu = React.memo((props) => {
         isState.open && props?.id && queryState({ onFetching: true, open: true });
     }, [isState.open]);
 
-    function transformData(data) {
+    const transformData = (data) => {
         const transformedData = {};
         data.forEach(item => {
             const { key, is_check, name, child } = item;
@@ -929,7 +933,26 @@ const Popup_ChucVu = React.memo((props) => {
     };
 
 
+    useEffect(() => {
+        const filteredData = isState.dataPower.filter(item => item.name.toLowerCase().includes(isState.valueSearch.toLowerCase()));
+        const newdb = isState.dataPower.map((item) => {
+            const itemChecked = filteredData.find((x) => item.key == x.key);
+            if (itemChecked) {
+                return {
+                    ...item,
+                    ...itemChecked,
+                    hidden: false
+                }
+            }
+            return {
+                ...item,
+                hidden: true
+            }
 
+        })
+        queryState({ dataPower: newdb });
+
+    }, [isState.valueSearch])
 
     const styleSelect = {
         theme: (theme) => ({
@@ -959,7 +982,7 @@ const Popup_ChucVu = React.memo((props) => {
             button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={() => queryState({ open: true })}
             open={isState.open}
-            onClose={() => queryState({ open: false, ...initalState })}
+            onClose={() => queryState({ open: false })}
             classNameBtn={props.className}
         >
             <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
@@ -1087,119 +1110,138 @@ const Popup_ChucVu = React.memo((props) => {
                             </div>
                         )}
                         {isState.tab == 1 && (
-                            <div className="space-y-2 max-h-[500px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                <div className={`grid grid-cols-1`}>
-                                    {isState.dataPower?.map((e) => {
-                                        return (
-                                            <div className="mt-2" key={e?.key}>
-                                                <div className="flex w-max items-center">
-                                                    <div className="inline-flex items-center">
+                            <>
+                                <div className="w-full">
+                                    <label>Tìm kiếm</label>
+                                    <div className="relative flex items-center">
+                                        <SearchNormal1 size={20} className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]" />
+                                        <input
+                                            onChange={(e) => queryState({ valueSearch: e?.target?.value })}
+                                            dataLang={props.dataLang}
+                                            value={isState.valueSearch}
+                                            className={"border py-1.5 rounded border-gray-300 2xl:text-left 2xl:pl-10 xl:!text-left xl:pl-16 relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-base text-xs  text-center 2xl:w-full xl:w-full w-[100%]"} />
+                                        {
+                                            isState.valueSearch != "" && <MdClear size={32} onClick={() => queryState({ valueSearch: "" })} className="absolute cursor-pointer hover:bg-gray-300 p-2 right-5 bottom-0.5 rounded-full transition-all duration-200 ease-linear" />
+                                        }
+                                    </div>
+
+                                </div>
+                                <div className="space-y-2 max-h-[500px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+
+                                    <div className={`grid grid-cols-1`}>
+                                        {isState.dataPower?.map((e) => {
+                                            return (
+                                                <div className={e?.hidden ? "hidden" : ""} key={e?.key}>
+                                                    <div className="flex w-max items-center">
+                                                        <div className="inline-flex items-center">
+                                                            <label
+                                                                className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                htmlFor={e?.key}
+                                                                data-ripple-dark="true"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                    id={e?.key}
+                                                                    value={e?.name}
+                                                                    checked={e?.is_check == 1 ? true : false}
+                                                                    onChange={(value) => handleChange(e)}
+                                                                />
+                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="h-3.5 w-3.5"
+                                                                        viewBox="0 0 20 20"
+                                                                        fill="currentColor"
+                                                                        stroke="currentColor"
+                                                                        stroke-width="1"
+                                                                    >
+                                                                        <path
+                                                                            fill-rule="evenodd"
+                                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                            clip-rule="evenodd"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </div>
+                                                            </label>
+                                                        </div>
                                                         <label
-                                                            className="relative flex cursor-pointer items-center rounded-full p-3"
                                                             htmlFor={e?.key}
-                                                            data-ripple-dark="true"
+                                                            className="text-[#344054] font-medium text-base cursor-pointer"
                                                         >
-                                                            <input
-                                                                type="checkbox"
-                                                                className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                                                id={e?.key}
-                                                                value={e?.name}
-                                                                checked={e?.is_check == 1 ? true : false}
-                                                                onChange={(value) => handleChange(e)}
-                                                            />
-                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    className="h-3.5 w-3.5"
-                                                                    viewBox="0 0 20 20"
-                                                                    fill="currentColor"
-                                                                    stroke="currentColor"
-                                                                    stroke-width="1"
-                                                                >
-                                                                    <path
-                                                                        fill-rule="evenodd"
-                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                        clip-rule="evenodd"
-                                                                    ></path>
-                                                                </svg>
-                                                            </div>
+                                                            {e?.name}
                                                         </label>
                                                     </div>
-                                                    <label
-                                                        htmlFor={e?.key}
-                                                        className="text-[#344054] font-medium text-base cursor-pointer"
-                                                    >
-                                                        {e?.name}
-                                                    </label>
-                                                </div>
-                                                {e?.is_check == 1 && (
-                                                    <div className="">
-                                                        {e?.child?.map((i, index) => {
-                                                            return (
-                                                                <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
-                                                                    <div className="border-b p-2 text-sm">{i?.name}</div>
-                                                                    <div className="grid grid-cols-3 gap-1 ">
-                                                                        {i?.permissions?.map((s) => {
-                                                                            return (
-                                                                                <div key={s?.key} className="flex w-full items-center">
-                                                                                    <div className="inline-flex items-center">
+                                                    {e?.is_check == 1 && (
+                                                        <div className="">
+                                                            {e?.child?.map((i, index) => {
+                                                                return (
+                                                                    <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
+                                                                        <div className="border-b p-2 text-sm">{i?.name}</div>
+                                                                        <div className="grid grid-cols-3 gap-1 ">
+                                                                            {i?.permissions?.map((s) => {
+                                                                                return (
+                                                                                    <div key={s?.key} className="flex w-full items-center">
+                                                                                        <div className="inline-flex items-center">
+                                                                                            <label
+                                                                                                className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                                                htmlFor={s?.key + "" + i?.key}
+                                                                                                data-ripple-dark="true"
+                                                                                            >
+                                                                                                <input
+                                                                                                    type="checkbox"
+                                                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                                                    id={s?.key + "" + i?.key}
+                                                                                                    value={s?.name}
+                                                                                                    checked={s?.is_check == 1 ? true : false}
+                                                                                                    onChange={(value) => {
+                                                                                                        handleChange(e?.key, i?.key, s)
+                                                                                                    }}
+                                                                                                />
+                                                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                                                    <svg
+                                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                                        className="h-3.5 w-3.5"
+                                                                                                        viewBox="0 0 20 20"
+                                                                                                        fill="currentColor"
+                                                                                                        stroke="currentColor"
+                                                                                                        stroke-width="1"
+                                                                                                    >
+                                                                                                        <path
+                                                                                                            fill-rule="evenodd"
+                                                                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                                            clip-rule="evenodd"
+                                                                                                        ></path>
+                                                                                                    </svg>
+                                                                                                </div>
+                                                                                            </label>
+                                                                                        </div>
                                                                                         <label
-                                                                                            className="relative flex cursor-pointer items-center rounded-full p-3"
                                                                                             htmlFor={s?.key + "" + i?.key}
-                                                                                            data-ripple-dark="true"
+                                                                                            className="text-[#344054] font-medium text-sm cursor-pointer"
                                                                                         >
-                                                                                            <input
-                                                                                                type="checkbox"
-                                                                                                className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                                                                                id={s?.key + "" + i?.key}
-                                                                                                value={s?.name}
-                                                                                                checked={s?.is_check == 1 ? true : false}
-                                                                                                onChange={(value) => {
-                                                                                                    handleChange(e?.key, i?.key, s)
-                                                                                                }}
-                                                                                            />
-                                                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                                                <svg
-                                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                                    className="h-3.5 w-3.5"
-                                                                                                    viewBox="0 0 20 20"
-                                                                                                    fill="currentColor"
-                                                                                                    stroke="currentColor"
-                                                                                                    stroke-width="1"
-                                                                                                >
-                                                                                                    <path
-                                                                                                        fill-rule="evenodd"
-                                                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                                        clip-rule="evenodd"
-                                                                                                    ></path>
-                                                                                                </svg>
-                                                                                            </div>
+                                                                                            {s?.name}
                                                                                         </label>
                                                                                     </div>
-                                                                                    <label
-                                                                                        htmlFor={s?.key + "" + i?.key}
-                                                                                        className="text-[#344054] font-medium text-sm cursor-pointer"
-                                                                                    >
-                                                                                        {s?.name}
-                                                                                    </label>
-                                                                                </div>
-                                                                            )
-                                                                        })}
+                                                                                )
+                                                                            })}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
+
+                            </>
                         )}
                         <div className="flex justify-end space-x-2">
                             <button
-                                onClick={() => queryState({ open: false, ...initalState })}
+                                onClick={() => queryState({ open: false, })}
                                 className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
                             >
                                 {props.dataLang?.branch_popup_exit}

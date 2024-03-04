@@ -17,9 +17,14 @@ import {
     EyeSlash as IconEyeSlash,
     Image as IconImage,
     GalleryEdit as IconEditImg,
+    SearchNormal1,
 } from "iconsax-react";
 import Image from "next/image";
 import useToast from "@/hooks/useToast";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import { MdClear } from "react-icons/md";
+import NoData from "@/components/UI/noData/nodata";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -70,7 +75,8 @@ const Popup_dsnd = (props) => {
         thumbFile: null,
         idPos: null,
         manage: [],
-        valueManage: []
+        valueManage: [],
+        valueSearch: "",
     }
 
     const [isState, setIsState] = useState(initialData)
@@ -78,7 +84,7 @@ const Popup_dsnd = (props) => {
     const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
     const _HandleChangeFileThumb = ({ target: { files } }) => {
-        var [file] = files;
+        const [file] = files;
         if (file) {
             queryState({ thumb: URL.createObjectURL(file), thumbFile: file });
         }
@@ -100,7 +106,7 @@ const Popup_dsnd = (props) => {
         Axios("GET", props?.id ? `/api_web/api_staff/getPermissionsStaff/${props?.id}?csrf_protection=true` :
             `/api_web/api_staff/getPermissionsStaff?csrf_protection=true`, {
             params: {
-                position_id: isState.idPos?.value ? isState.idPos?.value : ""
+                position_id: 0
             }
         }, (err, response) => {
             if (!err) {
@@ -118,7 +124,7 @@ const Popup_dsnd = (props) => {
                             }))
                         }))
                     }));
-                    queryState({ room: permissionsArray })
+                    queryState({ room: permissionsArray });
                 }
             } else {
                 {
@@ -130,22 +136,9 @@ const Popup_dsnd = (props) => {
 
     useEffect(() => {
         isState.open && fetchDataPower()
-        queryState({
-            onFetching: props?.id ? true : false,
-            brandpOpt: props.listBr ? props.listBr && [
-                ...props.listBr?.map((e) => ({
-                    label: e.name,
-                    value: Number(e.id),
-                }))
-            ] : [],
-            dataOption: props?.dataOption ? props?.dataOption : [],
-        });
-    }, [isState.open]);
-
-    useEffect(() => {
-        fetchDataPower()
         isState.idPos == null && queryState({ manage: [], valueManage: [] });
     }, [isState.idPos])
+
 
     const _ServerFetching_detailUser = () => {
         Axios("GET", `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`, {}, (err, response) => {
@@ -166,14 +159,25 @@ const Popup_dsnd = (props) => {
                         value: Number(x.id),
                     })),
                     thumb: db?.profile_image,
-                    idPos: db?.position_id
+                    idPos: db?.position_id == "0" ? null : { value: db?.position_id, label: db?.position_name }
                 })
             }
             queryState({ onFetching: false });
         });
     };
     useEffect(() => {
-        isState.open && props?.id && _ServerFetching_detailUser();
+        if (isState.open) {
+            queryState({
+                onFetching: props?.id ? true : false,
+                brandpOpt: props.listBr ? props.listBr && [...props.listBr?.map((e) => ({
+                    label: e.name,
+                    value: Number(e.id),
+                }))] : [],
+                dataOption: props?.dataOption ? props?.dataOption : [],
+            });
+            props?.id && _ServerFetching_detailUser();
+            fetchDataPower()
+        }
     }, [isState.open]);
 
     const handleChange = (parent, child = null, permissions = null) => {
@@ -218,12 +222,11 @@ const Popup_dsnd = (props) => {
             }
             return e;
         });
-
         queryState({ room: newData });
     };
 
     //post db
-    function transformData(data) {
+    const transformData = (data) => {
         const transformedData = {};
         data.forEach(item => {
             const { key, is_check, name, child } = item;
@@ -257,34 +260,28 @@ const Popup_dsnd = (props) => {
 
         return transformedData;
     }
+
     const _ServerSending = () => {
         let id = props?.id;
         const transformedResult = transformData(isState.room);
         var form = new FormData();
-        form.append("name", isState.name || "");
+        form.append("full_name", isState.name || "");
         form.append("code", isState.code || "");
         form.append("password", isState.password || "");
-
         // department_id là id phòng ban cũ
         form.append("admin", isState.admin || "");
         form.append("phone_number", isState.phone_number || "");
         form.append("email", isState.email || "");
-
         isState.valueBr.forEach((e) => form.append("branch_id[]", e?.value));
-
         isState.valueManage.forEach((e) => form.append("manage[]", e?.value));
-
         form.append("profile_image", isState.thumbFile || "");
-        form.append("position_id", isState.idPos || "");
+        form.append("position_id", isState.idPos?.value || "");
         form.append("is_delete_image ", isState.isDeleteThumb || "");
         const utf8Bytes = JSON.stringify(transformedResult)
         form.append("permissions", utf8Bytes);
         Axios(
             "POST",
-            `${id
-                ? `/api_web/api_staff/staff/${id}?csrf_protection=true`
-                : "/api_web/api_staff/staff/?csrf_protection=true"
-            }`,
+            `${id ? `/api_web/api_staff/staff/${id}?csrf_protection=true` : "/api_web/api_staff/staff/?csrf_protection=true"}`,
             {
                 data: form,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -295,7 +292,7 @@ const Popup_dsnd = (props) => {
                     if (isSuccess) {
                         isShow("success", props?.dataLang[message] || message);
                         props.onRefresh && props.onRefresh();
-                        setIsState(initalState)
+                        queryState({ open: false });
                     } else {
                         isShow("error", props.dataLang[message] + " " + branch_name || message);
                     }
@@ -375,6 +372,27 @@ const Popup_dsnd = (props) => {
         isState.onFetching_Manage && _ServerFetching__Manage();
     }, [isState.onFetching_Manage]);
 
+    useEffect(() => {
+        const filteredData = isState.room.filter(item => item.name.toLowerCase().includes(isState.valueSearch.toLowerCase()));
+        const newdb = isState.room.map((item) => {
+            const itemChecked = filteredData.find((x) => item.key == x.key);
+            if (itemChecked) {
+                return {
+                    ...item,
+                    ...itemChecked,
+                    hidden: false
+                }
+            }
+            return {
+                ...item,
+                hidden: true
+            }
+
+        })
+        queryState({ room: newdb });
+
+    }, [isState.valueSearch])
+
     return (
         <>
             <PopupEdit
@@ -386,7 +404,7 @@ const Popup_dsnd = (props) => {
                 button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
                 onClickOpen={() => queryState({ open: true })}
                 open={isState.open}
-                onClose={() => queryState({ open: false, ...initialData })}
+                onClose={() => queryState({ open: false })}
                 classNameBtn={props.className}
             >
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
@@ -405,16 +423,16 @@ const Popup_dsnd = (props) => {
                         {props.dataLang?.personnels_staff_popup_power}
                     </button>
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 w-[600px] ">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
-                        {isState.tab === 0 && (
+                        {isState.tab == 0 && (
                             <ScrollArea
                                 ref={scrollAreaRef}
-                                className="h-[550px] overflow-hidden"
+                                className="h-[480px] overflow-hidden"
                                 speed={1}
                                 smoothScrolling={true}
                             >
-                                <div className="w-[45vw]    ">
+                                <div className="">
                                     <div className="flex justify-between gap-5">
                                         <div className="w-1/2">
                                             <label className="text-[#344054] font-normal text-sm mb-1 ">
@@ -456,7 +474,8 @@ const Popup_dsnd = (props) => {
                                                     {props.dataLang?.client_list_brand}{" "}
                                                     <span className="text-red-500">*</span>
                                                 </label>
-                                                <Select
+                                                <SelectComponent
+                                                    classParent="m-0"
                                                     closeMenuOnSelect={false}
                                                     placeholder={props.dataLang?.client_list_brand}
                                                     options={isState.brandpOpt}
@@ -493,6 +512,7 @@ const Popup_dsnd = (props) => {
                                                     className={`${isState.errInputBr ? "border-red-500" : "border-transparent"
                                                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 />
+
                                                 {isState.errInputBr && (
                                                     <label className="mb-2  text-[14px] text-red-500">
                                                         {props.dataLang?.client_list_bran}
@@ -654,229 +674,233 @@ const Popup_dsnd = (props) => {
                                 </div>
                             </ScrollArea>
                         )}
-                        {isState.tab === 1 && (
-                            <div>
-                                <ScrollArea
-                                    className="min-h-[500px] max-h-[550px] overflow-hidden"
-                                    speed={1}
-                                    smoothScrolling={true}
-                                >
-                                    <div className="w-[45vw] flex  items-center justify-between gap-5  flex-wrap ">
-                                        <div className="flex items-center w-full gap-5 mb-3">
-                                            <div className="w-1/2">
-                                                <div className="">
-                                                    <label className="text-[#344054] font-normal text-base">
-                                                        {props.dataLang?.personnels_staff_position}
-                                                    </label>
-                                                    <Select
-                                                        options={isState.dataOption}
-                                                        formatOptionLabel={CustomSelectOption}
-                                                        value={isState.idPos}
-                                                        maxMenuHeight="200px"
-                                                        isClearable={true}
-                                                        onChange={(e) => queryState({ idPos: e })}
-                                                        placeholder={props.dataLang?.personnels_staff_position}
-                                                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
-                                                        isSearchable={true}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        closeMenuOnSelect={false}
-                                                        LoadingIndicator
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        menuPortalTarget={document.body}
-                                                        onMenuOpen={handleMenuOpen}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            menuPortal: (base) => ({
-                                                                ...base,
-                                                                zIndex: 9999,
-                                                                position: "absolute",
-                                                            }),
-                                                            control: (provided) => ({
-                                                                ...provided,
-                                                                border: "1px solid #d0d5dd",
-                                                                "&:focus": {
-                                                                    outline: "none",
-                                                                    border: "none",
-                                                                },
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="w-1/2">
-                                                <label className="text-[#344054] font-normal text-sm  ">
-                                                    {props.dataLang?.personnels_staff_popup_mana}{" "}
-                                                </label>
-                                                <Select
-                                                    closeMenuOnSelect={false}
-                                                    placeholder={props.dataLang?.personnels_staff_popup_mana}
-                                                    options={isState.manage}
-                                                    isSearchable={true}
-                                                    onChange={(e) => queryState({ valueManage: e })}
-                                                    LoadingIndicator
-                                                    isMulti
-                                                    noOptionsMessage={() => "Không có dữ liệu"}
-                                                    value={isState.valueManage}
-                                                    maxMenuHeight="200px"
-                                                    isClearable={true}
-                                                    menuPortalTarget={document.body}
-                                                    onMenuOpen={handleMenuOpen}
-                                                    styles={{
-                                                        placeholder: (base) => ({
-                                                            ...base,
-                                                            color: "#cbd5e1",
-                                                        }),
-                                                        menuPortal: (base) => ({
-                                                            ...base,
-                                                            zIndex: 9999,
-                                                            position: "absolute",
-                                                        }),
-                                                        control: (provided) => ({
-                                                            ...provided,
-                                                            border: "1px solid #d0d5dd",
-                                                            "&:focus": {
-                                                                outline: "none",
-                                                                border: "none",
-                                                            },
-                                                        }),
-                                                    }}
-                                                    className={` placeholder:text-slate-300  text-[#52575E] font-normal border outline-none rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="h-[400px] w-full">
-                                            <label className="text-[#344054] font-normal text-base mb-3">
-                                                {props?.dataLang?.personnels_staff_table_depart}
+                        {isState.tab == 1 && (
+                            <div className="flex  items-center justify-between gap-2  flex-wrap ">
+                                <div className="flex items-center w-full gap-5">
+                                    <div className="w-1/2">
+                                        <div className="">
+                                            <label className="text-[#344054] font-normal text-base">
+                                                {props.dataLang?.personnels_staff_position}
                                             </label>
-                                            <div className="space-y-2 max-h-[500px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                                <div className={`grid grid-cols-1`}>
-                                                    {isState.room?.map((e) => {
-                                                        return (
-                                                            <div className="mt-2" key={e?.key}>
-                                                                <div className="flex w-max items-center">
-                                                                    <div className="inline-flex items-center">
-                                                                        <label
-                                                                            className="relative flex cursor-pointer items-center rounded-full p-3"
-                                                                            htmlFor={e?.key}
-                                                                            data-ripple-dark="true"
-                                                                        >
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                                                                id={e?.key}
-                                                                                value={e?.name}
-                                                                                checked={e?.is_check == 1 ? true : false}
-                                                                                onChange={(value) => handleChange(e)}
-                                                                            />
-                                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                                <svg
-                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                    className="h-3.5 w-3.5"
-                                                                                    viewBox="0 0 20 20"
-                                                                                    fill="currentColor"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1"
-                                                                                >
-                                                                                    <path
-                                                                                        fill-rule="evenodd"
-                                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                        clip-rule="evenodd"
-                                                                                    ></path>
-                                                                                </svg>
-                                                                            </div>
-                                                                        </label>
-                                                                    </div>
-                                                                    <label
-                                                                        htmlFor={e?.key}
-                                                                        className="text-[#344054] font-medium text-base cursor-pointer"
-                                                                    >
-                                                                        {e?.name}
-                                                                    </label>
-                                                                </div>
-                                                                {e?.is_check == 1 && (
-                                                                    <div className="">
-                                                                        {e?.child?.map((i, index) => {
-                                                                            return (
-                                                                                <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
-                                                                                    <div className="border-b p-2 text-sm">{i?.name}</div>
-                                                                                    <div className="grid grid-cols-3 gap-1 ">
-                                                                                        {i?.permissions?.map((s) => {
-                                                                                            return (
-                                                                                                <div key={s?.key} className="flex w-full items-center">
-                                                                                                    <div className="inline-flex items-center">
-                                                                                                        <label
-                                                                                                            className="relative flex cursor-pointer items-center rounded-full p-3"
-                                                                                                            htmlFor={s?.key + "" + i?.key}
-                                                                                                            data-ripple-dark="true"
-                                                                                                        >
-                                                                                                            <input
-                                                                                                                type="checkbox"
-                                                                                                                className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                                                                                                id={s?.key + "" + i?.key}
-                                                                                                                value={s?.name}
-                                                                                                                checked={s?.is_check == 1 ? true : false}
-                                                                                                                onChange={(value) => {
-                                                                                                                    handleChange(e?.key, i?.key, s)
-                                                                                                                }}
-                                                                                                            />
-                                                                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                                                                <svg
-                                                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                                                    className="h-3.5 w-3.5"
-                                                                                                                    viewBox="0 0 20 20"
-                                                                                                                    fill="currentColor"
-                                                                                                                    stroke="currentColor"
-                                                                                                                    stroke-width="1"
-                                                                                                                >
-                                                                                                                    <path
-                                                                                                                        fill-rule="evenodd"
-                                                                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                                                        clip-rule="evenodd"
-                                                                                                                    ></path>
-                                                                                                                </svg>
-                                                                                                            </div>
-                                                                                                        </label>
-                                                                                                    </div>
-                                                                                                    <label
-                                                                                                        htmlFor={s?.key + "" + i?.key}
-                                                                                                        className="text-[#344054] font-medium text-sm cursor-pointer"
-                                                                                                    >
-                                                                                                        {s?.name}
-                                                                                                    </label>
-                                                                                                </div>
-                                                                                            )
-                                                                                        })}
-                                                                                    </div>
-                                                                                </div>
-                                                                            )
-                                                                        })}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
+                                            <SelectComponent
+                                                options={isState.dataOption}
+                                                formatOptionLabel={CustomSelectOption}
+                                                value={isState.idPos}
+                                                maxMenuHeight="200px"
+                                                isClearable={true}
+                                                onChange={(e) => queryState({ idPos: e })}
+                                                placeholder={props.dataLang?.personnels_staff_position}
+                                                className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
+                                                isSearchable={true}
+                                                theme={(theme) => ({
+                                                    ...theme,
+                                                    colors: {
+                                                        ...theme.colors,
+                                                        primary25: "#EBF5FF",
+                                                        primary50: "#92BFF7",
+                                                        primary: "#0F4F9E",
+                                                    },
+                                                })}
+                                                closeMenuOnSelect={false}
+                                                LoadingIndicator
+                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                menuPortalTarget={document.body}
+                                                onMenuOpen={handleMenuOpen}
+                                                styles={{
+                                                    placeholder: (base) => ({
+                                                        ...base,
+                                                        color: "#cbd5e1",
+                                                    }),
+                                                    menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999,
+                                                        position: "absolute",
+                                                    }),
+                                                    control: (provided) => ({
+                                                        ...provided,
+                                                        border: "1px solid #d0d5dd",
+                                                        "&:focus": {
+                                                            outline: "none",
+                                                            border: "none",
+                                                        },
+                                                    }),
+                                                }}
+                                            />
                                         </div>
                                     </div>
-                                </ScrollArea>
+                                    <div className="w-1/2">
+                                        <label className="text-[#344054] font-normal text-sm  ">
+                                            {props.dataLang?.personnels_staff_popup_mana}{" "}
+                                        </label>
+                                        <SelectComponent
+                                            closeMenuOnSelect={false}
+                                            placeholder={props.dataLang?.personnels_staff_popup_mana}
+                                            options={isState.manage}
+                                            isSearchable={true}
+                                            onChange={(e) => queryState({ valueManage: e })}
+                                            LoadingIndicator
+                                            isMulti
+                                            noOptionsMessage={() => "Không có dữ liệu"}
+                                            value={isState.valueManage}
+                                            maxMenuHeight="200px"
+                                            isClearable={true}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    border: "1px solid #d0d5dd",
+                                                    "&:focus": {
+                                                        outline: "none",
+                                                        border: "none",
+                                                    },
+                                                }),
+                                            }}
+                                            className={` placeholder:text-slate-300  text-[#52575E] font-normal border outline-none rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="w-full">
+                                    <label>Tìm kiếm</label>
+                                    <div className="relative flex items-center">
+                                        <SearchNormal1 size={20} className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]" />
+                                        <input
+                                            onChange={(e) => queryState({ valueSearch: e?.target?.value })}
+                                            dataLang={props.dataLang}
+                                            value={isState.valueSearch}
+                                            className={"border py-1.5 rounded border-gray-300 2xl:text-left 2xl:pl-10 xl:!text-left xl:pl-16 relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-base text-xs  text-center 2xl:w-full xl:w-full w-[100%]"} />
+                                        {
+                                            isState.valueSearch != "" && <MdClear size={32} onClick={() => queryState({ valueSearch: "" })} className="absolute cursor-pointer hover:bg-gray-300 p-2 right-5 bottom-0.5 rounded-full transition-all duration-200 ease-linear" />
+                                        }
+                                    </div>
+
+                                </div>
+                                <div className="w-full">
+                                    <div className="space-y-2 max-h-[380px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                        <div className={`grid grid-cols-1`}>
+                                            {isState.room?.map((e) => {
+                                                return (
+                                                    <div className={e?.hidden ? "hidden" : ""} key={e?.key}>
+                                                        <div className="flex w-max items-center">
+                                                            <div className="inline-flex items-center">
+                                                                <label
+                                                                    className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                    htmlFor={e?.key}
+                                                                    data-ripple-dark="true"
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                        id={e?.key}
+                                                                        value={e?.name}
+                                                                        checked={e?.is_check == 1 ? true : false}
+                                                                        onChange={(value) => handleChange(e)}
+                                                                    />
+                                                                    <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                        <svg
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            className="h-3.5 w-3.5"
+                                                                            viewBox="0 0 20 20"
+                                                                            fill="currentColor"
+                                                                            stroke="currentColor"
+                                                                            stroke-width="1"
+                                                                        >
+                                                                            <path
+                                                                                fill-rule="evenodd"
+                                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                clip-rule="evenodd"
+                                                                            ></path>
+                                                                        </svg>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                            <label
+                                                                htmlFor={e?.key}
+                                                                className="text-[#344054] font-medium text-base cursor-pointer"
+                                                            >
+                                                                {e?.name}
+                                                            </label>
+                                                        </div>
+                                                        {e?.is_check == 1 && (
+                                                            <div className="">
+                                                                {e?.child?.map((i, index) => {
+                                                                    return (
+                                                                        <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
+                                                                            <div className="border-b p-2 text-sm">{i?.name}</div>
+                                                                            <div className="grid grid-cols-3 gap-1 ">
+                                                                                {i?.permissions?.map((s) => {
+                                                                                    return (
+                                                                                        <div key={s?.key} className="flex w-full items-center">
+                                                                                            <div className="inline-flex items-center">
+                                                                                                <label
+                                                                                                    className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                                                    htmlFor={s?.key + "" + i?.key}
+                                                                                                    data-ripple-dark="true"
+                                                                                                >
+                                                                                                    <input
+                                                                                                        type="checkbox"
+                                                                                                        className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                                                        id={s?.key + "" + i?.key}
+                                                                                                        value={s?.name}
+                                                                                                        checked={s?.is_check == 1 ? true : false}
+                                                                                                        onChange={(value) => {
+                                                                                                            handleChange(e?.key, i?.key, s)
+                                                                                                        }}
+                                                                                                    />
+                                                                                                    <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                                                        <svg
+                                                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                                                            className="h-3.5 w-3.5"
+                                                                                                            viewBox="0 0 20 20"
+                                                                                                            fill="currentColor"
+                                                                                                            stroke="currentColor"
+                                                                                                            stroke-width="1"
+                                                                                                        >
+                                                                                                            <path
+                                                                                                                fill-rule="evenodd"
+                                                                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                                                clip-rule="evenodd"
+                                                                                                            ></path>
+                                                                                                        </svg>
+                                                                                                    </div>
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            <label
+                                                                                                htmlFor={s?.key + "" + i?.key}
+                                                                                                className="text-[#344054] font-medium text-sm cursor-pointer"
+                                                                                            >
+                                                                                                {s?.name}
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    )
+                                                                                })}
+                                                                            </div>
+                                                                        </div>
+                                                                    )
+                                                                })}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
                         <div className="text-right mt-5 space-x-2">
                             <button
                                 type="button"
-                                onClick={() => queryState({ open: false, ...initialData })}
+                                onClick={() => queryState({ open: false, })}
                                 className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {props.dataLang?.branch_popup_exit}
