@@ -646,8 +646,6 @@ const Index = (props) => {
                 setContactPerson(null);
                 setDataQuotes([]);
                 setQuote(null);
-
-                setOnFetchingItem(true);
             }
         } else if (type === "branch") {
             if (option?.length >= 1) {
