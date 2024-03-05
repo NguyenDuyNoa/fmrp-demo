@@ -106,9 +106,12 @@ const PopupConfim = (props) => {
                                     <Zoom className="w-1/2">
                                         <button
                                             onClick={() => {
-                                                if (role || auth?.orders?.is_agree == 1) {
+                                                if (role) {
                                                     return props.save()
-                                                } else {
+                                                } else if (auth?.orders?.is_agree == 1) {
+                                                    return props.save()
+                                                }
+                                                else {
                                                     showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
                                                 }
                                             }}

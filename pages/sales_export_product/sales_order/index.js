@@ -67,7 +67,7 @@ const Index = (props) => {
     const isShow = useToast();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-
+    console.log("auth", auth);
     const dataSeting = useSetingServer()
 
     const trangthaiExprired = useStatusExprired();
@@ -514,15 +514,24 @@ const Index = (props) => {
                                     {dataLang?.sales_product_list || "sales_product_list"}
                                 </h2>
                                 {
-                                    role || auth?.orders?.is_create == 1 &&
-                                    <div className={` flex justify-end items-center`}>
-                                        <Link
-                                            href={routerSalesOrder.form}
-                                            className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                        >
-                                            {dataLang?.btn_new || "btn_new"}
-                                        </Link>
-                                    </div>
+                                    role ?
+                                        <div className={` flex justify-end items-center`}>
+                                            <Link
+                                                href={routerSalesOrder.form}
+                                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                            >
+                                                {dataLang?.btn_new || "btn_new"}
+                                            </Link>
+                                        </div>
+                                        : auth?.orders?.is_create == 1 && <div className={` flex justify-end items-center`}>
+                                            <Link
+                                                href={routerSalesOrder.form}
+                                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                            >
+                                                {dataLang?.btn_new || "btn_new"}
+                                            </Link>
+                                        </div>
+
                                 }
                             </div>
 
@@ -752,8 +761,30 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
-                                                {
-                                                    role || auth?.orders?.is_export == 1 &&
+                                                {role ? <div className={``}>
+                                                    {initData.dataExcel?.length > 0 && (
+                                                        <ExcelFile
+                                                            filename="Danh sách đơn hàng bán"
+                                                            title="DSĐHB"
+                                                            element={
+                                                                <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
+                                                                    <IconExcel
+                                                                        className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
+                                                                        size={18}
+                                                                    />
+                                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                                </button>
+                                                            }
+                                                        >
+                                                            <ExcelSheet
+                                                                dataSet={multiDataSet}
+                                                                data={multiDataSet}
+                                                                name="Organization"
+                                                            />
+                                                        </ExcelFile>
+                                                    )}
+                                                </div> :
+                                                    auth?.orders?.is_export == 1 &&
                                                     <div className={``}>
                                                         {initData.dataExcel?.length > 0 && (
                                                             <ExcelFile
