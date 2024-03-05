@@ -87,7 +87,6 @@ function MainPage({ Component, pageProps }) {
         await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 const { settings } = response?.data
-                console.log("settings", settings);
                 dispatch({ type: "setings/server", payload: settings });
             }
         });

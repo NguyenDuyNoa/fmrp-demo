@@ -343,10 +343,10 @@ const Popup_dsnd = (props) => {
     // save form
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (isState.name == "" || isState.valueBr?.length == 0 || isState.password == "") {
+        if (isState.name == "" || isState.valueBr?.length == 0 || !props?.id && isState.password == "") {
             isState.name == "" && queryState({ errInput: true });
             isState.valueBr?.length == 0 && queryState({ errInputBr: true });
-            isState.password == "" && queryState({ errInputPas: true });
+            !props?.id && isState.password == "" && queryState({ errInputPas: true });
             isShow("error", props.dataLang?.required_field_null);
         } else {
             queryState({ onSending: true });

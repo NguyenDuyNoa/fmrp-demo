@@ -35,6 +35,8 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { TITLE_DELETE, CONFIRM_DELETION } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -43,29 +45,30 @@ const Index = (props) => {
 
     const router = useRouter();
 
-    const tabPage = router.query?.tab;
-
     const { isOpen, isId, handleQueryId } = useToggle();
 
-    const [keySearch, sKeySearch] = useState("");
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
-    const [limit, sLimit] = useState(15);
+    const initalState = {
+        tabPage: router.query?.tab,
+        keySearch: "",
+        onFetching: false,
+        onFetchingBranch: false,
+        data: {},
+        data_ex: [],
+        listDs: [],
+        listSelectCt: [],
+        listBr: [],
+        idBranch: null,
+        onFetchingGroup: false,
+        onFetchingSelectCt: false
+    }
+    const [isState, setIsState] = useState(initalState)
 
-    const [totalItem, sTotalItems] = useState([]);
+    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }))
 
-    const [onFetching, sOnFetching] = useState(false);
+    const trangthaiExprired = useStatusExprired();
 
-    const [data, sData] = useState({});
-
-    const [data_ex, sData_ex] = useState([]);
-
-    const [listDs, sListDs] = useState();
-
-    const [listSelectCt, sListSelectCt] = useState();
-
-    const [listBr, sListBr] = useState();
-
-    const [idBranch, sIdBranch] = useState(null);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -79,37 +82,36 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : 0 },
         });
+        queryState({ onFetchingBranch: true })
     }, []);
 
     const _ServerFetching = () => {
-        const id = Number(tabPage);
+        const id = Number(router.query?.tab);
         Axios(
             "GET",
-            `/api_web/${tabPage === "0" || tabPage === "-1"
+            `/api_web/${router.query?.tab === "0" || router.query?.tab === "-1"
                 ? "api_client/client?csrf_protection=true"
                 : "api_client/client/?csrf_protection=true"
             }`,
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[client_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null,
-                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
+                    "filter[client_group_id]": router.query?.tab !== "0" ? (router.query?.tab !== "-1" ? id : -1) : null,
+                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                    sData_ex(rResult);
+                    const { rResult, output } = response.data;
+                    updateTotalItems(output);
+                    queryState({ data: rResult, data_ex: rResult })
                 }
-                sOnFetching(false);
+                queryState({ onFetching: false })
             }
         );
     };
-
     const _ServerFetching_brand = () => {
         Axios(
             "GET",
@@ -121,25 +123,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sListBr(rResult);
+                    const { rResult, output } = response.data;
+                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) })
                 }
-                sOnFetching(false);
+                queryState({ onFetchingBranch: false })
             }
         );
     };
 
-    const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
-
-    const onchang_filterBr = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        }
-    };
-
-    const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-
-    const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
     const _ServerFetching_group = () => {
         Axios(
@@ -148,16 +139,16 @@ const Index = (props) => {
             {
                 params: {
                     limit: 0,
-                    search: keySearch,
-                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
+                    search: isState.keySearch,
+                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sListDs(rResult);
+                    const { rResult, output } = response.data;
+                    queryState({ listDs: rResult })
                 }
-                sOnFetching(false);
+                queryState({ onFetchingGroup: false })
             }
         );
     };
@@ -171,10 +162,10 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sListSelectCt(rResult);
+                    const { rResult, output } = response.data;
+                    queryState({ listSelectCt: rResult })
                 }
-                sOnFetching(false);
+                queryState({ onFetchingSelectCt: false })
             }
         );
     };
@@ -190,38 +181,40 @@ const Index = (props) => {
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value);
+        queryState({ keySearch: value })
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
-        sOnFetching(true);
+        queryState({ onFetching: true })
     }, 500)
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_group()) ||
-            (onFetching && _ServerFetching_selectct()) ||
-            (onFetching && _ServerFetching_brand());
-    }, [onFetching]);
+        (isState.onFetching && _ServerFetching())
+    }, [isState.onFetching]);
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) ||
-            (keySearch && sOnFetching(true)) ||
-            (idBranch?.length > 0 && sOnFetching(true));
-    }, [limit, router.query?.page, router.query?.tab, idBranch]);
+
+        (isState.onFetchingBranch && _ServerFetching_brand());
+    }, [isState.onFetchingBranch]);
+
+    useEffect(() => {
+        (isState.onFetchingGroup && _ServerFetching_group())
+    }, [isState.onFetchingGroup]);
+
+    useEffect(() => {
+        (isState.onFetchingSelectCt && _ServerFetching_selectct())
+    }, [isState.onFetchingSelectCt]);
+
+    useEffect(() => {
+        queryState({ onFetching: true, onFetchingGroup: true })
+    }, [limit, router.query?.page, router.query?.tab, isState.idBranch]);
 
     const handleDelete = async () => {
         Axios("DELETE", `/api_web/api_client/client/${isId}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var isSuccess = response.data;
+                const isSuccess = response.data;
                 if (isSuccess) {
                     isShow("success", dataLang?.aler_success_delete);
                 }
@@ -325,7 +318,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: data_ex?.map((e) => [
+            data: isState.data_ex?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.code ? e.code : ""}` },
                 { value: `${e.name ? e.name : ""}` },
@@ -344,7 +337,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const trangthaiExprired = useStatusExprired();
     return (
         <React.Fragment>
             <Head>
@@ -367,8 +359,8 @@ const Index = (props) => {
                                 <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.client_list_title}</h2>
                                 <div className="flex justify-end items-center gap-2">
                                     <Popup_dskh
-                                        listBr={listBr}
-                                        listSelectCt={listSelectCt}
+                                        listBr={isState.listBr}
+                                        listSelectCt={isState.listSelectCt}
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -376,8 +368,8 @@ const Index = (props) => {
                                 </div>
                             </div>
                             <div className="flex space-x-3 items-center  3xl:h-[8vh] 2xl:h-[9vh] xl:h-[9vh] lg:h-[9vh] md:h-[10vh] h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listDs &&
-                                    listDs.map((e) => {
+                                {isState.listDs &&
+                                    isState.listDs.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -415,12 +407,12 @@ const Index = (props) => {
                                                             label: "Chọn chi nhánh",
                                                             isDisabled: true,
                                                         },
-                                                        ...options,
+                                                        ...isState.listBr,
                                                     ]}
-                                                    onChange={onchang_filterBr.bind(this, "branch")}
-                                                    value={idBranch}
+                                                    onChange={(e) => queryState({ idBranch: e })}
+                                                    value={isState.idBranch}
                                                     placeholder={dataLang?.client_list_filterbrand}
-                                                    colSpan={idBranch?.length > 1 ? 2 : 1}
+                                                    colSpan={isState.idBranch?.length > 1 ? 2 : 1}
                                                     components={{ MultiValue }}
                                                     isMulti={true}
                                                     closeMenuOnSelect={false}
@@ -429,8 +421,8 @@ const Index = (props) => {
                                         </div>
                                         <div className="col-span-2">
                                             <div className="flex space-x-2 items-center justify-end">
-                                                <OnResetData sOnFetching={sOnFetching} />
-                                                {data_ex?.length > 0 && (
+                                                <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                                {isState.data_ex?.length > 0 && (
                                                     <ExcelFileComponent
                                                         multiDataSet={multiDataSet}
                                                         filename="Danh sách khách hàng"
@@ -474,12 +466,12 @@ const Index = (props) => {
                                                 {dataLang?.branch_popup_properties}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {isState.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : isState.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {data?.map((e) => (
+                                                    {isState.data?.map((e) => (
                                                         <div
                                                             className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
                                                             key={e.id.toString()}
@@ -562,12 +554,12 @@ const Index = (props) => {
                                                                             key={h.id}
                                                                             style={{
                                                                                 backgroundColor: `${h.color == "" || h.color == null
-                                                                                        ? "#e2f0fe"
-                                                                                        : h.color
+                                                                                    ? "#e2f0fe"
+                                                                                    : h.color
                                                                                     }`,
                                                                                 color: `${h.color == "" || h.color == null
-                                                                                        ? "#0F4F9E"
-                                                                                        : "white"
+                                                                                    ? "#0F4F9E"
+                                                                                    : "white"
                                                                                     }`,
                                                                             }}
                                                                             className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}
@@ -589,11 +581,11 @@ const Index = (props) => {
                                                             </h6>
                                                             <div className="space-x-2 w-[10%] text-center">
                                                                 <Popup_dskh
-                                                                    listBr={listBr}
-                                                                    listSelectCt={listSelectCt}
+                                                                    listBr={isState.listBr}
+                                                                    listSelectCt={isState.listSelectCt}
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
-                                                                    listDs={listDs}
+                                                                    listDs={isState.listDs}
                                                                     dataLang={dataLang}
                                                                     name={e.name}
                                                                     representative={e.representative}
@@ -646,11 +638,12 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
+                                    {/* {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

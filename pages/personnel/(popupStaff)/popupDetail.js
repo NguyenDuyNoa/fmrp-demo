@@ -27,6 +27,7 @@ const Popup_chitiet = (props) => {
     const [tab, sTab] = useState(0);
     const _HandleSelectTab = (e) => sTab(e);
     const [data, sData] = useState();
+    const [dataRole, sDataRole] = useState([])
 
     const [onFetching, sOnFetching] = useState(false);
     useEffect(() => {
@@ -46,8 +47,38 @@ const Popup_chitiet = (props) => {
             }
         );
     };
+
+    const fetchDataPower = () => {
+        Axios("GET", `/api_web/api_staff/getPermissionsStaff/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                const { data, isSuccess, message } = response?.data;
+                if (isSuccess == 1) {
+                    const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
+                        key,
+                        ...value,
+                        child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
+                            key: childKey,
+                            ...childValue,
+                            permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
+                                key: permissionsKey,
+                                ...permissionsValue,
+                            }))
+                        }))
+                    }));
+                    sDataRole(permissionsArray);
+                }
+            } else {
+                {
+                    console.log("err", err);
+                }
+            }
+        });
+    }
+
+
     useEffect(() => {
         onFetching && _ServerFetching_detailUser();
+        onFetching && fetchDataPower();
     }, [open]);
 
     return (
@@ -63,21 +94,19 @@ const Popup_chitiet = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 0
+                            ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                            : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_info}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${
-                            tab === 1
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 1
+                            ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                            : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_power}
                     </button>
@@ -182,7 +211,7 @@ const Popup_chitiet = (props) => {
                                                     {data?.admin === "1"
                                                         ? "Có"
                                                         : data?.admin === "0" &&
-                                                          "Không"}
+                                                        "Không"}
                                                 </span>
                                             </div>
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
@@ -196,10 +225,10 @@ const Popup_chitiet = (props) => {
                                                 <span className="font-normal capitalize">
                                                     {data?.last_login != null
                                                         ? moment(
-                                                              data?.last_login
-                                                          ).format(
-                                                              "DD/MM/YYYY, h:mm:ss"
-                                                          )
+                                                            data?.last_login
+                                                        ).format(
+                                                            "DD/MM/YYYY, h:mm:ss"
+                                                        )
                                                         : ""}
                                                 </span>
                                             </div>
@@ -215,8 +244,8 @@ const Popup_chitiet = (props) => {
                                                     {data?.active === "1"
                                                         ? "Đang hoạt động"
                                                         : data?.active ===
-                                                              "0" &&
-                                                          "Không hoạt động"}
+                                                        "0" &&
+                                                        "Không hoạt động"}
                                                 </span>
                                             </div>
                                         </div>
@@ -239,11 +268,11 @@ const Popup_chitiet = (props) => {
                                                                 quality={100}
                                                                 src={
                                                                     typeof data?.profile_image ===
-                                                                    "string"
+                                                                        "string"
                                                                         ? data?.profile_image
                                                                         : URL.createObjectURL(
-                                                                              data?.profile_image
-                                                                          )
+                                                                            data?.profile_image
+                                                                        )
                                                                 }
                                                                 alt="thumb type"
                                                                 className="w-[180px] h-[180px] rounded object-contain "
@@ -356,31 +385,26 @@ const Popup_chitiet = (props) => {
                                                             }
                                                             :
                                                         </span>{" "}
-                                                        <span className="flex  gap-1 w-[85%] justify-between  flex-wrap ">
-                                                            {data?.department?.map(
-                                                                (e) => {
-                                                                    return (
-                                                                        <div
-                                                                            className="inline-flex items-center w-[27%]"
-                                                                            key={
-                                                                                e.id
-                                                                            }
-                                                                        >
+                                                        <div className={``}>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2 max-h-[280px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                                        {dataRole?.map((e) => {
+                                                            return (
+                                                                <div key={e?.key}>
+                                                                    <div className="flex w-max items-center">
+                                                                        <div className="inline-flex items-center">
                                                                             <label
-                                                                                className="relative flex cursor-pointer items-center rounded-full p-1"
-                                                                                htmlFor={
-                                                                                    e?.id
-                                                                                }
+                                                                                className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                                htmlFor={e?.key}
                                                                                 data-ripple-dark="true"
                                                                             >
                                                                                 <input
                                                                                     type="checkbox"
-                                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
-                                                                                    id={
-                                                                                        e?.id
-                                                                                    }
-                                                                                    defaultChecked
-                                                                                    checked
+                                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                                    id={e?.key}
+                                                                                    value={e?.name}
+                                                                                    checked={e?.is_check == 1 ? true : false}
                                                                                 />
                                                                                 <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                                                                     <svg
@@ -399,16 +423,73 @@ const Popup_chitiet = (props) => {
                                                                                     </svg>
                                                                                 </div>
                                                                             </label>
-                                                                            <span className="text-[#344054] font-medium text-base ">
-                                                                                {
-                                                                                    e.name
-                                                                                }
-                                                                            </span>
                                                                         </div>
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </span>
+                                                                        <label
+                                                                            htmlFor={e?.key}
+                                                                            className="text-[#344054] font-medium text-base cursor-pointer"
+                                                                        >
+                                                                            {e?.name}
+                                                                        </label>
+                                                                    </div>
+                                                                    {e?.is_check == 1 && (
+                                                                        <div className="">
+                                                                            {e?.child?.map((i, index) => {
+                                                                                return (
+                                                                                    <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
+                                                                                        <div className="border-b p-2 text-sm">{i?.name}</div>
+                                                                                        <div className="grid grid-cols-3 gap-1 ">
+                                                                                            {i?.permissions?.map((s) => {
+                                                                                                return (
+                                                                                                    <div key={s?.key} className="flex w-full items-center">
+                                                                                                        <div className="inline-flex items-center">
+                                                                                                            <label
+                                                                                                                className="relative flex cursor-pointer items-center rounded-full p-3"
+                                                                                                                htmlFor={s?.key + "" + i?.key}
+                                                                                                                data-ripple-dark="true"
+                                                                                                            >
+                                                                                                                <input
+                                                                                                                    type="checkbox"
+                                                                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                                                                    id={s?.key + "" + i?.key}
+                                                                                                                    value={s?.name}
+                                                                                                                    checked={s?.is_check == 1 ? true : false}
+                                                                                                                />
+                                                                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                                                                    <svg
+                                                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                                                        className="h-3.5 w-3.5"
+                                                                                                                        viewBox="0 0 20 20"
+                                                                                                                        fill="currentColor"
+                                                                                                                        stroke="currentColor"
+                                                                                                                        stroke-width="1"
+                                                                                                                    >
+                                                                                                                        <path
+                                                                                                                            fill-rule="evenodd"
+                                                                                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                                                            clip-rule="evenodd"
+                                                                                                                        ></path>
+                                                                                                                    </svg>
+                                                                                                                </div>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                        <label
+                                                                                                            htmlFor={s?.key + "" + i?.key}
+                                                                                                            className="text-[#344054] font-medium text-sm cursor-pointer"
+                                                                                                        >
+                                                                                                            {s?.name}
+                                                                                                        </label>
+                                                                                                    </div>
+                                                                                                )
+                                                                                            })}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                )
+                                                                            })}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </div>
                                             </div>

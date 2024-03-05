@@ -695,6 +695,10 @@ const Index = (props) => {
                 if (typeOrder === "0") {
                     const newData = value
                         ?.map((e, index) => {
+                            const check = option?.find((x) => x?.item?.e?.id == e?.e?.id);
+                            if (check) {
+                                return check
+                            }
                             return {
                                 id: uuidv4(),
                                 item: {
@@ -715,12 +719,12 @@ const Index = (props) => {
                                 delivery_date: null,
                             };
                         })
-                        .sort((a, b) => b.sortIndex - a.sortIndex);
                     setOption([...newData]);
                 }
                 if (typeOrder === "1" && quote !== null) {
                     const newData = value
                         ?.map((e, index) => {
+                            console.log("e2", e);
                             return {
                                 id: uuidv4(),
                                 item: {
@@ -765,6 +769,7 @@ const Index = (props) => {
 
     const handleAddParent = (value) => {
         const checkData = option?.some((e) => e?.item?.value === value?.value);
+        console.log("value", value);
         if (!checkData) {
             if (typeOrder === "0") {
                 const newData = {
@@ -1097,15 +1102,16 @@ const Index = (props) => {
         var formData = new FormData();
         formData.append("code", codeProduct);
         formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
-        formData.append("branch_id", branch?.value);
-        formData.append("client_id", customer?.value);
-        formData.append("person_contact_id", contactPerson?.value);
-        formData.append("staff_id", staff?.value);
-        formData.append("note", note);
+        formData.append("branch_id", branch?.value ? branch?.value : "");
+        formData.append("client_id", customer?.value ? customer?.value : "");
+        formData.append("person_contact_id", contactPerson?.value ? contactPerson?.value : "");
+        formData.append("staff_id", staff?.value ? staff?.value : "");
+        formData.append("note", note ? note : "");
         formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
-
+        console.log("newDataOption", newDataOption);
         newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
+            formData.append(`items[${index}][id]`, item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : "");
             formData.append(`items[${index}][quantity]`, item?.quantity.toString());
             formData.append(`items[${index}][price]`, item?.price);
             formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
@@ -1383,7 +1389,6 @@ const Index = (props) => {
 
     // render option item in formatGroupLabel Item
     const selectItemsLabel = (option) => {
-        console.log("option", option);
         return (
             <div className="flex items-center justify-between">
                 <div className="flex items-center ">

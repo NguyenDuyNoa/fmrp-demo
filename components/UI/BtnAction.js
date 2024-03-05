@@ -47,6 +47,7 @@ import Popup_dspt from "@/pages/accountant/receipts/(popup)/popup";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { useSelector } from "react-redux";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -63,10 +64,6 @@ const BtnAction = React.memo((props) => {
 
     const [openAction, setOpenAction] = useState(false);
 
-    const [dataCompany, setDataCompany] = useState();
-
-    const [data, setData] = useState();
-
     const _ToggleModal = (e) => setOpenAction(e);
 
     const feature = useFeature()
@@ -78,6 +75,9 @@ const BtnAction = React.memo((props) => {
     const [dataProductSerial, sDataProductSerial] = useState({});
 
     const dataSeting = useSetingServer()
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    console.log("auth", auth);
 
     const confimDelete = (url) => {
         Axios("DELETE", url, {}, (err, response) => {
@@ -297,53 +297,6 @@ const BtnAction = React.memo((props) => {
         }
     };
 
-    const fetchDataSettingsCompany = async () => {
-        if (props?.id) {
-            try {
-                await Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                    if (response && response.data) {
-                        let res = response.data.data;
-                        setDataCompany(res);
-                    }
-                });
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        // const initialApi = {
-        //     price_quote: `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`,
-        //     sales_product: `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
-        //     deliveryReceipt: `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`,
-        //     returnSales: `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
-        //     internal_plan: `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
-        //     purchases: `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
-        //     order: `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
-        //     serviceVoucher: `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
-        //     import: `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
-        //     returns: `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
-        //     warehouseTransfer: `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`,
-        //     production_warehouse: `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
-        //     productsWarehouse: `/api_web/Api_product_receipt/productReceipt/${props?.id}?csrf_protection=true`,
-        //     recall: `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
-        //     exportToOther: `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
-        //     receipts: `/api_web/Api_expense_payslips/expenseCoupon/${props?.id}?csrf_protection=true`,
-        //     payment: `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-        // };
-
-        // try {
-        //     await Axios("GET", initialApi[props.type], {}, (err, response) => {
-        //         if (response && response.data) {
-        //             let db = props.type == "internal_plan" ? response.data.data : response.data;
-
-        //             setData(db);
-        //         }
-        //     });
-        // } catch (err) {
-        //     console.log(err);
-        // }
-    };
-
     const _ServerFetching_ValidatePayment = () => {
         Axios(
             "GET",
@@ -367,7 +320,6 @@ const BtnAction = React.memo((props) => {
     }, [feature]);
 
     useEffect(() => {
-        // openAction && fetchDataSettingsCompany();
         props.type == "order" && openAction && _ServerFetching_ValidatePayment();
     }, [openAction]);
 
@@ -468,7 +420,9 @@ const BtnAction = React.memo((props) => {
                         {!["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
                             <button
                                 onClick={() => handleClick()}
-                                className="group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                className={`
+                                ${props?.type == "sales_product" && (role == true || auth?.orders?.is_edit == "1") ? "" : "hidden"} 
+                                group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                             >
                                 <BiEdit
                                     size={20}
@@ -488,8 +442,6 @@ const BtnAction = React.memo((props) => {
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
-                                dataCompany={dataCompany}
-                                data={data}
                                 {...shareProps}
                             />
                         ) : (
@@ -498,13 +450,11 @@ const BtnAction = React.memo((props) => {
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
-                                dataCompany={dataCompany}
-                                data={data}
                             />
                         )}
 
-                        {props.type == "sales_product" && <Popup_KeepStock {...props} {...shareProps} />}
-                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == "1" || auth?.orders?.is_edit == "1") && <Popup_KeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == "1" || auth?.orders?.is_edit == "1") && <Popup_DetailKeepStock {...props} {...shareProps} />}
                         {props.type == "order" ? (
                             <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                 <RiDeleteBin6Line
@@ -522,7 +472,9 @@ const BtnAction = React.memo((props) => {
                         ) : (
                             <button
                                 onClick={() => handleQueryId({ id: props?.id, status: true })}
-                                className={`group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
+                                className={`
+                                ${props?.type == "sales_product" && (role == true || auth?.orders?.is_delete == "1") ? "" : "hidden"} 
+                                group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
                                     } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                             >
                                 <RiDeleteBin6Line
@@ -592,8 +544,6 @@ const Popup_Pdf = (props) => {
                                 props={props.props}
                                 openAction={props.openAction}
                                 setOpenAction={props.setOpenAction}
-                                dataCompany={props.dataCompany}
-                                data={props.data}
                                 dataLang={props.dataLang}
                             />
                         </div>

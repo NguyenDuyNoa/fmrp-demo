@@ -59,7 +59,11 @@ import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/
 import BtnAction from "@/components/UI/BtnAction";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
-
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -68,57 +72,53 @@ const Index = (props) => {
 
     const router = useRouter();
 
+    const dataSeting = useSetingServer()
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting)
+
     };
 
     const isShow = useToast();
 
     const { isOpen, isId, handleQueryId } = useToggle();
 
-    const _HandleFresh = () => sOnFetching(true);
+    const _HandleFresh = () => queryState({ onFetching: true });
 
     const trangthaiExprired = useStatusExprired();
 
-    const [data, sData] = useState([]);
+    const initialData = {
+        data: [],
+        dataExcel: [],
+        onFetching: false,
+        onFetchingBranch: false,
+        onFetchingCode: false,
+        onFetchingUser: false,
+        onFetchingFilter: false,
+        onFetchingGroup: false,
+        onSending: false,
+        keySearch: "",
+        listDs: [],
+        listBr: [],
+        listCode: [],
+        listUser: [],
+        idBranch: null,
+        idCode: null,
+        idUser: null,
+        active: null,
+        valueDate: {
+            startDate: null,
+            endDate: null,
+        }
+    }
 
-    const [dataExcel, sDataExcel] = useState([]);
+    const [isState, sIsState] = useState(initialData)
 
-    const [onFetching, sOnFetching] = useState(false);
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
-    const [onnFetching_filter, sOnFetching_filter] = useState(false);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
-    const [totalItems, sTotalItems] = useState([]);
-
-    const [keySearch, sKeySearch] = useState("");
-
-    const [limit, sLimit] = useState(15);
-
-    const [listDs, sListDs] = useState();
 
     const tabPage = router.query?.tab;
-
-    const [listBr, sListBr] = useState();
-
-    const [listCode, sListCode] = useState();
-
-    const [listUser, sListUser] = useState();
-
-    const [idBranch, sIdBranch] = useState(null);
-
-    const [idCode, sIdCode] = useState(null);
-
-    const [idUser, sIdUser] = useState(null);
-
-    const [active, sActive] = useState(null);
-
-    const [onSending, sOnSending] = useState(false);
-
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -138,25 +138,23 @@ const Index = (props) => {
             "/api_web/Api_purchases/purchases/?csrf_protection=true",
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
                     "filter[status]": tabPage,
-                    "filter[id]": idCode?.value,
-                    "filter[staff_id]": idUser?.value,
-                    "filter[start_date]": valueDate?.startDate,
-                    "filter[end_date]": valueDate?.endDate,
+                    "filter[id]": isState.idCode?.value,
+                    "filter[staff_id]": isState.idUser?.value,
+                    "filter[start_date]": isState.valueDate?.startDate,
+                    "filter[end_date]": isState.valueDate?.endDate,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let { output, rResult } = response.data;
-                    sData(rResult);
-                    sDataExcel(rResult);
+                    queryState({ data: rResult, dataExcel: rResult, onFetching: false });
                     sTotalItems(output);
                 }
-                sOnFetching(false);
             }
         );
     };
@@ -165,44 +163,26 @@ const Index = (props) => {
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                sListBr(rResult);
+                queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) });
             }
         });
 
         Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                sListCode(rResult);
+                queryState({ listCode: rResult?.map((e) => ({ label: e.code, value: e.id })) });
             }
         });
 
         Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                sListUser(rResult);
+                queryState({ listUser: rResult?.map((e) => ({ label: e.name, value: e.staffid })) });
             }
         });
-
-        sOnFetching_filter(false);
+        queryState({ onFetchingFilter: false });
     };
 
-    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
-
-    const listCode_filter = listCode ? listCode?.map((e) => ({ label: e.code, value: e.id })) : [];
-
-    const listUser_filter = listUser ? listUser?.map((e) => ({ label: e.name, value: e.staffid })) : [];
-
-    const onchang_filter = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        } else if (type == "code") {
-            sIdCode(value);
-        } else if (type == "user") {
-            sIdUser(value);
-        } else if (type == "date") {
-            sValueDate(value);
-        }
-    };
 
     const _ServerFetching_group = () => {
         Axios(
@@ -211,20 +191,20 @@ const Index = (props) => {
             {
                 params: {
                     limit: 0,
-                    search: keySearch,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                    "filter[id]": idCode?.value,
-                    "filter[staff_id]": idUser?.value,
-                    "filter[start_date]": valueDate?.startDate,
-                    "filter[end_date]": valueDate?.endDate,
+                    search: isState.keySearch,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                    "filter[id]": isState.idCode?.value,
+                    "filter[staff_id]": isState.idUser?.value,
+                    "filter[start_date]": isState.valueDate?.startDate,
+                    "filter[end_date]": isState.valueDate?.endDate,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let data = response.data;
-                    sListDs(data);
+                    queryState({ listDs: data });
                 }
-                sOnFetching(false);
+                queryState({ onFetchingGroup: false });
             }
         );
     };
@@ -240,61 +220,48 @@ const Index = (props) => {
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value);
-
+        queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
-
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
-        sOnFetching(true);
+        queryState({ onFetching: true });
     }, 500)
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
-    }, [onFetching]);
+        (isState.onFetching && _ServerFetching())
+    }, [isState.onFetching]);
 
     useEffect(() => {
-        onnFetching_filter && _ServerFetching_filter();
-    }, [onnFetching_filter]);
+        (isState.onFetchingGroup && _ServerFetching_group());
+    }, [isState.onFetchingGroup]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) ||
-            (keySearch && sOnFetching(true)) ||
-            sOnFetching_filter(true) ||
-            (router.query.tab == "" && sOnFetching(true)) ||
-            (idBranch != null && sOnFetching(true)) ||
-            (idCode != null && sOnFetching(true)) ||
-            (idUser != null && sOnFetching(true)) ||
-            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true));
+        isState.onFetchingFilter && _ServerFetching_filter();
+    }, [isState.onFetchingFilter]);
+
+    useEffect(() => {
+        queryState({ onFetching: true, onFetchingGroup: true });
     }, [
         limit,
         router.query?.page,
         router.query?.tab,
-        idBranch,
-        idCode,
-        idUser,
-        valueDate.endDate,
-        valueDate.startDate,
+        isState.idBranch,
+        isState.idCode,
+        isState.idUser,
+        isState.valueDate.endDate,
+        isState.valueDate.startDate,
     ]);
 
     const _ToggleStatus = () => {
-        const index = data.findIndex((x) => x.id === isId);
-        const newStatus = data[index].status === "0" ? "1" : "0";
+        const index = isState.data.findIndex((x) => x.id === isId);
+        const newStatus = isState.data[index].status === "0" ? "1" : "0";
 
         _ServerSending(isId, newStatus);
 
-        sActive(newStatus);
-
-        handleQueryId({ status: false });
+        handleQueryId({ status: false, active: newStatus });
     };
 
     const _ServerSending = (id, newStatus) => {
@@ -314,7 +281,7 @@ const Index = (props) => {
                     }
                 }
 
-                sOnSending(false);
+                queryState({ onSending: false });
 
                 _ServerFetching();
 
@@ -324,8 +291,8 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        active != null && sOnSending(true);
-    }, [active != null]);
+        isState.active != null && queryState({ onSending: true });
+    }, [isState.active != null]);
 
     const multiDataSet = [
         {
@@ -411,7 +378,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: dataExcel?.map((e) => [
+            data: isState.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
@@ -471,8 +438,8 @@ const Index = (props) => {
                         </div>
                     </div>
                     <div className="flex space-x-3 items-center h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        {listDs &&
-                            listDs.map((e) => {
+                        {isState.listDs &&
+                            isState.listDs.map((e) => {
                                 return (
                                     <div>
                                         <TabStatus
@@ -514,10 +481,10 @@ const Index = (props) => {
                                                 label: dataLang?.client_list_filterbrand,
                                                 isDisabled: true,
                                             },
-                                            ...listBr_filter,
+                                            ...isState.listBr,
                                         ]}
-                                        onChange={onchang_filter.bind(this, "branch")}
-                                        value={idBranch}
+                                        onChange={(e) => queryState({ idBranch: e })}
+                                        value={isState.idBranch}
                                         isClearable={true}
                                         // isMulti
                                         closeMenuOnSelect={false}
@@ -565,10 +532,10 @@ const Index = (props) => {
                                                 label: dataLang?.purchase_code,
                                                 isDisabled: true,
                                             },
-                                            ...listCode_filter,
+                                            ...isState.listCode,
                                         ]}
-                                        onChange={onchang_filter.bind(this, "code")}
-                                        value={idCode}
+                                        onChange={(e) => queryState({ idCode: e })}
+                                        value={isState.idCode}
                                         noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                         isClearable={true}
                                         placeholder={dataLang?.purchase_code || "purchase_code"}
@@ -613,11 +580,11 @@ const Index = (props) => {
                                                 label: dataLang?.purchase_propnent,
                                                 isDisabled: true,
                                             },
-                                            ...listUser_filter,
+                                            ...isState.listUser,
                                         ]}
                                         // formatOptionLabel={CustomSelectOption}
-                                        onChange={onchang_filter.bind(this, "user")}
-                                        value={idUser}
+                                        onChange={(e) => queryState({ idUser: e })}
+                                        value={isState.idUser}
                                         noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                         isClearable={true}
                                         placeholder={dataLang?.purchase_propnent || "purchase_propnent"}
@@ -656,10 +623,10 @@ const Index = (props) => {
                                 </div>
                                 <div className="ml-1 col-span-1 z-20">
                                     <Datepicker
-                                        value={valueDate}
+                                        value={isState.valueDate}
                                         i18n={"vi"}
                                         primaryColor={"blue"}
-                                        onChange={onchang_filter.bind(this, "date")}
+                                        onChange={(e) => queryState({ valueDate: e })}
                                         showShortcuts={true}
                                         displayFormat={"DD/MM/YYYY"}
                                         configs={{
@@ -678,20 +645,6 @@ const Index = (props) => {
                                         className="react-datepicker__input-container 2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px]"
                                         inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
                                     />
-                                    {/* <div className='relative flex items-center'>
-                              <DatePicker
-                                  selectsRange={true}
-                                  startDate={dateRange[0]}
-                                  endDate={dateRange[1]}
-                                  onChange={onchang_filter.bind(this, "date")}
-                                  locale={'vi'}
-                                  dateFormat="dd-MM-yyyy"
-                                  isClearable={true}
-                                  placeholderText="Chọn ngày chứng từ"
-                                  className="bg-white w-full py-2 rounded pl-10 text-black outline-[#0F4F9E]"
-                                  />
-                                  <IconCalendar size={20} className="absolute left-3 text-[#cccccc]" />
-                              </div> */}
                                 </div>
                             </div>
                         </div>
@@ -708,8 +661,8 @@ const Index = (props) => {
                                         color="green"
                                     />
                                 </button>
-                                <div>
-                                    {dataExcel?.length > 0 && (
+                                <div className="flex space-x-2 items-center justify-end">
+                                    {isState.dataExcel?.length > 0 && (
                                         <ExcelFile
                                             filename="Danh sách đơn đặt hàng (PO)"
                                             title="DSDDH"
@@ -730,34 +683,9 @@ const Index = (props) => {
                                             />
                                         </ExcelFile>
                                     )}
+                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                 </div>
-                                <div className="">
-                                    <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">
-                                        {dataLang?.display}
-                                    </div>
-                                    <select
-                                        className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                        onChange={(e) => sLimit(e.target.value)}
-                                        value={limit}
-                                    >
-                                        <option className="text-[10px] xl:text-xs 2xl:text-sm hidden" disabled>
-                                            {limit == -1 ? "Tất cả" : limit}
-                                        </option>
-                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={15}>
-                                            15
-                                        </option>
-                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={20}>
-                                            20
-                                        </option>
-                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={40}>
-                                            40
-                                        </option>
-                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={60}>
-                                            60
-                                        </option>
-                                        {/* <option value={-1}>Tất cả</option> */}
-                                    </select>
-                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -795,11 +723,11 @@ const Index = (props) => {
                                     {dataLang?.purchase_action || "purchase_action"}
                                 </h4>
                             </div>
-                            {onFetching ? (
+                            {isState.onFetching ? (
                                 <Loading className="h-80" color="#0f4f9e" />
-                            ) : data?.length > 0 ? (
+                            ) : isState.data?.length > 0 ? (
                                 <div className="divide-y divide-slate-200">
-                                    {data?.map((e) => (
+                                    {isState.data?.map((e) => (
                                         <div
                                             key={e?.id.toString()}
                                             className="grid grid-cols-12 items-center hover:bg-slate-50 relative"
@@ -823,24 +751,9 @@ const Index = (props) => {
                                             </h6>
                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                 {e?.status == "1" ? (
-                                                    <div
-                                                        className="border border-green-500 px-2 py-1 rounded text-green-500 hover:bg-green-500 hover:text-white font-normal flex justify-center  items-center gap-1 3xl:text-[16px] 2xl:text-[14px] xl:text-[10px] text-[8px]  transition-all duration-300 ease-in-out"
-                                                        onClick={() => handleQueryId({ id: e?.id, status: true })}
-                                                    >
-                                                        Đã duyệt{" "}
-                                                        <TickCircle
-                                                            className="bg-green-500 rounded-full "
-                                                            color="white"
-                                                            size={19}
-                                                        />
-                                                    </div>
+                                                    <BtnStatusApproved type={1} onClick={() => handleQueryId({ id: e?.id, status: true })} />
                                                 ) : (
-                                                    <div
-                                                        className="border border-red-500 3xl:px-2 px-0 py-1 rounded text-red-500 hover:bg-red-500 hover:text-white  font-normal flex justify-center items-center gap-1 3xl:text-[16px] 2xl:text-[13px] xl:text-[10px] text-[8px]   transition-all duration-300 ease-in-out "
-                                                        onClick={() => handleQueryId({ id: e?.id, status: true })}
-                                                    >
-                                                        Chưa duyệt <TickCircle size={22} />
-                                                    </div>
+                                                    <BtnStatusApproved type={0} onClick={() => handleQueryId({ id: e?.id, status: true })} />
                                                 )}
                                             </h6>
                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 flex items-center justify-center ">
@@ -910,10 +823,11 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                {data?.length != 0 && (
+                {isState.data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} thành phần
+                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
+                            {/* trong số {totalItems?.iTotalRecords} thành phần */}
                         </h6>
                         <Pagination
                             postsPerPage={limit}

@@ -1,6 +1,8 @@
 import axios from "axios";
 import store from "/services/redux";
 import { urlApi as url } from "/services/URL";
+import useToast from "@/hooks/useToast";
+import { useRouter } from "next/router";
 // axios.defaults.baseURL = "https://demo.fososoft.com/FMRP";
 axios.defaults.baseURL = `${url}`;
 
@@ -17,6 +19,7 @@ axios.interceptors.response.use(
     }
 );
 const _ServerInstance = (method, url, dataObject, callback) => {
+    const showToat = useToast()
     var token = null;
     try {
         token = localStorage?.getItem("tokenFMRP");
@@ -53,9 +56,25 @@ const _ServerInstance = (method, url, dataObject, callback) => {
             callback && callback(null, response);
         })
         .catch(function (error) {
-            if (error.response && error.response?.status === 500) {
+            if (error.response && error.response?.status == 500) {
                 // store.dispatch({type: "auth/update", payload: null})
-            } else {
+                // showToat("error", 'Đã xảy ra lỗi vui lòng làm mới trang')
+                console.log("error.response 500", error.response);
+                // window.location.href = '/error/405';
+            }
+            else if (error.response && error.response?.status == 403) {
+                console.log("error.response 403", error.response?.data);
+                showToat("error", error.response?.data?.message)
+                window.location.href = '/error/403';
+                // store.dispatch({type: "auth/update", payload: null})
+            }
+            else if (error.response && error.response?.status == 404) {
+                showToat("error", error.response?.data?.message)
+                console.log("error.response 404", error.response?.data);
+                window.location.href = '/error/404';
+                // store.dispatch({type: "auth/update", payload: null})
+            }
+            else {
                 callback && callback(error, null);
             }
         });

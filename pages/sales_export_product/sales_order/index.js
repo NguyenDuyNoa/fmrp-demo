@@ -36,6 +36,7 @@ import formatMoney from "@/utils/helpers/formatMoney";
 import { useSelector } from "react-redux";
 import useSetingServer from "@/hooks/useConfigNumber";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -65,7 +66,9 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const datatSetingFomart = useSetingServer()
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const dataSeting = useSetingServer()
 
     const trangthaiExprired = useStatusExprired();
 
@@ -81,22 +84,15 @@ const Index = (props) => {
 
     const [onFetching_filter, sOnFetching_filter] = useState(false);
 
-    const [totalItems, sTotalItems] = useState([]);
-
     const [keySearch, sKeySearch] = useState("");
 
-    const dataSeting = useSetingServer()
-
-    const [limit, sLimit] = useState(dataSeting?.tables_pagination_limit);
-
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const [total, setTotal] = useState({});
 
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleShowAll = () => setIsExpanded(!isExpanded);
-
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -126,8 +122,8 @@ const Index = (props) => {
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
-                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
                     "filter[status_bar]": tabPage ?? null,
+                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
                     "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
                     "filter[start_date]":
                         valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
@@ -155,6 +151,11 @@ const Index = (props) => {
                     limit: 0,
                     search: keySearch,
                     "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
+                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
+                    "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
+                    "filter[start_date]":
+                        valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
+                    "filter[end_date]": valueChange.valueDate?.endDate != null ? valueChange.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -184,15 +185,6 @@ const Index = (props) => {
                 }));
             }
         });
-        // await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
-        //     if (!err) {
-        //         let { result } = response.data;
-        //         sInitData((e) => ({
-        //             ...e,
-        //             listQuoteCode: result?.map(({ code, id }) => ({ label: code, value: id })),
-        //         }));
-        //     }
-        // });
         await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 let { data } = response?.data;
@@ -203,15 +195,7 @@ const Index = (props) => {
 
             }
         });
-        // await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
-        //     if (!err) {
-        //         let { rResult } = response.data;
-        //         sInitData((e) => ({
-        //             ...e,
-        //             listCustomer: rResult?.map(({ name, id }) => ({ label: name, value: id })),
-        //         }));
-        //     }
-        // });
+
         sOnFetching_filter(false);
     };
 
@@ -258,7 +242,7 @@ const Index = (props) => {
 
     useEffect(() => {
         sOnFetchingGroup(true)
-    }, [valueChange.idBranch])
+    }, [valueChange.idBranch, valueChange.idQuoteCode, valueChange.idCustomer, valueChange.valueDate?.startDate, valueChange.valueDate?.endDate])
 
     useEffect(() => {
         onFetchingGroup && _ServerFetching_group()
@@ -330,7 +314,7 @@ const Index = (props) => {
     }, 500);
 
     const formatNumber = (number) => {
-        const money = formatMoney(+number, datatSetingFomart)
+        const money = formatMoney(+number, dataSeting)
         return money
     };
     // excel
@@ -529,7 +513,7 @@ const Index = (props) => {
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.sales_product_list || "sales_product_list"}
                                 </h2>
-                                <div className="flex justify-end items-center">
+                                <div className={`${role ? "" : 'hidden' || auth?.orders?.is_create == "1" ? "" : "hidden"} flex justify-end items-center`}>
                                     <Link
                                         href={routerSalesOrder.form}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -765,7 +749,8 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
-                                                <div>
+                                                <div className={`${role ? "" : "hidden"
+                                                    || auth?.orders?.is_export == "1" ? "" : "hidden"}`}>
                                                     {initData.dataExcel?.length > 0 && (
                                                         <ExcelFile
                                                             filename="Danh sách đơn hàng bán"
@@ -1141,8 +1126,9 @@ const Index = (props) => {
                         {initData.data?.length != 0 && (
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
-                                    {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng
-                                    bán
+                                    {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng
+                                    bán */}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
@@ -1166,7 +1152,7 @@ const Index = (props) => {
                 save={toggleStatus}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 

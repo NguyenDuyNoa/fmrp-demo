@@ -48,6 +48,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
 import useFeature from "@/hooks/useConfigFeature";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -140,11 +141,11 @@ const Index = (props) => {
 
     const [dataProductExpiry, sDataProductExpiry] = useState({});
 
-    const [totalItems, sTotalItems] = useState({});
+
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems: totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const _ServerFetching = () => {
         Axios(
@@ -966,7 +967,7 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phẩm
+                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
                             {/* trong số {totalItems?.iTotalRecords} biến thể */}
                         </h6>
                         <Pagination

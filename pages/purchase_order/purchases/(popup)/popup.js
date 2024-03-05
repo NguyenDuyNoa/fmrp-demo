@@ -22,12 +22,16 @@ import ImageErrors from "components/UI/imageErrors";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
     const [onFetching, sOnFetching] = useState(false);
+    const dataSeting = useSetingServer()
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
@@ -57,8 +61,7 @@ const Popup_chitiet = (props) => {
     }
 
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting)
     };
 
     return (
@@ -93,8 +96,8 @@ const Popup_chitiet = (props) => {
                                             <h3 className="col-span-1 font-medium text-[13px]">
                                                 {data?.date != null
                                                     ? moment(data?.date).format(
-                                                          "DD/MM/YYYY"
-                                                      )
+                                                        "DD/MM/YYYY"
+                                                    )
                                                     : ""}
                                             </h3>
                                         </div>
@@ -129,46 +132,46 @@ const Popup_chitiet = (props) => {
                                         <div className="flex flex-wrap  gap-2 items-center justify-start">
                                             {(data?.order_status?.status ===
                                                 "purchase_ordered" && (
-                                                <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-sky-200">
-                                                    {
-                                                        props.dataLang[
-                                                            data?.order_status
-                                                                ?.status
-                                                        ]
-                                                    }
-                                                </span>
-                                            )) ||
-                                                (data?.order_status?.status ===
-                                                    "purchase_portion" && (
-                                                    <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-orange-200">
+                                                    <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-sky-200">
                                                         {
                                                             props.dataLang[
-                                                                data
-                                                                    ?.order_status
-                                                                    ?.status
+                                                            data?.order_status
+                                                                ?.status
                                                             ]
-                                                        }{" "}
-                                                        {`(${data?.order_status?.count})`}
+                                                        }
                                                     </span>
                                                 )) ||
                                                 (data?.order_status?.status ===
-                                                    "purchase_enough" && (
-                                                    <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-lime-200">
-                                                        <TickCircle
-                                                            className="bg-lime-500 rounded-full"
-                                                            color="white"
-                                                            size={15}
-                                                        />
-                                                        {
-                                                            props.dataLang[
+                                                    "purchase_portion" && (
+                                                        <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-orange-200">
+                                                            {
+                                                                props.dataLang[
                                                                 data
                                                                     ?.order_status
                                                                     ?.status
-                                                            ]
-                                                        }{" "}
-                                                        {`(${data?.order_status?.count})`}
-                                                    </span>
-                                                ))}
+                                                                ]
+                                                            }{" "}
+                                                            {`(${data?.order_status?.count})`}
+                                                        </span>
+                                                    )) ||
+                                                (data?.order_status?.status ===
+                                                    "purchase_enough" && (
+                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-lime-200">
+                                                            <TickCircle
+                                                                className="bg-lime-500 rounded-full"
+                                                                color="white"
+                                                                size={15}
+                                                            />
+                                                            {
+                                                                props.dataLang[
+                                                                data
+                                                                    ?.order_status
+                                                                    ?.status
+                                                                ]
+                                                            }{" "}
+                                                            {`(${data?.order_status?.count})`}
+                                                        </span>
+                                                    ))}
                                         </div>
                                         {/* <div className=' font-normal text-sky-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-sky-200'>{props.dataLang?.purchase_ordered || "purchase_ordered"}</div>
                           <div className=' font-normal text-orange-500 rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-orange-200'>{props.dataLang?.purchase_portion || "purchase_portion"} (0)</div>
@@ -183,23 +186,9 @@ const Popup_chitiet = (props) => {
                                             </h3>
                                             <h3 className="col-span-1 text-[13px]">
                                                 {data?.status == "1" ? (
-                                                    <div className="border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1">
-                                                        {props.dataLang
-                                                            ?.purchase_approved ||
-                                                            "purchase_approved"}{" "}
-                                                        <TickCircle
-                                                            className="bg-lime-500 rounded-full"
-                                                            color="white"
-                                                            size={19}
-                                                        />
-                                                    </div>
+                                                    <BtnStatusApproved className={``} type={1} onClick={() => { }} />
                                                 ) : (
-                                                    <div className="border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1">
-                                                        {props.dataLang
-                                                            ?.purchase_notapproved ||
-                                                            "purchase_notapproved"}{" "}
-                                                        <TickCircle size={22} />
-                                                    </div>
+                                                    <BtnStatusApproved className={``} type={0} onClick={() => { }} />
                                                 )}
                                             </h3>
                                         </div>
@@ -307,7 +296,7 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center mx-auto">
                                                                 {e?.item
                                                                     ?.images !=
-                                                                null ? (
+                                                                    null ? (
                                                                     <ModalImage
                                                                         small={
                                                                             e
@@ -366,17 +355,17 @@ const Popup_chitiet = (props) => {
                                                                     e?.quantity_left
                                                                 ) < 0
                                                                     ? "Đặt dư" +
-                                                                      " " +
-                                                                      formatNumber(
-                                                                          Number(
-                                                                              Math.abs(
-                                                                                  e?.quantity_left
-                                                                              )
-                                                                          )
-                                                                      )
+                                                                    " " +
+                                                                    formatNumber(
+                                                                        Number(
+                                                                            Math.abs(
+                                                                                e?.quantity_left
+                                                                            )
+                                                                        )
+                                                                    )
                                                                     : formatNumber(
-                                                                          e?.quantity_left
-                                                                      )}
+                                                                        e?.quantity_left
+                                                                    )}
                                                             </h6>
                                                             <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">
                                                                 <ExpandableContent

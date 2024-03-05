@@ -33,6 +33,8 @@ import useToast from "@/hooks/useToast";
 import { debounce } from "lodash";
 import { MdClear } from "react-icons/md";
 import NoData from "@/components/UI/noData/nodata";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const MoreSelectedBadge = ({ items }) => {
     const style = {
@@ -104,11 +106,9 @@ const Index = (props) => {
 
     const [idPosition, sIdPosition] = useState(null);
 
-    const [totalItems, sTotalItems] = useState({});
-
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
 
 
@@ -448,7 +448,8 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
+                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
                         </h6>
                         <Pagination
                             postsPerPage={limit}
@@ -485,39 +486,6 @@ const Item = React.memo((props) => {
 
         handleQueryId({ status: false });
     };
-
-    // const _HandleDelete = (id) => {
-    //     Swal.fire({
-    //         title: `${props.dataLang?.aler_ask}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#296dc1",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: `${props.dataLang?.aler_yes}`,
-    //         cancelButtonText: `${props.dataLang?.aler_cancel}`,
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             Axios("DELETE", `/api_web/api_staff/position/${id}?csrf_protection=true`, {}, (err, response) => {
-    //                 if (!err) {
-    //                     var { isSuccess, message } = response.data;
-    //                     if (isSuccess) {
-    //                         Toast.fire({
-    //                             icon: "success",
-    //                             title: props.dataLang[message],
-    //                         });
-    //                         props.onRefresh && props.onRefresh();
-    //                         props.onRefreshSub && props.onRefreshSub();
-    //                     } else {
-    //                         Toast.fire({
-    //                             icon: "error",
-    //                             title: props.dataLang[message],
-    //                         });
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     });
-    // };
 
     useEffect(() => {
         sHasChild(false);
