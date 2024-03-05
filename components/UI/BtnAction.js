@@ -421,7 +421,7 @@ const BtnAction = React.memo((props) => {
                             <button
                                 onClick={() => handleClick()}
                                 className={`
-                                ${props?.type == "sales_product" && (role == true || auth?.orders?.is_edit == "1") ? "" : "hidden"} 
+                                ${props?.type == "sales_product" && (role == true || auth?.orders?.is_edit == 1) ? "" : "hidden"} 
                                 group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                             >
                                 <BiEdit
@@ -453,8 +453,8 @@ const BtnAction = React.memo((props) => {
                             />
                         )}
 
-                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == "1" || auth?.orders?.is_edit == "1") && <Popup_KeepStock {...props} {...shareProps} />}
-                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == "1" || auth?.orders?.is_edit == "1") && <Popup_DetailKeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) && <Popup_KeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) && <Popup_DetailKeepStock {...props} {...shareProps} />}
                         {props.type == "order" ? (
                             <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                 <RiDeleteBin6Line

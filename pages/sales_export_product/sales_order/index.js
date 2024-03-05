@@ -513,14 +513,17 @@ const Index = (props) => {
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.sales_product_list || "sales_product_list"}
                                 </h2>
-                                <div className={`${role ? "" : 'hidden' || auth?.orders?.is_create == "1" ? "" : "hidden"} flex justify-end items-center`}>
-                                    <Link
-                                        href={routerSalesOrder.form}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >
-                                        {dataLang?.btn_new || "btn_new"}
-                                    </Link>
-                                </div>
+                                {
+                                    role || auth?.orders?.is_create == 1 &&
+                                    <div className={` flex justify-end items-center`}>
+                                        <Link
+                                            href={routerSalesOrder.form}
+                                            className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        >
+                                            {dataLang?.btn_new || "btn_new"}
+                                        </Link>
+                                    </div>
+                                }
                             </div>
 
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -749,30 +752,32 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
-                                                <div className={`${role ? "" : "hidden"
-                                                    || auth?.orders?.is_export == "1" ? "" : "hidden"}`}>
-                                                    {initData.dataExcel?.length > 0 && (
-                                                        <ExcelFile
-                                                            filename="Danh sách đơn hàng bán"
-                                                            title="DSĐHB"
-                                                            element={
-                                                                <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                        size={18}
-                                                                    />
-                                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={multiDataSet}
-                                                                data={multiDataSet}
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
-                                                    )}
-                                                </div>
+                                                {
+                                                    role || auth?.orders?.is_export == 1 &&
+                                                    <div className={``}>
+                                                        {initData.dataExcel?.length > 0 && (
+                                                            <ExcelFile
+                                                                filename="Danh sách đơn hàng bán"
+                                                                title="DSĐHB"
+                                                                element={
+                                                                    <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
+                                                                        <IconExcel
+                                                                            className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
+                                                                            size={18}
+                                                                        />
+                                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                                    </button>
+                                                                }
+                                                            >
+                                                                <ExcelSheet
+                                                                    dataSet={multiDataSet}
+                                                                    data={multiDataSet}
+                                                                    name="Organization"
+                                                                />
+                                                            </ExcelFile>
+                                                        )}
+                                                    </div>
+                                                }
                                                 <div>
                                                     <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
