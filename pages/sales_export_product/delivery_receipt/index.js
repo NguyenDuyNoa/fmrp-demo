@@ -13,7 +13,7 @@ import { debounce } from "lodash";
 import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import PopupDetail from "./(popupDetail)/PopupDetail";
+import PopupDetail from "./components/PopupDetail";
 import PopupDetailProduct from "../sales_order/components/PopupDetailProduct";
 
 import Loading from "@/components/UI/loading";
@@ -30,11 +30,15 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
+
     const dataLang = props.dataLang;
 
     const router = useRouter();
@@ -43,39 +47,35 @@ const Index = (props) => {
 
     const trangthaiExprired = useStatusExprired();
 
-    const [data, setData] = useState([]);
+    const dataSeting = useSetingServer()
 
-    const [dataExcel, sDataExcel] = useState([]);
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
-
-    const { isOpen, isId, isKeyState, handleQueryId } = useToggle();
-
-    const [totalItems, sTotalItems] = useState([]);
-
-    const [keySearch, sKeySearch] = useState("");
-
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const [total, setTotal] = useState({});
+    const initialState = {
+        data: [],
+        dataExcel: [],
+        onFetching: false,
+        onFetchingFilter: false,
+        keySearch: "",
+        listBr: [],
+        listDelivery: [],
+        listCustomer: [],
+        idBranch: null,
+        idDelivery: null,
+        idCustomer: null,
+        listTabStatus: [],
+        valueDate: {
+            startDate: null,
+            endDate: null,
+        }
 
-    const [listBr, sListBr] = useState([]);
+    }
+    const [isState, sIsState] = useState(initialState);
 
-    const [listDelivery, sListDelivery] = useState([]);
-
-    const [listCustomer, sListCustomer] = useState([]);
-
-    const [idBranch, sIdBranch] = useState(null);
-
-    const [idDelivery, sIdDelivery] = useState(null);
-
-    const [idCustomer, sIdCustomer] = useState(null);
-
-    const [listTabStatus, sListTabStatus] = useState();
-
-    const [valueDate, sValueDate] = useState({ startDate: null, endDate: null });
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -89,6 +89,7 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : -1 },
         });
+        queryState({ onFetchingFilter: true, onFetching: true });
     }, []);
 
     const _ServerFetching = () => {
@@ -98,25 +99,28 @@ const Index = (props) => {
             `/api_web/api_delivery/getDeliveries?csrf_protection=true`,
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
                     status: tabPage ? tabPage : -1,
-                    branch_id: idBranch != null ? idBranch.value : null,
-                    delivery_id: idDelivery != null ? idDelivery?.value : null,
-                    customer_id: idCustomer != null ? idCustomer.value : null,
-                    start_date: valueDate?.startDate != null ? valueDate?.startDate : null,
-                    end_date: valueDate?.endDate != null ? valueDate?.endDate : null,
+                    branch_id: isState.idBranch != null ? isState.idBranch.value : null,
+                    delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
+                    customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
+                    start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let { rResult, output, rTotal } = response.data.data;
-                    setData(rResult);
                     sTotalItems(output);
-                    sDataExcel(rResult);
                     setTotal(rTotal);
-                    sOnFetching(false);
+                    queryState({
+                        data: rResult,
+                        dataExcel: rResult,
+                        onFetching: false
+                    });
+
                 }
             }
         );
@@ -129,48 +133,55 @@ const Index = (props) => {
             {
                 params: {
                     limit: 0,
-                    search: keySearch,
-                    branch_id: idBranch != null ? idBranch.value : null,
-                    delivery_id: idDelivery != null ? idDelivery?.value : null,
-                    start_date: valueDate?.startDate != null ? valueDate?.startDate : null,
-                    end_date: valueDate?.endDate != null ? valueDate?.endDate : null,
-                    customer_id: idCustomer != null ? idCustomer.value : null,
+                    search: isState.keySearch,
+                    branch_id: isState.idBranch != null ? idBranch.value : null,
+                    delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
+                    start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+                    customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let { data } = response.data;
-                    sListTabStatus(data?.status);
+                    queryState({ listTabStatus: data?.status, onFetchingFilter: false });
                 }
-                sOnFetching(false);
             }
         );
     };
 
     // filter
+    const convertArray = (arr) => {
+        return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
+    }
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                sListBr(rResult);
+                queryState({ listBr: convertArray(rResult) });
             }
         });
 
-        await Axios("GET", `/api_web/api_delivery/searchDelivery?csrf_protection=true`, {}, (err, response) => {
+        await Axios("GET", `api_web/api_delivery/searchDeliveries?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let rResult = response.data.data;
-                sListDelivery(rResult?.map((e) => ({ label: e?.reference_no, value: e?.id })));
+                let { rResult } = response.data;
+                queryState({ listDelivery: rResult?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
             }
         });
+        // await Axios("GET", `/api_web/api_delivery/searchDelivery?csrf_protection=true`, {}, (err, response) => {
+        //     if (!err) {
+        //         let { rResult } = response.data;
+        //         queryState({ listDelivery: rResult?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
+        //     }
+        // });
 
         await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                let db = response.data.rResult;
-                sListCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
+                let { rResult } = response.data;
+                queryState({ listCustomer: convertArray(rResult) });
             }
         });
-
-        sOnFetching_filter(false);
+        queryState({ onFetchingFilter: false });
     };
 
     let searchTimeout;
@@ -207,42 +218,23 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
+        isState.onFetchingFilter && _ServerFetching_filter();
+    }, [isState.onFetchingFilter]);
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
-    }, [onFetching]);
-
-    // useEffect(() => {
-    //     (router.query.tab && sOnFetching(true)) ||
-    //         (keySearch && sOnFetching(true)) ||
-    //         (router.query?.tab && sOnFetching_filter(true)) ||
-    //         (idBranch != null && sOnFetching(true)) ||
-    //         (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-    //         (idCustomer != null && sOnFetching(true)) ||
-    //         (idDelivery != null && sOnFetching(true));
-    // }, [
-    //     limit,
-    //     router.query?.page,
-    //     router.query?.tab,
-    //     idBranch,
-    //     valueDate.endDate,
-    //     valueDate.startDate,
-    //     idCustomer,
-    //     idDelivery,
-    // ]);
+        (isState.onFetching && _ServerFetching()) || (isState.onFetching && _ServerFetching_group());
+    }, [isState.onFetching]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
+        queryState({ onFetching: true });
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
         if (
-            idBranch != null ||
-            (valueDate.startDate != null && valueDate.endDate != null) ||
-            idCustomer != null ||
-            idDelivery != null
+            isState.idBranch != null ||
+            (isState.valueDate.startDate != null && isState.valueDate.endDate != null) ||
+            isState.idCustomer != null ||
+            isState.idDelivery != null
         ) {
             router.push({
                 pathname: router.route,
@@ -251,32 +243,13 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idBranch != null && sOnFetching(true)) ||
-                    (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-                    (idCustomer != null && sOnFetching(true)) ||
-                    (idDelivery != null && sOnFetching(true)) ||
-                    (keySearch && sOnFetching(true));
+                queryState({ onFetching: true })
             }, 300);
         } else {
-            sOnFetching(true);
+            queryState({ onFetching: true })
         }
-    }, [limit, idBranch, idDelivery, idCustomer, valueDate.endDate, valueDate.startDate]);
+    }, [limit, isState.idBranch, isState.keySearch, isState.idDelivery, isState.idCustomer, isState.valueDate.endDate, isState.valueDate.startDate]);
 
-    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
-
-    const typeChange = {
-        branch: sIdBranch,
-        code: sIdDelivery,
-        customer: sIdCustomer,
-        date: sValueDate,
-    };
-
-    const onChangeFilter = async (type, value) => {
-        const updateFunction = await typeChange[type];
-        if (updateFunction) {
-            updateFunction(value);
-        }
-    };
 
     const paginate = (pageNumber) => {
         router.push({
@@ -289,20 +262,18 @@ const Index = (props) => {
     };
 
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value);
+        queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
-        sOnFetching(true);
+        queryState({ onFetching: true });
     }, 500);
 
-    const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
     };
     // excel
     const multiDataSet = [
@@ -397,7 +368,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: dataExcel?.map((e) => [
+            data: isState.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.reference_no ? e?.reference_no : ""}` },
@@ -407,7 +378,7 @@ const Index = (props) => {
                 },
                 { value: `${e?.reference_no_order ? e?.reference_no_order : ""}` },
                 {
-                    value: `${e?.grand_total ? formatNumber(e?.grand_total) : 0}`,
+                    value: `${e?.grand_total ? formatMoney(e?.grand_total) : 0}`,
                 },
                 { value: `${e?.created_by_full_name ? e?.created_by_full_name : ""}` },
                 {
@@ -420,8 +391,6 @@ const Index = (props) => {
     ];
 
     const [checkedWare, sCheckedWare] = useState({});
-    const [onSending, sOnSending] = useState(false);
-
     const handleSaveStatus = () => {
         if (isKeyState?.type === "browser") {
             const checked = isKeyState.value.target.checked;
@@ -433,7 +402,7 @@ const Index = (props) => {
                 checkedpost: isKeyState?.checkedUn,
             };
             sCheckedWare(dataChecked);
-            setData([...data]);
+            queryState({ data: [...data] });
         }
 
         handleQueryId({ status: false });
@@ -463,27 +432,27 @@ const Index = (props) => {
                     if (isSuccess) {
                         isShow(alert_type, dataLang[message]);
                         setTimeout(() => {
-                            sOnFetching(true);
+                            queryState({ onFetching: true });
                         }, 300);
                     } else {
                         isShow(alert_type, dataLang[message]);
                     }
                 }
-                sOnSending(false);
+                queryState({ onSending: false });
             }
         );
     };
 
     useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
+        isState.onSending && _ServerSending();
+    }, [isState.onSending]);
 
     useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
+        checkedWare.id != null && queryState({ onSending: true });
     }, [checkedWare]);
 
     useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
+        checkedWare.id != null && queryState({ onSending: true });
     }, [checkedWare.id != null]);
 
     return (
@@ -521,8 +490,8 @@ const Index = (props) => {
                                 </div>
                             </div>
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listTabStatus &&
-                                    listTabStatus.map((e) => {
+                                {isState.listTabStatus &&
+                                    isState.listTabStatus.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -569,10 +538,10 @@ const Index = (props) => {
                                                                     "price_quote_branch",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listBr_filter,
+                                                            ...isState.listBr,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "branch")}
-                                                        value={idBranch}
+                                                        onChange={(e) => queryState({ idBranch: e })}
+                                                        value={isState.idBranch}
                                                         placeholder={
                                                             dataLang?.price_quote_select_branch ||
                                                             "price_quote_select_branch"
@@ -625,11 +594,11 @@ const Index = (props) => {
                                                                     "delivery_receipt_code",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listDelivery,
+                                                            ...isState.listDelivery,
                                                         ]}
                                                         onInputChange={_HandleSeachApi.bind(this)}
-                                                        onChange={onChangeFilter.bind(this, "code")}
-                                                        value={idDelivery}
+                                                        onChange={(e) => queryState({ idDelivery: e })}
+                                                        value={isState.idDelivery}
                                                         placeholder={
                                                             dataLang?.delivery_receipt_code || "delivery_receipt_code"
                                                         }
@@ -681,10 +650,10 @@ const Index = (props) => {
                                                                     "price_quote_select_customer",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listCustomer,
+                                                            ...isState.listCustomer,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "customer")}
-                                                        value={idCustomer}
+                                                        onChange={(e) => queryState({ idCustomer: e })}
+                                                        value={isState.idCustomer}
                                                         placeholder={
                                                             dataLang?.price_quote_customer || "price_quote_customer"
                                                         }
@@ -726,10 +695,10 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="z-20 col-span-1">
                                                     <Datepicker
-                                                        value={valueDate}
+                                                        value={isState.valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onChangeFilter.bind(this, "date")}
+                                                        onChange={(e) => queryState({ valueDate: e })}
                                                         showShortcuts={true}
                                                         displayFormat={"DD/MM/YYYY"}
                                                         configs={{
@@ -753,9 +722,9 @@ const Index = (props) => {
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={sOnFetching} />
+                                                <OnResetData sOnFetching={(e) => queryState({ sOnFetching: e })} />
                                                 <div>
-                                                    {dataExcel?.length > 0 && (
+                                                    {isState.dataExcel?.length > 0 && (
                                                         <ExcelFile
                                                             filename={
                                                                 dataLang?.delivery_receipt_list ||
@@ -864,12 +833,12 @@ const Index = (props) => {
                                                 {dataLang?.price_quote_operations || "price_quote_operations"}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {isState.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : isState.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {data?.map((e) => (
+                                                    {isState.data?.map((e) => (
                                                         <div
                                                             className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
                                                             key={e.id.toString()}
@@ -907,7 +876,7 @@ const Index = (props) => {
                                                                 id={e?.order_id}
                                                             />
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.grand_total)}
+                                                                {formatMoney(e.grand_total)}
                                                             </h6>
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
@@ -1005,14 +974,14 @@ const Index = (props) => {
                             </div>
                             <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-1">
-                                    {formatNumber(total?.grand_total)}
+                                    {formatMoney(total?.grand_total)}
                                 </h3>
                             </div>
                             <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
                                     {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}

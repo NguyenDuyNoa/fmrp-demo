@@ -22,8 +22,8 @@ import {
 import moment from "moment/moment";
 import { components } from "react-select";
 
-import Popup_dsnd from "./(popupStaff)/popup";
-import Popup_chitiet from "./(popupStaff)/popupDetail";
+import Popup_dsnd from "./components/staff/popup";
+import Popup_chitiet from "./components/staff/popupDetail";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";

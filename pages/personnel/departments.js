@@ -7,7 +7,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import { components } from "react-select";
-import Popup_phongban from "./(popupDepartments)/popup";
+import Popup_phongban from "./components/departments/popup";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";

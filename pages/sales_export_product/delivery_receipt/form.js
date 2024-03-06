@@ -17,7 +17,7 @@ import Select, { components } from "react-select";
 import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
 import { NumericFormat } from "react-number-format";
 
-import PopupAddress from "./(popupAddress)/PopupAddress";
+import PopupAddress from "./components/PopupAddress";
 
 import Loading from "@/components/UI/loading";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
@@ -296,9 +296,8 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_letiation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
+                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_letiation + e.item?.text_type + e.item?.unit_name
+                                    }</span>`,
                                 value: e.item?.id,
                             },
                             child: child,
@@ -339,8 +338,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = () => {
@@ -707,10 +706,10 @@ const Index = (props) => {
             tax: generalTax
                 ? generalTax
                 : {
-                      label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                      value: value?.e?.tax_id_item,
-                      tax_rate: value?.e?.tax_rate_item,
-                  },
+                    label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                    value: value?.e?.tax_id_item,
+                    tax_rate: value?.e?.tax_rate_item,
+                },
             note: value?.e?.note_item,
         };
         return {
@@ -1147,10 +1146,9 @@ const Index = (props) => {
         });
         await Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true`
-                    : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true`
+                : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -1257,9 +1255,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -1286,9 +1283,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1341,9 +1337,8 @@ const Index = (props) => {
                                         placeholder={"Khách hàng"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errClient ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-[30]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errClient ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-[30]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         menuPortalTarget={document.body}
@@ -1449,9 +1444,8 @@ const Index = (props) => {
                                             placeholder={dataLang?.select_address || "select_address"}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${
-                                                errAddress ? "border border-red-500 rounded-md" : ""
-                                            } rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                            className={`${errAddress ? "border border-red-500 rounded-md" : ""
+                                                } rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                             isSearchable={true}
                                             // components={{
                                             //     ClearIndicator,
@@ -1528,9 +1522,8 @@ const Index = (props) => {
                                         placeholder={
                                             dataLang?.delivery_receipt_edit_User || "delivery_receipt_edit_User"
                                         }
-                                        className={`${
-                                            errStaff ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errStaff ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         // className={`placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1590,9 +1583,8 @@ const Index = (props) => {
                                         placeholder={
                                             dataLang?.delivery_receipt_product_order || "delivery_receipt_product_order"
                                         }
-                                        className={`${
-                                            errProductOrder ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errProductOrder ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1943,15 +1935,14 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "warehouse"
                                                                         )}
-                                                                        className={`${
-                                                                            (errWarehouse && ce?.warehouse == null) ||
-                                                                            (errWarehouse &&
-                                                                                (ce?.warehouse?.label == null ||
-                                                                                    ce?.warehouse?.warehouse_name ==
+                                                                        className={`${(errWarehouse && ce?.warehouse == null) ||
+                                                                                (errWarehouse &&
+                                                                                    (ce?.warehouse?.label == null ||
+                                                                                        ce?.warehouse?.warehouse_name ==
                                                                                         null))
                                                                                 ? "border-red-500 border"
                                                                                 : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
                                                                                 ? ""
@@ -1996,16 +1987,16 @@ const Index = (props) => {
                                                                                         <div className="flex items-center gap-2 italic">
                                                                                             {dataProductSerial.is_enable ===
                                                                                                 "1" && (
-                                                                                                <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                                    Serial:{" "}
-                                                                                                    {option?.serial
-                                                                                                        ? option?.serial
-                                                                                                        : "-"}
-                                                                                                </div>
-                                                                                            )}
+                                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
+                                                                                                        Serial:{" "}
+                                                                                                        {option?.serial
+                                                                                                            ? option?.serial
+                                                                                                            : "-"}
+                                                                                                    </div>
+                                                                                                )}
                                                                                             {dataMaterialExpiry.is_enable ===
                                                                                                 "1" ||
-                                                                                            dataProductExpiry.is_enable ===
+                                                                                                dataProductExpiry.is_enable ===
                                                                                                 "1" ? (
                                                                                                 <>
                                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
@@ -2018,10 +2009,10 @@ const Index = (props) => {
                                                                                                         Date:{" "}
                                                                                                         {option?.date
                                                                                                             ? moment(
-                                                                                                                  option?.date
-                                                                                                              ).format(
-                                                                                                                  "DD/MM/YYYY"
-                                                                                                              )
+                                                                                                                option?.date
+                                                                                                            ).format(
+                                                                                                                "DD/MM/YYYY"
+                                                                                                            )
                                                                                                             : "-"}
                                                                                                     </div>
                                                                                                 </>
@@ -2089,16 +2080,15 @@ const Index = (props) => {
                                                                                 "quantity"
                                                                             )}
                                                                             value={ce?.quantity || null}
-                                                                            className={`${
-                                                                                errQuantity &&
-                                                                                (ce?.quantity == null ||
-                                                                                    ce?.quantity == "" ||
-                                                                                    ce?.quantity == 0)
+                                                                            className={`${errQuantity &&
+                                                                                    (ce?.quantity == null ||
+                                                                                        ce?.quantity == "" ||
+                                                                                        ce?.quantity == 0)
                                                                                     ? "border-b border-red-500"
                                                                                     : errSurvive
-                                                                                    ? "border-b border-red-500"
-                                                                                    : "border-b border-gray-200"
-                                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                                        ? "border-b border-red-500"
+                                                                                        : "border-b border-gray-200"
+                                                                                } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                                             allowNegative={false}
                                                                             decimalScale={0}
                                                                             isNumericString={true}
@@ -2171,8 +2161,8 @@ const Index = (props) => {
                                                                                     {ce?.warehouse == null
                                                                                         ? 0
                                                                                         : formatNumber(
-                                                                                              +ce?.warehouse?.qty
-                                                                                          )}
+                                                                                            +ce?.warehouse?.qty
+                                                                                        )}
                                                                                 </span>
 
                                                                                 <span className="font-medium text-xs">
@@ -2183,7 +2173,7 @@ const Index = (props) => {
                                                                                     Sl chưa giao:{" "}
                                                                                     {formatNumber(
                                                                                         ce?.quantityStock -
-                                                                                            ce?.quantityDelive
+                                                                                        ce?.quantityDelive
                                                                                     )}
                                                                                 </span>
                                                                             </div>
@@ -2192,19 +2182,18 @@ const Index = (props) => {
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                     <NumericFormat
-                                                                        className={`${
-                                                                            errPrice &&
-                                                                            (ce?.price == null ||
-                                                                                ce?.price == "" ||
-                                                                                ce?.price == 0)
+                                                                        className={`${errPrice &&
+                                                                                (ce?.price == null ||
+                                                                                    ce?.price == "" ||
+                                                                                    ce?.price == 0)
                                                                                 ? "border-b border-red-500"
                                                                                 : errSurvivePrice &&
-                                                                                  (ce?.price == null ||
-                                                                                      ce?.price == "" ||
-                                                                                      ce?.price == 0)
-                                                                                ? "border-b border-red-500"
-                                                                                : "border-b border-gray-200"
-                                                                        } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                                    (ce?.price == null ||
+                                                                                        ce?.price == "" ||
+                                                                                        ce?.price == 0)
+                                                                                    ? "border-b border-red-500"
+                                                                                    : "border-b border-gray-200"
+                                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                                         onValueChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,
@@ -2249,7 +2238,7 @@ const Index = (props) => {
                                                                     <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                         {formatNumber(
                                                                             Number(ce?.price) *
-                                                                                (1 - Number(ce?.discount) / 100)
+                                                                            (1 - Number(ce?.discount) / 100)
                                                                         )}
                                                                     </h3>
                                                                 </div>
@@ -2298,9 +2287,9 @@ const Index = (props) => {
                                                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                     {formatNumber(
                                                                         ce?.price *
-                                                                            (1 - Number(ce?.discount) / 100) *
-                                                                            (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                                                            Number(ce?.quantity)
+                                                                        (1 - Number(ce?.discount) / 100) *
+                                                                        (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                                                        Number(ce?.quantity)
                                                                     )}
                                                                 </div>
                                                                 {/* <div>{ce?.note}</div> */}

@@ -1,0 +1,1 @@
+export const WARNING_STATUS_ROLE = 'Bạn không có quyền truy cập'

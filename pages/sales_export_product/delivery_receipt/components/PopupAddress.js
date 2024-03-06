@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import PhoneInput from "react-phone-input-2";
@@ -121,9 +121,8 @@ const PopupAddress = (props) => {
                             onChange={(value) => handleOnChangeInput("namePerson", value)}
                             namePerson="fname"
                             type="text"
-                            className={`${
-                                errNamePerson ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                            } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
+                            className={`${errNamePerson ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
                         />
                         {errNamePerson && (
                             <label className="text-sm text-red-500">
@@ -142,9 +141,8 @@ const PopupAddress = (props) => {
                             onChange={(value) => handleOnChangeInput("address", value)}
                             namePerson="adress"
                             type="text"
-                            className={`${
-                                errAddress ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                            } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none`}
+                            className={`${errAddress ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none`}
                         />
                         {errAddress && (
                             <label className="text-sm text-red-500">
@@ -194,10 +192,9 @@ const PopupAddress = (props) => {
                         <button
                             type="submit"
                             disabled={loading ? true : false}
-                            className={`${
-                                loading ? "disabled:opacity-75" : ""
-                            } button font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow flex justify-center items-center gap-2`}
-                            // className={`motion-reduce:hidden animate-spin button  font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow`}
+                            className={`${loading ? "disabled:opacity-75" : ""
+                                } button font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow flex justify-center items-center gap-2`}
+                        // className={`motion-reduce:hidden animate-spin button  font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow`}
                         >
                             <AiOutlineLoading3Quarters
                                 className={`${loading ? "motion-reduce:hidden animate-spin visible" : "hidden"}`}

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "services/axios";
 
 import { BiEdit } from "react-icons/bi";
-import { ArrowDown2 } from "iconsax-react";
+import { ArrowDown2, Box1, BoxSearch } from "iconsax-react";
 import pdfMake from "pdfmake/build/pdfmake";
 import { VscFilePdf } from "react-icons/vsc";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -48,6 +48,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useSelector } from "react-redux";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -416,10 +417,25 @@ const BtnAction = React.memo((props) => {
                                 </Popup_dspc>
                             </div>
                         )}
-                        {role ? !["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
+                        {!["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
                             <button
-                                onClick={() => handleClick()}
-                                className={` group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                onClick={() => {
+                                    if (role) {
+                                        handleClick()
+                                    }
+                                    if (props?.type == "sales_product" && auth?.orders?.is_edit == 0) {
+                                        isShow("warning", WARNING_STATUS_ROLE);
+                                    }
+                                    else if (props?.type == "price_quote" && auth?.quotes?.is_edit == 0) {
+                                        isShow("warning", WARNING_STATUS_ROLE);
+                                    }
+                                    else {
+                                        handleClick()
+                                    }
+                                }
+                                }
+                                className={`
+                                group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                             >
                                 <BiEdit
                                     size={20}
@@ -429,30 +445,8 @@ const BtnAction = React.memo((props) => {
                                     {props.dataLang?.btn_table_edit || "btn_table_edit"}
                                 </p>
                             </button>
-
-                        ) :
-                            !["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
-                                <button
-                                    onClick={() => handleClick()}
-                                    className={`
-                                ${props?.type == "sales_product" && auth?.orders?.is_edit == 0 && "hidden"} 
-                                ${props?.type == "price_quote" && auth?.quotes?.is_edit == 0 && "hidden"}
-                                group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
-                                >
-                                    <BiEdit
-                                        size={20}
-                                        className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                    />
-                                    <p className="group-hover:text-sky-500">
-                                        {props.dataLang?.btn_table_edit || "btn_table_edit"}
-                                    </p>
-                                </button>
-                            )
-
-
+                        )
                         }
-
-
                         {["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(
                             props?.type
                         ) ? (
@@ -471,9 +465,48 @@ const BtnAction = React.memo((props) => {
                                 setOpenAction={setOpenAction}
                             />
                         )}
+                        {
+                            props.type == "sales_product" && <>
+                                {(role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
+                                    <Popup_KeepStock {...props} {...shareProps} />
+                                    :
+                                    <button
+                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                        type="button"
+                                        className={`${props.type == "sales_product" ? "" : "justify-center"
+                                            } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                    >
+                                        <Box1
+                                            size={20}
+                                            className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <p className="group-hover:text-orange-500 pr-4">
+                                            {props.dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
+                                        </p>
+                                    </button>
+                                }
+                            </>
+                        }
 
-                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) && <Popup_KeepStock {...props} {...shareProps} />}
-                        {props.type == "sales_product" && (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) && <Popup_DetailKeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && <>
+                            {
+                                (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
+                                    <Popup_DetailKeepStock {...props} {...shareProps} />
+                                    :
+                                    <button
+                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                        type="button"
+                                        className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                                        <BoxSearch
+                                            size={20}
+                                            className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <p className="group-hover:text-amber-500 pr-2.5">
+                                            {props.dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
+                                        </p>
+                                    </button>
+                            }
+                        </>}
                         {props.type == "order" ? (
                             <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                 <RiDeleteBin6Line
@@ -491,8 +524,20 @@ const BtnAction = React.memo((props) => {
                         ) : (
                             <>
                                 {
-                                    role ? <button
-                                        onClick={() => handleQueryId({ id: props?.id, status: true })}
+                                    <button
+                                        onClick={() => {
+                                            if (role) {
+                                                handleQueryId({ id: props?.id, status: true })
+                                            }
+                                            if (props?.type == "sales_product" && auth?.orders?.is_delete == 0) {
+                                                isShow("warning", WARNING_STATUS_ROLE)
+                                            } else if (props?.type == "price_quote" && auth?.quotes?.is_delete == 0) {
+                                                isShow("warning", WARNING_STATUS_ROLE)
+                                            }
+                                            else {
+                                                handleQueryId({ id: props?.id, status: true })
+                                            }
+                                        }}
                                         className={` group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
                                             } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                     >
@@ -503,31 +548,14 @@ const BtnAction = React.memo((props) => {
                                         <p className="group-hover:text-[#f87171]">
                                             {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
                                         </p>
-                                    </button> :
-                                        <button
-                                            onClick={() => handleQueryId({ id: props?.id, status: true })}
-                                            className={`
-                                            ${props?.type == "sales_product" && auth?.orders?.is_delete == 0 && "hidden"}
-                                            ${props?.type == "price_quote" && auth?.quotes?.is_delete == 0 && "hidden"}
-                                             group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
-                                                } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
-                                        >
-                                            <RiDeleteBin6Line
-                                                size={20}
-                                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                                            />
-                                            <p className="group-hover:text-[#f87171]">
-                                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                                            </p>
-                                        </button>
+                                    </button>
                                 }
-
                             </>
 
                         )}
                     </div>
                 </div>
-            </Popup>
+            </Popup >
 
             <PopupConfim
                 dataLang={props.dataLang}
@@ -538,7 +566,7 @@ const BtnAction = React.memo((props) => {
                 save={() => handleDelete()}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </div>
+        </div >
     );
 });
 const Popup_Pdf = (props) => {

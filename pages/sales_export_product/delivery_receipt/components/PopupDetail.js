@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
-import PopupEdit from "../../../../components/UI/popup";
+import PopupEdit from "@/components/UI/popup";
 
 import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
@@ -300,8 +300,8 @@ const PopupDetail = (props) => {
                                                                                 <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                     {e?.expiration_date
                                                                                         ? moment(
-                                                                                              e?.expiration_date
-                                                                                          ).format("DD/MM/YYYY")
+                                                                                            e?.expiration_date
+                                                                                        ).format("DD/MM/YYYY")
                                                                                         : "-"}
                                                                                 </h6>
                                                                             </div>

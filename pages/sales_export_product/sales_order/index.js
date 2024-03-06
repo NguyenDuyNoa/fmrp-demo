@@ -11,7 +11,7 @@ import ReactExport from "react-data-export";
 import { registerLocale } from "react-datepicker";
 import Datepicker from "react-tailwindcss-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
 
@@ -41,6 +41,7 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -517,26 +518,25 @@ const Index = (props) => {
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.sales_product_list || "sales_product_list"}
                                 </h2>
-                                {
-                                    role ?
-                                        <div className={` flex justify-end items-center`}>
-                                            <Link
-                                                href={routerSalesOrder.form}
-                                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                            >
-                                                {dataLang?.btn_new || "btn_new"}
-                                            </Link>
-                                        </div>
-                                        : auth?.orders?.is_create == 1 && <div className={` flex justify-end items-center`}>
-                                            <Link
-                                                href={routerSalesOrder.form}
-                                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                            >
-                                                {dataLang?.btn_new || "btn_new"}
-                                            </Link>
-                                        </div>
+                                <div className={` flex justify-end items-center`}>
+                                    <button
+                                        onClick={() => {
+                                            if (role) {
+                                                router.push(routerSalesOrder.form)
+                                            } else if (auth?.orders?.is_create == 1) {
+                                                router.push(routerSalesOrder.form)
+                                            }
+                                            else {
+                                                isShow("warning", WARNING_STATUS_ROLE)
+                                            }
+                                        }}
+                                        type="button"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    >
+                                        {dataLang?.btn_new || "btn_new"}
+                                    </button>
+                                </div>
 
-                                }
                             </div>
 
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -634,17 +634,17 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
-                                                {role ? <div className={``}>
-                                                    {initData.dataExcel?.length > 0 && (
-                                                        <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
-                                                    )}
-                                                </div> :
-                                                    auth?.orders?.is_export == 1 &&
+                                                {(role == true || auth?.orders?.is_export == 1) ?
                                                     <div className={``}>
                                                         {initData.dataExcel?.length > 0 && (
                                                             <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
                                                         )}
                                                     </div>
+                                                    :
+                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                    </button>
                                                 }
                                                 <div>
                                                     <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />

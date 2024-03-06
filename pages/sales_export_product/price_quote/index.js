@@ -9,7 +9,7 @@ import PopupDetailQuote from "./components/PopupDetailQuote";
 import moment from "moment/moment";
 import { registerLocale } from "react-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 
 import Loading from "@/components/UI/loading";
@@ -35,6 +35,7 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 registerLocale("vi", vi);
 
 
@@ -494,25 +495,22 @@ const Index = (props) => {
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.price_quote || "price_quote"}
                                 </h2>
-                                {role ? (
-                                    <div className="flex justify-end items-center">
-                                        <Link
-                                            href={routerPriceQuote.form}
-                                            className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                        >
-                                            {dataLang?.btn_new || "btn_new"}
-                                        </Link>
-                                    </div>
-                                ) : auth?.quotes?.is_create == 1 &&
-                                <div className="flex justify-end items-center">
-                                    <Link
-                                        href={routerPriceQuote.form}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >
-                                        {dataLang?.btn_new || "btn_new"}
-                                    </Link>
-                                </div>
-                                }
+                                <button
+                                    onClick={() => {
+                                        if (role) {
+                                            router.push(routerPriceQuote.form)
+                                        } else if (auth?.quotes?.is_create == 1) {
+                                            router.push(routerPriceQuote.form)
+                                        }
+                                        else {
+                                            isShow("warning", WARNING_STATUS_ROLE)
+                                        }
+                                    }}
+                                    type="button"
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                >
+                                    {dataLang?.btn_new || "btn_new"}
+                                </button>
                             </div>
 
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -606,18 +604,17 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                                {role ?
-                                                    <div>
-                                                        {isState.dataExcel?.length > 0 && (
-                                                            <ExcelFileComponent classBtn="!px-1" filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />
-                                                        )}
+                                                {(role == true || auth?.quotes?.is_export == 1) ?
+                                                    <div className={``}>
+                                                        {initData.dataExcel?.length > 0 && (
+                                                            <ExcelFileComponent classBtn="!px-1" filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
                                                     </div>
-                                                    : auth?.quotes?.is_export == 1 &&
-                                                    <div>
-                                                        {isState.dataExcel?.length > 0 && (
-                                                            <ExcelFileComponent classBtn="!px-1" filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />
-                                                        )}
-                                                    </div>}
+                                                    :
+                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                    </button>
+                                                }
                                                 <div>
                                                     <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
