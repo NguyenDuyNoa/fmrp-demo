@@ -377,7 +377,7 @@ const FilePDF = ({
                                         {
                                             text:
                                                 item?.item?.name && item?.item?.code
-                                                    ? `${item?.item?.name} (${item?.item?.code})`
+                                                    ? `${item?.item?.name} (${item?.item?.product_variation})`
                                                     : "",
                                             fontSize: 10,
                                             margin: styleMarginChild,

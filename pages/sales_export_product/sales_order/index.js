@@ -15,8 +15,8 @@ import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "ico
 import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
 
-import PopupDetailProduct from "./(PopupDetail)/PopupDetailProduct";
-import PopupDetailQuote from "../price_quote/(PopupDetail)/PopupDetailQuote";
+import PopupDetailProduct from "./components/PopupDetailProduct";
+import PopupDetailQuote from "../price_quote/components/PopupDetailQuote";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -37,6 +37,10 @@ import { useSelector } from "react-redux";
 import useSetingServer from "@/hooks/useConfigNumber";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -67,7 +71,7 @@ const Index = (props) => {
     const isShow = useToast();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-    console.log("auth", auth);
+
     const dataSeting = useSetingServer()
 
     const trangthaiExprired = useStatusExprired();
@@ -161,7 +165,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     let data = response.data;
-                    sInitData((e) => ({ ...e, listTabStatus: data }));
+                    sInitData((e) => ({ ...e, listTabStatus: data || [] }));
                 }
                 sOnFetchingGroup(false);
             }
@@ -565,18 +569,10 @@ const Index = (props) => {
                                         <div className="col-span-6">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
-                                                    <form className="flex items-center relative ">
-                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
-                                                        <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
-                                                            type="text"
-                                                            onChange={(value) => handleOnChangeKeySearch(value)}
-                                                            placeholder={dataLang?.branch_search}
-                                                        />
-                                                    </form>
+                                                    <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch} />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
@@ -588,46 +584,11 @@ const Index = (props) => {
                                                         onChange={onChangeFilter("idBranch")}
                                                         value={valueChange.idBranch}
                                                         placeholder={dataLang?.branch || "branch"}
-                                                        hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        // components={{ MultiValue }}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         isLoading={initData.listQuoteCode == [] ? true : false}
                                                         options={[
                                                             {
@@ -645,44 +606,11 @@ const Index = (props) => {
                                                         placeholder={
                                                             dataLang?.sales_product_code || "sales_product_code"
                                                         }
-                                                        hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
@@ -695,66 +623,11 @@ const Index = (props) => {
                                                         onChange={onChangeFilter("idCustomer")}
                                                         value={valueChange.idCustomer}
                                                         placeholder={dataLang?.customer || "customer"}
-                                                        hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="z-20 col-span-1">
-                                                    <Datepicker
-                                                        value={valueChange.valueDate}
-                                                        i18n={"vi"}
-                                                        primaryColor={"blue"}
-                                                        onChange={onChangeFilter("valueDate")}
-                                                        showShortcuts={true}
-                                                        displayFormat={"DD/MM/YYYY"}
-                                                        configs={{
-                                                            shortcuts: {
-                                                                today: "Hôm nay",
-                                                                yesterday: "Hôm qua",
-                                                                past: (period) => `${period}  ngày qua`,
-                                                                currentMonth: "Tháng này",
-                                                                pastMonth: "Tháng trước",
-                                                            },
-                                                            footer: {
-                                                                cancel: "Từ bỏ",
-                                                                apply: "Áp dụng",
-                                                            },
-                                                        }}
-                                                        className="react-datepicker__input-container"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[9px] py-[11px] xl:px-0 px-2 bg-white focus:outline-[#0F4F9E] 3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[10px] 3xl:placeholder:text-xs 2xl:placeholder:text-[13px] xl:placeholder:text-[10px] lg:placeholder:text-[8px] border-none focus:outline-none focus:ring-0 focus:border-transparent"
-                                                    />
+                                                    <DatepickerComponent value={valueChange.valueDate} onChange={onChangeFilter("valueDate")} />
                                                 </div>
                                             </div>
                                         </div>
@@ -763,49 +636,13 @@ const Index = (props) => {
                                                 <OnResetData sOnFetching={sOnFetching} />
                                                 {role ? <div className={``}>
                                                     {initData.dataExcel?.length > 0 && (
-                                                        <ExcelFile
-                                                            filename="Danh sách đơn hàng bán"
-                                                            title="DSĐHB"
-                                                            element={
-                                                                <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                        size={18}
-                                                                    />
-                                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={multiDataSet}
-                                                                data={multiDataSet}
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
+                                                        <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
                                                     )}
                                                 </div> :
                                                     auth?.orders?.is_export == 1 &&
                                                     <div className={``}>
                                                         {initData.dataExcel?.length > 0 && (
-                                                            <ExcelFile
-                                                                filename="Danh sách đơn hàng bán"
-                                                                title="DSĐHB"
-                                                                element={
-                                                                    <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                        <IconExcel
-                                                                            className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                            size={18}
-                                                                        />
-                                                                        <span>{dataLang?.client_list_exportexcel}</span>
-                                                                    </button>
-                                                                }
-                                                            >
-                                                                <ExcelSheet
-                                                                    dataSet={multiDataSet}
-                                                                    data={multiDataSet}
-                                                                    name="Organization"
-                                                                />
-                                                            </ExcelFile>
+                                                            <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
                                                         )}
                                                     </div>
                                                 }

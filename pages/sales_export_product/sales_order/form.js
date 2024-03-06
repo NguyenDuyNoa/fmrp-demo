@@ -25,6 +25,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 const Index = (props) => {
     const router = useRouter();
 
@@ -342,7 +343,10 @@ const Index = (props) => {
 
     const handleFetchingItem = async () => {
         let form = new FormData()
-        form.append("branch_id", branch != null ? [+branch?.value]?.map((e) => e) : null)
+        // form.append("branch_id", branch != null ? [+branch?.value]?.map((e) => e) : null)
+        if (branch != null) {
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+        }
         if (typeOrder === "1") {
             if (quote && quote.value !== null) {
                 await Axios(
@@ -1461,40 +1465,7 @@ const Index = (props) => {
                 </title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
-                {/* <div className="3xl:px-5 px-4 3xl:pt-[76px] 2xl:pt-[72px] xl:pt-16 pt-14 pb-3 3xl:space-y-1.5 space-y-1 flex flex-col justify-between"> */}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
-                    {/* {trangthaiExprired ? (
-                        <div className="p-5"></div>
-                    ) : (
-                        <div className="flex space-x-1 3xl:text-[13px] 2xl:text-[12px] xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.sales_product_list || "sales_product_list"}
-                            </h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                    : dataLang?.sales_product_add_order || "sales_product_add_order"}
-                            </h6>
-                        </div>
-                    )} */}
-
-                    {/* <div className="flex justify-between items-center">
-                        <h2 className="3xl:text-[24px] 2xl:text-2xl xl:text-xl text-xl ">
-                            {id
-                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
-                        </h2>
-                        <div className="flex justify-end items-center">
-                            <button
-                                onClick={() => router.push(routerSalesOrder.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 3xl:py-1.5 2xl:py-2.5 xl:py-1.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.btn_back || "btn_back"}
-                            </button>
-                        </div>
-                    </div> */}
-
                     {trangthaiExprired ? (
                         <div className="p-2"></div>
                     ) : (
@@ -1552,7 +1523,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.branch || "branch"} <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataBranch}
                                         onChange={handleOnChangeInput.bind(this, "branch")}
                                         value={branch}
@@ -1564,20 +1535,6 @@ const Index = (props) => {
                                             } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1601,7 +1558,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.customer || "customer"} <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataCustomer}
                                         onChange={handleOnChangeInput.bind(this, "customer")}
                                         value={customer}
@@ -1614,20 +1571,6 @@ const Index = (props) => {
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1655,7 +1598,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.contact_person || "contact_person"}
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataPersonContact}
                                         onChange={handleOnChangeInput.bind(this, "contactPerson")}
                                         value={contactPerson}
@@ -1667,20 +1610,6 @@ const Index = (props) => {
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1740,7 +1669,7 @@ const Index = (props) => {
                                         {dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataStaffs}
                                         onChange={(value) => handleOnChangeInput("staff", value)}
                                         value={staff}
@@ -1756,20 +1685,6 @@ const Index = (props) => {
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1842,7 +1757,7 @@ const Index = (props) => {
                                             {dataLang?.sales_product_quotation || "sales_product_quotation"}{" "}
                                             <span className="text-red-500">*</span>{" "}
                                         </label>
-                                        <Select
+                                        <SelectComponent
                                             options={fakeDataQuotes}
                                             onChange={(value) => handleOnChangeInput("quote", value)}
                                             value={quote}
@@ -1857,20 +1772,6 @@ const Index = (props) => {
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                            })}
                                             styles={{
                                                 placeholder: (base) => ({
                                                     ...base,
@@ -1908,7 +1809,7 @@ const Index = (props) => {
                             <label className="text-[#344054] font-normal 2xl:text-base text-[14px]">
                                 {dataLang?.import_click_items || "import_click_items"}{" "}
                             </label>
-                            <Select
+                            <SelectComponent
                                 onInputChange={_HandleSeachApi.bind(this)}
                                 options={typeOrder === "1" && quote === null ? [] : allItems}
                                 // closeMenuOnSelect={false}
@@ -1996,20 +1897,6 @@ const Index = (props) => {
                                 isSearchable={true}
                                 noOptionsMessage={() => "Không có dữ liệu"}
                                 menuPortalTarget={document.body}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
                                 styles={{
                                     placeholder: (base) => ({
                                         ...base,
@@ -2074,7 +1961,7 @@ const Index = (props) => {
                                 {/* phân chia,m */}
                                 <div className="grid grid-cols-12">
                                     <div className="col-span-2 ">
-                                        <Select
+                                        <SelectComponent
                                             onInputChange={_HandleSeachApi.bind(this)}
                                             dangerouslySetInnerHTML={{
                                                 __html: option.label,
@@ -2091,20 +1978,6 @@ const Index = (props) => {
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                            })}
                                             styles={{
                                                 placeholder: (base) => ({
                                                     ...base,
@@ -2179,7 +2052,7 @@ const Index = (props) => {
                                             </h3>
                                         </div>
                                         <div className="col-span-1 flex justify-center items-center">
-                                            <Select
+                                            <SelectComponent
                                                 options={taxOptions}
                                                 value={null}
                                                 placeholder={"% Thuế"}
@@ -2191,20 +2064,6 @@ const Index = (props) => {
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 menuPortalTarget={document.body}
                                                 closeMenuOnSelect={true}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
                                                 styles={{
                                                     placeholder: (base) => ({
                                                         ...base,
@@ -2269,7 +2128,7 @@ const Index = (props) => {
                                 {sortedArr.map((e, index) => (
                                     <div className="grid grid-cols-12 gap-1 py-1 items-center" key={e?.id}>
                                         <div className="col-span-2 ">
-                                            <Select
+                                            <SelectComponent
                                                 onInputChange={_HandleSeachApi.bind(this)}
                                                 dangerouslySetInnerHTML={{
                                                     __html: option.label,
@@ -2287,20 +2146,6 @@ const Index = (props) => {
                                                 isSearchable={true}
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 menuPortalTarget={document.body}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
                                                 styles={{
                                                     placeholder: (base) => ({
                                                         ...base,
@@ -2379,17 +2224,17 @@ const Index = (props) => {
                                                     handleOnChangeInputOption(e?.id, "discount", value)
                                                 }
                                                 className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                isAllowed={(values) => {
-                                                    if (!values.value) return true;
-                                                    const { floatValue } = values;
+                                                isAllowed={({ floatValue }) => {
+                                                    if (floatValue == 0) {
+                                                        return true;
+                                                    }
                                                     if (floatValue > 101) {
                                                         isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
                                                     }
-                                                    return floatValue < 101;
+                                                    else {
+                                                        return true;
+                                                    }
                                                 }}
-                                                // decimalScale={0}
                                                 isNumericString={true}
                                             />
                                         </div>
@@ -2401,7 +2246,7 @@ const Index = (props) => {
                                             </h3>
                                         </div>
                                         <div className="col-span-1 flex justify-center items-center p-0">
-                                            <Select
+                                            <SelectComponent
                                                 options={taxOptions}
                                                 onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
                                                 value={
@@ -2423,20 +2268,6 @@ const Index = (props) => {
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 menuPortalTarget={document.body}
                                                 closeMenuOnSelect={true}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
                                                 styles={{
                                                     placeholder: (base) => ({
                                                         ...base,
@@ -2534,18 +2365,17 @@ const Index = (props) => {
                                     value={totalDiscount}
                                     onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
                                     className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] text-center py-1 px-2 bg-transparent font-normal xl:w-20 w-24 focus:outline-none border-b-2 border-gray-300"
-                                    thousandSeparator=","
-                                    isAllowed={(values) => {
-                                        if (!values.value) return true;
-                                        const { floatValue } = values;
-                                        if (floatValue > 101) {
-                                            isShow("error", `Vui lòng nhập số % chiết khấu nhỏ hơn 101`);
+                                    isAllowed={({ floatValue }) => {
+                                        if (floatValue == 0) {
+                                            return true;
                                         }
-                                        return floatValue < 101;
+                                        if (floatValue > 101) {
+                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                        }
+                                        else {
+                                            return true;
+                                        }
                                     }}
-                                    allowNegative={false}
-                                    // decimalScale={0}
-                                    isNumericString={true}
                                 />
 
                             </div>
@@ -2554,7 +2384,8 @@ const Index = (props) => {
                             <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
                                 {dataLang?.sales_product_tax || "sales_product_tax"}
                             </h2>
-                            <Select
+                            <SelectComponent
+                                classParent={"w-[80%]"}
                                 options={taxOptions}
                                 onChange={(value) => handleOnChangeInput("total_tax", value)}
                                 value={totalTax ? "" : ""}
@@ -2574,20 +2405,6 @@ const Index = (props) => {
                                 }}
                                 menuPortalTarget={document.body}
                                 closeMenuOnSelect={true}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
                                 styles={{
                                     placeholder: (base) => ({
                                         ...base,
@@ -2718,7 +2535,7 @@ const Index = (props) => {
                 save={resetValue}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 

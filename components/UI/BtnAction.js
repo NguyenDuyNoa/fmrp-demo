@@ -26,8 +26,8 @@ import {
 } from "@/routers/manufacture";
 
 import PopupConfim from "./popupConfim/popupConfim";
-import Popup_KeepStock from "@/pages/sales_export_product/sales_order/(PopupDetail)/PopupKeepStock";
-import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/(PopupDetail)/PopupDetailKeepStock";
+import Popup_KeepStock from "@/pages/sales_export_product/sales_order/components/PopupKeepStock";
+import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/components/PopupDetailKeepStock";
 
 ///Đơn đặt hàng PO
 import Popup_TableValidateEdit from "@/pages/purchase_order/order/(popup)/validateEdit";
@@ -436,6 +436,7 @@ const BtnAction = React.memo((props) => {
                                     onClick={() => handleClick()}
                                     className={`
                                 ${props?.type == "sales_product" && auth?.orders?.is_edit == 0 && "hidden"} 
+                                ${props?.type == "price_quote" && auth?.quotes?.is_edit == 0 && "hidden"}
                                 group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                 >
                                     <BiEdit
@@ -505,7 +506,10 @@ const BtnAction = React.memo((props) => {
                                     </button> :
                                         <button
                                             onClick={() => handleQueryId({ id: props?.id, status: true })}
-                                            className={`${props?.type == "sales_product" && auth?.orders?.is_delete == 0 && "hidden"} group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
+                                            className={`
+                                            ${props?.type == "sales_product" && auth?.orders?.is_delete == 0 && "hidden"}
+                                            ${props?.type == "price_quote" && auth?.quotes?.is_delete == 0 && "hidden"}
+                                             group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
                                                 } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                         >
                                             <RiDeleteBin6Line

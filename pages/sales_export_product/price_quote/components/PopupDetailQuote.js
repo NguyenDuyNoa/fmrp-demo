@@ -1,8 +1,5 @@
-import React, { useRef, useState, useEffect } from "react";
-import Head from "next/head";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
 import PopupEdit from "@/components/UI/popup";
@@ -13,17 +10,10 @@ import {
     Calendar as IconCalendar,
     SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
-    TickCircle,
-    ArrowCircleDown,
 } from "iconsax-react";
-import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
 
 import moment from "moment/moment";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
@@ -31,22 +21,39 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 import Loading from "@/components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+
+import useSetingServer from "@/hooks/useConfigNumber";
+
+
+
 const PopupDetailQuote = (props) => {
-    const scrollAreaRef = useRef(null);
+
+    const dataSeting = useSetingServer()
+
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [data, sData] = useState();
+
     const [onFetching, sOnFetching] = useState(false);
+
     const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
 
     const formatNumber = (num) => {
-        if (!num && num !== 0) return 0;
-        const roundedNum = Number(num).toFixed(2);
-        return parseFloat(roundedNum).toLocaleString("en");
+        return formatNumberConfig(+num, dataSeting)
+    };
+
+    const formatMoney = (num) => {
+        return formatMoneyConfig(+num, dataSeting);
     };
 
     const handleFetchingDetailQuote = async () => {
@@ -71,20 +78,6 @@ const PopupDetailQuote = (props) => {
         onFetching && handleFetchingDetailQuote();
     }, [open]);
 
-    const scrollableDiv = document.querySelector(".customsroll");
-    scrollableDiv?.addEventListener("wheel", (event) => {
-        const deltaY = event.deltaY;
-        const top = scrollableDiv.scrollTop;
-        const height = scrollableDiv.scrollHeight;
-        const offset = scrollableDiv.offsetHeight;
-        const isScrolledToTop = top === 0;
-        const isScrolledToBottom = top === height - offset;
-
-        if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
-            event.preventDefault();
-        }
-    });
-
     return (
         <>
             <PopupEdit
@@ -98,7 +91,7 @@ const PopupDetailQuote = (props) => {
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" />
 
                 <div className="3xl:w-[1200px] 2xl:w-[1100px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
-                    <div className="customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
+                    <div className="overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
                         <h2 className="font-normal bg-[#ECF0F4] 3xl:p-2 p-1 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
                             {props?.dataLang?.detail_general_information || "detail_general_information"}
                         </h2>
@@ -268,19 +261,19 @@ const PopupDetailQuote = (props) => {
                                                         {formatNumber(e?.quantity)}
                                                     </h6>
                                                     <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-right">
-                                                        {formatNumber(e?.price)}
+                                                        {formatMoney(e?.price)}
                                                     </h6>
                                                     <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">
                                                         {e?.discount_percent + "%"}
                                                     </h6>
                                                     <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-right">
-                                                        {formatNumber(e?.price_after_discount)}
+                                                        {formatMoney(e?.price_after_discount)}
                                                     </h6>
                                                     <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">
                                                         {formatNumber(e?.tax_rate) + "%"}
                                                     </h6>
                                                     <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-right">
-                                                        {formatNumber(e?.amount)}
+                                                        {formatMoney(e?.amount)}
                                                     </h6>
                                                     <h6 className="text-[12px] px-2 col-span-1 rounded-md text-left whitespace-normal">
                                                         {e?.note != undefined ? e?.note : ""}
@@ -342,27 +335,27 @@ const PopupDetailQuote = (props) => {
                             <div className="col-span-3 space-y-2">
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_price)}
+                                        {formatMoney(data?.total_price)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_discount)}
+                                        {formatMoney(data?.total_discount)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_price_after_discount)}
+                                        {formatMoney(data?.total_price_after_discount)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_tax_price)}
+                                        {formatMoney(data?.total_tax_price)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_amount)}
+                                        {formatMoney(data?.total_amount)}
                                     </h3>
                                 </div>
                             </div>

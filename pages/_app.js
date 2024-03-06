@@ -84,7 +84,8 @@ function MainPage({ Component, pageProps }) {
     };
 
     const FetchSetingServer = async () => {
-        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {}, (err, response) => {
+        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {
+        }, (err, response) => {
             if (!err) {
                 const { settings } = response?.data
                 dispatch({ type: "setings/server", payload: settings });
