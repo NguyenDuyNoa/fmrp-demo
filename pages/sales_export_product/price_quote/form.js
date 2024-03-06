@@ -727,8 +727,8 @@ const Index = (props) => {
                 (err, response) => {
                     const { isSuccess, message } = response.data;
 
-                    if (response && response.data && isSuccess === true && router.isReady) {
-                        isShow("success", `${dataLang[message]}`);
+                    if (isSuccess) {
+                        isShow("success", dataLang[message] || message);
                         sCode("");
                         sStartDate(new Date());
                         sEffectiveDate(new Date());
@@ -750,9 +750,8 @@ const Index = (props) => {
                             },
                         ]);
                         router.push(routerPriceQuote.home);
-                    }
-                    if (response && response.data && isSuccess === false) {
-                        isShow("error", `${dataLang[message]}`);
+                    } else {
+                        isShow("error", dataLang[message] || message);
                     }
                     sOnSending(false);
                 }
