@@ -220,6 +220,7 @@ const Index = (props) => {
         } else if (type === "branch") {
             if (sortedArr?.slice(1)?.length > 0) {
                 handleQueryId({ status: true });
+
             } else if (value !== idBranch) {
                 sIdBranch(value);
                 sIdCustomer(null);
@@ -242,6 +243,7 @@ const Index = (props) => {
                     },
                 ]);
             }
+
         } else if (type === "taxTotal") {
             sTaxTotal(value);
         } else if (type === "discounttong") {
@@ -414,6 +416,12 @@ const Index = (props) => {
     useEffect(() => {
         idBranch != null && sOnFetchingCustomer(true);
         idBranch != null && sOnFetchingItems(true);
+        if (idBranch == null) {
+            sIdCustomer(null);
+            sDataCustomer([]);
+            sDataContactPerson([]);
+            sIdContactPerson(null);
+        }
     }, [idBranch]);
 
     useEffect(() => {
