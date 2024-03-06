@@ -136,7 +136,7 @@ const Index = (props) => {
                 // tab: router.query?.page,
             },
         });
-        sOnFetching(true);
+        queryState({ onFetching: true })
     }, 500);
 
     useEffect(() => {
@@ -145,10 +145,7 @@ const Index = (props) => {
             (isState.onFetching && _ServerFetching_client());
     }, [isState.onFetching]);
     useEffect(() => {
-        // sOnFetching(true) ||
-        //     (isState.keySearch && sOnFetching(true)) ||
-        //     (isState.idBranch?.length > 0 && sOnFetching(true)) ||
-        //     (isState.idClient?.length > 0 && sOnFetching(true));
+
         queryState({ onFetching: true })
     }, [limit, router.query?.page, isState.idBranch, isState.idClient]);
     //excel
