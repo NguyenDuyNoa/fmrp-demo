@@ -155,7 +155,7 @@ const PopupDetailQuote = (props) => {
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_customer || "price_quote_customer"} :
                                     </h3>
-                                    <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal col-span-4">
+                                    <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal col-span-4 whitespace-nowrap">
                                         {data?.client_name}
                                     </h3>
                                 </div>
