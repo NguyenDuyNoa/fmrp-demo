@@ -903,7 +903,7 @@ const Index = (props) => {
                                                             {item.name}
                                                         </div>
                                                     </div>
-                                                    <div className='w-[10%] max-w-[10%] bg-[#E1ECFC]/80 3xl:text-base xl:text-sm text-xs text-center rounded-md'>
+                                                    <div className='w-[10%] max-w-[10%] bg-[#E1ECFC]/80 3xl:text-base xl:text-sm text-xs text-center rounded-md text-black'>
                                                         {item.totalItems}
                                                     </div>
                                                 </li>
