@@ -106,7 +106,7 @@ const Popup_dsnd = (props) => {
         Axios("GET", props?.id ? `/api_web/api_staff/getPermissionsStaff/${props?.id}?csrf_protection=true` :
             `/api_web/api_staff/getPermissionsStaff?csrf_protection=true`, {
             params: {
-                position_id: 0
+                position_id: isState?.positionId != isState?.idPos?.value ? isState?.idPos?.value : 0
             }
         }, (err, response) => {
             if (!err) {
@@ -158,6 +158,7 @@ const Popup_dsnd = (props) => {
                         label: x.full_name,
                         value: Number(x.id),
                     })),
+                    positionId: db?.position_id,
                     thumb: db?.profile_image,
                     idPos: db?.position_id == "0" ? null : { value: db?.position_id, label: db?.position_name }
                 })
