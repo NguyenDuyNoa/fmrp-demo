@@ -500,8 +500,9 @@ const LoginPage = React.memo((props) => {
                                     <div className="pointer-events-none select-none">
                                         <Image
                                             alt=""
-                                            src="/FMRP_Logo.png"
                                             width={200}
+                                            // src="/FMRP_Logo.png"
+                                            src="/LOGO_LOGIN.png"
                                             height={70}
                                             quality={100}
                                             className="object-contain"
