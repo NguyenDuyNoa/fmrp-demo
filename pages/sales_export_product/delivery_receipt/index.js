@@ -161,20 +161,12 @@ const Index = (props) => {
                 queryState({ listBr: convertArray(rResult) });
             }
         });
-
         await Axios("GET", `api_web/api_delivery/searchDeliveries?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let { rResult } = response.data;
-                queryState({ listDelivery: rResult?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
+                let { data } = response?.data;
+                queryState({ listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
             }
         });
-        // await Axios("GET", `/api_web/api_delivery/searchDelivery?csrf_protection=true`, {}, (err, response) => {
-        //     if (!err) {
-        //         let { rResult } = response.data;
-        //         queryState({ listDelivery: rResult?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
-        //     }
-        // });
-
         await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;

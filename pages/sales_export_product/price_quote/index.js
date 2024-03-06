@@ -183,20 +183,6 @@ const Index = (props) => {
                 queryState({ listCustomer: convertArray(data?.clients) });
             }
         })
-
-        Axios("GET", "/cron/test3?csrf_protection=true", {
-        }, (err, response) => {
-            if (!err) {
-                console.log("response?.data 3", response?.data);
-            }
-        })
-        Axios("GET", "/cron/test4?csrf_protection=true", {
-        }, (err, response) => {
-            if (!err) {
-                console.log("response?.data 4", response?.data);
-
-            }
-        })
         queryState({ onFetching_filter: false });
     };
 
