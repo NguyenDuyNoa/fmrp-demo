@@ -162,10 +162,12 @@ const Index = (props) => {
 
                 sOption(items);
                 sCode(rResult?.reference_no);
-                sIdContactPerson({
-                    label: rResult?.contact_name,
-                    value: rResult?.contact_id,
-                });
+                sIdContactPerson(
+                    rResult?.contact_id == 0 ? null :
+                        {
+                            label: rResult?.contact_name,
+                            value: rResult?.contact_id,
+                        });
                 sIdBranch({
                     label: rResult?.branch_name,
                     value: rResult?.branch_id,
