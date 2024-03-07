@@ -55,6 +55,7 @@ function MainPage({ Component, pageProps }) {
     const [changeLang, sChangeLang] = useState(false);
     const [data, sData] = useState();
     const [onSeting, sOnSeting] = useState(false)
+
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
 
@@ -82,6 +83,7 @@ function MainPage({ Component, pageProps }) {
             }
         });
     };
+
 
     const FetchSetingServer = async () => {
         await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {
@@ -203,12 +205,40 @@ const LoginPage = React.memo((props) => {
     const [listMajor, sListMajor] = useState([]);
     const [listPosition, sListPosition] = useState([]);
     const [checkMajior, sCheckMajior] = useState(null);
-
+    const [onSeting, sOnSeting] = useState(false)
     const [loadingRegester, sLoadingRegester] = useState(false);
 
     const showToat = (type, mssg) => {
         return Toast.fire({ icon: `${type}`, title: `${mssg}` });
     };
+
+
+    const FetchSetingServer = async () => {
+        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {
+        }, (err, response) => {
+            if (!err) {
+                const { settings } = response?.data
+                dispatch({ type: "setings/server", payload: settings });
+            }
+        });
+        await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                const data = response?.data;
+                const newData = {
+                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
+                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
+                    dataProductSerial: data.find((x) => x.code == "product_serial"),
+                }
+                dispatch({ type: "setings/feature", payload: newData });
+            }
+        });
+        sOnSeting(false)
+    };
+
+    useEffect(() => {
+        onSeting && FetchSetingServer();
+    }, [onSeting])
+
     const _ServerSending = () => {
         Axios(
             "POST",
@@ -224,6 +254,7 @@ const LoginPage = React.memo((props) => {
                 if (response !== null) {
                     const { isSuccess, message, token, database_app } = response?.data;
                     if (isSuccess) {
+                        sOnSeting(true)
                         dispatch({ type: "auth/update", payload: response.data?.data });
 
                         localStorage.setItem("tokenFMRP", token);
