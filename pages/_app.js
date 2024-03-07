@@ -232,12 +232,7 @@ const LoginPage = React.memo((props) => {
                 dispatch({ type: "setings/feature", payload: newData });
             }
         });
-        sOnSeting(false)
     };
-
-    useEffect(() => {
-        onSeting && FetchSetingServer();
-    }, [onSeting])
 
     const _ServerSending = () => {
         Axios(
@@ -254,7 +249,7 @@ const LoginPage = React.memo((props) => {
                 if (response !== null) {
                     const { isSuccess, message, token, database_app } = response?.data;
                     if (isSuccess) {
-                        sOnSeting(true)
+                        FetchSetingServer()
                         dispatch({ type: "auth/update", payload: response.data?.data });
 
                         localStorage.setItem("tokenFMRP", token);
