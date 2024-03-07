@@ -2109,7 +2109,7 @@ const Index = (props) => {
                                                                             if (floatValue == 0) {
                                                                                 return true;
                                                                             }
-                                                                            if (floatValue > 101) {
+                                                                            if (floatValue > 100) {
                                                                                 isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
                                                                                 return false
                                                                             }
@@ -2229,7 +2229,7 @@ const Index = (props) => {
                                         if (floatValue == 0) {
                                             return true;
                                         }
-                                        if (floatValue > 101) {
+                                        if (floatValue > 100) {
                                             isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
                                             return false
                                         }

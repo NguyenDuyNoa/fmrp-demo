@@ -415,13 +415,13 @@ const Index = (props) => {
 
     useEffect(() => {
         idBranch != null && sOnFetchingCustomer(true);
-        idBranch != null && sOnFetchingItems(true);
         if (idBranch == null) {
             sIdCustomer(null);
             sDataCustomer([]);
             sDataContactPerson([]);
             sIdContactPerson(null);
         }
+        sOnFetchingItems(true);
     }, [idBranch]);
 
     useEffect(() => {
@@ -1255,7 +1255,7 @@ const Index = (props) => {
                                                         if (floatValue == 0) {
                                                             return true;
                                                         }
-                                                        if (floatValue > 101) {
+                                                        if (floatValue > 100) {
                                                             isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
                                                             return false
                                                         }
@@ -1373,8 +1373,9 @@ const Index = (props) => {
                                         if (floatValue == 0) {
                                             return true;
                                         }
-                                        if (floatValue > 101) {
+                                        if (floatValue > 100) {
                                             isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                            return false;
                                         }
                                         else {
                                             return true;
