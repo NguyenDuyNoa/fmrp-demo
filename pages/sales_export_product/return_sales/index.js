@@ -12,8 +12,8 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Popup_status from "./(popupDetail)/popupStatus";
-import PopupDetail from "./(popupDetail)/PopupDetail";
+import Popup_status from "./components/popupStatus";
+import PopupDetail from "./components/PopupDetail";
 
 import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 
