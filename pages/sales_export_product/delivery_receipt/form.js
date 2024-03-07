@@ -15,7 +15,6 @@ import { AiFillPlusCircle } from "react-icons/ai";
 import Select, { components } from "react-select";
 
 import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
-import { NumericFormat } from "react-number-format";
 
 import PopupAddress from "./components/PopupAddress";
 
@@ -28,7 +27,11 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-
+import useFeature from "@/hooks/useConfigFeature";
+import formatNumberConfig from '@/utils/helpers/formatnumber'
+import formatMoneyConfig from '@/utils/helpers/formatMoney'
+import useSetingServer from "@/hooks/useConfigNumber";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -44,8 +47,6 @@ const Index = (props) => {
     const [onFetching, sOnFetching] = useState(false);
 
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
 
@@ -97,11 +98,7 @@ const Index = (props) => {
 
     const [dataTasxes, sDataTasxes] = useState([]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    const { dataMaterialExpiry, dataProductSerial, dataProductExpiry } = useFeature()
 
     const [listData, sListData] = useState([]);
 
@@ -142,6 +139,15 @@ const Index = (props) => {
     const [errPrice, sErrPrice] = useState(false);
 
     const [errSurvivePrice, sErrSurvivePrice] = useState(false);
+
+    const dataSeting = useSetingServer()
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    };
+
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    };
 
     const _HandleClosePopupAddress = (e) => {
         sOpenPopupAddress(e);
@@ -203,41 +209,10 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetchingCondition(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
-
-    useEffect(() => {
-        id && sOnFetchingCondition(true);
-    }, []);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
-
     const options = dataItems?.map((e) => ({
         label: `${e.name}
             <span style={{display: none}}>${e.code}</span>
-            <span style={{display: none}}>${e.product_letiation} </span>
+            <span style={{display: none}}>${e.product_variation} </span>
             <span style={{display: none}}>${e.serial} </span>
             <span style={{display: none}}>${e.lot} </span>
             <span style={{display: none}}>${e.expiration_date} </span>
@@ -296,7 +271,7 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_letiation + e.item?.text_type + e.item?.unit_name
+                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
                                     }</span>`,
                                 value: e.item?.id,
                             },
@@ -331,21 +306,11 @@ const Index = (props) => {
     }, [onFetchingDetail]);
 
     useEffect(() => {
-        id &&
-            JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}" &&
-            sOnFetchingDetail(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) !== "{}" &&
-        JSON.stringify(dataProductExpiry) !== "{}" &&
-        JSON.stringify(dataProductSerial) !== "{}",
-    ]);
+        id && sOnFetchingDetail(true);
+    }, []);
 
     const _ServerFetching_ItemsAll = () => {
-        Axios(
-            "POST",
-            "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true",
+        Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true",
             {
                 params: {
                     "filter[order_id]": idProductOrder !== null ? +idProductOrder.value : null,
@@ -364,9 +329,7 @@ const Index = (props) => {
 
     const _ServerFetching_Client = () => {
         sOnLoading(true);
-        Axios(
-            "GET",
-            "/api_web/api_client/client_option/?csrf_protection=true",
+        Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch.value : null,
@@ -385,9 +348,7 @@ const Index = (props) => {
 
     const _ServerFetching_ContactPerson = () => {
         sOnLoading(true);
-        Axios(
-            "GET",
-            "/api_web/api_client/contactCombobox/?csrf_protection=true",
+        Axios("GET", "/api_web/api_client/contactCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[client_id]": idClient != null ? idClient.value : null,
@@ -406,9 +367,7 @@ const Index = (props) => {
 
     const _ServerFetching_Staff = () => {
         sOnLoading(true);
-        Axios(
-            "GET",
-            "/api_web/Api_staff/staffOption?csrf_protection=true",
+        Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch !== null ? +idBranch?.value : null,
@@ -430,9 +389,7 @@ const Index = (props) => {
         data.append("branch_id", idBranch !== null ? +idBranch.value : null);
         data.append("client_id", idClient !== null ? +idClient.value : null);
         id && data.append("filter[delivery_id]", id ? id : "");
-        Axios(
-            "POST",
-            `/api_web/api_delivery/searchOrdersToCustomer?csrf_protection=true`,
+        Axios("POST", `/api_web/api_delivery/searchOrdersToCustomer?csrf_protection=true`,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -450,9 +407,7 @@ const Index = (props) => {
     const _ServerFetching_Address = () => {
         let data = new FormData();
         data.append("client_id", idClient !== null ? +idClient.value : null);
-        Axios(
-            "POST",
-            `/api_web/api_delivery/GetShippingClient?csrf_protection=true`,
+        Axios("POST", `/api_web/api_delivery/GetShippingClient?csrf_protection=true`,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -488,15 +443,7 @@ const Index = (props) => {
     const checkListData = (value, sDataItems, sListData, sId, id, idEmty, sIdStaff) => {
         return handleQueryId({
             status: true,
-            initialKey: {
-                value,
-                sDataItems,
-                sListData,
-                sId,
-                id,
-                idEmty,
-                sIdStaff,
-            },
+            initialKey: { value, sDataItems, sListData, sId, id, idEmty, sIdStaff },
         });
     };
 
@@ -673,10 +620,6 @@ const Index = (props) => {
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
-    const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
-    };
 
     const _DataValueItem = (value) => {
         const newChild = {
@@ -703,8 +646,7 @@ const Index = (props) => {
             price: Number(value?.e?.price),
             quantity: value?.e?.quantity,
             discount: generalDiscount ? generalDiscount : Number(value?.e?.discount_percent_item),
-            tax: generalTax
-                ? generalTax
+            tax: generalTax ? generalTax
                 : {
                     label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
                     value: value?.e?.tax_id_item,
@@ -726,7 +668,6 @@ const Index = (props) => {
     const _HandleAddChild = (parentId, value) => {
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
-                // const newChild = _DataValueItem(value).newChild;
                 const { newChild } = _DataValueItem(value);
                 return { ...e, child: [...e.child, newChild] };
             } else {
@@ -739,7 +680,6 @@ const Index = (props) => {
     const _HandleAddParent = (value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
-            // const newData = _DataValueItem(value).parent;
             const { parent } = _DataValueItem(value);
             sListData([parent, ...listData]);
         } else {
@@ -793,33 +733,13 @@ const Index = (props) => {
                     case "increase":
                         sErrSurvive(false);
                         if (+ce.quantity === +ce?.warehouse?.qty) {
-                            isShow(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                    +ce?.warehouse?.qty
-                                )} số lượng tồn kho`,
-                                3000
-                            );
+                            isShow("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(+ce?.warehouse?.qty)} số lượng tồn kho`, 3000);
                         } else if (+ce.quantity === quantityAmount) {
-                            isShow(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
-                                3000
-                            );
+                            isShow("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`, 3000);
                         } else if (+ce.quantity > +ce?.warehouse?.qty) {
-                            isShow(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                    +ce?.warehouse?.qty
-                                )} số lượng tồn kho`,
-                                3000
-                            );
+                            isShow("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(+ce?.warehouse?.qty)} số lượng tồn kho`, 3000);
                         } else if (+ce.quantity > quantityAmount) {
-                            isShow(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
-                                3000
-                            );
+                            isShow("error", `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`, 3000);
                         } else {
                             ce.quantity = Number(ce?.quantity) + 1;
                         }
@@ -846,10 +766,7 @@ const Index = (props) => {
 
                     case "warehouse":
                         if (!checkWarehouse && +ce?.quantity > +value?.qty) {
-                            isShow(
-                                "error",
-                                `Số lượng chưa giao vượt quá ${formatNumber(+value?.qty)} số lượng tồn kho`
-                            );
+                            isShow("error", `Số lượng chưa giao vượt quá ${formatNumber(+value?.qty)} số lượng tồn kho`);
                             ce.warehouse = value;
                             ce.quantity = value?.qty;
                             FunCheckQuantity(parentId, childId);
@@ -891,7 +808,6 @@ const Index = (props) => {
 
         if (checkChild > quantityAmount) {
             isShow("error", `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`);
-
             ce.quantity = "";
             HandTimeout();
             sErrQuantity(true);
@@ -1001,7 +917,7 @@ const Index = (props) => {
                                 {option.e?.code} :
                             </h5>
                             <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-                                {option.e?.product_letiation}
+                                {option.e?.product_variation}
                             </h5>
                         </div>
                         <div className="flex 3xl:gap-3 2xl:gap-3 xl:gap-3 gap-1">
@@ -1117,10 +1033,7 @@ const Index = (props) => {
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code ? code : "");
-        formData.append(
-            "date",
-            moment(startDate).format("YYYY-MM-DD HH:mm:ss") ? moment(startDate).format("YYYY-MM-DD HH:mm:ss") : ""
-        );
+        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss") ? moment(startDate).format("YYYY-MM-DD HH:mm:ss") : "");
         formData.append("branch_id", idBranch?.value ? idBranch?.value : "");
         formData.append("client_id", idClient?.value ? idClient?.value : "");
         formData.append("person_contact_id", idContactPerson?.value ? idContactPerson?.value : "");
@@ -1133,10 +1046,7 @@ const Index = (props) => {
             formData.append(`items[${index}][item]`, item?.matHang?.value);
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
-                formData.append(
-                    `items[${index}][child][${childIndex}][warehouse_id]`,
-                    childItem?.warehouse?.value || 0
-                );
+                formData.append(`items[${index}][child][${childIndex}][warehouse_id]`, childItem?.warehouse?.value || 0);
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.quantity);
                 formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
                 formData.append(`items[${index}][child][${childIndex}][discount]`, childItem?.discount);
@@ -1146,10 +1056,7 @@ const Index = (props) => {
         });
         await Axios(
             "POST",
-            `${id
-                ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true`
-                : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"
-            }`,
+            `${id ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true` : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -1195,9 +1102,7 @@ const Index = (props) => {
                             </h6>
                             <span className="text-[#141522]/40">/</span>
                             <h6>
-                                {id
-                                    ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
-                                    : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
+                                {id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit" : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
                             </h6>
                         </div>
                     )}
@@ -1231,9 +1136,7 @@ const Index = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
-                                        placeholder={
-                                            dataLang?.purchase_order_system_default || "purchase_order_system_default"
-                                        }
+                                        placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
@@ -1252,9 +1155,7 @@ const Index = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            placeholder={
-                                                dataLang?.price_quote_system_default || "price_quote_system_default"
-                                            }
+                                            placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
                                             className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                 } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
@@ -1283,8 +1184,7 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1337,8 +1237,7 @@ const Index = (props) => {
                                         placeholder={"Khách hàng"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errClient ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-[30]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errClient ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         menuPortalTarget={document.body}
@@ -1364,7 +1263,7 @@ const Index = (props) => {
                                             }),
                                             menuPortal: (base) => ({
                                                 ...base,
-                                                zIndex: 9999,
+                                                zIndex: 999,
                                             }),
                                             control: (base, state) => ({
                                                 ...base,
@@ -1440,18 +1339,11 @@ const Index = (props) => {
                                             options={dataAddress}
                                             onChange={_HandleChangeInput.bind(this, "idAddress")}
                                             value={idAddress}
-                                            // isLoading={loading}
                                             placeholder={dataLang?.select_address || "select_address"}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${errAddress ? "border border-red-500 rounded-md" : ""
-                                                } rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                            className={`${errAddress ? "border border-red-500 rounded-md" : ""} rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                             isSearchable={true}
-                                            // components={{
-                                            //     ClearIndicator,
-                                            //     LoadingIndicator,
-                                            //     SelectIndicator,
-                                            // }}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
                                             closeMenuOnSelect={true}
@@ -1524,7 +1416,6 @@ const Index = (props) => {
                                         }
                                         className={`${errStaff ? "border-red-500" : "border-transparent"
                                             } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                        // className={`placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1936,12 +1827,12 @@ const Index = (props) => {
                                                                             "warehouse"
                                                                         )}
                                                                         className={`${(errWarehouse && ce?.warehouse == null) ||
-                                                                                (errWarehouse &&
-                                                                                    (ce?.warehouse?.label == null ||
-                                                                                        ce?.warehouse?.warehouse_name ==
-                                                                                        null))
-                                                                                ? "border-red-500 border"
-                                                                                : ""
+                                                                            (errWarehouse &&
+                                                                                (ce?.warehouse?.label == null ||
+                                                                                    ce?.warehouse?.warehouse_name ==
+                                                                                    null))
+                                                                            ? "border-red-500 border"
+                                                                            : ""
                                                                             }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
@@ -1950,7 +1841,6 @@ const Index = (props) => {
                                                                         }
                                                                         menuPortalTarget={document.body}
                                                                         formatOptionLabel={(option) => {
-                                                                            console.log("option", option);
                                                                             return (
                                                                                 (option?.warehouse_name ||
                                                                                     option?.label ||
@@ -2072,7 +1962,7 @@ const Index = (props) => {
                                                                                 size="16"
                                                                             />
                                                                         </button>
-                                                                        <NumericFormat
+                                                                        <InPutNumericFormat
                                                                             onValueChange={_HandleChangeChild.bind(
                                                                                 this,
                                                                                 e?.id,
@@ -2081,18 +1971,17 @@ const Index = (props) => {
                                                                             )}
                                                                             value={ce?.quantity || null}
                                                                             className={`${errQuantity &&
-                                                                                    (ce?.quantity == null ||
-                                                                                        ce?.quantity == "" ||
-                                                                                        ce?.quantity == 0)
+                                                                                (ce?.quantity == null ||
+                                                                                    ce?.quantity == "" ||
+                                                                                    ce?.quantity == 0)
+                                                                                ? "border-b border-red-500"
+                                                                                : errSurvive
                                                                                     ? "border-b border-red-500"
-                                                                                    : errSurvive
-                                                                                        ? "border-b border-red-500"
-                                                                                        : "border-b border-gray-200"
-                                                                                } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                                                            allowNegative={false}
-                                                                            decimalScale={0}
-                                                                            isNumericString={true}
-                                                                            thousandSeparator=","
+                                                                                    : "border-b border-gray-200"
+                                                                                }
+                                                                                
+                                                                                ${ce?.quantity == 0 && 'border-red-500' || ce?.quantity == "" && 'border-red-500'} 
+                                                                                appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                                             isAllowed={(values) => {
                                                                                 const { value } = values;
                                                                                 const newValue = +value;
@@ -2181,19 +2070,21 @@ const Index = (props) => {
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                    <NumericFormat
+                                                                    <InPutNumericFormat
                                                                         className={`${errPrice &&
+                                                                            (ce?.price == null ||
+                                                                                ce?.price == "" ||
+                                                                                ce?.price == 0)
+                                                                            ? "border-b border-red-500"
+                                                                            : errSurvivePrice &&
                                                                                 (ce?.price == null ||
                                                                                     ce?.price == "" ||
                                                                                     ce?.price == 0)
                                                                                 ? "border-b border-red-500"
-                                                                                : errSurvivePrice &&
-                                                                                    (ce?.price == null ||
-                                                                                        ce?.price == "" ||
-                                                                                        ce?.price == 0)
-                                                                                    ? "border-b border-red-500"
-                                                                                    : "border-b border-gray-200"
-                                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                                : "border-b border-gray-200"
+                                                                            }
+                                                                            ${ce?.price == 0 && 'border-red-500' || ce?.price == "" && 'border-red-500'} 
+                                                                            appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                                         onValueChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,
@@ -2201,14 +2092,10 @@ const Index = (props) => {
                                                                             "price"
                                                                         )}
                                                                         value={ce?.price}
-                                                                        allowNegative={false}
-                                                                        decimalScale={0}
-                                                                        isNumericString={true}
-                                                                        thousandSeparator=","
                                                                     />
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                    <NumericFormat
+                                                                    <InPutNumericFormat
                                                                         className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
                                                                         onValueChange={_HandleChangeChild.bind(
                                                                             this,
@@ -2217,26 +2104,23 @@ const Index = (props) => {
                                                                             "discount"
                                                                         )}
                                                                         value={ce?.discount}
-                                                                        allowNegative={false}
-                                                                        decimalScale={0}
-                                                                        isNumericString={true}
-                                                                        thousandSeparator=","
                                                                         isAllowed={(values) => {
-                                                                            const { value } = values;
-                                                                            if (+value > 100) {
-                                                                                isShow(
-                                                                                    "error",
-                                                                                    " % Chiết khấu chỉ được bé hơn hoặc bằng 100%"
-                                                                                );
+                                                                            const { floatValue } = values;
+                                                                            if (floatValue == 0) {
+                                                                                return true;
                                                                             }
-                                                                            return value < 101;
+                                                                            if (floatValue > 101) {
+                                                                                isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                                                                return false
+                                                                            }
+                                                                            return true
                                                                         }}
                                                                     />
                                                                 </div>
 
                                                                 <div className="col-span-1 text-right flex items-center justify-end  h-full p-0.5">
                                                                     <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                        {formatNumber(
+                                                                        {formatMoney(
                                                                             Number(ce?.price) *
                                                                             (1 - Number(ce?.discount) / 100)
                                                                         )}
@@ -2283,7 +2167,6 @@ const Index = (props) => {
                                                                         classNamePrefix="customDropdowTax"
                                                                     />
                                                                 </div>
-                                                                {/* <div>{ce?.thanhTien}</div> */}
                                                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                     {formatNumber(
                                                                         ce?.price *
@@ -2292,7 +2175,6 @@ const Index = (props) => {
                                                                         Number(ce?.quantity)
                                                                     )}
                                                                 </div>
-                                                                {/* <div>{ce?.note}</div> */}
                                                                 <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
                                                                     <input
                                                                         value={ce?.note}
@@ -2338,14 +2220,21 @@ const Index = (props) => {
                         <div className="col-span-2  flex items-center gap-2">
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
-                                <NumericFormat
+                                <InPutNumericFormat
                                     value={generalDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "generalDiscount")}
                                     className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
-                                    thousandSeparator=","
-                                    allowNegative={false}
-                                    decimalScale={0}
-                                    isNumericString={true}
+                                    isAllowed={(values) => {
+                                        const { floatValue } = values;
+                                        if (floatValue == 0) {
+                                            return true;
+                                        }
+                                        if (floatValue > 101) {
+                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                            return false
+                                        }
+                                        return true
+                                    }}
                                 />
                             </div>
                         </div>
@@ -2431,7 +2320,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongTien)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product = Number(childItem?.price) * Number(childItem?.quantity);
@@ -2452,7 +2341,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tienChietKhau)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
@@ -2477,7 +2366,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongTienSauCK)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
@@ -2500,7 +2389,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tienThue)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
@@ -2526,7 +2415,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongThanhTien)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =

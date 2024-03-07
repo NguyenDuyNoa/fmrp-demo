@@ -18,68 +18,48 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import ExpandableContent from "components/UI/more";
+import formatNumberConfig from '@/utils/helpers/formatnumber'
+import formatMoneyConfig from '@/utils/helpers/formatMoney'
+import useSetingServer from "@/hooks/useConfigNumber";
+import useFeature from "@/hooks/useConfigFeature";
 
 const PopupDetail = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [data, setData] = useState();
+
     const [onFetching, sOnFetching] = useState(false);
+
+    const dataSeting = useSetingServer();
+
+    const { dataMaterialExpiry, dataProductSerial, dataProductExpiry } = useFeature()
 
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
 
     const formatNumber = (num) => {
-        if (!num && num !== 0) return 0;
-        const roundedNum = Number(num).toFixed(2);
-        return parseFloat(roundedNum).toLocaleString("en");
+        return formatNumberConfig(+num, dataSeting)
+    };
+    const formatMoney = (num) => {
+        return formatMoneyConfig(+num, dataSeting)
     };
 
     const handleFetchingDetail = async () => {
         await Axios("GET", `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if (response && response?.data) {
-                var db = response?.data;
-
+                const db = response?.data;
                 setData(db);
                 sOnFetching(false);
             }
         });
     };
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetching(false);
-        });
-    };
 
     useEffect(() => {
         onFetching && handleFetchingDetail();
-        onFetching && _ServerFetching();
     }, [open]);
-
-    const scrollableDiv = document.querySelector(".customsroll");
-    scrollableDiv?.addEventListener("wheel", (event) => {
-        const deltaY = event.deltaY;
-        const top = scrollableDiv.scrollTop;
-        const height = scrollableDiv.scrollHeight;
-        const offset = scrollableDiv.offsetHeight;
-        const isScrolledToTop = top === 0;
-        const isScrolledToBottom = top === height - offset;
-
-        if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
-            event.preventDefault();
-        }
-    });
 
     return (
         <>
@@ -324,19 +304,19 @@ const PopupDetail = (props) => {
                                                         {formatNumber(e?.quantity)}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-right">
-                                                        {formatNumber(e?.price)}
+                                                        {formatMoney(e?.price)}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-center">
                                                         {e?.discount_percent_item + "%"}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-right">
-                                                        {formatNumber(e?.price_after_discount)}
+                                                        {formatMoney(e?.price_after_discount)}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-center">
                                                         {formatNumber(e?.tax_rate_item) + "%"}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 pr-2 text-right">
-                                                        {formatNumber(e?.total_amount)}
+                                                        {formatMoney(e?.total_amount)}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-left">
                                                         {e?.note_item != undefined ? (
@@ -402,27 +382,27 @@ const PopupDetail = (props) => {
                             <div className="col-span-3 space-y-2">
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_price)}
+                                        {formatMoney(data?.total_price)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_discount)}
+                                        {formatMoney(data?.total_discount)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_price_after_discount)}
+                                        {formatMoney(data?.total_price_after_discount)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_tax_price)}
+                                        {formatMoney(data?.total_tax_price)}
                                     </h3>
                                 </div>
                                 <div className="font-normal mr-2.5">
                                     <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                        {formatNumber(data?.total_amount)}
+                                        {formatMoney(data?.total_amount)}
                                     </h3>
                                 </div>
                             </div>

@@ -20,6 +20,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
+import useFeature from "@/hooks/useConfigFeature";
 
 const Popup_EditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
@@ -44,17 +45,13 @@ const Popup_EditDetail = (props) => {
 
     const [open, sOpen] = useState(false);
 
+    const { dataProductExpiry, dataProductSerial, dataMaterialExpiry } = useFeature()
+
     const [isKeySearch, sIsKeySearch] = useState("");
 
     const [isFetching, sIsFetching] = useState(initialFetch);
 
     const [errorQuantity, sErrorQuantity] = useState(false);
-
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
     const _ToggleModal = (e) => sOpen(e);
 
@@ -67,33 +64,6 @@ const Popup_EditDetail = (props) => {
 
         id && open && sErrorQuantity(false);
     }, [open]);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            setIsFetch({ onFetchingCondition: true });
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
-
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            setIsFetch({ onFetchingCondition: false });
-        });
-    };
-
-    useEffect(() => {
-        id && open && isFetching.onFetchingCondition && _ServerFetchingCondition();
-    }, [isFetching.onFetchingCondition, open]);
 
     const handleChange = async (type, value, idParent) => {
         let newData = [];

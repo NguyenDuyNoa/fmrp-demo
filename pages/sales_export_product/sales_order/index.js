@@ -42,6 +42,7 @@ import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComp
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -72,6 +73,8 @@ const Index = (props) => {
     const isShow = useToast();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkExport } = useActionRole(auth, "sales_product")
 
     const dataSeting = useSetingServer()
 
@@ -483,10 +486,10 @@ const Index = (props) => {
                 if (!err) {
                     let { isSuccess, message } = response.data;
 
-                    if (isSuccess !== false) {
-                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
+                    if (isSuccess) {
+                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}` || message);
                     } else {
-                        isShow("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message]}` || message);
                     }
                     _ServerFetching();
                     _ServerFetching_group();
@@ -523,7 +526,7 @@ const Index = (props) => {
                                         onClick={() => {
                                             if (role) {
                                                 router.push(routerSalesOrder.form)
-                                            } else if (auth?.orders?.is_create == 1) {
+                                            } else if (checkAdd) {
                                                 router.push(routerSalesOrder.form)
                                             }
                                             else {
@@ -634,7 +637,7 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
-                                                {(role == true || auth?.orders?.is_export == 1) ?
+                                                {(role == true || checkExport) ?
                                                     <div className={``}>
                                                         {initData.dataExcel?.length > 0 && (
                                                             <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
@@ -1017,7 +1020,7 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"salesOrder"}
+                nameModel={"sales_product"}
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}

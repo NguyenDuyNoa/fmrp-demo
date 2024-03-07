@@ -36,6 +36,7 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 registerLocale("vi", vi);
 
 
@@ -55,6 +56,9 @@ const Index = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
+    const { checkAdd, checkExport } = useActionRole(auth, "price_quote")
+    console.log("checkExport", checkExport);
 
     const initData = {
         data: [],
@@ -485,7 +489,7 @@ const Index = (props) => {
                                     onClick={() => {
                                         if (role) {
                                             router.push(routerPriceQuote.form)
-                                        } else if (auth?.quotes?.is_create == 1) {
+                                        } else if (checkAdd) {
                                             router.push(routerPriceQuote.form)
                                         }
                                         else {
@@ -590,9 +594,9 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                                {(role == true || auth?.quotes?.is_export == 1) ?
+                                                {(role == true || checkExport) ?
                                                     <div className={``}>
-                                                        {initData.dataExcel?.length > 0 && (
+                                                        {isState.dataExcel?.length > 0 && (
                                                             <ExcelFileComponent classBtn="!px-1" filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
                                                     </div>
                                                     :
@@ -835,7 +839,7 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"priceQuote"}
+                nameModel={"price_quote"}
                 title={TITLE_STATUS}
                 status={status}
                 subtitle={CONFIRMATION_OF_CHANGES}

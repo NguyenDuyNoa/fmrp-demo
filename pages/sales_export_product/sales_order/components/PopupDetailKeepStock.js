@@ -75,12 +75,6 @@ const Popup_DetailKeepStock = (props) => {
 
     const { isValue, sIsValue, onChangeValue } = useChangeValue(initialValues);
 
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
     const dataSeting = useSetingServer()
 
     const _ToggleModal = (e) => sOpen(e);
@@ -96,7 +90,7 @@ const Popup_DetailKeepStock = (props) => {
         return formatNumberConfig(+number, dataSeting);
     }
 
-    const feature = useFeature()
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
     const handleFetching = () => {
         Axios(
@@ -128,39 +122,6 @@ const Popup_DetailKeepStock = (props) => {
             }
         );
     };
-
-    // useEffect(() => {
-    //     JSON.stringify(dataMaterialExpiry) === "{}" &&
-    //         JSON.stringify(dataProductExpiry) === "{}" &&
-    //         JSON.stringify(dataProductSerial) === "{}" &&
-    //         setIsFetch({ onFetchingCondition: true });
-    // }, [
-    //     JSON.stringify(dataMaterialExpiry) === "{}",
-    //     JSON.stringify(dataProductExpiry) === "{}",
-    //     JSON.stringify(dataProductSerial) === "{}",
-    // ]);
-
-    // const _ServerFetchingCondition = () => {
-    //     Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-    //         if (!err) {
-    //             let data = response.data;
-    //             sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-    //             sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-    //             sDataProductSerial(data.find((x) => x.code == "product_serial"));
-    //         }
-    //         setIsFetch({ onFetchingCondition: false });
-    //     });
-    // };
-
-    // useEffect(() => {
-    //     id && open && isFetching.onFetchingCondition && _ServerFetchingCondition();
-    // }, [isFetching.onFetchingCondition, open]);
-    console.log("feature", feature);
-    useEffect(() => {
-        sDataMaterialExpiry(feature?.dataMaterialExpiry);
-        sDataProductExpiry(feature?.dataProductExpiry);
-        sDataProductSerial(feature?.dataProductSerial);
-    }, [isFetching.onFetchingCondition, open, feature]);
 
 
     const _ServerFetching_filter = () => {

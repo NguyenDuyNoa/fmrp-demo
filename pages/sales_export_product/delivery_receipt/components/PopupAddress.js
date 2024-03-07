@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import PopupEdit from "/components/UI/popup";
-import Loading from "@/components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import PhoneInput from "react-phone-input-2";

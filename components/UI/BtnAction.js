@@ -49,6 +49,7 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useSelector } from "react-redux";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -67,18 +68,13 @@ const BtnAction = React.memo((props) => {
 
     const _ToggleModal = (e) => setOpenAction(e);
 
-    const feature = useFeature()
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
     const dataSeting = useSetingServer()
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-    console.log("auth", auth);
+
+    const { checkDelete, checkEdit } = useActionRole(auth, props?.type);
 
     const confimDelete = (url) => {
         Axios("DELETE", url, {}, (err, response) => {
@@ -313,19 +309,14 @@ const BtnAction = React.memo((props) => {
     };
 
 
-
-    useEffect(() => {
-        sDataMaterialExpiry(feature?.dataMaterialExpiry);
-        sDataProductExpiry(feature?.dataProductExpiry);
-        sDataProductSerial(feature?.dataProductSerial);
-    }, [feature]);
-
     useEffect(() => {
         props.type == "order" && openAction && _ServerFetching_ValidatePayment();
     }, [openAction]);
 
 
     const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial, dataSeting };
+
+
 
     return (
         <div>
@@ -423,14 +414,11 @@ const BtnAction = React.memo((props) => {
                                     if (role) {
                                         handleClick()
                                     }
-                                    if (props?.type == "sales_product" && auth?.orders?.is_edit == 0) {
-                                        isShow("warning", WARNING_STATUS_ROLE);
-                                    }
-                                    else if (props?.type == "price_quote" && auth?.quotes?.is_edit == 0) {
-                                        isShow("warning", WARNING_STATUS_ROLE);
+                                    else if (checkEdit) {
+                                        handleClick()
                                     }
                                     else {
-                                        handleClick()
+                                        isShow("warning", WARNING_STATUS_ROLE);
                                     }
                                 }
                                 }
@@ -529,13 +517,11 @@ const BtnAction = React.memo((props) => {
                                             if (role) {
                                                 handleQueryId({ id: props?.id, status: true })
                                             }
-                                            if (props?.type == "sales_product" && auth?.orders?.is_delete == 0) {
-                                                isShow("warning", WARNING_STATUS_ROLE)
-                                            } else if (props?.type == "price_quote" && auth?.quotes?.is_delete == 0) {
-                                                isShow("warning", WARNING_STATUS_ROLE)
+                                            else if (checkDelete) {
+                                                handleQueryId({ id: props?.id, status: true })
                                             }
                                             else {
-                                                handleQueryId({ id: props?.id, status: true })
+                                                isShow("warning", WARNING_STATUS_ROLE)
                                             }
                                         }}
                                         className={` group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
