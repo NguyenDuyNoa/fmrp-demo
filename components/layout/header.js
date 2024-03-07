@@ -15,6 +15,7 @@ import Expirred from "components/UI/expired";
 import PopupModelTime from "components/UI/modelTime";
 const Header = () => {
     const { permissions_current: auth } = useSelector((state) => state.auth);
+
     const ListDanhMuc = [
         {
             title: "Khách hàng",
@@ -1012,6 +1013,7 @@ const Header = () => {
             title: "+ Thêm",
         },
     ];
+
     const dataPstWH = useSelector((state) => state.trangthai);
     // Khai báo biến state
     const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
