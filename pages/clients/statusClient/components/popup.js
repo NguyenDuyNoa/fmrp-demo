@@ -17,161 +17,111 @@ const Toast = Swal.mixin({
 });
 import PopupEdit from "/components/UI/popup";
 import Select, { components } from "react-select";
+import useToast from "@/hooks/useToast";
 
 const Popup_status = (props) => {
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
-    const [onSending, sOnSending] = useState(false);
-    const [brandpOpt, sListBrand] = useState([]);
-    const [name, sName] = useState("");
-    const [color, sColor] = useState("");
-    const [errInput, sErrInput] = useState(false);
-    const [errInputColor, sErrInputColor] = useState(false);
+    const isShow = useToast()
 
-    const [errInputBr, sErrInputBr] = useState(false);
-    const [valueBr, sValueBr] = useState([]);
+    const initilaState = {
+        open: false,
+        onSending: false,
+        listBr: [],
+        valueBr: [],
+        name: "",
+        color: "",
+        errInput: false,
+        errInputBr: false,
+        errInputName: false,
+        errInputColor: false,
+    }
 
-    useEffect(() => {
-        sErrInput(false);
-        sErrInputBr(false);
-        sErrInputColor(false);
-        sName(props.name ? props.name : "");
-        sColor(props.color ? props.color : "");
-        sListBrand(
-            props.listBr
-                ? props.listBr && [
-                      ...props.listBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
-                : []
-        );
-        sValueBr(
-            props.sValueBr
-                ? props.listBr && [
-                      ...props.sValueBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
-                : []
-        );
-    }, [open]);
+    const [isState, sIsState] = useState(initilaState)
 
-    const branch_id = valueBr?.map((e) => {
-        return e?.value;
-    });
-
-    const _HandleChangeInput = (type, value) => {
-        if (type == "name") {
-            sName(value.target?.value);
-        } else if (type == "valueBr") {
-            sValueBr(value);
-        } else if (type == "color") {
-            sColor(value.target?.value);
-        }
-    };
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
 
     useEffect(() => {
-        sErrInput(false);
-        sErrInputColor(false);
-    }, [name.length > 0, color.length > 0]);
-    useEffect(() => {
-        sErrInputBr(false);
-    }, [branch_id?.length > 0]);
+        queryState({
+            listBr: props.listBr || [],
+            name: props.name ? props.name : "",
+            color: props.color ? props.color : "",
+            valueBr: props.sValueBr ? props.sValueBr?.map((e) => {
+                return {
+                    label: e.name,
+                    value: e.id
+                };
+            }) : []
+        });
+    }, [isState.open]);
 
     const _ServerSending = () => {
         const id = props.id;
-        console.log(id);
-        var data = new FormData();
-        data.append("name", name);
-        data.append("color", color);
-        Axios(
-            "POST",
-            `${
-                props.id
-                    ? `/api_web/api_client/status/${id}?csrf_protection=true`
-                    : "/api_web/api_client/status?csrf_protection=true"
-            }`,
+        let data = new FormData();
+        data.append("name", isState.name);
+        data.append("color", isState.color);
+        data.append("branch_id", isState.valueBr?.map((e) => {
+            return e?.value;
+        }))
+        Axios("POST", `${props.id ? `/api_web/api_client/status/${id}?csrf_protection=true` : "/api_web/api_client/status?csrf_protection=true"}`,
             {
-                data: {
-                    name: name,
-                    color: color,
-                    branch_id: branch_id,
-                },
+                data: data,
                 headers: { "Content-Type": "multipart/form-data" },
             },
             (err, response) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
-                        sErrInput(false);
-                        sErrInputColor(false);
-                        sName("");
-                        sColor("");
-                        sErrInputBr(false);
-                        sValueBr([]);
+                        isShow("success", props.dataLang[message] || message);
+                        sIsState(initilaState);
                         props.onRefresh && props.onRefresh();
-                        sOpen(false);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", props.dataLang[message] || message);
                     }
                 }
-                sOnSending(false);
+                queryState({ onSending: false });
             }
         );
     };
 
     useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
+        isState.onSending && _ServerSending();
+    }, [isState.onSending]);
+
+    useEffect(() => {
+        isState.name != "" && queryState({ errInputName: false });
+    }, [isState.name])
+
+    useEffect(() => {
+        isState.color != "" && queryState({ errInputColor: false });
+    }, [isState.color])
+
+    useEffect(() => {
+        isState.valueBr?.length > 0 && queryState({ errInputBr: false });
+    }, [isState.valueBr])
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (name.length == 0 || branch_id?.length == 0 || color.length == 0) {
-            name.length == 0 && sErrInput(true);
-            branch_id?.length == 0 && sErrInputBr(true);
-            color.length == 0 && sErrInputColor(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+        if (isState.name == "" || isState.valueBr?.length == 0 || isState.color == "") {
+            isState.name?.length == "" && queryState({ errInputName: true });
+            isState.valueBr?.length == 0 && queryState({ errInputBr: true });
+            isState.color == "" && queryState({ errInputColor: true });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
-            sOnSending(true);
+            queryState({ onSending: true });
         }
     };
     return (
         <PopupEdit
-            title={
-                props.id
-                    ? `${props.dataLang?.client_group_statusedit}`
-                    : `${props.dataLang?.client_group_statusadd}`
-            }
-            button={
-                props.id ? (
-                    <IconEdit />
-                ) : (
-                    `${props.dataLang?.branch_popup_create_new}`
-                )
-            }
-            onClickOpen={_ToggleModal.bind(this, true)}
-            open={open}
-            onClose={_ToggleModal.bind(this, false)}
+            title={props.id ? `${props.dataLang?.client_group_statusedit}` : `${props.dataLang?.client_group_statusadd}`}
+            button={props.id ? (<IconEdit />) : (`${props.dataLang?.branch_popup_create_new}`)}
+            onClickOpen={() => queryState({ open: true })}
+            open={isState.open}
+            onClose={() => queryState({ open: false })}
             classNameBtn={props.className}
         >
             <div className="w-96 mt-4">
@@ -183,17 +133,16 @@ const Popup_status = (props) => {
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
-                                value={name}
-                                onChange={_HandleChangeInput.bind(this, "name")}
+                                value={isState.name}
+                                onChange={(e) => queryState({ name: e.target.value })}
                                 name="fname"
                                 type="text"
-                                className={`${
-                                    errInput
-                                        ? "border-red-500"
-                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
+                                className={`${isState.errInputName
+                                    ? "border-red-500"
+                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
                             />
-                            {errInput && (
+                            {isState.errInputName && (
                                 <label className="mb-2  text-[14px] text-red-500">
                                     {props.dataLang?.client_group_please_name}
                                 </label>
@@ -206,13 +155,13 @@ const Popup_status = (props) => {
                         <Select
                             closeMenuOnSelect={false}
                             placeholder={props.dataLang?.client_list_brand}
-                            options={brandpOpt}
+                            options={isState.listBr}
                             isSearchable={true}
-                            onChange={_HandleChangeInput.bind(this, "valueBr")}
+                            onChange={(e) => queryState({ valueBr: e })}
                             LoadingIndicator
                             isMulti
                             noOptionsMessage={() => "Không có dữ liệu"}
-                            value={valueBr}
+                            value={isState.valueBr}
                             maxMenuHeight="200px"
                             isClearable={true}
                             menuPortalTarget={document.body}
@@ -227,12 +176,6 @@ const Popup_status = (props) => {
                                     zIndex: 9999,
                                     position: "absolute",
                                 }),
-                                // control: base => ({
-                                //   ...base,
-                                //   border: '1px solid #d0d5dd',
-                                //   boxShadow: 'none',
-
-                                // })  ,
                                 control: (provided) => ({
                                     ...provided,
                                     border: "1px solid #d0d5dd",
@@ -242,13 +185,12 @@ const Popup_status = (props) => {
                                     },
                                 }),
                             }}
-                            className={`${
-                                errInputBr
-                                    ? "border-red-500"
-                                    : "border-transparent"
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                            className={`${isState.errInputBr
+                                ? "border-red-500"
+                                : "border-transparent"
+                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                         />
-                        {errInputBr && (
+                        {isState.errInputBr && (
                             <label className="mb-2  text-[14px] text-red-500">
                                 {props.dataLang?.client_list_bran}
                             </label>
@@ -259,20 +201,16 @@ const Popup_status = (props) => {
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
-                                value={color}
-                                onChange={_HandleChangeInput.bind(
-                                    this,
-                                    "color"
-                                )}
+                                value={isState.color}
+                                onChange={(e) => queryState({ color: e.target.value })}
                                 name="color"
                                 type="color"
-                                className={`${
-                                    errInputColor
-                                        ? "border-red-500 min-h-[50px]"
-                                        : "focus:border-[#92BFF7] min-h-[50px] rounded-lg border-[#d0d5dd]"
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
+                                className={`${isState.errInputColor
+                                    ? "border-red-500 min-h-[50px]"
+                                    : "focus:border-[#92BFF7] min-h-[50px] rounded-lg border-[#d0d5dd]"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
                             />
-                            {errInputColor && (
+                            {isState.errInputColor && (
                                 <label className="mb-2  text-[14px] text-red-500">
                                     {props.dataLang?.client_group_please_color}
                                 </label>
@@ -281,7 +219,7 @@ const Popup_status = (props) => {
                         <div className="text-right mt-5 space-x-2">
                             <button
                                 type="button"
-                                onClick={_ToggleModal.bind(this, false)}
+                                onClick={() => queryState({ open: false })}
                                 className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
                             >
                                 {props.dataLang?.branch_popup_exit}

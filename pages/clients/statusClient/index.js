@@ -15,7 +15,7 @@ import {
 import "react-phone-input-2/lib/style.css";
 
 import Loading from "@/components/UI/loading";
-import Popup_status from "@/components/UI/popup";
+import Popup_status from "./components/popup";
 import BtnAction from "@/components/UI/BtnAction";
 import Pagination from "@/components/UI/pagination";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
@@ -97,8 +97,6 @@ const Index = (props) => {
             }
         );
     };
-
-
 
     useEffect(() => {
         (isState.onFetching && _ServerFetching())
@@ -355,11 +353,11 @@ const Index = (props) => {
                                                         Không tìm thấy các mục
                                                     </h1>
                                                     <div className="flex items-center justify-around mt-6 ">
-                                                        <Popup_status
+                                                        {/* <Popup_status
                                                             onRefresh={_ServerFetching.bind(this)}
                                                             dataLang={dataLang}
                                                             className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                                        />
+                                                        /> */}
                                                     </div>
                                                 </div>
                                             </div>

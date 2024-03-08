@@ -97,6 +97,7 @@ const BtnAction = React.memo((props) => {
                             "recall",
                             "exportToOther",
                             "client_customers",
+                            "client_group"
                         ];
 
                         checkType.includes(props.type) &&
@@ -117,6 +118,7 @@ const BtnAction = React.memo((props) => {
         const initialApiDelete = {
             client_customers: `/api_web/api_client/client/${props.id}?csrf_protection=true`,
             client_status: `/api_web/api_client/status/${props.id}?csrf_protection=true`,
+            client_group: `/api_web/Api_client/group/${props.id}?csrf_protection=true`,
             price_quote: `/api_web/Api_quotation/quotation/${props.id}?csrf_protection=true`,
             sales_product: `/api_web/Api_sale_order/saleOrder/${props.id}?csrf_protection=true`,
             deliveryReceipt: `/api_web/api_delivery/delete/${props.id}?csrf_protection=true`,
@@ -323,7 +325,7 @@ const BtnAction = React.memo((props) => {
     return (
         <div>
             {
-                ["client_customers", 'client_status'].includes(props?.type) ?
+                ["client_customers", 'client_status', 'client_group'].includes(props?.type) ?
                     <button
                         type="button"
                         onClick={() => handleQueryId({ id: props?.id, status: true })}

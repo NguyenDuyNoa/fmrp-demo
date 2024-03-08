@@ -494,7 +494,7 @@ const Index = (props) => {
                 ? generalTax
                 : {
                     label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                    value: value?.e?.tax_id ? value?.e?.tax_id : "0",
+                    value: value?.e?.tax_id_item ? value?.e?.tax_id_item : "0",
                     tax_rate: value?.e?.tax_rate ? value?.e?.tax_rate : "0",
                 },
             note: value?.e?.note_item,
@@ -744,7 +744,7 @@ const Index = (props) => {
             </div>
         );
     };
-
+    console.log("listData", listData);
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const checkChildItem = (childItem, property) => {
@@ -852,7 +852,7 @@ const Index = (props) => {
                     let { isSuccess, message } = response.data;
 
                     if (isSuccess) {
-                        isShow("success", `${dataLang[message] || message}`);
+                        isShow("success", `${dataLang[message] || message}` || message);
 
                         resetAllStates();
 
@@ -860,7 +860,7 @@ const Index = (props) => {
 
                         router.push(routerReturnSales.home);
                     } else {
-                        isShow("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message] || message}` || message);
                     }
                 }
 

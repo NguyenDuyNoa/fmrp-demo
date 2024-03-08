@@ -1,39 +1,39 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-
-import PopupEdit from "/components/UI/popup";
+import { debounce } from "lodash";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import Pagination from "/components/UI/pagination";
-import ReactExport from "react-data-export";
 
 import {
     Edit as IconEdit,
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Grid6 as IconExcel,
-    Refresh2,
+    Grid6,
 } from "iconsax-react";
-import Swal from "sweetalert2";
 import "react-phone-input-2/lib/style.css";
-import Select, { components } from "react-select";
-import { da } from "date-fns/locale";
+import { components } from "react-select";
 import Popup_groupKh from "./components/popup";
-import { useSelector } from "react-redux";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import useStatusExprired from "@/hooks/useStatusExprired";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { debounce } from "lodash";
+import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import BtnAction from "@/components/UI/BtnAction";
 
 const Index = (props) => {
     const router = useRouter();
@@ -44,46 +44,46 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const { isOpen, isId, handleQueryId } = useToggle();
+    const initilaState = {
+        data: [],
+        data_ex: [],
+        keySearch: "",
+        onFetching: false,
+        onFetchingBranch: false,
+        idBranch: [],
+        listBr: [],
+    }
+    const [isState, sIsState] = useState(initilaState)
 
-    const [data, sData] = useState([]);
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
 
-    const [onFetching, sOnFetching] = useState(true);
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const [data_ex, sData_ex] = useState([]);
-
-    const [keySearch, sKeySearch] = useState("");
+    const { checkExport, checkEdit, checkAdd } = useActionRole(auth, 'client_group');
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_client/group?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_client/group?csrf_protection=true`,
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
+                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sData(rResult);
+                    const { rResult, output } = response.data;
                     updateTotalItems(output);
-                    sData_ex(rResult);
+                    queryState({ data: rResult, data_ex: rResult, onFetching: false });
                 }
-                sOnFetching(false);
             }
         );
     };
-    const [listBr, sListBr] = useState();
     const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -91,77 +91,28 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sListBr(rResult);
+                    const { rResult } = response.data;
+                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) || [], onFetchingBranch: false });
                 }
-                sOnFetching(false);
             }
         );
-    };
-    const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
-    const [idBranch, sIdBranch] = useState(null);
-    const onchang_filterBr = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        }
-    };
+    }
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_brand());
-    }, [onFetching]);
+        (isState.onFetching && _ServerFetching())
+    }, [isState.onFetching]);
 
     useEffect(() => {
-        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
-    }, [limit, router.query?.page, idBranch]);
+        isState.onFetchingBranch && _ServerFetching_brand()
+    }, [isState.onFetchingBranch]);
 
-    const handleDelete = async () => {
-        Axios("DELETE", `/api_web/Api_client/group/${isId}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { isSuccess, message } = response.data;
-                if (isSuccess) {
-                    isShow("success", dataLang[message]);
-                } else {
-                    isShow("error", dataLang[message]);
-                }
-            }
-            _ServerFetching();
-        });
-        handleQueryId({ status: false });
-    };
+    useEffect(() => {
+        queryState({ onFetching: true })
+    }, [limit, router.query?.page, isState.idBranch]);
 
-    // const handleDelete = (event) => {
-    //     Swal.fire({
-    //         title: `${dataLang?.aler_ask}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#296dc1",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: `${dataLang?.aler_yes}`,
-    //         cancelButtonText: `${dataLang?.aler_cancel}`,
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             const id = event;
-
-    //             Axios("DELETE", `/api_web/Api_client/group/${id}?csrf_protection=true`, {}, (err, response) => {
-    //                 if (!err) {
-    //                     var { isSuccess, message } = response.data;
-    //                     if (isSuccess) {
-    //                         Toast.fire({
-    //                             icon: "success",
-    //                             title: dataLang[message],
-    //                         });
-    //                     } else {
-    //                         Toast.fire({
-    //                             icon: "error",
-    //                             title: dataLang[message],
-    //                         });
-    //                     }
-    //                 }
-    //                 _ServerFetching();
-    //             });
-    //         }
-    //     });
-    // };
+    useEffect(() => {
+        queryState({ onFetchingBranch: true })
+    }, [limit, router.query?.page]);
 
     const paginate = (pageNumber) => {
         router.push({
@@ -171,15 +122,9 @@ const Index = (props) => {
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value);
+        queryState({ keySearch: value });
         router.replace("/clients/groups");
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
-        sOnFetching(true);
+        queryState({ onFetching: true });
     }, 500
     )
     const multiDataSet = [
@@ -218,7 +163,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: data_ex?.map((e) => [
+            data: isState.data_ex?.map((e) => [
                 { value: `${e.id}`, style: { numFmt: "0" } },
                 { value: `${e.name ? e.name : ""}` },
                 { value: `${e.color ? e.color : ""}` },
@@ -228,9 +173,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
 
     return (
         <React.Fragment>
@@ -253,12 +195,23 @@ const Index = (props) => {
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E]">{dataLang?.client_groupuser}</h2>
                                 <div className="flex justify-end items-center">
-                                    <Popup_groupKh
-                                        listBr={listBr}
-                                        onRefresh={_ServerFetching.bind(this)}
-                                        dataLang={dataLang}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    />
+
+                                    {role == true || checkAdd ?
+                                        <Popup_groupKh
+                                            listBr={isState.listBr}
+                                            onRefresh={_ServerFetching.bind(this)}
+                                            dataLang={dataLang}
+                                            className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        /> :
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                isShow("warning", WARNING_STATUS_ROLE);
+                                            }}
+                                            className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        >{dataLang?.branch_popup_create_new}
+                                        </button>
+                                    }
                                 </div>
                             </div>
 
@@ -273,11 +226,11 @@ const Index = (props) => {
                                                     colSpan={1}
                                                 />
                                                 <SelectComponent
-                                                    options={listBr_filter}
-                                                    onChange={onchang_filterBr.bind(this, "branch")}
-                                                    value={idBranch}
+                                                    options={isState.listBr}
+                                                    onChange={(e) => queryState({ idBranch: e })}
+                                                    value={isState.idBranch}
                                                     placeholder={dataLang?.client_list_filterbrand}
-                                                    colSpan={idBranch?.length > 1 ? 3 : 1}
+                                                    colSpan={2}
                                                     components={{ MultiValue }}
                                                     isMulti={true}
                                                     closeMenuOnSelect={false}
@@ -286,15 +239,24 @@ const Index = (props) => {
                                         </div>
                                         <div className="col-span-2">
                                             <div className="flex space-x-2 items-center justify-end">
-                                                <OnResetData sOnFetching={sOnFetching} />
-                                                {data_ex?.length > 0 && (
-                                                    <ExcelFileComponent
-                                                        multiDataSet={multiDataSet}
-                                                        filename="Nhóm khách hàng"
-                                                        title="Nkh"
-                                                        dataLang={dataLang}
-                                                    />
-                                                )}
+                                                <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                                {(role == true || checkExport) ?
+                                                    <div className={``}>
+                                                        {isState.data_ex?.length > 0 && (
+                                                            <ExcelFileComponent
+                                                                multiDataSet={multiDataSet}
+                                                                filename="Nhóm khách hàng"
+                                                                title="Nkh"
+                                                                dataLang={dataLang}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    :
+                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                    </button>
+                                                }
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
@@ -319,12 +281,12 @@ const Index = (props) => {
                                                 {dataLang?.branch_popup_properties}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {isState.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : isState.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
-                                                    {data?.map((e) => (
+                                                    {isState.data?.map((e) => (
                                                         <div
                                                             className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
                                                             key={e.id.toString()}
@@ -351,25 +313,24 @@ const Index = (props) => {
                                                                 </span>
                                                             </h6>
 
-                                                            <div className="space-x-2 w-[20%] text-center">
+                                                            <div className="space-x-2 w-[20%] text-center flex items-center justify-center">
                                                                 <Popup_groupKh
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
-                                                                    listBr={listBr}
+                                                                    listBr={isState.listBr}
                                                                     sValueBr={e.branch}
                                                                     dataLang={dataLang}
                                                                     name={e.name}
                                                                     color={e.color}
                                                                     id={e.id}
                                                                 />
-                                                                <button
-                                                                    onClick={() =>
-                                                                        handleQueryId({ id: e.id, status: true })
-                                                                    }
-                                                                    className="xl:text-base text-xs "
-                                                                >
-                                                                    <IconDelete color="red" />
-                                                                </button>
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGroup={() => { }}
+                                                                    dataLang={dataLang}
+                                                                    id={e?.id}
+                                                                    type="client_group"
+                                                                />
                                                             </div>
                                                         </div>
                                                     ))}
@@ -398,7 +359,7 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
                                     {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
@@ -416,50 +377,9 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
-            <PopupConfim
-                type="warning"
-                dataLang={dataLang}
-                title={TITLE_DELETE}
-                subtitle={CONFIRM_DELETION}
-                isOpen={isOpen}
-                save={handleDelete}
-                cancel={() => handleQueryId({ status: false })}
-            />
+
         </React.Fragment>
     );
 };
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 3;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 export default Index;

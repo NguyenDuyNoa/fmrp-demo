@@ -13,7 +13,6 @@ import {
     Grid6,
 } from "iconsax-react";
 import { Tooltip } from "react-tippy";
-import { components } from "react-select";
 
 import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
@@ -84,7 +83,7 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : 0 },
         });
-        queryState({ onFetchingBranch: true })
+        queryState({ onFetchingBranch: true, onFetchingSelectCt: true });
     }, []);
 
     const _ServerFetching = () => {
@@ -185,8 +184,8 @@ const Index = (props) => {
     useEffect(() => {
         (isState.onFetching && _ServerFetching())
     }, [isState.onFetching]);
-    useEffect(() => {
 
+    useEffect(() => {
         (isState.onFetchingBranch && _ServerFetching_brand());
     }, [isState.onFetchingBranch]);
 
