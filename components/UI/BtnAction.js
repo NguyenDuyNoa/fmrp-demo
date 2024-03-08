@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "services/axios";
 
 import { BiEdit } from "react-icons/bi";
-import { ArrowDown2, Box1, BoxSearch } from "iconsax-react";
+import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
 import pdfMake from "pdfmake/build/pdfmake";
 import { VscFilePdf } from "react-icons/vsc";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -81,7 +81,6 @@ const BtnAction = React.memo((props) => {
             if (!err) {
                 if (response && response.data) {
                     let { isSuccess, message } = response.data;
-
                     if (isSuccess) {
                         isShow("success", props.dataLang[message] || message);
 
@@ -97,6 +96,7 @@ const BtnAction = React.memo((props) => {
                             "productsWarehouse",
                             "recall",
                             "exportToOther",
+                            "client_customers",
                         ];
 
                         checkType.includes(props.type) &&
@@ -115,6 +115,8 @@ const BtnAction = React.memo((props) => {
     const handleDelete = () => {
         //Báo giá
         const initialApiDelete = {
+            client_customers: `/api_web/api_client/client/${props.id}?csrf_protection=true`,
+            client_status: `/api_web/api_client/status/${props.id}?csrf_protection=true`,
             price_quote: `/api_web/Api_quotation/quotation/${props.id}?csrf_protection=true`,
             sales_product: `/api_web/Api_sale_order/saleOrder/${props.id}?csrf_protection=true`,
             deliveryReceipt: `/api_web/api_delivery/delete/${props.id}?csrf_protection=true`,
@@ -320,232 +322,244 @@ const BtnAction = React.memo((props) => {
 
     return (
         <div>
-            <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className}>
-                        <span>{props.dataLang?.btn_action || "btn_action"}</span>
-                        <ArrowDown2 size={12} />
+            {
+                ["client_customers", 'client_status'].includes(props?.type) ?
+                    <button
+                        type="button"
+                        onClick={() => handleQueryId({ id: props?.id, status: true })}
+                        className="xl:text-base text-xs "
+                    >
+                        <Trash color="red" />
                     </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit`}
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                open={openAction || isOpenValidate}
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-b-xl flex flex-col overflow-hidden">
-                        {props.type == "order" && (
-                            <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded">
-                                <BiEdit
-                                    size={20}
-                                    className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                />
-                                <Popup_TableValidateEdit
-                                    {...props}
-                                    {...shareProps}
-                                    isOpenValidate={isOpenValidate}
-                                    sIsOpenValidate={sIsOpenValidate}
-                                    data={isData}
-                                    className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
-                                />
-                            </div>
-                        )}
-                        {props.type == "serviceVoucher" && (
-                            <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full">
-                                <BiEdit
-                                    size={20}
-                                    className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                />
-                                <Popup_servie
-                                    status_pay={props?.status_pay}
-                                    onRefreshGr={props.onRefreshGr}
-                                    onClick={() => handleClick()}
-                                    onRefresh={props.onRefresh}
-                                    dataLang={props.dataLang}
-                                    id={props?.id}
-                                    {...shareProps}
-                                    className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5"
-                                >
-                                    {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                                </Popup_servie>
-                            </div>
-                        )}
 
-                        {props.type == "receipts" && (
-                            <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
-                                <BiEdit
-                                    size={20}
-                                    className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                />
-                                <Popup_dspt
-                                    onRefresh={props.onRefresh}
-                                    dataLang={props.dataLang}
-                                    id={props?.id}
-                                    className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
-                                >
-                                    {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                                </Popup_dspt>
-                            </div>
-                        )}
-                        {props.type == "payment" && (
-                            <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
-                                <BiEdit
-                                    size={20}
-                                    className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                />
-                                <Popup_dspc
-                                    onRefresh={props.onRefresh}
-                                    dataLang={props.dataLang}
-                                    id={props?.id}
-                                    className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
-                                >
-                                    {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                                </Popup_dspc>
-                            </div>
-                        )}
-                        {!["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
-                            <button
-                                onClick={() => {
-                                    if (role) {
-                                        handleClick()
-                                    }
-                                    else if (checkEdit) {
-                                        handleClick()
-                                    }
-                                    else {
-                                        isShow("warning", WARNING_STATUS_ROLE);
-                                    }
-                                }
-                                }
-                                className={`
-                                group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
-                            >
-                                <BiEdit
-                                    size={20}
-                                    className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                />
-                                <p className="group-hover:text-sky-500">
-                                    {props.dataLang?.btn_table_edit || "btn_table_edit"}
-                                </p>
+                    :
+                    <Popup
+                        trigger={
+                            <button className={`flex space-x-1 items-center ` + props.className}>
+                                <span>{props.dataLang?.btn_action || "btn_action"}</span>
+                                <ArrowDown2 size={12} />
                             </button>
-                        )
                         }
-                        {["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(
-                            props?.type
-                        ) ? (
-                            <Popup_Pdf
-                                dataLang={props.dataLang}
-                                props={props}
-                                openAction={openAction}
-                                setOpenAction={setOpenAction}
-                                {...shareProps}
-                            />
-                        ) : (
-                            <FilePDF
-                                {...shareProps}
-                                props={props}
-                                openAction={openAction}
-                                setOpenAction={setOpenAction}
-                            />
-                        )}
-                        {
-                            props.type == "sales_product" && <>
-                                {(role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
-                                    <Popup_KeepStock {...props} {...shareProps} />
-                                    :
-                                    <button
-                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
-                                        type="button"
-                                        className={`${props.type == "sales_product" ? "" : "justify-center"
-                                            } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
-                                    >
-                                        <Box1
+                        arrow={false}
+                        position="bottom right"
+                        className={`dropdown-edit`}
+                        keepTooltipInside={props.keepTooltipInside}
+                        closeOnDocumentClick
+                        nested
+                        open={openAction || isOpenValidate}
+                        onOpen={_ToggleModal.bind(this, true)}
+                        onClose={_ToggleModal.bind(this, false)}
+                    >
+                        <div className="w-auto rounded">
+                            <div className="bg-white rounded-b-xl flex flex-col overflow-hidden">
+                                {props.type == "order" && (
+                                    <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded">
+                                        <BiEdit
                                             size={20}
-                                            className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
+                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                                         />
-                                        <p className="group-hover:text-orange-500 pr-4">
-                                            {props.dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
-                                        </p>
-                                    </button>
-                                }
-                            </>
-                        }
+                                        <Popup_TableValidateEdit
+                                            {...props}
+                                            {...shareProps}
+                                            isOpenValidate={isOpenValidate}
+                                            sIsOpenValidate={sIsOpenValidate}
+                                            data={isData}
+                                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
+                                        />
+                                    </div>
+                                )}
+                                {props.type == "serviceVoucher" && (
+                                    <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full">
+                                        <BiEdit
+                                            size={20}
+                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <Popup_servie
+                                            status_pay={props?.status_pay}
+                                            onRefreshGr={props.onRefreshGr}
+                                            onClick={() => handleClick()}
+                                            onRefresh={props.onRefresh}
+                                            dataLang={props.dataLang}
+                                            id={props?.id}
+                                            {...shareProps}
+                                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5"
+                                        >
+                                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                                        </Popup_servie>
+                                    </div>
+                                )}
 
-                        {props.type == "sales_product" && <>
-                            {
-                                (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
-                                    <Popup_DetailKeepStock {...props} {...shareProps} />
-                                    :
-                                    <button
-                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
-                                        type="button"
-                                        className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
-                                        <BoxSearch
+                                {props.type == "receipts" && (
+                                    <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
+                                        <BiEdit
                                             size={20}
-                                            className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
+                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                                         />
-                                        <p className="group-hover:text-amber-500 pr-2.5">
-                                            {props.dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
-                                        </p>
-                                    </button>
-                            }
-                        </>}
-                        {props.type == "order" ? (
-                            <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
-                                <RiDeleteBin6Line
-                                    size={20}
-                                    className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                                />
-                                <Popup_TableValidateDelete
-                                    {...shareProps}
-                                    isOpen={isOpen}
-                                    handleQueryId={handleQueryId}
-                                    {...props}
-                                    className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
-                                />
-                            </div>
-                        ) : (
-                            <>
-                                {
+                                        <Popup_dspt
+                                            onRefresh={props.onRefresh}
+                                            dataLang={props.dataLang}
+                                            id={props?.id}
+                                            className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
+                                        >
+                                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                                        </Popup_dspt>
+                                    </div>
+                                )}
+                                {props.type == "payment" && (
+                                    <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
+                                        <BiEdit
+                                            size={20}
+                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <Popup_dspc
+                                            onRefresh={props.onRefresh}
+                                            dataLang={props.dataLang}
+                                            id={props?.id}
+                                            className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
+                                        >
+                                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                                        </Popup_dspc>
+                                    </div>
+                                )}
+                                {!["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
                                     <button
                                         onClick={() => {
                                             if (role) {
-                                                handleQueryId({ id: props?.id, status: true })
+                                                handleClick()
                                             }
-                                            else if (checkDelete) {
-                                                handleQueryId({ id: props?.id, status: true })
+                                            else if (checkEdit) {
+                                                handleClick()
                                             }
                                             else {
-                                                isShow("warning", WARNING_STATUS_ROLE)
+                                                isShow("warning", WARNING_STATUS_ROLE);
                                             }
-                                        }}
-                                        className={` group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
-                                            } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                        }
+                                        }
+                                        className={`
+                                group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                     >
+                                        <BiEdit
+                                            size={20}
+                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <p className="group-hover:text-sky-500">
+                                            {props.dataLang?.btn_table_edit || "btn_table_edit"}
+                                        </p>
+                                    </button>
+                                )
+                                }
+                                {["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(
+                                    props?.type
+                                ) ? (
+                                    <Popup_Pdf
+                                        dataLang={props.dataLang}
+                                        props={props}
+                                        openAction={openAction}
+                                        setOpenAction={setOpenAction}
+                                        {...shareProps}
+                                    />
+                                ) : (
+                                    <FilePDF
+                                        {...shareProps}
+                                        props={props}
+                                        openAction={openAction}
+                                        setOpenAction={setOpenAction}
+                                    />
+                                )}
+                                {
+                                    props.type == "sales_product" && <>
+                                        {(role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
+                                            <Popup_KeepStock {...props} {...shareProps} />
+                                            :
+                                            <button
+                                                onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                type="button"
+                                                className={`${props.type == "sales_product" ? "" : "justify-center"
+                                                    } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                            >
+                                                <Box1
+                                                    size={20}
+                                                    className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
+                                                />
+                                                <p className="group-hover:text-orange-500 pr-4">
+                                                    {props.dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
+                                                </p>
+                                            </button>
+                                        }
+                                    </>
+                                }
+
+                                {props.type == "sales_product" && <>
+                                    {
+                                        (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
+                                            <Popup_DetailKeepStock {...props} {...shareProps} />
+                                            :
+                                            <button
+                                                onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                type="button"
+                                                className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                                                <BoxSearch
+                                                    size={20}
+                                                    className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
+                                                />
+                                                <p className="group-hover:text-amber-500 pr-2.5">
+                                                    {props.dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
+                                                </p>
+                                            </button>
+                                    }
+                                </>}
+                                {props.type == "order" ? (
+                                    <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                         <RiDeleteBin6Line
                                             size={20}
                                             className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                                         />
-                                        <p className="group-hover:text-[#f87171]">
-                                            {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                                        </p>
-                                    </button>
-                                }
-                            </>
+                                        <Popup_TableValidateDelete
+                                            {...shareProps}
+                                            isOpen={isOpen}
+                                            handleQueryId={handleQueryId}
+                                            {...props}
+                                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        {
+                                            <button
+                                                onClick={() => {
+                                                    if (role) {
+                                                        handleQueryId({ id: props?.id, status: true })
+                                                    }
+                                                    else if (checkDelete) {
+                                                        handleQueryId({ id: props?.id, status: true })
+                                                    }
+                                                    else {
+                                                        isShow("warning", WARNING_STATUS_ROLE)
+                                                    }
+                                                }}
+                                                className={` group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
+                                                    } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                            >
+                                                <RiDeleteBin6Line
+                                                    size={20}
+                                                    className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
+                                                />
+                                                <p className="group-hover:text-[#f87171]">
+                                                    {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
+                                                </p>
+                                            </button>
+                                        }
+                                    </>
 
-                        )}
-                    </div>
-                </div>
-            </Popup >
-
+                                )}
+                            </div>
+                        </div>
+                    </Popup >
+            }
             <PopupConfim
                 dataLang={props.dataLang}
                 type="warning"
+                nameModel={props?.type}
                 title={TITLE_DELETE}
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}

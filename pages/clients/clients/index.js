@@ -10,18 +10,20 @@ import {
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    Refresh2,
+    Grid6,
 } from "iconsax-react";
 import { Tooltip } from "react-tippy";
-import Select, { components } from "react-select";
+import { components } from "react-select";
 
 import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
 
 import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import Pagination from "@/components/UI/pagination";
 import ImageErrors from "@/components/UI/imageErrors";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
@@ -29,14 +31,13 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 
 import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import { TITLE_DELETE, CONFIRM_DELETION } from "@/constants/delete/deleteTable";
 import { debounce } from "lodash";
-import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import { useSelector } from "react-redux";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -45,7 +46,11 @@ const Index = (props) => {
 
     const router = useRouter();
 
-    const { isOpen, isId, handleQueryId } = useToggle();
+    const trangthaiExprired = useStatusExprired();
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'client_customers');
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
@@ -67,9 +72,6 @@ const Index = (props) => {
 
     const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }))
 
-    const trangthaiExprired = useStatusExprired();
-
-
     const _HandleSelectTab = (e) => {
         router.push({
             pathname: router.route,
@@ -87,12 +89,7 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         const id = Number(router.query?.tab);
-        Axios(
-            "GET",
-            `/api_web/${router.query?.tab === "0" || router.query?.tab === "-1"
-                ? "api_client/client?csrf_protection=true"
-                : "api_client/client/?csrf_protection=true"
-            }`,
+        Axios("GET", `/api_web/${router.query?.tab === "0" || router.query?.tab === "-1" ? "api_client/client?csrf_protection=true" : "api_client/client/?csrf_protection=true"}`,
             {
                 params: {
                     search: isState.keySearch,
@@ -113,9 +110,7 @@ const Index = (props) => {
         );
     };
     const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -133,9 +128,7 @@ const Index = (props) => {
 
 
     const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/group_count/?csrf_protection=true`,
+        Axios("GET", `/api_web/api_client/group_count/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -154,9 +147,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_selectct = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_address/province?limit=0`,
+        Axios("GET", `/api_web/Api_address/province?limit=0`,
             {
                 limit: 0,
             },
@@ -210,19 +201,6 @@ const Index = (props) => {
     useEffect(() => {
         queryState({ onFetching: true, onFetchingGroup: true })
     }, [limit, router.query?.page, router.query?.tab, isState.idBranch]);
-
-    const handleDelete = async () => {
-        Axios("DELETE", `/api_web/api_client/client/${isId}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const isSuccess = response.data;
-                if (isSuccess) {
-                    isShow("success", dataLang?.aler_success_delete);
-                }
-            }
-            _ServerFetching();
-        });
-        handleQueryId({ status: false });
-    };
 
     //excel
     const multiDataSet = [
@@ -358,13 +336,24 @@ const Index = (props) => {
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.client_list_title}</h2>
                                 <div className="flex justify-end items-center gap-2">
-                                    <Popup_dskh
-                                        listBr={isState.listBr}
-                                        listSelectCt={isState.listSelectCt}
-                                        onRefresh={_ServerFetching.bind(this)}
-                                        dataLang={dataLang}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    />
+                                    {role == true || checkAdd ?
+                                        <Popup_dskh
+                                            listBr={isState.listBr}
+                                            listSelectCt={isState.listSelectCt}
+                                            onRefresh={_ServerFetching.bind(this)}
+                                            dataLang={dataLang}
+                                            nameModel={"client_contact"}
+                                            className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        /> :
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                isShow("warning", WARNING_STATUS_ROLE);
+                                            }}
+                                            className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        >{dataLang?.branch_popup_create_new}
+                                        </button>
+                                    }
                                 </div>
                             </div>
                             <div className="flex space-x-3 items-center  3xl:h-[8vh] 2xl:h-[9vh] xl:h-[9vh] lg:h-[9vh] md:h-[10vh] h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -422,14 +411,22 @@ const Index = (props) => {
                                         <div className="col-span-2">
                                             <div className="flex space-x-2 items-center justify-end">
                                                 <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                                {isState.data_ex?.length > 0 && (
-                                                    <ExcelFileComponent
-                                                        multiDataSet={multiDataSet}
-                                                        filename="Danh sách khách hàng"
-                                                        title="Dskh"
-                                                        dataLang={dataLang}
-                                                    />
-                                                )}
+                                                {(role == true || checkExport) ?
+                                                    <div className={``}>
+                                                        {isState.data_ex?.length > 0 && (
+                                                            <ExcelFileComponent
+                                                                multiDataSet={multiDataSet}
+                                                                filename="Danh sách khách hàng"
+                                                                title="Dskh"
+                                                                dataLang={dataLang}
+                                                            />)}
+                                                    </div>
+                                                    :
+                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                    </button>
+                                                }
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
@@ -515,33 +512,6 @@ const Index = (props) => {
                                                                                         className="object-cover rounded-[100%] text-left cursor-pointer"
                                                                                     />
                                                                                 </Tooltip>
-                                                                                {/* <Popup
-                                        className="dropdown-avt "
-                                        key={d.id}
-                                        trigger={(open) => (
-                                          // <img
-                                          //   src={d.profile_image}
-                                          //   width={40}
-                                          //   height={40}
-                                          //   className="object-cover rounded-[100%] text-left"
-                                          // ></img>
-                                          <ImageErrors
-                                            src={d.profile_image}
-                                            width={40}
-                                            height={40}
-                                            defaultSrc="/user-placeholder.jpg"
-                                            alt="Image"
-                                            className="object-cover rounded-[100%] text-left"
-                                          />
-                                        )}
-                                        position="top center"
-                                        on={["hover"]}
-                                        arrow={false}
-                                      >
-                                        <span className="bg-[#0f4f9e] text-white rounded p-1.5 ">
-                                          {d.full_name}
-                                        </span>
-                                      </Popup> */}
                                                                             </>
                                                                         );
                                                                     })
@@ -579,41 +549,44 @@ const Index = (props) => {
                                                                     </span>
                                                                 ))}
                                                             </h6>
-                                                            <div className="space-x-2 w-[10%] text-center">
-                                                                <Popup_dskh
-                                                                    listBr={isState.listBr}
-                                                                    listSelectCt={isState.listSelectCt}
+                                                            <div className="space-x-2 w-[10%] text-center flex items-center justify-center">
+                                                                {role == true || checkEdit ?
+                                                                    <Popup_dskh
+                                                                        listBr={isState.listBr}
+                                                                        listSelectCt={isState.listSelectCt}
+                                                                        onRefresh={_ServerFetching.bind(this)}
+                                                                        className="xl:text-base text-xs "
+                                                                        listDs={isState.listDs}
+                                                                        dataLang={dataLang}
+                                                                        name={e.name}
+                                                                        representative={e.representative}
+                                                                        code={e.code}
+                                                                        tax_code={e.tax_code}
+                                                                        phone_number={e.phone_number}
+                                                                        address={e.address}
+                                                                        date_incorporation={e.date_incorporation}
+                                                                        note={e.note}
+                                                                        email={e.email}
+                                                                        website={e.website}
+                                                                        debt_limit={e.debt_limit}
+                                                                        debt_limit_day={e.debt_limit_day}
+                                                                        debt_begin={e.debt_begin}
+                                                                        city={e.city}
+                                                                        district={e.district}
+                                                                        ward={e.ward}
+                                                                        id={e?.id}
+                                                                        nameModel={"client_contact"}
+                                                                    />
+                                                                    :
+                                                                    <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
+                                                                }
+                                                                <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
-                                                                    className="xl:text-base text-xs "
-                                                                    listDs={isState.listDs}
+                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
                                                                     dataLang={dataLang}
-                                                                    name={e.name}
-                                                                    representative={e.representative}
-                                                                    code={e.code}
-                                                                    tax_code={e.tax_code}
-                                                                    phone_number={e.phone_number}
-                                                                    address={e.address}
-                                                                    date_incorporation={e.date_incorporation}
-                                                                    note={e.note}
-                                                                    email={e.email}
-                                                                    website={e.website}
-                                                                    debt_limit={e.debt_limit}
-                                                                    debt_limit_day={e.debt_limit_day}
-                                                                    debt_begin={e.debt_begin}
-                                                                    city={e.city}
-                                                                    district={e.district}
-                                                                    ward={e.ward}
                                                                     id={e?.id}
+                                                                    type="client_customers"
                                                                 />
-
-                                                                <button
-                                                                    onClick={() =>
-                                                                        handleQueryId({ id: e.id, status: true })
-                                                                    }
-                                                                    className="xl:text-base text-xs "
-                                                                >
-                                                                    <IconDelete color="red" />
-                                                                </button>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -656,50 +629,7 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
-            <PopupConfim
-                dataLang={dataLang}
-                type="warning"
-                title={TITLE_DELETE}
-                subtitle={CONFIRM_DELETION}
-                isOpen={isOpen}
-                save={handleDelete}
-                cancel={() => handleQueryId({ status: false })}
-            />
         </React.Fragment>
     );
-};
-
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 3;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
 };
 export default Index;

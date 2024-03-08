@@ -1,27 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { _ServerInstance as Axios } from "/services/axios";
-import ReactExport from "react-data-export";
-
-import Swal from "sweetalert2";
-
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    LocationTick,
-    User,
     Refresh2,
+    Grid6,
 } from "iconsax-react";
+import moment from "moment/moment";
+import { useSelector } from "react-redux";
 import Loading from "components/UI/loading";
 import Pagination from "/components/UI/pagination";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import { useSelector } from "react-redux";
 import SearchComponent from "components/UI/filterComponents/searchComponent";
 import SelectComponent from "components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
@@ -29,13 +22,23 @@ import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { debounce } from "lodash";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useToast from "@/hooks/useToast";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+    const isShow = useToast()
 
     const router = useRouter();
 
     const trangthaiExprired = useStatusExprired();
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkExport } = useActionRole(auth, 'client_contact');
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
@@ -57,9 +60,7 @@ const Index = (props) => {
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_client/contact/?csrf_protection=true",
+        Axios("GET", "/api_web/api_client/contact/?csrf_protection=true",
             {
                 params: {
                     search: isState.keySearch,
@@ -81,9 +82,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_brand = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -100,9 +99,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_client = () => {
-        Axios(
-            "GET",
-            `/api_web/api_client/client_option/?csrf_protection=true`,
+        Axios("GET", `/api_web/api_client/client_option/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -241,9 +238,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => {
-        queryState({ onFetching: true });
-    };
 
     return (
         <React.Fragment>
@@ -315,25 +309,23 @@ const Index = (props) => {
                                         </div>
                                         <div className="col-span-2">
                                             <div className="flex space-x-2 items-center justify-end">
-                                                <button
-                                                    onClick={_HandleFresh.bind(this)}
-                                                    type="button"
-                                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
-                                                >
-                                                    <Refresh2
-                                                        className="group-hover:-rotate-45 transition-all ease-in-out"
-                                                        size="22"
-                                                        color="green"
-                                                    />
-                                                </button>
-                                                {isState.data_ex?.length > 0 && (
-                                                    <ExcelFileComponent
-                                                        multiDataSet={multiDataSet}
-                                                        filename="Danh sách liên hệ"
-                                                        title="Dslh"
-                                                        dataLang={dataLang}
-                                                    />
-                                                )}
+                                                <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                                {(role == true || checkExport) ?
+                                                    <div className={``}>
+                                                        {isState.data_ex?.length > 0 && (
+                                                            <ExcelFileComponent
+                                                                multiDataSet={multiDataSet}
+                                                                filename="Danh sách liên hệ"
+                                                                title="Dslh"
+                                                                dataLang={dataLang}
+                                                            />)}
+                                                    </div>
+                                                    :
+                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                    </button>
+                                                }
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
@@ -449,38 +441,5 @@ const Index = (props) => {
             </div>
         </React.Fragment>
     );
-};
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 3;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
 };
 export default Index;

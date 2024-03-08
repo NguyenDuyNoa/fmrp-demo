@@ -22,7 +22,8 @@ const PopupConfim = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkBrowser: checkAuth } = useActionRole(auth, props?.nameModel)
+    const { checkBrowser: checkAuth, checkDelete } = useActionRole(auth, props?.nameModel)
+    console.log("props", props);
 
     const showToat = useToast()
 
@@ -146,7 +147,38 @@ const PopupConfim = (props) => {
                                     </Zoom>
                                 </>
                             )}
-                            {!["price_quote", "sales_product"].includes(props.nameModel) && (
+                            {/* // nút xóa model khách hàng */}
+                            {['client_customers', 'client_contact', 'client_status'].includes(props.nameModel) && (
+                                <>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={props.cancel}
+                                            className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            Hủy
+                                        </button>
+                                    </Zoom>
+                                    <Zoom className="w-1/2">
+                                        <button
+                                            onClick={() => {
+                                                if (role) {
+                                                    props.save()
+                                                } else if (checkDelete) {
+                                                    props.save()
+                                                }
+                                                else {
+                                                    showToat('warning', 'Bạn không có quyền truy cập')
+                                                }
+                                            }}
+                                            className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                        >
+                                            Xác nhận
+                                        </button>
+                                    </Zoom>
+                                </>
+                            )}
+                            {/* // nút xóa các model khác 3 modle*/}
+                            {!["price_quote", "sales_product", 'client_customers', 'client_contact', 'client_status'].includes(props.nameModel) && (
                                 <>
                                     <Zoom className="w-1/2">
                                         <button
@@ -163,7 +195,8 @@ const PopupConfim = (props) => {
                                                     props.save()
                                                 } else if (checkAuth) {
                                                     props.save()
-                                                } else {
+                                                }
+                                                else {
                                                     showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
                                                 }
                                             }}

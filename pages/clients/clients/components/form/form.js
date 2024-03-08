@@ -2,6 +2,8 @@ import React from "react";
 import { IconDelete } from "iconsax-react";
 import Link from "next/link";
 import Select, { components } from "react-select";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import useToast from "@/hooks/useToast";
 
 const Form = ({
   code,
@@ -38,6 +40,7 @@ const Form = ({
   note,
   _HandleChangeInput,
 }) => {
+  const isShow = useToast()
   return (
     <div className="w-[50vw]  p-2 ">
       <div className="flex flex-wrap justify-between ">
@@ -65,11 +68,10 @@ const Form = ({
               placeholder={dataLang?.client_list_name}
               name="fname"
               type="text"
-              className={`${
-                errInput
-                  ? "border-red-500"
-                  : "focus:border-[#92BFF7] border-[#d0d5dd]"
-              } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+              className={`${errInput
+                ? "border-red-500"
+                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
             />
             {errInput && (
               <label className="mb-4  text-[14px] text-red-500">
@@ -188,9 +190,8 @@ const Form = ({
                   },
                 }),
               }}
-              className={`${
-                errInputBr ? "border-red-500" : "border-transparent"
-              } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+              className={`${errInputBr ? "border-red-500" : "border-transparent"
+                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
             />
             {errInputBr && (
               <label className="mb-2  text-[14px] text-red-500">
@@ -234,11 +235,10 @@ const Form = ({
                 position: "absolute",
               }),
             }}
-            className={`${
-              errInputBr
-                ? "border-red-500"
-                : "focus:border-[#92BFF7] border-[#d0d5dd]"
-            } placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none mb-2 rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
+            className={`${errInputBr
+              ? "border-red-500"
+              : "focus:border-[#92BFF7] border-[#d0d5dd]"
+              } placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none mb-2 rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
           />
           <label className="text-[#344054] font-normal text-sm mb-1 ">
             {dataLang?.client_list_group}
@@ -281,24 +281,42 @@ const Form = ({
           <label className="text-[#344054] font-normal text-sm mb-1 ">
             {dataLang?.client_popup_limit}
           </label>
-          <input
-            value={debt_limit}
-            onChange={_HandleChangeInput.bind(this, "debt_limit")}
+          <InPutNumericFormat
+            value={debt_limit || 0}
+            onValueChange={_HandleChangeInput.bind(this, "debt_limit")}
+            isAllowed={(values) => {
+              const { floatValue } = values;
+              if (floatValue == 0) {
+                return true;
+              }
+              if (floatValue < 0) {
+                isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                return false
+              }
+              return true
+            }}
             placeholder={dataLang?.client_popup_limit}
-            name="fname"
-            type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
           />
           <div>
             <label className="text-[#344054] font-normal text-sm mb-1 ">
               {dataLang?.client_popup_days}
             </label>
-            <input
-              value={debt_limit_day}
-              onChange={_HandleChangeInput.bind(this, "debt_limit_day")}
-              name="fname"
+            <InPutNumericFormat
+              value={debt_limit_day || 0}
+              onValueChange={_HandleChangeInput.bind(this, "debt_limit_day")}
+              isAllowed={(values) => {
+                const { floatValue } = values;
+                if (floatValue == 0) {
+                  return true;
+                }
+                if (floatValue < 0) {
+                  isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                  return false
+                }
+                return true
+              }}
               placeholder={dataLang?.client_popup_days}
-              type="text"
               className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
             />
           </div>
@@ -312,9 +330,9 @@ const Form = ({
               value={
                 valueCt
                   ? {
-                      label: cityOpt?.find((x) => x.value == valueCt)?.label,
-                      value: valueCt,
-                    }
+                    label: cityOpt?.find((x) => x.value == valueCt)?.label,
+                    value: valueCt,
+                  }
                   : null
               }
               onChange={handleChangeCt}
