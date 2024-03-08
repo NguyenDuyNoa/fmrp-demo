@@ -27,6 +27,14 @@ import { routerPurchases } from "routers/buyImportGoods";
 
 import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { CONFIRMATION_OF_CHANGES } from "@/constants/changeStatus/changeStatus";
+import { useToggle } from "@/hooks/useToggle";
 
 const Index = (props) => {
     const router = useRouter();
@@ -36,8 +44,6 @@ const Index = (props) => {
     const dataLang = props.dataLang;
 
     const isShow = useToast();
-
-    const scrollAreaRef = useRef(null);
 
     const trangthaiExprired = useStatusExprired();
 
@@ -69,18 +75,21 @@ const Index = (props) => {
 
     const [errName, sErrName] = useState(false);
 
-    const [errCode, sErrCode] = useState(false);
-
     const [errDate, sErrDate] = useState(false);
 
     const [errBranch, sErrBranch] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
+    const dataSeting = useSetingServer()
+
+    const [onFetchingItem, sOnFetchingItem] = useState(false)
+
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
+
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrName(false);
-        router.query && sErrCode(false);
         router.query && sErrBranch(false);
         router.query && sCode("");
         router.query && sNamePromis("Yêu cầu mua hàng (PR)");
@@ -105,18 +114,6 @@ const Index = (props) => {
     sortedArr.unshift(option[0]);
 
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_product/searchItemsVariant?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data.data;
-                sData(
-                    result?.map((e) => ({
-                        label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-                        value: e.id,
-                        e,
-                    }))
-                );
-            }
-        });
         Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
@@ -134,6 +131,42 @@ const Index = (props) => {
         );
         sOnFetching(false);
     };
+
+
+
+    const _ServerFetchingItem = () => {
+        let form = new FormData()
+        if (idBranch != null) {
+            [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+        }
+        Axios("POST", "/api_web/api_product/searchItemsVariant?csrf_protection=true", {
+            data: form,
+            headers: { "Content-Type": "multipart/form-data" },
+        }, (err, response) => {
+            if (!err) {
+                let { result } = response.data.data;
+                sData(
+                    result?.map((e) => ({
+                        label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                        value: e.id,
+                        e,
+                    }))
+                );
+            }
+        });
+        sOnFetchingItem(false)
+    }
+
+    useEffect(() => {
+        onFetchingItem && _ServerFetchingItem()
+    }, [onFetchingItem])
+
+    useEffect(() => {
+        sOnFetchingItem(true)
+    }, [idBranch])
+
+
+
     const _ServerFetchingDetail = () => {
         Axios("GET", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
@@ -187,9 +220,28 @@ const Index = (props) => {
         setTotalSoluong(newTotal); // cập nhật lại tổng số lượng
         setTotalQty(newOption.slice(1).length); // cập nhật lại độ dài của mảng từ phần tử thứ 2 trở đi
     };
+    const resetValue = () => {
+        if (isKeyState?.type === "branch") {
+            sIdBranch(isKeyState?.value);
+            sOption([{
+                id: Date.now(),
+                mathang: null,
+                donvitinh: "",
+                soluong: 0,
+                ghichu: "",
+            }])
+        }
+        handleQueryId({ status: false });
+    };
     const _HandleChangeInput = (type, value) => {
         if (type == "branch") {
-            sIdBranch(value);
+            if (option?.length > 1) {
+                if (idBranch != value) {
+                    handleQueryId({ status: true, initialKey: { type, value } });
+                }
+            } else {
+                sIdBranch(value);
+            }
         } else if (type == "date") {
             setSelectedDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
         } else if (type == "code") {
@@ -278,7 +330,8 @@ const Index = (props) => {
     };
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (namePromis?.length == 0 || selectedDate?.length == 0 || branch_id == null) {
+        const checkData = newDataOption?.some((e) => e?.soluong == 0 || e?.soluong == "");
+        if (namePromis?.length == 0 || selectedDate?.length == 0 || branch_id == null || checkData) {
             namePromis?.length == 0 && sErrName(true);
             selectedDate?.length == 0 && sErrDate(true);
             branch_id == null && sErrBranch(true);
@@ -310,10 +363,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`
-                    : `/api_web/Api_purchases/purchases/?csrf_protection=true`
+            `${id
+                ? `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`
+                : `/api_web/Api_purchases/purchases/?csrf_protection=true`
             }`,
             {
                 data: formData,
@@ -331,7 +383,6 @@ const Index = (props) => {
                         sIdBranch(null);
                         sErrDate(false);
                         sErrName(false);
-                        sErrCode(false);
                         sErrBranch(false);
                         sOption([
                             {
@@ -357,31 +408,32 @@ const Index = (props) => {
             }
         );
     };
-    const _HandleSeachApi = (inputValue) => {
-        inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
-                {
-                    data: {
-                        term: inputValue,
-                    },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        sData(
-                            result?.map((e) => ({
-                                label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-                                value: e.id,
-                                e,
-                            }))
-                        );
-                    }
+    const _HandleSeachApi = debounce((inputValue) => {
+        let form = new FormData()
+        if (idBranch != null) {
+            [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+        }
+        form.append("term", inputValue)
+        Axios(
+            "POST",
+            `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
+            {
+                data: form
+            },
+            (err, response) => {
+                if (!err) {
+                    var { result } = response?.data.data;
+                    sData(
+                        result?.map((e) => ({
+                            label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                            value: e.id,
+                            e,
+                        }))
+                    );
                 }
-            );
-    };
-
+            }
+        );
+    }, 500)
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
@@ -389,10 +441,6 @@ const Index = (props) => {
     useEffect(() => {
         sErrName(false);
     }, [namePromis?.length > 0]);
-
-    useEffect(() => {
-        sErrCode(false);
-    }, [code?.length > 0]);
 
     useEffect(() => {
         sErrDate(false);
@@ -419,8 +467,7 @@ const Index = (props) => {
 
     // };
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
 
     return (
@@ -506,9 +553,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -531,9 +577,8 @@ const Index = (props) => {
                                         name="fname"
                                         type="text"
                                         placeholder={dataLang?.purchase_name || "purchase_name"}
-                                        className={`${
-                                            errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                        className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                     />
                                     {errName && (
                                         <label className="text-sm text-red-500">
@@ -555,9 +600,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.client_list_filterbrand}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}
@@ -774,24 +818,23 @@ const Index = (props) => {
                                                     >
                                                         <Minus size="14" />
                                                     </button>
-                                                    <NumericFormat
-                                                        className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[13px] py-2 px-2 font-normal w-24 focus:outline-none border-b-2 border-gray-200"
+                                                    <InPutNumericFormat
+                                                        value={e?.soluong}
                                                         onValueChange={_HandleChangeInputOption.bind(
                                                             this,
                                                             e.id,
                                                             "soluong",
                                                             e
                                                         )}
-                                                        value={e?.soluong || 1}
-                                                        allowNegative={false}
-                                                        // readOnly={index === 0 ? readOnlyFirst : false}
-                                                        decimalScale={0}
-                                                        isNumericString={true}
-                                                        thousandSeparator=","
-                                                        isAllowed={(values) => {
-                                                            const { floatValue } = values;
-                                                            return floatValue > 0;
+                                                        isAllowed={({ floatValue }) => {
+                                                            if (floatValue == 0) {
+                                                                return true;
+                                                            } else {
+                                                                return true;
+                                                            }
                                                         }}
+                                                        allowNegative={false}
+                                                        className={`${e?.soluong == 0 && 'border-red-500' || e?.soluong == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                     />
                                                     <button
                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
@@ -887,6 +930,15 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
+            <PopupConfim
+                dataLang={dataLang}
+                type="warning"
+                title={TITLE_DELETE_ITEMS}
+                subtitle={CONFIRMATION_OF_CHANGES}
+                isOpen={isOpen}
+                save={resetValue}
+                cancel={() => handleQueryId({ status: false })}
+            />
         </React.Fragment>
     );
 };

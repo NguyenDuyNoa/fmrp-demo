@@ -60,7 +60,7 @@ const BtnAction = React.memo((props) => {
                 }
             })
         }
-        if(props?.status === 'ordered'){
+        if (props?.status === 'ordered') {
             Toast.fire({
                 icon: 'error',
                 title: `${props?.dataLang?.po_imported_cant_delete || 'po_imported_cant_delete'} `
@@ -96,8 +96,8 @@ const BtnAction = React.memo((props) => {
                 keepTooltipInside={props.keepTooltipInside}
                 closeOnDocumentClick
                 nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
+            // onOpen={_ToggleModal.bind(this, true)}
+            // onClose={_ToggleModal.bind(this, false)}
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">

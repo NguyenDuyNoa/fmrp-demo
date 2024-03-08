@@ -1,22 +1,39 @@
 import axios from "axios";
-import store from "/services/redux";
 import { urlApi as url } from "/services/URL";
-// axios.defaults.baseURL = "https://demo.fososoft.com/FMRP";
+import useToast from "@/hooks/useToast";
 axios.defaults.baseURL = `${url}`;
 
 axios.defaults.withCredentials = false;
+
 axios.defaults.include = true;
+
+
 axios.interceptors.response.use(
     function (response) {
-        console.log("Eeee");
         return response;
     },
     function (error) {
-        console.log("error");
+        console.log("error response", error);
         return Promise.reject(error);
     }
 );
+
+axios.interceptors.request.use(
+    (config) => {
+        // Thực hiện các xử lý trước khi gửi request, ví dụ như thêm headers
+        // config.headers.Authorization = 'Bearer YourAccessToken';
+        return config;
+    },
+    (error) => {
+        // Xử lý lỗi nếu có
+        console.log("error request", error);
+        return Promise.reject(error);
+    }
+);
+
+
 const _ServerInstance = (method, url, dataObject, callback) => {
+    const showToat = useToast()
     var token = null;
     try {
         token = localStorage?.getItem("tokenFMRP");
@@ -38,8 +55,7 @@ const _ServerInstance = (method, url, dataObject, callback) => {
         include: true,
         ...dataObject,
         headers: {
-            "Content-Type": dataObject.headers?.["Content-Type"]
-                ? dataObject.headers?.["Content-Type"]
+            "Content-Type": dataObject.headers?.["Content-Type"] ? dataObject.headers?.["Content-Type"]
                 : "application/json",
             Authorization: `Bearer ${token}`,
             "x-api-key": databaseApp,
@@ -52,9 +68,28 @@ const _ServerInstance = (method, url, dataObject, callback) => {
             callback && callback(null, response);
         })
         .catch(function (error) {
-            if (error.response && error.response?.status === 500) {
+            if (error.response && error.response?.status == 500) {
                 // store.dispatch({type: "auth/update", payload: null})
-            } else {
+                // showToat("error", 'Đã xảy ra lỗi vui lòng làm mới trang')
+                console.log("error.response 500", error.response);
+                // window.location.href = '/error/405';
+            }
+            else if (error.response && error.response?.status == 403) {
+                console.log("error.response 403", error.response?.data);
+                showToat("error", error.response?.data?.message)
+                setTimeout(() => {
+                    window.location.href = '/error/403';
+                }, 1500)
+                // window.location.href = '/error/403';
+                // store.dispatch({type: "auth/update", payload: null})
+            }
+            else if (error.response && error.response?.status == 404) {
+                console.log("error.response 404", error.response?.data);
+                showToat("error", error.response?.data?.message)
+                window.location.href = '/error/404';
+                // store.dispatch({type: "auth/update", payload: null})
+            }
+            else {
                 callback && callback(error, null);
             }
         });

@@ -12,10 +12,10 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Popup_status from "./(popupDetail)/popupStatus";
-import PopupDetail from "./(popupDetail)/PopupDetail";
+import Popup_status from "./components/popupStatus";
+import PopupDetail from "./components/PopupDetail";
 
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
+import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -31,6 +31,17 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import useActionRole from "@/hooks/useRole";
+import { useSelector } from "react-redux";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -49,9 +60,6 @@ const Index = (props) => {
         listCode: [],
         listClient: [],
         listStatus: [],
-    };
-
-    const initsId = {
         idBranch: null,
         idCode: null,
         idClient: null,
@@ -59,35 +67,39 @@ const Index = (props) => {
             startDate: null,
             endDate: null,
         },
+        onFetching: false,
+        onFetchingGroup: false,
+        onFetchingFilter: false,
+        keySearch: "",
+        onSending: false,
+        data_export: [],
     };
-    const trangthaiExprired = useStatusExprired();
 
     const isShow = useToast();
 
-    const [idFillter, sIdFillter] = useState(initsId);
+    const dataSeting = useSetingServer()
 
-    const [listData, sListData] = useState(initsArr);
+    const trangthaiExprired = useStatusExprired();
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkExport } = useActionRole(auth, "returnSales")
+
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
+    const [isState, sIsState] = useState(initsArr)
+
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
-
-    const [onFetching, sOnFetching] = useState(false);
-
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
-
-    const [totalItems, sTotalItems] = useState([]);
-
-    const [keySearch, sKeySearch] = useState("");
-
-    const [limit, sLimit] = useState(15);
 
     const [total, sTotal] = useState({});
 
     const [checkedWare, sCheckedWare] = useState({});
 
-    const [onSending, sOnSending] = useState(false);
-
-    const [data_export, sData_export] = useState([]);
-
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    };
     const _HandleSelectTab = (e) => {
         router.push({
             pathname: router.route,
@@ -100,37 +112,31 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
+        queryState({ onFetchingFilter: true });
     }, []);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_return_order/return_order/?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_return_order/return_order/?csrf_protection=true`,
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": idFillter.idCode != null ? idFillter.idCode?.value : null,
-                    "filter[branch_id]": idFillter.idBranch != null ? idFillter.idBranch.value : null,
-                    "filter[client_id]": idFillter?.idClient ? idFillter?.idClient.value : null,
-                    "filter[start_date]":
-                        idFillter?.valueDate?.startDate != null ? idFillter?.valueDate?.startDate : null,
-                    "filter[end_date]": idFillter?.valueDate?.endDate != null ? idFillter?.valueDate?.endDate : null,
+                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                    "filter[client_id]": isState?.idClient ? isState?.idClient.value : null,
+                    "filter[start_date]": isState?.valueDate?.startDate != null ? isState?.valueDate?.startDate : null,
+                    "filter[end_date]": isState?.valueDate?.endDate != null ? isState?.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let { rResult, output, rTotal } = response?.data;
-                    sListData((e) => ({
-                        ...e,
-                        data: rResult,
-                        dataExcel: rResult,
-                    }));
                     sTotalItems(output);
                     sTotal(rTotal);
-                    sOnFetching(false);
+                    queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false })
+
                 }
             }
         );
@@ -142,101 +148,112 @@ const Index = (props) => {
             `/api_web/Api_return_order/filterBar/?csrf_protection=true`,
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": idFillter.idCode != null ? idFillter.idCode?.value : null,
-                    "filter[branch_id]": idFillter.idBranch != null ? idFillter.idBranch.value : null,
-                    "filter[client_id]": idFillter?.idClient ? idFillter?.idClient.value : null,
+                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                    "filter[client_id]": isState?.idClient ? isState?.idClient.value : null,
                     "filter[start_date]":
-                        idFillter?.valueDate?.startDate != null ? idFillter?.valueDate?.startDate : null,
-                    "filter[end_date]": idFillter?.valueDate?.endDate != null ? idFillter?.valueDate?.endDate : null,
+                        isState?.valueDate?.startDate != null ? isState?.valueDate?.startDate : null,
+                    "filter[end_date]": isState?.valueDate?.endDate != null ? isState?.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let data = response.data;
-                    sListData((e) => ({ ...e, listStatus: data }));
+                    queryState({ listStatus: data || [] });
                 }
-                sOnFetching(false);
+                queryState({ onFetchingGroup: false });
             }
         );
     };
 
     // filter
+
+    const convertArray = (arr) => {
+        return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
+    }
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                sListData((e) => ({ ...e, listBr: rResult.map((e) => ({ label: e.name, value: e.id })) }));
-            }
-        });
-        await Axios("GET", `/api_web/api_client/client_option/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sListData((e) => ({ ...e, listClient: rResult.map((e) => ({ label: e.name, value: e.id })) }));
+                queryState({ listBr: convertArray(rResult) });
             }
         });
         await Axios(
-            "GET",
-            `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
-            {},
+            "GET", `/api_web/api_return_order/searchReturnOrder?csrf_protection=true`, {},
             (err, response) => {
                 if (!err) {
-                    let { result } = response.data;
-                    sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
+                    let { data } = response.data;
+                    queryState({ listCode: data?.return_order.map((e) => ({ label: e.reference_no, value: e.id })) });
                 }
             }
         );
-
-        sOnFetching_filter(false);
+        await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                queryState({ listClient: convertArray(data?.clients) });
+            }
+        })
+        queryState({ onFetchingFilter: false });
     };
 
-    let searchTimeout;
+    const handleSearchCodesApi = debounce((inputValue) => {
+        Axios("GET", `/api_web/api_return_order/searchReturnOrder?csrf_protection=true`,
+            {
+                data: { term: inputValue },
+            },
+            (err, response) => {
+                if (!err) {
+                    let { data } = response.data;
+                    queryState({ listCode: data?.return_order.map((e) => ({ label: e.reference_no, value: e.id })) });
+                }
+            }
+        );
+    }, 500)
 
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") return;
-        else {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let { result } = response.data;
-                            sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
-                        }
-                    }
-                );
-            }, 500);
-        }
-    };
-
-    useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
+    const handleSearchClientsApi = debounce((value) => {
+        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
+            params: {
+                search: value ? value : "",
+            },
+        }, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                queryState({ listClient: convertArray(data?.clients) });
+            }
+        })
+    }, 500)
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
-    }, [onFetching]);
+        isState.onFetchingFilter && _ServerFetching_filter();
+    }, [isState.onFetchingFilter]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
+        (isState.onFetching && _ServerFetching())
+    }, [isState.onFetching]);
+
+    useEffect(() => {
+        (isState.onFetchingGroup && _ServerFetching_group());
+    }, [isState.onFetchingGroup]);
+
+    useEffect(() => {
+        queryState({ onFetching: true });
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
+        queryState({ onFetchingGroup: true });
+    }, [router.query?.page, router.query?.tab]);
+
+
+    useEffect(() => {
         if (
-            idFillter.idBranch != null ||
-            (idFillter.valueDate.startDate != null && idFillter.valueDate.endDate != null) ||
-            idFillter.idClient != null ||
-            idFillter.idCode != null
+            isState.idBranch != null ||
+            (isState.valueDate.startDate != null && isState.valueDate.endDate != null) ||
+            isState.idClient != null ||
+            isState.idCode != null
         ) {
             router.push({
                 pathname: router.route,
@@ -245,27 +262,22 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idFillter.idBranch != null && sOnFetching(true)) ||
-                    (idFillter.idClient != null && sOnFetching(true)) ||
-                    (idFillter.idCode != null && sOnFetching(true)) ||
-                    (idFillter.valueDate.startDate != null &&
-                        idFillter.valueDate.endDate != null &&
-                        sOnFetching(true)) ||
-                    (keySearch && sOnFetching(true));
+                queryState({ onFetching: true, onFetchingGroup: true })
             }, 300);
         } else {
-            sOnFetching(true);
+            queryState({ onFetching: true, onFetchingGroup: true })
         }
     }, [
         limit,
-        idFillter.idBranch,
-        idFillter.idClient,
-        idFillter.idCode,
-        idFillter.valueDate.endDate,
-        idFillter.valueDate.startDate,
+        isState.keySearch,
+        isState.idBranch,
+        isState.idClient,
+        isState.idCode,
+        isState.valueDate.endDate,
+        isState.valueDate.startDate,
     ]);
 
-    const onChangeFilter = (type, value) => sIdFillter((e) => ({ ...e, [type]: value }));
+    const onChangeFilter = (type, value) => queryState({ [type]: value });
 
     const paginate = (pageNumber) => {
         router.push({
@@ -278,21 +290,17 @@ const Index = (props) => {
     };
 
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value);
+        queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
-        sOnFetching(true);
+        queryState({ onFetching: true });
     }, 500);
 
-    const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
-    };
+
     // excel
     const multiDataSet = [
         {
@@ -386,19 +394,19 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: listData?.dataExcel?.map((e) => [
+            data: isState?.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.client_name ? e?.client_name : ""}` },
                 {
-                    value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
+                    value: `${e?.total_price ? formatMoney(e?.total_price) : ""}`,
                 },
                 {
-                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
+                    value: `${e?.total_tax_price ? formatMoney(e?.total_tax_price) : ""}`,
                 },
                 {
-                    value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
+                    value: `${e?.total_amount ? formatMoney(e?.total_amount) : ""}`,
                 },
                 {
                     value: `${e?.handling_solution ? dataLang[e?.handling_solution] || e?.handling_solution : ""}`,
@@ -423,7 +431,7 @@ const Index = (props) => {
                 checkedpost: isKeyState?.checkedUn,
             };
             sCheckedWare(dataChecked);
-            sListData((e) => ({ ...e, data: [...e.data] }));
+            queryState({ data: [...isState.data] })
         }
 
         handleQueryId({ status: false });
@@ -451,32 +459,32 @@ const Index = (props) => {
                 if (!err) {
                     let { isSuccess, message, alert_type, data_export } = response.data;
                     if (isSuccess) {
-                        isShow(alert_type, dataLang[message]);
+                        isShow(alert_type, dataLang[message] || message);
                         setTimeout(() => {
-                            sOnFetching(true);
+                            queryState({ onFetching: true })
                         }, 300);
                     } else {
-                        isShow("error", dataLang[message]);
+                        isShow("error", dataLang[message] || message);
                     }
                     if (data_export?.length > 0) {
-                        sData_export(data_export);
+                        queryState({ data_export: [...data_export] })
                     }
                 }
-                sOnSending(false);
+                queryState({ onSending: false });
             }
         );
     };
 
     useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
+        isState.onSending && _ServerSending();
+    }, [isState.onSending]);
 
     useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
+        checkedWare.id != null && queryState({ onSending: true });
     }, [checkedWare]);
 
     useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
+        checkedWare.id != null && queryState({ onSending: true });
     }, [checkedWare.id != null]);
 
     return (
@@ -485,8 +493,8 @@ const Index = (props) => {
                 <title>{dataLang?.returnSales_titleLits || "returnSales_titleLits"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                {data_export.length > 0 && (
-                    <Popup_status className="hidden" data_export={data_export} dataLang={dataLang} />
+                {isState.data_export?.length > 0 && (
+                    <Popup_status className="hidden" data_export={isState.data_export} dataLang={dataLang} />
                 )}
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
@@ -505,18 +513,26 @@ const Index = (props) => {
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.returnSales_titleLits || "returnSales_titleLits"}
                                 </h2>
-                                <div className="flex justify-end items-center">
-                                    <Link
-                                        href={routerReturnSales.form}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E]  via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >
-                                        {dataLang?.btn_new || "btn_new"}
-                                    </Link>
-                                </div>
+                                <button
+                                    onClick={() => {
+                                        if (role) {
+                                            router.push(routerReturnSales.form)
+                                        } else if (checkAdd) {
+                                            router.push(routerReturnSales.form)
+                                        }
+                                        else {
+                                            isShow("warning", WARNING_STATUS_ROLE)
+                                        }
+                                    }}
+                                    type="button"
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                >
+                                    {dataLang?.btn_new || "btn_new"}
+                                </button>
                             </div>
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listData.listStatus &&
-                                    listData.listStatus.map((e) => {
+                                {isState.listStatus &&
+                                    isState.listStatus.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -543,274 +559,85 @@ const Index = (props) => {
                                         <div className="col-span-6">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
-                                                    <form className="flex items-center relative ">
-                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
-                                                        <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
-                                                            type="text"
-                                                            onChange={handleOnChangeKeySearch.bind(this)}
-                                                            placeholder={dataLang?.branch_search}
-                                                        />
-                                                    </form>
+                                                    <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch.bind(this)} />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.price_quote_branch ||
-                                                                    "price_quote_branch",
+                                                                label: dataLang?.price_quote_branch || "price_quote_branch",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listData.listBr,
+                                                            ...isState.listBr,
                                                         ]}
                                                         onChange={onChangeFilter.bind(this, "idBranch")}
-                                                        value={idFillter.idBranch}
-                                                        placeholder={
-                                                            dataLang?.price_quote_select_branch ||
-                                                            "price_quote_select_branch"
-                                                        }
+                                                        value={isState.idBranch}
+                                                        placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.purchase_order_table_code ||
-                                                                    "purchase_order_table_code",
+                                                                label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listData.listCode,
+                                                            ...isState.listCode,
                                                         ]}
-                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        onInputChange={handleSearchCodesApi.bind(this)}
                                                         onChange={onChangeFilter.bind(this, "idCode")}
-                                                        value={idFillter.idCode}
-                                                        placeholder={
-                                                            dataLang?.purchase_order_table_code ||
-                                                            "purchase_order_table_code"
-                                                        }
-                                                        hideSelectedOptions={false}
+                                                        value={isState.idCode}
+                                                        placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.price_quote_select_customer ||
-                                                                    "price_quote_select_customer",
+                                                                label: dataLang?.price_quote_select_customer || "price_quote_select_customer",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listData.listClient,
+                                                            ...isState.listClient,
                                                         ]}
+                                                        onInputChange={handleSearchClientsApi.bind(this)}
                                                         onChange={onChangeFilter.bind(this, "idClient")}
-                                                        value={idFillter.idClient}
-                                                        placeholder={
-                                                            dataLang?.price_quote_customer || "price_quote_customer"
-                                                        }
-                                                        hideSelectedOptions={false}
+                                                        value={isState.idClient}
+                                                        placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="z-20 col-span-1">
-                                                    <Datepicker
-                                                        value={idFillter.valueDate}
-                                                        i18n={"vi"}
-                                                        primaryColor={"blue"}
-                                                        onChange={onChangeFilter.bind(this, "valueDate")}
-                                                        showShortcuts={true}
-                                                        displayFormat={"DD/MM/YYYY"}
-                                                        configs={{
-                                                            shortcuts: {
-                                                                today: "Hôm nay",
-                                                                yesterday: "Hôm qua",
-                                                                past: (period) => `${period}  ngày qua`,
-                                                                currentMonth: "Tháng này",
-                                                                pastMonth: "Tháng trước",
-                                                            },
-                                                            footer: {
-                                                                cancel: "Từ bỏ",
-                                                                apply: "Áp dụng",
-                                                            },
-                                                        }}
-                                                        className="react-datepicker__input-container"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[9px] py-[11px] xl:px-0 px-2 bg-white focus:outline-[#0F4F9E] 3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[10px] 3xl:placeholder:text-xs 2xl:placeholder:text-[13px] xl:placeholder:text-[10px] lg:placeholder:text-[8px] border-none focus:outline-none focus:ring-0 focus:border-transparent"
-                                                    />
+                                                    <DatepickerComponent value={isState.valueDate} onChange={onChangeFilter.bind(this, "valueDate")} />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={sOnFetching} />
+                                                <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
                                                 <div>
-                                                    {listData.dataExcel?.length > 0 && (
-                                                        <ExcelFile
-                                                            filename={
-                                                                dataLang?.returnSales_titleEx || "returnSales_titleEx"
-                                                            }
-                                                            title="DSTLHB"
-                                                            element={
-                                                                <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                        size={18}
-                                                                    />
-                                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={multiDataSet}
-                                                                data={multiDataSet}
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
-                                                    )}
+                                                    {(role == true || checkExport) ?
+                                                        <div className={``}>
+                                                            {isState.dataExcel?.length > 0 && (
+                                                                <ExcelFileComponent classBtn="!px-1" filename={dataLang?.returnSales_titleEx || "returnSales_titleEx"} title={"DSTLHB"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
+                                                        </div>
+                                                        :
+                                                        <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                            <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                            <span>{dataLang?.client_list_exportexcel}</span>
+                                                        </button>
+                                                    }
                                                 </div>
                                                 <div>
-                                                    <div className="font-[300] text-slate-400 3xl:text-xs 2xl:text-xs xl:text-[10px] lg:text-[6px]">
-                                                        {dataLang?.display}
-                                                    </div>
-                                                    <select
-                                                        className="outline-none text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) => sLimit(e.target.value)}
-                                                        value={limit}
-                                                    >
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                                            disabled
-                                                        >
-                                                            {limit == -1 ? "Tất cả" : limit}
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={15}
-                                                        >
-                                                            15
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={20}
-                                                        >
-                                                            20
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={40}
-                                                        >
-                                                            40
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={60}
-                                                        >
-                                                            60
-                                                        </option>
-                                                    </select>
+                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
                                             </div>
                                         </div>
@@ -850,12 +677,12 @@ const Index = (props) => {
                                                 {dataLang?.import_action || "import_action"}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {isState.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : listData.data?.length > 0 ? (
+                                        ) : isState.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {listData?.data?.map((e) => (
+                                                    {isState?.data?.map((e) => (
                                                         <div
                                                             className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
@@ -877,13 +704,13 @@ const Index = (props) => {
                                                                 {e.client_name}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_price)}
+                                                                {formatMoney(e.total_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_tax_price)}
+                                                                {formatMoney(e.total_tax_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_amount)}
+                                                                {formatMoney(e.total_amount)}
                                                             </h6>
                                                             <h6 className="col-span-1 mx-auto">
                                                                 {(e?.handling_solution === "pay_down" && (
@@ -952,25 +779,26 @@ const Index = (props) => {
                             </div>
                             <div className="col-span-1 text-right">
                                 <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatNumber(total?.total_price)}
+                                    {formatMoney(total?.total_price)}
                                 </h3>
                             </div>
                             <div className="col-span-1 text-right ">
                                 <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatNumber(total?.total_tax_price)}
+                                    {formatMoney(total?.total_tax_price)}
                                 </h3>
                             </div>
                             <div className="col-span-1 text-right">
                                 <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatNumber(total?.total_amount)}
+                                    {formatMoney(total?.total_amount)}
                                 </h3>
                             </div>
                         </div>
-                        {listData.data?.length != 0 && (
+                        {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
-                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
+                                    {/* {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItems?.iTotalRecords} {dataLang?.ingredient} */}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

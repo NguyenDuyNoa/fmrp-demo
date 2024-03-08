@@ -31,6 +31,7 @@ import {
     postData,
     postdataListTypeofDoc,
 } from "Api/apiReceipts/api";
+import { debounce } from "lodash";
 const Popup_dspt = (props) => {
     let id = props?.id;
     const dataLang = props.dataLang;
@@ -119,10 +120,10 @@ const Popup_dspt = (props) => {
                     : null,
                 listTypeOfDocument: result?.type_vouchers
                     ? result?.voucher?.map(({ code, id, money }) => ({
-                          label: code,
-                          value: id,
-                          money: money,
-                      }))
+                        label: code,
+                        value: id,
+                        money: money,
+                    }))
                     : [],
                 price: +result?.total,
                 method: { label: result?.payment_mode_name, value: result?.payment_mode_id },
@@ -218,26 +219,19 @@ const Popup_dspt = (props) => {
         updateFetch({ onFetchingListTypeOfDocument: false });
     };
 
-    let searchTimeout;
 
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") return;
-        else {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                postdataListTypeofDoc({ ...param }, { data: inputValue }, (err, result) => {
-                    if (err) return console.error(err);
-                    updateData({
-                        dataListTypeofDoc: result?.map(({ code, id, money }) => ({
-                            label: code,
-                            value: id,
-                            money: money,
-                        })),
-                    });
-                });
-            }, 500);
-        }
-    };
+    const _HandleSeachApi = debounce((inputValue) => {
+        postdataListTypeofDoc({ ...param }, { data: inputValue }, (err, result) => {
+            if (err) return console.error(err);
+            updateData({
+                dataListTypeofDoc: result?.map(({ code, id, money }) => ({
+                    label: code,
+                    value: id,
+                    money: money,
+                })),
+            });
+        });
+    }, 500)
 
     useEffect(() => {
         listValue.object != null && updateFetch({ onFetchingTypeOfDocument: true });
@@ -380,7 +374,7 @@ const Popup_dspt = (props) => {
                 errListObject: !listValue.listObject,
                 errPrice:
                     listValue.typeOfDocument?.value == "import" &&
-                    (listValue.price == 0 || listValue.price == "" || listValue.price == null)
+                        (listValue.price == 0 || listValue.price == "" || listValue.price == null)
                         ? true
                         : listValue.price == 0 || listValue.price == null || listValue.price == "",
                 errMethod: !listValue.method,
@@ -575,9 +569,8 @@ const Popup_dspt = (props) => {
                                             value={listValue.branch}
                                             closeMenuOnSelect={true}
                                             {...configSelectPopup}
-                                            className={`${
-                                                error.errBranch ? "border-red-500" : "border-transparent"
-                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${error.errBranch ? "border-red-500" : "border-transparent"
+                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errBranch && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -598,9 +591,8 @@ const Popup_dspt = (props) => {
                                             maxMenuHeight="200px"
                                             closeMenuOnSelect={true}
                                             {...configSelectPopup}
-                                            className={`${
-                                                error.errMethod ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${error.errMethod ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errMethod && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -622,9 +614,8 @@ const Popup_dspt = (props) => {
                                             menuPortalTarget={document.body}
                                             onMenuOpen={handleMenuOpen}
                                             closeMenuOnSelect={true}
-                                            className={`${
-                                                error.errObject ? "border-red-500" : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            className={`${error.errObject ? "border-red-500" : "border-transparent"
+                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errObject && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -645,9 +636,8 @@ const Popup_dspt = (props) => {
                                                 isClearable={true}
                                                 value={listValue.listObject}
                                                 classNamePrefix="Select"
-                                                className={`${
-                                                    error.errListObject ? "border-red-500" : "border-transparent"
-                                                } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
+                                                    } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                 isSearchable={true}
                                                 noOptionsMessage={() => `Chưa có gợi ý`}
                                                 formatCreateLabel={(value) => `Tạo "${value}"`}
@@ -700,9 +690,8 @@ const Popup_dspt = (props) => {
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 closeMenuOnSelect={true}
-                                                className={`${
-                                                    error.errListObject ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                         )}
                                         {error.errListObject && (
@@ -746,13 +735,12 @@ const Popup_dspt = (props) => {
                                             isMulti
                                             menuPortalTarget={document.body}
                                             onMenuOpen={handleMenuOpen}
-                                            className={`${
-                                                error.errListTypeDoc &&
-                                                listValue.typeOfDocument != null &&
-                                                listValue.listTypeOfDocument?.length == 0
+                                            className={`${error.errListTypeDoc &&
+                                                    listValue.typeOfDocument != null &&
+                                                    listValue.listTypeOfDocument?.length == 0
                                                     ? "border-red-500"
                                                     : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
                                             listValue.typeOfDocument != null &&
@@ -795,9 +783,8 @@ const Popup_dspt = (props) => {
                                                         if (floatValue > totalMoney) {
                                                             ToatstNotifi(
                                                                 "error",
-                                                                `${
-                                                                    props.dataLang?.payment_errPlease ||
-                                                                    "payment_errPlease"
+                                                                `${props.dataLang?.payment_errPlease ||
+                                                                "payment_errPlease"
                                                                 } ${formatNumber(totalMoney)}`
                                                             );
                                                         }
@@ -809,11 +796,10 @@ const Popup_dspt = (props) => {
                                                     return true;
                                                 }
                                             }}
-                                            className={`${
-                                                error.errPrice && (listValue.price == null || listValue.price == "")
+                                            className={`${error.errPrice && (listValue.price == null || listValue.price == "")
                                                     ? "border-red-500"
                                                     : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
-                                            } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
+                                                } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
                                             thousandSeparator=","
                                         />
                                         {error.errPrice && (
@@ -852,11 +838,10 @@ const Popup_dspt = (props) => {
                                 {listValue.listTypeOfDocument.length > 0 && (
                                     <div className="col-span-12 border border-b-0 rounded transition-all duration-200 ease-linear">
                                         <div
-                                            className={`${
-                                                listValue.listTypeOfDocument.length > 5
+                                            className={`${listValue.listTypeOfDocument.length > 5
                                                     ? " h-[170px] overflow-auto"
                                                     : ""
-                                            } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+                                                } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
                                         >
                                             {listValue.listTypeOfDocument.map((e, index) => {
                                                 return (

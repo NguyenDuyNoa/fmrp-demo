@@ -24,6 +24,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { debounce } from "lodash";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -201,9 +202,8 @@ const Index = (props) => {
                         id: e?.item?.id,
                         matHang: {
                             e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${
-                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
                             value: e.item?.id,
                         },
                         child: e?.child.map((ce) => ({
@@ -268,8 +268,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_TheOrder = () => {
@@ -433,10 +433,10 @@ const Index = (props) => {
                             tax: thuetong
                                 ? thuetong
                                 : {
-                                      label: e?.e?.tax_name,
-                                      value: e?.e?.tax_id,
-                                      tax_rate: e?.e?.tax_rate,
-                                  },
+                                    label: e?.e?.tax_name,
+                                    value: e?.e?.tax_id,
+                                    tax_rate: e?.e?.tax_rate,
+                                },
                             thanhTien: Number(e?.e?.amount),
                             note: e?.e?.note,
                         },
@@ -854,10 +854,10 @@ const Index = (props) => {
                         tax: thuetong
                             ? thuetong
                             : {
-                                  label: e?.e?.tax_name,
-                                  value: e?.e?.tax_id,
-                                  tax_rate: e?.e?.tax_rate,
-                              },
+                                label: e?.e?.tax_name,
+                                value: e?.e?.tax_id,
+                                tax_rate: e?.e?.tax_rate,
+                            },
                         thanhTien: Number(e?.e?.amount),
                         note: e?.e?.note,
                     },
@@ -888,10 +888,10 @@ const Index = (props) => {
                         tax: thuetong
                             ? thuetong
                             : {
-                                  label: e?.e?.tax_name,
-                                  value: e?.e?.tax_id,
-                                  tax_rate: e?.e?.tax_rate,
-                              },
+                                label: e?.e?.tax_name,
+                                value: e?.e?.tax_id,
+                                tax_rate: e?.e?.tax_rate,
+                            },
                         thanhTien: Number(e?.e?.amount),
                         note: e?.e?.note,
                     },
@@ -1069,10 +1069,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_import/import/${id}?csrf_protection=true`
-                    : "/api_web/Api_import/import/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_import/import/${id}?csrf_protection=true`
+                : "/api_web/Api_import/import/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -1138,10 +1137,10 @@ const Index = (props) => {
                     tax: thuetong
                         ? thuetong
                         : {
-                              label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                              value: value?.e?.tax_id,
-                              tax_rate: value?.e?.tax_rate,
-                          },
+                            label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                            value: value?.e?.tax_id,
+                            tax_rate: value?.e?.tax_rate,
+                        },
                     thanhTien: Number(value?.e?.amount),
                     note: value?.e?.note,
                 };
@@ -1178,10 +1177,10 @@ const Index = (props) => {
                         tax: thuetong
                             ? thuetong
                             : {
-                                  label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                                  value: value?.e?.tax_id,
-                                  tax_rate: value?.e?.tax_rate,
-                              },
+                                label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                                value: value?.e?.tax_id,
+                                tax_rate: value?.e?.tax_rate,
+                            },
                         thanhTien: Number(value?.e?.amount),
                         note: value?.e?.note,
                     },
@@ -1321,10 +1320,10 @@ const Index = (props) => {
                                 tax: thuetong
                                     ? thuetong
                                     : {
-                                          label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                                          value: value?.e?.tax_id,
-                                          tax_rate: value?.e?.tax_rate,
-                                      },
+                                        label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                                        value: value?.e?.tax_id,
+                                        tax_rate: value?.e?.tax_rate,
+                                    },
                                 thanhTien: Number(value?.e?.amount),
                                 note: value?.e?.note,
                             },
@@ -1340,28 +1339,27 @@ const Index = (props) => {
         }
     };
 
-    const _HandleSeachApi = (inputValue) => {
-        inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true`,
-                {
-                    data: {
-                        term: inputValue,
-                    },
-                    params: {
-                        "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
-                        import_id: id ? id : "",
-                    },
+    const _HandleSeachApi = debounce((inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true`,
+            {
+                data: {
+                    term: inputValue,
                 },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        sDataItems(result);
-                    }
+                params: {
+                    "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
+                    import_id: id ? id : "",
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { result } = response?.data.data;
+                    sDataItems(result);
                 }
-            );
-    };
+            }
+        );
+    }, 500)
 
     return (
         <React.Fragment>
@@ -1438,9 +1436,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -1466,9 +1463,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         // components={{ MultiValue }}
                                         style={{
@@ -1522,9 +1518,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.import_supplier || "import_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errSupplier ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}
@@ -1584,9 +1579,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_the_orders || "import_the_orders"}
-                                        className={`${
-                                            errTheOrder ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errTheOrder ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         // components={{ MultiValue }}
                                         style={{
@@ -1828,19 +1822,18 @@ const Index = (props) => {
                         </h4>
                         <div className="col-span-10">
                             <div
-                                className={`${
-                                    dataProductSerial.is_enable == "1"
+                                className={`${dataProductSerial.is_enable == "1"
                                         ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                             ? "grid-cols-13"
                                             : dataMaterialExpiry.is_enable == "1"
-                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                            : "grid-cols-11"
+                                                ? "grid-cols-[repeat(13_minmax(0_1fr))]"
+                                                : "grid-cols-11"
                                         : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                        ? "grid-cols-12"
-                                        : dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-12"
-                                        : "grid-cols-10"
-                                } grid `}
+                                            ? "grid-cols-12"
+                                            : dataMaterialExpiry.is_enable == "1"
+                                                ? "grid-cols-12"
+                                                : "grid-cols-10"
+                                    } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
                                     {dataLang?.import_from_ware_loca || "import_from_ware_loca"}
@@ -1993,19 +1986,18 @@ const Index = (props) => {
                         </div>
                         <div className="col-span-10">
                             <div
-                                className={`${
-                                    dataProductSerial.is_enable == "1"
+                                className={`${dataProductSerial.is_enable == "1"
                                         ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                             ? "grid-cols-13"
                                             : dataMaterialExpiry.is_enable == "1"
-                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                            : "grid-cols-11"
+                                                ? "grid-cols-[repeat(13_minmax(0_1fr))]"
+                                                : "grid-cols-11"
                                         : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                        ? "grid-cols-12"
-                                        : dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-12"
-                                        : "grid-cols-10"
-                                } grid  divide-x border-t border-b border-r border-l`}
+                                            ? "grid-cols-12"
+                                            : dataMaterialExpiry.is_enable == "1"
+                                                ? "grid-cols-12"
+                                                : "grid-cols-10"
+                                    } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
                                     {" "}
@@ -2239,21 +2231,20 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-10  items-center">
                                                 <div
-                                                    className={`${
-                                                        dataProductSerial.is_enable == "1"
+                                                    className={`${dataProductSerial.is_enable == "1"
                                                             ? dataMaterialExpiry.is_enable !=
-                                                              dataProductExpiry.is_enable
+                                                                dataProductExpiry.is_enable
                                                                 ? "grid-cols-13"
                                                                 : dataMaterialExpiry.is_enable == "1"
-                                                                ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                                                : "grid-cols-11"
+                                                                    ? "grid-cols-[repeat(13_minmax(0_1fr))]"
+                                                                    : "grid-cols-11"
                                                             : dataMaterialExpiry.is_enable !=
-                                                              dataProductExpiry.is_enable
-                                                            ? "grid-cols-12"
-                                                            : dataMaterialExpiry.is_enable == "1"
-                                                            ? "grid-cols-12"
-                                                            : "grid-cols-10"
-                                                    } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r`}
+                                                                dataProductExpiry.is_enable
+                                                                ? "grid-cols-12"
+                                                                : dataMaterialExpiry.is_enable == "1"
+                                                                    ? "grid-cols-12"
+                                                                    : "grid-cols-10"
+                                                        } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r`}
                                                 >
                                                     {e?.child?.map((ce) => (
                                                         <React.Fragment key={ce?.id?.toString()}>
@@ -2267,14 +2258,13 @@ const Index = (props) => {
                                                                         ce?.id,
                                                                         "kho"
                                                                     )}
-                                                                    className={`${
-                                                                        (errWarehouse && ce?.kho == null) ||
-                                                                        (errWarehouse &&
-                                                                            (ce?.kho?.label == null ||
-                                                                                ce?.kho?.warehouse_name == null))
+                                                                    className={`${(errWarehouse && ce?.kho == null) ||
+                                                                            (errWarehouse &&
+                                                                                (ce?.kho?.label == null ||
+                                                                                    ce?.kho?.warehouse_name == null))
                                                                             ? "border-red-500 border"
                                                                             : ""
-                                                                    }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={"Kho - vị trí kho"}
                                                                     menuPortalTarget={document.body}
                                                                     formatOptionLabel={(option) => {
@@ -2325,18 +2315,17 @@ const Index = (props) => {
                                                                             disabled={
                                                                                 e?.matHang?.e?.text_type != "products"
                                                                             }
-                                                                            className={`border ${
-                                                                                e?.matHang?.e?.text_type != "products"
+                                                                            className={`border ${e?.matHang?.e?.text_type != "products"
                                                                                     ? "bg-gray-50"
                                                                                     : errSerial &&
-                                                                                      (ce?.serial == "" ||
-                                                                                          ce?.serial == null)
-                                                                                    ? "border-red-500"
-                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                                                        (ce?.serial == "" ||
+                                                                                            ce?.serial == null)
+                                                                                        ? "border-red-500"
+                                                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                                                                 //  && !ce?.disabledDate
                                                                                 //   ? ""
                                                                                 //   : ce?.disabledDate ? "" : ""
-                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
                                                                             // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
                                                                             // className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b w-[100%] border-gray-200" } rounded "appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal   focus:outline-none"`}
                                                                             onChange={_HandleChangeChild.bind(
@@ -2352,7 +2341,7 @@ const Index = (props) => {
                                                                 ""
                                                             )}
                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                dataProductExpiry.is_enable === "1" ? (
                                                                 <>
                                                                     <div className=" col-span-1  ">
                                                                         <div className="flex justify-center  h-full p-0.5 flex-col items-center">
@@ -2365,18 +2354,17 @@ const Index = (props) => {
                                                                             <input
                                                                                 value={ce?.lot}
                                                                                 disabled={ce?.disabledDate}
-                                                                                className={`border ${
-                                                                                    ce?.disabledDate
+                                                                                className={`border ${ce?.disabledDate
                                                                                         ? "bg-gray-50"
                                                                                         : errLot &&
-                                                                                          (ce?.lot == "" ||
-                                                                                              ce?.lot == null)
-                                                                                        ? "border-red-500"
-                                                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                            (ce?.lot == "" ||
+                                                                                                ce?.lot == null)
+                                                                                            ? "border-red-500"
+                                                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                     //  && !ce?.disabledDate
                                                                                     //   ? ""
                                                                                     //   : ce?.disabledDate ? "" : ""
-                                                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
                                                                                 // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
 
                                                                                 // className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded w-[100%] "appearance-none focus:outline-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal    focus:outline-none"`}
@@ -2418,18 +2406,17 @@ const Index = (props) => {
                                                                                             dataLang?.price_quote_system_default ||
                                                                                             "price_quote_system_default"
                                                                                         }
-                                                                                        className={`border ${
-                                                                                            ce?.disabledDate
+                                                                                        className={`border ${ce?.disabledDate
                                                                                                 ? "bg-gray-50"
                                                                                                 : errDateList &&
-                                                                                                  ce?.date == null
-                                                                                                ? "border-red-500"
-                                                                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                                    ce?.date == null
+                                                                                                    ? "border-red-500"
+                                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                             //  && !ce?.disabledDate
                                                                                             //   ? ""
                                                                                             //   : ce?.disabledDate ? "" : ""
-                                                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
-                                                                                        // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                                                                    // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
                                                                                     />
                                                                                     {effectiveDate && (
                                                                                         <>
@@ -2548,7 +2535,7 @@ const Index = (props) => {
                                                                 <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                     {formatNumber(
                                                                         Number(ce?.price) *
-                                                                            (1 - Number(ce?.chietKhau) / 100)
+                                                                        (1 - Number(ce?.chietKhau) / 100)
                                                                     )}
                                                                 </h3>
                                                             </div>
@@ -2595,9 +2582,9 @@ const Index = (props) => {
                                                             <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                 {formatNumber(
                                                                     ce?.price *
-                                                                        (1 - Number(ce?.chietKhau) / 100) *
-                                                                        (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                                                        Number(ce?.amount)
+                                                                    (1 - Number(ce?.chietKhau) / 100) *
+                                                                    (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                                                    Number(ce?.amount)
                                                                 )}
                                                             </div>
                                                             {/* <div>{ce?.note}</div> */}

@@ -7,7 +7,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import { components } from "react-select";
-import Popup_phongban from "./(popupDepartments)/popup";
+import Popup_phongban from "./components/departments/popup";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
@@ -22,6 +22,9 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
+import useToast from "@/hooks/useToast";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Index = (props) => {
     const router = useRouter();
@@ -29,6 +32,8 @@ const Index = (props) => {
     const { isOpen, isId, handleQueryId } = useToggle();
 
     const dataLang = props.dataLang;
+
+    const isShow = useToast()
 
     const trangthaiExprired = useStatusExprired();
 
@@ -40,9 +45,8 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems()
 
-    const [totalItem, sTotalItem] = useState([]);
 
     const _ServerFetching = () => {
         Axios(
@@ -156,16 +160,17 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/personnels/departments");
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
     const multiDataSet = [
         {
             columns: [
@@ -378,8 +383,9 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} thành phần
+                                    {/* {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

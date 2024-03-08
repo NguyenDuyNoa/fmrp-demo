@@ -10,11 +10,11 @@ import Datepicker from "react-tailwindcss-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
 import { useEffect } from "react";
 import { debounce } from "lodash";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
+import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import PopupDetail from "./(popupDetail)/PopupDetail";
-import PopupDetailProduct from "../sales_order/(PopupDetail)/PopupDetailProduct";
+import PopupDetail from "./components/PopupDetail";
+import PopupDetailProduct from "../sales_order/components/PopupDetailProduct";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -30,11 +30,20 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useSelector } from "react-redux";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 
 const Index = (props) => {
+
     const dataLang = props.dataLang;
 
     const router = useRouter();
@@ -43,39 +52,40 @@ const Index = (props) => {
 
     const trangthaiExprired = useStatusExprired();
 
-    const [data, setData] = useState([]);
+    const dataSeting = useSetingServer()
 
-    const [dataExcel, sDataExcel] = useState([]);
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
-    const [onFetching, sOnFetching] = useState(false);
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
+    const { checkAdd, checkExport } = useActionRole(auth, "deliveryReceipt")
 
-    const { isOpen, isId, isKeyState, handleQueryId } = useToggle();
-
-    const [totalItems, sTotalItems] = useState([]);
-
-    const [keySearch, sKeySearch] = useState("");
-
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const [total, setTotal] = useState({});
 
-    const [listBr, sListBr] = useState([]);
+    const initialState = {
+        data: [],
+        dataExcel: [],
+        onFetching: false,
+        onFetchingFilter: false,
+        keySearch: "",
+        listBr: [],
+        listDelivery: [],
+        listCustomer: [],
+        idBranch: null,
+        idDelivery: null,
+        idCustomer: null,
+        listTabStatus: [],
+        valueDate: {
+            startDate: null,
+            endDate: null,
+        }
 
-    const [listDelivery, sListDelivery] = useState([]);
+    }
+    const [isState, sIsState] = useState(initialState);
 
-    const [listCustomer, sListCustomer] = useState([]);
-
-    const [idBranch, sIdBranch] = useState(null);
-
-    const [idDelivery, sIdDelivery] = useState(null);
-
-    const [idCustomer, sIdCustomer] = useState(null);
-
-    const [listTabStatus, sListTabStatus] = useState();
-
-    const [valueDate, sValueDate] = useState({ startDate: null, endDate: null });
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -89,6 +99,7 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : -1 },
         });
+        queryState({ onFetchingFilter: true, onFetching: true });
     }, []);
 
     const _ServerFetching = () => {
@@ -98,25 +109,28 @@ const Index = (props) => {
             `/api_web/api_delivery/getDeliveries?csrf_protection=true`,
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
                     status: tabPage ? tabPage : -1,
-                    branch_id: idBranch != null ? idBranch.value : null,
-                    delivery_id: idDelivery != null ? idDelivery?.value : null,
-                    customer_id: idCustomer != null ? idCustomer.value : null,
-                    start_date: valueDate?.startDate != null ? valueDate?.startDate : null,
-                    end_date: valueDate?.endDate != null ? valueDate?.endDate : null,
+                    branch_id: isState.idBranch != null ? isState.idBranch.value : null,
+                    delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
+                    customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
+                    start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let { rResult, output, rTotal } = response.data.data;
-                    setData(rResult);
                     sTotalItems(output);
-                    sDataExcel(rResult);
                     setTotal(rTotal);
-                    sOnFetching(false);
+                    queryState({
+                        data: rResult,
+                        dataExcel: rResult,
+                        onFetching: false
+                    });
+
                 }
             }
         );
@@ -129,120 +143,97 @@ const Index = (props) => {
             {
                 params: {
                     limit: 0,
-                    search: keySearch,
-                    branch_id: idBranch != null ? idBranch.value : null,
-                    delivery_id: idDelivery != null ? idDelivery?.value : null,
-                    start_date: valueDate?.startDate != null ? valueDate?.startDate : null,
-                    end_date: valueDate?.endDate != null ? valueDate?.endDate : null,
-                    customer_id: idCustomer != null ? idCustomer.value : null,
+                    search: isState.keySearch,
+                    branch_id: isState.idBranch != null ? isState.idBranch.value : null,
+                    delivery_id: isState.idDelivery != null ? isState.idDelivery?.value : null,
+                    start_date: isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    end_date: isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+                    customer_id: isState.idCustomer != null ? isState.idCustomer.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let { data } = response.data;
-                    sListTabStatus(data?.status);
+                    queryState({ listTabStatus: data?.status, onFetchingFilter: false });
                 }
-                sOnFetching(false);
             }
         );
     };
 
     // filter
+    const convertArray = (arr) => {
+        return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
+    }
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                sListBr(rResult);
+                queryState({ listBr: convertArray(rResult) });
             }
         });
-
-        await Axios("GET", `/api_web/api_delivery/searchDelivery?csrf_protection=true`, {}, (err, response) => {
+        await Axios("GET", `api_web/api_delivery/searchDeliveries?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let rResult = response.data.data;
-                sListDelivery(rResult?.map((e) => ({ label: e?.reference_no, value: e?.id })));
+                let { data } = response?.data;
+                queryState({ listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
             }
         });
-
-        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
+        await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                let db = response.data.rResult;
-                sListCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
+                let { data } = response.data;
+                queryState({ listCustomer: convertArray(data?.clients) });
             }
         });
-
-        sOnFetching_filter(false);
+        queryState({ onFetchingFilter: false });
     };
 
-    let searchTimeout;
-
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") {
-            return;
-        } else {
-            clearTimeout(searchTimeout);
-
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/api_delivery/searchDelivery?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let result = response?.data;
-                            sListCode(
-                                result?.map((e) => ({
-                                    label: `${e.reference_no}`,
-                                    value: e.id,
-                                }))
-                            );
-                        }
-                    }
-                );
-            }, 500);
+    const handleSearchApiClient = debounce((value) => {
+        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
+            params: {
+                search: value ? value : "",
+            },
+        }, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                queryState({ listCustomer: convertArray(data?.clients) });
+            }
         }
-    };
+        )
+    }, 500)
+
+    const handleSearchApiOrders = debounce((value) => {
+        Axios("GET", "/api_web/api_delivery/searchDeliveries?csrf_protection=true", {
+            params: {
+                search: value ? value : "",
+            },
+        }, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                queryState({ listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
+            }
+        }
+        )
+    }, 500)
+
+
 
     useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
+        isState.onFetchingFilter && _ServerFetching_filter();
+    }, [isState.onFetchingFilter]);
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
-    }, [onFetching]);
-
-    // useEffect(() => {
-    //     (router.query.tab && sOnFetching(true)) ||
-    //         (keySearch && sOnFetching(true)) ||
-    //         (router.query?.tab && sOnFetching_filter(true)) ||
-    //         (idBranch != null && sOnFetching(true)) ||
-    //         (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-    //         (idCustomer != null && sOnFetching(true)) ||
-    //         (idDelivery != null && sOnFetching(true));
-    // }, [
-    //     limit,
-    //     router.query?.page,
-    //     router.query?.tab,
-    //     idBranch,
-    //     valueDate.endDate,
-    //     valueDate.startDate,
-    //     idCustomer,
-    //     idDelivery,
-    // ]);
+        (isState.onFetching && _ServerFetching()) || (isState.onFetching && _ServerFetching_group());
+    }, [isState.onFetching]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
+        queryState({ onFetching: true });
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
         if (
-            idBranch != null ||
-            (valueDate.startDate != null && valueDate.endDate != null) ||
-            idCustomer != null ||
-            idDelivery != null
+            isState.idBranch != null ||
+            (isState.valueDate?.startDate != null && isState.valueDate?.endDate != null) ||
+            isState.idCustomer != null ||
+            isState.idDelivery != null
         ) {
             router.push({
                 pathname: router.route,
@@ -251,32 +242,13 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idBranch != null && sOnFetching(true)) ||
-                    (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-                    (idCustomer != null && sOnFetching(true)) ||
-                    (idDelivery != null && sOnFetching(true)) ||
-                    (keySearch && sOnFetching(true));
+                queryState({ onFetching: true })
             }, 300);
         } else {
-            sOnFetching(true);
+            queryState({ onFetching: true })
         }
-    }, [limit, idBranch, idDelivery, idCustomer, valueDate.endDate, valueDate.startDate]);
+    }, [limit, isState.idBranch, isState.keySearch, isState.idDelivery, isState.idCustomer, isState.valueDate?.endDate, isState.valueDate?.startDate]);
 
-    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
-
-    const typeChange = {
-        branch: sIdBranch,
-        code: sIdDelivery,
-        customer: sIdCustomer,
-        date: sValueDate,
-    };
-
-    const onChangeFilter = async (type, value) => {
-        const updateFunction = await typeChange[type];
-        if (updateFunction) {
-            updateFunction(value);
-        }
-    };
 
     const paginate = (pageNumber) => {
         router.push({
@@ -289,20 +261,18 @@ const Index = (props) => {
     };
 
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value);
+        queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
-        sOnFetching(true);
+        queryState({ onFetching: true });
     }, 500);
 
-    const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
     };
     // excel
     const multiDataSet = [
@@ -397,7 +367,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: dataExcel?.map((e) => [
+            data: isState.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.reference_no ? e?.reference_no : ""}` },
@@ -407,7 +377,7 @@ const Index = (props) => {
                 },
                 { value: `${e?.reference_no_order ? e?.reference_no_order : ""}` },
                 {
-                    value: `${e?.grand_total ? formatNumber(e?.grand_total) : 0}`,
+                    value: `${e?.grand_total ? formatMoney(e?.grand_total) : 0}`,
                 },
                 { value: `${e?.created_by_full_name ? e?.created_by_full_name : ""}` },
                 {
@@ -420,8 +390,6 @@ const Index = (props) => {
     ];
 
     const [checkedWare, sCheckedWare] = useState({});
-    const [onSending, sOnSending] = useState(false);
-
     const handleSaveStatus = () => {
         if (isKeyState?.type === "browser") {
             const checked = isKeyState.value.target.checked;
@@ -433,7 +401,7 @@ const Index = (props) => {
                 checkedpost: isKeyState?.checkedUn,
             };
             sCheckedWare(dataChecked);
-            setData([...data]);
+            queryState({ data: [...isState.data] });
         }
 
         handleQueryId({ status: false });
@@ -461,29 +429,29 @@ const Index = (props) => {
                 if (!err) {
                     let { isSuccess, message, alert_type } = response?.data;
                     if (isSuccess) {
-                        isShow(alert_type, dataLang[message]);
+                        isShow(alert_type, dataLang[message] || message);
                         setTimeout(() => {
-                            sOnFetching(true);
+                            queryState({ onFetching: true });
                         }, 300);
                     } else {
-                        isShow(alert_type, dataLang[message]);
+                        isShow(alert_type, dataLang[message] || message);
                     }
                 }
-                sOnSending(false);
+                queryState({ onSending: false });
             }
         );
     };
 
     useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
+        isState.onSending && _ServerSending();
+    }, [isState.onSending]);
 
     useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
+        checkedWare.id != null && queryState({ onSending: true });
     }, [checkedWare]);
 
     useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
+        checkedWare.id != null && queryState({ onSending: true });
     }, [checkedWare.id != null]);
 
     return (
@@ -511,18 +479,26 @@ const Index = (props) => {
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.delivery_receipt_list || "delivery_receipt_list"}
                                 </h2>
-                                <div className="flex justify-end items-center">
-                                    <Link
-                                        href={routerDeliveryReceipt.form}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E]  via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >
-                                        {dataLang?.btn_new || "btn_new"}
-                                    </Link>
-                                </div>
+                                <button
+                                    onClick={() => {
+                                        if (role) {
+                                            router.push(routerDeliveryReceipt.form)
+                                        } else if (checkAdd) {
+                                            router.push(routerDeliveryReceipt.form)
+                                        }
+                                        else {
+                                            isShow("warning", WARNING_STATUS_ROLE)
+                                        }
+                                    }}
+                                    type="button"
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                >
+                                    {dataLang?.btn_new || "btn_new"}
+                                </button>
                             </div>
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listTabStatus &&
-                                    listTabStatus.map((e) => {
+                                {isState.listTabStatus &&
+                                    isState.listTabStatus.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -549,277 +525,83 @@ const Index = (props) => {
                                         <div className="col-span-6">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
-                                                    <form className="flex items-center relative ">
-                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
-                                                        <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
-                                                            type="text"
-                                                            onChange={handleOnChangeKeySearch.bind(this)}
-                                                            placeholder={dataLang?.branch_search}
-                                                        />
-                                                    </form>
+                                                    <SearchComponent dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleOnChangeKeySearch.bind(this)} />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.price_quote_branch ||
-                                                                    "price_quote_branch",
+                                                                label: dataLang?.price_quote_branch || "price_quote_branch",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listBr_filter,
+                                                            ...isState.listBr,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "branch")}
-                                                        value={idBranch}
-                                                        placeholder={
-                                                            dataLang?.price_quote_select_branch ||
-                                                            "price_quote_select_branch"
-                                                        }
-                                                        hideSelectedOptions={false}
+                                                        onChange={(e) => queryState({ idBranch: e })}
+                                                        value={isState.idBranch}
+                                                        placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        // components={{ MultiValue }}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.delivery_receipt_code ||
-                                                                    "delivery_receipt_code",
+                                                                label: dataLang?.delivery_receipt_code || "delivery_receipt_code",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listDelivery,
+                                                            ...isState.listDelivery,
                                                         ]}
-                                                        onInputChange={_HandleSeachApi.bind(this)}
-                                                        onChange={onChangeFilter.bind(this, "code")}
-                                                        value={idDelivery}
-                                                        placeholder={
-                                                            dataLang?.delivery_receipt_code || "delivery_receipt_code"
-                                                        }
-                                                        hideSelectedOptions={false}
+                                                        onInputChange={handleSearchApiOrders.bind(this)}
+                                                        onChange={(e) => queryState({ idDelivery: e })}
+                                                        value={isState.idDelivery}
+                                                        placeholder={dataLang?.delivery_receipt_code || "delivery_receipt_code"}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        // components={{ MultiValue }}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
-                                                        //  options={listBr_filter}
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.price_quote_select_customer ||
-                                                                    "price_quote_select_customer",
+                                                                label: dataLang?.price_quote_select_customer || "price_quote_select_customer",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listCustomer,
+                                                            ...isState.listCustomer,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "customer")}
-                                                        value={idCustomer}
-                                                        placeholder={
-                                                            dataLang?.price_quote_customer || "price_quote_customer"
-                                                        }
-                                                        hideSelectedOptions={false}
+                                                        onChange={(e) => queryState({ idCustomer: e })}
+                                                        value={isState.idCustomer}
+                                                        onInputChange={handleSearchApiClient.bind(this)}
+                                                        placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="z-20 col-span-1">
-                                                    <Datepicker
-                                                        value={valueDate}
-                                                        i18n={"vi"}
-                                                        primaryColor={"blue"}
-                                                        onChange={onChangeFilter.bind(this, "date")}
-                                                        showShortcuts={true}
-                                                        displayFormat={"DD/MM/YYYY"}
-                                                        configs={{
-                                                            shortcuts: {
-                                                                today: "Hôm nay",
-                                                                yesterday: "Hôm qua",
-                                                                past: (period) => `${period}  ngày qua`,
-                                                                currentMonth: "Tháng này",
-                                                                pastMonth: "Tháng trước",
-                                                            },
-                                                            footer: {
-                                                                cancel: "Từ bỏ",
-                                                                apply: "Áp dụng",
-                                                            },
-                                                        }}
-                                                        className="react-datepicker__input-container"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[9px] py-[11px] xl:px-0 px-2 bg-white focus:outline-[#0F4F9E] 3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[10px] 3xl:placeholder:text-xs 2xl:placeholder:text-[13px] xl:placeholder:text-[10px] lg:placeholder:text-[8px] border-none focus:outline-none focus:ring-0 focus:border-transparent"
-                                                    />
+                                                    <DatepickerComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={sOnFetching} />
-                                                <div>
-                                                    {dataExcel?.length > 0 && (
-                                                        <ExcelFile
-                                                            filename={
-                                                                dataLang?.delivery_receipt_list ||
-                                                                "delivery_receipt_list"
-                                                            }
-                                                            title="DSPGH"
-                                                            element={
-                                                                <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                        size={18}
-                                                                    />
-                                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={multiDataSet}
-                                                                data={multiDataSet}
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <div className="font-[300] text-slate-400 3xl:text-xs 2xl:text-xs xl:text-[10px] lg:text-[6px]">
-                                                        {dataLang?.display}
+                                                <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                                {(role == true || checkExport) ?
+                                                    <div className={``}>
+                                                        {isState.dataExcel?.length > 0 && (
+                                                            <ExcelFileComponent dataLang={dataLang}
+                                                                filename={dataLang?.delivery_receipt_list || "delivery_receipt_list"}
+                                                                title={'DSPGH'}
+                                                                multiDataSet={multiDataSet}
+                                                            />)}
                                                     </div>
-                                                    <select
-                                                        className="outline-none text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) => sLimit(e.target.value)}
-                                                        value={limit}
-                                                    >
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                                            disabled
-                                                        >
-                                                            {limit == -1 ? "Tất cả" : limit}
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={15}
-                                                        >
-                                                            15
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={20}
-                                                        >
-                                                            20
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={40}
-                                                        >
-                                                            40
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={60}
-                                                        >
-                                                            60
-                                                        </option>
-                                                    </select>
+                                                    :
+                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                    </button>
+                                                }
+                                                <div>
+                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
                                             </div>
                                         </div>
@@ -864,12 +646,12 @@ const Index = (props) => {
                                                 {dataLang?.price_quote_operations || "price_quote_operations"}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {isState.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : isState.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {data?.map((e) => (
+                                                    {isState.data?.map((e) => (
                                                         <div
                                                             className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
                                                             key={e.id.toString()}
@@ -907,7 +689,7 @@ const Index = (props) => {
                                                                 id={e?.order_id}
                                                             />
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.grand_total)}
+                                                                {formatMoney(e.grand_total)}
                                                             </h6>
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
@@ -1005,18 +787,19 @@ const Index = (props) => {
                             </div>
                             <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-1">
-                                    {formatNumber(total?.grand_total)}
+                                    {formatMoney(total?.grand_total)}
                                 </h3>
                             </div>
                             <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
-                                    {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
+                                    {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}
+                                    {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"} */}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

@@ -9,38 +9,23 @@ import Loading from "./loading";
 
 import { Lexend_Deca } from "@next/font/google";
 import { useSelector } from "react-redux";
-import ExpandableContent from "./more";
-import TabFilter from "./TabFilter";
-import { ArrowCircleDown, Cd, SearchNormal1, TickCircle } from "iconsax-react";
+import { Cd, SearchNormal1, TickCircle } from "iconsax-react";
+import useToast from "@/hooks/useToast";
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
 });
 
 export const Dropdown = (props) => {
-    const [isZoomed, setIsZoomed] = useState(false);
-
-    const handleClick = () => {
-        setIsZoomed(true);
-
-        setTimeout(() => {
-            setIsZoomed(false);
-        }, 200);
-    };
-
-    const zoomedStyle = {
-        transform: isZoomed ? "scale(1.1)" : "scale(1)",
-        transition: "transform 0.2s",
-        willChange: "transform",
-    };
+    const { is_admin } = useSelector((state) => state.auth);
+    console.log("is_admin", is_admin);
+    const showToat = useToast()
     return (
         <div className="">
             <Popup
                 trigger={
                     <button
-                        className={`text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] 
-              `}
-                    >
+                        className={`text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] `}>
                         {props.children}
                     </button>
                 }
@@ -53,11 +38,7 @@ export const Dropdown = (props) => {
                 <div className={`w-auto ${deca.className} `}>
                     <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
                         {props.data?.map((e, i) => (
-                            <div
-                                className={`${
-                                    e.title
-                                        ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5"
-                                        : "px-1"
+                            <div className={`${e.title ? "3xl:px-6 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5" : "px-1"
                                 } 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
                                 key={i}
                             >
@@ -69,35 +50,93 @@ export const Dropdown = (props) => {
                                 {e.sub?.map((ce, ci) => (
                                     <div className="space-y-0.5" key={ci}>
                                         {ce.link ? (
-                                            <Link
-                                                title={ce.title}
-                                                href={`${ce.link}`}
-                                                className="flex  items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
-                                            >
-                                                {ce?.img ? (
-                                                    <React.Fragment>
-                                                        <Image
-                                                            alt={ce.title}
-                                                            src={ce?.img}
-                                                            width={24}
-                                                            height={24}
-                                                            quality={100}
-                                                            className={`object-contain"`}
-                                                            loading="lazy"
-                                                            crossOrigin="anonymous"
-                                                            placeholder="blur"
-                                                            blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                                        />
-                                                        <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
-                                                            {ce.title}
-                                                        </h5>
-                                                    </React.Fragment>
-                                                ) : (
-                                                    <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
-                                                        {ce.title}
-                                                    </li>
-                                                )}
-                                            </Link>
+                                            <>{
+                                                is_admin ?
+                                                    <Link title={ce.title} href={`${ce.link}`}
+                                                        className="flex  items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
+                                                    >
+                                                        {ce?.img ? (
+                                                            <React.Fragment>
+                                                                <Image
+                                                                    alt={ce.title}
+                                                                    src={ce?.img}
+                                                                    width={24}
+                                                                    height={24}
+                                                                    quality={100}
+                                                                    className={`object-contain"`}
+                                                                    loading="lazy"
+                                                                    crossOrigin="anonymous"
+                                                                    placeholder="blur"
+                                                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                />
+                                                                <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
+                                                                    {ce.title}
+                                                                </h5>
+                                                            </React.Fragment>
+                                                        ) : (
+                                                            <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
+                                                                {ce.title}
+                                                            </li>
+                                                        )}
+                                                    </Link> :
+                                                    (ce?.viewOwn == "1" || ce?.view == "1") ?
+                                                        <Link title={ce.title} href={`${ce.link}`}
+                                                            className="flex  items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
+                                                            {ce?.img ? (
+                                                                <React.Fragment>
+                                                                    <Image
+                                                                        alt={ce.title}
+                                                                        src={ce?.img}
+                                                                        width={24}
+                                                                        height={24}
+                                                                        quality={100}
+                                                                        className={`object-contain"`}
+                                                                        loading="lazy"
+                                                                        crossOrigin="anonymous"
+                                                                        placeholder="blur"
+                                                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                    />
+                                                                    <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
+                                                                        {ce.title}
+                                                                    </h5>
+                                                                </React.Fragment>
+                                                            ) : (
+                                                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
+                                                                    {ce.title}
+                                                                </li>
+                                                            )}
+                                                        </Link>
+                                                        :
+                                                        <button type="button"
+                                                            onClick={() => showToat('warning', 'Bạn không có quyền truy cập')}
+                                                            className="flex text-left text-gray-400 w-full opacity-60 cursor-not-allowed  items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87]">
+                                                            {ce?.img ? (
+                                                                <React.Fragment>
+                                                                    <Image
+                                                                        alt={ce.title}
+                                                                        src={ce?.img}
+                                                                        width={24}
+                                                                        height={24}
+                                                                        quality={100}
+                                                                        className={`object-contain"`}
+                                                                        loading="lazy"
+                                                                        crossOrigin="anonymous"
+                                                                        placeholder="blur"
+                                                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                    />
+                                                                    <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
+                                                                        {ce.title}
+                                                                    </h5>
+                                                                </React.Fragment>
+                                                            ) : (
+                                                                <li className="3xl:text-base 2xl:text-[14px] xl:text-[12px] lg:text-[10px] text-[#344054] marker:text-[#9295A4] outline-none">
+                                                                    {ce.title}
+                                                                </li>
+                                                            )}
+                                                        </button>
+
+                                            }
+                                            </>
                                         ) : (
                                             <React.Fragment>
                                                 {ce.title && (
@@ -121,28 +160,24 @@ export const Dropdown = (props) => {
                                                 )}
                                             </React.Fragment>
                                         )}
-                                        {ce.items?.map((e, i) => (
-                                            <Link
-                                                href={e.link ? e.link : "#"}
-                                                title={e.name}
-                                                className="outline-none"
-                                                key={i}
-                                            >
-                                                {/* <a title={e.name} className="outline-none"> */}
-                                                <ZoomableElement
-                                                    name={e?.name}
-                                                />
-                                                {/* <li 
-                                                     style={zoomedStyle} 
-                                                     onMouseDown={handleMouseDown}
-                                                     onMouseUp={handleMouseUp}
-                                                     onMouseEnter={handleMouseEnter}
-                                                     className="text-[14px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                    {e.name}
-                                                    </li> */}
-                                                {/* </a> */}
-                                            </Link>
-                                        ))}
+                                        {ce.items?.map((e, i) => {
+                                            return (
+                                                <div>
+                                                    {is_admin ?
+                                                        <Link href={e.link ? e.link : "#"} title={e.name} className="outline-none" key={i}>
+                                                            <ZoomableElement name={e?.name} />
+                                                        </Link>
+                                                        : (e?.viewOwn == "1" || e?.view == "1") ? <Link href={e.link ? e.link : "#"} title={e.name} className="outline-none" key={i}>
+                                                            <ZoomableElement name={e?.name} />
+                                                        </Link> :
+                                                            <button onClick={() => showToat('warning', 'Bạn không có quyền truy cập')} type="button" className="outline-none cursor-not-allowed text-left text-gray-100 w-full opacity-60">
+                                                                <ZoomableElement name={e?.name} />
+                                                            </button>
+                                                    }
+                                                </div>
+                                            )
+
+                                        })}
                                     </div>
                                 ))}
                             </div>
@@ -269,19 +304,19 @@ export const DropdownThongBao = (props) => {
                                         {props.data?.tab.find(
                                             (e) => e.id === tab
                                         )?.sub?.length > 0 && (
-                                            <Link
-                                                href={`${props.data?.tab[tab]?.link}`}
-                                            >
-                                                <ZoomableElements className="text-center    items-center ">
-                                                    <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
-                                                        {
-                                                            props.data?.tab[tab]
-                                                                ?.more
-                                                        }
-                                                    </h5>
-                                                </ZoomableElements>
-                                            </Link>
-                                        )}
+                                                <Link
+                                                    href={`${props.data?.tab[tab]?.link}`}
+                                                >
+                                                    <ZoomableElements className="text-center    items-center ">
+                                                        <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
+                                                            {
+                                                                props.data?.tab[tab]
+                                                                    ?.more
+                                                            }
+                                                        </h5>
+                                                    </ZoomableElements>
+                                                </Link>
+                                            )}
                                     </>
                                 )}
                             </div>
@@ -360,7 +395,7 @@ const TabContent = ({ subItems, checkStt }) => {
                                             </div>
                                             <div className="">
                                                 {checkStt ||
-                                                checkStatus[index] ? (
+                                                    checkStatus[index] ? (
                                                     <TickCircle
                                                         size="16"
                                                         color="green"
@@ -401,19 +436,16 @@ const TabFilters = React.memo((props) => {
         <button
             style={props.style}
             onClick={props.onClick}
-            className={`${
-                props.tab == props.active && "bg-blue-400 text-white"
-            } ${
-                props.className
-            } justify-center 3xl:text-[12px] xxl:text-[11px]  2xl:text-[8.5px] xl:text-[8px] lg:text-[7.5px] text-[9px] flex  items-center rounded-md px-2 py-1 outline-none relative`}
+            className={`${props.tab == props.active && "bg-blue-400 text-white"
+                } ${props.className
+                } justify-center 3xl:text-[12px] xxl:text-[11px]  2xl:text-[8.5px] xl:text-[8px] lg:text-[7.5px] text-[9px] flex  items-center rounded-md px-2 py-1 outline-none relative`}
         >
             {props.children}
             {!props.checkStt && (
                 <span
-                    className={`${
-                        props?.sub?.length > 0 &&
+                    className={`${props?.sub?.length > 0 &&
                         "absolute 3xl:w-[20px] 2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[20px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[10px] 2xl:text-[9px] xl:text-[9px] lg:text-[9px] text-[9px] top-0 right-0 bg-[#ff6f00]  3xl:translate-x-[30%] 2xl:translate-x-2.5 xl:translate-x-2 lg:translate-x-[40%] 3xl:-translate-y-[50%] 2xl:-translate-y-2  xl:-translate-y-[40%] lg:-translate-y-[40%] text-white rounded-full text-center items-center flex justify-center"
-                    } `}
+                        } `}
                 >
                     {/* {props?.total > 0 && props?.total} */}
                     {props?.sub?.length > 0 && props?.sub?.length}

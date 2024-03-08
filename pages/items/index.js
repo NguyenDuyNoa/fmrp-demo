@@ -38,6 +38,9 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
+import useFeature from "@/hooks/useConfigFeature";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -66,6 +69,8 @@ const Index = (props) => {
 
     const dispatch = useDispatch();
 
+    const feature = useFeature()
+
     const [data, sData] = useState([]);
 
     const { isOpen, isId, handleQueryId } = useToggle();
@@ -93,11 +98,9 @@ const Index = (props) => {
         }
     };
 
-    const [totalItems, sTotalItems] = useState({});
-
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
@@ -123,16 +126,17 @@ const Index = (props) => {
                 sOnFetching(false);
             }
         );
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-            }
-        });
+        // Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+        //     if (!err) {
+        //         var data = response.data;
+        //         sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+        //     }
+        // });
     };
 
     useEffect(() => {
         onFetching && _ServerFetching();
+        sDataMaterialExpiry(feature?.dataProductSerial)
     }, [onFetching]);
 
     useEffect(() => {
@@ -214,25 +218,26 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 1500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 1500);
+        sOnFetching(true);
+    }, 500)
 
     const handleDelete = async () => {
         Axios("DELETE", `/api_web/api_material/material/${isId}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var { isSuccess, message } = response.data;
                 if (isSuccess) {
-                    isShow("success", props.dataLang[message]);
+                    isShow("success", props.dataLang[message] || message);
                 } else {
-                    isShow("success", props.dataLang[message]);
+                    isShow("error", props.dataLang[message] || message);
                 }
             }
             _ServerFetching();
@@ -605,7 +610,8 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
+                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
                         </h6>
                         <Pagination
                             postsPerPage={limit}
@@ -616,7 +622,7 @@ const Index = (props) => {
                     </div>
                 )}
             </div>
-            <PopupConfim  dataLang={dataLang}
+            <PopupConfim dataLang={dataLang}
                 type="warning"
                 title={TITLE_DELETE}
                 subtitle={CONFIRM_DELETION}
@@ -817,19 +823,91 @@ const Popup_NVL = React.memo((props) => {
 
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
-            sDataTotalVariant([
-                ...(optSelectedVariantMain?.length > 0
-                    ? optSelectedVariantMain?.map((item1) => ({
-                          ...item1,
-                          image: null,
-                          sku: "",
-                          variation_option_2: optSelectedVariantSub?.map((item2) => ({
-                              ...item2,
-                              sku: "",
-                          })),
-                      }))
-                    : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
-            ]);
+            const newData = optSelectedVariantMain?.map(e => {
+                const newViar = dataTotalVariant?.find(x => x?.id == e?.id)
+                return {
+                    ...e,
+                    image: null,
+                    sku: "",
+                    id_primary: newViar?.id_primary ? newViar?.id_primary : e?.id_primary,
+                    isDelete: newViar?.isDelete,
+                    variation_option_2: optSelectedVariantSub?.map((item2) => {
+                        const check = newViar?.variation_option_2.find(x => x?.id == item2?.id)
+                        return {
+                            ...item2,
+                            isDelete: check?.isDelete,
+                            id_primary: check && check?.id_primary ? check?.id_primary : item2?.id_primary,
+                            sku: "",
+                        }
+                    })
+                }
+            })
+            // const newdb = [...dataTotalVariant, ...newData]
+            // // Mảng chứa dữ liệu sau khi xử lý
+            // const processedData = [];
+            // // Tạo một đối tượng để theo dõi các phần tử theo id
+            // const idMap = {};
+            // // Duyệt qua mảng newdb
+            // newdb.forEach(item => {
+            //     const id = item.id;
+            //     // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
+            //     if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+            //         idMap[id] = item;
+            //     }
+            // });
+            // // Lấy các giá trị từ idMap và đưa vào mảng processedData
+            // for (const id in idMap) {
+            //     processedData.push(idMap[id]);
+            // }
+            // sDataTotalVariant(processedData.reverse());
+            console.log("newData", newData);
+            const newdb = [...dataTotalVariant, ...newData]
+
+            // Mảng chứa dữ liệu sau khi xử lý
+            const processedData = [];
+            // Tạo một đối tượng để theo dõi các phần tử theo id
+            const idMap = {};
+            // Duyệt qua mảng newdb
+            newdb.forEach(item => {
+                const id = item.id;
+                // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
+                // if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+                //     idMap[id] = item;
+                // }
+                // Nếu id là null, giữ nguyên phần tử
+                if (id === null) {
+                    idMap[id] = item;
+                } else {
+                    // Nếu id chưa được thêm vào idMap hoặc variation_option_2 có id, thì cập nhật idMap
+                    if (!idMap[id] || (item.variation_option_2 && item.variation_option_2.find(option => option.id))) {
+                        idMap[id] = item;
+                    }
+                }
+            });
+
+            console.log("newdb", newdb);
+            // Lấy các giá trị từ idMap và đưa vào mảng processedData
+            for (const id in idMap) {
+                processedData.push(idMap[id]);
+            }
+            console.log("Object.values(idMap)", Object.values(idMap));
+
+
+            console.log("processedData", processedData);
+            sDataTotalVariant(processedData.reverse());
+            // sDataTotalVariant([
+            //     ...(optSelectedVariantMain?.length > 0
+            //         ? optSelectedVariantMain?.map((item1) => ({
+            //             ...item1,
+            //             image: null,
+            //             sku: "",
+            //             variation_option_2: optSelectedVariantSub?.map((item2) => ({
+            //                 ...item2,
+            //                 sku: "",
+            //             })),
+            //         }))
+            //         : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
+            // ]);
             sDataVariantSending([
                 {
                     name: dataOptVariant.find((e) => e.value == variantMain)?.label,
@@ -954,16 +1032,18 @@ const Popup_NVL = React.memo((props) => {
         formData.append("is_delete_image ", isDeleteThumb);
         branch_id.forEach((id) => formData.append("branch_id[]", id));
 
-        for (let i = 0; i < dataTotalVariant.length; i++) {
+        for (let i = 0; i < dataTotalVariant?.length; i++) {
             var item = dataTotalVariant[i];
 
             formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
             formData.set(`variation_option_value[${i}][image]`, item.image || "");
+            formData.set(`variation_option_value[${i}][id_primary]`, item?.id_primary || "0");
 
             if (item.variation_option_2?.length > 0) {
                 for (let j = 0; j < item.variation_option_2?.length; j++) {
                     var subItem = item.variation_option_2[j];
                     formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem.id);
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id_primary]`, subItem?.id_primary || "0");
                     formData.set(`variation_option_value[${i}][variation_option_2][${j}][sku]`, subItem.sku || "");
                 }
             } else {
@@ -971,18 +1051,17 @@ const Popup_NVL = React.memo((props) => {
             }
         }
 
-        for (let i = 0; i < dataVariantSending.length; i++) {
-            for (let j = 0; j < dataVariantSending[i].option.length; j++) {
+        for (let i = 0; i < dataVariantSending?.length; i++) {
+            for (let j = 0; j < dataVariantSending[i].option?.length; j++) {
                 formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
             }
         }
 
         Axios(
             "POST",
-            `${
-                props?.id
-                    ? `/api_web/api_material/material/${props.id}?csrf_protection=true`
-                    : "/api_web/api_material/material?csrf_protection=true"
+            `${props?.id
+                ? `/api_web/api_material/material/${props.id}?csrf_protection=true`
+                : "/api_web/api_material/material?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -990,9 +1069,10 @@ const Popup_NVL = React.memo((props) => {
             },
             (err, response) => {
                 if (!err) {
+                    console.log("response", response);
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
+                        isShow("success", props.dataLang[message] || message);
                         sOpen(false);
                         props.onRefresh && props.onRefresh();
                         sGroupId();
@@ -1008,7 +1088,7 @@ const Popup_NVL = React.memo((props) => {
                         sThumb(null);
                         sThumbFile(null);
                     } else {
-                        isShow("error", props.dataLang[message]);
+                        isShow("error", props.dataLang[message] || message);
                     }
                 }
                 sOnSending(false);
@@ -1018,6 +1098,7 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         onSending && _ServerSending();
+        console.log("sub mit");
     }, [onSending]);
 
     const _HandleSubmit = (e) => {
@@ -1256,7 +1337,7 @@ const Popup_NVL = React.memo((props) => {
             handleQueryId({ status: false });
         }
     };
-
+    console.log("dataTotalVariant", dataTotalVariant);
     return (
         <PopupEdit
             title={
@@ -1274,17 +1355,15 @@ const Popup_NVL = React.memo((props) => {
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${
-                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
                         {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
@@ -1314,9 +1393,8 @@ const Popup_NVL = React.memo((props) => {
                                                 closeMenuOnSelect={false}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${
-                                                    errBranch ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errBranch ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -1355,9 +1433,9 @@ const Popup_NVL = React.memo((props) => {
                                                 value={
                                                     groupId
                                                         ? {
-                                                              label: dataOptGr?.find((x) => x?.value == groupId)?.label,
-                                                              value: groupId,
-                                                          }
+                                                            label: dataOptGr?.find((x) => x?.value == groupId)?.label,
+                                                            value: groupId,
+                                                        }
                                                         : null
                                                 }
                                                 onChange={_HandleChangeInput.bind(this, "group")}
@@ -1366,9 +1444,8 @@ const Popup_NVL = React.memo((props) => {
                                                 placeholder={props.dataLang?.header_category_material_group}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${
-                                                    errGroup ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errGroup ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -1408,11 +1485,10 @@ const Popup_NVL = React.memo((props) => {
                                                 onChange={_HandleChangeInput.bind(this, "code")}
                                                 type="text"
                                                 placeholder={props.dataLang?.client_popup_sytem}
-                                                className={`${
-                                                    errCode
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                                className={`${errCode
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                             />
                                             {errCode && (
                                                 <label className="text-sm text-red-500">
@@ -1434,11 +1510,10 @@ const Popup_NVL = React.memo((props) => {
                                                     props.dataLang?.category_material_list_name ||
                                                     "category_material_list_name"
                                                 }
-                                                className={`${
-                                                    errName
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                                className={`${errName
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                             />
                                             {errName && (
                                                 <label className="text-sm text-red-500">
@@ -1512,9 +1587,9 @@ const Popup_NVL = React.memo((props) => {
                                                 value={
                                                     unit
                                                         ? {
-                                                              label: dataOptUnit?.find((x) => x?.value == unit)?.label,
-                                                              value: unit,
-                                                          }
+                                                            label: dataOptUnit?.find((x) => x?.value == unit)?.label,
+                                                            value: unit,
+                                                        }
                                                         : null
                                                 }
                                                 onChange={_HandleChangeInput.bind(this, "unit")}
@@ -1526,9 +1601,8 @@ const Popup_NVL = React.memo((props) => {
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${
-                                                    errUnit ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
+                                                className={`${errUnit ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
                                                 isSearchable={true}
                                                 theme={(theme) => ({
                                                     ...theme,
@@ -1572,11 +1646,11 @@ const Popup_NVL = React.memo((props) => {
                                                         value={
                                                             unitChild
                                                                 ? {
-                                                                      label: dataOptUnit?.find(
-                                                                          (x) => x?.value == unitChild
-                                                                      )?.label,
-                                                                      value: unitChild,
-                                                                  }
+                                                                    label: dataOptUnit?.find(
+                                                                        (x) => x?.value == unitChild
+                                                                    )?.label,
+                                                                    value: unitChild,
+                                                                }
                                                                 : null
                                                         }
                                                         onChange={_HandleChangeInput.bind(this, "unitChild")}
@@ -1709,13 +1783,15 @@ const Popup_NVL = React.memo((props) => {
                                                     value={
                                                         variantMain
                                                             ? {
-                                                                  label: dataOptVariant.find(
-                                                                      (e) => e.value == variantMain
-                                                                  )?.label,
-                                                                  value: variantMain,
-                                                              }
+                                                                label: dataOptVariant.find(
+                                                                    (e) => e.value == variantMain
+                                                                )?.label,
+                                                                value: variantMain,
+                                                            }
                                                             : null
                                                     }
+                                                    // isDisabled={dataVariantSending[0] ? true : false}
+                                                    isDisabled={dataVariantSending[0] && dataTotalVariant?.some(e => e?.id != "" || e?.id != null)}
                                                     onChange={_HandleChangeInput.bind(this, "variantMain")}
                                                     isClearable={true}
                                                     placeholder={
@@ -1835,13 +1911,15 @@ const Popup_NVL = React.memo((props) => {
                                                     value={
                                                         variantSub
                                                             ? {
-                                                                  label: dataOptVariant.find(
-                                                                      (e) => e.value == variantSub
-                                                                  )?.label,
-                                                                  value: variantSub,
-                                                              }
+                                                                label: dataOptVariant.find(
+                                                                    (e) => e.value == variantSub
+                                                                )?.label,
+                                                                value: variantSub,
+                                                            }
                                                             : null
                                                     }
+                                                    // isDisabled={dataVariantSending[1] ? true : false}
+                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e.id && e?.variation_option_2?.length > 0)}
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
                                                     placeholder={
@@ -1956,7 +2034,7 @@ const Popup_NVL = React.memo((props) => {
                                             onClick={_HandleApplyVariant.bind(this)}
                                             disabled={
                                                 optSelectedVariantMain?.length == 0 &&
-                                                optSelectedVariantSub?.length == 0
+                                                    optSelectedVariantSub?.length == 0
                                                     ? true
                                                     : false
                                             }
@@ -1971,11 +2049,10 @@ const Popup_NVL = React.memo((props) => {
                                                 {props.dataLang?.list_variant || "list_variant"}
                                             </h4>
                                             <div
-                                                className={`${
-                                                    dataTotalVariant[0]?.variation_option_2?.length > 0
-                                                        ? "grid-cols-4"
-                                                        : "grid-cols-3"
-                                                } grid gap-5 p-1`}
+                                                className={`${dataTotalVariant[0]?.variation_option_2?.length > 0
+                                                    ? "grid-cols-4"
+                                                    : "grid-cols-4"
+                                                    } grid gap-5 p-1`}
                                             >
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400">
                                                     {props.dataLang?.avatar}
@@ -1983,11 +2060,14 @@ const Popup_NVL = React.memo((props) => {
                                                 <h4 className="text-[15px] font-[300] text-slate-400">
                                                     {dataVariantSending[0]?.name}
                                                 </h4>
-                                                {dataTotalVariant[0]?.variation_option_2?.length > 0 && (
+                                                {/* {dataTotalVariant[0]?.variation_option_2?.length > 0 && (
                                                     <h4 className="text-[15px] font-[300] text-slate-400">
                                                         {dataVariantSending[1]?.name}
                                                     </h4>
-                                                )}
+                                                )} */}
+                                                <h4 className="text-[15px] font-[300] text-slate-400">
+                                                    {dataVariantSending[1]?.name}
+                                                </h4>
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400">
                                                     {props.dataLang?.branch_popup_properties ||
                                                         "branch_popup_properties"}
@@ -1995,17 +2075,16 @@ const Popup_NVL = React.memo((props) => {
                                             </div>
                                             <ScrollArea className="max-h-[250px]" speed={1} smoothScrolling={true}>
                                                 <div className="space-y-0.5">
-                                                    {dataTotalVariant?.map((e) => (
+                                                    {dataTotalVariant?.map((e, index) => (
                                                         <div
-                                                            className={`${
-                                                                e?.variation_option_2?.length > 0
-                                                                    ? "grid-cols-4"
-                                                                    : "grid-cols-3"
-                                                            } grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
-                                                            key={e?.id.toString()}
+                                                            className={`${e?.variation_option_2?.length > 0
+                                                                ? "grid-cols-4"
+                                                                : "grid-cols-4"
+                                                                } grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
+                                                            key={e?.id ? e?.id.toString() : index + 1}
                                                         >
-                                                            <div className="w-full h-full flex flex-col justify-center items-center">
-                                                                <input
+                                                            <div className="w-full h-full flex flex-col justify-center items-center col-span-1">
+                                                                {e?.id != null && <input
                                                                     onChange={_HandleChangeVariant.bind(
                                                                         this,
                                                                         e?.id,
@@ -2015,14 +2094,14 @@ const Popup_NVL = React.memo((props) => {
                                                                     id={`uploadImg+${e?.id}`}
                                                                     accept="image/png, image/jpeg"
                                                                     hidden
-                                                                />
+                                                                />}
                                                                 <label
                                                                     htmlFor={`uploadImg+${e?.id}`}
-                                                                    className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded"
+                                                                    className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}
                                                                 >
                                                                     {e.image == null ? (
                                                                         <React.Fragment>
-                                                                            <div className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded">
+                                                                            <div className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}>
                                                                                 <IconImage />
                                                                             </div>
                                                                         </React.Fragment>
@@ -2048,7 +2127,7 @@ const Popup_NVL = React.memo((props) => {
                                                                             <React.Fragment key={ce.id?.toString()}>
                                                                                 <div>{ce.name}</div>
                                                                                 <div className="flex justify-center">
-                                                                                    <button
+                                                                                    {ce?.isDelete && <button
                                                                                         // onClick={_HandleDeleteVariant.bind(
                                                                                         //     this,
                                                                                         //     e.id,
@@ -2065,25 +2144,51 @@ const Popup_NVL = React.memo((props) => {
                                                                                     >
                                                                                         <IconDelete size="22" />
                                                                                     </button>
+                                                                                    }
+                                                                                    {ce?.isDelete == undefined && <button
+                                                                                        // onClick={_HandleDeleteVariant.bind(
+                                                                                        //     this,
+                                                                                        //     e.id,
+                                                                                        //     ce.id
+                                                                                        // )}
+                                                                                        onClick={() =>
+                                                                                            handleQueryId({
+                                                                                                id: e.id,
+                                                                                                status: true,
+                                                                                                idChild: ce.id,
+                                                                                            })
+                                                                                        }
+                                                                                        className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                                    >
+                                                                                        <IconDelete size="22" />
+                                                                                    </button>
+                                                                                    }
+
+
+
                                                                                 </div>
                                                                                 {/* <input value={ce.sku} onChange={_HandleChangeSku.bind(this, e.id, ce.id)} placeholder='Mã SKU' className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full h-fit bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} /> */}
                                                                             </React.Fragment>
                                                                         ))}
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="flex justify-center">
-                                                                        <button
-                                                                            onClick={() =>
-                                                                                handleQueryId({
-                                                                                    id: e.id,
-                                                                                    status: true,
-                                                                                })
-                                                                            }
-                                                                            className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
-                                                                        >
-                                                                            <IconDelete size="22" />
-                                                                        </button>
-                                                                    </div>
+                                                                    <React.Fragment>
+                                                                        <div className="col-span-1 truncate">
+                                                                        </div>
+                                                                        <div className="flex justify-center">
+                                                                            <button
+                                                                                onClick={() =>
+                                                                                    handleQueryId({
+                                                                                        id: e.id,
+                                                                                        status: true,
+                                                                                    })
+                                                                                }
+                                                                                className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                            >
+                                                                                <IconDelete size="22" />
+                                                                            </button>
+                                                                        </div>
+                                                                    </React.Fragment>
                                                                 )
                                                                 // <input value={e?.sku} onChange={_HandleChangeVariant.bind(this, e.id, "sku")} placeholder='Mã SKU' className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full h-fit bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                                             }
@@ -2166,17 +2271,15 @@ const Popup_ThongTin = React.memo((props) => {
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${
-                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
@@ -2332,9 +2435,8 @@ const Popup_ThongTin = React.memo((props) => {
                                 {list?.variation?.length > 0 ? (
                                     <div className="space-y-2 min-h-[384px]">
                                         <div
-                                            className={`${
-                                                list?.variation[1] ? "grid-cols-3" : "grid-cols-2"
-                                            } grid gap-2 px-2 py-1 `}
+                                            className={`${list?.variation[1] ? "grid-cols-3" : "grid-cols-2"
+                                                } grid gap-2 px-2 py-1 `}
                                         >
                                             <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
                                                 Hình đại diện
@@ -2358,11 +2460,10 @@ const Popup_ThongTin = React.memo((props) => {
                                                 {list?.variation_option_value?.map((e) => (
                                                     <div
                                                         key={e?.id.toString()}
-                                                        className={`${
-                                                            e?.variation_option_2?.length > 0
-                                                                ? "grid-cols-3"
-                                                                : "grid-cols-2"
-                                                        } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
+                                                        className={`${e?.variation_option_2?.length > 0
+                                                            ? "grid-cols-3"
+                                                            : "grid-cols-2"
+                                                            } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
                                                     >
                                                         <div className="flex justify-center self-center">
                                                             {e?.image == null ? (

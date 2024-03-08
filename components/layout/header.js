@@ -13,8 +13,9 @@ import { Tooltip } from "react-tippy";
 import "react-tippy/dist/tippy.css";
 import Expirred from "components/UI/expired";
 import PopupModelTime from "components/UI/modelTime";
-
 const Header = () => {
+    const { permissions_current: auth } = useSelector((state) => state.auth);
+
     const ListDanhMuc = [
         {
             title: "Khách hàng",
@@ -24,15 +25,29 @@ const Header = () => {
                     img: "/icon/header/danhmuc/kh.png",
                     items: [
                         {
+                            viewOwn: auth?.customers?.is_view_own,
+                            view: auth?.customers?.is_view,
                             name: "Danh sách khách hàng",
-                            link: "/clients/clients",
+                            link: "/clients/clients?tab=0",
                         },
-                        { name: "Danh sách liên hệ", link: "/clients/contact" },
                         {
+                            name: "Danh sách liên hệ",
+                            link: "/clients/contact",
+                            viewOwn: auth?.client_contact?.is_view_own,
+                            view: auth?.client_contact?.is_view,
+                        },
+                        {
+                            viewOwn: auth?.client_status?.is_view_own,
+                            view: auth?.client_status?.is_view,
                             name: "Trạng thái khách hàng",
                             link: "/clients/statusClient",
                         },
-                        { name: "Nhóm khách hàng", link: "/clients/groups" },
+                        {
+                            viewOwn: auth?.client_group?.is_view_own,
+                            view: auth?.client_group?.is_view,
+                            name: "Nhóm khách hàng",
+                            link: "/clients/groups"
+                        },
                     ],
                 },
             ],
@@ -44,13 +59,26 @@ const Header = () => {
                     title: "Nhà cung cấp",
                     img: "/icon/header/danhmuc/ncc.png",
                     items: [
-                        { name: "Danh sách NCC", link: "/suppliers/supplier" },
                         {
+                            viewOwn: auth?.suppliers?.is_view_own,
+                            view: auth?.suppliers?.is_view,
+                            name: "Danh sách NCC",
+                            link: "/suppliers/supplier"
+                        },
+                        {
+                            viewOwn: auth?.contacts_suppliers?.is_view_own,
+                            view: auth?.contacts_suppliers?.is_view,
                             name: "Danh sách liên hệ NCC",
                             link: "/suppliers/contacts",
                         },
-                        { name: "Mặt hàng chủ đạo theo NCC" },
+                        // {
+                        //     viewOwn: 0,
+                        //     view: 0,
+                        //     name: "Mặt hàng chủ đạo theo NCC"
+                        // },
                         {
+                            viewOwn: auth?.suppliers_groups?.is_view_own,
+                            view: auth?.suppliers_groups?.is_view,
                             name: "Nhóm nhà cung cấp",
                             link: "/suppliers/groups",
                         },
@@ -66,18 +94,35 @@ const Header = () => {
                     img: "/icon/header/danhmuc/nvl.png",
                     items: [
                         {
+                            viewOwn: auth?.material_category?.is_view_own,
+                            view: auth?.material_category?.is_view,
                             name: "Nhóm nguyên vật liệu",
                             link: "/items/category",
                         },
-                        { name: "Danh sách nguyên vật liệu", link: "/items" },
+                        {
+                            viewOwn: auth?.materials?.is_view_own,
+                            view: auth?.materials?.is_view,
+                            name: "Danh sách nguyên vật liệu",
+                            link: "/items"
+                        },
                     ],
                 },
                 {
                     title: "thành phẩm",
                     img: "/icon/header/danhmuc/tp.png",
                     items: [
-                        { name: "Nhóm thành phẩm", link: "/products/category" },
-                        { name: "Danh sách thành phẩm", link: "/products" },
+                        {
+                            viewOwn: auth?.category_products?.is_view_own,
+                            view: auth?.category_products?.is_view,
+                            name: "Nhóm thành phẩm",
+                            link: "/products/category"
+                        },
+                        {
+                            viewOwn: auth?.products?.is_view_own,
+                            view: auth?.products?.is_view,
+                            name: "Danh sách thành phẩm",
+                            link: "/products"
+                        },
                     ],
                 },
             ],
@@ -90,11 +135,23 @@ const Header = () => {
                     img: "/icon/header/danhmuc/nv.png",
                     items: [
                         {
+                            viewOwn: auth?.staff?.is_view_own,
+                            view: auth?.staff?.is_view,
                             name: "Danh sách người dùng",
                             link: "/personnel/staff",
                         },
-                        { name: "Phòng ban", link: "/personnel/departments" },
-                        { name: "Chức vụ", link: "/personnel/roles" },
+                        {
+                            viewOwn: auth?.department?.is_view_own,
+                            view: auth?.department?.is_view,
+                            name: "Phòng ban",
+                            link: "/personnel/departments"
+                        },
+                        {
+                            viewOwn: auth?.position?.is_view_own,
+                            view: auth?.position?.is_view,
+                            name: "Chức vụ",
+                            link: "/personnel/roles"
+                        },
                     ],
                 },
             ],
@@ -109,10 +166,14 @@ const Header = () => {
                     // title: "Báo giá",
                     items: [
                         {
+                            viewOwn: auth?.quotes?.is_view_own,
+                            view: auth?.quotes?.is_view,
                             name: "Báo giá",
                             link: "/sales_export_product/price_quote",
                         },
                         {
+                            viewOwn: auth?.orders?.is_view_own,
+                            view: auth?.orders?.is_view,
                             name: "Đơn hàng bán",
                             link: "/sales_export_product/sales_order",
                         },
@@ -128,10 +189,14 @@ const Header = () => {
                     // link: "#"
                     items: [
                         {
+                            viewOwn: auth?.deliveries?.is_view_own,
+                            view: auth?.deliveries?.is_view,
                             name: "Phiếu giao hàng",
                             link: "/sales_export_product/delivery_receipt",
                         },
                         {
+                            viewOwn: auth?.returned_goods?.is_view_own,
+                            view: auth?.returned_goods?.is_view,
                             name: "Trả lại hàng bán",
                             link: "/sales_export_product/return_sales",
                         },
@@ -150,11 +215,20 @@ const Header = () => {
                     img: "/icon/header/muanhap/mua.png",
                     items: [
                         {
+                            viewOwn: auth?.purchases?.is_view_own,
+                            view: auth?.purchases?.is_view,
                             name: "Yêu cầu mua hàng",
                             link: "/purchase_order/purchases",
                         },
-                        { name: "Đơn đặt hàng", link: "/purchase_order/order" },
                         {
+                            viewOwn: auth?.purchase_order?.is_view_own,
+                            view: auth?.purchase_order?.is_view,
+                            name: "Đơn đặt hàng",
+                            link: "/purchase_order/order"
+                        },
+                        {
+                            viewOwn: auth?.services?.is_view_own,
+                            view: auth?.services?.is_view,
                             name: "Phiếu dịch vụ",
                             link: "/purchase_order/serviceVoucher",
                         },
@@ -169,8 +243,18 @@ const Header = () => {
                     title: "Nhập hàng & trả hàng",
                     img: "/icon/header/kho/Vector-9.png",
                     items: [
-                        { name: "Nhập hàng", link: "/purchase_order/import" },
-                        { name: "Trả hàng", link: "/purchase_order/returns" },
+                        {
+                            viewOwn: auth?.import?.is_view_own,
+                            view: auth?.import?.is_view,
+                            name: "Nhập hàng",
+                            link: "/purchase_order/import"
+                        },
+                        {
+                            viewOwn: auth?.return_suppliers?.is_view_own,
+                            view: auth?.return_suppliers?.is_view,
+                            name: "Trả hàng",
+                            link: "/purchase_order/returns"
+                        },
                     ],
                 },
             ],
@@ -185,41 +269,65 @@ const Header = () => {
                     title: "Kho hàng",
                     img: "/icon/header/kho/kho.png",
                     items: [
-                        { name: "Kho", link: "/warehouses/warehouse" },
-                        { name: "Vị trí kho", link: "/warehouses/location" },
+                        {
+                            viewOwn: auth?.warehouse?.is_view_own,
+                            view: auth?.warehouse?.is_view,
+                            name: "Kho",
+                            link: "/warehouses/warehouse"
+                        },
+                        {
+                            viewOwn: auth?.warehouse_location?.is_view_own,
+                            view: auth?.warehouse_location?.is_view,
+                            name: "Vị trí kho",
+                            link: "/warehouses/location"
+                        },
                     ],
                 },
+                // {
+                //     title: "Cảnh báo tồn kho",
+                //     img: "/icon/header/kho/canhbao.png",
+                //     link: "#",
+                //     viewOwn: 0,
+                //     view: 0,
+                // },
                 {
-                    title: "Cảnh báo tồn kho",
-                    img: "/icon/header/kho/canhbao.png",
-                    link: "#",
-                },
-                {
+                    viewOwn: auth?.transfer?.is_view_own,
+                    view: auth?.transfer?.is_view,
                     title: "Chuyển kho",
                     img: "/icon/header/kho/chuyenkho.png",
                     link: "/manufacture/warehouse_transfer",
                 },
                 {
+                    viewOwn: auth?.suggest_exporting?.is_view_own,
+                    view: auth?.suggest_exporting?.is_view,
                     title: "Xuất kho sản xuất",
                     img: "/icon/header/kho/xuatkho.png",
                     link: "/manufacture/production_warehouse",
                 },
                 {
+                    viewOwn: auth?.purchase_products?.is_view_own,
+                    view: auth?.purchase_products?.is_view,
                     title: "Nhập kho thành phẩm",
                     img: "/icon/header/kho/nhapkho.png",
                     link: "/manufacture/products_warehouse",
                 },
                 {
+                    viewOwn: auth?.purchase_internal?.is_view_own,
+                    view: auth?.purchase_internal?.is_view,
                     title: "Thu hồi nguyên vật liệu",
                     img: "/icon/header/kho/thuhoi.png",
                     link: "/manufacture/recall",
                 },
                 {
+                    viewOwn: auth?.export_different?.is_view_own,
+                    view: auth?.export_different?.is_view,
                     title: "Xuất kho khác",
                     img: "/icon/header/kho/xuatkho.png",
                     link: "/manufacture/export_to_other",
                 },
                 {
+                    viewOwn: auth?.inventory?.is_view_own,
+                    view: auth?.inventory?.is_view,
                     title: "Kiểm kê kho",
                     img: "/icon/header/kho/kk.png",
                     link: "/inventory",
@@ -230,21 +338,29 @@ const Header = () => {
             title: "Sản xuất",
             sub: [
                 {
+                    viewOwn: auth?.internal_plans?.is_view_own,
+                    view: auth?.internal_plans?.is_view,
                     title: "Kế hoạch nội bộ",
                     img: "/icon/header/kho/kehoach.png",
                     link: "/manufacture/internal_plan",
                 },
                 {
+                    viewOwn: auth?.production_plan?.is_view_own,
+                    view: auth?.production_plan?.is_view,
                     title: "Kế hoạch sản xuất",
                     img: "/icon/header/kho/kehoach.png",
                     link: "/manufacture/production_plan",
                 },
                 {
+                    viewOwn: auth?.production_plans_fmrp?.is_view_own,
+                    view: auth?.production_plans_fmrp?.is_view,
                     title: "Kế hoạch NVL",
                     img: "/icon/header/kho/kehoach.png",
                     link: "/manufacture/materials_planning",
                 },
                 {
+                    viewOwn: -1,
+                    view: -1,
                     title: "Điều độ sản xuất",
                     img: "/icon/header/kho/dieudo.png",
                     link: "/manufacture/production_smoothing",
@@ -253,20 +369,37 @@ const Header = () => {
                     title: "Sản xuất",
                     img: "/icon/header/kho/sx.png",
                     items: [
-                        { name: "Tổng quan sản xuất", link: "/manufacture/production_overview" },
-                        { name: "Lệnh sản xuất tổng" },
-                        { name: "Lệnh sản xuất chi tiết" },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tổng quan sản xuất",
+                            link: "/manufacture/production_overview"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Lệnh sản xuất tổng"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Lệnh sản xuất chi tiết"
+                        },
                     ],
                 },
-                // {
-                //     title: "Cảnh báo tồn kho",
-                //     img: "/icon/header/kho/canhbao.png",
-                //     link: "#",
-                // },
+                {
+                    title: "Cảnh báo tồn kho",
+                    img: "/icon/header/kho/canhbao.png",
+                    link: "#",
+                    viewOwn: -1,
+                    view: -1,
+                },
                 {
                     title: "Lịch sản xuất",
                     img: "/icon/header/kho/lich.png",
                     link: "/manufacture/production_schedule",
+                    viewOwn: -1,
+                    view: -1,
                 },
                 // {
                 //     title: "Năng suất sản lượng",
@@ -276,13 +409,27 @@ const Header = () => {
             ],
         },
         {
-            title: "Xuất gia công",
+            title: "Gia công ngoài",
             sub: [
+                // {
+                //     title: "Xuất gia công",
+                //     img: "/icon/header/khac/xgc.png",
+                //     items: [{ name: "Xuất gia công" }, { name: "Nhập gia công" }],
+                // },
                 {
-                    title: "Xuất gia công",
-                    img: "/icon/header/khac/xgc.png",
-                    items: [{ name: "Xuất gia công" }, { name: "Nhập gia công" }],
-                },
+                    items: [
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Xuất gia công"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Nhập gia công"
+                        }
+                    ],
+                }
             ],
         },
         {
@@ -292,21 +439,29 @@ const Header = () => {
                     title: "Kiểm tra chất lượng",
                     img: "/icon/header/kho/kt.png",
                     link: "#",
+                    viewOwn: -1,
+                    view: -1,
                 },
                 {
                     title: "Danh mục lỗi",
                     img: "/icon/header/kho/dml.png",
                     link: "#",
+                    viewOwn: -1,
+                    view: -1,
                 },
                 {
                     title: "Điều độ sản xuất",
                     img: "/icon/header/kho/dieudo.png",
                     link: "#",
+                    viewOwn: -1,
+                    view: -1,
                 },
                 {
                     title: "Chi tiết lỗi",
                     img: "/icon/header/kho/ctl.png",
                     link: "#",
+                    viewOwn: -1,
+                    view: -1,
                 },
             ],
         },
@@ -320,10 +475,40 @@ const Header = () => {
                     title: "Tiện ích",
                     img: "/icon/header/khac/ti.png",
                     items: [
-                        { name: "Yêu cầu khiếu nại" },
-                        { name: "Lịch" },
-                        { name: "Import dữ liệu", link: "/import" },
-                        { name: "Export dữ liệu", link: "/export" },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Yêu cầu khiếu nại"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Lịch"
+                        },
+                        {
+                            viewOwn: (auth?.customers?.is_view_own == "1" ||
+                                auth?.suppliers?.is_view_own == "1" ||
+                                auth?.materials?.is_view_own == "1" ||
+                                auth?.products?.is_view_own == "1") ? "1" : "0",
+                            view: (auth?.customers?.is_view == "1" ||
+                                auth?.suppliers?.is_view == "1" ||
+                                auth?.materials?.is_view == "1" ||
+                                auth?.products?.is_view == "1") ? "1" : "0",
+                            name: "Import dữ liệu",
+                            link: "/import"
+                        },
+                        {
+                            viewOwn: (auth?.customers?.is_view_own == "1" ||
+                                auth?.suppliers?.is_view_own == "1" ||
+                                auth?.materials?.is_view_own == "1" ||
+                                auth?.products?.is_view_own == "1") ? "1" : "0",
+                            view: (auth?.customers?.is_view == "1" ||
+                                auth?.suppliers?.is_view == "1" ||
+                                auth?.materials?.is_view == "1" ||
+                                auth?.products?.is_view == "1") ? "1" : "0",
+                            name: "Export dữ liệu",
+                            link: "/export"
+                        },
                     ],
                 },
             ],
@@ -335,10 +520,26 @@ const Header = () => {
                     title: "Công việc",
                     img: "/icon/header/khac/cv.png",
                     items: [
-                        { name: "Danh sách công việc" },
-                        { name: "Danh sách kanban" },
-                        { name: "Lịch công việc" },
-                        { name: "Sơ đồ gant" },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Danh sách công việc"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Danh sách kanban"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Lịch công việc"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Sơ đồ gant"
+                        },
                     ],
                 },
             ],
@@ -353,14 +554,46 @@ const Header = () => {
                     title: "Báo cáo",
                     img: "/icon/header/khac/bc.png",
                     items: [
-                        { name: "Báo cáo QC" },
-                        { name: "Báo cáo bán hàng" },
-                        { name: "Báo cáo mua hàng" },
-                        { name: "Công nợ phải thu" },
-                        { name: "Tồn quỷ" },
-                        { name: "Tồn kho" },
-                        { name: "Quản lý sản xuất" },
-                        { name: "Báo cáo lợi nhuận" },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Báo cáo QC"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Báo cáo bán hàng"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Báo cáo mua hàng"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Công nợ phải thu"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tồn quỷ"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tồn kho"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Quản lý sản xuất"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Báo cáo lợi nhuận"
+                        },
                     ],
                 },
             ],
@@ -372,10 +605,26 @@ const Header = () => {
             sub: [
                 {
                     items: [
-                        { name: "Tạo khách hàng" },
-                        { name: "Tạo nhà cung cấp" },
-                        { name: "Tạo yêu cầu mua hàng" },
-                        { name: "Tạo đơn mua hàng" },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tạo khách hàng"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tạo nhà cung cấp"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tạo yêu cầu mua hàng"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tạo đơn mua hàng"
+                        },
                     ],
                 },
             ],
@@ -393,26 +642,38 @@ const Header = () => {
                         {
                             name: "Quy trình sử dụng phần mềm FMRP",
                             link: "/process",
+                            viewOwn: -1,
+                            view: -1,
                         },
                         {
                             name: "Quy trình tổng quan các phân hệ",
                             link: "/processOverview",
+                            viewOwn: -1,
+                            view: -1,
                         },
                         {
                             name: "Quy trình quản lý sản xuất",
                             link: "/process_manufacture",
+                            viewOwn: -1,
+                            view: -1,
                         },
                         {
                             name: "Quy trình bán hàng",
                             link: "/process_products",
+                            viewOwn: -1,
+                            view: -1,
                         },
                         {
                             name: "Quy trình tổng quan bán hàng - Sản xuất",
                             link: "/process_sales",
+                            viewOwn: -1,
+                            view: -1,
                         },
                         {
                             name: "Quy trình mua hàng - nhập kho",
                             link: "/process_order",
+                            viewOwn: -1,
+                            view: -1,
                         },
                     ],
                 },
@@ -653,8 +914,18 @@ const Header = () => {
                     title: "Công nợ bán",
                     img: "/icon/header/banxuat/cnb.png",
                     items: [
-                        { name: "Phiếu thu", link: "/accountant/receipts" },
-                        { name: "Công nợ khách hàng", link: "/accountant/customerDebt" },
+                        {
+                            viewOwn: auth?.other_payslips_coupon?.is_view_own,
+                            view: auth?.other_payslips_coupon?.is_view,
+                            name: "Phiếu thu",
+                            link: "/accountant/receipts"
+                        },
+                        {
+                            viewOwn: auth?.customer_debt?.is_view_own,
+                            view: auth?.customer_debt?.is_view,
+                            name: "Công nợ khách hàng",
+                            link: "/accountant/customerDebt"
+                        },
                     ],
                 },
             ],
@@ -666,8 +937,15 @@ const Header = () => {
                     title: "Công nợ mua",
                     img: "/icon/header/muanhap/cnm.png",
                     items: [
-                        { name: "Phiếu chi", link: "/accountant/payment" },
                         {
+                            viewOwn: auth?.other_payslips?.is_view_own,
+                            view: auth?.other_payslips?.is_view,
+                            name: "Phiếu chi",
+                            link: "/accountant/payment"
+                        },
+                        {
+                            viewOwn: auth?.supplier_debt?.is_view_own,
+                            view: auth?.supplier_debt?.is_view,
                             name: "Công nợ nhà cung cấp",
                             link: "/accountant/debt_suppliers",
                         },
@@ -735,6 +1013,7 @@ const Header = () => {
             title: "+ Thêm",
         },
     ];
+
     const dataPstWH = useSelector((state) => state.trangthai);
     // Khai báo biến state
     const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
@@ -785,14 +1064,18 @@ const Header = () => {
     // }, [dataPstWH]);
     const currentDropdown = dropdowns[currentDropdownIndex];
     return (
-        <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
+        <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
+            {/* <header className="z-40 w-full bg-[#0375f3] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
+            {/* <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="3xl:mx-10 2xl:mx-10 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
                 <div className="flex justify-between items-center">
                     <div className="flex 3xl:space-x-6 2xl:space-x-4 xl:space-x-4 space-x-2 items-center">
                         <Link href="/">
                             <Image
                                 alt=""
-                                src="/logo.png"
+                                src="/LOGO_HEADER.png"
+                                // src="/Logo2.png"
+                                // src="/logo.png"
                                 width={100}
                                 height={45}
                                 quality={100}
@@ -878,9 +1161,9 @@ const Header = () => {
                                         position={dropdown.position}
                                         className={dropdown.className}
                                         style={dataPstWH}
-                                        // onClick={() =>
-                                        //   dispatch({ type: "trangthai", payload: true })
-                                        // }
+                                    // onClick={() =>
+                                    //   dispatch({ type: "trangthai", payload: true })
+                                    // }
                                     >
                                         {dropdown.title}
                                     </Dropdown>
@@ -1075,6 +1358,8 @@ const DropdownAvatar = React.memo(() => {
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
+
+
 
     const _HandleLogout = () => {
         sOnSending(true);

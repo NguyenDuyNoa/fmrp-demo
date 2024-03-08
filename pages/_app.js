@@ -36,7 +36,7 @@ const Default = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <link rel="shortcut icon" href="/favicon.ico" />
+                <link rel="shortcut icon" href="/Favicon.png" />
             </Head>
             <Provider store={store}>
                 <main className={deca.className}>
@@ -54,11 +54,26 @@ function MainPage({ Component, pageProps }) {
     const langDefault = useSelector((state) => state.lang);
     const [changeLang, sChangeLang] = useState(false);
     const [data, sData] = useState();
+    const [onSeting, sOnSeting] = useState(false)
 
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
+
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
+
+
+    // kiểm tra khi chuyển tab trình duyệt nếu đăng xuất thì tất cả tab đăng xuất
+    if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                console.log('Tab không được nhìn thấy');
+            } else {
+                sOnChecking(true);
+            }
+        });
+    }
+
 
     const _ServerLang = async () => {
         await Axios("GET", `/api_web/Api_Lang/language/${langDefault}`, {}, (err, response) => {
@@ -69,9 +84,40 @@ function MainPage({ Component, pageProps }) {
         });
     };
 
+
+    const FetchSetingServer = async () => {
+        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {
+        }, (err, response) => {
+            if (!err) {
+                const { settings } = response?.data
+                dispatch({ type: "setings/server", payload: settings });
+            }
+        });
+        await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                const data = response?.data;
+                const newData = {
+                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
+                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
+                    dataProductSerial: data.find((x) => x.code == "product_serial"),
+                }
+                dispatch({ type: "setings/feature", payload: newData });
+            }
+        });
+        sOnSeting(false)
+    };
+
     useEffect(() => {
         changeLang && _ServerLang();
     }, [changeLang]);
+
+    useEffect(() => {
+        sOnSeting(true)
+    }, [])
+
+    useEffect(() => {
+        onSeting && FetchSetingServer()
+    }, [onSeting])
 
     useEffect(() => {
         sChangeLang(true);
@@ -105,6 +151,7 @@ function MainPage({ Component, pageProps }) {
     useEffect(() => {
         auth === null && sOnChecking(true);
     }, [auth]);
+
 
     if (auth == null) {
         return <LoadingPage />;
@@ -158,12 +205,35 @@ const LoginPage = React.memo((props) => {
     const [listMajor, sListMajor] = useState([]);
     const [listPosition, sListPosition] = useState([]);
     const [checkMajior, sCheckMajior] = useState(null);
-
+    const [onSeting, sOnSeting] = useState(false)
     const [loadingRegester, sLoadingRegester] = useState(false);
 
     const showToat = (type, mssg) => {
         return Toast.fire({ icon: `${type}`, title: `${mssg}` });
     };
+
+
+    const FetchSetingServer = async () => {
+        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {
+        }, (err, response) => {
+            if (!err) {
+                const { settings } = response?.data
+                dispatch({ type: "setings/server", payload: settings });
+            }
+        });
+        await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                const data = response?.data;
+                const newData = {
+                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
+                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
+                    dataProductSerial: data.find((x) => x.code == "product_serial"),
+                }
+                dispatch({ type: "setings/feature", payload: newData });
+            }
+        });
+    };
+
     const _ServerSending = () => {
         Axios(
             "POST",
@@ -179,6 +249,7 @@ const LoginPage = React.memo((props) => {
                 if (response !== null) {
                     const { isSuccess, message, token, database_app } = response?.data;
                     if (isSuccess) {
+                        FetchSetingServer()
                         dispatch({ type: "auth/update", payload: response.data?.data });
 
                         localStorage.setItem("tokenFMRP", token);
@@ -383,7 +454,8 @@ const LoginPage = React.memo((props) => {
                                         </div>
                                         <button
                                             onClick={_HandleSubmit.bind(this)}
-                                            className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105"
+                                            className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0375f3] via-[#0375f3] via-[#296dc1] to-[#0375f3] btn-animation hover:scale-105"
+                                        // className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105"
                                         >
                                             {dataLang?.auth_login || "auth_login"}
                                         </button>
@@ -454,8 +526,9 @@ const LoginPage = React.memo((props) => {
                                     <div className="pointer-events-none select-none">
                                         <Image
                                             alt=""
-                                            src="/logo_1.png"
                                             width={200}
+                                            // src="/FMRP_Logo.png"
+                                            src="/LOGO_LOGIN.png"
                                             height={70}
                                             quality={100}
                                             className="object-contain"
@@ -629,8 +702,8 @@ const LoginPage = React.memo((props) => {
                                                 })}
                                                 placeholder="Nhập họ và tên của bạn"
                                                 className={`${errors.fullName
-                                                        ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    ? "border-red-500 border"
+                                                    : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                     } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
@@ -652,8 +725,8 @@ const LoginPage = React.memo((props) => {
                                                 })}
                                                 placeholder="Nhập tên công ty"
                                                 className={`${errors.companyName
-                                                        ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    ? "border-red-500 border"
+                                                    : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                     } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
@@ -680,8 +753,8 @@ const LoginPage = React.memo((props) => {
                                                     })}
                                                     placeholder="Nhập Email của bạn"
                                                     className={`${errors.email
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                         } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.email && (
@@ -705,8 +778,8 @@ const LoginPage = React.memo((props) => {
                                                     })}
                                                     placeholder="Nhập số điện thoại"
                                                     className={`${errors.phone
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                         } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.phone && errors.phone.type === "required" && (
@@ -745,8 +818,8 @@ const LoginPage = React.memo((props) => {
                                                     })}
                                                     placeholder="Nhập mật khẩu"
                                                     className={`${errors.password
-                                                            ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                        ? "border-red-500 border"
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                         } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.password && errors.password.type === "required" && (
@@ -901,7 +974,8 @@ const LoadingPage = () => {
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg> */}
-                <img src="/loadingLogo.gif.jpg" className="h-40" />
+                <img src="/loadingLogo.gif" className="h-52" />
+                {/* <img src="/loadingLogo.gif.jpg" className="h-40" /> */}
             </div>
         </React.Fragment>
     );

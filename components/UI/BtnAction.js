@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "services/axios";
 
 import { BiEdit } from "react-icons/bi";
-import { ArrowDown2 } from "iconsax-react";
+import { ArrowDown2, Box1, BoxSearch } from "iconsax-react";
 import pdfMake from "pdfmake/build/pdfmake";
 import { VscFilePdf } from "react-icons/vsc";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -26,8 +26,8 @@ import {
 } from "@/routers/manufacture";
 
 import PopupConfim from "./popupConfim/popupConfim";
-import Popup_KeepStock from "@/pages/sales_export_product/sales_order/(PopupDetail)/PopupKeepStock";
-import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/(PopupDetail)/PopupDetailKeepStock";
+import Popup_KeepStock from "@/pages/sales_export_product/sales_order/components/PopupKeepStock";
+import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/components/PopupDetailKeepStock";
 
 ///Đơn đặt hàng PO
 import Popup_TableValidateEdit from "@/pages/purchase_order/order/(popup)/validateEdit";
@@ -45,6 +45,11 @@ import Popup_dspc from "@/pages/accountant/payment/(popup)/popup";
 import Popup_dspt from "@/pages/accountant/receipts/(popup)/popup";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useSelector } from "react-redux";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -61,17 +66,15 @@ const BtnAction = React.memo((props) => {
 
     const [openAction, setOpenAction] = useState(false);
 
-    const [dataCompany, setDataCompany] = useState();
-
-    const [data, setData] = useState();
-
     const _ToggleModal = (e) => setOpenAction(e);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const dataSeting = useSetingServer()
 
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkDelete, checkEdit } = useActionRole(auth, props?.type);
 
     const confimDelete = (url) => {
         Axios("DELETE", url, {}, (err, response) => {
@@ -291,62 +294,6 @@ const BtnAction = React.memo((props) => {
         }
     };
 
-    const fetchDataSettingsCompany = async () => {
-        if (props?.id) {
-            try {
-                await Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                    if (response && response.data) {
-                        let res = response.data.data;
-                        setDataCompany(res);
-                    }
-                });
-
-                await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-                    if (!err) {
-                        let data = response.data;
-                        sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                        sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                        sDataProductSerial(data.find((x) => x.code == "product_serial"));
-                    }
-                });
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        const initialApi = {
-            price_quote: `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`,
-            sales_product: `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
-            deliveryReceipt: `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`,
-            returnSales: `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
-            internal_plan: `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
-            purchases: `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
-            order: `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
-            serviceVoucher: `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
-            import: `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
-            returns: `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
-            warehouseTransfer: `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`,
-            production_warehouse: `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
-            productsWarehouse: `/api_web/Api_product_receipt/productReceipt/${props?.id}?csrf_protection=true`,
-            recall: `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
-            exportToOther: `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
-            receipts: `/api_web/Api_expense_payslips/expenseCoupon/${props?.id}?csrf_protection=true`,
-            payment: `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-        };
-
-        try {
-            await Axios("GET", initialApi[props.type], {}, (err, response) => {
-                if (response && response.data) {
-                    let db = props.type == "internal_plan" ? response.data.data : response.data;
-
-                    setData(db);
-                }
-            });
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
     const _ServerFetching_ValidatePayment = () => {
         Axios(
             "GET",
@@ -361,12 +308,15 @@ const BtnAction = React.memo((props) => {
         );
     };
 
+
     useEffect(() => {
-        openAction && fetchDataSettingsCompany();
         props.type == "order" && openAction && _ServerFetching_ValidatePayment();
     }, [openAction]);
 
-    const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial };
+
+    const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial, dataSeting };
+
+
 
     return (
         <div>
@@ -458,11 +408,22 @@ const BtnAction = React.memo((props) => {
                                 </Popup_dspc>
                             </div>
                         )}
-
                         {!["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
                             <button
-                                onClick={() => handleClick()}
-                                className="group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                onClick={() => {
+                                    if (role) {
+                                        handleClick()
+                                    }
+                                    else if (checkEdit) {
+                                        handleClick()
+                                    }
+                                    else {
+                                        isShow("warning", WARNING_STATUS_ROLE);
+                                    }
+                                }
+                                }
+                                className={`
+                                group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                             >
                                 <BiEdit
                                     size={20}
@@ -472,8 +433,8 @@ const BtnAction = React.memo((props) => {
                                     {props.dataLang?.btn_table_edit || "btn_table_edit"}
                                 </p>
                             </button>
-                        )}
-
+                        )
+                        }
                         {["deliveryReceipt", "returnSales", "import", "returns", "receipts", "payment"].includes(
                             props?.type
                         ) ? (
@@ -482,8 +443,6 @@ const BtnAction = React.memo((props) => {
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
-                                dataCompany={dataCompany}
-                                data={data}
                                 {...shareProps}
                             />
                         ) : (
@@ -492,13 +451,50 @@ const BtnAction = React.memo((props) => {
                                 props={props}
                                 openAction={openAction}
                                 setOpenAction={setOpenAction}
-                                dataCompany={dataCompany}
-                                data={data}
                             />
                         )}
+                        {
+                            props.type == "sales_product" && <>
+                                {(role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
+                                    <Popup_KeepStock {...props} {...shareProps} />
+                                    :
+                                    <button
+                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                        type="button"
+                                        className={`${props.type == "sales_product" ? "" : "justify-center"
+                                            } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                    >
+                                        <Box1
+                                            size={20}
+                                            className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <p className="group-hover:text-orange-500 pr-4">
+                                            {props.dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
+                                        </p>
+                                    </button>
+                                }
+                            </>
+                        }
 
-                        {props.type == "sales_product" && <Popup_KeepStock {...props} {...shareProps} />}
-                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} {...shareProps} />}
+                        {props.type == "sales_product" && <>
+                            {
+                                (role == true || auth?.orders?.is_create == 1 || auth?.orders?.is_edit == 1) ?
+                                    <Popup_DetailKeepStock {...props} {...shareProps} />
+                                    :
+                                    <button
+                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                        type="button"
+                                        className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                                        <BoxSearch
+                                            size={20}
+                                            className="group-hover:text-amber-500 group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <p className="group-hover:text-amber-500 pr-2.5">
+                                            {props.dataLang?.salesOrder_see_stock_keeping || "salesOrder_see_stock_keeping"}
+                                        </p>
+                                    </button>
+                            }
+                        </>}
                         {props.type == "order" ? (
                             <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
                                 <RiDeleteBin6Line
@@ -514,23 +510,38 @@ const BtnAction = React.memo((props) => {
                                 />
                             </div>
                         ) : (
-                            <button
-                                onClick={() => handleQueryId({ id: props?.id, status: true })}
-                                className={`group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
-                                    } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
-                            >
-                                <RiDeleteBin6Line
-                                    size={20}
-                                    className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                                />
-                                <p className="group-hover:text-[#f87171]">
-                                    {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                                </p>
-                            </button>
+                            <>
+                                {
+                                    <button
+                                        onClick={() => {
+                                            if (role) {
+                                                handleQueryId({ id: props?.id, status: true })
+                                            }
+                                            else if (checkDelete) {
+                                                handleQueryId({ id: props?.id, status: true })
+                                            }
+                                            else {
+                                                isShow("warning", WARNING_STATUS_ROLE)
+                                            }
+                                        }}
+                                        className={` group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
+                                            } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                    >
+                                        <RiDeleteBin6Line
+                                            size={20}
+                                            className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
+                                        />
+                                        <p className="group-hover:text-[#f87171]">
+                                            {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
+                                        </p>
+                                    </button>
+                                }
+                            </>
+
                         )}
                     </div>
                 </div>
-            </Popup>
+            </Popup >
 
             <PopupConfim
                 dataLang={props.dataLang}
@@ -541,7 +552,7 @@ const BtnAction = React.memo((props) => {
                 save={() => handleDelete()}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </div>
+        </div >
     );
 });
 const Popup_Pdf = (props) => {
@@ -551,6 +562,7 @@ const Popup_Pdf = (props) => {
         dataMaterialExpiry: props?.dataMaterialExpiry,
         dataProductExpiry: props?.dataProductExpiry,
         dataProductSerial: props?.dataProductSerial,
+        dataSeting: props?.dataSeting
     };
     return (
         <>
@@ -585,8 +597,6 @@ const Popup_Pdf = (props) => {
                                 props={props.props}
                                 openAction={props.openAction}
                                 setOpenAction={props.setOpenAction}
-                                dataCompany={props.dataCompany}
-                                data={props.data}
                                 dataLang={props.dataLang}
                             />
                         </div>

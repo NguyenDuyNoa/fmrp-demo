@@ -29,6 +29,8 @@ import OnResetData from "components/UI/btnResetData/btnReset";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -49,8 +51,7 @@ const Index = (props) => {
     const trangthaiExprired = useStatusExprired();
 
     const [keySearch, sKeySearch] = useState("");
-    const [limit, sLimit] = useState(15);
-    const [totalItem, sTotalItems] = useState([]);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
     const [onFetching, sOnFetching] = useState(false);
     const [data, sData] = useState({});
@@ -72,7 +73,7 @@ const Index = (props) => {
                 if (!err) {
                     var { rResult, output } = response.data;
                     sData(rResult);
-                    sTotalItems(output);
+                    updateTotalItems(output);
                     sData_ex(rResult);
                 }
                 sOnFetching(false);
@@ -143,7 +144,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -151,13 +152,14 @@ const Index = (props) => {
                 // tab: router.query?.page,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
     useEffect(() => {
         (onFetching && _ServerFetching()) ||
             (onFetching && _ServerFetching_brand()) ||
@@ -444,8 +446,9 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
+                                    {/* {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

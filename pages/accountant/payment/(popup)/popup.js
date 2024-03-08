@@ -45,6 +45,7 @@ import { useDispatch } from "react-redux";
 import CreatableSelect from "react-select/creatable";
 import formatNumber from "@/utils/helpers/formatnumber";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -203,25 +204,25 @@ const Popup_dspc = (props) => {
                         db?.objects === "other"
                             ? { label: db?.object_text, value: db?.object_text }
                             : {
-                                  label: dataLang[db?.object_text] || db?.object_text,
-                                  value: db?.objects_id,
-                              }
+                                label: dataLang[db?.object_text] || db?.object_text,
+                                value: db?.objects_id,
+                            }
                     );
                     sTypeOfDocument(
                         db?.type_vouchers
                             ? {
-                                  label: dataLang[db?.type_vouchers],
-                                  value: db?.type_vouchers,
-                              }
+                                label: dataLang[db?.type_vouchers],
+                                value: db?.type_vouchers,
+                            }
                             : null
                     );
                     sListTypeOfDocument(
                         db?.type_vouchers
                             ? db?.voucher?.map((e) => ({
-                                  label: e?.code,
-                                  value: e?.id,
-                                  money: e?.money,
-                              }))
+                                label: e?.code,
+                                value: e?.id,
+                                money: e?.money,
+                            }))
                             : []
                     );
                     sOption(
@@ -463,43 +464,76 @@ const Popup_dspc = (props) => {
 
     let searchTimeout;
 
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") return;
-        else {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                        params: {
-                            type: object?.value ? object?.value : null,
-                            voucher_type: typeOfDocument?.value ? typeOfDocument?.value : null,
-                            object_id: listObject?.value ? listObject?.value : null,
-                            "filter[branch_id]": branch?.value ? branch?.value : null,
-                            expense_voucher_id: id ? id : "",
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let db = response.data;
-                            sData((e) => ({
-                                ...e,
-                                dataListTypeofDoc: db?.map((e) => ({
-                                    label: e?.code,
-                                    value: e?.id,
-                                    money: e?.money,
-                                })),
-                            }));
-                        }
-                    }
-                );
-            }, 500);
-        }
-    };
+    const _HandleSeachApi = debounce((inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
+            {
+                data: {
+                    term: inputValue,
+                },
+                params: {
+                    type: object?.value ? object?.value : null,
+                    voucher_type: typeOfDocument?.value ? typeOfDocument?.value : null,
+                    object_id: listObject?.value ? listObject?.value : null,
+                    "filter[branch_id]": branch?.value ? branch?.value : null,
+                    expense_voucher_id: id ? id : "",
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    let db = response.data;
+                    sData((e) => ({
+                        ...e,
+                        dataListTypeofDoc: db?.map((e) => ({
+                            label: e?.code,
+                            value: e?.id,
+                            money: e?.money,
+                        })),
+                    }));
+                }
+            }
+        );
+    }, 500)
+    // let searchTimeout;
+
+    // const _HandleSeachApi = (inputValue) => {
+    //     if (inputValue == "") return;
+    //     else {
+    //         clearTimeout(searchTimeout);
+    //         searchTimeout = setTimeout(() => {
+    //             Axios(
+    //                 "POST",
+    //                 `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
+    //                 {
+    //                     data: {
+    //                         term: inputValue,
+    //                     },
+    //                     params: {
+    //                         type: object?.value ? object?.value : null,
+    //                         voucher_type: typeOfDocument?.value ? typeOfDocument?.value : null,
+    //                         object_id: listObject?.value ? listObject?.value : null,
+    //                         "filter[branch_id]": branch?.value ? branch?.value : null,
+    //                         expense_voucher_id: id ? id : "",
+    //                     },
+    //                 },
+    //                 (err, response) => {
+    //                     if (!err) {
+    //                         let db = response.data;
+    //                         sData((e) => ({
+    //                             ...e,
+    //                             dataListTypeofDoc: db?.map((e) => ({
+    //                                 label: e?.code,
+    //                                 value: e?.id,
+    //                                 money: e?.money,
+    //                             })),
+    //                         }));
+    //                     }
+    //                 }
+    //             );
+    //         }, 500);
+    //     }
+    // };
 
     //Loại chi phí
     const _ServerFetching_ListCost = () => {
@@ -711,10 +745,9 @@ const Popup_dspc = (props) => {
             }));
             ToatstNotifi(
                 "error",
-                `${
-                    totalSotienErr < price
-                        ? props?.dataLang.payment_err_alerTotalThan || "payment_err_alerTotalThan"
-                        : props.dataLang?.required_field_null || "required_field_null"
+                `${totalSotienErr < price
+                    ? props?.dataLang.payment_err_alerTotalThan || "payment_err_alerTotalThan"
+                    : props.dataLang?.required_field_null || "required_field_null"
                 }`
             );
         } else {
@@ -879,10 +912,9 @@ const Popup_dspc = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
-                    : "/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
+                : "/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -1024,9 +1056,8 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${
-                                                error.errBranch ? "border-red-500" : "border-transparent"
-                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${error.errBranch ? "border-red-500" : "border-transparent"
+                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errBranch && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1072,9 +1103,8 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${
-                                                error.errMethod ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${error.errMethod ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errMethod && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1120,9 +1150,8 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${
-                                                error.errObject ? "border-red-500" : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            className={`${error.errObject ? "border-red-500" : "border-transparent"
+                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errObject && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1143,9 +1172,8 @@ const Popup_dspc = (props) => {
                                                 isClearable={true}
                                                 value={listObject}
                                                 classNamePrefix="Select"
-                                                className={`${
-                                                    error.errListObject ? "border-red-500" : "border-transparent"
-                                                } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
+                                                    } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                 isSearchable={true}
                                                 noOptionsMessage={() => `Chưa có gợi ý`}
                                                 formatCreateLabel={(value) => `Tạo "${value}"`}
@@ -1222,9 +1250,8 @@ const Popup_dspc = (props) => {
                                                         position: "absolute",
                                                     }),
                                                 }}
-                                                className={`${
-                                                    error.errListObject ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                         )}
                                         {error.errListObject && (
@@ -1315,13 +1342,12 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${
-                                                error.errListTypeDoc &&
-                                                typeOfDocument != null &&
-                                                listTypeOfDocument?.length == 0
+                                            className={`${error.errListTypeDoc &&
+                                                    typeOfDocument != null &&
+                                                    listTypeOfDocument?.length == 0
                                                     ? "border-red-500"
                                                     : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
                                             typeOfDocument != null &&
@@ -1351,9 +1377,8 @@ const Popup_dspc = (props) => {
                                                 // ref={scrollAreaRef}
                                                 // speed={1}
                                                 // smoothScrolling={true}
-                                                className={`${
-                                                    data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
-                                                } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+                                                className={`${data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
+                                                    } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
                                             >
                                                 {data.dataTable.map((e) => {
                                                     return (
@@ -1410,10 +1435,9 @@ const Popup_dspc = (props) => {
                                                         if (floatValue > totalMoney) {
                                                             Toast.fire({
                                                                 icon: "error",
-                                                                title: `${
-                                                                    props.dataLang?.payment_errPlease ||
+                                                                title: `${props.dataLang?.payment_errPlease ||
                                                                     "payment_errPlease"
-                                                                } ${totalMoney.toLocaleString("en")}`,
+                                                                    } ${totalMoney.toLocaleString("en")}`,
                                                             });
                                                         }
                                                         return floatValue <= totalMoney;
@@ -1424,11 +1448,10 @@ const Popup_dspc = (props) => {
                                                     return true;
                                                 }
                                             }}
-                                            className={`${
-                                                error.errPrice && price == null
+                                            className={`${error.errPrice && price == null
                                                     ? "border-red-500"
                                                     : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
-                                            } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
+                                                } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
                                             thousandSeparator=","
                                         />
                                         {error.errPrice && (
@@ -1519,11 +1542,10 @@ const Popup_dspc = (props) => {
                                                                 position: "absolute",
                                                             }),
                                                         }}
-                                                        className={`${
-                                                            error.errCosts && e?.chiphi === ""
+                                                        className={`${error.errCosts && e?.chiphi === ""
                                                                 ? "border-red-500"
                                                                 : "border-transparent"
-                                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
+                                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                                     />
                                                 </div>
                                                 <div className="col-span-4 text-center flex items-center justify-center">
@@ -1549,10 +1571,9 @@ const Popup_dspc = (props) => {
                                                                 if (floatValue > price) {
                                                                     Toast.fire({
                                                                         icon: "error",
-                                                                        title: `${
-                                                                            props.dataLang?.payment_errPlease ||
+                                                                        title: `${props.dataLang?.payment_errPlease ||
                                                                             "payment_errPlease"
-                                                                        } ${price.toLocaleString("en")}`,
+                                                                            } ${price.toLocaleString("en")}`,
                                                                     });
                                                                 }
                                                                 return floatValue <= price;
@@ -1561,11 +1582,10 @@ const Popup_dspc = (props) => {
                                                             }
                                                         }}
                                                         isNumericString={true}
-                                                        className={`${
-                                                            error.errSotien && (e?.sotien === "" || e?.sotien === null)
+                                                        className={`${error.errSotien && (e?.sotien === "" || e?.sotien === null)
                                                                 ? "border-b-red-500"
                                                                 : " border-gray-200"
-                                                        } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
+                                                            } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                                         thousandSeparator=","
                                                     />
                                                 </div>

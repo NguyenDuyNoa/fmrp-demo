@@ -19,6 +19,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -94,16 +95,17 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/settings/branch");
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
     return (
         <React.Fragment>
             <Head>
@@ -319,10 +321,9 @@ const Popup_ChiNhanh = (props) => {
 
         Axios(
             "POST",
-            `${
-                props.id
-                    ? `/api_web/Api_Branch/branch/${id}?csrf_protection=true`
-                    : "/api_web/Api_Branch/branch?csrf_protection=true"
+            `${props.id
+                ? `/api_web/Api_Branch/branch/${id}?csrf_protection=true`
+                : "/api_web/Api_Branch/branch?csrf_protection=true"
             }`,
             {
                 data: data,
@@ -388,9 +389,8 @@ const Popup_ChiNhanh = (props) => {
                             onChange={_HandleChangeInput.bind(this, "name")}
                             name="fname"
                             type="text"
-                            className={`${
-                                required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                            } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
+                            className={`${required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
                         />
                         {required && <label className="text-sm text-red-500">Vui lòng nhập tên chi nhánh</label>}
                     </div>

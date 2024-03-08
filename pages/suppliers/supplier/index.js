@@ -32,6 +32,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -48,9 +50,8 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
-    const [totalItem, sTotalItems] = useState([]);
 
     const [onFetching, sOnFetching] = useState(false);
 
@@ -94,7 +95,7 @@ const Index = (props) => {
                 if (!err) {
                     var { rResult, output } = response.data;
                     sData(rResult);
-                    sTotalItems(output);
+                    updateTotalItems(output);
                     sData_ex(rResult);
                 }
                 sOnFetching(false);
@@ -185,7 +186,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -193,13 +194,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     useEffect(() => {
         (onFetching && _ServerFetching()) ||
@@ -624,8 +626,9 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
+                                    {/* {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

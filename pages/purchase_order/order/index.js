@@ -35,6 +35,7 @@ import Pagination from "@/components/UI/pagination";
 import { routerOrder } from "routers/buyImportGoods";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -268,7 +269,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -276,13 +277,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -400,13 +402,12 @@ const Index = (props) => {
                     value: `${e?.order_type ? (e?.order_type == "0" ? "Tạo mới" : "Theo YCHM") : ""}`,
                 },
                 {
-                    value: `${
-                        e?.purchases
+                    value: `${e?.purchases
                             ? e?.purchases?.map((e) => {
-                                  return e?.code;
-                              })
+                                return e?.code;
+                            })
                             : ""
-                    }`,
+                        }`,
                 },
                 {
                     value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
@@ -419,13 +420,12 @@ const Index = (props) => {
                 },
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
-                    value: `${
-                        e?.status_pay
+                    value: `${e?.status_pay
                             ? (e?.status_pay === "0" && "Chưa nhập") ||
-                              (e?.status_pay === "1" && "Nhập 1 phần") ||
-                              (e?.status_pay === "2" && "Đã nhập đủ đủ")
+                            (e?.status_pay === "1" && "Nhập 1 phần") ||
+                            (e?.status_pay === "2" && "Đã nhập đủ đủ")
                             : ""
-                    }`,
+                        }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -1082,10 +1082,9 @@ const TabClient = React.memo((props) => {
             {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
             {props.children}
             <span
-                className={`${
-                    props?.total > 0 &&
+                className={`${props?.total > 0 &&
                     "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00]  translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center 2xl:py-1 py-1"
-                } `}
+                    } `}
             >
                 {props?.total > 0 && props?.total}
             </span>

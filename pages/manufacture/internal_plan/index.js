@@ -29,6 +29,7 @@ import { useToggle } from "@/hooks/useToggle";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import useToast from "@/hooks/useToast";
+import { debounce } from "lodash";
 
 const PopupDetail = dynamic(() => import("./(popupDetail)/PopupDetail"), { ssr: false });
 const Index = (props) => {
@@ -163,7 +164,7 @@ const Index = (props) => {
         });
     };
 
-    const handleOnChangeKeySearch = ({ target: { value } }) => {
+    const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
         startEvent(() => {
             sKeySearch(value);
             router.replace({
@@ -174,7 +175,7 @@ const Index = (props) => {
             });
             sOnFetching(true);
         });
-    };
+    }, 500)
 
     const toggleStatus = () => {
         handlePostStatus(isId, status);

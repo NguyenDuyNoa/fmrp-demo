@@ -42,6 +42,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 import { routerRecall } from "@/routers/manufacture";
+import { debounce } from "lodash";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -205,29 +206,28 @@ const Index = (props) => {
         sOnFetching_filter(false);
     };
 
-    const _HandleSeachApi = (inputValue) => {
-        inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`,
-                {
-                    data: {
-                        term: inputValue,
-                    },
+    const _HandleSeachApi = debounce((inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`,
+            {
+                data: {
+                    term: inputValue,
                 },
-                (err, response) => {
-                    if (!err) {
-                        let { result } = response?.data;
-                        sListCode(
-                            result?.map((e) => ({
-                                label: `${e.code}`,
-                                value: e.id,
-                            }))
-                        );
-                    }
+            },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response?.data;
+                    sListCode(
+                        result?.map((e) => ({
+                            label: `${e.code}`,
+                            value: e.id,
+                        }))
+                    );
                 }
-            );
-    };
+            }
+        );
+    }, 500)
 
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
@@ -267,7 +267,7 @@ const Index = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -275,13 +275,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const paginate = (pageNumber) => {
         router.push({

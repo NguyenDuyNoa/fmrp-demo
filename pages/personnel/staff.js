@@ -22,8 +22,8 @@ import {
 import moment from "moment/moment";
 import { components } from "react-select";
 
-import Popup_dsnd from "./(popupStaff)/popup";
-import Popup_chitiet from "./(popupStaff)/popupDetail";
+import Popup_dsnd from "./components/staff/popup";
+import Popup_chitiet from "./components/staff/popupDetail";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
@@ -40,6 +40,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { debounce } from "lodash";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -64,6 +66,8 @@ const Index = (props) => {
 
     const isShow = useToast();
 
+    const [idBranch, sIdBranch] = useState(null);
+
     const { isOpen, isId, isKeyState, handleQueryId } = useToggle();
 
     const router = useRouter();
@@ -72,11 +76,11 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
-
-    const [totalItem, sTotalItems] = useState([]);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const [onFetching, sOnFetching] = useState(false);
+
+    const [onFetchingRoom, sOnFetchingRoom] = useState(false);
 
     const [data, sData] = useState({});
 
@@ -100,7 +104,7 @@ const Index = (props) => {
                 var { rResult } = response.data;
                 sRoom(rResult);
             }
-            sOnFetching(false);
+            sOnFetchingRoom(false)
         });
     };
 
@@ -150,7 +154,6 @@ const Index = (props) => {
 
     const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
 
-    const [idBranch, sIdBranch] = useState(null);
 
     const onchang_filterBr = (type, value) => {
         if (type == "branch") {
@@ -185,9 +188,14 @@ const Index = (props) => {
     useEffect(() => {
         onFetchingOpt && _ServerFetchingOtp();
     }, [onFetchingOpt]);
+    useEffect(() => {
+        onFetchingRoom && _ServerFetching_room();
+        onFetchingRoom && _ServerFetching_brand()
+    }, [onFetchingRoom]);
 
     useEffect(() => {
         sOnFetchingOpt(true);
+        sOnFetchingRoom(true);
     }, []);
 
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
@@ -204,7 +212,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -212,18 +220,11 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        sOnFetching(true);
+    }, 500)
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_brand()) ||
-            (onFetching && _ServerFetching_room());
+        onFetching && _ServerFetching()
     }, [onFetching]);
 
     useEffect(() => {
@@ -264,78 +265,6 @@ const Index = (props) => {
         }
     };
 
-    // const handleDelete = (event) => {
-    //     Swal.fire({
-    //         title: `${dataLang?.aler_ask}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#296dc1",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: `${dataLang?.aler_yes}`,
-    //         cancelButtonText: `${dataLang?.aler_cancel}`,
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             const id = event;
-    //             Axios("DELETE", `/api_web/api_staff/staff/${id}?csrf_protection=true`, {}, (err, response) => {
-    //                 if (!err) {
-    //                     var { isSuccess, message } = response.data;
-
-    //                     if (isSuccess) {
-    //                         Toast.fire({
-    //                             icon: "success",
-    //                             title: dataLang?.aler_success_delete,
-    //                         });
-    //                     } else if (message) {
-    //                         Toast.fire({
-    //                             icon: "error",
-    //                             title: `${dataLang[message]}`,
-    //                         });
-    //                     }
-    //                 }
-    //                 _ServerFetching();
-    //             });
-    //         }
-    //     });
-    // };
-
-    // const [fecthActive,sFecthActive] = useState(false)
-    // const _ToggleStatus = (id, value) => {
-    //   var index = data.findIndex(x => {
-    //     if(x.id === id){
-    //       return x.id === id
-    //     }
-    //   });
-    //   var db =  data[index].active = value.target.checked
-    //   // sActive()
-    //   sStatus(id)
-    //   sData([...data])
-    //   // console.log(data[index] = !active);
-    //   // data[index]?.active = !active
-    //   // sData([...data])
-    // }
-    // const _ToggleStatus = (id) => {
-    //     Swal.fire({
-    //         title: `${"Thay đổi trạng thái"}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#296dc1",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: `${dataLang?.aler_yes}`,
-    //         cancelButtonText: `${dataLang?.aler_cancel}`,
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             sStatus(id);
-    //             var index = data.findIndex((x) => x.id === id);
-    //             if (index !== -1 && data[index].active === "0") {
-    //                 sActive((data[index].active = "1"));
-    //             } else if (index !== -1 && data[index].active === "1") {
-    //                 sActive((data[index].active = "0"));
-    //             }
-    //             sData([...data]);
-    //         }
-    //     });
-    // };
-
     const _ServerSending = () => {
         let id = status;
         var data = new FormData();
@@ -353,10 +282,9 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        isShow("success", dataLang[message] || message);
+                    } else {
+                        isShow("error", dataLang[message] || message);
                     }
                 }
                 sOnSending(false);
@@ -561,6 +489,7 @@ const Index = (props) => {
                                                         },
                                                         ...dataOption,
                                                     ]}
+                                                    isClearable={true}
                                                     formatOptionLabel={CustomSelectOption}
                                                     onChange={_HandleFilterOpt.bind(this, "pos")}
                                                     value={idPos}
@@ -779,8 +708,9 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} thành phần
+                                    {/* {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

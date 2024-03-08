@@ -26,6 +26,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -77,10 +78,9 @@ const Index = (props) => {
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `${
-                (router.query?.tab === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) ||
-                (router.query?.tab === "stages" && "/api_web/api_product/stage/?csrf_protection=true") ||
-                (router.query?.tab === "costs" && "/api_web/Api_cost/cost/?csrf_protection=true")
+            `${(router.query?.tab === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) ||
+            (router.query?.tab === "stages" && "/api_web/api_product/stage/?csrf_protection=true") ||
+            (router.query?.tab === "costs" && "/api_web/Api_cost/cost/?csrf_protection=true")
             } `,
             {
                 params: {
@@ -111,10 +111,9 @@ const Index = (props) => {
     const handleDelete = async () => {
         Axios(
             "DELETE",
-            `${
-                (router.query.tab === "units" && `/api_web/Api_unit/unit/${isId}?csrf_protection=true`) ||
-                (router.query.tab === "stages" && `/api_web/api_product/stage/${isId}?csrf_protection=true`) ||
-                (router.query.tab === "costs" && `/api_web/Api_cost/cost/${isId}?csrf_protection=true`)
+            `${(router.query.tab === "units" && `/api_web/Api_unit/unit/${isId}?csrf_protection=true`) ||
+            (router.query.tab === "stages" && `/api_web/api_product/stage/${isId}?csrf_protection=true`) ||
+            (router.query.tab === "costs" && `/api_web/Api_cost/cost/${isId}?csrf_protection=true`)
             } `,
             {},
             (err, response) => {
@@ -143,7 +142,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: "/settings/category",
@@ -151,13 +150,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const _ServerFetchingOtp = () => {
         // Axios("GET", "/api_web/Api_cost/costCombobox/?csrf_protection=true", {}, (err, response) => {
@@ -226,31 +226,28 @@ const Index = (props) => {
                             <div className="flex space-x-3 items-center justify-start">
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "units")}
-                                    className={`${
-                                        router.query?.tab === "units"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
-                                    } rounded-lg px-4 py-2 outline-none`}
+                                    className={`${router.query?.tab === "units"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.category_unit}
                                 </button>
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "stages")}
-                                    className={`${
-                                        router.query?.tab === "stages"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
-                                    } rounded-lg px-4 py-2 outline-none`}
+                                    className={`${router.query?.tab === "stages"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.settings_category_stages_title}
                                 </button>
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "costs")}
-                                    className={`${
-                                        router.query?.tab === "costs"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
-                                    } rounded-lg px-4 py-2 outline-none`}
+                                    className={`${router.query?.tab === "costs"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.expense_costs || "expense_costs"}
                                 </button>
@@ -295,18 +292,16 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div
-                                        className={`${
-                                            router.query?.tab === "units" ? "w-[100%]" : "w-[110%]"
-                                        } 2xl:w-[100%] pr-2`}
+                                        className={`${router.query?.tab === "units" ? "w-[100%]" : "w-[110%]"
+                                            } 2xl:w-[100%] pr-2`}
                                     >
                                         <div
-                                            className={`${
-                                                router.query?.tab === "units"
-                                                    ? "grid-cols-6"
-                                                    : router.query?.tab === "stages"
+                                            className={`${router.query?.tab === "units"
+                                                ? "grid-cols-6"
+                                                : router.query?.tab === "stages"
                                                     ? "grid-cols-9"
                                                     : "grid-cols-11"
-                                            } grid  sticky top-0 bg-white p-2 z-10`}
+                                                } grid  sticky top-0 bg-white p-2 z-10`}
                                         >
                                             {router.query?.tab === "units" && (
                                                 <React.Fragment>
@@ -381,22 +376,21 @@ const Index = (props) => {
                                                     {data.map((e) => (
                                                         <div
                                                             key={e.id.toString()}
-                                                            className={`${
-                                                                router.query?.tab === "units"
-                                                                    ? "grid-cols-6"
-                                                                    : router.query?.tab === "stages"
+                                                            className={`${router.query?.tab === "units"
+                                                                ? "grid-cols-6"
+                                                                : router.query?.tab === "stages"
                                                                     ? "grid-cols-9"
                                                                     : "grid-cols-11"
-                                                            } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
+                                                                } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
                                                         >
                                                             {(router.query?.tab === "units" ||
                                                                 router.query?.tab === "currencies") && (
-                                                                <React.Fragment>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-5">
-                                                                        {router.query?.tab === "units" && e?.unit}
-                                                                    </h6>
-                                                                </React.Fragment>
-                                                            )}
+                                                                    <React.Fragment>
+                                                                        <h6 className="xl:text-base text-xs px-2 col-span-5">
+                                                                            {router.query?.tab === "units" && e?.unit}
+                                                                        </h6>
+                                                                    </React.Fragment>
+                                                                )}
                                                             {router.query?.tab === "stages" && (
                                                                 <React.Fragment>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-2">
@@ -407,7 +401,7 @@ const Index = (props) => {
                                                                     </h6>
                                                                     <h6 className="xl:text-base text-xs px-2 col-span-2 mx-auto">
                                                                         {router.query?.tab === "stages" &&
-                                                                        e?.status_qc === "1" ? (
+                                                                            e?.status_qc === "1" ? (
                                                                             <TickCircle size={32} color="#0BAA2E" />
                                                                         ) : (
                                                                             <CloseCircle size={32} color="#EE1E1E" />
@@ -550,9 +544,8 @@ const Items = React.memo((props) => {
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
-                        className={`${
-                            hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
-                        } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
+                        className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
+                            } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
                     >
                         <IconMinus size={16} />
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
@@ -741,9 +734,9 @@ const Popup_danhmuc = (props) => {
             sCosts_Branch(
                 props.data?.branch?.length > 0
                     ? props.data?.branch?.map((e) => ({
-                          label: e.name,
-                          value: e.id,
-                      }))
+                        label: e.name,
+                        value: e.id,
+                    }))
                     : []
             );
         open && sIdCategory(props.data?.parent_id ? props.data?.parent_id : null);
@@ -783,16 +776,14 @@ const Popup_danhmuc = (props) => {
         Axios(
             "POST",
             id
-                ? `${
-                      (tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true `) ||
-                      (tabPage === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`) ||
-                      (tabPage === "costs" && `/api_web/Api_cost/cost/${id}?csrf_protection=true`)
-                  } `
-                : `${
-                      (tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) ||
-                      (tabPage === "stages" && `/api_web/api_product/stage/?csrf_protection=true`) ||
-                      (tabPage === "costs" && `/api_web/Api_cost/cost/?csrf_protection=true`)
-                  } `,
+                ? `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true `) ||
+                (tabPage === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`) ||
+                (tabPage === "costs" && `/api_web/Api_cost/cost/${id}?csrf_protection=true`)
+                } `
+                : `${(tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) ||
+                (tabPage === "stages" && `/api_web/api_product/stage/?csrf_protection=true`) ||
+                (tabPage === "costs" && `/api_web/Api_cost/cost/?csrf_protection=true`)
+                } `,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -866,10 +857,9 @@ const Popup_danhmuc = (props) => {
         });
         Axios(
             "GET",
-            `${
-                props.data?.id
-                    ? `/api_web/Api_cost/costCombobox/${props.data?.id}?csrf_protection=true`
-                    : "/api_web/Api_cost/costCombobox/?csrf_protection=true"
+            `${props.data?.id
+                ? `/api_web/Api_cost/costCombobox/${props.data?.id}?csrf_protection=true`
+                : "/api_web/Api_cost/costCombobox/?csrf_protection=true"
             }`,
             {},
             (err, response) => {
@@ -895,16 +885,16 @@ const Popup_danhmuc = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         if (tabPage === "units") {
-            if (unit?.length == 0) {
-                unit?.length == 0 && sErrInput(true);
+            if (unit == "") {
+                unit == "" && sErrInput(true);
                 isShow("error", props.dataLang?.required_field_null);
             } else {
                 sOnSending(true);
             }
         } else if (tabPage === "stages") {
-            if (stages_name?.length == 0 || stages_code?.length == 0) {
-                stages_name?.length == 0 && sErrInputName(true);
-                stages_code?.length == 0 && sErrInputcode(true);
+            if (stages_name == "") {
+                stages_name == "" && sErrInputName(true);
+                stages_code == "" && sErrInputcode(true);
                 isShow("error", props.dataLang?.required_field_null);
             } else {
                 sOnSending(true);
@@ -948,18 +938,16 @@ const Popup_danhmuc = (props) => {
         <PopupEdit
             title={
                 props.data?.id
-                    ? `${
-                          (tabPage === "units" && props.dataLang?.category_unit_edit) ||
-                          (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) ||
-                          (tabPage === "costs" && props.dataLang?.expense_edit) ||
-                          "expense_edit"
-                      }`
-                    : `${
-                          (tabPage === "units" && props.dataLang?.category_unit_add) ||
-                          (tabPage === "stages" && props.dataLang?.settings_category_stages_add) ||
-                          (tabPage === "costs" && props.dataLang?.expense_add) ||
-                          "expense_add"
-                      }`
+                    ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) ||
+                    (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) ||
+                    (tabPage === "costs" && props.dataLang?.expense_edit) ||
+                    "expense_edit"
+                    }`
+                    : `${(tabPage === "units" && props.dataLang?.category_unit_add) ||
+                    (tabPage === "stages" && props.dataLang?.settings_category_stages_add) ||
+                    (tabPage === "costs" && props.dataLang?.expense_add) ||
+                    "expense_add"
+                    }`
             }
             button={props.data?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -981,9 +969,8 @@ const Popup_danhmuc = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "unit")}
                                         name="fname"
                                         type="text"
-                                        className={`${
-                                            errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                        className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                     />
                                     {errInput && (
                                         <label className="mb-4  text-[14px] text-red-500">
@@ -996,7 +983,7 @@ const Popup_danhmuc = (props) => {
                         {tabPage === "stages" && (
                             <React.Fragment>
                                 <div className="flex flex-wrap justify-between">
-                                    <div className="w-full">
+                                    {/* <div className="w-full">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
                                             {props.dataLang?.settings_category_stages_codeAdd ||
                                                 "settings_category_stages_codeAdd"}
@@ -1015,25 +1002,37 @@ const Popup_danhmuc = (props) => {
                                                 className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="w-full">
                                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                            {props.dataLang?.settings_category_stages_codenName ||
-                                                "settings_category_stages_codenName"}
+                                            {/* {props.dataLang?.settings_category_stages_codenName ||
+                                                "settings_category_stages_codenName"} */}
+                                            {props.dataLang?.settings_category_stages_codeAdd ||
+                                                "settings_category_stages_codeAdd"}
                                             <span className="text-red-500">*</span>
                                         </label>
                                         <div>
                                             <input
-                                                // value={stages_code}
-                                                // onChange={_HandleChangeInput.bind(this, "code")}
+                                                value={stages_code}
+                                                onChange={_HandleChangeInput.bind(this, "code")}
                                                 placeholder={
-                                                    props.dataLang?.settings_category_stages_codenName ||
-                                                    "settings_category_stages_codenName"
+                                                    // props.dataLang?.settings_category_stages_codenName ||
+                                                    // "settings_category_stages_codenName"
+                                                    props.dataLang?.settings_category_stages_codeAdd ||
+                                                    "settings_category_stages_codeAdd"
                                                 }
                                                 name="fname"
                                                 type="text"
-                                                className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputcode
+                                                    ? "border-red-500 border"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
+                                            {errInputcode && (
+                                                <label className="mb-4  text-[14px] text-red-500">
+                                                    {props.dataLang?.settings_category_stages_errCode}
+                                                </label>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="w-full">
@@ -1048,11 +1047,10 @@ const Popup_danhmuc = (props) => {
                                                 placeholder={props.dataLang?.settings_category_stages_name}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputName
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${errInputName
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -1136,9 +1134,8 @@ const Popup_danhmuc = (props) => {
                                             onChange={_HandleChangeInput.bind(this, "costs_code")}
                                             type="text"
                                             placeholder={props.dataLang?.expense_code || "expense_code"}
-                                            className={`${
-                                                errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                            className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                         />
                                         {errCode && (
                                             <label className="text-sm text-red-500">
@@ -1156,9 +1153,8 @@ const Popup_danhmuc = (props) => {
                                             onChange={_HandleChangeInput.bind(this, "costs_name")}
                                             type="text"
                                             placeholder={props.dataLang?.expense_name || "expense_name"}
-                                            className={`${
-                                                errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                            className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                         />
                                         {errName && (
                                             <label className="text-sm text-red-500">
@@ -1206,9 +1202,8 @@ const Popup_danhmuc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${
-                                                errBranch ? "border-red-500" : "border-transparent"
-                                            } text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] mb-2 font-normal outline-none border `}
+                                            className={`${errBranch ? "border-red-500" : "border-transparent"
+                                                } text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] mb-2 font-normal outline-none border `}
                                         />
                                         {errBranch && (
                                             <label className="mb-2 text-sm text-red-500">
@@ -1227,24 +1222,24 @@ const Popup_danhmuc = (props) => {
                                                 idCategory == "0" || !idCategory
                                                     ? { label: `${"Nhóm cha"}` }
                                                     : {
-                                                          label: dataOption.find((x) => x?.parent_id == idCategory)
-                                                              ?.label,
-                                                          code: dataOption.find((x) => x?.parent_id == idCategory)
-                                                              ?.code,
-                                                          value: idCategory,
-                                                      }
+                                                        label: dataOption.find((x) => x?.parent_id == idCategory)
+                                                            ?.label,
+                                                        code: dataOption.find((x) => x?.parent_id == idCategory)
+                                                            ?.code,
+                                                        value: idCategory,
+                                                    }
                                             }
                                             value={
                                                 idCategory == "0" || !idCategory
                                                     ? {
-                                                          label: "Nhóm cha",
-                                                          code: "nhóm cha",
-                                                      }
+                                                        label: "Nhóm cha",
+                                                        code: "nhóm cha",
+                                                    }
                                                     : {
-                                                          label: dataOption.find((x) => x?.value == idCategory)?.label,
-                                                          code: dataOption.find((x) => x?.value == idCategory)?.code,
-                                                          value: idCategory,
-                                                      }
+                                                        label: dataOption.find((x) => x?.value == idCategory)?.label,
+                                                        code: dataOption.find((x) => x?.value == idCategory)?.code,
+                                                        value: idCategory,
+                                                    }
                                             }
                                             onChange={valueIdCategory.bind(this)}
                                             isClearable={true}

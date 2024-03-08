@@ -46,6 +46,9 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
+import useFeature from "@/hooks/useConfigFeature";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
@@ -138,11 +141,11 @@ const Index = (props) => {
 
     const [dataProductExpiry, sDataProductExpiry] = useState({});
 
-    const [totalItems, sTotalItems] = useState({});
+
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems: totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const _ServerFetching = () => {
         Axios(
@@ -189,25 +192,29 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 1500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 1500);
+        sOnFetching(true);
+    }, 500)
+
+    const feature = useFeature()
+    console.log("feature", feature);
 
     const _ServerFetchingAnother = () => {
         Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
-                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
+                var { rResult } = response?.data;
+                sDataBranchOption(rResult?.map((e) => ({ label: e.name, value: e.id })));
                 dispatch({
                     type: "branch/update",
-                    payload: rResult.map((e) => ({
+                    payload: rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,
                     })),
@@ -217,10 +224,10 @@ const Index = (props) => {
 
         Axios("GET", "/api_web/api_product/productType/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
+                var data = response?.data;
                 dispatch({
                     type: "type_finishedProduct/update",
-                    payload: data.map((e) => ({
+                    payload: data?.map((e) => ({
                         label: dataLang[e.name],
                         value: e.code,
                     })),
@@ -230,10 +237,10 @@ const Index = (props) => {
 
         Axios("GET", "/api_web/Api_unit/unit/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                var { rResult } = response?.data;
                 dispatch({
                     type: "unit_finishedProduct/update",
-                    payload: rResult.map((e) => ({
+                    payload: rResult?.map((e) => ({
                         label: e.unit,
                         value: e.id,
                     })),
@@ -243,10 +250,10 @@ const Index = (props) => {
 
         Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                var { rResult } = response?.data;
                 dispatch({
                     type: "variant_NVL/update",
-                    payload: rResult.map((e) => ({
+                    payload: rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,
                         option: e.option,
@@ -296,12 +303,12 @@ const Index = (props) => {
             }
         });
 
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-            }
-        });
+        // Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+        //     if (!err) {
+        //         var data = response.data;
+        //         sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+        //     }
+        // });
         sOnFetchingAnother(false);
     };
 
@@ -311,6 +318,7 @@ const Index = (props) => {
 
     useEffect(() => {
         sOnFetchingAnother(true);
+        sDataProductExpiry(feature?.dataProductExpiry);
     }, []);
 
     const _HandleFilterOpt = (type, value) => {
@@ -470,41 +478,37 @@ const Index = (props) => {
                     <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                         <button
                             onClick={_HandleSelectTab.bind(this, "all")}
-                            className={`${
-                                router.query?.tab === "all"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
-                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                            className={`${router.query?.tab === "all"
+                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                : "hover:text-[#0F4F9E] "
+                                } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                         >
                             {props.dataLang?.all_group}
                         </button>
                         <button
                             onClick={_HandleSelectTab.bind(this, "products")}
-                            className={`${
-                                router.query?.tab === "products"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
-                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                            className={`${router.query?.tab === "products"
+                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                : "hover:text-[#0F4F9E] "
+                                } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                         >
                             {dataLang?.product}
                         </button>
                         <button
                             onClick={_HandleSelectTab.bind(this, "semi_products")}
-                            className={`${
-                                router.query?.tab === "semi_products"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
-                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                            className={`${router.query?.tab === "semi_products"
+                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                : "hover:text-[#0F4F9E] "
+                                } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                         >
                             {dataLang?.catagory_finishedProduct_type_semi_products}
                         </button>
                         <button
                             onClick={_HandleSelectTab.bind(this, "semi_products_outside")}
-                            className={`${
-                                router.query?.tab === "semi_products_outside"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
-                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                            className={`${router.query?.tab === "semi_products_outside"
+                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+                                : "hover:text-[#0F4F9E] "
+                                } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                         >
                             {dataLang?.catagory_finishedProduct_type_semi_products_outside}
                         </button>
@@ -883,14 +887,13 @@ const Index = (props) => {
                                                 </h6>
                                                 <h6 className="px-2 py-2.5 xl:text-[13px] text-xs w-[10%]">
                                                     <span
-                                                        className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit font-[300] break-words leading-relaxed ${
-                                                            (e?.type_products?.id === 0 &&
-                                                                "text-lime-500 border-lime-500") ||
+                                                        className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit font-[300] break-words leading-relaxed ${(e?.type_products?.id === 0 &&
+                                                            "text-lime-500 border-lime-500") ||
                                                             (e?.type_products?.id === 1 &&
                                                                 "text-orange-500 border-orange-500") ||
                                                             (e?.type_products?.id === 2 &&
                                                                 "text-sky-500 border-sky-500")
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {dataLang[e?.type_products?.name] || ""}
                                                     </span>
@@ -964,7 +967,8 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
+                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
                         </h6>
                         <Pagination
                             postsPerPage={limit}
@@ -1181,7 +1185,7 @@ const Popup_ThanhPham = React.memo((props) => {
     const [dataTotalVariant, sDataTotalVariant] = useState([]);
 
     const [dataVariantSending, sDataVariantSending] = useState([]);
-
+    console.log("dataVariantSending", dataVariantSending, dataVariantSending);
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
         // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
@@ -1249,22 +1253,87 @@ const Popup_ThanhPham = React.memo((props) => {
             sOptSelectedVariantSub(updatedOptions);
         }
     };
-
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
-            sDataTotalVariant([
-                ...(optSelectedVariantMain?.length > 0
-                    ? optSelectedVariantMain?.map((item1) => ({
-                          ...item1,
-                          image: null,
-                          price: null,
-                          variation_option_2: optSelectedVariantSub?.map((item2) => ({
-                              ...item2,
-                              price: null,
-                          })),
-                      }))
-                    : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
-            ]);
+            console.log("optSelectedVariantSub", optSelectedVariantSub);
+            console.log("optSelectedVariantMain", optSelectedVariantMain);
+            const newData = optSelectedVariantMain?.map(e => {
+                const newViar = dataTotalVariant?.find(x => x?.id == e?.id)
+                console.log("newViar", newViar);
+                return {
+                    ...e,
+                    id_primary: newViar?.id_primary ? newViar?.id_primary : e?.id_primary,
+                    isDelete: newViar?.isDelete,
+                    variation_option_2: optSelectedVariantSub?.map((item2) => {
+                        const check = newViar?.variation_option_2.find(x => x?.id == item2?.id);
+                        const checkItem = newViar?.variation_option_2?.find(x => x?.id_primary)
+                        console.log("checkItem", checkItem);
+                        return {
+                            ...item2,
+                            isDelete: check?.isDelete,
+                            id_primary: check && check?.id_primary ? check?.id_primary : item2?.id_primary,
+                            price: check && check?.price ? check?.price : checkItem ? checkItem.price : ""
+                        }
+
+                    })
+                }
+            })
+            console.log("newData", newData);
+            const newdb = [...dataTotalVariant, ...newData]
+
+            // Mảng chứa dữ liệu sau khi xử lý
+            const processedData = [];
+            // Tạo một đối tượng để theo dõi các phần tử theo id
+            const idMap = {};
+            // Duyệt qua mảng newdb
+            newdb.forEach(item => {
+                const id = item.id;
+                // Nếu id chưa được thêm vào idMap hoặc variation_option_2.length lớn hơn, thì cập nhật idMap
+                // if (!idMap[id] || item.variation_option_2.length > idMap[id].variation_option_2.length) {
+                //     idMap[id] = item;
+                // }
+                // Nếu id là null, giữ nguyên phần tử
+                if (id === null) {
+                    idMap[id] = item;
+                } else {
+                    // Nếu id chưa được thêm vào idMap hoặc variation_option_2 có id, thì cập nhật idMap
+                    if (!idMap[id] || (item.variation_option_2 && item.variation_option_2.find(option => option.id))) {
+                        idMap[id] = item;
+                    }
+                }
+            });
+
+            console.log("newdb", newdb);
+            // Lấy các giá trị từ idMap và đưa vào mảng processedData
+            for (const id in idMap) {
+                processedData.push(idMap[id]);
+            }
+            console.log("Object.values(idMap)", Object.values(idMap));
+
+
+            console.log("processedData", processedData);
+            sDataTotalVariant(processedData.reverse());
+            // sDataTotalVariant([
+            //     ...(optSelectedVariantMain?.length > 0
+            //         ? newData
+            //         : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
+            // ]);
+            // sDataTotalVariant([
+            //     ...(optSelectedVariantMain?.length > 0
+            //         ? optSelectedVariantMain?.map((item1) => {
+            //             console.log("item1", item1, optSelectedVariantSub);
+            //             return {
+            //                 ...item1,
+            //                 image: null,
+            //                 price: null,
+            //                 variation_option_2: optSelectedVariantSub?.map((item2) => ({
+            //                     ...item2,
+            //                     price: null,
+            //                 }))
+            //             }
+            //         })
+            //         : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
+            // ]);
             sDataVariantSending([
                 {
                     name: dataOptVariant.find((e) => e.value == variantMain)?.label,
@@ -1477,36 +1546,37 @@ const Popup_ThanhPham = React.memo((props) => {
         formData.append("note", note);
         branch.forEach((e) => formData.append("branch_id[]", e.value));
         formData.append("images", thumbFile);
-
-        for (let i = 0; i < dataTotalVariant.length; i++) {
+        console.log("dataTotalVariant", dataTotalVariant);
+        for (let i = 0; i < dataTotalVariant?.length; i++) {
             var item = dataTotalVariant[i];
 
             formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
             formData.set(`variation_option_value[${i}][image]`, item.image || "");
+            formData.set(`variation_option_value[${i}][id_primary]`, item?.id_primary || "0");
 
             if (item.variation_option_2?.length > 0) {
                 for (let j = 0; j < item.variation_option_2?.length; j++) {
                     var subItem = item.variation_option_2[j];
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem.id);
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][price]`, subItem.price || "");
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem?.id);
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id_primary]`, subItem?.id_primary || "0");
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][price]`, subItem?.price || "");
                 }
             } else {
                 formData.set(`variation_option_value[${i}][price]`, item.price || "");
             }
         }
 
-        for (let i = 0; i < dataVariantSending.length; i++) {
-            for (let j = 0; j < dataVariantSending[i].option.length; j++) {
+        for (let i = 0; i < dataVariantSending?.length; i++) {
+            for (let j = 0; j < dataVariantSending[i].option?.length; j++) {
                 formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
             }
         }
 
         Axios(
             "POST",
-            `${
-                props?.id
-                    ? `/api_web/api_product/product/${props.id}?csrf_protection=true`
-                    : "/api_web/api_product/product/?csrf_protection=true"
+            `${props?.id
+                ? `/api_web/api_product/product/${props.id}?csrf_protection=true`
+                : "/api_web/api_product/product/?csrf_protection=true"
             } `,
             {
                 data: formData,
@@ -1516,11 +1586,11 @@ const Popup_ThanhPham = React.memo((props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
+                        isShow("success", props.dataLang[message] || message);
                         props.setOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
-                        isShow("error", props.dataLang[message]);
+                        isShow("error", props.dataLang[message] || message);
                     }
                     sOnSending(false);
                 }
@@ -1697,7 +1767,7 @@ const Popup_ThanhPham = React.memo((props) => {
         //     }
         // });
     };
-
+    console.log(dataTotalVariant);
     return (
         <PopupEdit
             title={
@@ -1715,17 +1785,15 @@ const Popup_ThanhPham = React.memo((props) => {
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${
-                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
                         {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
@@ -1754,11 +1822,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 closeMenuOnSelect={false}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${
-                                                    errBranch && branch?.length == 0
-                                                        ? "border-red-500"
-                                                        : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errBranch && branch?.length == 0
+                                                    ? "border-red-500"
+                                                    : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -1800,11 +1867,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 placeholder={props.dataLang?.category_titel}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${
-                                                    errGroup && category?.value == null
-                                                        ? "border-red-500"
-                                                        : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errGroup && category?.value == null
+                                                    ? "border-red-500"
+                                                    : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -1842,11 +1908,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 onChange={_HandleChangeInput.bind(this, "code")}
                                                 type="text"
                                                 placeholder={props.dataLang?.client_popup_sytem}
-                                                className={`${
-                                                    errCode && code == ""
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                                className={`${errCode && code == ""
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                             />
                                             {errCode && code == "" && (
                                                 <label className="text-sm text-red-500">
@@ -1864,11 +1929,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 onChange={_HandleChangeInput.bind(this, "name")}
                                                 type="text"
                                                 placeholder={props.dataLang?.name_finishedProduct}
-                                                className={`${
-                                                    errName && name == ""
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                                className={`${errName && name == ""
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                             />
                                             {errName && name == "" && (
                                                 <label className="text-sm text-red-500">
@@ -1939,11 +2003,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${
-                                                    errType && type?.value == null
-                                                        ? "border-red-500"
-                                                        : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errType && type?.value == null
+                                                    ? "border-red-500"
+                                                    : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -1984,11 +2047,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 placeholder={props.dataLang?.unit}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
-                                                className={`${
-                                                    errUnit && unit?.value == null
-                                                        ? "border-red-500"
-                                                        : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errUnit && unit?.value == null
+                                                    ? "border-red-500"
+                                                    : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 theme={(theme) => ({
                                                     ...theme,
                                                     colors: {
@@ -2098,14 +2160,18 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
+                                                    // isDisabled={false}
+                                                    isDisabled={dataVariantSending[0] && dataTotalVariant?.some(e => e?.id != "" || e?.id != null)}
+                                                    // isDisabled={dataVariantSending[0] ? true : false}
+
                                                     value={
                                                         variantMain
                                                             ? {
-                                                                  label: dataOptVariant.find(
-                                                                      (e) => e.value == variantMain
-                                                                  )?.label,
-                                                                  value: variantMain,
-                                                              }
+                                                                label: dataOptVariant.find(
+                                                                    (e) => e.value == variantMain
+                                                                )?.label,
+                                                                value: variantMain,
+                                                            }
                                                             : null
                                                     }
                                                     onChange={_HandleChangeInput.bind(this, "variantMain")}
@@ -2220,14 +2286,18 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 </label>
                                                 <Select
                                                     options={dataOptVariant}
+                                                    // isDisabled={dataVariantSending[1] ? true : false}
+                                                    isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e.id && e?.variation_option_2?.length > 0)}
+                                                    // isDisabled={dataVariantSending[1] && dataTotalVariant?.some(e => e?.variation_option_2?.some(x => x.id != "" || x.id != null))}
+                                                    // isDisabled={false}
                                                     value={
                                                         variantSub
                                                             ? {
-                                                                  label: dataOptVariant.find(
-                                                                      (e) => e.value == variantSub
-                                                                  )?.label,
-                                                                  value: variantSub,
-                                                              }
+                                                                label: dataOptVariant.find(
+                                                                    (e) => e.value == variantSub
+                                                                )?.label,
+                                                                value: variantSub,
+                                                            }
                                                             : null
                                                     }
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
@@ -2340,7 +2410,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                             onClick={_HandleApplyVariant.bind(this)}
                                             disabled={
                                                 optSelectedVariantMain?.length == 0 &&
-                                                optSelectedVariantSub?.length == 0
+                                                    optSelectedVariantSub?.length == 0
                                                     ? true
                                                     : false
                                             }
@@ -2355,44 +2425,41 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 {props.dataLang?.list_variant || "list_variant"}
                                             </h4>
                                             <div
-                                                className={`${
-                                                    dataTotalVariant[0]?.variation_option_2?.length > 0
-                                                        ? "grid-cols-9"
-                                                        : "grid-cols-7"
-                                                } grid gap-5 p-1`}
+                                                className={`grid-cols-9 grid gap-5 py-1`}
                                             >
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400 col-span-2">
                                                     {props.dataLang?.avatar || "avatar"}
                                                 </h4>
-                                                <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
+                                                <h4 className="text-[15px] font-[300] text-slate-400 col-span-2  text-left">
                                                     {dataVariantSending[0]?.name}
                                                 </h4>
-                                                {dataTotalVariant[0]?.variation_option_2?.length > 0 && (
+                                                {/* {dataTotalVariant[0]?.variation_option_2?.length > 0 ? (
                                                     <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
                                                         {dataVariantSending[1]?.name}
                                                     </h4>
-                                                )}
+                                                )
+                                                    : <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
+                                                    </h4>} */}
+                                                <h4 className="text-[15px] font-[300] text-slate-400 col-span-2  text-left">
+                                                    {dataVariantSending[1]?.name}
+                                                </h4>
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400 col-span-2">
                                                     {"Giá"}
                                                 </h4>
-                                                <h4 className="text-[15px] text-center font-[300] text-slate-400">
+                                                <h4 className="text-[15px] text-left font-[300] text-slate-400">
                                                     {props.dataLang?.branch_popup_properties ||
                                                         "branch_popup_properties"}
                                                 </h4>
                                             </div>
                                             <ScrollArea className="max-h-[230px]" speed={1} smoothScrolling={true}>
                                                 <div className="space-y-0.5">
-                                                    {dataTotalVariant?.map((e) => (
+                                                    {dataTotalVariant?.map((e, index) => (
                                                         <div
-                                                            className={`${
-                                                                e?.variation_option_2?.length > 0
-                                                                    ? "grid-cols-9"
-                                                                    : "grid-cols-7"
-                                                            } grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
-                                                            key={e?.id.toString()}
+                                                            className={`grid-cols-9 grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
+                                                            key={e?.id ? e?.id.toString() : index + 1}
                                                         >
                                                             <div className="w-full h-full flex flex-col justify-center items-center col-span-2">
-                                                                <input
+                                                                {e?.id != null && <input
                                                                     onChange={_HandleChangeVariant.bind(
                                                                         this,
                                                                         e?.id,
@@ -2402,14 +2469,14 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                     id={`uploadImg+${e?.id}`}
                                                                     accept="image/png, image/jpeg"
                                                                     hidden
-                                                                />
+                                                                />}
                                                                 <label
                                                                     htmlFor={`uploadImg+${e?.id}`}
-                                                                    className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded"
+                                                                    className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}
                                                                 >
                                                                     {e.image == null ? (
                                                                         <React.Fragment>
-                                                                            <div className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded">
+                                                                            <div className={`${e?.id != null && "cursor-pointer"} h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 rounded`}>
                                                                                 <IconImage />
                                                                             </div>
                                                                         </React.Fragment>
@@ -2427,12 +2494,12 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                     )}
                                                                 </label>
                                                             </div>
-                                                            <div className=" col-span-2 truncate">{e.name}</div>
+                                                            <div className=" col-span-2 truncate  text-left">{e.name}</div>
                                                             {e?.variation_option_2?.length > 0 ? (
                                                                 <div className="col-span-5 grid grid-cols-5 gap-1 items-center">
                                                                     {e?.variation_option_2?.map((ce) => (
                                                                         <React.Fragment key={ce.id?.toString()}>
-                                                                            <div className="col-span-2 truncate">
+                                                                            <div className="col-span-2 truncate text-left">
                                                                                 {ce.name}
                                                                             </div>
                                                                             <NumericFormat
@@ -2447,7 +2514,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                                 className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                                             />
                                                                             <div className="flex justify-center">
-                                                                                <button
+                                                                                {ce?.isDelete && <button
                                                                                     // onClick={_HandleDeleteVariant.bind(
                                                                                     //     this,
                                                                                     //     e.id,
@@ -2464,12 +2531,36 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                                 >
                                                                                     <IconDelete size="22" />
                                                                                 </button>
+                                                                                }
+                                                                                {ce?.isDelete == undefined && <button
+                                                                                    // onClick={_HandleDeleteVariant.bind(
+                                                                                    //     this,
+                                                                                    //     e.id,
+                                                                                    //     ce.id
+                                                                                    // )}
+                                                                                    onClick={() =>
+                                                                                        handleQueryId({
+                                                                                            id: e.id,
+                                                                                            status: true,
+                                                                                            idChild: ce.id,
+                                                                                        })
+                                                                                    }
+                                                                                    className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                                >
+                                                                                    <IconDelete size="22" />
+                                                                                </button>
+                                                                                }
+
+
+
                                                                             </div>
                                                                         </React.Fragment>
                                                                     ))}
                                                                 </div>
                                                             ) : (
-                                                                <React.Fragment>
+                                                                <div className="col-span-5 grid grid-cols-5">
+                                                                    <div className="col-span-2 truncate">
+                                                                    </div>
                                                                     <NumericFormat
                                                                         thousandSeparator=","
                                                                         value={e?.price}
@@ -2481,12 +2572,8 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                         placeholder="Giá"
                                                                         className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                                     />
-                                                                    <div className="flex justify-center">
+                                                                    <div className="flex justify-center col-span-1">
                                                                         <button
-                                                                            // onClick={_HandleDeleteVariantItems.bind(
-                                                                            //     this,
-                                                                            //     e.id
-                                                                            // )}
                                                                             onClick={() =>
                                                                                 handleQueryId({
                                                                                     id: e.id,
@@ -2498,7 +2585,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                             <IconDelete size="22" />
                                                                         </button>
                                                                     </div>
-                                                                </React.Fragment>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     ))}
@@ -2646,33 +2733,29 @@ const Popup_ThongTin = React.memo((props) => {
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${
-                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 2)}
-                        className={`${
-                            tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.bom_finishedProduct || "bom_finishedProduct"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 3)}
-                        className={`${
-                            tab === 3 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-medium`}
+                        className={`${tab === 3 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.stage_finishedProduct || "stage_finishedProduct"}
                     </button>
@@ -2814,9 +2897,8 @@ const Popup_ThongTin = React.memo((props) => {
                                 {list?.variation?.length > 0 ? (
                                     <div className="space-y-0.5 min-h-[384px]">
                                         <div
-                                            className={`${
-                                                list?.variation[1] ? "grid-cols-4" : "grid-cols-3"
-                                            } grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}
+                                            className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-3"
+                                                } grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}
                                         >
                                             <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
                                                 {props.dataLang?.avatar}
@@ -2842,11 +2924,10 @@ const Popup_ThongTin = React.memo((props) => {
                                                 {list?.variation_option_value?.map((e) => (
                                                     <div
                                                         key={e?.id.toString()}
-                                                        className={`${
-                                                            e?.variation_option_2?.length > 0
-                                                                ? "grid-cols-4"
-                                                                : "grid-cols-3"
-                                                        } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
+                                                        className={`${e?.variation_option_2?.length > 0
+                                                            ? "grid-cols-4"
+                                                            : "grid-cols-3"
+                                                            } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
                                                     >
                                                         <div className="flex justify-center self-center">
                                                             {e?.image == null ? (
@@ -2922,11 +3003,10 @@ const Popup_ThongTin = React.memo((props) => {
                                                                 this,
                                                                 e.product_variation_option_value_id
                                                             )}
-                                                            className={`${
-                                                                tabBom === e.product_variation_option_value_id
-                                                                    ? "text-[#0F4F9E] bg-[#0F4F9E10]"
-                                                                    : "hover:text-[#0F4F9E] bg-slate-50/50"
-                                                            } outline-none min-w-fit px-3 py-1.5 rounded relative flex items-center`}
+                                                            className={`${tabBom === e.product_variation_option_value_id
+                                                                ? "text-[#0F4F9E] bg-[#0F4F9E10]"
+                                                                : "hover:text-[#0F4F9E] bg-slate-50/50"
+                                                                } outline-none min-w-fit px-3 py-1.5 rounded relative flex items-center`}
                                                         >
                                                             <span>
                                                                 {e.name_variation?.includes("NONE")
@@ -3356,9 +3436,8 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 position: "absolute",
                             }),
                         }}
-                        className={`${
-                            errName && value.name == null ? "border-red-500" : "border-transparent"
-                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                        className={`${errName && value.name == null ? "border-red-500" : "border-transparent"
+                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                     />
                 </div>
                 <div className="w-[30%] flex items-center justify-center">
@@ -3407,9 +3486,8 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     return (
         <PopupEdit
-            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${
-                props.name
-            })`}
+            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${props.name
+                })`}
             button={
                 props.type == "add"
                     ? `${props.dataLang?.stage_design_finishedProduct || "stage_design_finishedProduct"}`
@@ -3460,9 +3538,8 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 onClick={_HandleAddNew.bind(this)}
                                 disabled={statusBtnAdd}
                                 title="Thêm"
-                                className={`${
-                                    statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
-                                } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
+                                className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
+                                    } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
                             >
                                 <IconAdd />
                                 {props.dataLang?.stage_add_finishedProduct}
@@ -3643,17 +3720,17 @@ const Popup_Bom = React.memo((props) => {
                     sDataVariant(
                         rResult[0]?.product_variation?.includes("NONE")
                             ? [
-                                  {
-                                      label: "Mặc định",
-                                      value: rResult[0]?.id,
-                                      child: [],
-                                  },
-                              ]
+                                {
+                                    label: "Mặc định",
+                                    value: rResult[0]?.id,
+                                    child: [],
+                                },
+                            ]
                             : rResult.map((e) => ({
-                                  label: e.product_variation,
-                                  value: e.id,
-                                  child: [],
-                              }))
+                                label: e.product_variation,
+                                value: e.id,
+                                child: [],
+                            }))
                     );
                 }
             }
@@ -3804,10 +3881,10 @@ const Popup_Bom = React.memo((props) => {
                                                     ...child,
                                                     dataName: data?.items
                                                         ? data?.items.map((e) => ({
-                                                              label: e.name,
-                                                              value: e.id,
-                                                              product_variation: e?.product_variation,
-                                                          }))
+                                                            label: e.name,
+                                                            value: e.id,
+                                                            product_variation: e?.product_variation,
+                                                        }))
                                                         : [],
                                                 };
                                             }
@@ -3851,9 +3928,9 @@ const Popup_Bom = React.memo((props) => {
                                                     ...child,
                                                     dataUnit: data?.units
                                                         ? data?.units.map((e) => ({
-                                                              label: e.unit,
-                                                              value: e.unitid,
-                                                          }))
+                                                            label: e.unit,
+                                                            value: e.unitid,
+                                                        }))
                                                         : [],
                                                 };
                                             }
@@ -4010,9 +4087,8 @@ const Popup_Bom = React.memo((props) => {
 
     return (
         <PopupEdit
-            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${
-                props.name
-            })`}
+            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name
+                })`}
             button={
                 props.type == "add"
                     ? `${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"}`
@@ -4083,11 +4159,10 @@ const Popup_Bom = React.memo((props) => {
                                     <button
                                         key={e?.value}
                                         onClick={_HandleSelectTab.bind(this, e?.value)}
-                                        className={`${
-                                            tab == e?.value
-                                                ? "text-[#0F4F9E] bg-[#0F4F9E10]"
-                                                : "hover:text-[#0F4F9E] bg-slate-50/50"
-                                        } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center`}
+                                        className={`${tab == e?.value
+                                            ? "text-[#0F4F9E] bg-[#0F4F9E10]"
+                                            : "hover:text-[#0F4F9E] bg-slate-50/50"
+                                            } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center`}
                                     >
                                         <span>{e?.label?.includes("NONE") ? "Mặc định" : e?.label}</span>
                                         <button
@@ -4161,11 +4236,10 @@ const Popup_Bom = React.memo((props) => {
                                                             menuPortalTarget={document.body}
                                                             onMenuOpen={handleMenuOpen}
                                                             classNamePrefix="Select"
-                                                            className={`${
-                                                                errType && e.type == null
-                                                                    ? "border-red-500"
-                                                                    : "border-transparent"
-                                                            } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                            className={`${errType && e.type == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                                } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                             theme={(theme) => ({
                                                                 ...theme,
                                                                 colors: {
@@ -4227,11 +4301,10 @@ const Popup_Bom = React.memo((props) => {
                                                             menuPortalTarget={document.body}
                                                             onMenuOpen={handleMenuOpen}
                                                             classNamePrefix="Select "
-                                                            className={`${
-                                                                errName && e.name == null
-                                                                    ? "border-red-500"
-                                                                    : "border-transparent"
-                                                            } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                            className={`${errName && e.name == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                                } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                             theme={(theme) => ({
                                                                 ...theme,
                                                                 colors: {
@@ -4273,11 +4346,10 @@ const Popup_Bom = React.memo((props) => {
                                                             menuPortalTarget={document.body}
                                                             onMenuOpen={handleMenuOpen}
                                                             classNamePrefix="Select"
-                                                            className={`${
-                                                                errName && e.name == null
-                                                                    ? "border-red-500"
-                                                                    : "border-transparent"
-                                                            } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                            className={`${errName && e.name == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                                } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                             theme={(theme) => ({
                                                                 ...theme,
                                                                 colors: {
@@ -4332,10 +4404,9 @@ const Popup_Bom = React.memo((props) => {
                                                             )}
                                                             suffix="%"
                                                             thousandSeparator=","
-                                                            placeholder={`%${
-                                                                props.dataLang?.loss_finishedProduct ||
+                                                            placeholder={`%${props.dataLang?.loss_finishedProduct ||
                                                                 "loss_finishedProduct"
-                                                            }`}
+                                                                }`}
                                                             className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                         />
                                                     </div>

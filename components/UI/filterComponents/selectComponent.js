@@ -21,9 +21,10 @@ const SelectComponent = ({
     defaultValue,
     noOptionsMessage,
     menuShouldBlockScroll,
+    classParent
 }) => {
     return (
-        <div className="ml-1" style={{ gridColumn: `span ${colSpan || 1}` }}>
+        <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
             <Select
                 options={options}
                 value={value}

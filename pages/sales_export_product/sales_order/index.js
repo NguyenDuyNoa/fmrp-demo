@@ -11,12 +11,12 @@ import ReactExport from "react-data-export";
 import { registerLocale } from "react-datepicker";
 import Datepicker from "react-tailwindcss-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
 
-import PopupDetailProduct from "./(PopupDetail)/PopupDetailProduct";
-import PopupDetailQuote from "../price_quote/(PopupDetail)/PopupDetailQuote";
+import PopupDetailProduct from "./components/PopupDetailProduct";
+import PopupDetailQuote from "../price_quote/components/PopupDetailQuote";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -32,6 +32,17 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { routerSalesOrder } from "@/routers/sellingGoods";
+import formatMoney from "@/utils/helpers/formatMoney";
+import { useSelector } from "react-redux";
+import useSetingServer from "@/hooks/useConfigNumber";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -61,6 +72,12 @@ const Index = (props) => {
 
     const isShow = useToast();
 
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkExport } = useActionRole(auth, "sales_product")
+
+    const dataSeting = useSetingServer()
+
     const trangthaiExprired = useStatusExprired();
 
     const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
@@ -71,13 +88,13 @@ const Index = (props) => {
 
     const [onFetching, sOnFetching] = useState(false);
 
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
+    const [onFetchingGroup, sOnFetchingGroup] = useState(false);
 
-    const [totalItems, sTotalItems] = useState([]);
+    const [onFetching_filter, sOnFetching_filter] = useState(false);
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const [total, setTotal] = useState({});
 
@@ -98,6 +115,9 @@ const Index = (props) => {
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
     }, []);
+    useEffect(() => {
+        dataSeting?.tables_pagination_limit && sLimit(dataSeting?.tables_pagination_limit)
+    }, [dataSeting?.tables_pagination_limit]);
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
@@ -110,8 +130,8 @@ const Index = (props) => {
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
-                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
                     "filter[status_bar]": tabPage ?? null,
+                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
                     "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
                     "filter[start_date]":
                         valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
@@ -120,8 +140,8 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err && response && response.data) {
-                    let { rResult, output, rTotal } = response.data;
-                    sInitData((e) => ({ ...e, data: rResult.map((e) => ({ ...e, show: false })), dataExcel: rResult }));
+                    let { rResult, output, rTotal } = response?.data;
+                    sInitData((e) => ({ ...e, data: rResult?.map((e) => ({ ...e, show: false })), dataExcel: rResult }));
                     sTotalItems(output);
                     setTotal(rTotal);
                     sOnFetching(false);
@@ -139,14 +159,19 @@ const Index = (props) => {
                     limit: 0,
                     search: keySearch,
                     "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
+                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
+                    "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
+                    "filter[start_date]":
+                        valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
+                    "filter[end_date]": valueChange.valueDate?.endDate != null ? valueChange.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     let data = response.data;
-                    sInitData((e) => ({ ...e, listTabStatus: data }));
+                    sInitData((e) => ({ ...e, listTabStatus: data || [] }));
                 }
-                sOnFetching(false);
+                sOnFetchingGroup(false);
             }
         );
     };
@@ -159,29 +184,64 @@ const Index = (props) => {
                 sInitData((e) => ({ ...e, listBr: rResult?.map(({ name, id }) => ({ label: name, value: id })) }));
             }
         });
-        await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
+        await Axios("GET", `/api_web/api_sale_order/searchOrders?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                let { result } = response.data;
+                let { data } = response?.data;
                 sInitData((e) => ({
                     ...e,
-                    listQuoteCode: result?.map(({ code, id }) => ({ label: code, value: id })),
+                    listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id })),
                 }));
             }
         });
-        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
+        await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                let { rResult } = response.data;
+                let { data } = response?.data;
                 sInitData((e) => ({
                     ...e,
-                    listCustomer: rResult?.map(({ name, id }) => ({ label: name, value: id })),
+                    listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
                 }));
+
             }
         });
+
         sOnFetching_filter(false);
     };
 
+    const handleSearchApi = debounce((value) => {
+        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
+            params: {
+                search: value ? value : "",
+            },
+        }, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                sInitData((e) => ({
+                    ...e,
+                    listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
+                }));
+            }
+        }
+        )
+    }, 500)
+
+    const handleSearchApiOrders = debounce((value) => {
+        Axios("GET", `/api_web/api_sale_order/searchOrders?csrf_protection=true`, {
+            params: {
+                search: value ? value : "",
+            },
+        }, (err, response) => {
+            if (!err) {
+                let { data } = response?.data;
+                sInitData((e) => ({
+                    ...e,
+                    listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id })),
+                }));
+            }
+        });
+    }, 500)
+
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
+        (onFetching && _ServerFetching())
     }, [onFetching]);
 
     useEffect(() => {
@@ -189,7 +249,19 @@ const Index = (props) => {
     }, [onFetching_filter]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
+        sOnFetchingGroup(true)
+    }, [valueChange.idBranch, valueChange.idQuoteCode, valueChange.idCustomer, valueChange.valueDate?.startDate, valueChange.valueDate?.endDate])
+
+    useEffect(() => {
+        onFetchingGroup && _ServerFetching_group()
+    }, [onFetchingGroup])
+
+    useEffect(() => {
+        sOnFetching_filter(true)
+    }, [])
+
+    useEffect(() => {
+        (router.query.tab && sOnFetching(true))
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
@@ -250,9 +322,8 @@ const Index = (props) => {
     }, 500);
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        const money = formatMoney(+number, dataSeting)
+        return money
     };
     // excel
     const multiDataSet = [
@@ -370,11 +441,10 @@ const Index = (props) => {
                 },
                 { value: `${e?.staff_name ? e?.staff_name : ""}` },
                 {
-                    value: `${
-                        e?.status
-                            ? (e?.status === "un_approved" && "Chưa duyệt") || (e?.status === "approved" && "Đã duyệt")
-                            : ""
-                    }`,
+                    value: `${e?.status
+                        ? (e?.status === "un_approved" && "Chưa duyệt") || (e?.status === "approved" && "Đã duyệt")
+                        : ""
+                        }`,
                 },
                 { value: `${e?.process ? e?.process : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -416,10 +486,10 @@ const Index = (props) => {
                 if (!err) {
                     let { isSuccess, message } = response.data;
 
-                    if (isSuccess !== false) {
-                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
+                    if (isSuccess) {
+                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}` || message);
                     } else {
-                        isShow("error", `${dataLang[message] || message}`);
+                        isShow("error", `${dataLang[message]}` || message);
                     }
                     _ServerFetching();
                     _ServerFetching_group();
@@ -451,19 +521,30 @@ const Index = (props) => {
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.sales_product_list || "sales_product_list"}
                                 </h2>
-                                <div className="flex justify-end items-center">
-                                    <Link
-                                        href={routerSalesOrder.form}
+                                <div className={` flex justify-end items-center`}>
+                                    <button
+                                        onClick={() => {
+                                            if (role) {
+                                                router.push(routerSalesOrder.form)
+                                            } else if (checkAdd) {
+                                                router.push(routerSalesOrder.form)
+                                            }
+                                            else {
+                                                isShow("warning", WARNING_STATUS_ROLE)
+                                            }
+                                        }}
+                                        type="button"
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.btn_new || "btn_new"}
-                                    </Link>
+                                    </button>
                                 </div>
+
                             </div>
 
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {initData.listTabStatus &&
-                                    initData.listTabStatus.map((e) => {
+                                {initData?.listTabStatus &&
+                                    initData?.listTabStatus?.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -491,18 +572,10 @@ const Index = (props) => {
                                         <div className="col-span-6">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
-                                                    <form className="flex items-center relative ">
-                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
-                                                        <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
-                                                            type="text"
-                                                            onChange={(value) => handleOnChangeKeySearch(value)}
-                                                            placeholder={dataLang?.branch_search}
-                                                        />
-                                                    </form>
+                                                    <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch} />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
@@ -514,46 +587,11 @@ const Index = (props) => {
                                                         onChange={onChangeFilter("idBranch")}
                                                         value={valueChange.idBranch}
                                                         placeholder={dataLang?.branch || "branch"}
-                                                        hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        // components={{ MultiValue }}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         isLoading={initData.listQuoteCode == [] ? true : false}
                                                         options={[
                                                             {
@@ -566,48 +604,16 @@ const Index = (props) => {
                                                             ...initData.listQuoteCode,
                                                         ]}
                                                         onChange={onChangeFilter("idQuoteCode")}
+                                                        onInputChange={handleSearchApiOrders}
                                                         value={valueChange.idQuoteCode}
                                                         placeholder={
                                                             dataLang?.sales_product_code || "sales_product_code"
                                                         }
-                                                        hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <Select
+                                                    <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
@@ -616,98 +622,33 @@ const Index = (props) => {
                                                             },
                                                             ...initData.listCustomer,
                                                         ]}
+                                                        onInputChange={handleSearchApi}
                                                         onChange={onChangeFilter("idCustomer")}
                                                         value={valueChange.idCustomer}
                                                         placeholder={dataLang?.customer || "customer"}
-                                                        hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
                                                     />
                                                 </div>
                                                 <div className="z-20 col-span-1">
-                                                    <Datepicker
-                                                        value={valueChange.valueDate}
-                                                        i18n={"vi"}
-                                                        primaryColor={"blue"}
-                                                        onChange={onChangeFilter("valueDate")}
-                                                        showShortcuts={true}
-                                                        displayFormat={"DD/MM/YYYY"}
-                                                        configs={{
-                                                            shortcuts: {
-                                                                today: "Hôm nay",
-                                                                yesterday: "Hôm qua",
-                                                                past: (period) => `${period}  ngày qua`,
-                                                                currentMonth: "Tháng này",
-                                                                pastMonth: "Tháng trước",
-                                                            },
-                                                            footer: {
-                                                                cancel: "Từ bỏ",
-                                                                apply: "Áp dụng",
-                                                            },
-                                                        }}
-                                                        className="react-datepicker__input-container"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[9px] py-[11px] xl:px-0 px-2 bg-white focus:outline-[#0F4F9E] 3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[10px] 3xl:placeholder:text-xs 2xl:placeholder:text-[13px] xl:placeholder:text-[10px] lg:placeholder:text-[8px] border-none focus:outline-none focus:ring-0 focus:border-transparent"
-                                                    />
+                                                    <DatepickerComponent value={valueChange.valueDate} onChange={onChangeFilter("valueDate")} />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
-                                                <div>
-                                                    {initData.dataExcel?.length > 0 && (
-                                                        <ExcelFile
-                                                            filename="Danh sách đơn hàng bán"
-                                                            title="DSĐHB"
-                                                            element={
-                                                                <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                        size={18}
-                                                                    />
-                                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={multiDataSet}
-                                                                data={multiDataSet}
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
-                                                    )}
-                                                </div>
+                                                {(role == true || checkExport) ?
+                                                    <div className={``}>
+                                                        {initData.dataExcel?.length > 0 && (
+                                                            <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
+                                                        )}
+                                                    </div>
+                                                    :
+                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                                    </button>
+                                                }
                                                 <div>
                                                     <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
@@ -822,8 +763,7 @@ const Index = (props) => {
                                                                 <h6 className="px-2 col-span-1 flex items-center justify-center text-center ">
                                                                     <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                                         {(e?.status === "approved" && (
-                                                                            <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 transition-all duration-300 ease-in-out text-green-500 hover:bg-green-500 hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
+                                                                            <BtnStatusApproved
                                                                                 onClick={() =>
                                                                                     handleQueryId({
                                                                                         id: e?.id,
@@ -831,14 +771,11 @@ const Index = (props) => {
                                                                                         idChild: "approved",
                                                                                     })
                                                                                 }
-                                                                            >
-                                                                                Đã Duyệt
-                                                                                <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
-                                                                            </div>
+                                                                                type="1"
+                                                                            />
                                                                         )) ||
                                                                             (e?.status === "un_approved" && (
-                                                                                <div
-                                                                                    className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 transition-all duration-300 ease-in-out hover:text-white border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
+                                                                                <BtnStatusApproved
                                                                                     onClick={() =>
                                                                                         handleQueryId({
                                                                                             id: e?.id,
@@ -846,10 +783,9 @@ const Index = (props) => {
                                                                                             idChild: "un_approved",
                                                                                         })
                                                                                     }
-                                                                                >
-                                                                                    Chưa Duyệt
-                                                                                    <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
-                                                                                </div>
+                                                                                    type="0"
+                                                                                />
+
                                                                             ))}
                                                                     </h6>
                                                                 </h6>
@@ -857,33 +793,33 @@ const Index = (props) => {
                                                                     {(["payment_unpaid"].includes(
                                                                         e?.status_payment
                                                                     ) && (
-                                                                        <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
-                                                                            {dataLang[e?.status_payment] ||
-                                                                                e?.status_payment}
-                                                                        </span>
-                                                                    )) ||
-                                                                        (["payment_partially_paid"].includes(
-                                                                            e?.status_payment
-                                                                        ) && (
-                                                                            <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
-                                                                                {dataLang[e?.status_payment] ||
-                                                                                    e?.status_payment}{" "}
-                                                                                {`(${formatNumber(e?.total_payment)})`}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (["payment_paid"].includes(
-                                                                            e?.status_payment
-                                                                        ) && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                                <TickCircle
-                                                                                    className="bg-lime-500 rounded-full"
-                                                                                    color="white"
-                                                                                    size={15}
-                                                                                />
+                                                                            <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
                                                                                 {dataLang[e?.status_payment] ||
                                                                                     e?.status_payment}
                                                                             </span>
-                                                                        ))}
+                                                                        )) ||
+                                                                        (["payment_partially_paid"].includes(
+                                                                            e?.status_payment
+                                                                        ) && (
+                                                                                <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
+                                                                                    {dataLang[e?.status_payment] ||
+                                                                                        e?.status_payment}{" "}
+                                                                                    {`(${formatNumber(e?.total_payment)})`}
+                                                                                </span>
+                                                                            )) ||
+                                                                        (["payment_paid"].includes(
+                                                                            e?.status_payment
+                                                                        ) && (
+                                                                                <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
+                                                                                    <TickCircle
+                                                                                        className="bg-lime-500 rounded-full"
+                                                                                        color="white"
+                                                                                        size={15}
+                                                                                    />
+                                                                                    {dataLang[e?.status_payment] ||
+                                                                                        e?.status_payment}
+                                                                                </span>
+                                                                            ))}
                                                                 </h6>
                                                                 <h6 className="col-span-1 w-fit mx-auto">
                                                                     <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
@@ -915,63 +851,58 @@ const Index = (props) => {
                                                                                             "keep_stock",
                                                                                             "import_outsourcing",
                                                                                         ].includes(item?.code) && (
-                                                                                            <>
-                                                                                                <div className="flex items-center">
-                                                                                                    <div
-                                                                                                        className={`${
-                                                                                                            item?.active
+                                                                                                <>
+                                                                                                    <div className="flex items-center">
+                                                                                                        <div
+                                                                                                            className={`${item?.active
                                                                                                                 ? `h-2 w-2 rounded-full bg-green-500`
                                                                                                                 : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                        } `}
-                                                                                                    />
-                                                                                                    {!isValueDelivery && (
-                                                                                                        <div
-                                                                                                            className={`${
-                                                                                                                item?.active
+                                                                                                                } `}
+                                                                                                        />
+                                                                                                        {!isValueDelivery && (
+                                                                                                            <div
+                                                                                                                className={`${item?.active
                                                                                                                     ? `w-full bg-green-500 h-0.5 `
                                                                                                                     : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                            }`}
-                                                                                                        />
-                                                                                                    )}
-                                                                                                </div>
-                                                                                                <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
-                                                                                                    <div
-                                                                                                        className={`${
-                                                                                                            item?.active
+                                                                                                                    }`}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </div>
+                                                                                                    <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
+                                                                                                        <div
+                                                                                                            className={`${item?.active
                                                                                                                 ? "text-green-500"
                                                                                                                 : "text-slate-500"
-                                                                                                        } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                    >
-                                                                                                        <div className="flex justify-center items-center w-full gap-1">
-                                                                                                            <h6>
-                                                                                                                {
-                                                                                                                    dataLang[
+                                                                                                                } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                                                                                        >
+                                                                                                            <div className="flex justify-center items-center w-full gap-1">
+                                                                                                                <h6>
+                                                                                                                    {
+                                                                                                                        dataLang[
                                                                                                                         item
                                                                                                                             ?.name
-                                                                                                                    ]
-                                                                                                                }
-                                                                                                            </h6>
-                                                                                                            {isValueDelivery && (
-                                                                                                                <h6
-                                                                                                                    className={`${
-                                                                                                                        item?.active &&
-                                                                                                                        isValueDelivery
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                </h6>
+                                                                                                                {isValueDelivery && (
+                                                                                                                    <h6
+                                                                                                                        className={`${item?.active &&
+                                                                                                                            isValueDelivery
                                                                                                                             ? "text-green-500"
                                                                                                                             : "text-orange-500"
-                                                                                                                    } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
-                                                                                                                >{`(${
-                                                                                                                    dataLang[
+                                                                                                                            } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                                                                                    >{`(${dataLang[
                                                                                                                         item
                                                                                                                             ?.status
                                                                                                                     ] ||
-                                                                                                                    item?.status
-                                                                                                                })`}</h6>
-                                                                                                            )}
+                                                                                                                        item?.status
+                                                                                                                        })`}</h6>
+                                                                                                                )}
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                            </>
-                                                                                        )}
+                                                                                                </>
+                                                                                            )}
                                                                                         <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
                                                                                             {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
                                                                                             {isValue &&
@@ -981,8 +912,8 @@ const Index = (props) => {
                                                                                                         0,
                                                                                                         isExpanded
                                                                                                             ? item
-                                                                                                                  ?.reference
-                                                                                                                  .length
+                                                                                                                ?.reference
+                                                                                                                .length
                                                                                                             : 2
                                                                                                     )
                                                                                                     .map(
@@ -1001,7 +932,7 @@ const Index = (props) => {
                                                                                                     )}
                                                                                             {item?.reference &&
                                                                                                 item?.reference.length >
-                                                                                                    2 && (
+                                                                                                2 && (
                                                                                                     <button
                                                                                                         onClick={
                                                                                                             toggleShowAll
@@ -1071,8 +1002,9 @@ const Index = (props) => {
                         {initData.data?.length != 0 && (
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
-                                    {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng
-                                    bán
+                                    {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng
+                                    bán */}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
@@ -1088,7 +1020,7 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"salesOrder"}
+                nameModel={"sales_product"}
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
@@ -1096,7 +1028,7 @@ const Index = (props) => {
                 save={toggleStatus}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 

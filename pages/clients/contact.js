@@ -27,57 +27,59 @@ import SelectComponent from "components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 import useStatusExprired from "@/hooks/useStatusExprired";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import { debounce } from "lodash";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
+
     const router = useRouter();
-    const tabPage = router.query?.tab;
 
-    const [keySearch, sKeySearch] = useState("");
-    const [limit, sLimit] = useState(15);
-    const [totalItem, sTotalItems] = useState([]);
+    const trangthaiExprired = useStatusExprired();
 
-    const [onFetching, sOnFetching] = useState(false);
-    const [data, sData] = useState({});
-    const [data_ex, sData_ex] = useState([]);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
+
+    const initilalState = {
+        keySearch: "",
+        onFetching: false,
+        onFetchingBranch: false,
+        onFetchingUser: false,
+        data: {},
+        data_ex: [],
+        idBranch: null,
+        idClient: null,
+        listClient: [],
+        listBr: []
+    }
+
+    const [isState, sIsState] = useState(initilalState)
+
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
+
     const _ServerFetching = () => {
         Axios(
             "GET",
             "/api_web/api_client/contact/?csrf_protection=true",
             {
                 params: {
-                    search: keySearch,
+                    search: isState.keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    // "filter[client_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null ,
-                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-                    "filter[client_id]": idClient?.length > 0 ? idClient.map((e) => e.value) : null,
+                    "filter[branch_id]": isState.idBranch?.length > 0 ? isState.idBranch.map((e) => e.value) : null,
+                    "filter[client_id]": isState.idClient?.length > 0 ? isState.idClient.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sData(rResult);
-                    sTotalItems(output);
-                    sData_ex(rResult);
+                    const { rResult, output } = response.data;
+                    queryState({ data_ex: rResult, data: rResult, onFetching: false });
+                    updateTotalItems(output);
                 }
-                sOnFetching(false);
+                queryState({ onFetching: false });
             }
         );
     };
 
-    const [listBr, sListBr] = useState();
     const _ServerFetching_brand = () => {
         Axios(
             "GET",
@@ -89,19 +91,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sListBr(rResult);
+                    const { rResult, output } = response.data;
+                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) })
                 }
-                sOnFetching(false);
+                queryState({ onFetchingBranch: false });
             }
         );
     };
-    const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
-    const [idBranch, sIdBranch] = useState(null);
-    const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
-    const [listClient, sListClient] = useState();
     const _ServerFetching_client = () => {
         Axios(
             "GET",
@@ -113,30 +110,14 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output } = response.data;
-                    sListClient(rResult);
+                    const { rResult, output } = response.data;
+                    queryState({ listClient: rResult?.map((e) => ({ label: e.name, value: e.id })) });
                 }
-                sOnFetching(false);
+                queryState({ onFetchingUser: false });
             }
         );
     };
-    const listClient_filter = listClient?.map((e) => ({
-        label: e.name,
-        value: e.id,
-    }));
-    const [idClient, sIdClient] = useState(null);
-    const hiddenOptionsClient = idClient?.length > 3 ? idClient?.slice(0, 3) : [];
-    const optionsClient = listClient_filter
-        ? listClient_filter?.filter((x) => !hiddenOptionsClient.includes(x.value))
-        : [];
 
-    const onchang_filter = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        } else if (type == "client") {
-            sIdClient(value);
-        }
-    };
 
     const paginate = (pageNumber) => {
         router.push({
@@ -147,59 +128,26 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
-        sKeySearch(value);
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
+        queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
             query: {
                 // tab: router.query?.page,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        queryState({ onFetching: true })
+    }, 500);
+
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_brand()) ||
-            (onFetching && _ServerFetching_client());
-    }, [onFetching]);
+        (isState.onFetching && _ServerFetching()) ||
+            (isState.onFetching && _ServerFetching_brand()) ||
+            (isState.onFetching && _ServerFetching_client());
+    }, [isState.onFetching]);
     useEffect(() => {
-        sOnFetching(true) ||
-            (keySearch && sOnFetching(true)) ||
-            (idBranch?.length > 0 && sOnFetching(true)) ||
-            (idClient?.length > 0 && sOnFetching(true));
-    }, [limit, router.query?.page, idBranch, idClient]);
-    const handleDelete = (event) => {
-        Swal.fire({
-            title: `${dataLang?.aler_ask}`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const id = event;
-                Axios("DELETE", `/api_web/api_client/client/${id}?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var isSuccess = response.data?.isSuccess;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: "success",
-                                title: dataLang?.aler_success_delete,
-                            });
-                        }
-                    }
-                    _ServerFetching();
-                });
-            }
-        });
-    };
+
+        queryState({ onFetching: true })
+    }, [limit, router.query?.page, isState.idBranch, isState.idClient]);
     //excel
     const multiDataSet = [
         {
@@ -277,7 +225,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: data_ex?.map((e) => [
+            data: isState.data_ex?.map((e) => [
                 { value: `${e.client_contact_id}`, style: { numFmt: "0" } },
                 { value: `${e.client_name ? e.client_name : ""}` },
                 { value: `${e.contact_name ? e.contact_name : ""}` },
@@ -285,9 +233,8 @@ const Index = (props) => {
                 { value: `${e.position ? e.position : ""}` },
                 { value: `${e.email ? e.email : ""}` },
                 {
-                    value: `${
-                        e.birthday ? (e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "") : ""
-                    }`,
+                    value: `${e.birthday ? (e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "") : ""
+                        }`,
                 },
                 { value: `${e.address ? e.address : ""}` },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
@@ -295,9 +242,8 @@ const Index = (props) => {
         },
     ];
     const _HandleFresh = () => {
-        sOnFetching(true);
+        queryState({ onFetching: true });
     };
-    const trangthaiExprired = useStatusExprired();
 
     return (
         <React.Fragment>
@@ -338,12 +284,12 @@ const Index = (props) => {
                                                             label: "Chọn chi nhánh",
                                                             isDisabled: true,
                                                         },
-                                                        ...options,
+                                                        ...isState.listBr,
                                                     ]}
-                                                    onChange={onchang_filter.bind(this, "branch")}
-                                                    value={idBranch}
+                                                    onChange={(e) => queryState({ idBranch: e })}
+                                                    value={isState.idBranch}
                                                     placeholder={dataLang?.client_list_filterbrand}
-                                                    colSpan={idBranch?.length > 1 ? 2 : 1}
+                                                    colSpan={isState.idBranch?.length > 1 ? 2 : 1}
                                                     components={{ MultiValue }}
                                                     closeMenuOnSelect={false}
                                                     isMulti={true}
@@ -355,12 +301,12 @@ const Index = (props) => {
                                                             label: "Chọn khách hàng",
                                                             isDisabled: true,
                                                         },
-                                                        ...optionsClient,
+                                                        ...isState.listClient,
                                                     ]}
-                                                    onChange={onchang_filter.bind(this, "client")}
-                                                    value={idClient}
+                                                    onChange={(e) => queryState({ idClient: e })}
+                                                    value={isState.idClient}
                                                     placeholder="Chọn Khách hàng"
-                                                    colSpan={idClient?.length > 1 ? 2 : 1}
+                                                    colSpan={isState.idClient?.length > 1 ? 2 : 1}
                                                     components={{ MultiValue }}
                                                     closeMenuOnSelect={false}
                                                     isMulti={true}
@@ -380,7 +326,7 @@ const Index = (props) => {
                                                         color="green"
                                                     />
                                                 </button>
-                                                {data_ex?.length > 0 && (
+                                                {isState.data_ex?.length > 0 && (
                                                     <ExcelFileComponent
                                                         multiDataSet={multiDataSet}
                                                         filename="Danh sách liên hệ"
@@ -421,12 +367,12 @@ const Index = (props) => {
                                                 {dataLang?.client_contact_table_brand}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {isState.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : isState.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
-                                                    {data?.map((e) => (
+                                                    {isState.data?.map((e) => (
                                                         <div
                                                             className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
                                                             key={e.client_contact_id.toString()}
@@ -483,11 +429,12 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
+                                    {/* {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

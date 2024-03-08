@@ -1,7 +1,11 @@
 import { useState } from "react";
+import useSetingServer from "./useConfigNumber";
 
 export const useLimitAndTotalItems = (initialLimit = 15, initialTotalItems = {}) => {
-    const [limit, sLimit] = useState(initialLimit);
+    const dataSeting = useSetingServer()
+
+    const [limit, sLimit] = useState(dataSeting?.tables_pagination_limit);
+
 
     const [totalItems, sTotalItems] = useState(initialTotalItems);
 

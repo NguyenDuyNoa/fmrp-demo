@@ -23,6 +23,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { routerInternalPlan } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const initsFetching = {
@@ -131,9 +132,8 @@ const Index = (props) => {
                                 idParenBackend: e?.id,
                                 matHang: {
                                     e: e,
-                                    label: `${e?.item_name} <span style={{display: none}}>${
-                                        e?.code + e?.product_variation + e?.text_type + e?.unit_name
-                                    }</span>`,
+                                    label: `${e?.item_name} <span style={{display: none}}>${e?.code + e?.product_variation + e?.text_type + e?.unit_name
+                                        }</span>`,
                                     value: e?.item_id,
                                 },
                                 unit: e?.unit_name,
@@ -182,34 +182,55 @@ const Index = (props) => {
         sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
     };
 
-    let searchTimeout;
 
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") return;
-        else {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
-                    {
-                        params: {
-                            "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
-                        },
-                        data: {
-                            term: inputValue,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let { result } = response.data.data;
-                            sDataSelect((e) => ({ ...e, dataItems: result }));
-                        }
-                    }
-                );
-            }, 500);
-        }
-    };
+    const _HandleSeachApi = debounce((inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+            {
+                params: {
+                    "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
+                },
+                data: {
+                    term: inputValue,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response.data.data;
+                    sDataSelect((e) => ({ ...e, dataItems: result }));
+                }
+            }
+        );
+    }, 500)
+    // let searchTimeout;
+
+    // const _HandleSeachApi = (inputValue) => {
+    //     if (inputValue == "") return;
+    //     else {
+    //         clearTimeout(searchTimeout);
+    //         searchTimeout = setTimeout(() => {
+    //             Axios(
+    //                 "POST",
+    //                 `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+    //                 {
+    //                     params: {
+    //                         "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
+    //                     },
+    //                     data: {
+    //                         term: inputValue,
+    //                     },
+    //                 },
+    //                 (err, response) => {
+    //                     if (!err) {
+    //                         let { result } = response.data.data;
+    //                         sDataSelect((e) => ({ ...e, dataItems: result }));
+    //                     }
+    //                 }
+    //             );
+    //         }, 500);
+    //     }
+    // };
 
     const handleSaveStatus = () => {
         isKeyState?.sDataSelect((e) => ({ ...e, dataItems: [] }));
@@ -495,10 +516,9 @@ const Index = (props) => {
         });
         await Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
-                    : "/api_web/api_internal_plan/handling?csrf_protection=true"
+            `${id
+                ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
+                : "/api_web/api_internal_plan/handling?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -635,9 +655,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${
-                                            errors.errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errors.errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -689,9 +708,8 @@ const Index = (props) => {
                                         name="fname"
                                         type="text"
                                         placeholder={dataLang?.internal_plan_name || "internal_plan_name"}
-                                        className={`focus:border-[#92BFF7] ${
-                                            errors.errPlan ? "border-red-500 " : "border-[#d0d5dd]"
-                                        }   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
+                                        className={`focus:border-[#92BFF7] ${errors.errPlan ? "border-red-500 " : "border-[#d0d5dd]"
+                                            }   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                     {errors.errPlan && (
                                         <label className="text-sm text-red-500">
@@ -898,14 +916,13 @@ const Index = (props) => {
                                                                 "quantity"
                                                             )}
                                                             value={e.quantity || null}
-                                                            className={`${
-                                                                errors.errQuantity &&
+                                                            className={`${errors.errQuantity &&
                                                                 (e.quantity == null ||
                                                                     e.quantity == "" ||
                                                                     e.quantity == 0)
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
-                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                ? "border-b border-red-500"
+                                                                : "border-b border-gray-200"
+                                                                } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                             allowNegative={false}
                                                             decimalScale={0}
                                                             isNumericString={true}
@@ -937,11 +954,10 @@ const Index = (props) => {
                                                             isClearable
                                                             value={e.date}
                                                             placeholderText="Chọn ngày"
-                                                            className={`outline-none ${
-                                                                errors.errDate && (e.date == null || e.date == "")
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
-                                                            } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
+                                                            className={`outline-none ${errors.errDate && (e.date == null || e.date == "")
+                                                                ? "border-b border-red-500"
+                                                                : "border-b border-gray-200"
+                                                                } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
                                                         />
                                                     </div>
                                                 </div>

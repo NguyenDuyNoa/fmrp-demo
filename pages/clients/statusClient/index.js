@@ -14,7 +14,7 @@ import {
 } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 
-import Popup_status from "./(popup)/popup";
+import Popup_status from "./components/popup";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
@@ -30,6 +30,9 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -48,9 +51,9 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
 
-    const [totalItem, sTotalItem] = useState([]);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
+
 
     const [data_ex, sData_ex] = useState([]);
 
@@ -70,7 +73,7 @@ const Index = (props) => {
                 if (!err) {
                     var { rResult, output } = response.data;
                     sData(rResult);
-                    sTotalItem(output);
+                    updateTotalItems(output);
                     sData_ex(rResult);
                 }
                 sOnFetching(false);
@@ -135,16 +138,17 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/clients/statusClient");
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const multiDataSet = [
         {
@@ -367,8 +371,9 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
+                                    {/* {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

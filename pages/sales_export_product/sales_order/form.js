@@ -7,7 +7,7 @@ import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
 import Select, { components } from "react-select";
-import { NumericFormat } from "react-number-format";
+import { NumberFormatBase, NumericFormat } from "react-number-format";
 import { Trash as IconDelete, Add, Minus } from "iconsax-react";
 
 import { _ServerInstance as Axios } from "/services/axios";
@@ -20,9 +20,16 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
 import { routerSalesOrder } from "@/routers/sellingGoods";
-
+import { debounce } from "lodash";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 const Index = (props) => {
     const router = useRouter();
+
+    const dataSeting = useSetingServer()
 
     const id = router.query?.id;
 
@@ -127,7 +134,7 @@ const Index = (props) => {
         router.query && setNote("");
 
         router.query && setOnFetching(true);
-        router.query && setOnFetchingItemsAll(true);
+        // router.query && setOnFetchingItemsAll(true);
     }, [id, router.query]);
 
     // Fetch edit
@@ -225,16 +232,17 @@ const Index = (props) => {
     const handleFetchingCustomer = () => {
         Axios(
             "GET",
-            `/api_web/api_client/client_option/?csrf_protection=true`,
+            `/api_web/api_client/searchClients?csrf_protection=true`,
             {
                 params: {
-                    "filter[branch_id]": branch !== null ? branch?.value : null,
+                    search: "",
+                    "branch_id": branch !== null ? [branch?.value]?.map((e) => e) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var db = response.data.rResult;
-                    setDataCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
+                    var { data } = response.data
+                    setDataCustomer(data?.clients?.map((e) => ({ label: e.name, value: e.id })));
                 }
             }
         );
@@ -244,19 +252,19 @@ const Index = (props) => {
     const handleFetchingContactPerson = () => {
         Axios(
             "GET",
-            `/api_web/api_client/contactCombobox/?csrf_protection=true`,
+            `/api_web/api_client/searchContact?csrf_protection=true`,
             {
                 params: {
-                    "filter[client_id]": customer != null ? customer.value : null,
+                    "client_id": customer != null ? customer.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response.data;
+                    const { data } = response.data;
                     setDataContactPerson(
-                        rResult?.map((e) => ({
-                            label: e.full_name,
-                            value: e.id,
+                        data?.contacts.map((e) => ({
+                            label: e?.full_name,
+                            value: e?.id,
                         }))
                     );
                 }
@@ -264,24 +272,23 @@ const Index = (props) => {
         );
         setOnFetchingContactPerson(false);
     };
-
     // Staff
     const handleFetchingStaff = () => {
         Axios(
             "GET",
-            `/api_web/Api_staff/staffOption?csrf_protection=true`,
+            `/api_web/api_client/getStaffBranch?csrf_protection=true`,
             {
                 params: {
-                    "filter[branch_id]": branch !== null ? +branch?.value : null,
+                    "branch_id": branch != null ? [+branch?.value]?.map((e) => e) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult } = response?.data;
+                    const { data } = response?.data;
                     setDataStaffs(
-                        rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.staffid,
+                        data?.staffs?.map((e) => ({
+                            label: e?.full_name,
+                            value: e?.staffid,
                         }))
                     );
                 }
@@ -318,27 +325,28 @@ const Index = (props) => {
 
     // fetch items
     const handleFetchingItemsAll = () => {
-        if (typeOrder === "1") {
-            Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    setDataItems(result);
-                }
-            });
-            setOnFetchingItemsAll(false);
+        let form = new FormData()
+        if (branch != null) {
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
         }
-        if (typeOrder === "0") {
-            Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    setDataItems(result);
-                }
-            });
-            setOnFetchingItemsAll(false);
-        }
+        Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
+            data: form,
+            headers: { "Content-Type": "multipart/form-data" },
+        }, (err, response) => {
+            if (!err) {
+                const { result } = response.data.data;
+                setDataItems(result);
+            }
+        });
+        setOnFetchingItemsAll(false);
     };
 
     const handleFetchingItem = async () => {
+        let form = new FormData()
+        // form.append("branch_id", branch != null ? [+branch?.value]?.map((e) => e) : null)
+        if (branch != null) {
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+        }
         if (typeOrder === "1") {
             if (quote && quote.value !== null) {
                 await Axios(
@@ -351,7 +359,7 @@ const Index = (props) => {
                     },
                     (err, response) => {
                         if (!err) {
-                            var { result } = response.data.data;
+                            const { result } = response.data.data;
                             setDataItems(result);
                         }
                     }
@@ -361,10 +369,13 @@ const Index = (props) => {
                 await Axios(
                     "POST",
                     "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
-                    {},
+                    {
+                        data: form,
+                        headers: { "Content-Type": "multipart/form-data" },
+                    },
                     (err, response) => {
                         if (!err) {
-                            var { result } = response.data.data;
+                            const { result } = response.data.data;
                             setDataItems(result);
                         }
                     }
@@ -375,10 +386,13 @@ const Index = (props) => {
             await Axios(
                 "POST",
                 "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
-                {},
+                {
+                    data: form,
+                    headers: { "Content-Type": "multipart/form-data" },
+                },
                 (err, response) => {
                     if (!err) {
-                        var { result } = response.data.data;
+                        const { result } = response.data.data;
                         setDataItems(result);
                     }
                 }
@@ -387,56 +401,6 @@ const Index = (props) => {
         }
     };
 
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetail();
-    }, [onFetchingDetail]);
-
-    useEffect(() => {
-        id && setOnFetchingDetail(true);
-    }, []);
-
-    useEffect(() => {
-        (branch === null && setDataCustomer([])) ||
-            setCustomer(null) ||
-            setDataContactPerson([]) ||
-            setContactPerson(null) ||
-            setDataStaffs([]) ||
-            setStaff(null);
-    }, []);
-
-    useEffect(() => {
-        onFetchingCustomer && handleFetchingCustomer();
-    }, [onFetchingCustomer]);
-    useEffect(() => {
-        onFetchingStaff && handleFetchingStaff();
-    }, [onFetchingStaff]);
-
-    useEffect(() => {
-        onFetchingQuote && handleFetchingQuote();
-    }, [onFetchingQuote]);
-
-    useEffect(() => {
-        onFetchingContactPerson && handleFetchingContactPerson();
-    }, [onFetchingContactPerson]);
-
-    useEffect(() => {
-        branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true));
-    }, [branch]);
-
-    useEffect(() => {
-        customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true));
-    }, [customer]);
-    useEffect(() => {
-        quote !== null && setOnFetchingItem(true);
-    }, [quote]);
-
-    useEffect(() => {
-        setOnFetchingItemsAll && handleFetchingItemsAll();
-    }, [setOnFetchingItemsAll]);
-
-    useEffect(() => {
-        onFetchingItem && handleFetchingItem();
-    }, [onFetchingItem]);
 
     const options = dataItems?.map((e) => {
         return {
@@ -512,11 +476,12 @@ const Index = (props) => {
     }, []);
 
     useEffect(() => {
-        onFetchingCustomer && handleFetchingCustomer();
-    }, [onFetchingCustomer]);
-    useEffect(() => {
         onFetchingStaff && handleFetchingStaff();
     }, [onFetchingStaff]);
+
+    useEffect(() => {
+        onFetchingCustomer && handleFetchingCustomer();
+    }, [onFetchingCustomer]);
 
     useEffect(() => {
         onFetchingQuote && handleFetchingQuote();
@@ -528,11 +493,14 @@ const Index = (props) => {
 
     useEffect(() => {
         branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true));
+        branch !== null && setOnFetchingItemsAll(true)
+        branch == null && setItemsAll([]);
     }, [branch]);
 
     useEffect(() => {
-        customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true));
+        customer !== null && setOnFetchingContactPerson(true)
     }, [customer]);
+
     useEffect(() => {
         quote !== null && setOnFetchingItem(true);
     }, [quote]);
@@ -548,11 +516,6 @@ const Index = (props) => {
     useEffect(() => {
         onFetching && handleFetchingBranch();
     }, [onFetching]);
-
-    // useEffect(() => {
-    //   router.query && setOnFetching(true)
-    //   router.query && setOnFetchingItemsAll(true)
-    // }, [router.query]);
 
     useEffect(() => {
         setErrDate(false);
@@ -572,7 +535,13 @@ const Index = (props) => {
     }, [staff != null]);
 
     // search api
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
+        if (branch == null) return
+        let form = new FormData()
+        if (branch != null) {
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+        }
+        form.append("term", inputValue)
         if (typeOrder === "1" && quote && +quote.value) {
             Axios(
                 "POST",
@@ -598,9 +567,8 @@ const Index = (props) => {
                 "POST",
                 `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
                 {
-                    data: {
-                        term: inputValue,
-                    },
+                    data: form,
+                    headers: { "Content-Type": "multipart/form-data" },
                 },
                 (err, response) => {
                     if (!err) {
@@ -610,14 +578,19 @@ const Index = (props) => {
                 }
             );
         }
-    };
+    }, 500)
 
     // format number
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        // if (!number && number !== 0) return 0;
+        // const integerPart = Math.floor(number);
+        // return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
+
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    }
 
     const resetValue = () => {
         if (status == "customer") {
@@ -646,7 +619,7 @@ const Index = (props) => {
             setTypeOrder(isId);
             setHidden(isId === "1");
             setQuote(isId === "0" ? null : quote);
-
+            isId == 1 && setOnFetchingQuote(true)
             setOnFetchingItem(isId === "0" && true);
             setOnFetchingItemsAll(isId === "1" && true);
 
@@ -677,8 +650,6 @@ const Index = (props) => {
                 setContactPerson(null);
                 setDataQuotes([]);
                 setQuote(null);
-
-                setOnFetchingItem(true);
             }
         } else if (type === "branch") {
             if (option?.length >= 1) {
@@ -726,6 +697,10 @@ const Index = (props) => {
                 if (typeOrder === "0") {
                     const newData = value
                         ?.map((e, index) => {
+                            const check = option?.find((x) => x?.item?.e?.id == e?.e?.id);
+                            if (check) {
+                                return check
+                            }
                             return {
                                 id: uuidv4(),
                                 item: {
@@ -746,12 +721,12 @@ const Index = (props) => {
                                 delivery_date: null,
                             };
                         })
-                        .sort((a, b) => b.sortIndex - a.sortIndex);
                     setOption([...newData]);
                 }
                 if (typeOrder === "1" && quote !== null) {
                     const newData = value
                         ?.map((e, index) => {
+                            console.log("e2", e);
                             return {
                                 id: uuidv4(),
                                 item: {
@@ -796,6 +771,7 @@ const Index = (props) => {
 
     const handleAddParent = (value) => {
         const checkData = option?.some((e) => e?.item?.value === value?.value);
+        console.log("value", value);
         if (!checkData) {
             if (typeOrder === "0") {
                 const newData = {
@@ -1128,15 +1104,16 @@ const Index = (props) => {
         var formData = new FormData();
         formData.append("code", codeProduct);
         formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
-        formData.append("branch_id", branch?.value);
-        formData.append("client_id", customer?.value);
-        formData.append("person_contact_id", contactPerson?.value);
-        formData.append("staff_id", staff?.value);
-        formData.append("note", note);
+        formData.append("branch_id", branch?.value ? branch?.value : "");
+        formData.append("client_id", customer?.value ? customer?.value : "");
+        formData.append("person_contact_id", contactPerson?.value ? contactPerson?.value : "");
+        formData.append("staff_id", staff?.value ? staff?.value : "");
+        formData.append("note", note ? note : "");
         formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
-
+        console.log("newDataOption", newDataOption);
         newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
+            formData.append(`items[${index}][id]`, item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : "");
             formData.append(`items[${index}][quantity]`, item?.quantity.toString());
             formData.append(`items[${index}][price]`, item?.price);
             formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
@@ -1166,10 +1143,9 @@ const Index = (props) => {
                     headers: { "Content-Type": "multipart/form-data" },
                 },
                 (err, response) => {
-                    console.log("response", response);
-
-                    if (response && response.data && response?.data?.isSuccess === true && router.isReady) {
-                        isShow("success", `${dataLang[response?.data?.message]}`);
+                    const { isSuccess, message } = response?.data
+                    if (isSuccess) {
+                        isShow("success", `${dataLang[message]}` || message);
                         setCodeProduct("");
                         setStartDate(new Date());
                         setDeliveryDate(new Date());
@@ -1188,8 +1164,8 @@ const Index = (props) => {
                         setOption([]);
                         router.push(routerSalesOrder.home);
                     }
-                    if (response && response.data && response?.data?.isSuccess === false) {
-                        isShow("error", `${dataLang[response?.data?.message]}`);
+                    else {
+                        isShow("error", `${dataLang[message]}` || message);
                     }
                     setOnSending(false);
                 }
@@ -1415,7 +1391,6 @@ const Index = (props) => {
 
     // render option item in formatGroupLabel Item
     const selectItemsLabel = (option) => {
-        console.log("option", option);
         return (
             <div className="flex items-center justify-between">
                 <div className="flex items-center ">
@@ -1490,40 +1465,7 @@ const Index = (props) => {
                 </title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
-                {/* <div className="3xl:px-5 px-4 3xl:pt-[76px] 2xl:pt-[72px] xl:pt-16 pt-14 pb-3 3xl:space-y-1.5 space-y-1 flex flex-col justify-between"> */}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
-                    {/* {trangthaiExprired ? (
-                        <div className="p-5"></div>
-                    ) : (
-                        <div className="flex space-x-1 3xl:text-[13px] 2xl:text-[12px] xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.sales_product_list || "sales_product_list"}
-                            </h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                    : dataLang?.sales_product_add_order || "sales_product_add_order"}
-                            </h6>
-                        </div>
-                    )} */}
-
-                    {/* <div className="flex justify-between items-center">
-                        <h2 className="3xl:text-[24px] 2xl:text-2xl xl:text-xl text-xl ">
-                            {id
-                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
-                        </h2>
-                        <div className="flex justify-end items-center">
-                            <button
-                                onClick={() => router.push(routerSalesOrder.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 3xl:py-1.5 2xl:py-2.5 xl:py-1.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.btn_back || "btn_back"}
-                            </button>
-                        </div>
-                    </div> */}
-
                     {trangthaiExprired ? (
                         <div className="p-2"></div>
                     ) : (
@@ -1581,7 +1523,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.branch || "branch"} <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataBranch}
                                         onChange={handleOnChangeInput.bind(this, "branch")}
                                         value={branch}
@@ -1593,20 +1535,6 @@ const Index = (props) => {
                                             } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1630,7 +1558,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.customer || "customer"} <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataCustomer}
                                         onChange={handleOnChangeInput.bind(this, "customer")}
                                         value={customer}
@@ -1643,20 +1571,6 @@ const Index = (props) => {
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1684,7 +1598,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
                                         {dataLang?.contact_person || "contact_person"}
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataPersonContact}
                                         onChange={handleOnChangeInput.bind(this, "contactPerson")}
                                         value={contactPerson}
@@ -1696,20 +1610,6 @@ const Index = (props) => {
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1769,7 +1669,7 @@ const Index = (props) => {
                                         {dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectComponent
                                         options={dataStaffs}
                                         onChange={(value) => handleOnChangeInput("staff", value)}
                                         value={staff}
@@ -1785,20 +1685,6 @@ const Index = (props) => {
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
                                         styles={{
                                             placeholder: (base) => ({
                                                 ...base,
@@ -1871,7 +1757,7 @@ const Index = (props) => {
                                             {dataLang?.sales_product_quotation || "sales_product_quotation"}{" "}
                                             <span className="text-red-500">*</span>{" "}
                                         </label>
-                                        <Select
+                                        <SelectComponent
                                             options={fakeDataQuotes}
                                             onChange={(value) => handleOnChangeInput("quote", value)}
                                             value={quote}
@@ -1886,20 +1772,6 @@ const Index = (props) => {
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                            })}
                                             styles={{
                                                 placeholder: (base) => ({
                                                     ...base,
@@ -1937,10 +1809,10 @@ const Index = (props) => {
                             <label className="text-[#344054] font-normal 2xl:text-base text-[14px]">
                                 {dataLang?.import_click_items || "import_click_items"}{" "}
                             </label>
-                            <Select
+                            <SelectComponent
                                 onInputChange={_HandleSeachApi.bind(this)}
                                 options={typeOrder === "1" && quote === null ? [] : allItems}
-                                closeMenuOnSelect={false}
+                                // closeMenuOnSelect={false}
                                 onChange={(value) => handleOnChangeInput("itemAll", value)}
                                 value={itemsAll?.value ? itemsAll?.value : option?.map((e) => e?.item)}
                                 isMulti
@@ -2025,20 +1897,6 @@ const Index = (props) => {
                                 isSearchable={true}
                                 noOptionsMessage={() => "Không có dữ liệu"}
                                 menuPortalTarget={document.body}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
                                 styles={{
                                     placeholder: (base) => ({
                                         ...base,
@@ -2103,7 +1961,7 @@ const Index = (props) => {
                                 {/* phân chia,m */}
                                 <div className="grid grid-cols-12">
                                     <div className="col-span-2 ">
-                                        <Select
+                                        <SelectComponent
                                             onInputChange={_HandleSeachApi.bind(this)}
                                             dangerouslySetInnerHTML={{
                                                 __html: option.label,
@@ -2120,20 +1978,6 @@ const Index = (props) => {
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                            })}
                                             styles={{
                                                 placeholder: (base) => ({
                                                     ...base,
@@ -2167,18 +2011,11 @@ const Index = (props) => {
                                             >
                                                 <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75 " />
                                             </button>
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 value={1}
-                                                thousandSeparator=","
                                                 allowNegative={false}
-                                                readOnly={true}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                isAllowed={(values) => {
-                                                    const { floatValue } = values;
-                                                    return floatValue > 0;
-                                                }}
+                                                thousandSeparator=","
                                             />
                                             <button
                                                 disabled={true}
@@ -2188,7 +2025,7 @@ const Index = (props) => {
                                             </button>
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={1}
                                                 allowNegative={false}
                                                 readOnly={true}
@@ -2199,14 +2036,13 @@ const Index = (props) => {
                                             />
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={0}
                                                 className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
                                                 thousandSeparator=","
                                                 allowNegative={false}
                                                 readOnly={true}
-                                                isNumericString={true}
-                                            />
+                                                isNumericString={true} />
                                         </div>
                                         <div className="col-span-1 text-right flex items-center justify-end">
                                             <h3
@@ -2216,7 +2052,7 @@ const Index = (props) => {
                                             </h3>
                                         </div>
                                         <div className="col-span-1 flex justify-center items-center">
-                                            <Select
+                                            <SelectComponent
                                                 options={taxOptions}
                                                 value={null}
                                                 placeholder={"% Thuế"}
@@ -2228,20 +2064,6 @@ const Index = (props) => {
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 menuPortalTarget={document.body}
                                                 closeMenuOnSelect={true}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
                                                 styles={{
                                                     placeholder: (base) => ({
                                                         ...base,
@@ -2306,7 +2128,7 @@ const Index = (props) => {
                                 {sortedArr.map((e, index) => (
                                     <div className="grid grid-cols-12 gap-1 py-1 items-center" key={e?.id}>
                                         <div className="col-span-2 ">
-                                            <Select
+                                            <SelectComponent
                                                 onInputChange={_HandleSeachApi.bind(this)}
                                                 dangerouslySetInnerHTML={{
                                                     __html: option.label,
@@ -2324,20 +2146,6 @@ const Index = (props) => {
                                                 isSearchable={true}
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 menuPortalTarget={document.body}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
                                                 styles={{
                                                     placeholder: (base) => ({
                                                         ...base,
@@ -2373,20 +2181,18 @@ const Index = (props) => {
                                                 >
                                                     <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
                                                 </button>
-                                                <NumericFormat
-                                                    className={`cursor-text appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                    onValueChange={(value) =>
-                                                        handleOnChangeInputOption(e?.id, "quantity", value)
-                                                    }
-                                                    value={e?.quantity || 1}
-                                                    thousandSeparator=","
-                                                    allowNegative={false}
-                                                    decimalScale={0}
-                                                    isNumericString={true}
-                                                    isAllowed={(values) => {
-                                                        const { floatValue } = values;
-                                                        return floatValue > 0;
+                                                <InPutNumericFormat
+                                                    value={e?.quantity}
+                                                    onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
+                                                    isAllowed={({ floatValue }) => {
+                                                        if (floatValue == 0) {
+                                                            return true;
+                                                        } else {
+                                                            return true;
+                                                        }
                                                     }}
+                                                    allowNegative={false}
+                                                    className={`${e?.quantity == 0 && 'border-red-500' || e?.quantity == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                                 <button
                                                     onClick={() => handleIncrease(e.id)}
@@ -2397,36 +2203,39 @@ const Index = (props) => {
                                             </div>
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={e?.price}
-                                                onValueChange={(value) =>
-                                                    handleOnChangeInputOption(e?.id, "price", value)
-                                                }
+                                                onValueChange={(value) => handleOnChangeInputOption(e?.id, "price", value)}
+                                                isAllowed={({ floatValue }) => {
+                                                    if (floatValue == 0) {
+                                                        return true;
+                                                    } else {
+                                                        return true;
+                                                    }
+                                                }}
                                                 allowNegative={false}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                className={`cursor-text appearance-none 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                                                thousandSeparator=","
+                                                className={`${e?.price == 0 && 'border-red-500' || e?.price == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
+                                            <InPutNumericFormat
                                                 value={e?.discount}
                                                 onValueChange={(value) =>
                                                     handleOnChangeInputOption(e?.id, "discount", value)
                                                 }
                                                 className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                isAllowed={(values) => {
-                                                    if (!values.value) return true;
-                                                    const { floatValue } = values;
-                                                    if (floatValue > 101) {
-                                                        isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                                isAllowed={({ floatValue }) => {
+                                                    if (floatValue == 0) {
+                                                        return true;
                                                     }
-                                                    return floatValue < 101;
+                                                    if (floatValue > 100) {
+                                                        isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                                        return false
+                                                    }
+                                                    else {
+                                                        return true;
+                                                    }
                                                 }}
-                                                // decimalScale={0}
                                                 isNumericString={true}
                                             />
                                         </div>
@@ -2438,7 +2247,7 @@ const Index = (props) => {
                                             </h3>
                                         </div>
                                         <div className="col-span-1 flex justify-center items-center p-0">
-                                            <Select
+                                            <SelectComponent
                                                 options={taxOptions}
                                                 onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
                                                 value={
@@ -2460,20 +2269,6 @@ const Index = (props) => {
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 menuPortalTarget={document.body}
                                                 closeMenuOnSelect={true}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
                                                 styles={{
                                                     placeholder: (base) => ({
                                                         ...base,
@@ -2496,7 +2291,7 @@ const Index = (props) => {
                                             <h3
                                                 className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                             >
-                                                {formatNumber(e?.total_amount)}
+                                                {formatMoney(e?.total_amount)}
                                             </h3>
                                         </div>
                                         <div className="col-span-1 ">
@@ -2567,30 +2362,32 @@ const Index = (props) => {
                                 {dataLang?.sales_product_discount || "sales_product_discount"}
                             </h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
-                                <NumericFormat
+                                <InPutNumericFormat
                                     value={totalDiscount}
                                     onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
                                     className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] text-center py-1 px-2 bg-transparent font-normal xl:w-20 w-24 focus:outline-none border-b-2 border-gray-300"
-                                    thousandSeparator=","
-                                    isAllowed={(values) => {
-                                        if (!values.value) return true;
-                                        const { floatValue } = values;
-                                        if (floatValue > 101) {
-                                            isShow("error", `Vui lòng nhập số % chiết khấu nhỏ hơn 101`);
+                                    isAllowed={({ floatValue }) => {
+                                        if (floatValue == 0) {
+                                            return true;
                                         }
-                                        return floatValue < 101;
+                                        if (floatValue > 100) {
+                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                            return false
+                                        }
+                                        else {
+                                            return true;
+                                        }
                                     }}
-                                    allowNegative={false}
-                                    decimalScale={0}
-                                    isNumericString={true}
                                 />
+
                             </div>
                         </div>
                         <div className="col-span-3 flex items-center gap-2">
                             <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
                                 {dataLang?.sales_product_tax || "sales_product_tax"}
                             </h2>
-                            <Select
+                            <SelectComponent
+                                classParent={"w-[80%]"}
                                 options={taxOptions}
                                 onChange={(value) => handleOnChangeInput("total_tax", value)}
                                 value={totalTax ? "" : ""}
@@ -2610,20 +2407,6 @@ const Index = (props) => {
                                 }}
                                 menuPortalTarget={document.body}
                                 closeMenuOnSelect={true}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
                                 styles={{
                                     placeholder: (base) => ({
                                         ...base,
@@ -2689,7 +2472,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.price_quote_total || "price_quote_total"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2697,7 +2480,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.sales_product_discount || "sales_product_discount"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalDiscountPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalDiscountPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2708,7 +2491,7 @@ const Index = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalDiscountAfterPrice)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalDiscountAfterPrice)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2716,7 +2499,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.sales_product_total_tax || "sales_product_total_tax"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalTax)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalTax)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -2724,7 +2507,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h3>
                             </div>
                             <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalAmount)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.totalAmount)}</h3>
                             </div>
                         </div>
                         <div className="space-x-2">
@@ -2754,7 +2537,7 @@ const Index = (props) => {
                 save={resetValue}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 

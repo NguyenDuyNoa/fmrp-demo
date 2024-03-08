@@ -31,6 +31,8 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { debounce } from "lodash";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -82,11 +84,9 @@ const Index = (props) => {
 
     const [data, sData] = useState([]);
 
-    const [totalItems, sTotalItems] = useState({});
-
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems: totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const _ServerFetching = () => {
         Axios(
@@ -169,16 +169,17 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 1500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 1500);
+        sOnFetching(true);
+    }, 500)
 
     //excel
     const multiDataSet = [
@@ -429,7 +430,8 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
+                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
                         </h6>
                         <Pagination
                             postsPerPage={limit}
@@ -484,9 +486,8 @@ const Items = React.memo((props) => {
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
-                        className={`${
-                            hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
-                        } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
+                        className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
+                            } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
                     >
                         <IconMinus size={16} />
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
@@ -565,7 +566,7 @@ const Items = React.memo((props) => {
                 </div>
             )}
             <PopupConfim
-                type="warning" dataLang={dataLang}
+                type="warning" dataLang={props.dataLang}
                 title={TITLE_DELETE}
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
@@ -671,9 +672,9 @@ const Popup_NVL = React.memo((props) => {
             sBranch(
                 props.data?.branch?.length > 0
                     ? props.data?.branch?.map((e) => ({
-                          label: e.name,
-                          value: e.id,
-                      }))
+                        label: e.name,
+                        value: e.id,
+                    }))
                     : []
             );
         open && sErrCode(false);
@@ -697,10 +698,9 @@ const Popup_NVL = React.memo((props) => {
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `${
-                props.data?.id
-                    ? `/api_web/api_material/categoryOption/${props.data?.id}?csrf_protection=true`
-                    : "api_web/api_material/categoryOption?csrf_protection=true"
+            `${props.data?.id
+                ? `/api_web/api_material/categoryOption/${props.data?.id}?csrf_protection=true`
+                : "api_web/api_material/categoryOption?csrf_protection=true"
             }`,
             {},
             (err, response) => {
@@ -734,10 +734,9 @@ const Popup_NVL = React.memo((props) => {
 
         Axios(
             "POST",
-            `${
-                props.data?.id
-                    ? `/api_web/api_material/category/${props.data?.id}?csrf_protection=true`
-                    : "/api_web/api_material/category?csrf_protection=true"
+            `${props.data?.id
+                ? `/api_web/api_material/category/${props.data?.id}?csrf_protection=true`
+                : "/api_web/api_material/category?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -825,9 +824,8 @@ const Popup_NVL = React.memo((props) => {
                         isMulti
                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                         closeMenuOnSelect={false}
-                        className={`${
-                            errBranch ? "border-red-500" : "border-transparent"
-                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                         theme={(theme) => ({
                             ...theme,
                             colors: {
@@ -859,9 +857,8 @@ const Popup_NVL = React.memo((props) => {
                         onChange={_HandleChangeInput.bind(this, "code")}
                         type="text"
                         placeholder={props.dataLang?.category_material_group_code}
-                        className={`${
-                            errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                        className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errCode && (
                         <label className="text-sm text-red-500">
@@ -878,9 +875,8 @@ const Popup_NVL = React.memo((props) => {
                         onChange={_HandleChangeInput.bind(this, "name")}
                         type="text"
                         placeholder={props.dataLang?.category_material_group_name}
-                        className={`${
-                            errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                        className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errName && (
                         <label className="text-sm text-red-500">
@@ -898,22 +894,22 @@ const Popup_NVL = React.memo((props) => {
                         defaultValue={
                             idCategory == "0" || !idCategory
                                 ? {
-                                      label: `${props.dataLang?.category_material_group_level}`,
-                                  }
+                                    label: `${props.dataLang?.category_material_group_level}`,
+                                }
                                 : {
-                                      label: dataOption.find((x) => x?.parent_id == idCategory)?.label,
-                                      code: dataOption.find((x) => x?.parent_id == idCategory)?.code,
-                                      value: idCategory,
-                                  }
+                                    label: dataOption.find((x) => x?.parent_id == idCategory)?.label,
+                                    code: dataOption.find((x) => x?.parent_id == idCategory)?.code,
+                                    value: idCategory,
+                                }
                         }
                         value={
                             idCategory == "0" || !idCategory
                                 ? { label: "Nhóm cha", code: "nhóm cha" }
                                 : {
-                                      label: dataOption.find((x) => x?.value == idCategory)?.label,
-                                      code: dataOption.find((x) => x?.value == idCategory)?.code,
-                                      value: idCategory,
-                                  }
+                                    label: dataOption.find((x) => x?.value == idCategory)?.label,
+                                    code: dataOption.find((x) => x?.value == idCategory)?.code,
+                                    value: idCategory,
+                                }
                         }
                         onChange={valueIdCategory.bind(this)}
                         isClearable={true}

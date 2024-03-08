@@ -35,6 +35,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -206,7 +207,7 @@ const Index = (props) => {
         });
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -214,13 +215,14 @@ const Index = (props) => {
                 page: router.query?.page,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
     //excel
     const multiDataSet = [
         {
@@ -442,8 +444,8 @@ const Index = (props) => {
                                                             <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
                                                                 {e?.date_create != null
                                                                     ? moment(e.date_create).format(
-                                                                          "DD/MM/YYYY, h:mm:ss"
-                                                                      )
+                                                                        "DD/MM/YYYY, h:mm:ss"
+                                                                    )
                                                                     : ""}
                                                             </h6>
 
@@ -558,21 +560,21 @@ const Popup_Vitrikho = (props) => {
         sListkho(
             props.listKho
                 ? props.listKho && [
-                      ...props.listKho?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
+                    ...props.listKho?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    })),
+                ]
                 : []
         );
         sValuekho(
             props?.valuekho
                 ? props.valuekho && [
-                      {
-                          label: props.warehouse_name,
-                          value: props.warehouse_id,
-                      },
-                  ]
+                    {
+                        label: props.warehouse_name,
+                        value: props.warehouse_id,
+                    },
+                ]
                 : []
         );
     }, [open]);
@@ -596,10 +598,9 @@ const Popup_Vitrikho = (props) => {
         data.append("warehouse_id", kho_id);
         Axios(
             "POST",
-            `${
-                props.id
-                    ? `/api_web/api_warehouse/location/${id}?csrf_protection=true`
-                    : "/api_web/api_warehouse/location/?csrf_protection=true"
+            `${props.id
+                ? `/api_web/api_warehouse/location/${id}?csrf_protection=true`
+                : "/api_web/api_warehouse/location/?csrf_protection=true"
             }`,
             {
                 data: data,
@@ -697,11 +698,10 @@ const Popup_Vitrikho = (props) => {
                                                 placeholder={props.dataLang?.warehouses_localtion_code}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputCode
+                                                className={`${errInputCode
                                                         ? "border-red-500"
                                                         : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -720,11 +720,10 @@ const Popup_Vitrikho = (props) => {
                                                 placeholder={props.dataLang?.warehouses_localtion_NAME}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputName
+                                                className={`${errInputName
                                                         ? "border-red-500"
                                                         : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -774,9 +773,8 @@ const Popup_Vitrikho = (props) => {
                                                         },
                                                     }),
                                                 }}
-                                                className={`${
-                                                    errInputKho ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errInputKho ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             />
                                             {errInputKho && (
                                                 <label className="mb-2  text-[14px] text-red-500">

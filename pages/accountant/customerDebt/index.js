@@ -20,6 +20,7 @@ import DatepickerComponent from "components/UI/filterComponents/dateTodateCompon
 import OnResetData from "components/UI/btnResetData/btnReset";
 import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const initialData = {
@@ -176,7 +177,7 @@ const Index = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _HandleOnChangeKeySearch = ({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
             pathname: router.route,
@@ -184,13 +185,14 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true);
-            }
-            sOnFetching(true);
-        }, 500);
-    };
+        // setTimeout(() => {
+        //     if (!value) {
+        //         sOnFetching(true);
+        //     }
+        //     sOnFetching(true);
+        // }, 500);
+        sOnFetching(true);
+    }, 500)
 
     const paginate = (pageNumber) => {
         router.push({

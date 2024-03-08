@@ -24,6 +24,7 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { routerRecall } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -190,9 +191,8 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
+                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                    }</span>`,
                                 value: e.item?.id,
                             },
                             child: e?.child.map((ce) => ({
@@ -206,10 +206,10 @@ const Index = (props) => {
                                 location:
                                     ce?.warehouse?.location_name || ce?.warehouse?.id || ce?.warehouse?.warehouse_name
                                         ? {
-                                              label: ce?.warehouse?.location_name || null,
-                                              value: ce?.warehouse?.id || null,
-                                              warehouse_name: ce?.warehouse?.warehouse_name || null,
-                                          }
+                                            label: ce?.warehouse?.location_name || null,
+                                            value: ce?.warehouse?.id || null,
+                                            warehouse_name: ce?.warehouse?.warehouse_name || null,
+                                        }
                                         : null,
                                 price: ce?.price,
                                 serial: ce?.serial == null ? "" : ce?.serial,
@@ -243,8 +243,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = () => {
@@ -290,40 +290,66 @@ const Index = (props) => {
         );
         sOnFetchingWarehouse(false);
     };
-    // Khai báo biến để theo dõi timeout
-    let searchTimeout;
 
-    const _HandleSeachApi = (inputValue) => {
+    const _HandleSeachApi = debounce((inputValue) => {
         if (idBranch == null || inputValue == "") {
             return;
         } else {
-            // Hủy timeout cũ nếu có
-            clearTimeout(searchTimeout);
-
-            // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
-                    {
-                        params: {
-                            "filter[branch_id]": idBranch ? idBranch?.value : null,
-                        },
-
-                        data: {
-                            term: inputValue,
-                        },
+            Axios(
+                "POST",
+                `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
+                {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
                     },
-                    (err, response) => {
-                        if (!err) {
-                            var { result } = response.data.data;
-                            sDataItems(result);
-                        }
+
+                    data: {
+                        term: inputValue,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response.data.data;
+                        sDataItems(result);
                     }
-                );
-            }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
+                }
+            );
         }
-    };
+    }, 500)
+    // // Khai báo biến để theo dõi timeout
+    // let searchTimeout;
+
+    // const _HandleSeachApi = (inputValue) => {
+    //     if (idBranch == null || inputValue == "") {
+    //         return;
+    //     } else {
+    //         // Hủy timeout cũ nếu có
+    //         clearTimeout(searchTimeout);
+
+    //         // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
+    //         searchTimeout = setTimeout(() => {
+    //             Axios(
+    //                 "POST",
+    //                 `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
+    //                 {
+    //                     params: {
+    //                         "filter[branch_id]": idBranch ? idBranch?.value : null,
+    //                     },
+
+    //                     data: {
+    //                         term: inputValue,
+    //                     },
+    //                 },
+    //                 (err, response) => {
+    //                     if (!err) {
+    //                         var { result } = response.data.data;
+    //                         sDataItems(result);
+    //                     }
+    //                 }
+    //             );
+    //         }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
+    //     }
+    // };
 
     const _ServerFetching_Location = async () => {
         await Axios(
@@ -543,10 +569,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true`
-                    : `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`
+            `${id
+                ? `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true`
+                : `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`
             }`,
             {
                 data: formData,
@@ -868,9 +893,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -898,9 +922,8 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -960,9 +983,8 @@ const Index = (props) => {
                                             dataLang?.productsWarehouse_warehouseImport ||
                                             "productsWarehouse_warehouseImport"
                                         }
-                                        className={`${
-                                            errRecallWarehouse ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errRecallWarehouse ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1066,9 +1088,8 @@ const Index = (props) => {
                         </h4>
                         <div className="col-span-9">
                             <div
-                                className={`${
-                                    dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
-                                } grid `}
+                                className={`${dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
+                                    } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
                                     {dataLang?.productsWarehouse_warehouseLocaImport ||
@@ -1198,9 +1219,8 @@ const Index = (props) => {
 
                         <div className="col-span-9">
                             <div
-                                className={`${
-                                    dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
-                                } grid  divide-x border-t border-b border-r border-l`}
+                                className={`${dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
+                                    } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
                                     {" "}
@@ -1390,11 +1410,10 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-9  items-center">
                                                 <div
-                                                    className={`${
-                                                        dataMaterialExpiry.is_enable == "1"
-                                                            ? "grid-cols-7"
-                                                            : "grid-cols-5"
-                                                    }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
+                                                    className={`${dataMaterialExpiry.is_enable == "1"
+                                                        ? "grid-cols-7"
+                                                        : "grid-cols-5"
+                                                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
                                                 >
                                                     {e?.child?.map((ce) => (
                                                         <React.Fragment key={ce?.id?.toString()}>
@@ -1411,16 +1430,15 @@ const Index = (props) => {
                                                                         ce?.id,
                                                                         "location"
                                                                     )}
-                                                                    className={`${
-                                                                        errWarehouse && ce?.location == null
-                                                                            ? "border-red-500 border"
-                                                                            : ""
-                                                                    }  my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    className={`${errWarehouse && ce?.location == null
+                                                                        ? "border-red-500 border"
+                                                                        : ""
+                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
                                                                             : dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                                              "productsWarehouse_warehouseLocaImport"
+                                                                            "productsWarehouse_warehouseLocaImport"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata || "returns_nodata"
@@ -1466,15 +1484,14 @@ const Index = (props) => {
                                                                             <input
                                                                                 value={ce?.lot}
                                                                                 disabled={ce?.disabledDate}
-                                                                                className={`border ${
-                                                                                    ce?.disabledDate
-                                                                                        ? "bg-gray-50"
-                                                                                        : errLot &&
-                                                                                          (ce?.lot == "" ||
-                                                                                              ce?.lot == null)
+                                                                                className={`border ${ce?.disabledDate
+                                                                                    ? "bg-gray-50"
+                                                                                    : errLot &&
+                                                                                        (ce?.lot == "" ||
+                                                                                            ce?.lot == null)
                                                                                         ? "border-red-500"
                                                                                         : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                                                } placeholder:text-slate-300 w-full  bg-[#ffffff]  rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                    } placeholder:text-slate-300 w-full  bg-[#ffffff]  rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                 onChange={_HandleChangeChild.bind(
                                                                                     this,
                                                                                     e?.id,
@@ -1507,14 +1524,13 @@ const Index = (props) => {
                                                                                             dataLang?.price_quote_system_default ||
                                                                                             "price_quote_system_default"
                                                                                         }
-                                                                                        className={`border ${
-                                                                                            ce?.disabledDate
-                                                                                                ? "bg-gray-50"
-                                                                                                : errDateList &&
-                                                                                                  ce?.date == null
+                                                                                        className={`border ${ce?.disabledDate
+                                                                                            ? "bg-gray-50"
+                                                                                            : errDateList &&
+                                                                                                ce?.date == null
                                                                                                 ? "border-red-500"
                                                                                                 : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                     />
                                                                                     {effectiveDate && (
                                                                                         <>
@@ -1557,14 +1573,13 @@ const Index = (props) => {
                                                                 </button>
 
                                                                 <NumericFormat
-                                                                    className={`${
-                                                                        errQty &&
+                                                                    className={`${errQty &&
                                                                         (ce?.recallQuantity == null ||
                                                                             ce?.recallQuantity == "" ||
                                                                             ce?.recallQuantity == 0)
-                                                                            ? "border-red-500 border-b"
-                                                                            : ""
-                                                                    } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
+                                                                        ? "border-red-500 border-b"
+                                                                        : ""
+                                                                        } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,

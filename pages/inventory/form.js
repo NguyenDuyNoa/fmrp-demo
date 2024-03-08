@@ -27,6 +27,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 import { NumericFormat } from "react-number-format";
+import { debounce } from "lodash";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -356,7 +357,7 @@ const Form = (props) => {
                                 item?.locate?.value === locate?.value &&
                                 item.lot?.value === lot?.value &&
                                 moment(item.date).format("DD/MM/yyyy") ==
-                                    moment(date).format("DD/MM/yyyy")
+                                moment(date).format("DD/MM/yyyy")
                         );
                     const newChild = e.child
                         ?.map((ce) => {
@@ -978,11 +979,10 @@ const Form = (props) => {
                                     }
                                     isClearable={true}
                                     isDisabled={dataChoose.length > 0}
-                                    className={`${
-                                        errBranch && branch == null
-                                            ? "border-red-500"
-                                            : "border-transparent"
-                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `}
+                                    className={`${errBranch && branch == null
+                                        ? "border-red-500"
+                                        : "border-transparent"
+                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `}
                                     isSearchable={true}
                                     noOptionsMessage={() =>
                                         `${dataLang?.no_data_found}`
@@ -1031,11 +1031,10 @@ const Form = (props) => {
                                     placeholder={"Chọn kho hàng"}
                                     isDisabled={dataChoose.length > 0}
                                     isClearable={true}
-                                    className={`${
-                                        errWareHouse
-                                            ? "border-red-500"
-                                            : "border-transparent"
-                                    } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `}
+                                    className={`${errWareHouse
+                                        ? "border-red-500"
+                                        : "border-transparent"
+                                        } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `}
                                     isSearchable={true}
                                     noOptionsMessage={() =>
                                         `${dataLang?.no_data_found}`
@@ -1102,23 +1101,22 @@ const Form = (props) => {
                                     </h5>
                                     {/* <div className={`${(dataMaterialExpiry.is_enable == "0" && dataProductSerial.is_enable == "0") ? "grid-cols-7" : (dataProductExpiry.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                     <div
-                                        className={`${
-                                            dataProductSerial.is_enable == "1"
-                                                ? dataMaterialExpiry.is_enable !=
-                                                  dataProductExpiry.is_enable
-                                                    ? "grid-cols-10"
-                                                    : dataMaterialExpiry.is_enable ==
-                                                      "1"
+                                        className={`${dataProductSerial.is_enable == "1"
+                                            ? dataMaterialExpiry.is_enable !=
+                                                dataProductExpiry.is_enable
+                                                ? "grid-cols-10"
+                                                : dataMaterialExpiry.is_enable ==
+                                                    "1"
                                                     ? "grid-cols-[repeat(10_minmax(0_1fr))]"
                                                     : "grid-cols-8"
-                                                : dataMaterialExpiry.is_enable !=
-                                                  dataProductExpiry.is_enable
+                                            : dataMaterialExpiry.is_enable !=
+                                                dataProductExpiry.is_enable
                                                 ? "grid-cols-9"
                                                 : dataMaterialExpiry.is_enable ==
-                                                  "1"
-                                                ? "grid-cols-9"
-                                                : "grid-cols-7"
-                                        } grid col-span-5 `}
+                                                    "1"
+                                                    ? "grid-cols-9"
+                                                    : "grid-cols-7"
+                                            } grid col-span-5 `}
                                     >
                                         <h5 className="font-[300] text-slate-600  px-1.5">
                                             Vị trí kho
@@ -1128,12 +1126,12 @@ const Form = (props) => {
                                         {dataProductSerial?.is_enable == "1" && <h5 className='font-[300] text-slate-600 text-center px-1.5'>Serial</h5>} */}
                                         {dataProductSerial.is_enable ===
                                             "1" && (
-                                            <h4 className="font-[300] text-slate-600 text-center px-1.5">
-                                                {"Serial"}
-                                            </h4>
-                                        )}
+                                                <h4 className="font-[300] text-slate-600 text-center px-1.5">
+                                                    {"Serial"}
+                                                </h4>
+                                            )}
                                         {dataMaterialExpiry.is_enable === "1" ||
-                                        dataProductExpiry.is_enable === "1" ? (
+                                            dataProductExpiry.is_enable === "1" ? (
                                             <>
                                                 <h4 className="font-[300] text-slate-600 text-center px-1.5">
                                                     {"Lot"}
@@ -1215,24 +1213,23 @@ const Form = (props) => {
                                             </div>
                                             {/* <div className={`${(e?.checkExpiry == "0" && e?.checkSerial == "0") ? "grid-cols-7" : (e?.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                             <div
-                                                className={`${
-                                                    dataProductSerial.is_enable ==
+                                                className={`${dataProductSerial.is_enable ==
                                                     "1"
-                                                        ? dataMaterialExpiry.is_enable !=
-                                                          dataProductExpiry.is_enable
-                                                            ? "grid-cols-10"
-                                                            : dataMaterialExpiry.is_enable ==
-                                                              "1"
+                                                    ? dataMaterialExpiry.is_enable !=
+                                                        dataProductExpiry.is_enable
+                                                        ? "grid-cols-10"
+                                                        : dataMaterialExpiry.is_enable ==
+                                                            "1"
                                                             ? "grid-cols-[repeat(10_minmax(0_1fr))]"
                                                             : "grid-cols-8"
-                                                        : dataMaterialExpiry.is_enable !=
-                                                          dataProductExpiry.is_enable
+                                                    : dataMaterialExpiry.is_enable !=
+                                                        dataProductExpiry.is_enable
                                                         ? "grid-cols-9"
                                                         : dataMaterialExpiry.is_enable ==
-                                                          "1"
-                                                        ? "grid-cols-9"
-                                                        : "grid-cols-7"
-                                                } grid col-span-5  h-full items-center`}
+                                                            "1"
+                                                            ? "grid-cols-9"
+                                                            : "grid-cols-7"
+                                                    } grid col-span-5  h-full items-center`}
                                             >
                                                 {/* {loadingData ? <h1 className='text-4xl font-bold'>Loading</h1> */}
                                                 {/* : */}
@@ -1262,13 +1259,12 @@ const Form = (props) => {
                                                                         true
                                                                     }
                                                                     classNamePrefix="Select"
-                                                                    className={`${
-                                                                        errNullLocate &&
+                                                                    className={`${errNullLocate &&
                                                                         ce.locate ==
-                                                                            null
-                                                                            ? "border-red-500"
-                                                                            : "border-transparent"
-                                                                    } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                                        null
+                                                                        ? "border-red-500"
+                                                                        : "border-transparent"
+                                                                        } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
                                                                     isSearchable={
                                                                         true
                                                                     }
@@ -1335,7 +1331,7 @@ const Form = (props) => {
                                                                 />
                                                             </div>
                                                             {dataProductSerial.is_enable ===
-                                                            "1" ? (
+                                                                "1" ? (
                                                                 <div className="p-1.5 border h-full  flex flex-col justify-center ">
                                                                     <input
                                                                         disabled={
@@ -1351,18 +1347,17 @@ const Form = (props) => {
                                                                             ce?.id,
                                                                             "serial"
                                                                         )}
-                                                                        className={`${
-                                                                            e?.checkSerial ==
+                                                                        className={`${e?.checkSerial ==
                                                                             "0"
-                                                                                ? "border-transparent"
-                                                                                : errNullSerial &&
-                                                                                  (ce.serial ===
-                                                                                      null ||
-                                                                                      ce.serial ===
-                                                                                          "")
+                                                                            ? "border-transparent"
+                                                                            : errNullSerial &&
+                                                                                (ce.serial ===
+                                                                                    null ||
+                                                                                    ce.serial ===
+                                                                                    "")
                                                                                 ? "border-red-500"
                                                                                 : "border-gray-200"
-                                                                        } text-center py-1 px-1 font-medium w-full focus:outline-none border-b-2 `}
+                                                                            } text-center py-1 px-1 font-medium w-full focus:outline-none border-b-2 `}
                                                                     />
                                                                     {isSubmitted &&
                                                                         duplicateIds.includes(
@@ -1384,7 +1379,7 @@ const Form = (props) => {
                                                             )}
                                                             {dataMaterialExpiry.is_enable ===
                                                                 "1" ||
-                                                            dataProductExpiry.is_enable ===
+                                                                dataProductExpiry.is_enable ===
                                                                 "1" ? (
                                                                 <>
                                                                     <div className="p-1.5 border h-full flex items-center">
@@ -1413,16 +1408,15 @@ const Form = (props) => {
                                                                                 true
                                                                             }
                                                                             classNamePrefix="Select"
-                                                                            className={`${
-                                                                                e?.checkExpiry ==
+                                                                            className={`${e?.checkExpiry ==
                                                                                 "0"
-                                                                                    ? "border-transparent"
-                                                                                    : errNullLot &&
-                                                                                      ce.lot ==
-                                                                                          null
+                                                                                ? "border-transparent"
+                                                                                : errNullLot &&
+                                                                                    ce.lot ==
+                                                                                    null
                                                                                     ? "border-red-500"
                                                                                     : "border-transparent"
-                                                                            } Select__custom removeDivide placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                                                } Select__custom removeDivide placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
                                                                             isSearchable={
                                                                                 true
                                                                             }
@@ -1518,16 +1512,15 @@ const Form = (props) => {
                                                                                 ce?.id,
                                                                                 "date"
                                                                             )}
-                                                                            className={`${
-                                                                                e?.checkExpiry ==
+                                                                            className={`${e?.checkExpiry ==
                                                                                 "0"
-                                                                                    ? "border-gray-200"
-                                                                                    : errNullDate &&
-                                                                                      ce?.date ==
-                                                                                          null
+                                                                                ? "border-gray-200"
+                                                                                : errNullDate &&
+                                                                                    ce?.date ==
+                                                                                    null
                                                                                     ? "border-red-500"
                                                                                     : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                            } bg-transparent disabled:bg-gray-100  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
+                                                                                } bg-transparent disabled:bg-gray-100  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
                                                                         />
                                                                         <IconCalendar
                                                                             size={
@@ -1655,13 +1648,12 @@ const Form = (props) => {
                                                                         ce?.id,
                                                                         "amount"
                                                                     )}
-                                                                    className={`${
-                                                                        errNullQty &&
+                                                                    className={`${errNullQty &&
                                                                         ce?.amount ==
-                                                                            null
-                                                                            ? "border-red-500 border-b-2"
-                                                                            : " border-gray-200 border-b-2"
-                                                                    }  appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none  `}
+                                                                        null
+                                                                        ? "border-red-500 border-b-2"
+                                                                        : " border-gray-200 border-b-2"
+                                                                        }  appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none  `}
                                                                     thousandSeparator=","
                                                                     isAllowed={(
                                                                         values
@@ -1676,9 +1668,9 @@ const Form = (props) => {
                                                                         ) {
                                                                             return (
                                                                                 floatValue >=
-                                                                                    0 &&
+                                                                                0 &&
                                                                                 floatValue <
-                                                                                    2
+                                                                                2
                                                                             );
                                                                         } else {
                                                                             return (
@@ -1694,7 +1686,7 @@ const Form = (props) => {
                                                                     null &&
                                                                     Number(
                                                                         ce?.amount -
-                                                                            ce?.quantity
+                                                                        ce?.quantity
                                                                     )?.toLocaleString()}
                                                             </h6>
                                                             <h6 className="p-1.5 border h-full  flex flex-col justify-center items-center ">
@@ -1702,7 +1694,7 @@ const Form = (props) => {
                                                                     null &&
                                                                     Number(
                                                                         ce?.amount *
-                                                                            ce?.price
+                                                                        ce?.price
                                                                     )?.toLocaleString()}
                                                             </h6>
                                                             <div className="flex flex-col justify-center items-center p-1.5 border h-full ">
@@ -1822,7 +1814,7 @@ const Form = (props) => {
                                                         return (
                                                             acc2 +
                                                             obj2.amount *
-                                                                obj2.price
+                                                            obj2.price
                                                         );
                                                     },
                                                     0
@@ -1895,7 +1887,7 @@ const Popup_Product = React.memo((props) => {
     const _HandleChangeValue = (value) => {
         sProduct(value);
     };
-    const _HandleInputChange = (inputValue) => {
+    const _HandleInputChange = debounce((inputValue) => {
         Axios(
             "POST",
             "/api_web/api_product/searchItemsNoneVariant?csrf_protection=true",
@@ -1920,7 +1912,7 @@ const Popup_Product = React.memo((props) => {
                 }
             }
         );
-    };
+    }, 500)
 
     const _ServerFetching = () => {
         Axios(
@@ -1979,13 +1971,11 @@ const Popup_Product = React.memo((props) => {
                                     label: e,
                                     value: e,
                                 })),
-                                dataSerial:
-                                    e.serial_array !== [null]
-                                        ? e.serial_array?.map((e) => ({
-                                              label: e,
-                                              value: e,
-                                          }))
-                                        : [],
+                                dataSerial: e.serial_array?.length > 0 ? e.serial_array?.map((e) => ({
+                                    label: e,
+                                    value: e,
+                                }))
+                                    : [],
                                 child: [],
                                 checkChild: e.warehouse?.map((ce) => ({
                                     amount: null,
@@ -2264,7 +2254,7 @@ const Popup_Product = React.memo((props) => {
                                 item?.locate?.value === locate?.value &&
                                 item.lot?.value === lot?.value &&
                                 moment(item.date).format("DD/MM/yyyy") ==
-                                    moment(date).format("DD/MM/yyyy")
+                                moment(date).format("DD/MM/yyyy")
                         );
                     const newChild = e.child
                         ?.map((ce) => {
@@ -2653,7 +2643,7 @@ const Popup_Product = React.memo((props) => {
                                                         <h5 className="text-gray-400 font-medium text-xs">
                                                             {
                                                                 props.dataLang[
-                                                                    e.type
+                                                                e.type
                                                                 ]
                                                             }
                                                         </h5>
@@ -2667,11 +2657,10 @@ const Popup_Product = React.memo((props) => {
                                                                 e.id,
                                                                 "show"
                                                             )}
-                                                            className={`${
-                                                                e.show
-                                                                    ? "rotate-180"
-                                                                    : "rotate-0"
-                                                            } transition w-6 h-6 rounded-full flex flex-col justify-center items-center bg-blue-200 text-blue-700`}
+                                                            className={`${e.show
+                                                                ? "rotate-180"
+                                                                : "rotate-0"
+                                                                } transition w-6 h-6 rounded-full flex flex-col justify-center items-center bg-blue-200 text-blue-700`}
                                                         >
                                                             <IconDown size="15" />
                                                         </button>
@@ -2691,39 +2680,38 @@ const Popup_Product = React.memo((props) => {
                                             {e.child?.length > 0 && e.show && (
                                                 <div className="w-full space-y-1">
                                                     <div
-                                                        className={`${
-                                                            e?.checkExpiry ==
-                                                                "0" &&
+                                                        className={`${e?.checkExpiry ==
+                                                            "0" &&
                                                             e?.checkSerial ==
-                                                                "0"
-                                                                ? "grid-cols-5"
-                                                                : e?.checkExpiry ==
-                                                                  "1"
+                                                            "0"
+                                                            ? "grid-cols-5"
+                                                            : e?.checkExpiry ==
+                                                                "1"
                                                                 ? "grid-cols-7"
                                                                 : "grid-cols-6"
-                                                        } grid gap-2 items-center`}
+                                                            } grid gap-2 items-center`}
                                                     >
                                                         <h5 className="font-[300] text-sm px-1 text-center">
                                                             Vị trí kho
                                                         </h5>
                                                         {e?.checkExpiry ==
                                                             "1" && (
-                                                            <h5 className="font-[300] text-sm px-1 text-center">
-                                                                LOT
-                                                            </h5>
-                                                        )}
+                                                                <h5 className="font-[300] text-sm px-1 text-center">
+                                                                    LOT
+                                                                </h5>
+                                                            )}
                                                         {e?.checkExpiry ==
                                                             "1" && (
-                                                            <h5 className="font-[300] text-sm px-1 text-center">
-                                                                Date
-                                                            </h5>
-                                                        )}
+                                                                <h5 className="font-[300] text-sm px-1 text-center">
+                                                                    Date
+                                                                </h5>
+                                                            )}
                                                         {e?.checkSerial ==
                                                             "1" && (
-                                                            <h5 className="font-[300] text-sm px-1 text-center">
-                                                                Serial
-                                                            </h5>
-                                                        )}
+                                                                <h5 className="font-[300] text-sm px-1 text-center">
+                                                                    Serial
+                                                                </h5>
+                                                            )}
                                                         <h5 className="font-[300] text-sm px-1 text-center">
                                                             SL phần mềm
                                                         </h5>
@@ -2738,17 +2726,16 @@ const Popup_Product = React.memo((props) => {
                                                         </h5>
                                                     </div>
                                                     <div
-                                                        className={`${
-                                                            e?.checkExpiry ==
-                                                                "0" &&
+                                                        className={`${e?.checkExpiry ==
+                                                            "0" &&
                                                             e?.checkSerial ==
-                                                                "0"
-                                                                ? "grid-cols-5"
-                                                                : e?.checkExpiry ==
-                                                                  "1"
+                                                            "0"
+                                                            ? "grid-cols-5"
+                                                            : e?.checkExpiry ==
+                                                                "1"
                                                                 ? "grid-cols-7"
                                                                 : "grid-cols-6"
-                                                        } grid gap-2 items-center`}
+                                                            } grid gap-2 items-center`}
                                                     >
                                                         {e.child.map((ce) => (
                                                             <React.Fragment
@@ -2843,149 +2830,149 @@ const Popup_Product = React.memo((props) => {
                                                                 </div>
                                                                 {e?.checkExpiry ==
                                                                     "1" && (
-                                                                    // lot
-                                                                    <div className="px-1">
-                                                                        <CreatableSelect
-                                                                            options={
-                                                                                e?.dataLot
-                                                                            }
-                                                                            placeholder={
-                                                                                "Lot"
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "lot"
-                                                                            )}
-                                                                            isClearable={
-                                                                                true
-                                                                            }
-                                                                            classNamePrefix="Select"
-                                                                            className={`Select__custom removeDivide border-transparent placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
-                                                                            isSearchable={
-                                                                                true
-                                                                            }
-                                                                            noOptionsMessage={() =>
-                                                                                `Chưa có gợi ý`
-                                                                            }
-                                                                            formatCreateLabel={(
-                                                                                value
-                                                                            ) =>
-                                                                                `Tạo "${value}"`
-                                                                            }
-                                                                            menuPortalTarget={
-                                                                                document.body
-                                                                            }
-                                                                            onMenuOpen={
-                                                                                handleMenuOpen
-                                                                            }
-                                                                            style={{
-                                                                                border: "none",
-                                                                                boxShadow:
-                                                                                    "none",
-                                                                                outline:
-                                                                                    "none",
-                                                                            }}
-                                                                            theme={(
-                                                                                theme
-                                                                            ) => ({
-                                                                                ...theme,
-                                                                                colors: {
-                                                                                    ...theme.colors,
-                                                                                    primary25:
-                                                                                        "#EBF5FF",
-                                                                                    primary50:
-                                                                                        "#92BFF7",
-                                                                                    primary:
-                                                                                        "#0F4F9E",
-                                                                                },
-                                                                            })}
-                                                                            styles={{
-                                                                                placeholder:
-                                                                                    (
-                                                                                        base
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        color: "#cbd5e1",
-                                                                                    }),
-                                                                                menuPortal:
-                                                                                    (
-                                                                                        base
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        zIndex: 9999,
-                                                                                        position:
-                                                                                            "absolute",
-                                                                                    }),
-                                                                                control:
-                                                                                    (
-                                                                                        base,
-                                                                                        state
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        boxShadow:
-                                                                                            "none",
-                                                                                        ...(state.isFocused && {
-                                                                                            border: "0 0 0 1px #92BFF7",
+                                                                        // lot
+                                                                        <div className="px-1">
+                                                                            <CreatableSelect
+                                                                                options={
+                                                                                    e?.dataLot
+                                                                                }
+                                                                                placeholder={
+                                                                                    "Lot"
+                                                                                }
+                                                                                onChange={_HandleChangeChild.bind(
+                                                                                    this,
+                                                                                    e?.id,
+                                                                                    ce?.id,
+                                                                                    "lot"
+                                                                                )}
+                                                                                isClearable={
+                                                                                    true
+                                                                                }
+                                                                                classNamePrefix="Select"
+                                                                                className={`Select__custom removeDivide border-transparent placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                                                isSearchable={
+                                                                                    true
+                                                                                }
+                                                                                noOptionsMessage={() =>
+                                                                                    `Chưa có gợi ý`
+                                                                                }
+                                                                                formatCreateLabel={(
+                                                                                    value
+                                                                                ) =>
+                                                                                    `Tạo "${value}"`
+                                                                                }
+                                                                                menuPortalTarget={
+                                                                                    document.body
+                                                                                }
+                                                                                onMenuOpen={
+                                                                                    handleMenuOpen
+                                                                                }
+                                                                                style={{
+                                                                                    border: "none",
+                                                                                    boxShadow:
+                                                                                        "none",
+                                                                                    outline:
+                                                                                        "none",
+                                                                                }}
+                                                                                theme={(
+                                                                                    theme
+                                                                                ) => ({
+                                                                                    ...theme,
+                                                                                    colors: {
+                                                                                        ...theme.colors,
+                                                                                        primary25:
+                                                                                            "#EBF5FF",
+                                                                                        primary50:
+                                                                                            "#92BFF7",
+                                                                                        primary:
+                                                                                            "#0F4F9E",
+                                                                                    },
+                                                                                })}
+                                                                                styles={{
+                                                                                    placeholder:
+                                                                                        (
+                                                                                            base
+                                                                                        ) => ({
+                                                                                            ...base,
+                                                                                            color: "#cbd5e1",
                                                                                         }),
-                                                                                    }),
-                                                                                dropdownIndicator:
-                                                                                    (
-                                                                                        base
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        display:
-                                                                                            "none",
-                                                                                    }),
-                                                                            }}
-                                                                        />
-                                                                    </div>
-                                                                )}
+                                                                                    menuPortal:
+                                                                                        (
+                                                                                            base
+                                                                                        ) => ({
+                                                                                            ...base,
+                                                                                            zIndex: 9999,
+                                                                                            position:
+                                                                                                "absolute",
+                                                                                        }),
+                                                                                    control:
+                                                                                        (
+                                                                                            base,
+                                                                                            state
+                                                                                        ) => ({
+                                                                                            ...base,
+                                                                                            boxShadow:
+                                                                                                "none",
+                                                                                            ...(state.isFocused && {
+                                                                                                border: "0 0 0 1px #92BFF7",
+                                                                                            }),
+                                                                                        }),
+                                                                                    dropdownIndicator:
+                                                                                        (
+                                                                                            base
+                                                                                        ) => ({
+                                                                                            ...base,
+                                                                                            display:
+                                                                                                "none",
+                                                                                        }),
+                                                                                }}
+                                                                            />
+                                                                        </div>
+                                                                    )}
                                                                 {e?.checkExpiry ==
                                                                     "1" && (
-                                                                    // date
-                                                                    <div className="relative flex items-center px-1">
-                                                                        <DatePicker
-                                                                            dateFormat="dd/MM/yyyy"
-                                                                            placeholderText="date"
-                                                                            selected={
-                                                                                ce?.date
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "date"
-                                                                            )}
-                                                                            className={`focus:border-[#92BFF7] border-[#d0d5dd] bg-transparent placeholder:text-slate-300 w-full rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
-                                                                        />
-                                                                        <IconCalendar
-                                                                            size={
-                                                                                22
-                                                                            }
-                                                                            className="absolute right-3 text-[#cccccc]"
-                                                                        />
-                                                                    </div>
-                                                                )}
+                                                                        // date
+                                                                        <div className="relative flex items-center px-1">
+                                                                            <DatePicker
+                                                                                dateFormat="dd/MM/yyyy"
+                                                                                placeholderText="date"
+                                                                                selected={
+                                                                                    ce?.date
+                                                                                }
+                                                                                onChange={_HandleChangeChild.bind(
+                                                                                    this,
+                                                                                    e?.id,
+                                                                                    ce?.id,
+                                                                                    "date"
+                                                                                )}
+                                                                                className={`focus:border-[#92BFF7] border-[#d0d5dd] bg-transparent placeholder:text-slate-300 w-full rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
+                                                                            />
+                                                                            <IconCalendar
+                                                                                size={
+                                                                                    22
+                                                                                }
+                                                                                className="absolute right-3 text-[#cccccc]"
+                                                                            />
+                                                                        </div>
+                                                                    )}
                                                                 {e?.checkSerial ==
                                                                     "1" && (
-                                                                    // serial
-                                                                    <div className="px-1">
-                                                                        <input
-                                                                            value={
-                                                                                ce?.serial
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "serial"
-                                                                            )}
-                                                                            className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
-                                                                        />
-                                                                    </div>
-                                                                )}
+                                                                        // serial
+                                                                        <div className="px-1">
+                                                                            <input
+                                                                                value={
+                                                                                    ce?.serial
+                                                                                }
+                                                                                onChange={_HandleChangeChild.bind(
+                                                                                    this,
+                                                                                    e?.id,
+                                                                                    ce?.id,
+                                                                                    "serial"
+                                                                                )}
+                                                                                className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
+                                                                            />
+                                                                        </div>
+                                                                    )}
                                                                 <h6 className="px-1 self-center text-center">
                                                                     {
                                                                         ce?.quantity
@@ -3017,9 +3004,9 @@ const Popup_Product = React.memo((props) => {
                                                                             ) {
                                                                                 return (
                                                                                     floatValue >=
-                                                                                        0 &&
+                                                                                    0 &&
                                                                                     floatValue <
-                                                                                        2
+                                                                                    2
                                                                                 );
                                                                             } else {
                                                                                 return (
@@ -3035,7 +3022,7 @@ const Popup_Product = React.memo((props) => {
                                                                         null &&
                                                                         Number(
                                                                             ce?.amount -
-                                                                                ce?.quantity
+                                                                            ce?.quantity
                                                                         )?.toLocaleString()}
                                                                 </h6>
                                                                 <div className="px-1 self-center flex justify-center space-x-3">
@@ -3199,23 +3186,22 @@ const Popup_status = (props) => {
                                             <h6 className="text-[13px]  px-2 col-span-2 text-center capitalize">
                                                 {e?.quantity_net -
                                                     e?.check_quantity_stock >
-                                                0
-                                                    ? `Mặt hàng cần điều chỉnh tăng ${
-                                                          Number(
-                                                              e?.quantity_net
-                                                          ) -
-                                                          Number(
-                                                              e?.check_quantity_stock
-                                                          )
-                                                      }`
+                                                    0
+                                                    ? `Mặt hàng cần điều chỉnh tăng ${Number(
+                                                        e?.quantity_net
+                                                    ) -
+                                                    Number(
+                                                        e?.check_quantity_stock
+                                                    )
+                                                    }`
                                                     : `Mặt hàng cần điều chỉnh giảm ${Math.abs(
-                                                          Number(
-                                                              e?.quantity_net
-                                                          ) -
-                                                              Number(
-                                                                  e?.check_quantity_stock
-                                                              )
-                                                      )}`}
+                                                        Number(
+                                                            e?.quantity_net
+                                                        ) -
+                                                        Number(
+                                                            e?.check_quantity_stock
+                                                        )
+                                                    )}`}
                                             </h6>
                                         </div>
                                     ))}
