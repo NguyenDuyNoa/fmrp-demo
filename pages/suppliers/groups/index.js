@@ -9,7 +9,7 @@ import { Trash as IconDelete, SearchNormal1 as IconSearch } from "iconsax-react"
 import "react-phone-input-2/lib/style.css";
 import { components } from "react-select";
 
-import Popup_groupKh from "./(popup)/popup";
+import Popup_groupKh from "./components/popup";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";

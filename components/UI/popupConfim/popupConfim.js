@@ -148,65 +148,76 @@ const PopupConfim = (props) => {
                                 </>
                             )}
                             {/* // nút xóa model khách hàng */}
-                            {['client_customers', 'client_contact', 'client_status'].includes(props.nameModel) && (
-                                <>
-                                    <Zoom className="w-1/2">
-                                        <button
-                                            onClick={props.cancel}
-                                            className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                        >
-                                            Hủy
-                                        </button>
-                                    </Zoom>
-                                    <Zoom className="w-1/2">
-                                        <button
-                                            onClick={() => {
-                                                if (role) {
-                                                    props.save()
-                                                } else if (checkDelete) {
-                                                    props.save()
-                                                }
-                                                else {
-                                                    showToat('warning', 'Bạn không có quyền truy cập')
-                                                }
-                                            }}
-                                            className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                        >
-                                            Xác nhận
-                                        </button>
-                                    </Zoom>
-                                </>
-                            )}
+                            {
+                                ['client_customers',
+                                    'client_contact',
+                                    'client_status',
+                                    'client_group'
+                                ].includes(props.nameModel) && (
+                                    <>
+                                        <Zoom className="w-1/2">
+                                            <button
+                                                onClick={props.cancel}
+                                                className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                            >
+                                                Hủy
+                                            </button>
+                                        </Zoom>
+                                        <Zoom className="w-1/2">
+                                            <button
+                                                onClick={() => {
+                                                    if (role) {
+                                                        props.save()
+                                                    } else if (checkDelete) {
+                                                        props.save()
+                                                    }
+                                                    else {
+                                                        showToat('warning', 'Bạn không có quyền truy cập')
+                                                    }
+                                                }}
+                                                className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                            >
+                                                Xác nhận
+                                            </button>
+                                        </Zoom>
+                                    </>
+                                )}
                             {/* // nút xóa các model khác 3 modle*/}
-                            {!["price_quote", "sales_product", 'client_customers', 'client_contact', 'client_status'].includes(props.nameModel) && (
-                                <>
-                                    <Zoom className="w-1/2">
-                                        <button
-                                            onClick={props.cancel}
-                                            className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                        >
-                                            Hủy
-                                        </button>
-                                    </Zoom>
-                                    <Zoom className="w-1/2">
-                                        <button
-                                            onClick={() => {
-                                                if (role) {
-                                                    props.save()
-                                                } else if (checkAuth) {
-                                                    props.save()
-                                                }
-                                                else {
-                                                    showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
-                                                }
-                                            }}
-                                            className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
-                                        >
-                                            Xác nhận
-                                        </button>
-                                    </Zoom>
-                                </>
-                            )}
+                            {![
+                                "price_quote",
+                                "sales_product",
+                                'client_customers',
+                                'client_contact',
+                                'client_status',
+                                'client_group'].includes(props.nameModel) && (
+                                    <>
+                                        <Zoom className="w-1/2">
+                                            <button
+                                                onClick={props.cancel}
+                                                className="text-base text-white bg-red-600 transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  border-red-600 border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                            >
+                                                Hủy
+                                            </button>
+                                        </Zoom>
+                                        <Zoom className="w-1/2">
+                                            <button
+                                                onClick={() => {
+                                                    if (role) {
+                                                        props.save()
+                                                    } else if (checkAuth) {
+                                                        props.save()
+                                                    }
+                                                    else {
+                                                        showToat('warning', 'Bạn không có quyền thay đổi trạng thái')
+                                                    }
+                                                }}
+                                                className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
+                                            >
+                                                Xác nhận
+                                            </button>
+                                        </Zoom>
+                                    </>
+                                )}
                         </div>
                         {/* {props.children} */}
                     </div>

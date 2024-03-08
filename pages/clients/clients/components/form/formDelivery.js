@@ -2,16 +2,16 @@ import React from "react";
 import { IconDelete } from "iconsax-react";
 import ButtoonDelete from "../button/buttonDelete";
 import Link from "next/link";
-const FormContactDelivery = ({ optionDelivery, dataLang, _OnChangeOptionDelivery, onDelete, children }) => {
+const FormContactDelivery = ({ optionDelivery, dataLang, onChangOptionsDelivery, onDelete, children }) => {
     return (
         <div className="w-[48%] bg-white shadow-lg rounded-xl mb-3 hover:scale-[1.01] hover:shadow-2xl transition-all duration-200 ease-linear">
-            <div className="p-3 pt-0" key={optionDelivery.id?.toString()}>
+            <div className="p-3 pt-0" key={optionDelivery.idFe?.toString()}>
                 <label className="text-[#344054] font-normal text-sm mb-1 ">
                     {dataLang?.client_popup_devivelyName || "client_popup_devivelyName"}
                 </label>
                 <input
                     value={optionDelivery.nameDelivery}
-                    onChange={_OnChangeOptionDelivery.bind(this, optionDelivery.id, "nameDelivery")}
+                    onChange={(e) => onChangOptionsDelivery(optionDelivery.idFe, "nameDelivery", e)}
                     placeholder={dataLang?.client_popup_devivelyName || "client_popup_devivelyName"}
                     name="optionVariant"
                     type="text"
@@ -20,7 +20,7 @@ const FormContactDelivery = ({ optionDelivery, dataLang, _OnChangeOptionDelivery
                 <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.client_popup_phone}</label>
                 <input
                     value={optionDelivery.phoneDelivery}
-                    onChange={_OnChangeOptionDelivery.bind(this, optionDelivery.id, "phoneDelivery")}
+                    onChange={(e) => onChangOptionsDelivery(optionDelivery.idFe, "phoneDelivery", e)}
                     name="fname"
                     type="number"
                     placeholder={dataLang?.client_contact_table_phone || "client_contact_table_phone"}
@@ -30,7 +30,7 @@ const FormContactDelivery = ({ optionDelivery, dataLang, _OnChangeOptionDelivery
                 <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.client_popup_adress}</label>
                 <textarea
                     value={optionDelivery.addressDelivery}
-                    onChange={_OnChangeOptionDelivery.bind(this, optionDelivery.id, "addressDelivery")}
+                    onChange={(e) => onChangOptionsDelivery(optionDelivery.idFe, "addressDelivery", e)}
                     name="fname"
                     type="text"
                     placeholder={dataLang?.client_popup_adress || "client_popup_adress"}
@@ -39,16 +39,16 @@ const FormContactDelivery = ({ optionDelivery, dataLang, _OnChangeOptionDelivery
                 <div className="flex items-center ">
                     <label
                         className="relative flex cursor-pointer items-center rounded-full p-3 gap-3.5 group"
-                        htmlFor={optionDelivery.id}
+                        htmlFor={optionDelivery.idFe}
                         data-ripple-dark="true"
                     >
                         <input
                             type="checkbox"
                             className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                            id={optionDelivery.id}
+                            id={optionDelivery.idFe}
                             value={optionDelivery.actionDelivery}
                             checked={optionDelivery.actionDelivery}
-                            onChange={_OnChangeOptionDelivery.bind(this, optionDelivery.id, "actionDelivery")}
+                            onChange={(e) => onChangOptionsDelivery(optionDelivery.idFe, "actionDelivery", e)}
                         />
                         <div className="pointer-events-none absolute top-2/4 3xl:left-[7%] 2xl:left-[7%] xl:left-[7%] lg:left-[7%] left-[7%] -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                             <svg
@@ -73,7 +73,7 @@ const FormContactDelivery = ({ optionDelivery, dataLang, _OnChangeOptionDelivery
                         </div>
                     </label>
                 </div>
-                <ButtoonDelete onClick={() => onDelete({ id: optionDelivery.id, status: true })}>
+                <ButtoonDelete onClick={() => onDelete({ id: optionDelivery.idFe, status: true })}>
                     {children}
                 </ButtoonDelete>
             </div>

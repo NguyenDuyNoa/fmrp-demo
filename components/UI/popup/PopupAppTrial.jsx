@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import Popup from 'reactjs-popup';
-import Image from 'next/image'
+import React, { useEffect, useState } from "react";
+import Popup from "reactjs-popup";
+import Image from "next/image";
 
 import { useSelector } from "react-redux";
 import { MdClose } from "react-icons/md";
@@ -217,8 +217,8 @@ const PopupAppTrial = () => {
                     </div>
                 </div> */}
             </div>
-        </Popup >
-    )
-}
+        </Popup>
+    );
+};
 
-export default PopupAppTrial
+export default PopupAppTrial;

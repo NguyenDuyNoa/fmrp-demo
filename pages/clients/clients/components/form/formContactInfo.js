@@ -1,19 +1,17 @@
 import React from "react";
-import { IconDelete } from "iconsax-react";
 import ButtoonDelete from "../button/buttonDelete";
-import Link from "next/link";
-const FormContactInfo = ({ option, dataLang, _OnChangeOption, onDelete, children }) => {
+const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children }) => {
     return (
         <div className="w-[48%] bg-white shadow-lg rounded-xl mb-2 hover:scale-[1.01] hover:shadow-2xl transition-all duration-200 ease-linear">
-            <div key={option.id?.toString()}>
+            <div key={option.idFe?.toString()}>
                 <div className="w-full p-3 pt-0">
-                    <div className="" key={option.id?.toString()}>
+                    <div className="" key={option.idFe?.toString()}>
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
                             {dataLang?.client_popup_fiandlass}
                         </label>
                         <input
                             value={option.full_name}
-                            onChange={_OnChangeOption.bind(this, option.id, "full_name")}
+                            onChange={(e) => onChangOptions(option.idFe, "full_name", e?.target.value)}
                             name="optionVariant"
                             type="text"
                             placeholder="Họ và tên"
@@ -24,7 +22,7 @@ const FormContactInfo = ({ option, dataLang, _OnChangeOption, onDelete, children
                         </label>
                         <input
                             value={option.phone_number}
-                            onChange={_OnChangeOption.bind(this, option.id, "phone_number")}
+                            onChange={(e) => onChangOptions(option.idFe, "phone_number", e?.target.value)}
                             name="fname"
                             type="number"
                             placeholder="Số điện thoại"
@@ -33,7 +31,7 @@ const FormContactInfo = ({ option, dataLang, _OnChangeOption, onDelete, children
                         <label className="text-[#344054] font-normal text-sm mb-1 ">Email</label>
                         <input
                             value={option.email}
-                            onChange={_OnChangeOption.bind(this, option.id, "email")}
+                            onChange={(e) => onChangOptions(option.idFe, "email", e?.target.value)}
                             name="optionEmail"
                             type="text"
                             placeholder="Email"
@@ -44,7 +42,7 @@ const FormContactInfo = ({ option, dataLang, _OnChangeOption, onDelete, children
                         </label>
                         <input
                             value={option.position}
-                            onChange={_OnChangeOption.bind(this, option.id, "position")}
+                            onChange={(e) => onChangOptions(option.idFe, "position", e?.target.value)}
                             name="fname"
                             type="text"
                             placeholder="Chức vụ"
@@ -55,7 +53,7 @@ const FormContactInfo = ({ option, dataLang, _OnChangeOption, onDelete, children
                         </label>
                         <input
                             value={option.birthday}
-                            onChange={_OnChangeOption.bind(this, option.id, "birthday")}
+                            onChange={(e) => onChangOptions(option.idFe, "birthday", e?.target.value)}
                             name="fname"
                             type="date"
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
@@ -65,14 +63,14 @@ const FormContactInfo = ({ option, dataLang, _OnChangeOption, onDelete, children
                         </label>
                         <textarea
                             value={option.address}
-                            onChange={_OnChangeOption.bind(this, option.id, "address")}
+                            onChange={(e) => onChangOptions(option.idFe, "address", e?.target.value)}
                             name="fname"
                             type="text"
                             placeholder="Địa chỉ"
                             className="focus:border-[#92BFF7] placeholder:text-xs border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
                         />
                     </div>
-                    <ButtoonDelete onClick={() => onDelete({ id: option.id, status: true })}>{children}</ButtoonDelete>
+                    <ButtoonDelete onClick={() => onDelete({ id: option.idFe, status: true })}>{children}</ButtoonDelete>
                 </div>
             </div>
         </div>

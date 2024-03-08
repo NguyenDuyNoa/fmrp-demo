@@ -14,9 +14,9 @@ import { components } from "react-select";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import TabClient from "./(tab)/tab";
-import Popup_dsncc from "./(popup)/popup";
-import Popup_chitiet from "./(popup)/detail";
+import TabClient from "./components/tab/tab";
+import Popup_dsncc from "./components/popup/popup";
+import Popup_chitiet from "./components/popup/detail";
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
