@@ -1,5 +1,5 @@
 import React from "react";
-import ButtonDelete from "../(buttonContact)/buttonDelete";
+import ButtonDelete from "../button/buttonDelete";
 const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
     return (
         <div className="" key={e.id?.toString()}>
