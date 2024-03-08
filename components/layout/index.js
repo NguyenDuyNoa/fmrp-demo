@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "./header";
 import PopupModelTime from "components/UI/modelTime";
 import { useSelector } from "react-redux";
+import PopupAppTrial from "../UI/popup/PopupAppTrial";
 const Index = (props) => {
     // const [open, sOpen] = useState(false);
     // const data = useSelector((state) => state.auth);
@@ -10,14 +11,17 @@ const Index = (props) => {
     // }, [data]);
     // console.log("open", open);
     return (
-        <div>
-            <Header />
+        <>
+            <div>
+                <Header />
 
-            <div className="">
-                {/* <PopupModelTime hidden="hidden" open={open}></PopupModelTime> */}
-                {props.children}
+                <div className=" overflow-hidden">
+                    {/* <PopupModelTime hidden="hidden" open={open}></PopupModelTime> */}
+                    {props.children}
+                </div>
             </div>
-        </div>
+            <PopupAppTrial />
+        </>
     );
 };
 

@@ -94,7 +94,6 @@ const Index = (props) => {
     const [isState, setIsState] = useState(initialState)
     const queryKeyIsState = (key) => setIsState((prev) => ({ ...prev, ...key }))
 
-    // fetch list chi nhánh kho
     const fetchListBranchWarehouse = () => {
         Axios(
             "GET",
@@ -114,6 +113,53 @@ const Index = (props) => {
             }
         );
     };
+
+    const fetchFilterLocationWarehouse = () => {
+        Axios(
+            "GET",
+            `/api_web/api_warehouse/location/?csrf_protection=true&filter[warehouse_id]=${isState.idWarehouse}`,
+            {},
+            (err, response) => {
+
+                if (!err) {
+                    var { rResult } = response.data;
+                    queryKeyIsState({
+                        listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })),
+                    })
+                }
+            }
+        );
+    };
+
+    // fetch list biến thể
+    const fetchFilterVariationWarehouse = () => {
+        Axios("GET", `/api_web/Api_variation/variation?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                const { rResult } = response.data ?? {};
+                const options = rResult?.flatMap(({ option }) => option) ?? [];
+                queryKeyIsState({
+                    listVariant: options?.map(({ id, name }) => ({
+                        label: name,
+                        value: id,
+                    })),
+                })
+            }
+        });
+    };
+
+    const handleOpenSelect = (type) => {
+        if (type === 'branch' && isState?.listBranchWarehouse?.length === 0) {
+            fetchListBranchWarehouse()
+        } else if (type === 'locationWarehouse' && isState?.listLocationWarehouse?.length === 0 && isState.idWarehouse) {
+            // fetch list vị trí kho theo từng kho
+            fetchFilterLocationWarehouse()
+        } else if (type === 'mainVariation' && isState?.listVariant?.length === 0) {
+            fetchFilterVariationWarehouse()
+        } else if (type === 'subVariation') {
+
+        }
+    }
+
     // fetch danh sách kho
     const fetchDataListWarehouse = () => {
         Axios(
@@ -165,9 +211,14 @@ const Index = (props) => {
     }
 
     useEffect(() => {
-        fetchListBranchWarehouse()
         fetchDataListWarehouse()
     }, [isState.idBranch])
+
+    useEffect(() => {
+        if (isState.idWarehouse) {
+            fetchFilterLocationWarehouse()
+        }
+    }, [isState.idWarehouse])
 
     // fetch data ẩn hiện cột trong table
     const fetchDataOnOffCol = () => {
@@ -225,45 +276,9 @@ const Index = (props) => {
         );
     }
 
-    // fetch list vị trí kho theo từng kho
-    const fetchFilterLocationWarehouse = () => {
-        Axios(
-            "GET",
-            `/api_web/api_warehouse/location/?csrf_protection=true&filter[warehouse_id]=${isState.idWarehouse}`,
-            {},
-            (err, response) => {
-
-                if (!err) {
-                    var { rResult } = response.data;
-                    queryKeyIsState({
-                        listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })),
-                    })
-                }
-            }
-        );
-    };
-
-    // fetch list biến thể
-    const fetchFilterVariationWarehouse = () => {
-        Axios("GET", `/api_web/Api_variation/variation?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data ?? {};
-                const options = rResult?.flatMap(({ option }) => option) ?? [];
-                queryKeyIsState({
-                    listVariant: options?.map(({ id, name }) => ({
-                        label: name,
-                        value: id,
-                    })),
-                })
-            }
-        });
-    };
-
     useEffect(() => {
         if (isState.idWarehouse) {
             fetchDataWarehouseDetail()
-            fetchFilterLocationWarehouse()
-            fetchFilterVariationWarehouse()
             fetchDataOnOffCol()
         }
     }, [isState.limitItemWarehouseDetail, isState.idWarehouse, isState.idLocationWarehouse, isState.idVariantSub, isState.idVariantMain, isState.keySearchItem, router.query?.page])
@@ -272,6 +287,7 @@ const Index = (props) => {
 
     const onChangeFilter = (type, value) => {
         if (type == "branch") {
+            // fetch list chi nhánh kho
             queryKeyIsState({
                 idBranch: value,
             })
@@ -572,7 +588,7 @@ const Index = (props) => {
         fetchDataWarehouseDetail()
         fetchDataOnOffCol()
     };
-    console.log("check loading :", isState.isLoading);
+    console.log("dataWarehouseDetail :", isState.dataWarehouseDetail);
 
     return (
         <React.Fragment>
@@ -629,6 +645,7 @@ const Index = (props) => {
                                                         },
                                                         ...options,
                                                     ]}
+                                                    onMenuOpen={() => handleOpenSelect('branch')}
                                                     onChange={onChangeFilter.bind(this, "branch")}
                                                     value={isState.idBranch}
                                                     hideSelectedOptions={false}
@@ -684,6 +701,7 @@ const Index = (props) => {
                                                         },
                                                         ...isState.listLocationWarehouse,
                                                     ]}
+                                                    onMenuOpen={() => handleOpenSelect('locationWarehouse')}
                                                     onChange={onChangeFilter.bind(this, "location")}
                                                     value={isState.idLocationWarehouse}
                                                     hideSelectedOptions={false}
@@ -740,6 +758,7 @@ const Index = (props) => {
                                                         },
                                                         ...isState.listVariant,
                                                     ]}
+                                                    onMenuOpen={() => handleOpenSelect('mainVariation')}
                                                     onChange={onChangeFilter.bind(this, "MainVariation")}
                                                     value={isState.idVariantMain}
                                                     hideSelectedOptions={false}
@@ -795,6 +814,7 @@ const Index = (props) => {
                                                         },
                                                         ...isState.listVariant,
                                                     ]}
+                                                    onMenuOpen={() => handleOpenSelect('subVariation')}
                                                     onChange={onChangeFilter.bind(this, "SubVariation")}
                                                     value={isState.idVariantSub}
                                                     hideSelectedOptions={false}
@@ -925,40 +945,40 @@ const Index = (props) => {
                                                             ? "grid-cols-9" : "grid-cols-7"
                                                     }  grid sticky top-0 bg-white px-2 pt-2 z-10 border-b`}
                                             >
-                                                <h4 className="col-span-2 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-left">
+                                                <h4 className="col-span-2 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                     {dataLang?.warehouses_detail_product || "warehouses_detail_product"}
                                                 </h4>
-                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                     {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
                                                 </h4>
-                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                     {dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}
                                                 </h4>
-                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                     {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
                                                 </h4>
                                                 {isState.dataProductSerial.is_enable === "1" && (
-                                                    <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                    <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                         {"Serial"}
                                                     </h4>
                                                 )}
                                                 {isState.dataMaterialExpiry.is_enable === "1" ||
                                                     isState.dataProductExpiry.is_enable === "1" ? (
                                                     <>
-                                                        <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                        <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                             {"Lot"}
                                                         </h4>
-                                                        <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                        <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                             {dataLang?.warehouses_detail_date || "warehouses_detail_date"}
                                                         </h4>
                                                     </>
                                                 ) : (
                                                     ""
                                                 )}
-                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                     {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}
                                                 </h4>
-                                                <h4 className="col-span-1 3xl:text-base xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-center">
+                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                     {dataLang?.warehouses_detail_value || "warehouses_detail_value"}
                                                 </h4>
                                             </div>
@@ -1056,7 +1076,7 @@ const Index = (props) => {
                                                                             : isState.dataMaterialExpiry.is_enable == "1" ? "col-span-7" : "col-span-5"
                                                                         }`}
                                                                 >
-                                                                    {e?.detail.map((e) => (
+                                                                    {e?.detail.map((item) => (
                                                                         <div
                                                                             className={`grid ${isState.dataProductSerial.is_enable == "1"
                                                                                 ? isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
@@ -1072,23 +1092,23 @@ const Index = (props) => {
                                                                             <div className="col-span-1 border-b">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
                                                                                     {" "}
-                                                                                    {e.location_name == null ? "-" : e.location_name}
+                                                                                    {item.location_name == null ? "-" : item.location_name}
                                                                                 </h6>
                                                                             </div>
                                                                             <div className=" col-span-1 border-b">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
-                                                                                    {e.option_name_1 == null ? "-" : e.option_name_1}
+                                                                                    {item.option_name_1 == null ? "-" : item.option_name_1}
                                                                                 </h6>
                                                                             </div>
                                                                             <div className=" col-span-1 border-b">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
-                                                                                    {e.option_name_2 == null ? "-" : e.option_name_2}
+                                                                                    {item.option_name_2 == null ? "-" : item.option_name_2}
                                                                                 </h6>
                                                                             </div>
                                                                             {isState.dataProductSerial.is_enable === "1" ? (
                                                                                 <div className=" col-span-1 border-b">
                                                                                     <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                                        {e.serial == null || e.serial == "" ? "-" : e.serial}
+                                                                                        {item.serial == null || item.serial == "" ? "-" : item.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (
@@ -1098,12 +1118,12 @@ const Index = (props) => {
                                                                                 <>
                                                                                     <div className=" col-span-1 border-b ">
                                                                                         <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-left ">
-                                                                                            {e.lot == null || e.lot == "" ? "-" : e.lot}
+                                                                                            {item.lot == null || item.lot == "" ? "-" : item.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className=" col-span-1 border-b ">
                                                                                         <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-center ">
-                                                                                            {e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                            {item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>
@@ -1112,17 +1132,18 @@ const Index = (props) => {
                                                                             )}
                                                                             <div className=" col-span-1 border-b ">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs  px-2 py-3  w-[full] text-red-500 font-medium text-center ">
-                                                                                    {e.quantity ? formatNumber(e?.quantity) : "-"}
+                                                                                    {item.quantity ? formatNumber(+item?.quantity) : "-"}
                                                                                 </h6>
                                                                             </div>
                                                                             <div className=" col-span-1 border-b">
                                                                                 <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600  px-2 py-3  w-[full] text-right ">
-                                                                                    {e.amount ? formatNumber(e?.amount) : "-"}
+                                                                                    {item.amount ? formatNumber(+item?.amount) : "-"}
                                                                                 </h6>
                                                                             </div>
                                                                         </div>
                                                                     ))}
                                                                 </div>
+
                                                             </div>
                                                         ))}
                                                     </div>
