@@ -18,8 +18,8 @@ import {
     Add as IconAdd,
     Map,
 } from "iconsax-react";
-import TableContact from "./(table)/tableContact";
-import TableDelivery from "./(table)/tableDelivery";
+import TableContact from "../table/tableContact";
+import TableDelivery from "../table/tableDelivery";
 import ImageErrors from "components/UI/imageErrors";
 import { Tooltip } from "react-tippy";
 
@@ -100,11 +100,10 @@ const Popup_chitiet = (props) => {
                         <button
                             key={tabItem.index}
                             onClick={_HandleSelectTab.bind(this, tabItem.index)}
-                            className={`px-4 py-2 outline-none font-semibold ${
-                                tab === tabItem.index
-                                    ? "text-[#0F4F9E] border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E]"
-                            }`}
+                            className={`px-4 py-2 outline-none font-semibold ${tab === tabItem.index
+                                ? "text-[#0F4F9E] border-b-2 border-[#0F4F9E]"
+                                : "hover:text-[#0F4F9E]"
+                                }`}
                         >
                             {tabItem.label}
                         </button>
@@ -233,10 +232,10 @@ const Popup_chitiet = (props) => {
                                                 <span className="flex flex-wrap">
                                                     {data?.staff_charge
                                                         ? data?.staff_charge?.map(
-                                                              (e) => {
-                                                                  return (
-                                                                      <span className="font-normal capitalize   ml-1">
-                                                                          {/* <Popup
+                                                            (e) => {
+                                                                return (
+                                                                    <span className="font-normal capitalize   ml-1">
+                                                                        {/* <Popup
                                   className="dropdown-avt"
                                   key={e.id}
                                   trigger={(open) => (
@@ -255,32 +254,32 @@ const Popup_chitiet = (props) => {
                                     {e.full_name}{" "}
                                   </span>
                                 </Popup> */}
-                                                                          <Tooltip
-                                                                              title={
-                                                                                  e.full_name
-                                                                              }
-                                                                              arrow
-                                                                              theme="dark"
-                                                                          >
-                                                                              <ImageErrors
-                                                                                  src={
-                                                                                      e.profile_image
-                                                                                  }
-                                                                                  width={
-                                                                                      40
-                                                                                  }
-                                                                                  height={
-                                                                                      40
-                                                                                  }
-                                                                                  defaultSrc="/user-placeholder.jpg"
-                                                                                  alt="Image"
-                                                                                  className="object-cover rounded-[100%] text-left"
-                                                                              />
-                                                                          </Tooltip>
-                                                                      </span>
-                                                                  );
-                                                              }
-                                                          )
+                                                                        <Tooltip
+                                                                            title={
+                                                                                e.full_name
+                                                                            }
+                                                                            arrow
+                                                                            theme="dark"
+                                                                        >
+                                                                            <ImageErrors
+                                                                                src={
+                                                                                    e.profile_image
+                                                                                }
+                                                                                width={
+                                                                                    40
+                                                                                }
+                                                                                height={
+                                                                                    40
+                                                                                }
+                                                                                defaultSrc="/user-placeholder.jpg"
+                                                                                alt="Image"
+                                                                                className="object-cover rounded-[100%] text-left"
+                                                                            />
+                                                                        </Tooltip>
+                                                                    </span>
+                                                                );
+                                                            }
+                                                        )
                                                         : ""}
                                                 </span>
                                             </div>
@@ -317,20 +316,18 @@ const Popup_chitiet = (props) => {
                                                             return (
                                                                 <span
                                                                     style={{
-                                                                        backgroundColor: `${
+                                                                        backgroundColor: `${e.color ==
+                                                                            "" ||
                                                                             e.color ==
-                                                                                "" ||
-                                                                            e.color ==
-                                                                                null
-                                                                                ? "#e2f0fe"
-                                                                                : e.color
-                                                                        }`,
-                                                                        color: `${
-                                                                            e.color ==
+                                                                            null
+                                                                            ? "#e2f0fe"
+                                                                            : e.color
+                                                                            }`,
+                                                                        color: `${e.color ==
                                                                             ""
-                                                                                ? "#0F4F9E"
-                                                                                : "#0F4F9E"
-                                                                        }`,
+                                                                            ? "#0F4F9E"
+                                                                            : "#0F4F9E"
+                                                                            }`,
                                                                     }}
                                                                     className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2   rounded-[5.5px]"
                                                                 >
@@ -380,11 +377,11 @@ const Popup_chitiet = (props) => {
                                                 <span className="font-normal capitalize">
                                                     {data?.date_incorporation !=
                                                         null &&
-                                                    data?.date_incorporation !=
+                                                        data?.date_incorporation !=
                                                         "0000-00-00"
                                                         ? moment(
-                                                              data?.date_incorporation
-                                                          ).format("DD/MM/YYYY")
+                                                            data?.date_incorporation
+                                                        ).format("DD/MM/YYYY")
                                                         : ""}
                                                 </span>
                                             </div>
@@ -399,8 +396,8 @@ const Popup_chitiet = (props) => {
                                                 <span className="font-normal capitalize">
                                                     {data?.city != ""
                                                         ? data?.city.type +
-                                                          " " +
-                                                          data?.city.name
+                                                        " " +
+                                                        data?.city.name
                                                         : ""}
                                                 </span>
                                             </div>
@@ -415,8 +412,8 @@ const Popup_chitiet = (props) => {
                                                 <span className="font-normal capitalize">
                                                     {data?.district != ""
                                                         ? data?.district.type +
-                                                          " " +
-                                                          data?.district.name
+                                                        " " +
+                                                        data?.district.name
                                                         : ""}
                                                 </span>
                                                 ,
@@ -430,8 +427,8 @@ const Popup_chitiet = (props) => {
                                                 <span className="font-normal capitalize">
                                                     {data?.ward != ""
                                                         ? data?.ward.type +
-                                                          " " +
-                                                          data?.ward.name
+                                                        " " +
+                                                        data?.ward.name
                                                         : ""}
                                                 </span>
                                             </div>

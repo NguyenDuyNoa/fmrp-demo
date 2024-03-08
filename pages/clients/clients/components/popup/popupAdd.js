@@ -22,11 +22,11 @@ import {
 } from "iconsax-react";
 
 import Swal from "sweetalert2";
-import ButtoonAdd from "./(button)/buttonAdd";
-import ButtoonDelete from "./(button)/buttonDelete";
-import FormContactInfo from "./(form)/formContactInfo";
-import FormContactDelivery from "./(form)/formDelivery";
-import Form from "./(form)/form";
+import ButtoonAdd from "../button/buttonAdd";
+import ButtoonDelete from "../button/buttonDelete";
+import FormContactInfo from "../form/formContactInfo";
+import FormContactDelivery from "../form/formDelivery";
+import Form from "../form/form";
 import { useToggle } from "@/hooks/useToggle";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -150,11 +150,11 @@ const Popup_dskh = (props) => {
         sListBrand(
             props.listBr
                 ? props.listBr && [
-                      ...props.listBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
+                    ...props.listBr?.map((e) => ({
+                        label: e.name,
+                        value: Number(e.id),
+                    })),
+                ]
                 : []
         );
         sOption(props.option ? props.option : []);
@@ -514,10 +514,9 @@ const Popup_dskh = (props) => {
         });
         await Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/api_client/client/${id}?csrf_protection=true`
-                    : "/api_web/api_client/client?csrf_protection=true"
+            `${id
+                ? `/api_web/api_client/client/${id}?csrf_protection=true`
+                : "/api_web/api_client/client?csrf_protection=true"
             }`,
             {
                 // data: {
@@ -788,25 +787,22 @@ const Popup_dskh = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_general}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${
-                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_contact}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 2)}
-                        className={`${
-                            tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_devivelyInfo}
                     </button>

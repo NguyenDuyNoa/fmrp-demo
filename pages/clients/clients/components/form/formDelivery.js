@@ -1,6 +1,6 @@
 import React from "react";
 import { IconDelete } from "iconsax-react";
-import ButtoonDelete from "../(button)/buttonDelete";
+import ButtoonDelete from "../button/buttonDelete";
 import Link from "next/link";
 const FormContactDelivery = ({ optionDelivery, dataLang, _OnChangeOptionDelivery, onDelete, children }) => {
     return (

@@ -19,7 +19,7 @@ import Swal from "sweetalert2";
 import "react-phone-input-2/lib/style.css";
 import Select, { components } from "react-select";
 import { da } from "date-fns/locale";
-import Popup_groupKh from "./(popup)/popup";
+import Popup_groupKh from "./components/popup";
 import { useSelector } from "react-redux";
 import SearchComponent from "components/UI/filterComponents/searchComponent";
 import SelectComponent from "components/UI/filterComponents/selectComponent";

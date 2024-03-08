@@ -15,8 +15,8 @@ import {
 import { Tooltip } from "react-tippy";
 import Select, { components } from "react-select";
 
-import Popup_dskh from "./(popup)/popupAdd";
-import Popup_chitiet from "./(popup)/popupDetail";
+import Popup_dskh from "./components/popup/popupAdd";
+import Popup_chitiet from "./components/popup/popupDetail";
 
 import Loading from "@/components/UI/loading";
 import TabFilter from "@/components/UI/TabFilter";
