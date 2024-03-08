@@ -314,16 +314,20 @@ const Index = (props) => {
                                                             </h6>
 
                                                             <div className="space-x-2 w-[20%] text-center flex items-center justify-center">
-                                                                <Popup_groupKh
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    className="xl:text-base text-xs "
-                                                                    listBr={isState.listBr}
-                                                                    sValueBr={e.branch}
-                                                                    dataLang={dataLang}
-                                                                    name={e.name}
-                                                                    color={e.color}
-                                                                    id={e.id}
-                                                                />
+                                                                {role == true || checkEdit ?
+                                                                    <Popup_groupKh
+                                                                        onRefresh={_ServerFetching.bind(this)}
+                                                                        className="xl:text-base text-xs "
+                                                                        listBr={isState.listBr}
+                                                                        sValueBr={e.branch}
+                                                                        dataLang={dataLang}
+                                                                        name={e.name}
+                                                                        color={e.color}
+                                                                        id={e.id}
+                                                                    />
+                                                                    :
+                                                                    <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
+                                                                }
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGroup={() => { }}
