@@ -52,7 +52,6 @@ const Index = (props) => {
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
-
     const [onFetching, sOnFetching] = useState(false);
 
     const [data, sData] = useState({});
