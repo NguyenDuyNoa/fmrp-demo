@@ -8,6 +8,14 @@ const nextConfig = {
     env: {
         customKey: "my-value",
     },
+    async rewrites() {
+        return [
+            {
+                source: '/',
+                destination: '/dashboard',
+            },
+        ]
+    },
 };
 
 module.exports = nextConfig;
