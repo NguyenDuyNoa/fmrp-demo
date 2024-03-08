@@ -3,7 +3,10 @@ const useActionRole = (auth, type) => {
         "quotes": "price_quote",
         "orders": "sales_product",
         "deliveries": "deliveryReceipt",
-        "returned_goods": "returnSales"
+        "returned_goods": "returnSales",
+        "customers": "client_customers",
+        "client_contact": "client_contact",
+        "client_status": "client_status",
         // Thêm các type ||  nameModel
 
 

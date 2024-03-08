@@ -5,8 +5,6 @@ import { _ServerInstance as Axios } from "/services/axios";
 import PopupEdit from "/components/UI/popup";
 import { v4 as uuidv4 } from "uuid";
 
-import Popup from "reactjs-popup";
-
 import dynamic from "next/dynamic";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
@@ -23,7 +21,6 @@ import {
 
 import Swal from "sweetalert2";
 import ButtoonAdd from "../button/buttonAdd";
-import ButtoonDelete from "../button/buttonDelete";
 import FormContactInfo from "../form/formContactInfo";
 import FormContactDelivery from "../form/formDelivery";
 import Form from "../form/form";
@@ -31,24 +28,22 @@ import { useToggle } from "@/hooks/useToggle";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useToast from "@/hooks/useToast";
+import useActionRole from "@/hooks/useRole";
+import { useSelector } from "react-redux";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Popup_dskh = (props) => {
-    const dataLang = props.dataLang;
-
     const scrollAreaRef = useRef(null);
 
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit } = useActionRole(auth, props?.nameModel)
 
     const { isOpen, isId, handleQueryId } = useToggle();
 
@@ -484,8 +479,6 @@ const Popup_dskh = (props) => {
         data.append("city", valueCt ? valueCt : "");
         data.append("district", valueDis?.value ? valueDis?.value : "");
         data.append("ward", valueWa?.value ? valueWa?.value : "");
-        // data.append("client_group_id", group ? group : "");
-        // data.append("branch_id", branch_id ? branch_id : "");
         valueBr?.forEach((e, index) => {
             data.append(`branch_id[${index}]`, e?.value ? e?.value : "");
         });
@@ -519,26 +512,6 @@ const Popup_dskh = (props) => {
                 : "/api_web/api_client/client?csrf_protection=true"
             }`,
             {
-                // data: {
-                //   name: name,
-                //   code: code,
-                //   tax_code: tax_code,
-                //   representative: representative,
-                //   phone_number: phone_number,
-                //   address: address,
-                //   date_incorporation: date_incorporation ? date_incorporation : "",
-                //   note: note,
-                //   email: email,
-                //   debt_limit: debt_limit,
-                //   debt_limit_day: debt_limit_day,
-                //   city: valueCt,
-                //   district: valueDis,
-                //   ward: valueWa,
-                //   branch_id: branch_id,
-                //   staff_charge: char,
-                //   client_group_id: group,
-                //   contact: option,
-                // },
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
             },
@@ -606,32 +579,6 @@ const Popup_dskh = (props) => {
         sOption([...option]);
     };
 
-    // const _OnChangeOptionDelivery = (id, type, value) => {
-    //   var index = optionDelivery.findIndex((x) => x.id === id);
-    //   if (type == "nameDelivery") {
-    //     optionDelivery[index].nameDelivery = value.target?.value;
-    //   } else if (type === "addressDelivery") {
-    //     optionDelivery[index].addressDelivery = value.target?.value;
-    //   } else if (type === "phoneDelivery") {
-    //     optionDelivery[index].phoneDelivery = value.target?.value;
-    //   } else if (type === "actionDelivery") {
-    //     optionDelivery[index].actionDelivery = value.target?.checked;
-    //   }
-    //   sOptionDelivery([...optionDelivery]);
-    // };
-    // const _OnChangeOptionDelivery = (id, type, value) => {
-    //   const index = optionDelivery.findIndex((x) => x.id === id);
-    //   if (index === -1) {
-    //     return; // Kiểm tra xem id có tồn tại trong optionDelivery hay không
-    //   }
-    //   const updatedOptionDelivery = [...optionDelivery];
-    //   updatedOptionDelivery[index] = {
-    //     ...updatedOptionDelivery[index],
-    //     [type]:
-    //       type === "actionDelivery" ? value.target?.checked : value.target?.value,
-    //   };
-    //   sOptionDelivery(updatedOptionDelivery);
-    // };
     const _OnChangeOptionDelivery = (id, type, value) => {
         const updatedOptionDelivery = optionDelivery.map((item) => {
             if (item.id === id) {
@@ -682,43 +629,12 @@ const Popup_dskh = (props) => {
         sOptionDelivery([...optionDelivery, newData]);
     };
 
-    // delete option form
-    // const _HandleDelete = (id) => {
-    //     Swal.fire({
-    //         title: `${dataLang?.aler_ask}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#296dc1",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: `${dataLang?.aler_yes}`,
-    //         cancelButtonText: `${dataLang?.aler_cancel}`,
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             sOption([...option.filter((x) => x.id !== id)]);
-    //         }
-    //     });
-    // };
     const _HandleDelete = async () => {
         tab == 1 && sOption([...option.filter((x) => x.id !== isId)]);
         tab == 2 && sOptionDelivery([...optionDelivery.filter((x) => x.id !== isId)]);
         handleQueryId({ status: false });
     };
 
-    // const _HandleDeleteDelivery = (id) => {
-    //     Swal.fire({
-    //         title: `${dataLang?.aler_ask}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#296dc1",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: `${dataLang?.aler_yes}`,
-    //         cancelButtonText: `${dataLang?.aler_cancel}`,
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             sOptionDelivery([...optionDelivery.filter((x) => x.id !== id)]);
-    //         }
-    //     });
-    // };
     useEffect(() => {
         option.length == 0 && sHidden(false);
         option.length != 0 && sHidden(true);
@@ -793,7 +709,15 @@ const Popup_dskh = (props) => {
                         {props.dataLang?.client_popup_general}
                     </button>
                     <button
-                        onClick={_HandleSelectTab.bind(this, 1)}
+                        onClick={() => {
+                            if (role) {
+                                _HandleSelectTab(1)
+                            } else if (checkAdd || checkEdit) {
+                                _HandleSelectTab(1)
+                            } else {
+                                isShow("warning", WARNING_STATUS_ROLE)
+                            }
+                        }}
                         className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
@@ -872,7 +796,15 @@ const Popup_dskh = (props) => {
                                                 <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
                                             </FormContactInfo>
                                         ))}
-                                        <ButtoonAdd onClick={_HandleAddNew.bind(this)}>
+                                        <ButtoonAdd onClick={() => {
+                                            if (role) {
+                                                _HandleAddNew()
+                                            } else if (checkAdd) {
+                                                _HandleAddNew()
+                                            } else {
+                                                isShow("warning", WARNING_STATUS_ROLE);
+                                            }
+                                        }}>
                                             <IconAdd className="animate-bounce" />
                                             {props.dataLang?.client_popup_addcontact}
                                         </ButtoonAdd>
@@ -927,6 +859,7 @@ const Popup_dskh = (props) => {
             </PopupEdit>
             <PopupConfim
                 type="warning"
+                nameModel={props?.nameModel}
                 dataLang={props.dataLang}
                 title={TITLE_DELETE}
                 subtitle={CONFIRM_DELETION}
