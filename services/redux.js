@@ -51,6 +51,8 @@ function adminReducer(state = adminState, action) {
             return { ...state, trangthai: action.payload };
         case "trangthaiExprired":
             return { ...state, trangthaiExprired: action.payload };
+        case "dataAuthentication":
+            return { ...state, dataAuthentication: action.payload };
         case "setings/server":
             return { ...state, setings: action.payload };
         case "setings/feature":
