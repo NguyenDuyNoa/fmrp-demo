@@ -320,9 +320,9 @@ const LoginPage = React.memo((props) => {
             showToat("error", "Vui lòng chọn ngành hàng của bạn");
         }
     };
-
     const onSubmit = async (data) => {
         sLoadingRegester(true);
+        console.log('data', data);
         sPassword(data?.password);
 
         const dataSubmit = new FormData();
@@ -335,6 +335,7 @@ const LoginPage = React.memo((props) => {
         dataSubmit.append("address", data?.city);
         dataSubmit.append("password", data?.password);
         dataSubmit.append("role_user", data?.location);
+        dataSubmit.append("otp", data?.otp);
 
         await Axios(
             "POST",
@@ -874,8 +875,12 @@ const LoginPage = React.memo((props) => {
                                                 Nhập mã xác thực qua SMS
                                             </button>
                                             <input
-                                                type="text"
+                                                type="number"
                                                 placeholder="Nhập mã xác thực"
+                                                name="otp"
+                                                {...register("otp", {
+                                                    required: false,
+                                                })}
                                                 className="w-full border border-[#D0D5DD] 3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none focus:border-[#3276FA] rounded placeholder:text-[13px]"
                                             />
                                         </div>

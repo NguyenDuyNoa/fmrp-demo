@@ -3,6 +3,9 @@ import Header from "./header";
 import PopupModelTime from "components/UI/modelTime";
 import { useSelector } from "react-redux";
 import PopupAppTrial from "../UI/popup/PopupAppTrial";
+import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
+import useStatusExprired from "@/hooks/useStatusExprired";
+
 const Index = (props) => {
     // const [open, sOpen] = useState(false);
     // const data = useSelector((state) => state.auth);
@@ -10,6 +13,7 @@ const Index = (props) => {
     //     data.fail_expiration && sOpen(data?.fail_expiration);
     // }, [data]);
     // console.log("open", open);
+
     return (
         <>
             <div>
@@ -21,6 +25,7 @@ const Index = (props) => {
                 </div>
             </div>
             <PopupAppTrial />
+            <PopupAppRenewal />
         </>
     );
 };
