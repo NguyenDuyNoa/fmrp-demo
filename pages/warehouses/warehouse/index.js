@@ -588,7 +588,6 @@ const Index = (props) => {
         fetchDataWarehouseDetail()
         fetchDataOnOffCol()
     };
-    console.log("dataWarehouseDetail :", isState.dataWarehouseDetail);
 
     return (
         <React.Fragment>

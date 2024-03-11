@@ -21,10 +21,13 @@ const PopupAppTrial = () => {
         setOpenModal(false);
     };
     useEffect(() => {
+        console.log('check dataAuthentication.active_popup', dataAuthentication.active_popup);
         if (dataAuthentication.active_popup) {
             setOpenModal(false);
+            console.log('check 1');
         } else {
             setOpenModal(true);
+            console.log('check 2');
         }
     }, [dataAuthentication.active_popup]);
 
@@ -56,11 +59,11 @@ const PopupAppTrial = () => {
             lockScroll
             closeOnEscape
             closeOnDocumentClick={false}
-            // onClose={() => setOpenModal(false)}
-            // defaultOpen={true}
+        // onClose={() => setOpenModal(false)}
+        // defaultOpen={true}
         >
             <div className='3xl:w-[1000px] 3xl:max-w-[1100px] 3xl:h-[600px] w-[800px] max-w-[900px] h-[500px] grid grid-cols-2 bg-white rounded-xl relative'>
-                <MdClose onClick={handleCloseModal} className='absolute top-4 right-4 text-2xl cursor-pointer text-[#000000] hover:text-[#000000]/80 hover:scale-105 duration-300 transition-colors' />
+                {/* <MdClose onClick={handleCloseModal} className='absolute top-4 right-4 text-2xl cursor-pointer text-[#000000] hover:text-[#000000]/80 hover:scale-105 duration-300 transition-colors' /> */}
                 <div className="col-span-1 w-full 3xl:h-[600px] h-[550px] bg-[url('/popup/background.png')] bg-cover rounded-tl-xl rounded-bl-xl">
                     <div className='w-full h-full bg-[#0A4AC6]/30 rounded-tl-xl rounded-bl-xl' />
                 </div>
