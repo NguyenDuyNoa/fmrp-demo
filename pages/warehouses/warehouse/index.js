@@ -38,6 +38,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import moment from "moment";
 
 import { debounce } from "lodash";
+import { Container } from "@/components/UI/common/layout";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -594,7 +595,7 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.Warehouse_title}</title>
             </Head>
-            <div className="px-10 3xl:pt-24 xl:pt-[70px] lg:pt-[64px] pb-10 3xl:space-y-4 space-y-2 overflow-hidden h-screen">
+            <Container className="px-10 3xl:pt-24 xl:pt-[70px] lg:pt-[64px] pb-10 3xl:space-y-4 space-y-2 overflow-hidden h-screen">
                 {trangthaiExprired ? (
                     <div className="p-2"></div>
                 ) : (
@@ -1182,7 +1183,7 @@ const Index = (props) => {
                         )}
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
