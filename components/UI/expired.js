@@ -1,22 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { NotificationBing } from "iconsax-react";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { _ServerInstance as Axios } from "/services/axios";
 
 const Expirred = () => {
     const router = useRouter();
+
+    const dispatch = useDispatch();
+
+    const [checkDate, sCheckDate] = useState(false);
+
     const [date, sDate] = useState({
         dateStart: null,
         dateEnd: null,
         dateLimit: null,
     });
-    const [checkDate, sCheckDate] = useState(false);
-
-    const dispatch = useDispatch();
 
     const data = useSelector((state) => state.auth);
+
     useEffect(() => {
         sCheckDate(data?.fail_expiration);
         sDate({
@@ -33,19 +35,20 @@ const Expirred = () => {
     useEffect(() => {
         dispatch({
             type: "trangthaiExprired",
-            payload: checkDate,
+            payload: false,
+            // payload: checkDate,
         });
     }, [checkDate]);
-
+    console.log("data", data);
     return (
         <React.Fragment>
-            {checkDate ? (
+            {!checkDate ? (
                 <div className="rounded relative">
                     <div className="flex justify-between items-center bg-gray-100 p-1">
                         <div className="flex items-center gap-1">
                             {+date?.dateLimit > 0 ?
                                 <h2 className="font-medium 3xl:text-[14px] 2xl:text-[14px] xl:text-[12px] text-[13px] px-2">
-                                    Phiên bản dùng thử dành cho FOSO từ ngày
+                                    Phiên bản {data?.trial == "1" ? 'dùng thử' : "có phí"} dành cho {data?.code_company} từ ngày
                                     <span className="mx-1">
                                         {date?.dateStart} đến ngày {date?.dateEnd}
                                     </span>
@@ -56,11 +59,10 @@ const Expirred = () => {
                                     ngày. Một số tính năng của bạn sẽ bị đóng.
                                 </h2> :
                                 <h2 className="font-medium 3xl:text-[14px] 2xl:text-[14px] xl:text-[12px] text-[13px] px-2">
-                                    Phiên bản dùng thử dành cho FOSO từ ngày
+                                    Phiên bản {data?.trial == "1" ? 'dùng thử' : "có phí"} dành cho {data?.code_company} từ ngày
                                     <span className="mx-1">
                                         {date?.dateStart} đến ngày {date?.dateEnd} đã hết hạn.
                                     </span>
-
                                 </h2>
                             }
                             <NotificationBing size="20" color="red" className="animate-bounce" />
@@ -87,10 +89,7 @@ const Expirred = () => {
                         </span>
                     </span>
                 </div>
-            ) : (
-                // <div></div>
-                ""
-            )}
+            ) : null}
         </React.Fragment>
     );
 };
