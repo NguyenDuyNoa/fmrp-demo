@@ -37,7 +37,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { debounce } from "lodash";
 
-const Index = (props) => {
+const Location = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
@@ -984,4 +984,4 @@ const MultiValue = ({ index, getValue, ...props }) => {
         <MoreSelectedBadge items={overflow} />
     ) : null;
 };
-export default Index;
+export default Location;

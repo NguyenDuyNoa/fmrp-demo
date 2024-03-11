@@ -126,7 +126,7 @@ function MainPage({ Component, pageProps }) {
 
     const auth = useSelector((state) => state.auth);
 
-    const [onChecking, sOnChecking] = useState(false);
+    const [onChecking, sOnChecking] = useState(true);
 
     const ServerFetching = () => {
         Axios("GET", "/api_web/Api_Authentication/authentication?csrf_protection=true", {}, (err, response) => {

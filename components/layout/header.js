@@ -1065,8 +1065,6 @@ const Header = () => {
     const currentDropdown = dropdowns[currentDropdownIndex];
     return (
         <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
-            {/* <header className="z-40 w-full bg-[#0375f3] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
-            {/* <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12"> */}
             <div className="3xl:mx-10 2xl:mx-10 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
                 <div className="flex justify-between items-center">
                     <div className="flex 3xl:space-x-6 2xl:space-x-4 xl:space-x-4 space-x-2 items-center">
@@ -1074,12 +1072,10 @@ const Header = () => {
                             <Image
                                 alt=""
                                 src="/LOGO_HEADER.png"
-                                // src="/Logo2.png"
-                                // src="/logo.png"
                                 width={100}
                                 height={45}
                                 quality={100}
-                                className="3xl:w-[110px] 2xl:w-[90px] xl:w-[70px] w-[70px] h-auto object-contain"
+                                className="3xl:w-[110px] 2xl:w-[100px] xl:w-[90px] w-[70px] h-auto object-contain"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 placeholder="blur"
@@ -1213,7 +1209,7 @@ const Header = () => {
                         <a
                             href="#"
                             title="Thông báo"
-                            className="hover:scale-105 transition 3xl:w-5 2xl:w-4 xl:w-3.5 lg:w-3 3xl:h-5 2xl:h-4 xl:h-3.5 lg:h-3  "
+                            className="hover:scale-105 transition 3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px]   "
                         >
                             <Image
                                 alt=""
@@ -1221,7 +1217,7 @@ const Header = () => {
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain"
+                                className="w-full h-full object-contain"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1242,7 +1238,7 @@ const Header = () => {
                                 />
                             </div>
                             <input
-                                className="3xl:w-64 2xl:w-60 xl:w-52 lg:w-44 3xl:h-10 2xl:h-9 xl:h-8 lg:h-7 3xl:placeholder:text-base 2xl:placeholder:text-[14px] xl:placeholder:text-[12px] lg:placeholder:text-[10px] placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
+                                className="3xl:w-64 2xl:w-44 xxl:w-40 xl:w-32 lg:w-28 3xl:h-10 2xl:h-9 xl:h-8 lg:h-7 3xl:placeholder:text-base 2xl:placeholder:text-[14px] xl:placeholder:text-[12px] lg:placeholder:text-[10px] placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
                                 type="text"
                                 placeholder="Tìm kiếm"
                             />
@@ -1250,7 +1246,8 @@ const Header = () => {
                         <Link
                             href="/settings"
                             title="Cài đặt"
-                            className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                            className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition"
+                        // className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
                         >
                             <Image
                                 alt=""
@@ -1284,10 +1281,11 @@ const Header = () => {
                 2
               </div>
             </a> */}
-                        <a
+                        <Link
                             href="#"
                             title="Thông báo"
-                            className="3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
+                            className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition relative  "
+                        // className="3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
                         >
                             <DropdownThongBao
                                 data={ListThongBao}
@@ -1300,7 +1298,7 @@ const Header = () => {
                                     width={18}
                                     height={18}
                                     quality={100}
-                                    className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                                    className="object-contain w-full h-full transition"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1309,7 +1307,7 @@ const Header = () => {
                                     2
                                 </div>
                             </DropdownThongBao>
-                        </a>
+                        </Link>
                         <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
                             <Image
                                 alt=""
@@ -1317,7 +1315,8 @@ const Header = () => {
                                 width={18}
                                 height={18}
                                 quality={100}
-                                className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                                className="object-contain 3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px]  transition"
+                                // className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
