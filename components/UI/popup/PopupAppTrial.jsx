@@ -20,14 +20,12 @@ const PopupAppTrial = () => {
     const handleCloseModal = () => {
         setOpenModal(false);
     };
+    
     useEffect(() => {
-        console.log('check dataAuthentication.active_popup', dataAuthentication.active_popup);
         if (dataAuthentication.active_popup) {
             setOpenModal(false);
-            console.log('check 1');
         } else {
             setOpenModal(true);
-            console.log('check 2');
         }
     }, [dataAuthentication.active_popup]);
 
@@ -43,7 +41,6 @@ const PopupAppTrial = () => {
                 } else {
                     // dispatch({ type: "auth/update", payload: false });
                 }
-                console.log("response", response);
             }
         });
     };
