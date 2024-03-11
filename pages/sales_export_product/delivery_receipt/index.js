@@ -1,12 +1,8 @@
-import Select from "react-select";
 import React, { useState } from "react";
 
 import Head from "next/head";
-import Link from "next/link";
 import moment from "moment/moment";
 import { useRouter } from "next/router";
-import ReactExport from "react-data-export";
-import Datepicker from "react-tailwindcss-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
 import { useEffect } from "react";
 import { debounce } from "lodash";
@@ -521,8 +517,8 @@ const Index = (props) => {
                             {/* table */}
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded-lg grid grid-cols-7 justify-between xl:p-3 p-2">
-                                        <div className="col-span-6">
+                                    <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                        <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
                                                     <SearchComponent dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleOnChangeKeySearch.bind(this)} />
@@ -539,7 +535,8 @@ const Index = (props) => {
                                                         ]}
                                                         onChange={(e) => queryState({ idBranch: e })}
                                                         value={isState.idBranch}
-                                                        placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
+                                                        placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
+                                                        // placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
                                                         isClearable={true}
                                                     />
                                                 </div>
@@ -565,7 +562,7 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: dataLang?.price_quote_select_customer || "price_quote_select_customer",
+                                                                label: dataLang?.price_quote_customer || "price_quote_customer",
                                                                 isDisabled: true,
                                                             },
                                                             ...isState.listCustomer,
@@ -574,6 +571,7 @@ const Index = (props) => {
                                                         value={isState.idCustomer}
                                                         onInputChange={handleSearchApiClient.bind(this)}
                                                         placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
+                                                        // placeholder={dataLang?.price_quote_select_customer || "price_quote_select_customer"}
                                                         isClearable={true}
                                                     />
                                                 </div>
@@ -582,7 +580,7 @@ const Index = (props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="col-span-1">
+                                        <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
                                                 {(role == true || checkExport) ?
@@ -608,7 +606,7 @@ const Index = (props) => {
                                     </div>
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%] lg:w-[100%] ">
+                                    <div className="w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                                 {dataLang?.delivery_receipt_date || "delivery_receipt_date"}
@@ -795,7 +793,7 @@ const Index = (props) => {
                             </div>
                         </div>
                         {isState.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
+                            <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
                                     {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}
                                     {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"} */}

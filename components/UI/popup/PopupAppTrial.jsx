@@ -5,46 +5,45 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 import { MdClose } from "react-icons/md";
 import { _ServerInstance as Axios } from "/services/axios";
-import { Verify } from 'iconsax-react';
-import moment from 'moment';
+import { Verify } from "iconsax-react";
+import moment from "moment";
 
 const PopupAppTrial = () => {
-    const [isMounted, setIsMounted] = useState(false)
-    const [openModal, setOpenModal] = useState(false)
-    const dataAuthentication = useSelector(state => state.auth);
+    const [isMounted, setIsMounted] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
+    const dataAuthentication = useSelector((state) => state.auth);
 
     useEffect(() => {
-        setIsMounted(true)
-    }, [])
-
+        setIsMounted(true);
+    }, []);
 
     const handleCloseModal = () => {
-        setOpenModal(false)
-    }
+        setOpenModal(false);
+    };
     useEffect(() => {
         if (dataAuthentication.active_popup) {
-            setOpenModal(false)
+            setOpenModal(false);
         } else {
-            setOpenModal(true)
+            setOpenModal(true);
         }
-    }, [dataAuthentication.active_popup])
+    }, [dataAuthentication.active_popup]);
 
     const handleClickButton = () => {
         Axios("GET", "/api_web/Api_Authentication/check_active_popup?csrf_protection=true", {}, (err, response) => {
             if (err) {
                 // dispatch({ type: "auth/update", payload: false });
-                console.log('err', err);
+                console.log("err", err);
             } else {
                 const { isSuccess, info } = response?.data;
                 if (isSuccess) {
-                    setOpenModal(false)
+                    setOpenModal(false);
                 } else {
                     // dispatch({ type: "auth/update", payload: false });
                 }
-                console.log('response', response);
+                console.log("response", response);
             }
         });
-    }
+    };
 
     if (!isMounted) {
         return null;
@@ -57,8 +56,8 @@ const PopupAppTrial = () => {
             lockScroll
             closeOnEscape
             closeOnDocumentClick={false}
-        // onClose={() => setOpenModal(false)}
-        // defaultOpen={true}
+            // onClose={() => setOpenModal(false)}
+            // defaultOpen={true}
         >
             <div className='3xl:w-[1000px] 3xl:max-w-[1100px] 3xl:h-[600px] w-[800px] max-w-[900px] h-[500px] grid grid-cols-2 bg-white rounded-xl relative'>
                 <MdClose onClick={handleCloseModal} className='absolute top-4 right-4 text-2xl cursor-pointer text-[#000000] hover:text-[#000000]/80 hover:scale-105 duration-300 transition-colors' />
@@ -76,11 +75,7 @@ const PopupAppTrial = () => {
 
                             <div className="flex items-center gap-2">
                                 <div>
-                                    <Verify
-                                        size="18"
-                                        color="green"
-                                        className="animate-bounce"
-                                    />
+                                    <Verify size="18" color="green" className="animate-bounce" />
                                 </div>
                                 <div className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
                                     <span>
@@ -99,11 +94,7 @@ const PopupAppTrial = () => {
 
                             <div className="flex items-center gap-2">
                                 <div>
-                                    <Verify
-                                        size="18"
-                                        color="green"
-                                        className="animate-bounce"
-                                    />
+                                    <Verify size="18" color="green" className="animate-bounce" />
                                 </div>
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px]">
                                     FMRP mong rằng bạn sẽ tìm được giải pháp hiệu quả cho quá trình quản lý sản xuất của doanh nghiệp bạn.
@@ -112,11 +103,7 @@ const PopupAppTrial = () => {
 
                             <div className="flex items-center gap-2">
                                 <div>
-                                    <Verify
-                                        size="18"
-                                        color="green"
-                                        className="animate-bounce"
-                                    />
+                                    <Verify size="18" color="green" className="animate-bounce" />
                                 </div>
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
                                     <span>Thời gian dùng thử: Bắt đầu từ ngày</span>
@@ -143,11 +130,7 @@ const PopupAppTrial = () => {
 
                             <div className="flex items-center gap-2">
                                 <div>
-                                    <Verify
-                                        size="18"
-                                        color="green"
-                                        className="animate-bounce"
-                                    />
+                                    <Verify size="18" color="green" className="animate-bounce" />
                                 </div>
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px] flex flex-col ">
                                     <div className='flex items-center gap-1'>
@@ -165,11 +148,11 @@ const PopupAppTrial = () => {
                                 </h2>
                             </div>
 
-                            <div className='flex items-center justify-center mt-2'>
+                            <div className="flex items-center justify-center mt-2">
                                 <button
                                     onClick={handleClickButton}
-                                    type='button'
-                                    className='px-4 py-2 text-white bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 duration-300 transition-all ease-in-out rounded-lg focus:outline-none'
+                                    type="button"
+                                    className="px-4 py-2 text-white bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 duration-300 transition-all ease-in-out rounded-lg focus:outline-none"
                                 >
                                     Bắt đầu trải nghiệm
                                 </button>

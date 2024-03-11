@@ -467,12 +467,14 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.price_quote || "price_quote"} </title>
             </Head>
-            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (
-                    <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.price_quote || "price_quote"}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.price_quote || "price_quote"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.price_quote_list || "price_quote"}</h6>
                     </div>
@@ -481,7 +483,7 @@ const Index = (props) => {
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between  mt-1 mr-2">
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.price_quote || "price_quote"}
                                 </h2>
@@ -525,8 +527,8 @@ const Index = (props) => {
                             </div>
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-1 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded-t-lg grid grid-cols-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                        <div className="col-span-6">
+                                    <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9  xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                        <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
                                                     <SearchComponent dataLang={dataLang} onChange={_HandleOnChangeKeySearch.bind(this)} />
@@ -591,13 +593,13 @@ const Index = (props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="col-span-1">
+                                        <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
                                                 {(role == true || checkExport) ?
                                                     <div className={``}>
                                                         {isState.dataExcel?.length > 0 && (
-                                                            <ExcelFileComponent classBtn="!px-1" filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
+                                                            <ExcelFileComponent filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
                                                     </div>
                                                     :
                                                     <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
@@ -613,7 +615,7 @@ const Index = (props) => {
                                     </div>
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%] lg:w-[100%] ">
+                                    <div className="w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center whitespace-nowrap">
                                                 {dataLang?.price_quote_date || "price_quote_table_date"}
@@ -818,7 +820,7 @@ const Index = (props) => {
                             </div>
                         </div>
                         {isState.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
+                            <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 {/* <h6>{dataLang?.display}  {totalItems?.iTotalDisplayRecords}</h6> */}
                                 <h6>
                                     {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} phiếu báo
