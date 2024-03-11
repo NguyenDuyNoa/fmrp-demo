@@ -78,16 +78,15 @@ const PopupAppTrial = () => {
                                     <Verify size="18" color="green" className="animate-bounce" />
                                 </div>
                                 <div className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
-                                    <span>
-                                        Chào mừng
-                                    </span>
+                                    <span>Chào mừng</span>
 
                                     <span className="text-blue-500 uppercase mx-1">
                                         {dataAuthentication?.user_full_name}
                                     </span>
 
                                     <span>
-                                        đến với FMRP! Hãy dành thời gian để khám phá các tính năng hữu ích mà FMRP mang lại nhé.
+                                        đến với FMRP! Hãy dành thời gian để khám phá các tính năng hữu ích mà FMRP mang
+                                        lại nhé.
                                     </span>
                                 </div>
                             </div>
@@ -120,9 +119,7 @@ const PopupAppTrial = () => {
 
                                     <span>và kết thúc sau</span>
 
-                                    <span className="text-red-500 mx-1">
-                                        {dataAuthentication?.day_expiration}
-                                    </span>
+                                    <span className="text-red-500 mx-1">{dataAuthentication?.day_expiration}</span>
 
                                     <span>ngày.</span>
                                 </h2>
@@ -133,13 +130,13 @@ const PopupAppTrial = () => {
                                     <Verify size="18" color="green" className="animate-bounce" />
                                 </div>
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px] flex flex-col ">
-                                    <div className='flex items-center gap-1'>
+                                    <div className="flex items-center gap-1">
                                         <span>Mã công ty:</span>
                                         <span className="capitalize text-blue-500">
                                             {dataAuthentication?.code_company}
                                         </span>
                                     </div>
-                                    <div className='flex items-center gap-1'>
+                                    <div className="flex items-center gap-1">
                                         <span>Tên truy cập:</span>
                                         <span className="capitalize text-blue-500">
                                             {dataAuthentication?.user_email}

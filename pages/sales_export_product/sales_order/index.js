@@ -1,15 +1,11 @@
-import Select from "react-select";
 import vi from "date-fns/locale/vi";
 import React, { useState, useEffect } from "react";
 
 import Head from "next/head";
-import Link from "next/link";
 import { debounce } from "lodash";
 import moment from "moment/moment";
 import { useRouter } from "next/router";
-import ReactExport from "react-data-export";
 import { registerLocale } from "react-datepicker";
-import Datepicker from "react-tailwindcss-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
 import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
@@ -44,8 +40,6 @@ import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecompon
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -507,17 +501,20 @@ const Index = (props) => {
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (
-                    <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.sales_product_list || "sales_product_list"}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.sales_product_list || "sales_product_list"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.sales_product_list || "sales_product_list"}</h6>
                     </div>
+
                 )}
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between  mt-1 mr-2">
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                     {dataLang?.sales_product_list || "sales_product_list"}
                                 </h2>
@@ -568,8 +565,8 @@ const Index = (props) => {
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 {/* combobox search, excel */}
                                 <div className="xl:space-y-1 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded-t-lg grid grid-cols-7 2xl:xl:p-2 xl:p-1.5 p-1.5 ">
-                                        <div className="col-span-6">
+                                    <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                        <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
                                                     <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch} />
@@ -579,14 +576,14 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: dataLang?.select_branch || "select_branch",
+                                                                label: dataLang?.price_quote_branch || "price_quote_branch",
                                                                 isDisabled: true,
                                                             },
                                                             ...initData.listBr,
                                                         ]}
                                                         onChange={onChangeFilter("idBranch")}
                                                         value={valueChange.idBranch}
-                                                        placeholder={dataLang?.branch || "branch"}
+                                                        placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
                                                         isClearable={true}
                                                     />
                                                 </div>
@@ -596,9 +593,7 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.sales_product_select_order ||
-                                                                    "sales_product_select_order",
+                                                                label: dataLang?.sales_product_code || "sales_product_code",
                                                                 isDisabled: true,
                                                             },
                                                             ...initData.listQuoteCode,
@@ -617,7 +612,7 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: dataLang?.select_customer || "select_customer",
+                                                                label: dataLang?.price_quote_customer || "price_quote_customer",
                                                                 isDisabled: true,
                                                             },
                                                             ...initData.listCustomer,
@@ -625,7 +620,7 @@ const Index = (props) => {
                                                         onInputChange={handleSearchApi}
                                                         onChange={onChangeFilter("idCustomer")}
                                                         value={valueChange.idCustomer}
-                                                        placeholder={dataLang?.customer || "customer"}
+                                                        placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                                         isClearable={true}
                                                     />
                                                 </div>
@@ -634,7 +629,7 @@ const Index = (props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="col-span-1">
+                                        <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
                                                 {(role == true || checkExport) ?
@@ -659,7 +654,7 @@ const Index = (props) => {
 
                                 {/* table */}
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%] lg:w-[100%] ">
+                                    <div className="w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center whitespace-nowrap">
                                                 {dataLang?.sales_product_date || "sales_product_date"}
@@ -1000,7 +995,7 @@ const Index = (props) => {
                             </div>
                         </div>
                         {initData.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
+                            <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
                                     {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng
                                     bán */}

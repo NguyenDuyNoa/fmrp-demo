@@ -8,7 +8,7 @@ const OnResetData = ({ sOnFetching }) => {
             <button
                 onClick={_HandleFresh}
                 type="button"
-                className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
+                className="bg-green-50 hover:bg-green-200 hover:scale-105 group xxl:p-2.5 p-2 rounded-md transition-all ease-in-out"
             >
                 <Refresh2 className="group-hover:-rotate-45 transition-all ease-in-out" size={18} color="green" />
             </button>

@@ -37,6 +37,7 @@ import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecompon
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
+import { Container, ContainerBody } from "@/components/UI/common";
 
 const Index = (props) => {
 
@@ -455,7 +456,7 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.delivery_receipt_list || "delivery_receipt_list"} </title>
             </Head>
-            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (
@@ -467,8 +468,7 @@ const Index = (props) => {
                         <h6>{dataLang?.delivery_receipt_list || "delivery_receipt_list"}</h6>
                     </div>
                 )}
-
-                <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
+                <ContainerBody>
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between  mt-1 mr-2">
@@ -498,15 +498,11 @@ const Index = (props) => {
                                         return (
                                             <div>
                                                 <TabFilter
-                                                    style={{
-                                                        backgroundColor: "#e2f0fe",
-                                                    }}
                                                     dataLang={dataLang}
                                                     key={e?.id}
                                                     onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
                                                     total={e?.count}
                                                     active={e?.id}
-                                                    className={"text-[#0F4F9E]"}
                                                 >
                                                     {e?.name}
                                                 </TabFilter>
@@ -808,8 +804,8 @@ const Index = (props) => {
                             </div>
                         )}
                     </div>
-                </div>
-            </div>
+                </ContainerBody>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
