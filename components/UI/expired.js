@@ -35,14 +35,14 @@ const Expirred = () => {
     useEffect(() => {
         dispatch({
             type: "trangthaiExprired",
-            payload: false,
-            // payload: checkDate,
+            // payload: false,
+            payload: checkDate,
         });
     }, [checkDate]);
     console.log("data", data);
     return (
         <React.Fragment>
-            {!checkDate ? (
+            {checkDate ? (
                 <div className="rounded relative">
                     <div className="flex justify-between items-center bg-gray-100 p-1">
                         <div className="flex items-center gap-1">
