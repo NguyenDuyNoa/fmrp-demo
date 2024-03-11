@@ -64,9 +64,9 @@ const Popup_status = (props) => {
         let data = new FormData();
         data.append("name", isState.name);
         data.append("color", isState.color);
-        data.append("branch_id", isState.valueBr?.map((e) => {
-            return e?.value;
-        }))
+        isState.valueBr.forEach((e) => {
+            data.append("branch_id[]", e?.value);
+        })
         Axios("POST", `${props.id ? `/api_web/api_client/status/${id}?csrf_protection=true` : "/api_web/api_client/status?csrf_protection=true"}`,
             {
                 data: data,

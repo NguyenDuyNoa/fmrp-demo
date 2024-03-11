@@ -54,9 +54,9 @@ const Popup_groupKh = (props) => {
         var data = new FormData();
         data.append("name", isState.name);
         data.append("color", isState.color);
-        data.append("branch_id", isState.valueBr?.map((e) => {
-            return e?.value;
-        }))
+        isState.valueBr.forEach((e) => {
+            data.append("branch_id[]", e?.value);
+        })
         await Axios("POST", `${props.id ? `/api_web/Api_client/group/${id}?csrf_protection=true` : "/api_web/Api_client/group?csrf_protection=true"}`,
             {
                 data: data,
