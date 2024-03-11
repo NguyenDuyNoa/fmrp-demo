@@ -367,7 +367,8 @@ const PopupDetail = (props) => {
                                         </div>
                                         <div className="font-normal mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumberMoney(+data?.total_tax)}
+                                                {formatNumberMoney(+data?.total_tax_price)}
+                                                {/* {formatNumberMoney(+data?.total_tax)} */}
                                             </h3>
                                         </div>
                                         <div className="font-normal mr-2.5">

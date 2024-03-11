@@ -1,5 +1,5 @@
 export const ContainerFilterTab = ({ children }) => {
-    return <div className="flex py-2 2xl:space-x-3 lg:space-x-3 items-center h-fit justify-start overflow-hidden overflow-y-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+    return <div className="flex 2xl:space-x-3 lg:space-x-3 items-center h-fit justify-start overflow-hidden overflow-y-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
         {children}
     </div>
 }
