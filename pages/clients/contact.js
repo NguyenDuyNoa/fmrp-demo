@@ -265,159 +265,160 @@ const Index = (props) => {
                                 {dataLang?.client_contact_title || "client_contact_title"}
                             </h2>
                         </div>
-                        {/* <ContainerTable> */}
-                        <div className="xl:space-y-3 space-y-2">
-                            <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                <div className="col-span-4">
-                                    <div className="grid grid-cols-9 gap-2">
-                                        <SearchComponent
-                                            dataLang={dataLang}
-                                            onChange={_HandleOnChangeKeySearch.bind(this)}
-                                            colSpan={2}
-                                        />
-                                        <SelectComponent
-                                            options={[
-                                                {
-                                                    value: "",
-                                                    label: dataLang?.price_quote_branch || "price_quote_branch",
-                                                    isDisabled: true,
-                                                },
-                                                ...isState.listBr,
-                                            ]}
-                                            onChange={(e) => queryState({ idBranch: e })}
-                                            value={isState.idBranch}
-                                            placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
-                                            // placeholder={dataLang?.client_list_filterbrand}
-                                            colSpan={3}
-                                            components={{ MultiValue }}
-                                            closeMenuOnSelect={false}
-                                            isMulti={true}
-                                        />
-                                        <SelectComponent
-                                            options={[
-                                                {
-                                                    value: "",
-                                                    label: dataLang?.client_group_client || "client_group_client",
-                                                    isDisabled: true,
-                                                },
-                                                ...isState.listClient,
-                                            ]}
-                                            onChange={(e) => queryState({ idClient: e })}
-                                            value={isState.idClient}
-                                            placeholder={dataLang?.client_group_client || "client_group_client"}
-                                            colSpan={3}
-                                            components={{ MultiValue }}
-                                            closeMenuOnSelect={false}
-                                            isMulti={true}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="flex space-x-2 items-center justify-end">
-                                        <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                        {(role == true || checkExport) ?
-                                            <div className={``}>
-                                                {isState.data_ex?.length > 0 && (
-                                                    <ExcelFileComponent
-                                                        multiDataSet={multiDataSet}
-                                                        filename="Danh sách liên hệ"
-                                                        title="Dslh"
-                                                        dataLang={dataLang}
-                                                    />)}
-                                            </div>
-                                            :
-                                            <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
-                                                <span>{dataLang?.client_list_exportexcel}</span>
-                                            </button>
-                                        }
-                                        <div>
-                                            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                        <ContainerTable>
+                            <div className="xl:space-y-3 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-4">
+                                        <div className="grid grid-cols-9 gap-2">
+                                            <SearchComponent
+                                                dataLang={dataLang}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                colSpan={2}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...isState.listBr,
+                                                ]}
+                                                onChange={(e) => queryState({ idBranch: e })}
+                                                value={isState.idBranch}
+                                                placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
+                                                // placeholder={dataLang?.client_list_filterbrand}
+                                                colSpan={3}
+                                                components={{ MultiValue }}
+                                                closeMenuOnSelect={false}
+                                                isMulti={true}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.client_group_client || "client_group_client",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...isState.listClient,
+                                                ]}
+                                                onChange={(e) => queryState({ idClient: e })}
+                                                value={isState.idClient}
+                                                placeholder={dataLang?.client_group_client || "client_group_client"}
+                                                colSpan={3}
+                                                components={{ MultiValue }}
+                                                closeMenuOnSelect={false}
+                                                isMulti={true}
+                                            />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="h-[100%] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                            <div className="w-[100%] lg:w-[100%] ">
-                                <div className="grid grid-cols-12 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                        {dataLang?.client_contact_table_fulname}
-                                    </h4>
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                        {dataLang?.client_contact_table_name}
-                                    </h4>
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                        {dataLang?.client_contact_table_phone}
-                                    </h4>
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                        {dataLang?.client_contact_table_mail}
-                                    </h4>
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                        {dataLang?.client_contact_table_pos}
-                                    </h4>
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                        {dataLang?.client_contact_table_hapy}
-                                    </h4>
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                        {dataLang?.client_contact_table_address}
-                                    </h4>
-                                    <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                        {dataLang?.client_contact_table_brand}
-                                    </h4>
-                                </div>
-                                {isState.onFetching ? (
-                                    <Loading className="h-80" color="#0f4f9e" />
-                                ) : isState.data?.length > 0 ? (
-                                    <>
-                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
-                                            {isState.data?.map((e) => (
-                                                <div
-                                                    className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                    key={e.client_contact_id.toString()}
-                                                >
-                                                    <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
-                                                        {e.client_name}
-                                                    </h6>
-                                                    <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
-                                                        {e.contact_name}
-                                                    </h6>
-                                                    <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
-                                                        {e.phone_number}
-                                                    </h6>
-                                                    <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left ">
-                                                        {e.email}
-                                                    </h6>
-                                                    <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
-                                                        {e.position}
-                                                    </h6>
-                                                    <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-center">
-                                                        {e.birthday != "0000-00-00"
-                                                            ? moment(e.birthday).format("DD/MM/YYYY")
-                                                            : ""}
-                                                    </h6>
-                                                    <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
-                                                        {e.address}
-                                                    </h6>
-                                                    <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
-                                                        <span className="flex gap-2 flex-wrap justify-start ">
-                                                            {e?.branch?.map((e) => (
-                                                                <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {e.name}
-                                                                </span>
-                                                            ))}
-                                                        </span>
-                                                    </h6>
+                                    <div className="col-span-2">
+                                        <div className="flex space-x-2 items-center justify-end">
+                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            {(role == true || checkExport) ?
+                                                <div className={``}>
+                                                    {isState.data_ex?.length > 0 && (
+                                                        <ExcelFileComponent
+                                                            multiDataSet={multiDataSet}
+                                                            filename="Danh sách liên hệ"
+                                                            title="Dslh"
+                                                            dataLang={dataLang}
+                                                        />)}
                                                 </div>
-                                            ))}
+                                                :
+                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                </button>
+                                            }
+                                            <div>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                            </div>
                                         </div>
-                                    </>
-                                ) : (
-                                    <NoData />
-                                )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        {/* </ContainerTable> */}
+                            <div className="min:h-[200px] h-[100%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                {/* <div className="h-[100%] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
+                                <div className="w-[100%] lg:w-[100%] ">
+                                    <div className="grid grid-cols-12 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
+                                            {dataLang?.client_contact_table_fulname}
+                                        </h4>
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
+                                            {dataLang?.client_contact_table_name}
+                                        </h4>
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                            {dataLang?.client_contact_table_phone}
+                                        </h4>
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
+                                            {dataLang?.client_contact_table_mail}
+                                        </h4>
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                            {dataLang?.client_contact_table_pos}
+                                        </h4>
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                            {dataLang?.client_contact_table_hapy}
+                                        </h4>
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                            {dataLang?.client_contact_table_address}
+                                        </h4>
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
+                                            {dataLang?.client_contact_table_brand}
+                                        </h4>
+                                    </div>
+                                    {isState.onFetching ? (
+                                        <Loading className="h-80" color="#0f4f9e" />
+                                    ) : isState.data?.length > 0 ? (
+                                        <>
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
+                                                {isState.data?.map((e) => (
+                                                    <div
+                                                        className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
+                                                        key={e.client_contact_id.toString()}
+                                                    >
+                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                            {e.client_name}
+                                                        </h6>
+                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                            {e.contact_name}
+                                                        </h6>
+                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                            {e.phone_number}
+                                                        </h6>
+                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left ">
+                                                            {e.email}
+                                                        </h6>
+                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                            {e.position}
+                                                        </h6>
+                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-center">
+                                                            {e.birthday != "0000-00-00"
+                                                                ? moment(e.birthday).format("DD/MM/YYYY")
+                                                                : ""}
+                                                        </h6>
+                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                            {e.address}
+                                                        </h6>
+                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                            <span className="flex gap-2 flex-wrap justify-start ">
+                                                                {e?.branch?.map((e) => (
+                                                                    <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                        {e.name}
+                                                                    </span>
+                                                                ))}
+                                                            </span>
+                                                        </h6>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <NoData />
+                                    )}
+                                </div>
+                            </div>
+                        </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
                         <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
