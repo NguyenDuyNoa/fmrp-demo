@@ -7,10 +7,10 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                 className={`${
                     // warehouseman_id == "0" ? "bg-blue-700/90" : " bg-green-700/90"
                     warehouseman_id == "0" ? "bg-blue-200" : " bg-green-200"
-                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
+                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center gap-1`}
             >
                 <label
-                    className="relative flex cursor-pointer items-center rounded-full p-2 xl:p-1.5"
+                    className="relative flex cursor-pointer items-center rounded-full px-1 py-2"
                     htmlFor={id}
                     data-ripple-dark="true"
                 >
@@ -22,7 +22,7 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                                 ? "checked:border-blue-700 checked:bg-blue-700/90 checked:before:bg-blue-700/90"
                                 : "checked:border-green-700 checked:bg-green-700/90 border-green-700 checked:before:bg-limborder-green-700/90"
                             }
-                         before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 xl:h-3.5 xl:w-3.5 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-blue-700 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                         before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 xl:h-3.5 xl:w-3.5 lg:w-3 lg:h-3 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-blue-700 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
                         id={id}
                         value={warehouseman_id}
                         checked={warehouseman_id != "0" ? true : false}
@@ -31,7 +31,7 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                     <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 xl:h-3.5 xl:w-3.5 w-4"
+                            className="h-4 xl:h-3.5 xl:w-3.5 lg:w-3 lg:h-3 w-4"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                             stroke="currentColor"
@@ -48,7 +48,7 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                 <label
                     htmlFor={id}
                     className={`${warehouseman_id == "0" ? "text-blue-700" : "text-green-700"
-                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] font-medium cursor-pointer`}
+                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] lg:text-[8px] text-[8px] font-medium cursor-pointer`}
                 >
                     {warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}
                 </label>

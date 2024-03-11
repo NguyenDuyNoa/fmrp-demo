@@ -511,13 +511,11 @@ const Index = (props) => {
                                         return (
                                             <div>
                                                 <TabFilter
-                                                    style={{ backgroundColor: "#e2f0fe" }}
                                                     dataLang={dataLang}
                                                     key={e?.id}
                                                     onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
                                                     total={e?.count}
                                                     active={e?.id}
-                                                    className={"text-[#0F4F9E]"}
                                                 >
                                                     {dataLang[e?.name]}
                                                 </TabFilter>
