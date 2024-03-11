@@ -909,21 +909,21 @@ const Index = (props) => {
                                 </div>
 
                                 <div className='grid grid-cols-10'>
-                                    <ul className='col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 xl:px-4 xl:py-2 px-2 py-1 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                                    <ul className='col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                                         {
                                             isState.dataWarehouse && isState.dataWarehouse.map((item, index) => (
                                                 <li
                                                     key={item.id}
-                                                    className={` ${isState.idWarehouse === item.id ? "bg-[#3276FA] text-white" : ""} capitalize flex gap-2 px-4 py-2 items-center justify-between w-full rounded-md cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
+                                                    className={` ${isState.idWarehouse === item.id ? "bg-[#3276FA] text-white" : ""} font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
                                                     onClick={() => handleClickChooseWarehouse(item)}
                                                 >
-                                                    <div className='flex w-[90%] max-w-[90%] items-center gap-2'>
+                                                    <div className='flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2'>
                                                         <div className='w-[6px] h-[6px] rounded-full bg-[#6C9AC4]' />
                                                         <div className='w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs '>
                                                             {item.name}
                                                         </div>
                                                     </div>
-                                                    <div className='w-[10%] max-w-[10%] bg-[#E1ECFC]/80 3xl:text-base xl:text-sm text-xs text-center rounded-md text-black'>
+                                                    <div className='xl:w-[10%] xl:max-w-[10%] w-[15%] max-w-[15%] bg-[#E1ECFC]/80 p-1 3xl:text-base xl:text-xs text-xs text-center rounded-md text-black'>
                                                         {item.totalItems}
                                                     </div>
                                                 </li>
@@ -951,10 +951,10 @@ const Index = (props) => {
                                                 <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                     {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
                                                 </h4>
-                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
+                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] 3xl:text-start text-center">
                                                     {dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}
                                                 </h4>
-                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
+                                                <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] 3xl:text-start text-center">
                                                     {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
                                                 </h4>
                                                 {isState.dataProductSerial.is_enable === "1" && (
@@ -968,7 +968,7 @@ const Index = (props) => {
                                                         <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
                                                             {"Lot"}
                                                         </h4>
-                                                        <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] text-start">
+                                                        <h4 className="col-span-1 py-2 xl:text-sm lg:text-xs px-2 text-gray-600 uppercase  font-[600] 3xl:text-start text-center">
                                                             {dataLang?.warehouses_detail_date || "warehouses_detail_date"}
                                                         </h4>
                                                     </>
@@ -1002,20 +1002,20 @@ const Index = (props) => {
                                                                 <div className={`${""} col-span-2 flex justify-center items-center border-b py-2`}>
                                                                     <h6 className="xl:text-base text-xs w-full  ">
                                                                         {e?.image == null ? (
-                                                                            <div className='flex gap-3 px-2 w-full'>
-                                                                                <div className='w-[25%] max-w-[25%]'>
+                                                                            <div className='flex 3xl:gap-3 gap-2 px-2 w-full'>
+                                                                                <div className='3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center'>
                                                                                     <ModalImage
                                                                                         small="/no_image.png"
                                                                                         large="/no_image.png"
-                                                                                        className="w-[70px] h-[70px] rounded object-contain"
+                                                                                        className="xxl:w-[70px] xxl:min-w-[70px] xxl:h-[70px] xl:w-[50px] xl:min-w-[50px] xl:h-[50px] w-[40px] min-w-[40px] h-[40px] rounded object-contain"
                                                                                     />
                                                                                 </div>
-                                                                                <div className='w-[75%] max-w-[75%] flex flex-col gap-2'>
-                                                                                    <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                <div className='3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1'>
+                                                                                    <h6 className="3xl:text-base xl:text-sm lg:text-xs text-xs font-semibold text-zinc-600 w-full text-left">
                                                                                         {e.item_name == null ? "-" : e.item_name}
                                                                                     </h6>
 
-                                                                                    <h6 className="3xl:text-base xl:text-sm lg:text-xs font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                    <h6 className="3xl:text-sm xl:text-xs lg:text-xs text-xs font-medium text-zinc-500 w-full text-left">
                                                                                         {e.item_code == null ? "-" : e.item_code}
                                                                                     </h6>
 
@@ -1024,7 +1024,7 @@ const Index = (props) => {
                                                                                             className={`${e.item_type == "product"
                                                                                                 ? "text-lime-500  border-lime-500 "
                                                                                                 : " text-orange-500 border-orange-500"
-                                                                                                } border rounded py-1 px-1.5 w-fit text-[10px]`}
+                                                                                                } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
                                                                                         >
                                                                                             {e.item_type ? dataLang[e?.item_type] : ""}
                                                                                         </span>
@@ -1032,29 +1032,29 @@ const Index = (props) => {
                                                                                 </div>
                                                                             </div>
                                                                         ) : (
-                                                                            <div className='flex gap-3 px-2 w-full'>
-                                                                                <div className='w-[25%] max-w-[25%]'>
+                                                                            <div className='flex 3xl:gap-3 gap-2 px-2 w-full'>
+                                                                                <div className='3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center'>
                                                                                     <ModalImage
                                                                                         small={e?.image}
                                                                                         large={e?.image}
-                                                                                        className="w-[70px] max-w-[70px] h-[70px] rounded-lg object-cover"
+                                                                                        className="xxl:w-[70px] xxl:min-w-[70px] xxl:h-[70px] xl:w-[50px] xl:min-w-[50px] xl:h-[50px] w-[40px] min-w-[40px] h-[40px] rounded-lg object-cover"
                                                                                     />
                                                                                 </div>
-                                                                                <div className='w-[75%] max-w-[75%] flex flex-col gap-2'>
-                                                                                    <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                <div className='3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1'>
+                                                                                    <h6 className="3xl:text-base xl:text-sm lg:text-xs text-xs font-semibold text-zinc-600 w-full text-left ">
                                                                                         {e.item_name == null ? "-" : e.item_name}
                                                                                     </h6>
 
-                                                                                    <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[full] text-left ">
+                                                                                    <h6 className="3xl:text-sm xl:text-xs lg:text-xs text-xs font-medium text-zinc-500 w-full text-left">
                                                                                         {e.item_code == null ? "-" : e.item_code}
                                                                                     </h6>
 
                                                                                     <h6 className="w-fit text-left ">
                                                                                         <span
                                                                                             className={`${e.item_type == "product"
-                                                                                                ? "text-lime-500  border-lime-500 "
+                                                                                                ? "text-lime-500  border-lime-500"
                                                                                                 : " text-orange-500 border-orange-500"
-                                                                                                } border rounded py-1 px-1.5 w-fit text-[10px]`}
+                                                                                                } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
                                                                                         >
                                                                                             {e.item_type ? dataLang[e?.item_type] : ""}
                                                                                         </span>

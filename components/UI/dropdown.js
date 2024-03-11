@@ -18,14 +18,15 @@ const deca = Lexend_Deca({
 
 export const Dropdown = (props) => {
     const { is_admin } = useSelector((state) => state.auth);
-    console.log("is_admin", is_admin);
+
     const showToat = useToast()
+
     return (
         <div className="">
             <Popup
                 trigger={
                     <button
-                        className={`text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] `}>
+                        className={`text-slate-200 3xl:text-[18px] 2xl:text-base xxl:text-base xl:text-sm text-xs  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] `}>
                         {props.children}
                     </button>
                 }

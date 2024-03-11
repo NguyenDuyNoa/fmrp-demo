@@ -62,16 +62,16 @@ const PopupAppTrial = () => {
         >
             <div className='3xl:w-[1000px] 3xl:max-w-[1100px] 3xl:h-[600px] w-[800px] max-w-[900px] h-[500px] grid grid-cols-2 bg-white rounded-xl relative'>
                 <MdClose onClick={handleCloseModal} className='absolute top-4 right-4 text-2xl cursor-pointer text-[#000000] hover:text-[#000000]/80 hover:scale-105 duration-300 transition-colors' />
-                <div className="col-span-1 w-full 3xl:h-[600px] h-[500px] bg-[url('/popup/background.png')] bg-cover rounded-tl-xl rounded-bl-xl">
+                <div className="col-span-1 w-full 3xl:h-[600px] h-[550px] bg-[url('/popup/background.png')] bg-cover rounded-tl-xl rounded-bl-xl">
                     <div className='w-full h-full bg-[#0A4AC6]/30 rounded-tl-xl rounded-bl-xl' />
                 </div>
-                <div className="col-span-1 w-full h-full bg-[url('/popup/background2.png')] bg-cover bg-white rounded-tr-xl rounded-br-xl px-12 py-8 flex flex-col items-center justify-center gap-4">
+                <div className="col-span-1 w-full h-full bg-[url('/popup/background2.png')] bg-cover bg-white rounded-tr-xl rounded-br-xl 3xl:px-12 3xl:py-8 px-10 py-5 flex flex-col items-center justify-center gap-4">
                     <div className="flex flex-col justify-between gap-5 ">
-                        <div className=" flex flex-col gap-6">
+                        <div className=" flex flex-col 3xl:gap-6 gap-3">
                             <div className="flex items-center gap-2 mb-2">
-                                <h1 className="3xl:text-3xl text-2xl font-bold text-[#000000] text-center">
+                                <div className="3xl:text-3xl text-2xl font-bold text-[#000000] text-center">
                                     Khởi đầu chuyển đổi số ngay với phần mềm FMRP !
-                                </h1>
+                                </div>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -82,15 +82,19 @@ const PopupAppTrial = () => {
                                         className="animate-bounce"
                                     />
                                 </div>
-                                <h1 className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
-                                    Chào mừng
+                                <div className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
+                                    <span>
+                                        Chào mừng
+                                    </span>
+
                                     <span className="text-blue-500 uppercase mx-1">
                                         {dataAuthentication?.user_full_name}
                                     </span>
-                                    đến với FMRP! Hãy dành thời gian để
-                                    khám phá các tính năng hữu ích mà
-                                    FMRP mang lại nhé.
-                                </h1>
+
+                                    <span>
+                                        đến với FMRP! Hãy dành thời gian để khám phá các tính năng hữu ích mà FMRP mang lại nhé.
+                                    </span>
+                                </div>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -102,9 +106,7 @@ const PopupAppTrial = () => {
                                     />
                                 </div>
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px]">
-                                    FMRP mong rằng bạn sẽ tìm được giải
-                                    pháp hiệu quả cho quá trình quản lý
-                                    sản xuất của doanh nghiệp bạn.
+                                    FMRP mong rằng bạn sẽ tìm được giải pháp hiệu quả cho quá trình quản lý sản xuất của doanh nghiệp bạn.
                                 </h2>
                             </div>
 
@@ -117,23 +119,25 @@ const PopupAppTrial = () => {
                                     />
                                 </div>
                                 <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
-                                    Thời gian dùng thử: Bắt đầu từ ngày
+                                    <span>Thời gian dùng thử: Bắt đầu từ ngày</span>
+
                                     <span className="text-blue-500 mx-1">
-                                        {moment(
-                                            dataAuthentication?.start_date
-                                        ).format("DD/MM/YYYY")}
+                                        {moment(dataAuthentication?.start_date).format("DD/MM/YYYY")}
                                     </span>
-                                    đến ngày
+
+                                    <span>đến ngày</span>
+
                                     <span className="text-blue-500 mx-1">
-                                        {moment(
-                                            dataAuthentication?.expiration_date
-                                        ).format("DD/MM/YYYY")}
+                                        {moment(dataAuthentication?.expiration_date).format("DD/MM/YYYY")}
                                     </span>
-                                    và kết thúc sau
+
+                                    <span>và kết thúc sau</span>
+
                                     <span className="text-red-500 mx-1">
                                         {dataAuthentication?.day_expiration}
                                     </span>
-                                    ngày.
+
+                                    <span>ngày.</span>
                                 </h2>
                             </div>
 
@@ -145,19 +149,19 @@ const PopupAppTrial = () => {
                                         className="animate-bounce"
                                     />
                                 </div>
-                                <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju flex flex-col ">
-                                    <span>
-                                        Mã công ty:
-                                        <span className="capitalize mx-1 text-blue-500">
+                                <h2 className=" py-1 text-gray-700 font-semibold text-[14px] flex flex-col ">
+                                    <div className='flex items-center gap-1'>
+                                        <span>Mã công ty:</span>
+                                        <span className="capitalize text-blue-500">
                                             {dataAuthentication?.code_company}
                                         </span>
-                                    </span>
-                                    <span>
-                                        Tên truy cập:
-                                        <span className="capitalize mx-1 text-blue-500">
+                                    </div>
+                                    <div className='flex items-center gap-1'>
+                                        <span>Tên truy cập:</span>
+                                        <span className="capitalize text-blue-500">
                                             {dataAuthentication?.user_email}
                                         </span>
-                                    </span>
+                                    </div>
                                 </h2>
                             </div>
 
@@ -173,49 +177,6 @@ const PopupAppTrial = () => {
                         </div>
                     </div>
                 </div>
-                {/* <div className="col-span-1 w-full h-full bg-[url('/popup/background2.png')] bg-cover bg-white rounded-tr-xl rounded-br-xl 3xl:p-20 p-16 flex flex-col items-center justify-center gap-4">
-                    <div className='3xl:text-3xl text-2xl font-bold text-[#000000] text-center'>
-                        Chúc mừng bạn đã đăng ký thành công!
-                    </div>
-                    <div className='3xl:text-lg text-base text-[#9295A4] font-medium'>
-                        Trải nghiệm FMRP ngay
-                    </div>
-                    <div className='px-6 py-4 bg-[#EBF5FF] rounded-2xl flex flex-col gap-2 w-full'>
-                        <div className='flex flex-col'>
-                            <div className='uppercase 3xl:text-sm text-xs text-[#52575E]'>
-                                Tên công ty
-                            </div>
-                            <div className='3xl:text-lg text-base capitalize font-semibold'>
-                                {dataAuthentication?.company?.name ? dataAuthentication?.company?.name : ''}
-                            </div>
-                        </div>
-                        <div className='flex flex-col'>
-                            <div className='uppercase 3xl:text-sm text-xs text-[#52575E]'>
-                                Email
-                            </div>
-                            <div className='3xl:text-lg text-base capitalize font-semibold'>
-                                {dataAuthentication?.company?.email ? dataAuthentication?.company?.email : ''}
-                            </div>
-                        </div>
-                        <div className='flex flex-col'>
-                            <div className='uppercase 3xl:text-sm text-xs text-[#52575E]'>
-                                Số điện thoại
-                            </div>
-                            <div className='3xl:text-lg text-base capitalize font-semibold'>
-                                {dataAuthentication?.company?.phone_number ? dataAuthentication?.company?.phone_number : ''}
-                            </div>
-                        </div>
-                    </div>
-                    <div className='flex items-center justify-center mt-2'>
-                        <button
-                            onClick={handleClickButton}
-                            type='button'
-                            className='px-4 py-2 text-white bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 duration-300 transition-all ease-in-out rounded-lg focus:outline-none'
-                        >
-                            Bắt đầu trải nghiệm
-                        </button>
-                    </div>
-                </div> */}
             </div>
         </Popup>
     );
