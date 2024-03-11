@@ -39,6 +39,8 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
 
 const Index = (props) => {
@@ -487,12 +489,12 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.returnSales_titleLits || "returnSales_titleLits"} </title>
             </Head>
-            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container>
                 {isState.data_export?.length > 0 && (
                     <Popup_status className="hidden" data_export={isState.data_export} dataLang={dataLang} />
                 )}
                 {trangthaiExprired ? (
-                    <div className="p-4"></div>
+                    <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{dataLang?.returnSales_title || "returnSales_title"}</h6>
@@ -501,7 +503,7 @@ const Index = (props) => {
                     </div>
                 )}
 
-                <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
+                <ContainerBody>
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between  mt-1 mr-2">
@@ -525,7 +527,7 @@ const Index = (props) => {
                                     {dataLang?.btn_new || "btn_new"}
                                 </button>
                             </div>
-                            <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <ContainerFilterTab>
                                 {isState.listStatus &&
                                     isState.listStatus.map((e) => {
                                         return (
@@ -542,9 +544,9 @@ const Index = (props) => {
                                             </div>
                                         );
                                     })}
-                            </div>
+                            </ContainerFilterTab>
                             {/* table */}
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
+                            <ContainerTable>
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                         <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
@@ -760,9 +762,9 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </ContainerTable>
                         </div>
-                        <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
+                        <ContainerTotal className='!grid-cols-10'>
                             <div className="col-span-3 p-2 text-center">
                                 <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
                                     {dataLang?.import_total || "import_total"}
@@ -783,7 +785,7 @@ const Index = (props) => {
                                     {formatMoney(total?.total_amount)}
                                 </h3>
                             </div>
-                        </div>
+                        </ContainerTotal>
                         {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6 className="">
@@ -800,8 +802,8 @@ const Index = (props) => {
                             </div>
                         )}
                     </div>
-                </div>
-            </div>
+                </ContainerBody>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

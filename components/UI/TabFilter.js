@@ -9,7 +9,7 @@ const TabFilter = React.memo((props) => {
         // <button style={props.style} onClick={props.onClick} className={`${props.className} justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:text-[16px] 2xl:text-[16.5px] xl:text-[12px] lg:text-[13px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}>
         <button
             style={{
-                backgroundColor: "#e2f0fe",
+                backgroundColor: props.backgroundColor ? props.backgroundColor : "#e2f0fe",
             }}
             onClick={props.onClick}
             className={`${props.className} text-[#0F4F9E] justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:h-10 2xl:h-8 xl:h-8 lg:h-7 3xl:text-[17px] 2xl:text-[15px] xl:text-[12px] lg:text-[11px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}

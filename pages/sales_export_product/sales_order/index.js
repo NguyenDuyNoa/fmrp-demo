@@ -39,6 +39,8 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
 
 const Index = (props) => {
@@ -497,9 +499,9 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.sales_product_list || "sales_product_list"} </title>
             </Head>
-            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-4"></div>
+                    <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
@@ -511,7 +513,7 @@ const Index = (props) => {
 
                 )}
 
-                <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
+                <ContainerBody>
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between  mt-1 mr-2">
@@ -536,10 +538,8 @@ const Index = (props) => {
                                         {dataLang?.btn_new || "btn_new"}
                                     </button>
                                 </div>
-
                             </div>
-
-                            <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <ContainerFilterTab>
                                 {initData?.listTabStatus &&
                                     initData?.listTabStatus?.map((e) => {
                                         return (
@@ -560,9 +560,9 @@ const Index = (props) => {
                                             </div>
                                         );
                                     })}
-                            </div>
+                            </ContainerFilterTab>
                             {/* table */}
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
+                            <ContainerTable>
                                 {/* combobox search, excel */}
                                 <div className="xl:space-y-1 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
@@ -977,9 +977,9 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </ContainerTable>
                         </div>
-                        <div className="grid grid-cols-13 bg-gray-100 items-center">
+                        <ContainerTotal className={'grid-cols-13'}>
                             <div className="col-span-3 p-2 text-center">
                                 <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                     {dataLang?.total_outside || "total_outside"}
@@ -993,7 +993,7 @@ const Index = (props) => {
                             <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
                             </div>
-                        </div>
+                        </ContainerTotal>
                         {initData.data?.length != 0 && (
                             <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
@@ -1010,8 +1010,8 @@ const Index = (props) => {
                             </div>
                         )}
                     </div>
-                </div>
-            </div>
+                </ContainerBody>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

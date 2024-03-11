@@ -37,6 +37,8 @@ import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComp
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
+import { Container, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 registerLocale("vi", vi);
 
 
@@ -467,9 +469,9 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.price_quote || "price_quote"} </title>
             </Head>
-            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-4"></div>
+                    <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
@@ -505,7 +507,7 @@ const Index = (props) => {
                                 </button>
                             </div>
 
-                            <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <ContainerFilterTab>
                                 {isState.listTabStatus &&
                                     isState.listTabStatus.map((e) => {
                                         return (
@@ -522,9 +524,9 @@ const Index = (props) => {
                                             </div>
                                         );
                                     })}
-                            </div>
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
-                                <div className="xl:space-y-1 space-y-2">
+                            </ContainerFilterTab>
+                            <ContainerTable>
+                                <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9  xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                         <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                             <div className="grid grid-cols-5 gap-2">
@@ -793,9 +795,9 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </ContainerTable>
                         </div>
-                        <div className="grid grid-cols-12 bg-gray-100 items-center">
+                        <ContainerTotal>
                             <div className="col-span-4 p-2 text-left">
                                 <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                     {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
@@ -816,7 +818,7 @@ const Index = (props) => {
                                     {formatNumber(total?.total_amount)}
                                 </h3>
                             </div>
-                        </div>
+                        </ContainerTotal>
                         {isState.data?.length != 0 && (
                             <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 {/* <h6>{dataLang?.display}  {totalItems?.iTotalDisplayRecords}</h6> */}
@@ -835,7 +837,7 @@ const Index = (props) => {
                         )}
                     </div>
                 </div>
-            </div >
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
