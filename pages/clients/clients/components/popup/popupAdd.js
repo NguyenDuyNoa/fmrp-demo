@@ -40,7 +40,7 @@ const Popup_dskh = (props) => {
 
     const { checkAdd, checkEdit } = useActionRole(auth, props?.nameModel)
 
-    const { isOpen, isId, handleQueryId } = useToggle();
+    const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
     const isShow = useToast();
 
@@ -105,7 +105,7 @@ const Popup_dskh = (props) => {
             _ServerFetching_detailUser()
         }
     }, [isState?.onFetching])
-
+    console.log("checkEdit", isIdChild);
     const _ServerFetching_detailUser = async () => {
         await Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
@@ -147,7 +147,8 @@ const Popup_dskh = (props) => {
                             position: e?.position,
                             birthday: e?.birthday,
                             address: e?.address,
-                            phone_number: e?.phone_number
+                            phone_number: e?.phone_number,
+                            disble: role == false || checkEdit == false
                         }
                     }) || [],
                     optionDelivery: db?.clients_address_delivery?.map((e) => ({
@@ -164,6 +165,7 @@ const Popup_dskh = (props) => {
             queryState({ onFetching: false });
         });
     };
+    console.log("option", isState.option);
 
     const _ServerFetching_Char = async () => {
         await Axios(
@@ -346,7 +348,7 @@ const Popup_dskh = (props) => {
             data.append(`staff_charge[${index}]`, e?.value ? e?.value : "");
         });
         isState.option?.forEach((e, index) => {
-            data.append(`contact[${index}][id]`, e?.idBe ? e?.idFe : "");
+            data.append(`contact[${index}][id]`, e?.idBe ? e?.idBe : "");
             data.append(`contact[${index}][full_name]`, e?.full_name ? e?.full_name : "");
             data.append(`contact[${index}][email]`, e?.email ? e?.email : "");
             data.append(`contact[${index}][position]`, e?.position ? e?.position : "");
@@ -448,8 +450,12 @@ const Popup_dskh = (props) => {
     };
 
     const _HandleDelete = async () => {
-        tab == 1 && queryState({ option: [...isState.option.filter((x) => x.idFe !== isId)] });
-        tab == 2 && queryState({ optionDelivery: [...isState.optionDelivery.filter((x) => x.idFe !== isId)] });
+        if (tab == 1) {
+            queryState({ option: [...isState.option.filter((x) => x.idFe !== isId)] });
+        }
+        if (tab == 2) {
+            queryState({ optionDelivery: [...isState.optionDelivery.filter((x) => x.idFe !== isId)] });
+        }
         handleQueryId({ status: false });
     };
 
@@ -495,15 +501,7 @@ const Popup_dskh = (props) => {
                         {props.dataLang?.client_popup_general}
                     </button>
                     <button
-                        onClick={() => {
-                            if (role) {
-                                _HandleSelectTab(1)
-                            } else if (checkAdd || checkEdit) {
-                                _HandleSelectTab(1)
-                            } else {
-                                isShow("warning", WARNING_STATUS_ROLE)
-                            }
-                        }}
+                        onClick={() => _HandleSelectTab(1)}
                         className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
@@ -520,21 +518,16 @@ const Popup_dskh = (props) => {
                 <div className="mt-4">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         {tab === 0 && (
-                            <ScrollArea
-                                ref={scrollAreaRef}
-                                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-hidden "
-                                speed={1}
-                                smoothScrolling={true}
+                            <div
+                                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                             >
                                 <Form dataLang={props.dataLang} isState={isState} queryState={queryState} />
-                            </ScrollArea>
+                            </div>
                         )}
                         {tab === 1 && (
                             <div>
-                                <ScrollArea
-                                    className="min-h-[0px] max-h-[550px] overflow-hidden"
-                                    speed={1}
-                                    smoothScrolling={true}
+                                <div
+                                    className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                                 >
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.option.map((e) => (
@@ -548,28 +541,18 @@ const Popup_dskh = (props) => {
                                                 <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
                                             </FormContactInfo>
                                         ))}
-                                        <ButtoonAdd onClick={() => {
-                                            if (role) {
-                                                _HandleAddNew()
-                                            } else if (checkAdd) {
-                                                _HandleAddNew()
-                                            } else {
-                                                isShow("warning", WARNING_STATUS_ROLE);
-                                            }
-                                        }}>
+                                        <ButtoonAdd onClick={() => _HandleAddNew()}>
                                             <IconAdd className="animate-bounce" />
                                             {props.dataLang?.client_popup_addcontact}
                                         </ButtoonAdd>
                                     </div>
-                                </ScrollArea>
+                                </div>
                             </div>
                         )}
                         {tab === 2 && (
                             <div>
-                                <ScrollArea
-                                    className="min-h-[0px] max-h-[550px] overflow-hidden"
-                                    speed={1}
-                                    smoothScrolling={true}
+                                <div
+                                    className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                                 >
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.optionDelivery.map((e) => (
@@ -588,7 +571,7 @@ const Popup_dskh = (props) => {
                                             {props.dataLang?.client_popup_devivelyAdd}
                                         </ButtoonAdd>
                                     </div>
-                                </ScrollArea>
+                                </div>
                             </div>
                         )}
                         <div className="text-right mt-5 space-x-2">
@@ -616,6 +599,7 @@ const Popup_dskh = (props) => {
                 title={TITLE_DELETE}
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
+                isIdChild={isIdChild}
                 save={_HandleDelete}
                 cancel={() => handleQueryId({ status: false })}
             />

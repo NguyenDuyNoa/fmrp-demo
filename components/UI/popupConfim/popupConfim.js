@@ -23,7 +23,7 @@ const PopupConfim = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkBrowser: checkAuth, checkDelete } = useActionRole(auth, props?.nameModel)
-    console.log("props", props);
+    console.log("props", props.nameModel);
 
     const showToat = useToast()
 
@@ -152,7 +152,10 @@ const PopupConfim = (props) => {
                                 ['client_customers',
                                     'client_contact',
                                     'client_status',
-                                    'client_group'
+                                    'client_group',
+                                    'suppliers',
+                                    'contacts_suppliers',
+                                    'suppliers_groups'
                                 ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">
@@ -170,11 +173,16 @@ const PopupConfim = (props) => {
                                                         props.save()
                                                     } else if (checkDelete) {
                                                         props.save()
+                                                    } else if (props.nameModel == "client_contact" && !props?.isIdChild && !checkDelete) {
+                                                        props.save()
+                                                    } else if (props.nameModel == "contacts_suppliers" && !props?.isIdChild && !checkDelete) {
+                                                        props.save()
                                                     }
                                                     else {
                                                         showToat('warning', 'Bạn không có quyền truy cập')
                                                     }
                                                 }}
+
                                                 className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
                                             >
                                                 Xác nhận
@@ -189,7 +197,11 @@ const PopupConfim = (props) => {
                                 'client_customers',
                                 'client_contact',
                                 'client_status',
-                                'client_group'].includes(props.nameModel) && (
+                                'client_group',
+                                'suppliers',
+                                'contacts_suppliers',
+                                'suppliers_groups'
+                            ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">
                                             <button
@@ -223,7 +235,7 @@ const PopupConfim = (props) => {
                     </div>
                 </div>
             </Popup>
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 export default PopupConfim;

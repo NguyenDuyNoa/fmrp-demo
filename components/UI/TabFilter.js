@@ -12,7 +12,7 @@ const TabFilter = React.memo((props) => {
                 backgroundColor: props.backgroundColor ? props.backgroundColor : "#e2f0fe",
             }}
             onClick={props.onClick}
-            className={`${props.className} mt-3 mb-1 text-[#0F4F9E] justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:text-[17px] 2xl:text-[15px] xl:text-[12px] lg:text-[11px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}
+            className={`${props.className} mt-3 mb-1 whitespace-nowrap text-[#0F4F9E] justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:text-[17px] 2xl:text-[15px] xl:text-[12px] lg:text-[11px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}
         // className={`${props.className} text-[#0F4F9E] justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:h-10 2xl:h-8 xl:h-8 lg:h-7 3xl:text-[17px] 2xl:text-[15px] xl:text-[12px] lg:text-[11px] flex gap-2 items-center rounded-md px-2 py-2 outline-none relative`}
         >
             {router.query?.tab === `${props.active}` && (

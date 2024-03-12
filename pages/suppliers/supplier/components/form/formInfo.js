@@ -1,39 +1,10 @@
 import React from "react";
 import Select from "react-select";
 import { NumericFormat } from "react-number-format";
-const FormInfo = (props) => {
-  const {
-    code,
-    name,
-    representative,
-    email,
-    phone_number,
-    tax_code,
-    date_incorporation,
-    valueBr,
-    brandpOpt,
-    errInput,
-    errInputBr,
-    listGr,
-    valueGr,
-    handleChangeGr,
-    handleMenuOpen,
-    cityOpt,
-    valueCt,
-    handleChangeCt,
-    ditrict,
-    valueDis,
-    handleChangeDtric,
-    listWar,
-    valueWa,
-    handleChangeWar,
-    address,
-    note,
-    _HandleChangeInput,
-    dataLang,
-    debt_begin,
-  } = props;
-
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import useToast from "@/hooks/useToast";
+const FormInfo = ({ isState, queryState, dataLang }) => {
+  const isShow = useToast()
   return (
     <div className="w-[50vw]  p-2  ">
       <div className="flex flex-wrap justify-between ">
@@ -42,8 +13,8 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_code}{" "}
           </label>
           <input
-            value={code}
-            onChange={_HandleChangeInput.bind(this, "code")}
+            value={isState.code}
+            onChange={(e) => queryState({ code: e.target.value })}
             name="fname"
             type="text"
             placeholder={dataLang?.client_popup_sytem}
@@ -56,18 +27,17 @@ const FormInfo = (props) => {
           </label>
           <div>
             <input
-              value={name}
-              onChange={_HandleChangeInput.bind(this, "name")}
+              value={isState.name}
+              onChange={(e) => queryState({ name: e.target.value })}
               placeholder={dataLang?.suppliers_supplier_name}
               name="fname"
               type="text"
-              className={`${
-                errInput
-                  ? "border-red-500"
-                  : "focus:border-[#92BFF7] border-[#d0d5dd]"
-              } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+              className={`${isState.errInput
+                ? "border-red-500"
+                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
             />
-            {errInput && (
+            {isState.errInput && (
               <label className="mb-4  text-[14px] text-red-500">
                 {dataLang?.suppliers_supplier_err}
               </label>
@@ -77,9 +47,9 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_reper}
           </label>
           <input
-            value={representative}
+            value={isState.representative}
             placeholder={dataLang?.suppliers_supplier_reper}
-            onChange={_HandleChangeInput.bind(this, "representative")}
+            onChange={(e) => queryState({ representative: e.target.value })}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
@@ -88,8 +58,8 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_email}
           </label>
           <input
-            value={email}
-            onChange={_HandleChangeInput.bind(this, "email")}
+            value={isState.email}
+            onChange={(e) => queryState({ email: e.target.value })}
             placeholder={dataLang?.suppliers_supplier_email}
             name="fname"
             type="email"
@@ -99,9 +69,9 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_phone}
           </label>
           <input
-            value={phone_number}
+            value={isState.phone_number}
             placeholder={dataLang?.suppliers_supplier_phone}
-            onChange={_HandleChangeInput.bind(this, "phone_number")}
+            onChange={(e) => queryState({ phone_number: e.target.value })}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
@@ -110,9 +80,9 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_taxcode}
           </label>
           <input
-            value={tax_code}
+            value={isState.tax_code}
             placeholder={dataLang?.suppliers_supplier_taxcode}
-            onChange={_HandleChangeInput.bind(this, "tax_code")}
+            onChange={(e) => queryState({ tax_code: e.target.value })}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
@@ -121,8 +91,8 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_date}
           </label>
           <input
-            value={date_incorporation}
-            onChange={_HandleChangeInput.bind(this, "date_incorporation")}
+            value={isState.date_incorporation}
+            onChange={(e) => queryState({ date_incorporation: e.target.value })}
             name="fname"
             type="date"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
@@ -137,17 +107,16 @@ const FormInfo = (props) => {
             <Select
               closeMenuOnSelect={false}
               placeholder={dataLang?.client_list_brand}
-              options={brandpOpt}
+              options={isState.dataBr}
               isSearchable={true}
-              onChange={_HandleChangeInput.bind(this, "valueBr")}
+              onChange={(e) => queryState({ valueBr: e })}
               LoadingIndicator
               isMulti
               noOptionsMessage={() => "Không có dữ liệu"}
-              value={valueBr}
+              value={isState.valueBr}
               maxMenuHeight="200px"
               isClearable={true}
               menuPortalTarget={document.body}
-              onMenuOpen={handleMenuOpen}
               styles={{
                 placeholder: (base) => ({
                   ...base,
@@ -159,11 +128,10 @@ const FormInfo = (props) => {
                   position: "absolute",
                 }),
               }}
-              className={`${
-                errInputBr ? "border-red-500" : "border-transparent"
-              } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+              className={`${isState.errInputBr ? "border-red-500" : "border-transparent"
+                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
             />
-            {errInputBr && (
+            {isState.errInputBr && (
               <label className="mb-2  text-[14px] text-red-500">
                 {dataLang?.client_list_bran}
               </label>
@@ -175,9 +143,9 @@ const FormInfo = (props) => {
           <Select
             placeholder={dataLang?.suppliers_supplier_group}
             noOptionsMessage={() => "Không có dữ liệu"}
-            options={listGr}
-            value={valueGr}
-            onChange={handleChangeGr}
+            options={isState.dataGroup}
+            value={isState.valueGr}
+            onChange={(e) => queryState({ valueGr: e })}
             isSearchable={true}
             LoadingIndicator
             isMulti={true}
@@ -193,7 +161,6 @@ const FormInfo = (props) => {
               },
             })}
             menuPortalTarget={document.body}
-            onMenuOpen={handleMenuOpen}
             styles={{
               placeholder: (base) => ({
                 ...base,
@@ -210,14 +177,31 @@ const FormInfo = (props) => {
           <label className="text-[#344054] font-normal text-sm mb-1 ">
             {dataLang?.suppliers_supplier_debt}
           </label>
-          <NumericFormat
-            value={debt_begin}
+          {/* <NumericFormat
+            value={isState.debt_begin}
             onValueChange={_HandleChangeInput.bind(this, "debt_begin")}
             className="ocus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
             thousandSeparator=","
             allowNegative={false}
             isNumericString={true}
             placeholder={dataLang?.suppliers_supplier_debt}
+          /> */}
+          <InPutNumericFormat
+            value={isState.debt_begin || 0}
+            onValueChange={(e) => queryState({ debt_begin: e.floatValue })}
+            isAllowed={(values) => {
+              const { floatValue } = values;
+              if (floatValue == 0) {
+                return true;
+              }
+              if (floatValue < 0) {
+                isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                return false
+              }
+              return true
+            }}
+            placeholder={dataLang?.suppliers_supplier_debt}
+            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
           />
 
           <div>
@@ -226,16 +210,9 @@ const FormInfo = (props) => {
             </label>
             <Select
               placeholder={dataLang?.suppliers_supplier_city}
-              options={cityOpt}
-              value={
-                valueCt
-                  ? {
-                      label: cityOpt?.find((x) => x.value == valueCt)?.label,
-                      value: valueCt,
-                    }
-                  : null
-              }
-              onChange={handleChangeCt}
+              options={isState.dataCity}
+              value={isState.valueCt}
+              onChange={(e) => queryState({ valueCt: e })}
               isSearchable={true}
               LoadingIndicator
               maxMenuHeight="200px"
@@ -251,7 +228,6 @@ const FormInfo = (props) => {
                 },
               })}
               menuPortalTarget={document.body}
-              onMenuOpen={handleMenuOpen}
               styles={{
                 placeholder: (base) => ({
                   ...base,
@@ -272,16 +248,9 @@ const FormInfo = (props) => {
             </label>
             <Select
               placeholder={dataLang?.suppliers_supplier_district}
-              options={ditrict}
-              value={
-                valueDis
-                  ? {
-                      label: ditrict?.find((x) => x.value == valueDis)?.label,
-                      value: valueDis,
-                    }
-                  : null
-              }
-              onChange={handleChangeDtric}
+              options={isState.dataDitrict}
+              value={isState.valueDitrict}
+              onChange={(e) => queryState({ valueDitrict: e })}
               isSearchable={true}
               LoadingIndicator
               maxMenuHeight="200px"
@@ -297,7 +266,6 @@ const FormInfo = (props) => {
               })}
               noOptionsMessage={() => "Không có dữ liệu"}
               menuPortalTarget={document.body}
-              onMenuOpen={handleMenuOpen}
               styles={{
                 placeholder: (base) => ({
                   ...base,
@@ -318,16 +286,9 @@ const FormInfo = (props) => {
             </label>
             <Select
               placeholder={dataLang?.suppliers_supplier_wards}
-              options={listWar}
-              value={
-                valueWa
-                  ? {
-                      label: listWar?.find((x) => x.value == valueWa)?.label,
-                      value: valueWa,
-                    }
-                  : null
-              }
-              onChange={handleChangeWar}
+              options={isState.dataWar}
+              value={isState.valueWa}
+              onChange={(e) => queryState({ valueWa: e })}
               isSearchable={true}
               LoadingIndicator
               maxMenuHeight="200px"
@@ -343,7 +304,6 @@ const FormInfo = (props) => {
               })}
               noOptionsMessage={() => "Không có dữ liệu"}
               menuPortalTarget={document.body}
-              onMenuOpen={handleMenuOpen}
               styles={{
                 placeholder: (base) => ({
                   ...base,
@@ -362,9 +322,9 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_adress}
           </label>
           <textarea
-            value={address}
+            value={isState.address}
             placeholder={dataLang?.suppliers_supplier_adress}
-            onChange={_HandleChangeInput.bind(this, "address")}
+            onChange={(e) => queryState({ address: e.target.value })}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] h-[40px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
@@ -375,9 +335,9 @@ const FormInfo = (props) => {
             {dataLang?.suppliers_supplier_note}
           </label>
           <textarea
-            value={note}
+            value={isState.note}
             placeholder={dataLang?.suppliers_supplier_note}
-            onChange={_HandleChangeInput.bind(this, "note")}
+            onChange={(e) => queryState({ note: e.target.value })}
             name="fname"
             type="text"
             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"

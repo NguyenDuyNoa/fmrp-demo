@@ -1,174 +1,120 @@
 import React, { useEffect, useRef, useState } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
 
 import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
 import {
     Edit as IconEdit,
     Trash as IconDelete,
     Grid6 as IconExcel,
     SearchNormal1 as IconSearch,
-    Refresh2,
 } from "iconsax-react";
-import Swal from "sweetalert2";
 
 import "react-phone-input-2/lib/style.css";
-import ReactExport from "react-data-export";
-import Select, { components } from "react-select";
-import { da } from "date-fns/locale";
+import Select from "react-select";
+import useToast from "@/hooks/useToast";
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Popup_groupKh = (props) => {
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
+    const isShow = useToast()
+
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+    const initialData = {
+        name: "",
+        errInput: false,
+        errInputBr: false,
+        valueBr: [],
+        listBr: [],
+        onSending: false,
+    }
 
-    const [onSending, sOnSending] = useState(false);
-    const [brandpOpt, sListBrand] = useState([]);
-    const [name, sName] = useState("");
-    const [color, sColor] = useState("");
-    const [errInput, sErrInput] = useState(false);
+    const [isState, sIsState] = useState(initialData)
 
-    const [errInputBr, sErrInputBr] = useState(false);
-    const [valueBr, sValueBr] = useState([]);
-    // const branch = valueBr.map(e => e.value)
-
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
     useEffect(() => {
-        sErrInputBr(false);
-        sErrInput(false);
-        sName(props.name ? props.name : "");
-        sColor(props.color ? props.color : "");
-        sListBrand(
-            props.listBr
-                ? props.listBr && [
-                      ...props.listBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
-                : []
-        );
-        sValueBr(
-            props.sValueBr
-                ? props.listBr && [
-                      ...props.sValueBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
-                : []
-        );
-    }, [open]);
-    const branch_id = valueBr?.map((e) => {
-        return e?.value;
-    });
-    const _HandleChangeInput = (type, value) => {
-        if (type == "name") {
-            sName(value.target?.value);
-        } else if (type == "valueBr") {
-            sValueBr(value);
-        } else if (type == "color") {
-            sColor(value.target?.value);
+        if (props?.id) {
+            queryState({
+                listBr: props?.isState?.listBr || [],
+                name: props?.name,
+                valueBr: props?.sValueBr?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+            })
+        } else {
+            sIsState(prev => {
+                return {
+                    ...prev,
+                    ...initialData,
+                    listBr: props?.isState?.listBr || [],
+                }
+            });
         }
-    };
+    }, [open]);
+
 
     useEffect(() => {
-        sErrInput(false);
-    }, [name.length > 0]);
+        isState.name == "" && queryState({ errInput: false });
+    }, [isState.name]);
+
     useEffect(() => {
-        sErrInputBr(false);
-    }, [branch_id?.length > 0]);
+        isState.valueBr?.length > 0 && queryState({ errInputBr: false });
+    }, [isState.valueBr]);
 
     const _ServerSending = () => {
         const id = props.id;
-        var data = new FormData();
-        data.append("name", name);
-        Axios(
-            "POST",
-            `${
-                props.id
-                    ? `/api_web/api_supplier/group/${id}?csrf_protection=true`
-                    : "/api_web/api_supplier/group/?csrf_protection=true"
-            }`,
+        let data = new FormData();
+        data.append("name", isState.name);
+        isState.valueBr?.forEach((e) => {
+            data.append("branch_id[]", e.value);
+        })
+        Axios("POST", `${props.id ? `/api_web/api_supplier/group/${id}?csrf_protection=true` : "/api_web/api_supplier/group/?csrf_protection=true"}`,
             {
-                data: {
-                    name: name,
-                    branch_id: branch_id,
-                },
+                data: data,
                 headers: { "Content-Type": "multipart/form-data" },
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    const { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
-                        sErrInput(false);
-                        sName("");
-                        sErrInputBr(false);
-                        sValueBr([]);
+                        isShow("success", `${props.dataLang[message]}` || message)
+                        sIsState(initialData);
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
+                        isShow("error", `${props.dataLang[message]}` || message)
                     }
                 }
-                sOnSending(false);
+                queryState({ onSending: false });
             }
         );
     };
     //da up date
     useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
+        isState.onSending && _ServerSending();
+    }, [isState.onSending]);
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (name.length == 0 || branch_id?.length == 0) {
-            name?.length == 0 && sErrInput(true);
-            branch_id?.length == 0 && sErrInputBr(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
+        if (isState.name == "" || isState.valueBr?.length == 0) {
+            isState.name == "" && queryState({ errInput: true });
+            isState.valueBr?.length == 0 && queryState({ errInputBr: true });
+            isShow("error", props.dataLang?.required_field_null);
         } else {
-            // sErrInput(false)
-            sOnSending(true);
+            queryState({ onSending: true });
         }
     };
     return (
         <PopupEdit
-            title={
-                props.id
-                    ? `${props.dataLang?.suppliers_groups_edit}`
-                    : `${props.dataLang?.suppliers_groups_add}`
-            }
-            button={
-                props.id ? (
-                    <IconEdit />
-                ) : (
-                    `${props.dataLang?.branch_popup_create_new}`
-                )
-            }
+            title={props.id ? `${props.dataLang?.suppliers_groups_edit}` : `${props.dataLang?.suppliers_groups_add}`}
+            button={props.id ? (<IconEdit />) : (`${props.dataLang?.branch_popup_create_new}`)}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}
@@ -183,17 +129,16 @@ const Popup_groupKh = (props) => {
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
-                                value={name}
-                                onChange={_HandleChangeInput.bind(this, "name")}
+                                value={isState.name}
+                                onChange={(e) => queryState({ name: e.target.value })}
                                 name="fname"
                                 type="text"
-                                className={`${
-                                    errInput
-                                        ? "border-red-500"
-                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none mb-2`}
+                                className={`${isState.errInput
+                                    ? "border-red-500"
+                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none mb-2`}
                             />
-                            {errInput && (
+                            {isState.errInput && (
                                 <label className="mb-2  text-[14px] text-red-500">
                                     {props.dataLang?.client_group_please_name}
                                 </label>
@@ -207,16 +152,13 @@ const Popup_groupKh = (props) => {
                             <Select
                                 closeMenuOnSelect={false}
                                 placeholder={props.dataLang?.client_list_brand}
-                                options={brandpOpt}
+                                options={isState.listBr}
                                 isSearchable={true}
-                                onChange={_HandleChangeInput.bind(
-                                    this,
-                                    "valueBr"
-                                )}
+                                onChange={(e) => queryState({ valueBr: e })}
                                 LoadingIndicator
                                 isMulti
                                 noOptionsMessage={() => "Không có dữ liệu"}
-                                value={valueBr}
+                                value={isState.valueBr}
                                 maxMenuHeight="200px"
                                 isClearable={true}
                                 menuPortalTarget={document.body}
@@ -241,13 +183,12 @@ const Popup_groupKh = (props) => {
                                         position: "absolute",
                                     }),
                                 }}
-                                className={`${
-                                    errInputBr
-                                        ? "border-red-500"
-                                        : "border-transparent"
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                className={`${isState.errInputBr
+                                    ? "border-red-500"
+                                    : "border-transparent"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                             />
-                            {errInputBr && (
+                            {isState.errInputBr && (
                                 <label className="mb-2  text-[14px] text-red-500">
                                     {props.dataLang?.client_list_bran}
                                 </label>

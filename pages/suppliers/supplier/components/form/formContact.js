@@ -6,6 +6,7 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.suppliers_supplier_fullname}</label>
             <input
                 value={e.full_name}
+                disabled={e?.idBe && e?.disble}
                 placeholder={dataLang?.suppliers_supplier_fullname}
                 onChange={_OnChangeOption.bind(this, e.id, "full_name")}
                 name="optionVariant"
@@ -14,6 +15,7 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
             />
             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.suppliers_supplier_phone}</label>
             <input
+                disabled={e?.idBe && e?.disble}
                 value={e.phone_number}
                 placeholder={dataLang?.suppliers_supplier_phone}
                 onChange={_OnChangeOption.bind(this, e.id, "phone_number")}
@@ -23,6 +25,7 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
             />
             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.suppliers_supplier_email}</label>
             <input
+                disabled={e?.idBe && e?.disble}
                 value={e.email}
                 placeholder={dataLang?.suppliers_supplier_email}
                 onChange={_OnChangeOption.bind(this, e.id, "email")}
@@ -32,6 +35,7 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
             />
             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.suppliers_supplier_pos}</label>
             <input
+                disabled={e?.idBe && e?.disble}
                 value={e.position}
                 placeholder={dataLang?.suppliers_supplier_pos}
                 onChange={_OnChangeOption.bind(this, e.id, "position")}
@@ -41,6 +45,7 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
             />
             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.suppliers_supplier_adress}</label>
             <textarea
+                disabled={e?.idBe && e?.disble}
                 value={e.address}
                 placeholder={dataLang?.suppliers_supplier_adress}
                 onChange={_OnChangeOption.bind(this, e.id, "address")}
@@ -48,7 +53,7 @@ const FormContact = ({ dataLang, e, _OnChangeOption, _HandleDelete }) => {
                 type="text"
                 className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
             />
-            <ButtonDelete onClick={() => _HandleDelete({ id: e.id, status: true })} />
+            <ButtonDelete onClick={() => _HandleDelete({ id: e.idFe, status: true, idChild: e?.idBe })} />
         </div>
     );
 };

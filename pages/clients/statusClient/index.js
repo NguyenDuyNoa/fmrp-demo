@@ -223,7 +223,7 @@ const Index = (props) => {
                             <div className="xl:space-y-3 space-y-2">
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-4">
-                                        <div className="grid grid-cols-9">
+                                        <div className="grid grid-cols-9 gap-2">
                                             <SearchComponent
                                                 dataLang={dataLang}
                                                 onChange={_HandleOnChangeKeySearch.bind(this)}

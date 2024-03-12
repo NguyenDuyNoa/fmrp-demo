@@ -39,7 +39,6 @@ const Expirred = () => {
             payload: checkDate,
         });
     }, [checkDate]);
-    console.log("data", data);
     return (
         <React.Fragment>
             {checkDate ? (

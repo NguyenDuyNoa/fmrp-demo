@@ -10,6 +10,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             {dataLang?.client_popup_fiandlass}
                         </label>
                         <input
+                            disabled={option?.idBe && option?.disble}
                             value={option.full_name}
                             onChange={(e) => onChangOptions(option.idFe, "full_name", e?.target.value)}
                             name="optionVariant"
@@ -21,6 +22,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             {dataLang?.client_popup_phone}
                         </label>
                         <input
+                            disabled={option?.idBe && option?.disble}
                             value={option.phone_number}
                             onChange={(e) => onChangOptions(option.idFe, "phone_number", e?.target.value)}
                             name="fname"
@@ -30,6 +32,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                         />
                         <label className="text-[#344054] font-normal text-sm mb-1 ">Email</label>
                         <input
+                            disabled={option?.idBe && option?.disble}
                             value={option.email}
                             onChange={(e) => onChangOptions(option.idFe, "email", e?.target.value)}
                             name="optionEmail"
@@ -41,6 +44,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             {dataLang?.client_popup_position}
                         </label>
                         <input
+                            disabled={option?.idBe && option?.disble}
                             value={option.position}
                             onChange={(e) => onChangOptions(option.idFe, "position", e?.target.value)}
                             name="fname"
@@ -52,6 +56,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             {dataLang?.client_popup_birthday}
                         </label>
                         <input
+                            disabled={option?.idBe && option?.disble}
                             value={option.birthday}
                             onChange={(e) => onChangOptions(option.idFe, "birthday", e?.target.value)}
                             name="fname"
@@ -62,6 +67,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             {dataLang?.client_popup_adress}
                         </label>
                         <textarea
+                            disabled={option?.idBe && option?.disble}
                             value={option.address}
                             onChange={(e) => onChangOptions(option.idFe, "address", e?.target.value)}
                             name="fname"
@@ -70,7 +76,7 @@ const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children 
                             className="focus:border-[#92BFF7] placeholder:text-xs border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
                         />
                     </div>
-                    <ButtoonDelete onClick={() => onDelete({ id: option.idFe, status: true })}>{children}</ButtoonDelete>
+                    <ButtoonDelete onClick={() => onDelete({ id: option.idFe, status: true, idChild: option?.idBe })}>{children}</ButtoonDelete>
                 </div>
             </div>
         </div>

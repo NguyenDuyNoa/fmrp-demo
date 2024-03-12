@@ -508,7 +508,7 @@ const Index = (props) => {
                                                                                 height={40}
                                                                                 defaultSrc="/user-placeholder.jpg"
                                                                                 alt="Image"
-                                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                                className="min-w-[40px] min-h-[40px] object-cover rounded-[100%] text-left cursor-pointer"
                                                                             />
                                                                         </Tooltip>
                                                                     </>
@@ -590,7 +590,6 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </ContainerTable>
-
                     </div>
                     {isState.data?.length != 0 && (
                         <div className="flex space-x-5 my-2 items-center">
