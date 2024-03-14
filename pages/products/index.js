@@ -684,16 +684,16 @@ const Index = (props) => {
                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] col-span-1 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-left">
                                                             {e?.note}
                                                         </h6>
-                                                        <div className="px-2 py-2.5 col-span-2 flex flex-wrap">
-                                                            {e?.branch.map((e) => (
-                                                                <h6
-                                                                    key={e?.id.toString()}
-                                                                    className="xl:text-[14px] text-xs mr-1 mb-1 xl:py-[1px] xl:px-1.5 px-0.5 text-[#0F4F9E] rounded border border-[#0F4F9E] h-fit font-[300] break-words"
+                                                        <h6 className="flex col-span-2  gap-1 flex-wrap">
+                                                            {e?.branch.map((i) => (
+                                                                <span
+                                                                    key={i}
+                                                                    className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
                                                                 >
-                                                                    {e?.name}
-                                                                </h6>
+                                                                    {i.name}
+                                                                </span>
                                                             ))}
-                                                        </div>
+                                                        </h6>
                                                         <div className="pl-2 py-2.5 col-span-1 flex space-x-2 justify-center">
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
