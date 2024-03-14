@@ -258,7 +258,7 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar>
+                            <Customscrollbar className="min:h-[200px] 3xl:h-[80%] xxl:h-[74%] 2xl:h-[76%] xl:h-[72%] lg:h-[82%] max:h-[400px] pb-2">
                                 <div className="w-[100%] lg:w-[100%] ">
                                     <div className="grid grid-cols-12 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
                                         <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-6 text-left">

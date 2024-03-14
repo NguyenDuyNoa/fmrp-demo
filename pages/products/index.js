@@ -558,15 +558,16 @@ const Index = (props) => {
                                         <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                             {dataLang?.category_titel}
                                         </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        {/* <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                             {dataLang?.code_finishedProduct}
+                                        </h4> */}
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
+                                            {dataLang?.product}
+                                            {/* {dataLang?.name_finishedProduct} */}
                                         </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.name_finishedProduct}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        {/* <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                             {dataLang?.type_finishedProduct}
-                                        </h4>
+                                        </h4> */}
                                         <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                             {dataLang?.unit || "unit"}
                                         </h4>
@@ -585,7 +586,7 @@ const Index = (props) => {
                                         <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                             {dataLang?.note || "note"}
                                         </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
                                             {dataLang?.client_list_brand || "client_list_brand"}
                                         </h4>
                                         <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
@@ -620,33 +621,35 @@ const Index = (props) => {
                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] col-span-1 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-left">
                                                             {e?.category_name}
                                                         </h6>
-                                                        <div className="3xl:text-base 2xl:text-[12.5px] col-span-1 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-left">
-                                                            <Popup_ThongTin
-                                                                id={e?.id}
-                                                                dataProductExpiry={dataProductExpiry}
-                                                                dataLang={dataLang}
-                                                            >
-                                                                <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none">
-                                                                    {e?.code}
-                                                                </button>
-                                                            </Popup_ThongTin>
+                                                        <div className="flex flex-col 3xl:text-base 2xl:text-[12.5px] col-span-2 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-left">
+                                                            <h6 className="">
+                                                                {e?.name}
+                                                            </h6>
+                                                            <h6>
+                                                                {dataLang?.code_finishedProduct || "code_finishedProduct"}: <Popup_ThongTin
+                                                                    id={e?.id}
+                                                                    dataProductExpiry={dataProductExpiry}
+                                                                    dataLang={dataLang}
+                                                                >
+                                                                    <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none">
+                                                                        {e?.code}
+                                                                    </button>
+                                                                </Popup_ThongTin>
+                                                            </h6>
+                                                            <h6 className="flex gap-1 items-center">
+                                                                <span
+                                                                    className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit w-fit font-[300] break-words leading-relaxed ${(e?.type_products?.id === 0 &&
+                                                                        "text-lime-500 border-lime-500") ||
+                                                                        (e?.type_products?.id === 1 &&
+                                                                            "text-orange-500 border-orange-500") ||
+                                                                        (e?.type_products?.id === 2 &&
+                                                                            "text-sky-500 border-sky-500")
+                                                                        }`}
+                                                                >
+                                                                    {dataLang[e?.type_products?.name] || ""}
+                                                                </span>
+                                                            </h6>
                                                         </div>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] col-span-1 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-left">
-                                                            {e?.name}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] col-span-1 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-left">
-                                                            <span
-                                                                className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit font-[300] break-words leading-relaxed ${(e?.type_products?.id === 0 &&
-                                                                    "text-lime-500 border-lime-500") ||
-                                                                    (e?.type_products?.id === 1 &&
-                                                                        "text-orange-500 border-orange-500") ||
-                                                                    (e?.type_products?.id === 2 &&
-                                                                        "text-sky-500 border-sky-500")
-                                                                    }`}
-                                                            >
-                                                                {dataLang[e?.type_products?.name] || ""}
-                                                            </span>
-                                                        </h6>
                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] col-span-1 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-center">
                                                             {e?.unit}
                                                         </h6>
@@ -681,7 +684,7 @@ const Index = (props) => {
                                                         <h6 className="3xl:text-base 2xl:text-[12.5px] col-span-1 xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5  rounded-md text-left">
                                                             {e?.note}
                                                         </h6>
-                                                        <div className="px-2 py-2.5 col-span-1 flex flex-wrap">
+                                                        <div className="px-2 py-2.5 col-span-2 flex flex-wrap">
                                                             {e?.branch.map((e) => (
                                                                 <h6
                                                                     key={e?.id.toString()}
