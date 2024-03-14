@@ -10,9 +10,7 @@ import {
 } from "iconsax-react";
 import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment/moment';
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+
 
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from '/services/axios';
@@ -22,6 +20,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 import useSetingServer from "@/hooks/useConfigNumber";
+import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 
 
 const PopupDetail = (props) => {
@@ -198,8 +197,8 @@ const PopupDetail = (props) => {
                                         :
                                         data?.items?.length > 0 ?
                                             (<>
-                                                <ScrollArea
-                                                    className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden" speed={1} smoothScrolling={true}>
+                                                <Customscrollbar
+                                                    className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden">
                                                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                                         {(data?.items?.map((e) =>
                                                             <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
@@ -252,7 +251,7 @@ const PopupDetail = (props) => {
                                                             </div>
                                                         ))}
                                                     </div>
-                                                </ScrollArea>
+                                                </Customscrollbar>
                                             </>
                                             ) :
                                             (

@@ -10,7 +10,11 @@ const useActionRole = (auth, type) => {
         "client_group": "client_group",
         "suppliers": "suppliers",
         "contacts_suppliers": "contacts_suppliers",
-        "suppliers_groups": "suppliers_groups"
+        "suppliers_groups": "suppliers_groups",
+        "material_category": "material_category",
+        "materials": "materials",
+        "category_products": "category_products",
+        "products": "products"
         // Thêm các type ||  nameModel
 
 

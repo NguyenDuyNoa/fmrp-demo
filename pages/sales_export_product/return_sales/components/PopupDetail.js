@@ -28,9 +28,6 @@ import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
@@ -44,6 +41,7 @@ import { useEffect } from "react";
 
 import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -279,10 +277,7 @@ const PopupDetail = (props) => {
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
+                                            <Customscrollbar className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
@@ -339,7 +334,7 @@ const PopupDetail = (props) => {
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                         {e?.item?.serial == null ||
-                                                                                        e?.item?.serial == ""
+                                                                                            e?.item?.serial == ""
                                                                                             ? "-"
                                                                                             : e?.item?.serial}
                                                                                     </h6>
@@ -348,7 +343,7 @@ const PopupDetail = (props) => {
                                                                                 ""
                                                                             )}
                                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                                dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
@@ -356,7 +351,7 @@ const PopupDetail = (props) => {
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                             {e?.item?.lot == null ||
-                                                                                            e?.item?.lot == ""
+                                                                                                e?.item?.lot == ""
                                                                                                 ? "-"
                                                                                                 : e?.item?.lot}
                                                                                         </h6>
@@ -368,9 +363,9 @@ const PopupDetail = (props) => {
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                             {e?.item?.expiration_date
                                                                                                 ? moment(
-                                                                                                      e?.item
-                                                                                                          ?.expiration_date
-                                                                                                  ).format("DD/MM/YYYY")
+                                                                                                    e?.item
+                                                                                                        ?.expiration_date
+                                                                                                ).format("DD/MM/YYYY")
                                                                                                 : "-"}
                                                                                         </h6>
                                                                                     </div>
@@ -425,7 +420,7 @@ const PopupDetail = (props) => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
                                     ) : (
                                         <div className=" max-w-[352px] mt-24 mx-auto">

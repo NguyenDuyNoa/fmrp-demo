@@ -7,7 +7,6 @@ import ModalImage from "react-modal-image";
 import React, { useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
 
 import PopupEdit from "@/components/UI/popup";
@@ -23,6 +22,7 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useFeature from "@/hooks/useConfigFeature";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
@@ -427,10 +427,8 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                 <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
-                                    <ScrollArea
+                                    <Customscrollbar
                                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                        speed={1}
-                                        smoothScrolling={true}
                                     >
                                         <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                             {data?.items?.map((e) => (
@@ -656,7 +654,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                 </div>
                                             ))}
                                         </div>
-                                    </ScrollArea>
+                                    </Customscrollbar>
                                 </>
                             ) : (
                                 <div className=" max-w-[352px] mt-24 mx-auto">

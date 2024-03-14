@@ -11,15 +11,13 @@ import { registerLocale } from "react-datepicker";
 import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import formatMoney from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const PopupDetailProduct = (props) => {
     const scrollAreaRef = useRef(null);
@@ -269,10 +267,8 @@ const PopupDetailProduct = (props) => {
                                 <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
-                                    <ScrollArea
+                                    <Customscrollbar
                                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                        speed={1}
-                                        smoothScrolling={true}
                                     >
                                         <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                             {data?.items?.map((e) => (
@@ -336,7 +332,7 @@ const PopupDetailProduct = (props) => {
                                                 </div>
                                             ))}
                                         </div>
-                                    </ScrollArea>
+                                    </Customscrollbar>
                                 </>
                             ) : (
                                 <div className=" max-w-[352px] mt-24 mx-auto">

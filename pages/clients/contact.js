@@ -29,6 +29,7 @@ import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import NoData from "@/components/UI/noData/nodata";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -338,7 +339,7 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="min:h-[200px] h-[90%] max:h-[650px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <Customscrollbar className="min:h-[200px] h-[90%] max:h-[750px] pb-2">
                                 {/* <div className="h-[100%] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
                                 <div className="w-[100%] lg:w-[100%] ">
                                     <div className="grid grid-cols-12 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
@@ -417,7 +418,7 @@ const Index = (props) => {
                                         <NoData />
                                     )}
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (

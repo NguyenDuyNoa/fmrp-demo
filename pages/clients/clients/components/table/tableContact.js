@@ -3,6 +3,7 @@ import Link from "next/link";
 import Loading from "components/UI/loading";
 import dynamic from "next/dynamic";
 import moment from "moment";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
@@ -10,7 +11,7 @@ const TableContact = (props) => {
   return (
     <div>
       <div className="w-[930px]">
-        <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+        <Customscrollbar className="min:h-[200px] h-[72%] max:h-[400px] pb-2">
           <div className="pr-2 w-[100%] lx:w-[110%] ">
             <div className="flex items-center sticky top-0 bg-slate-100  z-10 ">
               <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[20%] font-[400] text-center">
@@ -86,7 +87,7 @@ const TableContact = (props) => {
               </div>
             )}
           </div>
-        </div>
+        </Customscrollbar>
       </div>
     </div>
   );

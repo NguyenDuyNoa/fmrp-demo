@@ -26,9 +26,9 @@ import ModalImage from "react-modal-image";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useFeature from "@/hooks/useConfigFeature";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
 
 const Popup_DetailKeepStock = (props) => {
@@ -396,11 +396,8 @@ const Popup_DetailKeepStock = (props) => {
                                 <Loading className="max-h-28" color="#0f4f9e" />
                             ) : dataClone?.transfer?.length > 0 ? (
                                 <>
-                                    <ScrollArea
-                                        stopScrollPropagation={true}
+                                    <Customscrollbar
                                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                        speed={1}
-                                        smoothScrolling={true}
                                     >
                                         <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
                                             {dataClone?.transfer?.map((e) => {
@@ -493,11 +490,8 @@ const Popup_DetailKeepStock = (props) => {
                                                                         </h6>
                                                                     </div>
 
-                                                                    <ScrollArea
-                                                                        stopScrollPropagation={true}
+                                                                    <Customscrollbar
                                                                         className="min-h-[90px] mx-5  max-h-[170px] col-span-10 2xl:max-h-[250px] overflow-hidden"
-                                                                        speed={1}
-                                                                        smoothScrolling={true}
                                                                     >
                                                                         <div className="max-h-[300px] col-span-10 grid grid-cols-10 items-center ">
                                                                             {e?.items?.map((e, index) => (
@@ -645,7 +639,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                 </div>
                                                                             ))}
                                                                         </div>
-                                                                    </ScrollArea>
+                                                                    </Customscrollbar>
                                                                 </>
                                                             )}
                                                         </div>
@@ -653,7 +647,7 @@ const Popup_DetailKeepStock = (props) => {
                                                 );
                                             })}
                                         </div>
-                                    </ScrollArea>
+                                    </Customscrollbar>
                                 </>
                             ) : (
                                 <div className=" max-w-[352px] mt-24 mx-auto">

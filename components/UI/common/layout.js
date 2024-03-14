@@ -13,8 +13,9 @@ export const Container = ({ children }) => {
 
 export const ContainerBody = ({ children }) => {
     return (
-        <div className="grid grid-cols gap-1 h-[100%] overflow-hidden col-span-7 flex-col justify-between">
-            <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
+        <div className=" gap-1 h-[100%] overflow-hidden col-span-7 flex-col justify-between">
+            <div className="h-[100%] flex flex-col justify-between overflow-hidden">
+                {/* <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden"> */}
                 {children}
             </div>
         </div>

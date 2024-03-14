@@ -1386,10 +1386,10 @@ const DropdownAvatar = React.memo(() => {
                                 <Image
                                     alt=""
                                     src={auth?.user_avatar}
-                                    width={35.5}
-                                    height={35.5}
+                                    width={40}
+                                    height={40}
                                     quality={100}
-                                    className="lg:min-w-[20px] object-cover rounded-full"
+                                    className="object-cover min-w-[40px] min-h-[40px] rounded-full"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1398,10 +1398,10 @@ const DropdownAvatar = React.memo(() => {
                                 <Image
                                     alt=""
                                     src={"/avatar_null.png"}
-                                    width={35.5}
-                                    height={35.5}
+                                    width={40}
+                                    height={40}
                                     quality={100}
-                                    className="object-cover rounded-full"
+                                    className="object-cover min-w-[40px] min-h-[40px] rounded-full"
                                     loading="lazy"
                                     crossOrigin="anonymous"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1438,7 +1438,7 @@ const DropdownAvatar = React.memo(() => {
                                         width={40}
                                         height={40}
                                         quality={100}
-                                        className="object-cover rounded-full"
+                                        className="object-cover min-w-[40px] min-h-[40px] rounded-full"
                                         loading="lazy"
                                         crossOrigin="anonymous"
                                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1447,10 +1447,10 @@ const DropdownAvatar = React.memo(() => {
                                     <Image
                                         alt=""
                                         src={"/avatar_null.png"}
-                                        width={35.5}
-                                        height={35.5}
+                                        width={40}
+                                        height={40}
                                         quality={100}
-                                        className="object-cover rounded-full"
+                                        className="object-cover min-w-[40px] min-h-[40px] rounded-full"
                                         loading="lazy"
                                         crossOrigin="anonymous"
                                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="

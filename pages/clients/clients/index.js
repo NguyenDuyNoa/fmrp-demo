@@ -39,6 +39,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
 import NoData from "@/components/UI/noData/nodata";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -432,7 +433,7 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="min:h-[200px] 3xl:h-[80%] xxl:h-[74%] 2xl:h-[76%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <Customscrollbar>
                                 <div className="w-[100%] lg:w-[100%] ">
                                     <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                         <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
@@ -466,7 +467,7 @@ const Index = (props) => {
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
-                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
+                                        <Customscrollbar className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                             {isState.data?.map((e) => (
                                                 <div
                                                     className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
@@ -583,12 +584,12 @@ const Index = (props) => {
                                                     </div>
                                                 </div>
                                             ))}
-                                        </div>
+                                        </Customscrollbar>
                                     ) : (
                                         <NoData />
                                     )}
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (

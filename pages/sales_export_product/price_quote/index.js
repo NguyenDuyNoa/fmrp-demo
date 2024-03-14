@@ -39,6 +39,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import { Container, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 registerLocale("vi", vi);
 
 
@@ -614,7 +615,7 @@ const Index = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <Customscrollbar >
                                     <div className="w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center whitespace-nowrap">
@@ -794,7 +795,7 @@ const Index = (props) => {
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </ContainerTable>
                         </div>
                         <ContainerTotal>
@@ -841,7 +842,7 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"price_quote"}
+                nameModel={"price_quote_status"}
                 title={TITLE_STATUS}
                 status={status}
                 subtitle={CONFIRMATION_OF_CHANGES}

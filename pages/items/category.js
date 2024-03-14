@@ -1,7 +1,8 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -11,51 +12,41 @@ import {
     ArrowDown2 as IconDown,
     Trash as IconDelete,
     Edit as IconEdit,
+    Grid6,
 } from "iconsax-react";
 
-import Swal from "sweetalert2";
-
-import Select, { components } from "react-select";
-
-import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+
+import Popup_NVL from "./components/category/popup";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { debounce } from "lodash";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
-const CustomSelectOption = ({ value, label, level, code }) => (
-    <div className="flex space-x-2 truncate">
-        {level == 1 && <span>--</span>}
-        {level == 2 && <span>----</span>}
-        {level == 3 && <span>------</span>}
-        {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
-    </div>
-);
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
+import BtnAction from "@/components/UI/BtnAction";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
+
+    const isShow = useToast()
 
     const dispatch = useDispatch();
 
@@ -87,6 +78,11 @@ const Index = (props) => {
     const [keySearch, sKeySearch] = useState("");
 
     const { limit, updateLimit: sLimit, totalItems: totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkExport } = useActionRole(auth, 'material_category');
+
 
     const _ServerFetching = () => {
         Axios(
@@ -172,12 +168,6 @@ const Index = (props) => {
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 1500);
         sOnFetching(true);
     }, 500)
 
@@ -237,240 +227,194 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.header_category_material_group}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between">
-                <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.list_btn_seting_category}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6 className="text-[#141522]/40">{dataLang?.header_category_material}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>{dataLang?.header_category_material_group}</h6>
-                        </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                        <h2 className="xl:text-3xl text-xl font-medium ">{dataLang?.category_material_group_title}</h2>
-                        <div className="flex space-x-3 items-center">
-                            <Popup_NVL
-                                onRefresh={_ServerFetching.bind(this)}
-                                onRefreshOpt={_ServerFetchingOtp.bind(this)}
-                                dataLang={dataLang}
-                                data={data}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                            />
-                        </div>
+            <Container>
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.header_category_material || "header_category_material"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{dataLang?.header_category_material_group || "header_category_material_group"}</h6>
                     </div>
-
-                    <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
-                        <div className="col-span-4">
-                            <div className="grid grid-cols-5 gap-2">
-                                <SearchComponent
-                                    dataLang={dataLang}
-                                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                                    colSpan={1}
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: "Chọn chi nhánh",
-                                            isDisabled: true,
-                                        },
-                                        ...options,
-                                    ]}
-                                    onChange={_HandleFilterOpt.bind(this, "branch")}
-                                    value={idBranch}
-                                    placeholder={dataLang?.client_list_filterbrand}
-                                    colSpan={idBranch?.length > 1 ? 3 : 1}
-                                    components={{ MultiValue }}
-                                    isMulti={true}
-                                    closeMenuOnSelect={false}
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: "Chọn mã danh mục",
-                                            isDisabled: true,
-                                        },
-                                        ...dataOption,
-                                    ]}
-                                    onChange={_HandleFilterOpt.bind(this, "category")}
-                                    value={idCategory}
-                                    placeholder="Chọn mã danh mục"
-                                    colSpan={1}
-                                    formatOptionLabel={CustomSelectOption}
-                                />
-                                {/* <div className="ml-1 col-span-1">
-                                    <Select
-                                        // options={dataOption}
-                                        options={[
-                                            {
-                                                value: "",
-                                                label: "Chọn mã danh mục",
-                                                isDisabled: true,
-                                            },
-                                            ...dataOption,
-                                        ]}
-                                        formatOptionLabel={CustomSelectOption}
-                                        onChange={_HandleFilterOpt.bind(this, "category")}
-                                        value={idCategory}
-                                        isClearable={true}
-                                        placeholder="Chọn mã danh mục"
-                                        className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
-                                        isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                border: "none",
-                                                outline: "none",
-                                                boxShadow: "none",
-                                                ...(state.isFocused && {
-                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                }),
-                                            }),
-                                        }}
-                                    />
-                                </div> */}
-                            </div>
-                        </div>
-                        <div className="col-span-2">
-                            <div className="flex space-x-2 items-center justify-end">
-                                <OnResetData sOnFetching={sOnFetching} />
-                                {data.length != 0 && (
-                                    <ExcelFileComponent
-                                        multiDataSet={multiDataSet}
-                                        filename="Nhóm nvl"
-                                        title="Hiii"
+                )}
+                <ContainerBody>
+                    <div className="space-y-3 h-[96%] overflow-hidden">
+                        <div className="flex justify-between  mt-1 mr-2">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                {dataLang?.category_material_group_title}
+                            </h2>
+                            <div className="flex justify-end items-center gap-2">
+                                {role == true || checkAdd ?
+                                    <Popup_NVL
+                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefreshOpt={_ServerFetchingOtp.bind(this)}
                                         dataLang={dataLang}
-                                    />
-                                )}
-
-                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="min:h-[500px] h-[91%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="xl:w-[100%] w-[110%] pr-2">
-                            <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10 ">
-                                <div className="w-[2%] flex justify-center">
-                                    <input type="checkbox" className="scale-125" />
-                                </div>
-                                <h4 className="w-[8%]" />
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[16%] font-[600] text-center">
-                                    {dataLang?.category_material_group_code}
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[25%] font-[600] truncate text-center">
-                                    {dataLang?.category_material_group_name}
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
-                                    {dataLang?.client_popup_note}
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[24%] font-[600] text-center">
-                                    Chi nhánh
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
-                                    {dataLang?.branch_popup_properties}
-                                </h4>
-                            </div>
-                            <div className="divide-y divide-slate-200">
-                                {
-                                    onFetching ? (
-                                        <Loading />
-                                    ) : data?.length > 0 ? (
-                                        data.map((e) => (
-                                            <Items
-                                                onRefresh={_ServerFetching.bind(this)}
-                                                onRefreshOpt={_ServerFetchingOtp.bind(this)}
-                                                dataLang={dataLang}
-                                                key={e.id}
-                                                data={e}
-                                            />
-                                        ))
-                                    ) : (
-                                        // {!onFetching && data?.length == 0 && (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    Không tìm thấy các mục
-                                                </h1>
-                                            </div>
-                                        </div>
-                                    )
-                                    // )}
-                                    // {onFetching && <Loading />}
+                                        data={data}
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            isShow("warning", WARNING_STATUS_ROLE);
+                                        }}
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    >{dataLang?.branch_popup_create_new}
+                                    </button>
                                 }
                             </div>
                         </div>
+                        <ContainerTable>
+                            <div className="xl:space-y-3 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-4">
+                                        <div className="grid grid-cols-9 gap-2">
+                                            <SearchComponent
+                                                dataLang={dataLang}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                colSpan={2}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...options,
+                                                ]}
+                                                isClearable={true}
+                                                onChange={_HandleFilterOpt.bind(this, "branch")}
+                                                value={idBranch}
+                                                placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
+                                                colSpan={3}
+                                                components={{ MultiValue }}
+                                                isMulti={true}
+                                                closeMenuOnSelect={false}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.category_material_group_code || "category_material_group_code",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...dataOption,
+                                                ]}
+                                                isClearable={true}
+                                                onChange={_HandleFilterOpt.bind(this, "category")}
+                                                value={idCategory}
+                                                placeholder={dataLang?.category_material_group_code || "category_material_group_code"}
+                                                colSpan={3}
+                                                formatOptionLabel={SelectOptionLever}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <div className="flex space-x-2 items-center justify-end">
+                                            <OnResetData sOnFetching={sOnFetching} />
+
+                                            {(role == true || checkExport) ?
+                                                <div className={``}>
+                                                    {data?.length > 0 && (
+                                                        <ExcelFileComponent
+                                                            multiDataSet={multiDataSet}
+                                                            filename="Nhóm nvl"
+                                                            title="Hiii"
+                                                            dataLang={dataLang}
+                                                        />
+                                                    )}
+                                                </div>
+                                                :
+                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                </button>
+                                            }
+                                            <div>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <Customscrollbar className="min:h-[200px] h-[90%] max:h-[650px]o pb-2">
+                                <div className="w-[100%] lg:w-[100%] ">
+                                    <div className="grid grid-cols-11 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10 ">
+                                        {/* <div className="col-span-1 flex justify-center">
+                                            <input type="checkbox" className="scale-125" />
+                                        </div> */}
+                                        <h4 className="col-span-1" />
+                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.category_material_group_code}
+                                        </h4>
+                                        <h4 className="col-span-3 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.category_material_group_name}
+                                        </h4>
+                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.client_popup_note}
+                                        </h4>
+                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            Chi nhánh
+                                        </h4>
+                                        <h4 className="col-span-1 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.branch_popup_properties}
+                                        </h4>
+                                    </div>
+                                    <div className="divide-y divide-slate-200">
+                                        {
+                                            onFetching ? (
+                                                <Loading />
+                                            ) : data?.length > 0 ? (
+                                                data.map((e) => (
+                                                    <Items
+                                                        onRefresh={_ServerFetching.bind(this)}
+                                                        onRefreshOpt={_ServerFetchingOtp.bind(this)}
+                                                        dataLang={dataLang}
+                                                        key={e.id}
+                                                        data={e}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <NoData />
+                                            )
+                                        }
+                                    </div>
+                                </div>
+                            </Customscrollbar>
+                        </ContainerTable>
                     </div>
-                </div>
-                {data?.length != 0 && (
-                    <div className="flex space-x-5 items-center">
-                        <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
-                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
-                        </h6>
-                        <Pagination
-                            postsPerPage={limit}
-                            totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                            paginate={paginate}
-                            currentPage={router.query?.page || 1}
-                        />
-                    </div>
-                )}
-            </div>
+                    {data?.length != 0 && (
+                        <div className="flex space-x-5 my-2 items-center">
+                            <h6>
+                                {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
+                                {/* trong số {totalItems?.iTotalRecords} biến thể */}
+                            </h6>
+                            <Pagination
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page || 1}
+                            />
+                        </div>
+                    )}
+                </ContainerBody>
+            </Container>
         </React.Fragment>
     );
 };
 
 const Items = React.memo((props) => {
+    const isShow = useToast();
+
     const [hasChild, sHasChild] = useState(false);
 
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
-    const isShow = useToast();
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { isOpen, isId, handleQueryId } = useToggle();
+    const { checkEdit } = useActionRole(auth, 'material_category');
 
-    const handleDelete = () => {
-        Axios("DELETE", `/api_web/api_material/category/${isId}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var { isSuccess, message } = response.data;
-                if (isSuccess) {
-                    isShow("success", props.dataLang[message]);
-                } else {
-                    isShow("success", props.dataLang[message]);
-                }
-            }
-            props.onRefresh && props.onRefresh();
-            props.onRefreshOpt && props.onRefreshOpt();
-        });
-
-        handleQueryId({ status: false });
-    };
 
     useEffect(() => {
         sHasChild(false);
@@ -478,11 +422,8 @@ const Items = React.memo((props) => {
 
     return (
         <div key={props.data?.id}>
-            <div className="flex items-center py-2 px-2 bg-white hover:bg-slate-50 relative">
-                <div className="w-[2%] flex justify-center">
-                    <input type="checkbox" className="scale-125" />
-                </div>
-                <div className="w-[8%] flex justify-center">
+            <div className="grid grid-cols-11 items-center py-2 px-2 bg-white hover:bg-slate-50 relative">
+                <div className="col-span-1 flex justify-center">
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
@@ -493,46 +434,51 @@ const Items = React.memo((props) => {
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </div>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[16%]">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.code}
                 </h6>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[25%] truncate">
+                <h6 className="col-span-3 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.name}
                 </h6>
-                <h6 className="px-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[15%] ">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.note}
                 </h6>
-                <div className="w-[24%] flex flex-wrap px-2">
-                    {props.data?.branch.map((e) => (
-                        <h6
-                            key={e?.id.toString()}
-                            className="text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit"
-                        >
-                            {e?.name}
-                        </h6>
-                    ))}
-                </div>
-                <div className="w-[10%] flex justify-center space-x-2">
-                    <Popup_NVL
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                    <span className="flex gap-2 flex-wrap justify-start ">
+                        {props.data?.branch?.map((e) => (
+                            <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                {e.name}
+                            </span>
+                        ))}
+                    </span>
+
+                </h6>
+                <div className="col-span-1 flex justify-center space-x-2">
+                    {role == true || checkEdit ?
+                        <Popup_NVL
+                            onRefresh={props.onRefresh}
+                            onRefreshOpt={props.onRefreshOpt}
+                            dataLang={props.dataLang}
+                            data={props.data}
+                            dataOption={props.dataOption}
+                        />
+                        :
+                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
+                    }
+                    <BtnAction
                         onRefresh={props.onRefresh}
-                        onRefreshOpt={props.onRefreshOpt}
+                        onRefreshGroup={props.onRefreshOpt}
                         dataLang={props.dataLang}
-                        data={props.data}
-                        dataOption={props.dataOption}
+                        id={props.data?.id}
+                        type="material_category"
                     />
-                    <button
-                        onClick={() => handleQueryId({ id: props.data?.id, status: true })}
-                        className="xl:text-base text-xs outline-none"
-                    >
-                        <IconDelete color="red" />
-                    </button>
+
                 </div>
             </div>
             {hasChild && (
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
                         <ItemsChild
-                            onClick={() => handleQueryId({ id: e.id, status: true })}
                             onRefresh={props.onRefresh}
                             onRefreshOpt={props.onRefreshOpt}
                             dataLang={props.dataLang}
@@ -541,7 +487,6 @@ const Items = React.memo((props) => {
                             grandchild="0"
                             children={e?.children?.map((e) => (
                                 <ItemsChild
-                                    onClick={() => handleQueryId({ id: e.id, status: true })}
                                     onRefresh={props.onRefresh}
                                     onRefreshOpt={props.onRefreshOpt}
                                     dataLang={props.dataLang}
@@ -550,7 +495,6 @@ const Items = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={() => handleQueryId({ id: e.id, status: true })}
                                             onRefresh={props.onRefresh}
                                             onRefreshOpt={props.onRefreshOpt}
                                             dataLang={props.dataLang}
@@ -565,36 +509,31 @@ const Items = React.memo((props) => {
                     ))}
                 </div>
             )}
-            <PopupConfim
-                type="warning" dataLang={props.dataLang}
-                title={TITLE_DELETE}
-                subtitle={CONFIRM_DELETION}
-                isOpen={isOpen}
-                save={handleDelete}
-                cancel={() => handleQueryId({ status: false })}
-            />
         </div>
     );
 });
 
 const ItemsChild = React.memo((props) => {
+    const isShow = useToast()
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    const { checkEdit } = useActionRole(auth, 'material_category');
     return (
         <React.Fragment key={props.data?.id}>
-            <div className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
+            <div className={`grid grid-cols-11 items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
                 {props.data?.level == "3" && (
-                    <div className="w-[10%] h-full flex justify-center items-center pl-24">
+                    <div className="col-span-1 h-full flex justify-center items-center pl-24">
                         <IconDown className="rotate-45" />
                     </div>
                 )}
                 {props.data?.level == "2" && (
-                    <div className="w-[10%] h-full flex justify-center items-center pl-12">
+                    <div className="col-span-1 h-full flex justify-center items-center pl-12">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
                     </div>
                 )}
                 {props.data?.level == "1" && (
-                    <div className="w-[10%] h-full flex justify-center items-center ">
+                    <div className="col-span-1 h-full flex justify-center items-center ">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
@@ -602,36 +541,40 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className="mt-1.5" />
                     </div>
                 )}
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[16%]">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.code}
                 </h6>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[25%] truncate">
+                <h6 className="col-span-3 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.name}
                 </h6>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[15%]">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.note}
                 </h6>
-                {/* <h6 className='xl:text-base text-xs px-2 w-[24%]'>{props.data?.note}</h6> */}
-                <div className="w-[24%] flex flex-wrap px-2">
+                <div className="col-span-2 gap-2 flex flex-wrap px-2">
                     {props.data?.branch.map((e) => (
-                        <h6
-                            key={e?.id.toString()}
-                            className="text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit"
-                        >
-                            {e?.name}
-                        </h6>
+                        <span key={e?.id} className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                            {e.name}
+                        </span>
                     ))}
                 </div>
-                <div className="w-[10%] flex justify-center space-x-2">
-                    <Popup_NVL
+                <div className="col-span-1 flex justify-center space-x-2">
+                    {role == true || checkEdit ?
+                        <Popup_NVL
+                            onRefresh={props.onRefresh}
+                            onRefreshOpt={props.onRefreshOpt}
+                            dataLang={props.dataLang}
+                            data={props.data}
+                        />
+                        :
+                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
+                    }
+                    <BtnAction
                         onRefresh={props.onRefresh}
-                        onRefreshOpt={props.onRefreshOpt}
+                        onRefreshGroup={props.onRefreshOpt}
                         dataLang={props.dataLang}
-                        data={props.data}
+                        id={props.data?.id}
+                        type="material_category"
                     />
-                    <button onClick={props.onClick} className="xl:text-base text-xs">
-                        <IconDelete color="red" />
-                    </button>
                 </div>
             </div>
             {props.children}
@@ -639,356 +582,5 @@ const ItemsChild = React.memo((props) => {
     );
 });
 
-const Popup_NVL = React.memo((props) => {
-    const dataOptBranch = useSelector((state) => state.branch);
-
-    const [dataOption, sDataOption] = useState([]);
-
-    const isShow = useToast();
-
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-
-    const [onFetching, sOnFetching] = useState(false);
-    const [onSending, sOnSending] = useState(false);
-
-    const [branch, sBranch] = useState([]);
-    const branch_id = branch?.map((e) => e.value);
-
-    const [code, sCode] = useState("");
-    const [name, sName] = useState("");
-    const [editorValue, sEditorValue] = useState("");
-
-    const [errBranch, sErrBranch] = useState(false);
-    const [errCode, sErrCode] = useState(false);
-    const [errName, sErrName] = useState(false);
-
-    useEffect(() => {
-        open && sCode(props.data?.code ? props.data?.code : "");
-        open && sName(props.data?.name ? props.data?.name : "");
-        open && sEditorValue(props.data?.note ? props.data?.note : "");
-        open && sIdCategory(props.data?.parent_id ? props.data?.parent_id : null);
-        open &&
-            sBranch(
-                props.data?.branch?.length > 0
-                    ? props.data?.branch?.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    }))
-                    : []
-            );
-        open && sErrCode(false);
-        open && sErrName(false);
-        open && sErrBranch(false);
-        open && sOnFetching(true);
-    }, [open]);
-
-    const _HandleChangeInput = (type, value) => {
-        if (type == "name") {
-            sName(value.target?.value);
-        } else if (type == "code") {
-            sCode(value.target?.value);
-        } else if (type == "editor") {
-            sEditorValue(value.target?.value);
-        } else if (type == "branch") {
-            sBranch(value);
-        }
-    };
-
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `${props.data?.id
-                ? `/api_web/api_material/categoryOption/${props.data?.id}?csrf_protection=true`
-                : "api_web/api_material/categoryOption?csrf_protection=true"
-            }`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOption(
-                        rResult.map((e) => ({
-                            label: e.name + " " + "(" + e.code + ")",
-                            value: e.id,
-                            level: e.level,
-                        }))
-                    );
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    const _ServerSending = () => {
-        var formData = new FormData();
-
-        formData.append("code", code);
-        formData.append("name", name);
-        formData.append("note", editorValue);
-        formData.append("parent_id", idCategory ? idCategory : null);
-        branch_id.forEach((id) => formData.append("branch_id[]", id));
-
-        Axios(
-            "POST",
-            `${props.data?.id
-                ? `/api_web/api_material/category/${props.data?.id}?csrf_protection=true`
-                : "/api_web/api_material/category?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
-                        sName("");
-                        sCode("");
-                        sEditorValue("");
-                        sIdCategory([]);
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshOpt && props.onRefreshOpt();
-                        sOpen(false);
-                    } else {
-                        isShow("error", props.dataLang[message]);
-                    }
-                    sOnSending(false);
-                }
-            }
-        );
-    };
-
-    useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
-
-    const _HandleSubmit = (e) => {
-        e.preventDefault();
-        if (name?.length == 0 || code?.length == 0 || branch?.length == 0) {
-            name?.length == 0 && sErrName(true);
-            code?.length == 0 && sErrCode(true);
-            branch?.length == 0 && sErrBranch(true);
-            isShow("error", props.dataLang?.required_field_null);
-        } else {
-            sOnSending(true);
-        }
-    };
-
-    useEffect(() => {
-        sErrName(false);
-    }, [name?.length > 0]);
-
-    useEffect(() => {
-        sErrCode(false);
-    }, [code?.length > 0]);
-
-    useEffect(() => {
-        sErrBranch(false);
-    }, [branch?.length > 0]);
-
-    const [idCategory, sIdCategory] = useState(null);
-
-    const valueIdCategory = (e) => sIdCategory(e?.value);
-
-    return (
-        <PopupEdit
-            title={
-                props.data?.id
-                    ? `${props.dataLang?.category_material_group_edit}`
-                    : `${props.dataLang?.category_material_group_addnew}`
-            }
-            button={props.data?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
-            onClickOpen={_ToggleModal.bind(this, true)}
-            open={open}
-            onClose={_ToggleModal.bind(this, false)}
-            classNameBtn={props.className}
-        >
-            <div className="py-4 w-[600px] space-y-5">
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
-                        <span className="text-red-500">*</span>
-                    </label>
-                    <Select
-                        options={dataOptBranch}
-                        formatOptionLabel={CustomSelectOption}
-                        value={branch}
-                        onChange={_HandleChangeInput.bind(this, "branch")}
-                        isClearable={true}
-                        placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
-                        isMulti
-                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                        closeMenuOnSelect={false}
-                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                        theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                                ...theme.colors,
-                                primary25: "#EBF5FF",
-                                primary50: "#92BFF7",
-                                primary: "#0F4F9E",
-                            },
-                        })}
-                        styles={{
-                            placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                            }),
-                        }}
-                    />
-                    {errBranch && (
-                        <label className="text-sm text-red-500">
-                            {props.dataLang?.client_list_bran || "client_list_bran"}
-                        </label>
-                    )}
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_code} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        value={code}
-                        onChange={_HandleChangeInput.bind(this, "code")}
-                        type="text"
-                        placeholder={props.dataLang?.category_material_group_code}
-                        className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
-                    />
-                    {errCode && (
-                        <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_code}
-                        </label>
-                    )}
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_name} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        value={name}
-                        onChange={_HandleChangeInput.bind(this, "name")}
-                        type="text"
-                        placeholder={props.dataLang?.category_material_group_name}
-                        className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
-                    />
-                    {errName && (
-                        <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_name}
-                        </label>
-                    )}
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_level}
-                    </label>
-                    <Select
-                        options={dataOption}
-                        formatOptionLabel={CustomSelectOption}
-                        defaultValue={
-                            idCategory == "0" || !idCategory
-                                ? {
-                                    label: `${props.dataLang?.category_material_group_level}`,
-                                }
-                                : {
-                                    label: dataOption.find((x) => x?.parent_id == idCategory)?.label,
-                                    code: dataOption.find((x) => x?.parent_id == idCategory)?.code,
-                                    value: idCategory,
-                                }
-                        }
-                        value={
-                            idCategory == "0" || !idCategory
-                                ? { label: "Nhóm cha", code: "nhóm cha" }
-                                : {
-                                    label: dataOption.find((x) => x?.value == idCategory)?.label,
-                                    code: dataOption.find((x) => x?.value == idCategory)?.code,
-                                    value: idCategory,
-                                }
-                        }
-                        onChange={valueIdCategory.bind(this)}
-                        isClearable={true}
-                        placeholder={props.dataLang?.category_material_group_level}
-                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
-                        isSearchable={true}
-                        theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                                ...theme.colors,
-                                primary25: "#EBF5FF",
-                                primary50: "#92BFF7",
-                                primary: "#0F4F9E",
-                            },
-                        })}
-                    />
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note}</label>
-                    <textarea
-                        type="text"
-                        placeholder={props.dataLang?.client_popup_note}
-                        rows={5}
-                        value={editorValue}
-                        onChange={_HandleChangeInput.bind(this, "editor")}
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none resize-none"
-                    />
-                </div>
-                <div className="flex justify-end space-x-2">
-                    <button
-                        onClick={_ToggleModal.bind(this, false)}
-                        className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
-                    >
-                        {props.dataLang?.branch_popup_exit}
-                    </button>
-                    <button
-                        onClick={_HandleSubmit.bind(this)}
-                        className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition"
-                    >
-                        {props.dataLang?.branch_popup_save}
-                    </button>
-                </div>
-            </div>
-        </PopupEdit>
-    );
-});
-
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 
 export default Index;

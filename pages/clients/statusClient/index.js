@@ -34,6 +34,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import NoData from "@/components/UI/noData/nodata";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -275,7 +276,7 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="min:h-[200px] 3xl:h-[90%] 2xl:h-[85%] xl:h-[82%] lg:h-[88%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[85%] xl:h-[82%] lg:h-[88%] max:h-[400px] pb-2">
                                 <div className="w-[100%] lg:w-[100%] ">
                                     <div className="grid grid-cols-12 items-center sticky top-0  rounded-xl shadow-sm bg-white divide-x p-2 z-10">
                                         <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center">
@@ -355,7 +356,7 @@ const Index = (props) => {
                                         <NoData />
                                     )}
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (

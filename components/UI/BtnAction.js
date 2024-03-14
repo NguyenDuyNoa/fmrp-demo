@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "services/axios";
 
 import { BiEdit } from "react-icons/bi";
-import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
+import { ArrowDown2, AttachCircle, Box1, BoxSearch, I3Square, Trash } from "iconsax-react";
 import pdfMake from "pdfmake/build/pdfmake";
 import { VscFilePdf } from "react-icons/vsc";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -50,6 +50,8 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { useSelector } from "react-redux";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
+import Popup_GiaiDoan from "@/pages/products/components/product/popupGiaiDoan";
+import Popup_Bom from "@/pages/products/components/product/popupBom";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -99,7 +101,9 @@ const BtnAction = React.memo((props) => {
                             "client_customers",
                             "client_group",
                             "suppliers",
-                            "suppliers_groups"
+                            "suppliers_groups",
+                            "material_category",
+                            "category_products"
                         ];
 
                         checkType.includes(props.type) &&
@@ -118,6 +122,10 @@ const BtnAction = React.memo((props) => {
     const handleDelete = () => {
         //Báo giá
         const initialApiDelete = {
+            products: `/api_web/api_product/product/${props.id}?csrf_protection=true`,
+            category_products: `/api_web/api_product/category/${props.id}?csrf_protection=true`,
+            materials: `/api_web/api_material/material/${props.id}?csrf_protection=true`,
+            material_category: `/api_web/api_material/category/${props.id}?csrf_protection=true`,
             suppliers_groups: `/api_web/api_supplier/group/${props.id}?csrf_protection=true`,
             suppliers: `/api_web/api_supplier/supplier/${props.id}?csrf_protection=true`,
             client_customers: `/api_web/api_client/client/${props.id}?csrf_protection=true`,
@@ -324,12 +332,20 @@ const BtnAction = React.memo((props) => {
 
     const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial, dataSeting };
 
-
+    console.log("products", props.type);
 
     return (
         <div className="flex items-center justify-center">
             {
-                ["client_customers", 'client_status', 'client_group', 'suppliers', 'suppliers_groups'].includes(props?.type) ?
+                ["client_customers",
+                    'client_status',
+                    'client_group',
+                    'suppliers',
+                    'suppliers_groups',
+                    'material_category',
+                    'materials',
+                    'category_products'
+                ].includes(props?.type) ?
                     <button
                         type="button"
                         onClick={() => handleQueryId({ id: props?.id, status: true })}
@@ -394,6 +410,28 @@ const BtnAction = React.memo((props) => {
                                         </Popup_servie>
                                     </div>
                                 )}
+
+                                {props.type == "products" &&
+                                    <>
+
+                                        <Popup_GiaiDoan
+                                            dataLang={props.dataLang}
+                                            id={props.id}
+                                            name={props?.name}
+                                            code={props?.code}
+                                            type={props?.typeOpen}
+                                            className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                        />
+                                        <Popup_Bom
+                                            dataLang={props.dataLang}
+                                            id={props.id}
+                                            name={props?.name}
+                                            code={props?.code}
+                                            type={props?.typeOpen}
+                                            className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                        />
+                                    </>
+                                }
 
                                 {props.type == "receipts" && (
                                     <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
@@ -543,8 +581,8 @@ const BtnAction = React.memo((props) => {
                                                         isShow("warning", WARNING_STATUS_ROLE)
                                                     }
                                                 }}
-                                                className={` group transition-all ease-in-out flex items-center ${props.type == "sales_product" ? "" : "justify-center"
-                                                    } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                                className={` group transition-all ease-in-out flex items-center 
+                                                ${props.type == "products" && "justify-start" || props.type == "sales_product" ? "" : "justify-center"}  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                             >
                                                 <RiDeleteBin6Line
                                                     size={20}

@@ -31,6 +31,7 @@ import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
 import { useSelector } from "react-redux";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 
 const Popup_dskh = (props) => {
@@ -518,16 +519,16 @@ const Popup_dskh = (props) => {
                 <div className="mt-4">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         {tab === 0 && (
-                            <div
-                                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
+                            <Customscrollbar
+                                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]"
                             >
                                 <Form dataLang={props.dataLang} isState={isState} queryState={queryState} />
-                            </div>
+                            </Customscrollbar>
                         )}
                         {tab === 1 && (
                             <div>
-                                <div
-                                    className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
+                                <Customscrollbar
+                                    className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]"
                                 >
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.option.map((e) => (
@@ -546,13 +547,12 @@ const Popup_dskh = (props) => {
                                             {props.dataLang?.client_popup_addcontact}
                                         </ButtoonAdd>
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </div>
                         )}
                         {tab === 2 && (
                             <div>
-                                <div
-                                    className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
+                                <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto"
                                 >
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.optionDelivery.map((e) => (
@@ -571,7 +571,7 @@ const Popup_dskh = (props) => {
                                             {props.dataLang?.client_popup_devivelyAdd}
                                         </ButtoonAdd>
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </div>
                         )}
                         <div className="text-right mt-5 space-x-2">

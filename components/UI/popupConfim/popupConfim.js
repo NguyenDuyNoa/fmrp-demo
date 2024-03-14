@@ -1,13 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import Popup from "reactjs-popup";
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Add as IconClose,
-} from "iconsax-react";
+
 import { Lexend_Deca } from "@next/font/google";
 import Image from "next/image";
 import Zoom from "../zoomElement/zoomElement";
@@ -23,8 +16,7 @@ const PopupConfim = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkBrowser: checkAuth, checkDelete } = useActionRole(auth, props?.nameModel)
-    console.log("props", props.nameModel);
-
+    console.log("props.nameModel", props.nameModel);
     const showToat = useToast()
 
     return (
@@ -36,7 +28,7 @@ const PopupConfim = (props) => {
                 className={`${props.className} popup-edit`}
             >
                 <div
-                    className={`3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px] ${props.nameModel == "price_quote" && "min-w-[500px]"
+                    className={`3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 min-w-[400px] ${props.nameModel == "price_quote_status" && "min-w-[500px]"
                         }`}
                 >
                     <div className={`${deca.className} bg-[#ffffff] p-4 shadow-xl rounded-xl flex flex-col gap-3`}>
@@ -66,7 +58,7 @@ const PopupConfim = (props) => {
                             {props.subtitle}
                         </h1>
                         <div className="flex items-center justify-between gap-4">
-                            {props.nameModel == "price_quote" && (
+                            {props.nameModel == "price_quote_status" && (
                                 <>
                                     <Zoom className="w-1/2">
                                         <button
@@ -116,7 +108,7 @@ const PopupConfim = (props) => {
                                     </Zoom>
                                 </>
                             )}
-                            {props.nameModel == "sales_product" && (
+                            {props.nameModel == "sales_product_status" && (
                                 <>
                                     <Zoom className="w-1/2">
                                         <button
@@ -155,7 +147,14 @@ const PopupConfim = (props) => {
                                     'client_group',
                                     'suppliers',
                                     'contacts_suppliers',
-                                    'suppliers_groups'
+                                    'suppliers_groups',
+                                    'material_category',
+                                    'material_variation',
+                                    'materials',
+                                    'category_products',
+                                    'price_quote',
+                                    'sales_product',
+                                    'product_variant'
                                 ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">
@@ -169,20 +168,36 @@ const PopupConfim = (props) => {
                                         <Zoom className="w-1/2">
                                             <button
                                                 onClick={() => {
-                                                    if (role) {
-                                                        props.save()
-                                                    } else if (checkDelete) {
-                                                        props.save()
-                                                    } else if (props.nameModel == "client_contact" && !props?.isIdChild && !checkDelete) {
-                                                        props.save()
-                                                    } else if (props.nameModel == "contacts_suppliers" && !props?.isIdChild && !checkDelete) {
-                                                        props.save()
-                                                    }
-                                                    else {
-                                                        showToat('warning', 'Bạn không có quyền truy cập')
+                                                    switch (props?.nameModel) {
+                                                        case "client_contact":
+                                                            //Xóa biến liên hệ KH
+                                                            if (!props?.isIdChild && !checkDelete) {
+                                                                props.save();
+                                                            }
+                                                            break;
+                                                        case "contacts_suppliers":
+                                                            //Xóa biến liên hệ ncc
+                                                            if (!props?.isIdChild && !checkDelete) {
+                                                                props.save();
+                                                            }
+                                                            break;
+                                                        case "material_variation":
+                                                            //Xóa biến thể nvl
+                                                            props.save();
+                                                            break;
+                                                        case 'product_variant':
+                                                            //Xóa biến thể thành phẩm
+                                                            props.save();
+                                                            break;
+                                                        default:
+                                                            if (role || checkDelete) {
+                                                                props.save();
+                                                            } else {
+                                                                showToat('warning', 'Bạn không có quyền truy cập');
+                                                            }
+                                                            break;
                                                     }
                                                 }}
-
                                                 className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
                                             >
                                                 Xác nhận
@@ -190,7 +205,7 @@ const PopupConfim = (props) => {
                                         </Zoom>
                                     </>
                                 )}
-                            {/* // nút xóa các model khác 3 modle*/}
+                            {/* // nút xóa các model có nút popup tác vụ */}
                             {![
                                 "price_quote",
                                 "sales_product",
@@ -200,7 +215,14 @@ const PopupConfim = (props) => {
                                 'client_group',
                                 'suppliers',
                                 'contacts_suppliers',
-                                'suppliers_groups'
+                                'suppliers_groups',
+                                'material_category',
+                                'material_variation',
+                                'materials',
+                                'category_products',
+                                'price_quote_status',
+                                'sales_product_status',
+                                'product_variant',
                             ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">

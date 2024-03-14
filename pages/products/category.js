@@ -1,8 +1,8 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
+import React, { useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import {
@@ -11,75 +11,38 @@ import {
     ArrowDown2 as IconDown,
     Trash as IconDelete,
     Edit as IconEdit,
+    Grid6,
 } from "iconsax-react";
-import Select, { components } from "react-select";
 
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
+import BtnAction from "@/components/UI/BtnAction";
+import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 
 import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
+import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
-
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { debounce } from "lodash";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
-
-const CustomSelectOption = ({ value, label, level }) => (
-    <div className="flex space-x-2 truncate">
-        {level == 1 && <span>--</span>}
-        {level == 2 && <span>----</span>}
-        {level == 3 && <span>------</span>}
-        {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[200px] w-fit truncate">{label}</span>
-    </div>
-);
+import Popup_ThanhPham from "./components/category/popup";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
+
+    const isShow = useToast()
 
     const dispatch = useDispatch();
 
@@ -103,6 +66,11 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkExport } = useActionRole(auth, 'category_products');
+
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const _ServerFetching = () => {
@@ -120,7 +88,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { output, rResult } = response.data;
+                    const { output, rResult } = response.data;
                     sData(rResult);
                     sTotalItems(output);
                 }
@@ -155,19 +123,13 @@ const Index = (props) => {
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 1500);
         sOnFetching(true);
     }, 500)
 
     const _ServerFetchingSub = () => {
         Axios("GET", "/api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                const { rResult } = response.data;
                 sDataCategoryOption(
                     rResult.map((e) => ({
                         label: `${e.name + " " + "(" + e.code + ")"}`,
@@ -199,7 +161,7 @@ const Index = (props) => {
     const _ServerFetchingAnother = () => {
         Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                const { rResult } = response.data;
                 sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
                 dispatch({
                     type: "branch/update",
@@ -287,166 +249,182 @@ const Index = (props) => {
                     {dataLang?.header_category_finishedProduct_group || "header_category_finishedProduct_group"}
                 </title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between">
-                <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.list_btn_seting_category}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6 className="text-[#141522]/40">{dataLang?.header_category_material}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {dataLang?.header_category_finishedProduct_group ||
-                                    "header_category_finishedProduct_group"}
-                            </h6>
-                        </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                        <h2 className="xl:text-3xl text-xl font-medium ">
-                            {dataLang?.catagory_finishedProduct_group_title || "catagory_finishedProduct_group_title"}
-                        </h2>
-                        <div className="flex space-x-3 items-center">
-                            <Popup_ThanhPham
-                                onRefresh={_ServerFetching.bind(this)}
-                                onRefreshSub={_ServerFetchingSub.bind(this)}
-                                dataLang={dataLang}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                            />
-                        </div>
+            <Container>
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.header_category_material || "header_category_material"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{dataLang?.header_category_finishedProduct_group || "header_category_finishedProduct_group"}</h6>
                     </div>
-
-                    <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
-                        <div className="col-span-4">
-                            <div className="grid grid-cols-5 gap-2">
-                                <SearchComponent
-                                    dataLang={dataLang}
-                                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                                    colSpan={1}
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: "Chọn chi nhánh",
-                                            isDisabled: true,
-                                        },
-                                        ...options,
-                                    ]}
-                                    onChange={_HandleFilterOpt.bind(this, "branch")}
-                                    value={idBranch}
-                                    placeholder={dataLang?.client_list_filterbrand}
-                                    colSpan={idBranch?.length > 1 ? 2 : 1}
-                                    components={{ MultiValue }}
-                                    isMulti={true}
-                                    closeMenuOnSelect={false}
-                                />
-                                <SelectComponent
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: "Chọn tên danh mục",
-                                            isDisabled: true,
-                                        },
-                                        ...dataCategoryOption,
-                                    ]}
-                                    formatOptionLabel={CustomSelectOption}
-                                    onChange={_HandleFilterOpt.bind(this, "category")}
-                                    value={idCategory}
-                                    placeholder={
-                                        dataLang?.category_material_group_name || "category_material_group_name"
-                                    }
-                                    colSpan={1}
-                                    closeMenuOnSelect={true}
-                                />
-                            </div>
-                        </div>
-                        <div className="col-span-2">
-                            <div className="flex space-x-2 items-center justify-end">
-                                <OnResetData sOnFetching={sOnFetching} />
-                                {data.length != 0 && (
-                                    <ExcelFileComponent
-                                        multiDataSet={multiDataSet}
-                                        filename={
-                                            dataLang?.header_category_finishedProduct_group ||
-                                            "header_category_finishedProduct_group"
-                                        }
-                                        title="DSNTP"
+                )}
+                <ContainerBody>
+                    <div className="space-y-3 h-[96%] overflow-hidden">
+                        <div className="flex justify-between  mt-1 mr-2">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                {dataLang?.catagory_finishedProduct_group_title || 'catagory_finishedProduct_group_title'}
+                            </h2>
+                            <div className="flex justify-end items-center gap-2">
+                                {role == true || checkAdd ?
+                                    <Popup_ThanhPham
+                                        onRefresh={_ServerFetching.bind(this)}
+                                        onRefreshSub={_ServerFetchingSub.bind(this)}
                                         dataLang={dataLang}
-                                    />
-                                )}
-                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="min:h-[500px] h-[91%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="pr-2">
-                            <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10 ">
-                                <h4 className="w-[10%]" />
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">
-                                    {dataLang?.category_material_group_code || "category_material_group_code"}
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">
-                                    {dataLang?.category_material_group_name || "category_material_group_name"}
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
-                                    {dataLang?.note || "note"}
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[25%] font-[600] text-center">
-                                    {dataLang?.client_list_brand || "client_list_brand"}
-                                </h4>
-                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
-                                    {dataLang?.branch_popup_properties || "branch_popup_properties"}
-                                </h4>
-                            </div>
-                            <div className="divide-y divide-slate-200">
-                                {
-                                    onFetching ? (
-                                        <Loading />
-                                    ) : data?.length > 0 ? (
-                                        data.map((e) => (
-                                            <Item
-                                                onRefresh={_ServerFetching.bind(this)}
-                                                onRefreshSub={_ServerFetchingSub.bind(this)}
-                                                dataLang={dataLang}
-                                                key={e.id}
-                                                data={e}
-                                            />
-                                        ))
-                                    ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    Không tìm thấy các mục
-                                                </h1>
-                                            </div>
-                                        </div>
-                                    )
-                                    // {onFetching && <Loading />}
+                                        // nameModel={"client_contact"}
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            isShow("warning", WARNING_STATUS_ROLE);
+                                        }}
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    >{dataLang?.branch_popup_create_new}
+                                    </button>
                                 }
                             </div>
                         </div>
+                        <ContainerTable>
+                            <div className="xl:space-y-3 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-4">
+                                        <div className="grid grid-cols-9 gap-2">
+                                            <SearchComponent
+                                                dataLang={dataLang}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                colSpan={2}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...options,
+                                                ]}
+                                                onChange={_HandleFilterOpt.bind(this, "branch")}
+                                                value={idBranch}
+                                                placeholder={dataLang?.price_quote_branch || 'price_quote_branch'}
+                                                colSpan={3}
+                                                components={{ MultiValue }}
+                                                isMulti={true}
+                                                isClearable={true}
+                                                closeMenuOnSelect={false}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.category_material_group_code || "category_material_group_code",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...dataCategoryOption,
+                                                ]}
+                                                formatOptionLabel={SelectOptionLever}
+                                                onChange={_HandleFilterOpt.bind(this, "category")}
+                                                value={idCategory}
+                                                placeholder={dataLang?.category_material_group_code || "category_material_group_code"
+                                                }
+                                                colSpan={3}
+                                                isClearable={true}
+                                                closeMenuOnSelect={true}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <div className="flex space-x-2 items-center justify-end">
+                                            <OnResetData sOnFetching={sOnFetching} />
+                                            {(role == true || checkExport) ?
+                                                <div className={``}>
+                                                    {data?.length > 0 && (
+                                                        <ExcelFileComponent
+                                                            multiDataSet={multiDataSet}
+                                                            filename={
+                                                                dataLang?.header_category_finishedProduct_group ||
+                                                                "header_category_finishedProduct_group"
+                                                            }
+                                                            title="DSNTP"
+                                                            dataLang={dataLang}
+                                                        />)}
+                                                </div>
+                                                :
+                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                </button>
+                                            }
+                                            <div>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Customscrollbar className="min:h-[200px] h-[90%] max:h-[650px] pb-2">
+                                <div className="w-[100%] lg:w-[100%] ">
+                                    <div className="grid grid-cols-11 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10 ">
+                                        <h4 className="col-span-1" />
+                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.category_material_group_code || "category_material_group_code"}
+                                        </h4>
+                                        <h4 className="col-span-3 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.category_material_group_name || "category_material_group_name"}
+                                        </h4>
+                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.note || "note"}
+                                        </h4>
+                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.client_list_brand || "client_list_brand"}
+                                        </h4>
+                                        <h4 className="col-span-1 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                            {dataLang?.branch_popup_properties || "branch_popup_properties"}
+                                        </h4>
+                                    </div>
+                                    <div className="divide-y divide-slate-200">
+                                        {
+                                            onFetching ? (
+                                                <Loading />
+                                            ) : data?.length > 0 ? (
+                                                data.map((e) => (
+                                                    <Item
+                                                        onRefresh={_ServerFetching.bind(this)}
+                                                        onRefreshSub={_ServerFetchingSub.bind(this)}
+                                                        dataLang={dataLang}
+                                                        key={e.id}
+                                                        data={e}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <NoData />
+                                            )
+                                        }
+                                    </div>
+                                </div>
+                            </Customscrollbar>
+                        </ContainerTable>
                     </div>
-                </div>
-                {data?.length != 0 && (
-                    <div className="flex space-x-5 items-center">
-                        <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} thành phần
-                            {/* trong số {totalItems?.iTotalRecords} biến thể */}
-                        </h6>
-                        <Pagination
-                            postsPerPage={limit}
-                            totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                            paginate={paginate}
-                            currentPage={router.query?.page || 1}
-                        />
-                    </div>
-                )}
-            </div>
+                    {data?.length != 0 && (
+                        <div className="flex space-x-5 my-2 items-center">
+                            <h6>
+                                {/* Hiển thị {totalItems?.iTotalDisplayRecords} thành phần */}
+                                {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
+
+                                {/* trong số {totalItems?.iTotalRecords} biến thể */}
+                            </h6>
+                            <Pagination
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page || 1}
+                            />
+                        </div>
+                    )}
+                </ContainerBody>
+            </Container>
         </React.Fragment>
     );
 };
@@ -454,37 +432,22 @@ const Index = (props) => {
 const Item = React.memo((props) => {
     const [hasChild, sHasChild] = useState(false);
 
+    const isShow = useToast()
+
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
-    const isShow = useToast();
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { isOpen, isId, handleQueryId } = useToggle();
-
-    const handleDelete = async () => {
-        Axios("DELETE", `/api_web/api_product/category/${isId}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var { isSuccess, message } = response.data;
-                if (isSuccess) {
-                    isShow("success", props.dataLang[message]);
-                } else {
-                    isShow("success", props.dataLang[message]);
-                }
-            }
-            props.onRefresh && props.onRefresh();
-            props.onRefreshSub && props.onRefreshSub();
-        });
-
-        handleQueryId({ status: false });
-    };
+    const { checkEdit } = useActionRole(auth, 'category_products');
 
     useEffect(() => {
         sHasChild(false);
     }, [props.data?.children?.length == null]);
 
     return (
-        <div>
-            <div className="flex py-2 px-2 bg-white hover:bg-slate-50">
-                <div className="w-[10%] flex justify-center">
+        <div key={props.data?.id}>
+            <div className="grid grid-cols-11 items-center py-2 px-2 bg-white hover:bg-slate-50 relative">
+                <div className="col-span-1 flex justify-center">
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
@@ -495,45 +458,48 @@ const Item = React.memo((props) => {
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </div>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[20%]">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.code}
                 </h6>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[20%]">
+                <h6 className="col-span-3 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.name}
                 </h6>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[15%]">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.note}
                 </h6>
-                <div className="flex flex-wrap px-2 w-[25%]">
-                    {props.data?.branch.map((e) => (
-                        <h6
-                            key={e?.id.toString()}
-                            className="text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit"
-                        >
-                            {e?.name}
-                        </h6>
-                    ))}
-                </div>
-                <div className="flex justify-center space-x-2 w-[10%] px-2">
-                    <Popup_ThanhPham
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                    <span className="flex gap-2 flex-wrap justify-start ">
+                        {props.data?.branch?.map((e) => (
+                            <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                {e.name}
+                            </span>
+                        ))}
+                    </span>
+                </h6>
+                <div className="flex justify-center space-x-2 col-span-1 px-2">
+                    {role == true || checkEdit ?
+                        <Popup_ThanhPham
+                            onRefresh={props.onRefresh}
+                            onRefreshSub={props.onRefreshSub}
+                            dataLang={props.dataLang}
+                            id={props.data?.id}
+                        />
+                        :
+                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
+                    }
+                    <BtnAction
                         onRefresh={props.onRefresh}
-                        onRefreshSub={props.onRefreshSub}
+                        onRefreshGroup={props.onRefreshOpt}
                         dataLang={props.dataLang}
                         id={props.data?.id}
+                        type="category_products"
                     />
-                    <button
-                        onClick={() => handleQueryId({ id: props.data?.id, status: true })}
-                        className="xl:text-base text-xs outline-none"
-                    >
-                        <IconDelete color="red" />
-                    </button>
                 </div>
             </div>
             {hasChild && (
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
                         <ItemsChild
-                            onClick={() => handleQueryId({ id: e.id, status: true })}
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
@@ -542,7 +508,6 @@ const Item = React.memo((props) => {
                             grandchild="0"
                             children={e?.children?.map((e) => (
                                 <ItemsChild
-                                    onClick={() => handleQueryId({ id: e.id, status: true })}
                                     onRefresh={props.onRefresh}
                                     onRefreshSub={props.onRefreshSub}
                                     dataLang={props.dataLang}
@@ -551,7 +516,6 @@ const Item = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={() => handleQueryId({ id: e.id, status: true })}
                                             onRefresh={props.onRefresh}
                                             onRefreshSub={props.onRefreshSub}
                                             dataLang={props.dataLang}
@@ -566,37 +530,33 @@ const Item = React.memo((props) => {
                     ))}
                 </div>
             )}
-            <PopupConfim
-                type="warning"
-                dataLang={props.dataLang}
-                title={TITLE_DELETE}
-                subtitle={CONFIRM_DELETION}
-                isOpen={isOpen}
-                save={handleDelete}
-                cancel={() => handleQueryId({ status: false })}
-            />
         </div>
     );
 });
 
 const ItemsChild = React.memo((props) => {
+    const isShow = useToast()
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkEdit } = useActionRole(auth, 'category_products');
     return (
         <React.Fragment key={props.data?.id}>
-            <div className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
+            <div className={`grid grid-cols-11 items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
                 {props.data?.level == "3" && (
-                    <div className="w-[10%] h-full flex justify-center items-center pl-24">
+                    <div className="col-span-1 h-full flex justify-center items-center pl-24">
                         <IconDown className="rotate-45" />
                     </div>
                 )}
                 {props.data?.level == "2" && (
-                    <div className="w-[10%] h-full flex justify-center items-center pl-12">
+                    <div className="col-span-1 h-full flex justify-center items-center pl-12">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
                     </div>
                 )}
                 {props.data?.level == "1" && (
-                    <div className="w-[10%] h-full flex justify-center items-center ">
+                    <div className="col-span-1 h-full flex justify-center items-center ">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
@@ -604,36 +564,41 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className="mt-1.5" />
                     </div>
                 )}
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 text-xs px-2 w-[20%]">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.code}
                 </h6>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 text-xs px-2 w-[20%]">
+                <h6 className="col-span-3 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.name}
                 </h6>
-                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 text-xs px-2 w-[15%]">
+                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
                     {props.data?.note}
                 </h6>
-                <div className="w-[25%] flex flex-wrap px-2">
+                <div className="col-span-2 gap-2 flex flex-wrap px-2">
                     {props.data?.branch.map((e) => (
-                        <h6
-                            key={e?.id.toString()}
-                            className="text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit"
-                        >
-                            {e?.name}
-                        </h6>
+                        <span key={e?.id} className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                            {e.name}
+                        </span>
                     ))}
                 </div>
-                <div className="w-[10%] flex justify-center space-x-2">
-                    <Popup_ThanhPham
+                <div className="col-span-1 flex justify-center space-x-2">
+                    {role == true || checkEdit ?
+                        <Popup_ThanhPham
+                            onRefresh={props.onRefresh}
+                            onRefreshSub={props.onRefreshSub}
+                            dataLang={props.dataLang}
+                            data={props.data}
+                            id={props.data?.id}
+                        />
+                        :
+                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
+                    }
+                    <BtnAction
                         onRefresh={props.onRefresh}
-                        onRefreshSub={props.onRefreshSub}
+                        onRefreshGroup={props.onRefreshOpt}
                         dataLang={props.dataLang}
-                        data={props.data}
                         id={props.data?.id}
+                        type="category_products"
                     />
-                    <button onClick={props.onClick} className="xl:text-base text-xs">
-                        <IconDelete color="red" />
-                    </button>
                 </div>
             </div>
             {props.children}
@@ -641,385 +606,6 @@ const ItemsChild = React.memo((props) => {
     );
 });
 
-const Popup_ThanhPham = React.memo((props) => {
-    const dataOptBranch = useSelector((state) => state.branch);
-    const dataOptGroup = useSelector((state) => state.categoty_finishedProduct);
 
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-
-    const [dataOption, sDataOption] = useState([]);
-
-    const [onSending, sOnSending] = useState(false);
-    const [onFetching, sOnFetching] = useState(false);
-    const [onFetchingSubId, sOnFetchingSubId] = useState(false);
-    const [onFetchingSub, sOnFetchingSub] = useState(false);
-
-    const [name, sName] = useState("");
-    const [code, sCode] = useState("");
-    const [note, sNote] = useState("");
-    const [branch, sBranch] = useState([]);
-
-    const [group, sGroup] = useState(null);
-
-    const [errBranch, sErrBranch] = useState(false);
-    const [errName, sErrName] = useState(false);
-    const [errCode, sErrCode] = useState(false);
-
-    useEffect(() => {
-        open && sErrBranch(false);
-        open && sErrName(false);
-        open && sErrCode(false);
-        open && sName("");
-        open && sCode("");
-        open && sNote("");
-        open && sBranch([]);
-        open && sDataOption([]);
-        open && sGroup(null);
-        open && props?.id && sOnFetching(true);
-        setTimeout(() => {
-            open && props?.id && sOnFetchingSubId(true);
-        }, 500);
-    }, [open]);
-
-    const _HandleChangeInput = (type, value) => {
-        if (type == "name") {
-            sName(value?.target.value);
-        } else if (type == "code") {
-            sCode(value?.target.value);
-        } else if (type == "note") {
-            sNote(value?.target.value);
-        } else if (type == "branch") {
-            sBranch(value);
-        } else if (type == "group") {
-            sGroup(value?.value);
-        }
-    };
-
-    const _ServerSending = () => {
-        var formData = new FormData();
-
-        formData.append("code", code);
-        formData.append("name", name);
-        formData.append("note", note);
-        formData.append("parent_id", group);
-        branch.forEach((id) => formData.append("branch_id[]", id.value));
-
-        Axios(
-            "POST",
-            `${props?.id
-                ? `/api_web/api_product/category/${props?.id}?csrf_protection=true`
-                : "/api_web/api_product/category?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${props.dataLang[message]}`,
-                        });
-                        sOpen(false);
-                        sName("");
-                        sCode("");
-                        sNote("");
-                        sGroup(null);
-                        sBranch([]);
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshSub && props.onRefreshSub();
-                    } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${props.dataLang[message]}`,
-                        });
-                    }
-                    sOnSending(false);
-                }
-            }
-        );
-    };
-
-    useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
-
-    const _HandleSubmit = (e) => {
-        e.preventDefault();
-        if (name?.length == 0 || code?.length == 0 || branch?.length == 0) {
-            name?.length == 0 && sErrName(true);
-            code?.length == 0 && sErrCode(true);
-            branch?.length == 0 && sErrBranch(true);
-            Toast.fire({
-                icon: "error",
-                title: `${props.dataLang?.required_field_null}`,
-            });
-        } else {
-            sOnSending(true);
-        }
-    };
-
-    useEffect(() => {
-        sErrName(false);
-    }, [name?.length > 0]);
-
-    useEffect(() => {
-        sErrCode(false);
-    }, [code?.length > 0]);
-
-    useEffect(() => {
-        sErrBranch(false);
-    }, [branch?.length > 0]);
-
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_product/category/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var list = response.data;
-                sName(list?.name);
-                sCode(list?.code);
-                sNote(list?.note);
-                sGroup(list?.parent_id);
-                sBranch(
-                    list?.branch.map((e) => ({
-                        label: e.name,
-                        value: e.id,
-                    }))
-                );
-            }
-            sOnFetching(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    const _ServerFetchingSubId = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/categoryOption/${props.id}?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOption(
-                        rResult.map((x) => ({
-                            label: x.name,
-                            value: x.id,
-                            level: x.level,
-                        }))
-                    );
-                }
-                sOnFetchingSubId(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetchingSubId && _ServerFetchingSubId();
-    }, [onFetchingSubId]);
-
-    const _ServerFetchingSub = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/categoryOption/?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOption(
-                        rResult.map((x) => ({
-                            label: x.name,
-                            value: x.id,
-                            level: x.level,
-                        }))
-                    );
-                }
-                sOnFetchingSub(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onFetchingSub && _ServerFetchingSub();
-    }, [onFetchingSub]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            open && branch && props.id && sOnFetchingSubId(true);
-            open && branch && !props.id && sOnFetchingSub(true);
-        }, 800);
-    }, [branch]);
-
-    return (
-        <PopupEdit
-            title={
-                props?.id
-                    ? `${props.dataLang?.catagory_finishedProduct_group_edit || "catagory_finishedProduct_group_edit"}`
-                    : `${props.dataLang?.catagory_finishedProduct_group_addnew ||
-                    "catagory_finishedProduct_group_addnew"
-                    }`
-            }
-            button={props?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
-            onClickOpen={_ToggleModal.bind(this, true)}
-            open={open}
-            onClose={_ToggleModal.bind(this, false)}
-            classNameBtn={props.className}
-        >
-            <div className="py-4 w-[600px] space-y-5">
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
-                        <span className="text-red-500">*</span>
-                    </label>
-                    <Select
-                        options={dataOptBranch}
-                        // formatOptionLabel={CustomSelectOption}
-                        value={branch}
-                        onChange={_HandleChangeInput.bind(this, "branch")}
-                        isClearable={true}
-                        placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
-                        isMulti
-                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                        closeMenuOnSelect={false}
-                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                        theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                                ...theme.colors,
-                                primary25: "#EBF5FF",
-                                primary50: "#92BFF7",
-                                primary: "#0F4F9E",
-                            },
-                        })}
-                        styles={{
-                            placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                            }),
-                        }}
-                    />
-                    {errBranch && (
-                        <label className="text-sm text-red-500">
-                            {props.dataLang?.client_list_bran || "client_list_bran"}
-                        </label>
-                    )}
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_code} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        value={code}
-                        onChange={_HandleChangeInput.bind(this, "code")}
-                        type="text"
-                        placeholder={props.dataLang?.category_material_group_code}
-                        className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
-                    />
-                    {errCode && (
-                        <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_code}
-                        </label>
-                    )}
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_name} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        value={name}
-                        onChange={_HandleChangeInput.bind(this, "name")}
-                        type="text"
-                        placeholder={props.dataLang?.category_material_group_name}
-                        className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
-                    />
-                    {errName && (
-                        <label className="text-sm text-red-500">
-                            {props.dataLang?.category_material_group_err_name}
-                        </label>
-                    )}
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_level}
-                    </label>
-                    <Select
-                        options={branch?.length != 0 ? dataOption : dataOptGroup}
-                        formatOptionLabel={CustomSelectOption}
-                        value={
-                            group == "0" || !group
-                                ? null
-                                : {
-                                    label: dataOptGroup.find((x) => x?.value == group)?.label,
-                                    code: dataOptGroup.find((x) => x?.value == group)?.code,
-                                    value: group,
-                                }
-                        }
-                        onChange={_HandleChangeInput.bind(this, "group")}
-                        isClearable={true}
-                        placeholder={props.dataLang?.category_material_group_level}
-                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
-                        isSearchable={true}
-                        theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                                ...theme.colors,
-                                primary25: "#EBF5FF",
-                                primary50: "#92BFF7",
-                                primary: "#0F4F9E",
-                            },
-                        })}
-                        styles={{
-                            placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                            }),
-                        }}
-                    />
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note}</label>
-                    <textarea
-                        type="text"
-                        placeholder={props.dataLang?.client_popup_note}
-                        rows={5}
-                        value={note}
-                        onChange={_HandleChangeInput.bind(this, "note")}
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none resize-none"
-                    />
-                </div>
-                <div className="flex justify-end space-x-2">
-                    <button
-                        onClick={_ToggleModal.bind(this, false)}
-                        className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
-                    >
-                        {props.dataLang?.branch_popup_exit}
-                    </button>
-                    <button
-                        onClick={_HandleSubmit.bind(this)}
-                        className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition"
-                    >
-                        {props.dataLang?.branch_popup_save}
-                    </button>
-                </div>
-            </div>
-        </PopupEdit>
-    );
-});
 
 export default Index;

@@ -2,6 +2,7 @@ import React from "react";
 import Loading from "components/UI/loading";
 import { Map, IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
@@ -9,7 +10,7 @@ const TableDelivery = (props) => {
   return (
     <div>
       <div className="w-[930px]">
-        <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+        <Customscrollbar className="min:h-[200px] h-[72%] max:h-[400px] pb-2">
           <div className="pr-2 w-[100%] ">
             <div className="grid grid-cols-12 items-center sticky top-0 bg-slate-100  z-10">
               <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-1  font-semibold text-center">
@@ -86,7 +87,7 @@ const TableDelivery = (props) => {
               </div>
             )}
           </div>
-        </div>
+        </Customscrollbar>
       </div>
     </div>
   );

@@ -3,9 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-  ssr: false,
-});
+
 import { NumericFormat } from "react-number-format";
 import ReactExport from "react-data-export";
 
@@ -31,6 +29,7 @@ import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
 import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -63,8 +62,8 @@ const Popup_chitiet = (props) => {
   useEffect(() => {
     props?.id && sOnFetching(true);
   }, [open]);
-  const _ServerFetching_detailUser =  () => {
-     Axios(
+  const _ServerFetching_detailUser = () => {
+    Axios(
       "GET",
       `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`,
       {},
@@ -94,32 +93,27 @@ const Popup_chitiet = (props) => {
         <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
           <button
             onClick={_HandleSelectTab.bind(this, 0)}
-            className={`${
-              tab === 0
+            className={`${tab === 0
                 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
                 : "hover:text-[#0F4F9E] "
-            }  px-4 py-2 outline-none font-semibold`}
+              }  px-4 py-2 outline-none font-semibold`}
           >
             {props.dataLang?.client_popup_general}
           </button>
           <button
             onClick={_HandleSelectTab.bind(this, 1)}
-            className={`${
-              tab === 1
+            className={`${tab === 1
                 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
                 : "hover:text-[#0F4F9E] "
-            }  px-4 py-2 outline-none font-semibold`}
+              }  px-4 py-2 outline-none font-semibold`}
           >
             {props.dataLang?.client_popup_detailContact}
           </button>
         </div>
         <div className="mt-4 space-x-5 w-[930px] 3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] ">
           {tab === 0 && (
-            <ScrollArea
-              ref={scrollAreaRef}
+            <Customscrollbar
               className="3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden "
-              speed={1}
-              smoothScrolling={true}
             >
               {onFetching ? (
                 <Loading className="h-80" color="#0f4f9e" />
@@ -246,8 +240,8 @@ const Popup_chitiet = (props) => {
                           {data?.date_incorporation != null
                             ? data?.date_incorporation != "0000-00-00"
                               ? moment(data?.date_incorporation).format(
-                                  "DD/MM/YYYY"
-                                )
+                                "DD/MM/YYYY"
+                              )
                               : ""
                             : ""}
                         </span>
@@ -286,7 +280,7 @@ const Popup_chitiet = (props) => {
                   </div>
                 )
               )}
-            </ScrollArea>
+            </Customscrollbar>
           )}
           {tab === 1 && (
             <div>
@@ -314,10 +308,8 @@ const Popup_chitiet = (props) => {
                       <Loading className="h-80" color="#0f4f9e" />
                     ) : data?.contact?.length > 0 ? (
                       <>
-                        <ScrollArea
+                        <Customscrollbar
                           className="3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden"
-                          speed={1}
-                          smoothScrolling={true}
                         >
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
                             {data?.contact?.map((e) => (
@@ -343,7 +335,7 @@ const Popup_chitiet = (props) => {
                               </div>
                             ))}
                           </div>
-                        </ScrollArea>
+                        </Customscrollbar>
                       </>
                     ) : (
                       <div className=" max-w-[352px] mt-24 mx-auto">

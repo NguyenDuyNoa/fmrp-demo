@@ -1015,7 +1015,7 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"sales_product"}
+                nameModel={"sales_product_status"}
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}

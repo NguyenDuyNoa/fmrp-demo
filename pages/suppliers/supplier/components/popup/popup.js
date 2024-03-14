@@ -21,6 +21,7 @@ import { useToggle } from "@/hooks/useToggle";
 import PopupEdit from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Popup_dsncc = (props) => {
   const dataLang = props.dataLang;
@@ -385,15 +386,15 @@ const Popup_dsncc = (props) => {
         <div className="mt-4">
           <form onSubmit={_HandleSubmit.bind(this)} className="">
             {isState.tab === 0 && (
-              <div className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
+              <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
 
               >
                 <FormInfo isState={isState} queryState={queryState} dataLang={dataLang}></FormInfo>
-              </div>
+              </Customscrollbar>
             )}
             {isState.tab === 1 && (
               <div>
-                <div
+                <Customscrollbar
                   className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                 >
                   <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
@@ -409,7 +410,7 @@ const Popup_dsncc = (props) => {
                     ))}
                     <ButtonAdd onClick={_HandleAddNew.bind(this)} dataLang={dataLang}></ButtonAdd>
                   </div>
-                </div>
+                </Customscrollbar>
               </div>
             )}
             <div className="text-right mt-5 space-x-2">

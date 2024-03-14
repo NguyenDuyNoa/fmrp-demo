@@ -23,9 +23,6 @@ import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
@@ -34,6 +31,8 @@ import { _ServerInstance as Axios } from "/services/axios";
 import Swal from "sweetalert2";
 
 import { useEffect } from "react";
+import NoData from "@/components/UI/noData/nodata";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -103,7 +102,7 @@ const Popup_status = (props) => {
             classNameBtn={props.className}
         >
             <div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
-                <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <Customscrollbar className="min:h-[200px] h-[82%] max:h-[500px]  pb-2">
                     <div className="pr-2 ">
                         <div
                             className={`grid-cols-8 grid sticky top-0 bg-white shadow mt-1 rounded items-center z-10 divide-x `}
@@ -190,7 +189,7 @@ const Popup_status = (props) => {
                                                                 ""
                                                             )}
                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                dataProductExpiry.is_enable === "1" ? (
                                                                 <div className="flex">
                                                                     <div className="flex gap-1 items-center italic font-normal text-[12px]">
                                                                         <h6>Lot: </h6>
@@ -203,8 +202,8 @@ const Popup_status = (props) => {
                                                                         <h6 className="px-1 w-[full] text-center">
                                                                             {e.expiration_date
                                                                                 ? moment(e.expiration_date).format(
-                                                                                      "DD/MM/YYYY"
-                                                                                  )
+                                                                                    "DD/MM/YYYY"
+                                                                                )
                                                                                 : "-"}
                                                                         </h6>
                                                                     </div>
@@ -230,23 +229,10 @@ const Popup_status = (props) => {
                                 </div>
                             </>
                         ) : (
-                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                <div className="text-center">
-                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                        <IconSearch />
-                                    </div>
-                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                        {dataLang?.purchase_order_table_item_not_found ||
-                                            "purchase_order_table_item_not_found"}
-                                    </h1>
-                                    <div className="flex items-center justify-around mt-6 ">
-                                        {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                    </div>
-                                </div>
-                            </div>
+                            <NoData />
                         )}
                     </div>
-                </div>
+                </Customscrollbar>
             </div>
         </PopupEdit>
     );
