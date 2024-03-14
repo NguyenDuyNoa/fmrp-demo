@@ -399,7 +399,7 @@ const Index = (props) => {
                                                 ]}
                                                 onChange={(e) => queryState({ idBranch: e })}
                                                 value={isState.idBranch}
-                                                placeholder={dataLang?.price_quote_branch}
+                                                placeholder={dataLang?.price_quote_branch || 'price_quote_branch'}
                                                 colSpan={3}
                                                 components={{ MultiValue }}
                                                 isMulti={true}

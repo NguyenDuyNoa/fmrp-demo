@@ -99,11 +99,7 @@ const BtnAction = React.memo((props) => {
                             "recall",
                             "exportToOther",
                             "client_customers",
-                            "client_group",
                             "suppliers",
-                            "suppliers_groups",
-                            "material_category",
-                            "category_products"
                         ];
 
                         checkType.includes(props.type) &&
@@ -122,6 +118,9 @@ const BtnAction = React.memo((props) => {
     const handleDelete = () => {
         //Báo giá
         const initialApiDelete = {
+            personnel_roles: `/api_web/api_staff/position/${props.id}?csrf_protection=true`,
+            department: `/api_web/api_staff/department/${props.id}?csrf_protection=true`,
+            personnel_staff: `/api_web/api_staff/staff/${props.id}?csrf_protection=true`,
             products: `/api_web/api_product/product/${props.id}?csrf_protection=true`,
             category_products: `/api_web/api_product/category/${props.id}?csrf_protection=true`,
             materials: `/api_web/api_material/material/${props.id}?csrf_protection=true`,
@@ -344,7 +343,10 @@ const BtnAction = React.memo((props) => {
                     'suppliers_groups',
                     'material_category',
                     'materials',
-                    'category_products'
+                    'category_products',
+                    'personnel_staff',
+                    'department',
+                    'personnel_roles'
                 ].includes(props?.type) ?
                     <button
                         type="button"

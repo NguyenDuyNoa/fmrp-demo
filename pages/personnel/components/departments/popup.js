@@ -12,13 +12,6 @@ const Popup_phongban = (props) => {
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const scrollAreaRef = useRef(null);
-
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
-    };
-
     const [onSending, sOnSending] = useState(false);
 
     const [brandpOpt, sListBrand] = useState([]);
@@ -33,44 +26,14 @@ const Popup_phongban = (props) => {
 
     const [valueBr, sValueBr] = useState([]);
 
+
     useEffect(() => {
         sErrInputBr(false);
         sErrInput(false);
         sName(props.name ? props.name : "");
         sEmail(props.email ? props.email : "");
-        sListBrand(
-            props?.id
-                ? props.listBr
-                    ? props.listBr && [
-                          ...props.listBr
-                              ?.map((e) => ({
-                                  label: e.name,
-                                  value: Number(e.id),
-                              }))
-                              ?.filter((e) => valueBr?.some((x) => e.label !== x.label)),
-                      ]
-                    : []
-                : props.listBr
-                ? props.listBr && [
-                      ...props.listBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
-                : []
-        );
-        // sListBrand(props.listBr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
-        sValueBr(
-            props.sValueBr
-                ? props.listBr && [
-                      ...props.sValueBr?.map((e) => ({
-                          label: e.name,
-                          value: Number(e.id),
-                      })),
-                  ]
-                : []
-        );
-        // sValueBr(props.sValueBr ? props.listBr && [...props.sValueBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
+        sListBrand(props?.isState?.listBr || []);
+        sValueBr(props.sValueBr?.map(e => ({ label: e.name, value: e.id })) || [])
     }, [open]);
 
     const branch_id = valueBr?.map((e) => {
@@ -88,8 +51,8 @@ const Popup_phongban = (props) => {
     };
 
     useEffect(() => {
-        sErrInput(false);
-    }, [name.length > 0]);
+        name != "" && sErrInput(false);
+    }, [name]);
 
     useEffect(() => {
         sErrInputBr(false);
@@ -100,12 +63,7 @@ const Popup_phongban = (props) => {
         var data = new FormData();
         data.append("name", name);
         data.append("email", email);
-        Axios(
-            "POST",
-            `${
-                props.id
-                    ? `/api_web/api_staff/department/${id}?csrf_protection=true`
-                    : "/api_web/api_staff/department/?csrf_protection=true"
+        Axios("POST", `${props.id ? `/api_web/api_staff/department/${id}?csrf_protection=true` : "/api_web/api_staff/department/?csrf_protection=true"
             }`,
             {
                 data: {
@@ -117,7 +75,7 @@ const Popup_phongban = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    const { isSuccess, message } = response.data;
                     if (isSuccess) {
                         isShow("success", props.dataLang[message]);
                         sErrInput(false);
@@ -147,16 +105,12 @@ const Popup_phongban = (props) => {
             branch_id?.length == 0 && sErrInputBr(true);
             isShow("error", props.dataLang?.required_field_null);
         } else {
-            // sErrInput(false)
             sOnSending(true);
         }
     };
     return (
         <PopupEdit
-            title={
-                props.id
-                    ? `${props.dataLang?.personnels_deparrtments_edit}`
-                    : `${props.dataLang?.personnels_deparrtments_add}`
+            title={props.id ? `${props.dataLang?.personnels_deparrtments_edit}` : `${props.dataLang?.personnels_deparrtments_add}`
             }
             button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -176,9 +130,8 @@ const Popup_phongban = (props) => {
                                 onChange={_HandleChangeInput.bind(this, "name")}
                                 name="fname"
                                 type="text"
-                                className={`${
-                                    errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
+                                className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
                             />
                             {errInput && (
                                 <label className="mb-2  text-[14px] text-red-500">
@@ -215,7 +168,6 @@ const Popup_phongban = (props) => {
                             maxMenuHeight="200px"
                             isClearable={true}
                             menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
                             styles={{
                                 placeholder: (base) => ({
                                     ...base,
@@ -247,7 +199,7 @@ const Popup_phongban = (props) => {
                                     },
                                 }),
                             }}
-                            // className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
+                        // className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
                         />
                         {errInputBr && (
                             <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>

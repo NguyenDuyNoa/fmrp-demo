@@ -16,8 +16,52 @@ const PopupConfim = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkBrowser: checkAuth, checkDelete } = useActionRole(auth, props?.nameModel)
-    console.log("props.nameModel", props.nameModel);
+
     const showToat = useToast()
+
+    const handleConfimDelete = () => {
+        switch (props?.nameModel) {
+            case "client_contact":
+                //Xóa biến liên hệ KH
+                if (!props?.isIdChild && !checkDelete) {
+                    props.save();
+                }
+                break;
+            case "contacts_suppliers":
+                //Xóa biến liên hệ ncc
+                if (!props?.isIdChild && !checkDelete) {
+                    props.save();
+                }
+                break;
+            case "material_variation":
+                //Xóa biến thể nvl
+                props.save();
+                break;
+            case 'product_variant':
+                //Xóa biến thể thành phẩm
+                props.save();
+                break;
+            case 'personnel_staff_status':
+                // Đổi trạng thái hoạt động của người dùng
+                props.save();
+                break;
+            case "personnel_staff":
+                ///Xóa người dùng
+                if (role) {
+                    props.save();
+                } else {
+                    showToat('warning', 'Bạn không phải admin không thể xóa người dùng')
+                }
+                break
+            default:
+                if (role || checkDelete) {
+                    props.save();
+                } else {
+                    showToat('warning', 'Bạn không có quyền truy cập');
+                }
+                break;
+        }
+    }
 
     return (
         <React.Fragment>
@@ -139,7 +183,7 @@ const PopupConfim = (props) => {
                                     </Zoom>
                                 </>
                             )}
-                            {/* // nút xóa model khách hàng */}
+                            {/* // nút xóa model không phải poup và xóa biến thể, chuyển đổi trạng thái status */}
                             {
                                 ['client_customers',
                                     'client_contact',
@@ -154,7 +198,11 @@ const PopupConfim = (props) => {
                                     'category_products',
                                     'price_quote',
                                     'sales_product',
-                                    'product_variant'
+                                    'product_variant',
+                                    'personnel_staff',
+                                    'personnel_staff_status',
+                                    'department',
+                                    'personnel_roles'
                                 ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">
@@ -167,37 +215,7 @@ const PopupConfim = (props) => {
                                         </Zoom>
                                         <Zoom className="w-1/2">
                                             <button
-                                                onClick={() => {
-                                                    switch (props?.nameModel) {
-                                                        case "client_contact":
-                                                            //Xóa biến liên hệ KH
-                                                            if (!props?.isIdChild && !checkDelete) {
-                                                                props.save();
-                                                            }
-                                                            break;
-                                                        case "contacts_suppliers":
-                                                            //Xóa biến liên hệ ncc
-                                                            if (!props?.isIdChild && !checkDelete) {
-                                                                props.save();
-                                                            }
-                                                            break;
-                                                        case "material_variation":
-                                                            //Xóa biến thể nvl
-                                                            props.save();
-                                                            break;
-                                                        case 'product_variant':
-                                                            //Xóa biến thể thành phẩm
-                                                            props.save();
-                                                            break;
-                                                        default:
-                                                            if (role || checkDelete) {
-                                                                props.save();
-                                                            } else {
-                                                                showToat('warning', 'Bạn không có quyền truy cập');
-                                                            }
-                                                            break;
-                                                    }
-                                                }}
+                                                onClick={() => handleConfimDelete()}
                                                 className="text-base hover:text-white hover:bg-[#0F4F9E] transition-all duration-150 ease-linear tran font-normal rounded-lg w-full  text-[#344054] border-[#D0D5DD] border px-[18px] py-[10px] shadow-[0px 1px 2px 0px rgba(16, 24, 40, 0.05)]"
                                             >
                                                 Xác nhận
@@ -223,6 +241,10 @@ const PopupConfim = (props) => {
                                 'price_quote_status',
                                 'sales_product_status',
                                 'product_variant',
+                                'personnel_staff',
+                                'personnel_staff_status',
+                                'department',
+                                'personnel_roles'
                             ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">

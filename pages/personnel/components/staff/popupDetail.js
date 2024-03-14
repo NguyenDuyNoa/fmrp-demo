@@ -1,12 +1,7 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import dynamic from "next/dynamic";
-
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
@@ -20,16 +15,22 @@ import {
 } from "iconsax-react";
 import moment from "moment/moment";
 import Image from "next/image";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const Popup_chitiet = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [tab, sTab] = useState(0);
+
     const _HandleSelectTab = (e) => sTab(e);
+
     const [data, sData] = useState();
+
     const [dataRole, sDataRole] = useState([])
 
     const [onFetching, sOnFetching] = useState(false);
+
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
@@ -94,18 +95,14 @@ const Popup_chitiet = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${tab === 0
-                            ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                            : "hover:text-[#0F4F9E] "
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_info}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
-                        className={`${tab === 1
-                            ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                            : "hover:text-[#0F4F9E] "
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_power}
@@ -113,12 +110,7 @@ const Popup_chitiet = (props) => {
                 </div>
                 <div className="mt-4 space-x-5 w-[930px] h-auto  ">
                     {tab === 0 && (
-                        <ScrollArea
-                            ref={scrollAreaRef}
-                            className="h-[auto] overflow-hidden "
-                            speed={1}
-                            smoothScrolling={true}
-                        >
+                        <Customscrollbar className="h-[auto] overflow-hidden ">
                             {onFetching ? (
                                 <Loading className="h-80" color="#0f4f9e" />
                             ) : (
@@ -321,17 +313,15 @@ const Popup_chitiet = (props) => {
                                     </div>
                                 )
                             )}
-                        </ScrollArea>
+                        </Customscrollbar>
                     )}
                     {tab === 1 && (
                         <div>
                             <div className="w-[930px] ">
-                                <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                        <ScrollArea
+                                <Customscrollbar className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2">
+                                    <div className="pr-2 w-full">
+                                        <div
                                             className="min-h-[455px] max-h-[455px] overflow-hidden bg-slate-100/40 rounded-md"
-                                            speed={1}
-                                            smoothScrolling={true}
                                         >
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
                                                 <div className="">
@@ -388,7 +378,7 @@ const Popup_chitiet = (props) => {
                                                         <div className={``}>
                                                         </div>
                                                     </div>
-                                                    <div className="space-y-2 max-h-[280px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                                    <Customscrollbar className="space-y-2 max-h-[280px] overflow-y-auto">
                                                         {dataRole?.map((e) => {
                                                             return (
                                                                 <div key={e?.key}>
@@ -490,12 +480,12 @@ const Popup_chitiet = (props) => {
                                                                 </div>
                                                             );
                                                         })}
-                                                    </div>
+                                                    </Customscrollbar>
                                                 </div>
                                             </div>
-                                        </ScrollArea>
+                                        </div>
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </div>
                         </div>
                     )}

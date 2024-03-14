@@ -1,4 +1,6 @@
 const useActionRole = (auth, type) => {
+
+    //conver lại type của be trả về theo type của mình thông qua props
     const conversionRules = {
         "quotes": "price_quote",
         "orders": "sales_product",
@@ -14,7 +16,9 @@ const useActionRole = (auth, type) => {
         "material_category": "material_category",
         "materials": "materials",
         "category_products": "category_products",
-        "products": "products"
+        "products": "products",
+        "staff": "personnel_staff",
+        "department": "department"
         // Thêm các type ||  nameModel
 
 

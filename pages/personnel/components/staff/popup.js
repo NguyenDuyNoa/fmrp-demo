@@ -1,12 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 import PopupEdit from "/components/UI/popup";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import dynamic from "next/dynamic";
-import Select from "react-select";
-
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
@@ -22,23 +16,12 @@ import {
 import Image from "next/image";
 import useToast from "@/hooks/useToast";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import { MdClear } from "react-icons/md";
-import NoData from "@/components/UI/noData/nodata";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 
-const CustomSelectOption = ({ value, label, level, code }) => (
-    <div className="flex space-x-2 truncate">
-        {level == 1 && <span>--</span>}
-        {level == 2 && <span>----</span>}
-        {level == 3 && <span>------</span>}
-        {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
-    </div>
-);
 
 const Popup_dsnd = (props) => {
-    const dataLang = props.dataLang;
-
     const isShow = useToast();
 
     const scrollAreaRef = useRef(null);
@@ -170,11 +153,8 @@ const Popup_dsnd = (props) => {
         if (isState.open) {
             queryState({
                 onFetching: props?.id ? true : false,
-                brandpOpt: props.listBr ? props.listBr && [...props.listBr?.map((e) => ({
-                    label: e.name,
-                    value: Number(e.id),
-                }))] : [],
-                dataOption: props?.dataOption ? props?.dataOption : [],
+                brandpOpt: props?.isState?.dataBranch || [],
+                dataOption: props?.isState?.dataOption || [],
             });
             props?.id && _ServerFetching_detailUser();
             fetchDataPower()
@@ -427,11 +407,7 @@ const Popup_dsnd = (props) => {
                 <div className="mt-4 w-[600px] ">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         {isState.tab == 0 && (
-                            <ScrollArea
-                                ref={scrollAreaRef}
-                                className="h-[480px] overflow-hidden"
-                                speed={1}
-                                smoothScrolling={true}
+                            <Customscrollbar className="h-[480px] overflow-hidden"
                             >
                                 <div className="">
                                     <div className="flex justify-between gap-5">
@@ -673,7 +649,7 @@ const Popup_dsnd = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                            </ScrollArea>
+                            </Customscrollbar>
                         )}
                         {isState.tab == 1 && (
                             <div className="flex  items-center justify-between gap-2  flex-wrap ">
@@ -685,7 +661,7 @@ const Popup_dsnd = (props) => {
                                             </label>
                                             <SelectComponent
                                                 options={isState.dataOption}
-                                                formatOptionLabel={CustomSelectOption}
+                                                formatOptionLabel={SelectOptionLever}
                                                 value={isState.idPos}
                                                 maxMenuHeight="200px"
                                                 isClearable={true}
