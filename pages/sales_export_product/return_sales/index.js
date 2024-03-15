@@ -42,6 +42,10 @@ import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecompon
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import NoData from "@/components/UI/noData/nodata";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 
 
 const Index = (props) => {
@@ -639,74 +643,70 @@ const Index = (props) => {
                                 </div>
                                 <Customscrollbar>
                                     <div className="w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                        <HeaderTable gridCols={10}>
+                                            <ColumnTable textAlign='center' colSpan={1}>
                                                 {dataLang?.import_day_vouchers || "import_day_vouchers"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.import_code_vouchers || "import_code_vouchers"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.returnSales_client || "returnSales_client"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.import_total_amount || "import_total_amount"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.import_tax_money || "import_tax_money"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.import_into_money || "import_into_money"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.returns_form || "returns_form"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.import_branch || "import_branch"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                            </ColumnTable>
+                                            <ColumnTable textAlign={'center'} colSpan={1}>
                                                 {dataLang?.import_action || "import_action"}
-                                            </h4>
-                                        </div>
+                                            </ColumnTable>
+                                        </HeaderTable>
                                         {isState.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : isState.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                     {isState?.data?.map((e) => (
-                                                        <div
-                                                            className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                            key={e.id.toString()}
-                                                        >
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                        <RowTable gridCols={10} key={e.id.toString()}>
+                                                            <RowItemTable textAlign={'center'} colSpan={1}>
                                                                 {e?.date != null
                                                                     ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'center'}>
                                                                 <PopupDetail
                                                                     dataLang={dataLang}
-                                                                    className="text-left"
-                                                                    name={e?.code}
+                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer " name={e?.code}
                                                                     id={e?.id}
                                                                 />
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'center'}>
                                                                 {e.client_name}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
                                                                 {formatMoney(e.total_price)}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
                                                                 {formatMoney(e.total_tax_price)}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
                                                                 {formatMoney(e.total_amount)}
-                                                            </h6>
-                                                            <h6 className="col-span-1 mx-auto">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className=" mx-auto">
                                                                 {(e?.handling_solution === "pay_down" && (
                                                                     <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2">
                                                                         {dataLang[e?.handling_solution] ||
@@ -719,20 +719,20 @@ const Index = (props) => {
                                                                                 e?.handling_solution}
                                                                         </div>
                                                                     ))}
-                                                            </h6>
-                                                            <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1}>
                                                                 <ButtonWarehouse
                                                                     warehouseman_id={e?.warehouseman_id}
                                                                     _HandleChangeInput={_HandleChangeInput}
                                                                     id={e?.id}
                                                                 />
-                                                            </h6>
-                                                            <h6 className="col-span-1 w-fit mx-auto">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className="w-fit mx-auto">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
                                                                     {e?.branch_name}
                                                                 </div>
-                                                            </h6>
-                                                            <div className="col-span-1 flex justify-center">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className="flex justify-center">
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -742,24 +742,13 @@ const Index = (props) => {
                                                                     type="returnSales"
                                                                     className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
-                                                            </div>
-                                                        </div>
+                                                            </RowItemTable>
+                                                        </RowTable>
                                                     ))}
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        {dataLang?.price_quote_table_item_not_found ||
-                                                            "price_quote_table_item_not_found"}
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 "></div>
-                                                </div>
-                                            </div>
+                                            <NoData />
                                         )}
                                     </div>
                                 </Customscrollbar>
@@ -788,19 +777,18 @@ const Index = (props) => {
                             </div>
                         </ContainerTotal>
                         {isState.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                                <h6 className="">
-                                    {/* {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords} {dataLang?.ingredient} */}
-                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                </h6>
+                            <ContainerPagination>
+                                <TitlePagination
+                                    dataLang={dataLang}
+                                    totalItems={totalItems?.iTotalDisplayRecords}
+                                />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
-                            </div>
+                            </ContainerPagination>
                         )}
                     </div>
                 </ContainerBody>

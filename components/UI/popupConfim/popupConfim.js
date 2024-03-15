@@ -23,15 +23,21 @@ const PopupConfim = (props) => {
         switch (props?.nameModel) {
             case "client_contact":
                 //Xóa biến liên hệ KH
-                if (!props?.isIdChild && !checkDelete) {
-                    props.save();
-                }
+                // if (!props?.isIdChild && !checkDelete) {
+                //     props.save();
+                // } else {
+                //     showToat('warning', 'Bạn không có quyền truy cập');
+                // }
+                props.save();
                 break;
             case "contacts_suppliers":
                 //Xóa biến liên hệ ncc
-                if (!props?.isIdChild && !checkDelete) {
-                    props.save();
-                }
+                // if (!props?.isIdChild && !checkDelete) {
+                //     props.save();
+                // } else {
+                //     showToat('warning', 'Bạn không có quyền truy cập');
+                // }
+                props.save();
                 break;
             case "material_variation":
                 //Xóa biến thể nvl

@@ -33,8 +33,10 @@ const Header = () => {
                         {
                             name: "Danh sách liên hệ",
                             link: "/clients/contact",
-                            viewOwn: auth?.client_contact?.is_view_own,
-                            view: auth?.client_contact?.is_view,
+                            // viewOwn: auth?.client_contact?.is_view_own,
+                            // view: auth?.client_contact?.is_view,
+                            viewOwn: auth?.customers?.is_view_own,
+                            view: auth?.customers?.is_view,
                         },
                         {
                             viewOwn: auth?.client_status?.is_view_own,
@@ -66,8 +68,10 @@ const Header = () => {
                             link: "/suppliers/supplier"
                         },
                         {
-                            viewOwn: auth?.contacts_suppliers?.is_view_own,
-                            view: auth?.contacts_suppliers?.is_view,
+                            // viewOwn: auth?.contacts_suppliers?.is_view_own,
+                            // view: auth?.contacts_suppliers?.is_view,
+                            viewOwn: auth?.suppliers?.is_view_own,
+                            view: auth?.suppliers?.is_view,
                             name: "Danh sách liên hệ NCC",
                             link: "/suppliers/contacts",
                         },

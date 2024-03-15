@@ -4,7 +4,7 @@ const BtnStatusApproved = ({ onClick, title, type, className }) => {
     const STATUS_APPROVED = "Đã Duyệt"
     const STATUS_UNAPPROVED = "Chưa Duyệt"
     return <div
-        className={`${className} 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 
+        className={`${className} cursor-pointer 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 
         3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] 
         lg:h-5
         ${type == "0" && "border-red-500 text-red-500 hover:bg-red-500"}

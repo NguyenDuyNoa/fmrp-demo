@@ -126,7 +126,7 @@ const Popup_dsncc = (props) => {
               position: e?.position,
               address: e?.address,
               phone_number: e?.phone_number,
-              disble: role == false || checkEdit == false
+              // disble: role == true || checkEdit == true
             }
           }) || [],
         })
@@ -263,6 +263,7 @@ const Popup_dsncc = (props) => {
     isState.valueGr?.forEach((e, index) => {
       data.append(`supplier_group_id[${index}]`, e?.value ? e?.value : "");
     });
+
     isState.option?.forEach((e, index) => {
       data.append(`contact[${index}][id]`, e?.idBe ? e?.idBe : "");
       data.append(`contact[${index}][full_name]`, e?.full_name);
@@ -280,12 +281,12 @@ const Popup_dsncc = (props) => {
         if (!err) {
           const { isSuccess, message, } = response.data;
           if (isSuccess) {
-            isShow("success", props?.dataLang[message]);
+            isShow("success", props?.dataLang[message] || message);
             props.onRefresh && props.onRefresh();
             props.onRefreshGroup && props.onRefreshGroup();
             sIsState(initalState)
           } else {
-            isShow("error", props?.dataLang[message]);
+            isShow("error", props?.dataLang[message] || message);
           }
         }
         queryState({ onSending: false });
@@ -295,19 +296,16 @@ const Popup_dsncc = (props) => {
 
   //onchang option form
   const _OnChangeOption = (id, type, value) => {
-    var index = isState.option.findIndex((x) => x.id === id);
-    if (type == "full_name") {
-      isState.option[index].full_name = value.target?.value;
-    } else if (type == "email") {
-      isState.option[index].email = value.target?.value;
-    } else if (type == "position") {
-      isState.option[index].position = value.target?.value;
-    } else if (type === "address") {
-      isState.option[index].address = value.target?.value;
-    } else if (type === "phone_number") {
-      isState.option[index].phone_number = value.target?.value;
-    }
-    queryState({ option: [...isState.option] })
+    const newDb = isState.option.map((e) => {
+      if (e.idFe === id) {
+        return {
+          ...e,
+          [type]: value.target?.value
+        }
+      }
+      return e
+    })
+    queryState({ option: newDb })
   };
 
   // add option form
@@ -337,7 +335,7 @@ const Popup_dsncc = (props) => {
   // save form
   const _HandleSubmit = (e) => {
     e.preventDefault();
-    if (isState.name == "" || isState.valueBr?.length == 0) {
+    if (isState.name == "" || isState.valueBr?.length == 0 || isState.option.some(x => x.full_name == "" || x.phone_number == "")) {
       isState.name == "" && queryState({ errInput: true });
       isState.valueBr?.length == 0 && queryState({ errInputBr: true });
       isShow("error", props.dataLang?.required_field_null);

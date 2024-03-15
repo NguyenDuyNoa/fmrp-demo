@@ -37,9 +37,13 @@ import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComp
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
-import { Container, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import NoData from "@/components/UI/noData/nodata";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 registerLocale("vi", vi);
 
 
@@ -61,7 +65,6 @@ const Index = (props) => {
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const { checkAdd, checkExport } = useActionRole(auth, "price_quote")
-    console.log("checkExport", checkExport);
 
     const initData = {
         data: [],
@@ -483,361 +486,335 @@ const Index = (props) => {
                     </div>
                 )}
 
-                <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-0.5 h-[96%] overflow-hidden">
-                            <div className="flex justify-between  mt-1 mr-2">
-                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                    {dataLang?.price_quote || "price_quote"}
-                                </h2>
-                                <button
-                                    onClick={() => {
-                                        if (role) {
-                                            router.push(routerPriceQuote.form)
-                                        } else if (checkAdd) {
-                                            router.push(routerPriceQuote.form)
-                                        }
-                                        else {
-                                            isShow("warning", WARNING_STATUS_ROLE)
-                                        }
-                                    }}
-                                    type="button"
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                >
-                                    {dataLang?.btn_new || "btn_new"}
-                                </button>
-                            </div>
 
-                            <ContainerFilterTab>
-                                {isState.listTabStatus &&
-                                    isState.listTabStatus.map((e) => {
-                                        return (
-                                            <div>
-                                                <TabFilter
-                                                    dataLang={dataLang}
-                                                    key={e?.id}
-                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                    total={e?.count}
-                                                    active={e?.id}
-                                                >
-                                                    {dataLang[e?.name]}
-                                                </TabFilter>
+                <ContainerBody>
+                    <div className="space-y-0.5 h-[96%] overflow-hidden">
+                        <div className="flex justify-between  mt-1 mr-2">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                {dataLang?.price_quote || "price_quote"}
+                            </h2>
+                            <button
+                                onClick={() => {
+                                    if (role) {
+                                        router.push(routerPriceQuote.form)
+                                    } else if (checkAdd) {
+                                        router.push(routerPriceQuote.form)
+                                    }
+                                    else {
+                                        isShow("warning", WARNING_STATUS_ROLE)
+                                    }
+                                }}
+                                type="button"
+                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                            >
+                                {dataLang?.btn_new || "btn_new"}
+                            </button>
+                        </div>
+
+                        <ContainerFilterTab>
+                            {isState.listTabStatus &&
+                                isState.listTabStatus.map((e) => {
+                                    return (
+                                        <div>
+                                            <TabFilter
+                                                dataLang={dataLang}
+                                                key={e?.id}
+                                                onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                                total={e?.count}
+                                                active={e?.id}
+                                            >
+                                                {dataLang[e?.name]}
+                                            </TabFilter>
+                                        </div>
+                                    );
+                                })}
+                        </ContainerFilterTab>
+                        <ContainerTable>
+                            <div className="xl:space-y-3 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9  xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
+                                        <div className="grid grid-cols-5 gap-2">
+                                            <div className="col-span-1">
+                                                <SearchComponent dataLang={dataLang} onChange={_HandleOnChangeKeySearch.bind(this)} />
                                             </div>
-                                        );
-                                    })}
-                            </ContainerFilterTab>
-                            <ContainerTable>
-                                <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9  xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                        <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                            <div className="grid grid-cols-5 gap-2">
-                                                <div className="col-span-1">
-                                                    <SearchComponent dataLang={dataLang} onChange={_HandleOnChangeKeySearch.bind(this)} />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <SelectComponent
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: dataLang?.price_quote_branch || "price_quote_branch",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...isState.listBr,
-                                                        ]}
-                                                        onChange={(e) => queryState({ idBranch: e })}
-                                                        value={isState.idBranch}
-                                                        placeholder={dataLang?.price_quote_select_branch ||
-                                                            "price_quote_select_branch"
-                                                        }
-                                                        isClearable={true}
-                                                        closeMenuOnSelect={true}
-                                                    />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <SelectComponent
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: dataLang?.price_quote_select_code || "price_quote_select_code",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...isState.listQuoteCode,
-                                                        ]}
-                                                        onInputChange={handleSearchApi}
-                                                        onChange={(e) => queryState({ idQuoteCode: e })}
-                                                        value={isState.idQuoteCode}
-                                                        placeholder={dataLang?.price_quote_code || "price_quote_code"}
-                                                        isClearable={true}
-                                                    />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <SelectComponent
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: dataLang?.price_quote_select_customer || "price_quote_select_customer",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...isState.listCustomer,
-                                                        ]}
-                                                        onInputChange={handleSearchClientsApi}
-                                                        onChange={(e) => queryState({ idCustomer: e })}
-                                                        value={isState.idCustomer}
-                                                        placeholder={
-                                                            dataLang?.price_quote_customer || "price_quote_customer"
-                                                        }
-                                                        isClearable={true}
-                                                    />
-                                                </div>
-                                                <div className="z-20 col-span-1">
-                                                    <DatepickerComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
-                                                </div>
+                                            <div className="col-span-1">
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...isState.listBr,
+                                                    ]}
+                                                    onChange={(e) => queryState({ idBranch: e })}
+                                                    value={isState.idBranch}
+                                                    placeholder={dataLang?.price_quote_select_branch ||
+                                                        "price_quote_select_branch"
+                                                    }
+                                                    isClearable={true}
+                                                    closeMenuOnSelect={true}
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.price_quote_select_code || "price_quote_select_code",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...isState.listQuoteCode,
+                                                    ]}
+                                                    onInputChange={handleSearchApi}
+                                                    onChange={(e) => queryState({ idQuoteCode: e })}
+                                                    value={isState.idQuoteCode}
+                                                    placeholder={dataLang?.price_quote_code || "price_quote_code"}
+                                                    isClearable={true}
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.price_quote_select_customer || "price_quote_select_customer",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...isState.listCustomer,
+                                                    ]}
+                                                    onInputChange={handleSearchClientsApi}
+                                                    onChange={(e) => queryState({ idCustomer: e })}
+                                                    value={isState.idCustomer}
+                                                    placeholder={
+                                                        dataLang?.price_quote_customer || "price_quote_customer"
+                                                    }
+                                                    isClearable={true}
+                                                />
+                                            </div>
+                                            <div className="z-20 col-span-1">
+                                                <DatepickerComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
                                             </div>
                                         </div>
-                                        <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                            <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                                {(role == true || checkExport) ?
-                                                    <div className={``}>
-                                                        {isState.dataExcel?.length > 0 && (
-                                                            <ExcelFileComponent filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
-                                                    </div>
-                                                    :
-                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
-                                                        <span>{dataLang?.client_list_exportexcel}</span>
-                                                    </button>
-                                                }
-                                                <div>
-                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                    </div>
+                                    <div className="col-span-1 xl:col-span-2 lg:col-span-2">
+                                        <div className="flex justify-end items-center gap-2">
+                                            <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
+                                            {(role == true || checkExport) ?
+                                                <div className={``}>
+                                                    {isState.dataExcel?.length > 0 && (
+                                                        <ExcelFileComponent filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
                                                 </div>
+                                                :
+                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                </button>
+                                            }
+                                            <div>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <Customscrollbar >
-                                    <div className="w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center whitespace-nowrap">
-                                                {dataLang?.price_quote_date || "price_quote_table_date"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_code || "price_quote_table_code"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-2 font-[600] text-left">
-                                                {dataLang?.price_quote_customer || "price_quote_table_customer"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_total || "price_quote_table_total"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_tax_money || "price_quote_tax_money"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_into_money || "price_quote_into_money"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_effective_date || "price_quote_table_effective_date"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_order_status || "price_quote_order_status"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-left">
-                                                {dataLang?.price_quote_note || "price_quote_note"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_branch || "price_quote_branch"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_operations || "price_quote_operations"}
-                                            </h4>
-                                        </div>
-                                        {isState.onFetching ? (
-                                            <Loading className="h-80" color="#0f4f9e" />
-                                        ) : isState.data?.length > 0 ? (
-                                            <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {isState.data?.map((e) => (
-                                                        <div
-                                                            className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
-                                                            key={e.id.toString()}
-                                                        >
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center">
-                                                                {e?.date != null
-                                                                    ? moment(e?.date).format("DD/MM/YYYY")
-                                                                    : ""}
-                                                            </h6>
+                            </div>
+                            <Customscrollbar >
+                                <div className="w-[100%] lg:w-[100%] ">
+                                    <HeaderTable gridCols={12}>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_date || "price_quote_table_date"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_code || "price_quote_table_code"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.price_quote_customer || "price_quote_table_customer"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_total || "price_quote_table_total"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_tax_money || "price_quote_tax_money"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_into_money || "price_quote_into_money"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_effective_date || "price_quote_table_effective_date"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_order_status || "price_quote_order_status"}
+                                        </ColumnTable>
+                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-left">
+                                            {dataLang?.price_quote_note || "price_quote_note"}
+                                        </h4>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_branch || "price_quote_branch"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.price_quote_operations || "price_quote_operations"}
+                                        </ColumnTable>
+                                    </HeaderTable>
+                                    {isState.onFetching ? (
+                                        <Loading className="h-80" color="#0f4f9e" />
+                                    ) : isState.data?.length > 0 ? (
+                                        <>
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
+                                                {isState.data?.map((e) => (
+                                                    <RowTable gridCols={12} key={e.id.toString()}>
+                                                        <RowItemTable colSpan={1} textAlign='center'>
+                                                            {e?.date != null
+                                                                ? moment(e?.date).format("DD/MM/YYYY")
+                                                                : ""}
+                                                        </RowItemTable>
 
-                                                            <h6 className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer">
-                                                                <PopupDetailQuote
-                                                                    dataLang={dataLang}
-                                                                    className="text-left"
-                                                                    name={e?.reference_no}
-                                                                    id={e?.id}
-                                                                />
-                                                            </h6>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <PopupDetailQuote
+                                                                dataLang={dataLang}
+                                                                className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                                                                name={e?.reference_no}
+                                                                id={e?.id}
+                                                            />
+                                                        </RowItemTable>
 
-                                                            <h6 className="3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-2 text-left ">
-                                                                {e.client_name}
-                                                            </h6>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
+                                                            {e.client_name}
+                                                        </RowItemTable>
 
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_price)}
-                                                            </h6>
+                                                        <RowItemTable textAlign={'right'}>
+                                                            {formatNumber(e.total_price)}
+                                                        </RowItemTable>
 
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right ">
-                                                                {formatNumber(e.total_tax_price)}
-                                                            </h6>
+                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            {formatNumber(e.total_tax_price)}
+                                                        </RowItemTable>
 
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_amount)}
-                                                            </h6>
+                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            {formatNumber(e.total_amount)}
+                                                        </RowItemTable>
 
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] col-span-1 text-center ">
-                                                                {e?.validity != null
-                                                                    ? moment(e?.validity).format("DD/MM/YYYY")
-                                                                    : ""}
-                                                            </h6>
+                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            {e?.validity != null
+                                                                ? moment(e?.validity).format("DD/MM/YYYY")
+                                                                : ""}
+                                                        </RowItemTable>
 
-                                                            <h6 className="px-2 col-span-1 flex items-center justify-center text-center ">
-                                                                <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
-                                                                    {(e?.status === "confirmed" && (
+                                                        <RowItemTable colSpan={1} className="flex items-center justify-center text-center ">
+                                                            <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
+                                                                {(e?.status === "confirmed" && (
+                                                                    <BtnStatusApproved
+                                                                        onClick={() =>
+                                                                            handleQueryId({
+                                                                                id: e?.id,
+                                                                                status: true,
+                                                                                idChild: "confirmed",
+                                                                            })
+                                                                        }
+                                                                        type="1"
+                                                                    />
+                                                                )) ||
+                                                                    (e?.status === "not_confirmed" && (
                                                                         <BtnStatusApproved
                                                                             onClick={() =>
                                                                                 handleQueryId({
                                                                                     id: e?.id,
                                                                                     status: true,
-                                                                                    idChild: "confirmed",
+                                                                                    idChild: "not_confirmed",
                                                                                 })
                                                                             }
-                                                                            type="1"
-                                                                        />
+                                                                            type="0" />
                                                                     )) ||
-                                                                        (e?.status === "not_confirmed" && (
-                                                                            <BtnStatusApproved
-                                                                                onClick={() =>
-                                                                                    handleQueryId({
-                                                                                        id: e?.id,
-                                                                                        status: true,
-                                                                                        idChild: "not_confirmed",
-                                                                                    })
-                                                                                }
-                                                                                type="0" />
-                                                                        )) ||
-                                                                        (e?.status === "no_confirmed" && (
-                                                                            <BtnStatusApproved
-                                                                                onClick={() =>
-                                                                                    handleQueryId({
-                                                                                        id: e?.id,
-                                                                                        status: true,
-                                                                                        idChild: "no_confirmed",
-                                                                                    })
-                                                                                }
-                                                                                title="Không duyệt"
-                                                                                type="2" />
-                                                                        )) ||
-                                                                        (e?.status === "ordered" && (
-                                                                            // <BtnStatusApproved
-                                                                            //     onClick={() =>
-                                                                            //         handleToggleOrdered(e?.id)
-                                                                            //     }
-                                                                            //     title="Đã Tạo Đơn Đặt Hàng"
-                                                                            //     type="3" />
-                                                                            <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400 bg-orange-500 hover:bg-orange-600  transition-all duration-300 ease-in-out rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center"
-                                                                                onClick={() =>
-                                                                                    handleToggleOrdered(e?.id)
-                                                                                }
-                                                                            >
-                                                                                Đã Tạo Đơn Đặt Hàng
-                                                                                <TickCircle className=" absolute 3xl:top-[30%] 3lx:-right-[-5%] 2xl:top-[25%] 2lx:-right-[-5%] xl:top-[25%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4 xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 text-white border-orange-400" />
-                                                                            </div>
-                                                                        ))}
-                                                                </h6>
+                                                                    (e?.status === "no_confirmed" && (
+                                                                        <BtnStatusApproved
+                                                                            onClick={() =>
+                                                                                handleQueryId({
+                                                                                    id: e?.id,
+                                                                                    status: true,
+                                                                                    idChild: "no_confirmed",
+                                                                                })
+                                                                            }
+                                                                            title="Không duyệt"
+                                                                            type="2" />
+                                                                    )) ||
+                                                                    (e?.status === "ordered" && (
+                                                                        <div
+                                                                            className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400 bg-orange-500 hover:bg-orange-600  transition-all duration-300 ease-in-out rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center"
+                                                                            onClick={() =>
+                                                                                handleToggleOrdered(e?.id)
+                                                                            }
+                                                                        >
+                                                                            Đã Tạo Đơn Đặt Hàng
+                                                                            <TickCircle className=" absolute 3xl:top-[30%] 3lx:-right-[-5%] 2xl:top-[25%] 2lx:-right-[-5%] xl:top-[25%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4 xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 text-white border-orange-400" />
+                                                                        </div>
+                                                                    ))}
                                                             </h6>
-
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-left h-60px truncate ">
-                                                                {e?.note}
-                                                            </h6>
-
-                                                            <h6 className="col-span-1 w-fit mx-auto">
-                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {e?.branch_name}
-                                                                </div>
-                                                            </h6>
-
-                                                            <div className="col-span-1 flex justify-center">
-                                                                <BtnAction
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    status={e?.status}
-                                                                    id={e?.id}
-                                                                    type="price_quote"
-                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                                />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
+                                                            {e?.note}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="w-fit mx-auto">
+                                                            <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                {e?.branch_name}
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        {dataLang?.price_quote_table_item_not_found ||
-                                                            "price_quote_table_item_not_found"}
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 "></div>
-                                                </div>
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="flex items-center justify-center">
+                                                            <BtnAction
+                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                dataLang={dataLang}
+                                                                status={e?.status}
+                                                                id={e?.id}
+                                                                type="price_quote"
+                                                            />
+                                                        </RowItemTable>
+                                                    </RowTable>
+                                                ))}
                                             </div>
-                                        )}
-                                    </div>
-                                </Customscrollbar>
-                            </ContainerTable>
-                        </div>
-                        <ContainerTotal>
-                            <div className="col-span-4 p-2 text-left">
-                                <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {formatNumber(total?.total_price)}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap ">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {formatNumber(total?.total_tax_price)}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {formatNumber(total?.total_amount)}
-                                </h3>
-                            </div>
-                        </ContainerTotal>
-                        {isState.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                                {/* <h6>{dataLang?.display}  {totalItems?.iTotalDisplayRecords}</h6> */}
-                                <h6>
-                                    {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} phiếu báo
-                                    giá */}
-                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                </h6>
-                                <Pagination
-                                    postsPerPage={limit}
-                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                                    paginate={paginate}
-                                    currentPage={router.query?.page || 1}
-                                />
-                            </div>
-                        )}
+                                        </>
+                                    ) : (
+                                        <NoData />
+                                    )}
+                                </div>
+                            </Customscrollbar>
+                        </ContainerTable>
                     </div>
-                </div>
+                    <ContainerTotal>
+                        <div className="col-span-4 p-2 text-left">
+                            <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
+                                {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
+                            </h3>
+                        </div>
+                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
+                                {formatNumber(total?.total_price)}
+                            </h3>
+                        </div>
+                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap ">
+                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
+                                {formatNumber(total?.total_tax_price)}
+                            </h3>
+                        </div>
+                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
+                                {formatNumber(total?.total_amount)}
+                            </h3>
+                        </div>
+                    </ContainerTotal>
+                    {isState.data?.length != 0 && (
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItems?.iTotalDisplayRecords}
+                            />
+                            <Pagination
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page || 1}
+                            />
+                        </ContainerPagination>
+                    )}
+                </ContainerBody>
+
             </Container>
             <PopupConfim
                 dataLang={dataLang}

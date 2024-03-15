@@ -18,7 +18,9 @@ const useActionRole = (auth, type) => {
         "category_products": "category_products",
         "products": "products",
         "staff": "personnel_staff",
-        "department": "department"
+        "department": "department",
+        'purchases': "purchases",
+        "purchase_order": "order"
         // Thêm các type ||  nameModel
 
 

@@ -44,7 +44,8 @@ const Index = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
     console.log("authX", auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'contacts_suppliers');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'suppliers');
+    // const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'contacts_suppliers');
     console.log(checkExport);
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()

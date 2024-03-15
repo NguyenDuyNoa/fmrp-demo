@@ -1,47 +1,51 @@
-import React, { useState } from "react";
 
 import Head from "next/head";
+import { debounce } from "lodash";
 import moment from "moment/moment";
 import { useRouter } from "next/router";
-import { _ServerInstance as Axios } from "/services/axios";
-import { useEffect } from "react";
-import { debounce } from "lodash";
+import { useSelector } from "react-redux";
+import ModalImage from "react-modal-image";
+import React, { useState, useEffect } from "react";
 import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
-import ModalImage from "react-modal-image";
+import { _ServerInstance as Axios } from "/services/axios";
+
 import PopupDetail from "./components/PopupDetail";
 import PopupDetailProduct from "../sales_order/components/PopupDetailProduct";
-
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
+import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import ImageErrors from "@/components/UI/imageErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import { routerDeliveryReceipt } from "routers/sellingGoods";
-
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { useSelector } from "react-redux";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import useActionRole from "@/hooks/useRole";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, FilterTab } from "@/components/UI/common/layout";
-import NoData from "@/components/UI/noData/nodata";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
+
+import useToast from "@/hooks/useToast";
+import useActionRole from "@/hooks/useRole";
+import { useToggle } from "@/hooks/useToggle";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+
+
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { routerDeliveryReceipt } from "routers/sellingGoods";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 const Index = (props) => {
 
     const dataLang = props.dataLang;
@@ -606,75 +610,70 @@ const Index = (props) => {
                             <Customscrollbar>
                                 {/* className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100" */}
                                 <div className="w-[100%] lg:w-[100%] ">
-                                    <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                    <HeaderTable gridCols={12}>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.delivery_receipt_date || "delivery_receipt_date"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center' colSpan={2}>
                                             {dataLang?.price_quote_customer || "price_quote_table_customer"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.delivery_receipt_OrderNumber ||
                                                 "delivery_receipt_OrderNumber"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.price_quote_into_money || "price_quote_into_money"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.delivery_receipt_BrowseStorekeepers ||
                                                 "delivery_receipt_BrowseStorekeepers"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.price_quote_note || "price_quote_note"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.price_quote_branch || "price_quote_branch"}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable textAlign='center'>
                                             {dataLang?.price_quote_operations || "price_quote_operations"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                 {isState.data?.map((e) => (
-                                                    <div
-                                                        className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
-                                                        key={e.id.toString()}
-                                                    >
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                    <RowTable key={e?.id} gridCols={12}>
+                                                        <RowItemTable colSpan={1} textAlign='center'>
                                                             {e?.date != null
                                                                 ? moment(e?.date).format("DD/MM/YYYY")
                                                                 : ""}
-                                                        </h6>
-
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear  cursor-pointer">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1}>
                                                             <PopupDetail
                                                                 dataLang={dataLang}
-                                                                className="text-left"
+                                                                className=" transition-all text-[#0F4F9E] hover:text-blue-600 ease-linear  cursor-pointer"                                                                // className="text-left"
                                                                 name={e?.reference_no}
                                                                 id={e?.id}
                                                             />
-                                                        </h6>
-
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left ">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.name_client}
-                                                        </h6>
+                                                        </RowItemTable>
 
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left">
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.name_address_delivery}
-                                                        </h6>
+                                                        </RowItemTable>
                                                         <PopupDetailProduct
                                                             dataLang={dataLang}
                                                             className="text-left"
@@ -685,11 +684,10 @@ const Index = (props) => {
                                                             }
                                                             id={e?.order_id}
                                                         />
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatMoney(e.grand_total)}
-                                                        </h6>
-
-                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"left"} className="flex items-center space-x-1">
                                                             <div className="relative">
                                                                 <ModalImage
                                                                     small={
@@ -724,26 +722,25 @@ const Index = (props) => {
                                                             <h6 className="capitalize">
                                                                 {e?.created_by_full_name}
                                                             </h6>
-                                                        </h6>
+                                                        </RowItemTable>
 
-                                                        <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
+                                                        <RowItemTable colSpan={1}>
                                                             <ButtonWarehouse
                                                                 warehouseman_id={e?.warehouseman_id}
                                                                 _HandleChangeInput={_HandleChangeInput}
                                                                 id={e?.id}
                                                             />
-                                                        </h6>
+                                                        </RowItemTable>
 
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right truncate">
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {e?.note}
-                                                        </h6>
-                                                        <h6 className="col-span-1 w-fit mx-auto">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className=" w-fit mx-auto">
                                                             <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
                                                                 {e?.name_branch}
                                                             </div>
-                                                        </h6>
-
-                                                        <div className="col-span-1 flex justify-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className=" flex items-center justify-center">
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
                                                                 onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -751,10 +748,10 @@ const Index = (props) => {
                                                                 warehouseman_id={e?.warehouseman_id}
                                                                 id={e?.id}
                                                                 type="deliveryReceipt"
-                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                                className="bg-slate-100 flex items-center xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:!text-sm xl:!text-xs !text-[9px]"
                                                             />
-                                                        </div>
-                                                    </div>
+                                                        </RowItemTable>
+                                                    </RowTable>
                                                 ))}
                                             </div>
                                         </>
@@ -781,19 +778,18 @@ const Index = (props) => {
                         </div>
                     </ContainerTotal>
                     {isState.data?.length != 0 && (
-                        <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                            <h6>
-                                {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"} */}
-                                {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
-                            </h6>
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItems?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page ? router.query?.page : 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>
@@ -807,7 +803,7 @@ const Index = (props) => {
                 save={handleSaveStatus}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 

@@ -50,6 +50,9 @@ import Radio from "./(radio)/radio";
 import Popup_bom from "./(popup)/popupBom";
 import { useSelector } from "react-redux";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useToast from "@/hooks/useToast";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -65,11 +68,14 @@ const Index = (props) => {
     const tabPage = router.query?.tab;
     const hiRef = useRef(null);
     const scrollAreaRef = useRef(null);
+    const trangthaiExprired = useStatusExprired()
 
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
+    const isShow = useToast()
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -138,8 +144,16 @@ const Index = (props) => {
         extra: false,
     });
 
-    const trangthaiExprired = useStatusExprired()
 
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit } = useActionRole(auth,
+        router.query?.tab == 1 && "client_customers" ||
+        router.query?.tab == 2 && "suppliers" ||
+        router.query?.tab == 3 && "materials" ||
+        router.query?.tab == 4 && "products"
+        // ... thêm các type
+    )
     const _ServerFetching = () => {
         sOnLoading(true);
 
@@ -835,12 +849,11 @@ const Index = (props) => {
                 else if (!ObError?.name) {
                     Toast.fire({
                         icon: "error",
-                        title: `${
-                            (tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
+                        title: `${(tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
                             (tabPage == 2 && !ObError?.name && dataLang?.import_ERR_add_nameDataSuplier) ||
                             (tabPage == 3 && !ObError?.name && dataLang?.import_ERR_add_nameMterial) ||
                             (tabPage == 4 && !ObError?.name && dataLang?.import_ERR_add_nameProduct)
-                        }`,
+                            }`,
                     });
                 }
                 //bắt buộc phải có cột chi nhánh
@@ -1351,44 +1364,6 @@ const Index = (props) => {
                                 <div className="col-span-2"></div>
                                 <div className="col-span-4 mb-2 mt-2">
                                     {(tabPage == 5 && (
-                                        // <React.Fragment>
-                                        //   <h5 className="mb-1 block text-sm font-medium text-gray-700 relative">
-                                        //     {dataLang?.import_file_template ||
-                                        //       "import_file_template"}{" "}
-                                        //     <span className="text-red-500">*</span>
-                                        //     <ArrowDown
-                                        //       size="20"
-                                        //       className="absolute top-0 right-0 animate-bounce"
-                                        //       color="blue"
-                                        //     />
-                                        //   </h5>
-                                        //   <a
-                                        //     href={`${urlApi}/file/products/import_stages.xlsx`}
-                                        //     className="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
-                                        //   >
-                                        //     <span className="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
-                                        //     <span className="absolute right-0 flex items-center justify-start w-10 h-10 duration-300 transform translate-x-full group-hover:translate-x-0 ease">
-                                        //       <svg
-                                        //         className="w-5 h-5"
-                                        //         fill="none"
-                                        //         stroke="currentColor"
-                                        //         viewBox="0 0 24 24"
-                                        //         xmlns="http://www.w3.org/2000/svg"
-                                        //       >
-                                        //         <path
-                                        //           stroke-linecap="round"
-                                        //           stroke-linejoin="round"
-                                        //           stroke-width="2"
-                                        //           d="M14 5l7 7m0 0l-7 7m7-7H3"
-                                        //         ></path>
-                                        //       </svg>
-                                        //     </span>
-                                        //     <span className="relative left-1/2 -translate-x-1/2 text-sm">
-                                        //       {dataLang?.import_Download_file_template ||
-                                        //         "import_Download_file_template"}
-                                        //     </span>
-                                        //   </a>
-                                        // </React.Fragment>
                                         <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} urlApi={urlApi} />
                                     )) ||
                                         (tabPage == 6 && (
@@ -1501,9 +1476,8 @@ const Index = (props) => {
                                                         position: "absolute",
                                                     }),
                                                 }}
-                                                className={`${
-                                                    errValueCheck ? "border-red-500" : "border-transparent"
-                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${errValueCheck ? "border-red-500" : "border-transparent"
+                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                             {errValueCheck && (
                                                 <label className="text-sm text-red-500">
@@ -1531,12 +1505,11 @@ const Index = (props) => {
                                             </label>
                                             <label
                                                 for="importFile"
-                                                className={`${
-                                                    (errFileImport && dataImport.length == 0) ||
+                                                className={`${(errFileImport && dataImport.length == 0) ||
                                                     (errFileImport && fileImport == null)
-                                                        ? "border-red-500"
-                                                        : "border-gray-200"
-                                                } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
+                                                    ? "border-red-500"
+                                                    : "border-gray-200"
+                                                    } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
                                             >
                                                 <input
                                                     accept=".xlsx, .xls"
@@ -1569,75 +1542,6 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-4  ">
                                     {(tabPage != 5 && tabPage != 6 && (
-                                        // <div className="grid grid-cols-4 gap-2.5">
-                                        //   <div className="mx-auto w-full col-span-2">
-                                        //     <label
-                                        //       htmlFor="input-label"
-                                        //       className="block text-sm font-medium mb-2 dark:text-white"
-                                        //     >
-                                        //       {dataLang?.import_line_starts || "import_line_starts"}{" "}
-                                        //       <span className="text-red-500">*</span>
-                                        //     </label>
-                                        //     <NumericFormat
-                                        //       className={`${
-                                        //         errRowStart &&
-                                        //         (row_tarts == null || row_tarts == "")
-                                        //           ? "border-red-500"
-                                        //           : "border-gray-200"
-                                        //       } border py-2.5 outline-none px-4  block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
-                                        //       onValueChange={_HandleChange.bind(this, "row_tarts")}
-                                        //       value={row_tarts}
-                                        //       allowNegative={false}
-                                        //       decimalScale={0}
-                                        //       isNumericString={true}
-                                        //       thousandSeparator=","
-                                        //       placeholder={
-                                        //         dataLang?.import_line_starts || "import_line_starts"
-                                        //       }
-                                        //     />
-                                        //     {errRowStart && row_tarts == null && (
-                                        //       <label className="text-sm text-red-500">
-                                        //         {dataLang?.import_ERR_line || "import_ERR_line"}
-                                        //       </label>
-                                        //     )}
-                                        //   </div>
-                                        //   <div className="mx-auto w-full col-span-2">
-                                        //     <label
-                                        //       for="input-labels"
-                                        //       className="block text-sm font-medium mb-2 dark:text-white"
-                                        //     >
-                                        //       {dataLang?.import_finished_row ||
-                                        //         "import_finished_row"}
-                                        //       <span className="text-red-500">*</span>
-                                        //     </label>
-                                        //     <NumericFormat
-                                        //       className={`${
-                                        //         errEndRow && (end_row == null || end_row == "")
-                                        //           ? "border-red-500"
-                                        //           : "border-gray-200"
-                                        //       } border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
-                                        //       onValueChange={_HandleChange.bind(this, "end_row")}
-                                        //       value={end_row}
-                                        //       disabled={row_tarts == null}
-                                        //       allowNegative={false}
-                                        //       decimalScale={0}
-                                        //       isNumericString={true}
-                                        //       thousandSeparator=","
-                                        //       placeholder={
-                                        //         row_tarts == null
-                                        //           ? dataLang?.import_startrow || "import_startrow"
-                                        //           : dataLang?.import_finished_row ||
-                                        //             "import_finished_row"
-                                        //       }
-                                        //     />
-                                        //     {errEndRow && end_row == null && (
-                                        //       <label className="text-sm text-red-500">
-                                        //         {dataLang?.import_ERR_linefinish ||
-                                        //           "import_ERR_linefinish"}
-                                        //       </label>
-                                        //     )}
-                                        //   </div>
-                                        // </div>
                                         <Row
                                             dataLang={dataLang}
                                             _HandleChange={_HandleChange.bind(this)}
@@ -1648,74 +1552,6 @@ const Index = (props) => {
                                         />
                                     )) ||
                                         ((tabPage == 5 || tabPage == 6) && (
-                                            // <React.Fragment>
-                                            //   <div className="bg-white rounded-2xl shadow-2xl relative">
-                                            //     <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
-                                            //       <Notification
-                                            //         size="26"
-                                            //         color="red"
-                                            //         className=" animate-bounce"
-                                            //       />
-                                            //     </div>
-                                            //     <div className="p-2">
-                                            //       <div className="flex items-center gap-2">
-                                            //         <ArrowRight
-                                            //           size="16"
-                                            //           color="red"
-                                            //           className="animate-bounce"
-                                            //         />
-                                            //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                                            //           {dataLang?.import_err_stages ||
-                                            //             "import_err_stages"}
-                                            //         </h2>
-                                            //       </div>
-                                            //       <div className="flex items-center gap-2">
-                                            //         <ArrowRight
-                                            //           size="16"
-                                            //           color="red"
-                                            //           className="animate-bounce"
-                                            //         />
-                                            //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                                            //           {dataLang?.import_err_stages_two ||
-                                            //             "import_err_stages_two"}
-                                            //         </h2>
-                                            //       </div>
-                                            //       <div className="flex items-center gap-2">
-                                            //         <ArrowRight
-                                            //           size="16"
-                                            //           color="red"
-                                            //           className="animate-bounce"
-                                            //         />
-                                            //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                                            //           {dataLang?.import_err_stages_there ||
-                                            //             "import_err_stages_there"}
-                                            //         </h2>
-                                            //       </div>
-                                            //       <div className="flex items-center gap-2">
-                                            //         <ArrowRight
-                                            //           size="16"
-                                            //           color="red"
-                                            //           className="animate-bounce"
-                                            //         />
-                                            //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                                            //           {dataLang?.import_err_stages_for ||
-                                            //             "import_err_stages_for"}
-                                            //         </h2>
-                                            //       </div>
-                                            //       <div className="flex items-center gap-2">
-                                            //         <ArrowRight
-                                            //           size="16"
-                                            //           color="red"
-                                            //           className="animate-bounce"
-                                            //         />
-                                            //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                                            //           {dataLang?.import_err_stages_five ||
-                                            //             "import_err_stages_five"}
-                                            //         </h2>
-                                            //       </div>
-                                            //     </div>
-                                            //   </div>
-                                            // </React.Fragment>
                                             <SampleImport dataLang={dataLang} tabPage={tabPage} />
                                         ))}
                                 </div>
@@ -1755,9 +1591,8 @@ const Index = (props) => {
                                     )}
                                     {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
                                         <div
-                                            className={`flex items-center justify-center  gap-2 pt-5 ${
-                                                save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
-                                            }`}
+                                            className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                                }`}
                                         >
                                             <Stepper
                                                 stepper={stepper}
@@ -1770,9 +1605,8 @@ const Index = (props) => {
                                     )}
                                     {(tabPage == 1 || tabPage == 2) && (
                                         <div
-                                            className={`flex items-center justify-center  gap-2 pt-5 ${
-                                                save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
-                                            }`}
+                                            className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                                }`}
                                         >
                                             <Stepper
                                                 stepper={stepper}
@@ -1787,9 +1621,8 @@ const Index = (props) => {
                                 <div className="col-span-2"></div>
                                 <div className="col-span-2"></div>
                                 <div
-                                    className={`${listData?.length > 2 ? "mt-3" : ""} ${
-                                        onLoadingListData ? "col-span-8" : "col-span-6"
-                                    }`}
+                                    className={`${listData?.length > 2 ? "mt-3" : ""} ${onLoadingListData ? "col-span-8" : "col-span-6"
+                                        }`}
                                 >
                                     {onLoadingListData ? (
                                         <Loading className="h-2" color="#0f4f9e" />
@@ -1847,11 +1680,10 @@ const Index = (props) => {
                                                                         position: "absolute",
                                                                     }),
                                                                 }}
-                                                                className={`${
-                                                                    errFiles && e.dataFields == null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                                className={`${errFiles && e.dataFields == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                                    }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                             />
                                                         </div>
                                                         <div className="col-span-6">
@@ -1903,11 +1735,10 @@ const Index = (props) => {
                                                                         position: "absolute",
                                                                     }),
                                                                 }}
-                                                                className={`${
-                                                                    errColumn && e?.column == null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                                className={`${errColumn && e?.column == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                             />
                                                         </div>
                                                         <div className="col-span-1 mx-auto">
@@ -1922,12 +1753,12 @@ const Index = (props) => {
                                                         </h5>
                                                     )}
                                                     {e?.dataFields?.value == "group_id" ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "category_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "unit_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "unit_convert_id") ? (
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "category_id") ||
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "unit_id") ||
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "unit_convert_id") ? (
                                                         <div className="flex items-center space-x-2 rounded p-2 ">
                                                             <TiTick color="green" />
                                                             <label
@@ -2125,16 +1956,29 @@ const Index = (props) => {
                                         <div></div>
                                     )}
                                     <button
-                                        onClick={_HandleSubmit.bind(this)}
+                                        onClick={(e) => {
+                                            if (role) {
+                                                _HandleSubmit(e)
+                                                return
+                                            } else if (checkAdd) {
+                                                _HandleSubmit(e)
+                                                return
+                                            } else if (checkEdit) {
+                                                _HandleSubmit(e)
+                                                return
+                                            }
+                                            else {
+                                                return isShow("warning", WARNING_STATUS_ROLE)
+                                            }
+                                        }}
                                         type="button"
                                         className="xl:text-sm text-xs p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
                                     >
                                         <div
-                                            className={`${
-                                                multipleProgress
-                                                    ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
-                                                    : ""
-                                            }`}
+                                            className={`${multipleProgress
+                                                ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
+                                                : ""
+                                                }`}
                                         ></div>
                                         <span>{"Import"}</span>
                                     </button>

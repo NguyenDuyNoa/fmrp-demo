@@ -41,6 +41,11 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import NoData from "@/components/UI/noData/nodata";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 
 
 const Index = (props) => {
@@ -514,221 +519,216 @@ const Index = (props) => {
                 )}
 
                 <ContainerBody>
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-0.5 h-[96%] overflow-hidden">
-                            <div className="flex justify-between  mt-1 mr-2">
-                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                    {dataLang?.sales_product_list || "sales_product_list"}
-                                </h2>
-                                <div className={` flex justify-end items-center`}>
-                                    <button
-                                        onClick={() => {
-                                            if (role) {
-                                                router.push(routerSalesOrder.form)
-                                            } else if (checkAdd) {
-                                                router.push(routerSalesOrder.form)
-                                            }
-                                            else {
-                                                isShow("warning", WARNING_STATUS_ROLE)
-                                            }
-                                        }}
-                                        type="button"
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >
-                                        {dataLang?.btn_new || "btn_new"}
-                                    </button>
-                                </div>
+                    <div className="space-y-0.5 h-[96%] overflow-hidden">
+                        <div className="flex justify-between  mt-1 mr-2">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                {dataLang?.sales_product_list || "sales_product_list"}
+                            </h2>
+                            <div className={` flex justify-end items-center`}>
+                                <button
+                                    onClick={() => {
+                                        if (role) {
+                                            router.push(routerSalesOrder.form)
+                                        } else if (checkAdd) {
+                                            router.push(routerSalesOrder.form)
+                                        }
+                                        else {
+                                            isShow("warning", WARNING_STATUS_ROLE)
+                                        }
+                                    }}
+                                    type="button"
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                >
+                                    {dataLang?.btn_new || "btn_new"}
+                                </button>
                             </div>
-                            <ContainerFilterTab>
-                                {initData?.listTabStatus &&
-                                    initData?.listTabStatus?.map((e) => {
-                                        return (
-                                            <div>
-                                                <TabFilter
-                                                    style={{
-                                                        backgroundColor: "#e2f0fe",
-                                                    }}
-                                                    dataLang={dataLang}
-                                                    key={e?.id}
-                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                    total={e?.count}
-                                                    active={e?.id}
-                                                    className={"text-[#0F4F9E]"}
-                                                >
-                                                    {dataLang[e?.name]}
-                                                </TabFilter>
+                        </div>
+                        <ContainerFilterTab>
+                            {initData?.listTabStatus &&
+                                initData?.listTabStatus?.map((e) => {
+                                    return (
+                                        <div>
+                                            <TabFilter
+                                                style={{
+                                                    backgroundColor: "#e2f0fe",
+                                                }}
+                                                dataLang={dataLang}
+                                                key={e?.id}
+                                                onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                                total={e?.count}
+                                                active={e?.id}
+                                                className={"text-[#0F4F9E]"}
+                                            >
+                                                {dataLang[e?.name]}
+                                            </TabFilter>
+                                        </div>
+                                    );
+                                })}
+                        </ContainerFilterTab>
+                        {/* table */}
+                        <ContainerTable>
+                            {/* combobox search, excel */}
+                            <div className="xl:space-y-1 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
+                                        <div className="grid grid-cols-5 gap-2">
+                                            <div className="col-span-1">
+                                                <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch} />
                                             </div>
-                                        );
-                                    })}
-                            </ContainerFilterTab>
-                            {/* table */}
-                            <ContainerTable>
-                                {/* combobox search, excel */}
-                                <div className="xl:space-y-1 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
-                                        <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
-                                            <div className="grid grid-cols-5 gap-2">
-                                                <div className="col-span-1">
-                                                    <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch} />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <SelectComponent
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: dataLang?.price_quote_branch || "price_quote_branch",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...initData.listBr,
-                                                        ]}
-                                                        onChange={onChangeFilter("idBranch")}
-                                                        value={valueChange.idBranch}
-                                                        placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
-                                                        isClearable={true}
-                                                    />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <SelectComponent
-                                                        isLoading={initData.listQuoteCode == [] ? true : false}
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: dataLang?.sales_product_code || "sales_product_code",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...initData.listQuoteCode,
-                                                        ]}
-                                                        onChange={onChangeFilter("idQuoteCode")}
-                                                        onInputChange={handleSearchApiOrders}
-                                                        value={valueChange.idQuoteCode}
-                                                        placeholder={
-                                                            dataLang?.sales_product_code || "sales_product_code"
-                                                        }
-                                                        isClearable={true}
-                                                    />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <SelectComponent
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: dataLang?.price_quote_customer || "price_quote_customer",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...initData.listCustomer,
-                                                        ]}
-                                                        onInputChange={handleSearchApi}
-                                                        onChange={onChangeFilter("idCustomer")}
-                                                        value={valueChange.idCustomer}
-                                                        placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
-                                                        isClearable={true}
-                                                    />
-                                                </div>
-                                                <div className="z-20 col-span-1">
-                                                    <DatepickerComponent value={valueChange.valueDate} onChange={onChangeFilter("valueDate")} />
-                                                </div>
+                                            <div className="col-span-1">
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...initData.listBr,
+                                                    ]}
+                                                    onChange={onChangeFilter("idBranch")}
+                                                    value={valueChange.idBranch}
+                                                    placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
+                                                    isClearable={true}
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <SelectComponent
+                                                    isLoading={initData.listQuoteCode == [] ? true : false}
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.sales_product_code || "sales_product_code",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...initData.listQuoteCode,
+                                                    ]}
+                                                    onChange={onChangeFilter("idQuoteCode")}
+                                                    onInputChange={handleSearchApiOrders}
+                                                    value={valueChange.idQuoteCode}
+                                                    placeholder={
+                                                        dataLang?.sales_product_code || "sales_product_code"
+                                                    }
+                                                    isClearable={true}
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.price_quote_customer || "price_quote_customer",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...initData.listCustomer,
+                                                    ]}
+                                                    onInputChange={handleSearchApi}
+                                                    onChange={onChangeFilter("idCustomer")}
+                                                    value={valueChange.idCustomer}
+                                                    placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
+                                                    isClearable={true}
+                                                />
+                                            </div>
+                                            <div className="z-20 col-span-1">
+                                                <DatepickerComponent value={valueChange.valueDate} onChange={onChangeFilter("valueDate")} />
                                             </div>
                                         </div>
-                                        <div className="col-span-1 xl:col-span-2 lg:col-span-2">
-                                            <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={sOnFetching} />
-                                                {(role == true || checkExport) ?
-                                                    <div className={``}>
-                                                        {initData.dataExcel?.length > 0 && (
-                                                            <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
-                                                        )}
-                                                    </div>
-                                                    :
-                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
-                                                        <span>{dataLang?.client_list_exportexcel}</span>
-                                                    </button>
-                                                }
-                                                <div>
-                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+                                    </div>
+                                    <div className="col-span-1 xl:col-span-2 lg:col-span-2">
+                                        <div className="flex justify-end items-center gap-2">
+                                            <OnResetData sOnFetching={sOnFetching} />
+                                            {(role == true || checkExport) ?
+                                                <div className={``}>
+                                                    {initData.dataExcel?.length > 0 && (
+                                                        <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
+                                                    )}
                                                 </div>
+                                                :
+                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                </button>
+                                            }
+                                            <div>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* table */}
-                                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center whitespace-nowrap">
-                                                {dataLang?.sales_product_date || "sales_product_date"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.sales_product_code || "sales_product_code"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-left">
-                                                {dataLang?.customer || "customer"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.sales_product_type_order || "sales_product_type_order"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.sales_product_total_into_money ||
-                                                    "sales_product_total_into_money"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.sales_product_status || "sales_product_status"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.sales_product_statusTT || "sales_product_statusTT"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.branch || "branch"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-4 font-[600] text-center">
-                                                {dataLang?.sales_product_order_process || "sales_product_order_process"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.sales_product_action || "sales_product_action"}
-                                            </h4>
-                                        </div>
-                                        {/* {loading ? */}
-                                        {onFetching ? (
-                                            <Loading className="h-80" color="#0f4f9e" />
-                                        ) : initData.data?.length > 0 ? (
-                                            <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {initData.data?.map((e) => (
-                                                        <>
-                                                            <div
-                                                                className="relative grid grid-cols-13 items-center py-1.5 px-2 hover:bg-slate-100/40"
-                                                                key={e.id.toString()}
-                                                            >
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  text-zinc-600 px-2 col-span-1 text-center ">
-                                                                    {e?.date != null
-                                                                        ? moment(e?.date).format("DD/MM/YYYY")
-                                                                        : ""}
-                                                                </h6>
-                                                                <h6 className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer">
-                                                                    <PopupDetailProduct
-                                                                        dataLang={dataLang}
-                                                                        className="text-left"
-                                                                        name={e?.code ? e?.code : ""}
-                                                                        id={e?.id}
-                                                                    />
-                                                                </h6>
+                            {/* table */}
+                            <Customscrollbar className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px]">
+                                <div className="w-full">
+                                    <HeaderTable gridCols={13}>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.sales_product_date || "sales_product_date"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.sales_product_code || "sales_product_code"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'left'}>
+                                            {dataLang?.customer || "customer"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.sales_product_type_order || "sales_product_type_order"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.sales_product_total_into_money ||
+                                                "sales_product_total_into_money"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.sales_product_status || "sales_product_status"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.sales_product_statusTT || "sales_product_statusTT"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.branch || "branch"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={4} textAlign={'center'}>
+                                            {dataLang?.sales_product_order_process || "sales_product_order_process"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.sales_product_action || "sales_product_action"}
+                                        </ColumnTable>
+                                    </HeaderTable>
+                                    {/* {loading ? */}
+                                    {onFetching ? (
+                                        <Loading className="h-80" color="#0f4f9e" />
+                                    ) : initData.data?.length > 0 ? (
+                                        <>
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
+                                                {initData.data?.map((e) => (
+                                                    <>
+                                                        <RowTable gridCols={13} key={e.id.toString()}>
+                                                            <RowItemTable colSpan={1} textAlign='center'>
+                                                                {e?.date != null
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
+                                                                    : ""}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                                <PopupDetailProduct
+                                                                    dataLang={dataLang}
+                                                                    className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer" name={e?.code ? e?.code : ""}
+                                                                    id={e?.id}
+                                                                />
+                                                            </RowItemTable>
 
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  text-zinc-600 px-2 col-span-1 text-left ">
-                                                                    {e?.client_name}
-                                                                </h6>
+                                                            <RowItemTable colSpan={1} textAlign='left'>
+                                                                {e?.client_name}
+                                                            </RowItemTable>
 
-                                                                {/* fix */}
-                                                                <div className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 text-center">
-                                                                    {e?.quote_code !== null && e?.quote_id !== "0" ? (
-                                                                        // <div className="border  rounded-xl mx-auto w-2/3 group bg-lime-200 border-lime-200 text-lime-500">
-                                                                        <Zoom
-                                                                            whileHover={{ scale: 1.1 }}
-                                                                            whileTap={{ scale: 0.9 }}
-                                                                        >
-                                                                            <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500 ">
-                                                                                {/* <div>Phiếu báo giá</div> */}
-                                                                                {/* {"("}
+                                                            {/* fix */}
+                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                                {e?.quote_code !== null && e?.quote_id !== "0" ? (
+                                                                    // <div className="border  rounded-xl mx-auto w-2/3 group bg-lime-200 border-lime-200 text-lime-500">
+                                                                    <Zoom
+                                                                        whileHover={{ scale: 1.1 }}
+                                                                        whileTap={{ scale: 0.9 }}
+                                                                    >
+                                                                        <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500 ">
+                                                                            {/* <div>Phiếu báo giá</div> */}
+                                                                            {/* {"("}
                                                                             <PopupDetailQuote
                                                                                 dataLang={dataLang}
                                                                                 className="text-left group-hover:text-green-500"
@@ -737,279 +737,264 @@ const Index = (props) => {
                                                                             />
                                                                             {")"} */}
 
-                                                                                <PopupDetailQuote
-                                                                                    dataLang={dataLang}
-                                                                                    className="text-left "
-                                                                                    name={"Phiếu báo giá"}
-                                                                                    id={e?.quote_id}
-                                                                                />
-                                                                            </div>
-                                                                        </Zoom>
-                                                                    ) : (
-                                                                        <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
-                                                                            Tạo mới
+                                                                            <PopupDetailQuote
+                                                                                dataLang={dataLang}
+                                                                                className="text-left "
+                                                                                name={"Phiếu báo giá"}
+                                                                                id={e?.quote_id}
+                                                                            />
                                                                         </div>
-                                                                    )}
-                                                                </div>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  text-zinc-600 px-2 col-span-1 text-right">
-                                                                    {formatNumber(e.total_amount)}
-                                                                </h6>
+                                                                    </Zoom>
+                                                                ) : (
+                                                                    <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
+                                                                        Tạo mới
+                                                                    </div>
+                                                                )}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                                                {formatNumber(e.total_amount)}
+                                                            </RowItemTable>
 
-                                                                <h6 className="px-2 col-span-1 flex items-center justify-center text-center ">
-                                                                    <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
-                                                                        {(e?.status === "approved" && (
+                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                                <h6 className="flex items-center justify-center text-center cursor-pointer">
+                                                                    {(e?.status === "approved" && (
+                                                                        <BtnStatusApproved
+                                                                            onClick={() =>
+                                                                                handleQueryId({
+                                                                                    id: e?.id,
+                                                                                    status: true,
+                                                                                    idChild: "approved",
+                                                                                })
+                                                                            }
+                                                                            type="1"
+                                                                        />
+                                                                    )) ||
+                                                                        (e?.status === "un_approved" && (
                                                                             <BtnStatusApproved
                                                                                 onClick={() =>
                                                                                     handleQueryId({
                                                                                         id: e?.id,
                                                                                         status: true,
-                                                                                        idChild: "approved",
+                                                                                        idChild: "un_approved",
                                                                                     })
                                                                                 }
-                                                                                type="1"
+                                                                                type="0"
                                                                             />
-                                                                        )) ||
-                                                                            (e?.status === "un_approved" && (
-                                                                                <BtnStatusApproved
-                                                                                    onClick={() =>
-                                                                                        handleQueryId({
-                                                                                            id: e?.id,
-                                                                                            status: true,
-                                                                                            idChild: "un_approved",
-                                                                                        })
-                                                                                    }
-                                                                                    type="0"
-                                                                                />
 
-                                                                            ))}
-                                                                    </h6>
+                                                                        ))}
                                                                 </h6>
-                                                                <h6 className="col-span-1 ">
-                                                                    {(["payment_unpaid"].includes(
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1}>
+                                                                {(["payment_unpaid"].includes(
+                                                                    e?.status_payment
+                                                                ) && (
+                                                                        <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
+                                                                            {dataLang[e?.status_payment] ||
+                                                                                e?.status_payment}
+                                                                        </span>
+                                                                    )) ||
+                                                                    (["payment_partially_paid"].includes(
                                                                         e?.status_payment
                                                                     ) && (
-                                                                            <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
+                                                                            <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
+                                                                                {dataLang[e?.status_payment] ||
+                                                                                    e?.status_payment}{" "}
+                                                                                {`(${formatNumber(e?.total_payment)})`}
+                                                                            </span>
+                                                                        )) ||
+                                                                    (["payment_paid"].includes(
+                                                                        e?.status_payment
+                                                                    ) && (
+                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
+                                                                                <TickCircle
+                                                                                    className="bg-lime-500 rounded-full"
+                                                                                    color="white"
+                                                                                    size={15}
+                                                                                />
                                                                                 {dataLang[e?.status_payment] ||
                                                                                     e?.status_payment}
                                                                             </span>
-                                                                        )) ||
-                                                                        (["payment_partially_paid"].includes(
-                                                                            e?.status_payment
-                                                                        ) && (
-                                                                                <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
-                                                                                    {dataLang[e?.status_payment] ||
-                                                                                        e?.status_payment}{" "}
-                                                                                    {`(${formatNumber(e?.total_payment)})`}
-                                                                                </span>
-                                                                            )) ||
-                                                                        (["payment_paid"].includes(
-                                                                            e?.status_payment
-                                                                        ) && (
-                                                                                <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                                    <TickCircle
-                                                                                        className="bg-lime-500 rounded-full"
-                                                                                        color="white"
-                                                                                        size={15}
-                                                                                    />
-                                                                                    {dataLang[e?.status_payment] ||
-                                                                                        e?.status_payment}
-                                                                                </span>
-                                                                            ))}
-                                                                </h6>
-                                                                <h6 className="col-span-1 w-fit mx-auto">
-                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                        {e?.branch_name}
-                                                                    </div>
-                                                                </h6>
+                                                                        ))}
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} className="w-fit mx-auto">
+                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                    {e?.branch_name}
+                                                                </div>
+                                                            </RowItemTable>
 
-                                                                <div className=" col-span-4">
-                                                                    <div className="flex items-start py-2 ml-3">
-                                                                        {e?.process.map((item, i) => {
-                                                                            const isValue = [
-                                                                                "production_plan",
-                                                                                "produced_at_company",
-                                                                                "import_warehouse",
-                                                                                "delivery",
-                                                                            ].includes(item?.code);
+                                                            <RowItemTable colSpan={4}>
+                                                                <div className="flex items-start py-2 ml-3">
+                                                                    {e?.process.map((item, i) => {
+                                                                        const isValue = [
+                                                                            "production_plan",
+                                                                            "produced_at_company",
+                                                                            "import_warehouse",
+                                                                            "delivery",
+                                                                        ].includes(item?.code);
 
-                                                                            const isValueDelivery = [
-                                                                                "delivery",
-                                                                            ].includes(item?.code);
+                                                                        const isValueDelivery = [
+                                                                            "delivery",
+                                                                        ].includes(item?.code);
 
-                                                                            return (
-                                                                                <>
-                                                                                    <div
-                                                                                        className="relative"
-                                                                                        key={`process-${i}`}
-                                                                                    >
-                                                                                        {![
-                                                                                            "keep_stock",
-                                                                                            "import_outsourcing",
-                                                                                        ].includes(item?.code) && (
-                                                                                                <>
-                                                                                                    <div className="flex items-center">
+                                                                        return (
+                                                                            <>
+                                                                                <div
+                                                                                    className="relative"
+                                                                                    key={`process-${i}`}
+                                                                                >
+                                                                                    {![
+                                                                                        "keep_stock",
+                                                                                        "import_outsourcing",
+                                                                                    ].includes(item?.code) && (
+                                                                                            <>
+                                                                                                <div className="flex items-center">
+                                                                                                    <div
+                                                                                                        className={`${item?.active
+                                                                                                            ? `h-2 w-2 rounded-full bg-green-500`
+                                                                                                            : `h-2 w-2 rounded-full bg-gray-400`
+                                                                                                            } `}
+                                                                                                    />
+                                                                                                    {!isValueDelivery && (
                                                                                                         <div
                                                                                                             className={`${item?.active
-                                                                                                                ? `h-2 w-2 rounded-full bg-green-500`
-                                                                                                                : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                                } `}
+                                                                                                                ? `w-full bg-green-500 h-0.5 `
+                                                                                                                : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
+                                                                                                                }`}
                                                                                                         />
-                                                                                                        {!isValueDelivery && (
-                                                                                                            <div
-                                                                                                                className={`${item?.active
-                                                                                                                    ? `w-full bg-green-500 h-0.5 `
-                                                                                                                    : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                                    }`}
-                                                                                                            />
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                    <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
-                                                                                                        <div
-                                                                                                            className={`${item?.active
-                                                                                                                ? "text-green-500"
-                                                                                                                : "text-slate-500"
-                                                                                                                } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                        >
-                                                                                                            <div className="flex justify-center items-center w-full gap-1">
-                                                                                                                <h6>
-                                                                                                                    {
-                                                                                                                        dataLang[
-                                                                                                                        item
-                                                                                                                            ?.name
-                                                                                                                        ]
-                                                                                                                    }
-                                                                                                                </h6>
-                                                                                                                {isValueDelivery && (
-                                                                                                                    <h6
-                                                                                                                        className={`${item?.active &&
-                                                                                                                            isValueDelivery
-                                                                                                                            ? "text-green-500"
-                                                                                                                            : "text-orange-500"
-                                                                                                                            } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
-                                                                                                                    >{`(${dataLang[
-                                                                                                                        item
-                                                                                                                            ?.status
-                                                                                                                    ] ||
-                                                                                                                        item?.status
-                                                                                                                        })`}</h6>
-                                                                                                                )}
-                                                                                                            </div>
+                                                                                                    )}
+                                                                                                </div>
+                                                                                                <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
+                                                                                                    <div
+                                                                                                        className={`${item?.active
+                                                                                                            ? "text-green-500"
+                                                                                                            : "text-slate-500"
+                                                                                                            } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                                                                                    >
+                                                                                                        <div className="flex justify-center items-center w-full gap-1">
+                                                                                                            <h6>
+                                                                                                                {
+                                                                                                                    dataLang[
+                                                                                                                    item
+                                                                                                                        ?.name
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            </h6>
+                                                                                                            {isValueDelivery && (
+                                                                                                                <h6
+                                                                                                                    className={`${item?.active &&
+                                                                                                                        isValueDelivery
+                                                                                                                        ? "text-green-500"
+                                                                                                                        : "text-orange-500"
+                                                                                                                        } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                                                                                >{`(${dataLang[
+                                                                                                                    item
+                                                                                                                        ?.status
+                                                                                                                ] ||
+                                                                                                                    item?.status
+                                                                                                                    })`}</h6>
+                                                                                                            )}
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                </>
-                                                                                            )}
-                                                                                        <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
-                                                                                            {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
-                                                                                            {isValue &&
-                                                                                                item?.reference &&
-                                                                                                item?.reference
-                                                                                                    .slice(
-                                                                                                        0,
-                                                                                                        isExpanded
-                                                                                                            ? item
-                                                                                                                ?.reference
-                                                                                                                .length
-                                                                                                            : 2
+                                                                                                </div>
+                                                                                            </>
+                                                                                        )}
+                                                                                    <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
+                                                                                        {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
+                                                                                        {isValue &&
+                                                                                            item?.reference &&
+                                                                                            item?.reference
+                                                                                                .slice(
+                                                                                                    0,
+                                                                                                    isExpanded
+                                                                                                        ? item
+                                                                                                            ?.reference
+                                                                                                            .length
+                                                                                                        : 2
+                                                                                                )
+                                                                                                .map(
+                                                                                                    (ci, index) => (
+                                                                                                        <div
+                                                                                                            className="flex-col flex"
+                                                                                                            key={
+                                                                                                                index
+                                                                                                            }
+                                                                                                        >
+                                                                                                            {
+                                                                                                                ci?.code
+                                                                                                            }
+                                                                                                        </div>
                                                                                                     )
-                                                                                                    .map(
-                                                                                                        (ci, index) => (
-                                                                                                            <div
-                                                                                                                className="flex-col flex"
-                                                                                                                key={
-                                                                                                                    index
-                                                                                                                }
-                                                                                                            >
-                                                                                                                {
-                                                                                                                    ci?.code
-                                                                                                                }
-                                                                                                            </div>
-                                                                                                        )
-                                                                                                    )}
-                                                                                            {item?.reference &&
-                                                                                                item?.reference.length >
-                                                                                                2 && (
-                                                                                                    <button
-                                                                                                        onClick={
-                                                                                                            toggleShowAll
-                                                                                                        }
-                                                                                                    >
-                                                                                                        {isExpanded
-                                                                                                            ? "Rút gọn"
-                                                                                                            : "Xem thêm"}
-                                                                                                    </button>
                                                                                                 )}
-                                                                                        </p>
-                                                                                    </div>
-                                                                                </>
-                                                                            );
-                                                                        })}
-                                                                    </div>
+                                                                                        {item?.reference &&
+                                                                                            item?.reference.length >
+                                                                                            2 && (
+                                                                                                <button
+                                                                                                    onClick={
+                                                                                                        toggleShowAll
+                                                                                                    }
+                                                                                                >
+                                                                                                    {isExpanded
+                                                                                                        ? "Rút gọn"
+                                                                                                        : "Xem thêm"}
+                                                                                                </button>
+                                                                                            )}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </>
+                                                                        );
+                                                                    })}
                                                                 </div>
-
-                                                                <div className="col-span-1 flex justify-center">
-                                                                    <BtnAction
-                                                                        onRefresh={_ServerFetching.bind(this)}
-                                                                        dataLang={dataLang}
-                                                                        status={e?.status}
-                                                                        id={e?.id}
-                                                                        type="sales_product"
-                                                                        className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="text-[#141522] text-base opacity-90 font-medium">
-                                                        {dataLang?.price_quote_table_item_not_found ||
-                                                            "price_quote_table_item_not_found"}
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 "></div>
-                                                </div>
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} >
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    status={e?.status}
+                                                                    id={e?.id}
+                                                                    type="sales_product"
+                                                                />
+                                                            </RowItemTable>
+                                                        </RowTable>
+                                                    </>
+                                                ))}
                                             </div>
-                                        )}
-                                    </div>
+                                        </>
+                                    ) : (
+                                        <NoData />
+                                    )}
                                 </div>
-                            </ContainerTable>
-                        </div>
-                        <ContainerTotal className={'grid-cols-13'}>
-                            <div className="col-span-3 p-2 text-center">
-                                <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {dataLang?.total_outside || "total_outside"}
-                                </h3>
-                            </div>
-                            <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {formatNumber(total?.total_amount)}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
-                            </div>
-                        </ContainerTotal>
-                        {initData.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                                <h6>
-                                    {/* {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng
-                                    bán */}
-                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                </h6>
-                                <Pagination
-                                    postsPerPage={limit}
-                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                                    paginate={paginate}
-                                    currentPage={router.query?.page ? router.query?.page : 1}
-                                />
-                            </div>
-                        )}
+                            </Customscrollbar>
+                        </ContainerTable>
                     </div>
+                    <ContainerTotal className={'grid-cols-13'}>
+                        <div className="col-span-3 p-2 text-center">
+                            <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
+                                {dataLang?.total_outside || "total_outside"}
+                            </h3>
+                        </div>
+                        <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
+                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
+                                {formatNumber(total?.total_amount)}
+                            </h3>
+                        </div>
+                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
+                        </div>
+                    </ContainerTotal>
+                    {initData.data?.length != 0 && (
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItems?.iTotalDisplayRecords}
+                            />
+                            <Pagination
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page ? router.query?.page : 1}
+                            />
+                        </ContainerPagination>
+                    )}
                 </ContainerBody>
             </Container>
             <PopupConfim

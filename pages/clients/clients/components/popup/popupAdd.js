@@ -149,11 +149,11 @@ const Popup_dskh = (props) => {
                             birthday: e?.birthday,
                             address: e?.address,
                             phone_number: e?.phone_number,
-                            disble: role == false || checkEdit == false
+                            // disble: role == true || checkEdit == true
                         }
                     }) || [],
                     optionDelivery: db?.clients_address_delivery?.map((e) => ({
-                        id: e?.id,
+                        idFe: e?.id,
                         nameDelivery: e?.fullname,
                         phoneDelivery: e?.phone,
                         addressDelivery: e?.address,
@@ -166,7 +166,6 @@ const Popup_dskh = (props) => {
             queryState({ onFetching: false });
         });
     };
-    console.log("option", isState.option);
 
     const _ServerFetching_Char = async () => {
         await Axios(
@@ -467,7 +466,7 @@ const Popup_dskh = (props) => {
     // save form
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (isState.name == "" || isState.valueBr?.length == 0) {
+        if (isState.name == "" || isState.valueBr?.length == 0 || isState.option.some(x => x.full_name == "" || x.phone_number == "")) {
             isState.name == "" && queryState({ errInputName: true });
             isState.valueBr?.length == 0 && queryState({ errInputBr: true });
             isShow("error", props.dataLang?.required_field_null);
@@ -533,7 +532,7 @@ const Popup_dskh = (props) => {
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.option.map((e) => (
                                             <FormContactInfo
-                                                key={e.id?.toString()}
+                                                key={e.idFe?.toString()}
                                                 option={e}
                                                 dataLang={props.dataLang}
                                                 onChangOptions={onChangOptions}
@@ -557,7 +556,7 @@ const Popup_dskh = (props) => {
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.optionDelivery.map((e) => (
                                             <FormContactDelivery
-                                                key={e.id?.toString()}
+                                                key={e.idFe?.toString()}
                                                 optionDelivery={e}
                                                 dataLang={props.dataLang}
                                                 onChangOptionsDelivery={onChangOptionsDelivery}

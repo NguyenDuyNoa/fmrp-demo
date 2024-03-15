@@ -331,11 +331,10 @@ const Index = React.memo(
             <a
               key={number}
               onClick={() => paginate(number)}
-              className={`${
-                Number(currentPage) === number
+              className={`${Number(currentPage) === number
                   ? "bg-[#0F4F9E] text-white"
                   : "bg-slate-200 hover:bg-[#e3e3e3]"
-              } cursor-pointer w-8 h-8 flex flex-col justify-center items-center font-[600] rounded-md transition duration-200 ease-in-out`}
+                } cursor-pointer w-8 h-8 flex flex-col justify-center items-center font-[600] rounded-md transition duration-200 ease-in-out`}
             >
               {number}
             </a>

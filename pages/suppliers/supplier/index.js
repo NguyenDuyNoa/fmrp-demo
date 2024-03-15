@@ -93,7 +93,7 @@ const Index = (props) => {
     }, []);
 
     const _ServerFetching = () => {
-        const id = Number(tabPage);
+        const id = tabPage;
         Axios(
             "GET",
             `/api_web/api_supplier/supplier/?csrf_protection=true`,
