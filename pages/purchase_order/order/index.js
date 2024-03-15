@@ -43,7 +43,7 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -57,6 +57,9 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import NoData from "@/components/UI/noData/nodata";
 
 
 const Index = (props) => {
@@ -571,188 +574,157 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                <div className="pr-2 w-[100%] lx:w-[120%] ">
-                                    <div className="grid grid-cols-12 items-center sticky top-0  p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.purchase_order_table_dayvoucers ||
-                                                "purchase_order_table_dayvoucers"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                            <Customscrollbar>
+                                <div className="w-full">
+                                    <HeaderTable gridCols={12}>
+                                        <ColumnTable colSpan={1} textAlign='center'>
+                                            {dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_code || "purchase_order_table_code"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.purchase_order_table_supplier ||
-                                                "purchase_order_table_supplier"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.purchase_order_table_ordertype ||
-                                                "purchase_order_table_ordertype"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_number || "purchase_order_table_number"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_total || "purchase_order_table_total"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.purchase_order_table_totalTax ||
-                                                "purchase_order_table_totalTax"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.purchase_order_table_intoMoney ||
-                                                "purchase_order_table_intoMoney"}
-                                        </h4>
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}
+                                        </ColumnTable>
                                         {/* <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.purchase_order_table_importStatus ||
-                                                "purchase_order_table_importStatus"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_note || "purchase_order_note"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.purchase_order_table_operations ||
-                                                "purchase_order_table_operations"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
-                                        <>
-                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                {isState.data?.map((e) => (
-                                                    <div
-                                                        className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                        key={e.id.toString()}
-                                                    >
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] hover:text-blue-600 transition-all ease-in-out xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer">
-                                                            <Popup_chitiet
-                                                                dataLang={dataLang}
-                                                                className="text-left"
-                                                                name={e?.code}
-                                                                id={e?.id}
-                                                            />
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left">
-                                                            {e.supplier_name}
-                                                        </h6>
-                                                        <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 flex items-center justify-center text-center">
-                                                            {e?.order_type == "0" ? (
-                                                                <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px] min-w-[80px]">
-                                                                    Tạo mới
-                                                                </span>
-                                                            ) : (
-                                                                <span className="min-w-[80px] font-normal 2xl:text-xs xl:text-xs text-[8px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
-                                                                    YCMH
-                                                                </span>
-                                                            )}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out">
-                                                            {/* {e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')} */}
-                                                            {e?.purchases?.map((purchase, index) => (
-                                                                <React.Fragment key={purchase.id}>
-                                                                    {index !== 0 && ","}
-                                                                    <Popup_chitietThere
-                                                                        dataLang={dataLang}
-                                                                        className="text-left"
-                                                                        type={e?.order_type}
-                                                                        id={purchase.id}
-                                                                        name={purchase.code}
-                                                                    />
-                                                                </React.Fragment>
-                                                            ))}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                            {formatMoney(e.total_price)}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                            {formatMoney(e.total_tax_price)}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                            {formatMoney(e.total_amount)}
-                                                        </h6>
-                                                        {/* <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
-                                    {e?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
-                                     e?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
-                                     e?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
-                                    }
-                                </h6> */}
-                                                        <h6 className="px-2 py-2.5  col-span-1 flex items-center justify-center text-center ">
-                                                            {(e?.import_status === "not_stocked" && (
-                                                                <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
-                                                                    {dataLang[e?.import_status] || e?.import_status}{" "}
+                                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
+                                            {isState.data?.map((e) => (
+                                                <RowTable key={e?.id} gridCols={12}>
+                                                    <RowItemTable colSpan={1} textAlign='center'>
+                                                        {e?.date != null
+                                                            ? moment(e?.date).format("DD/MM/YYYY")
+                                                            : ""}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1}>
+                                                        <Popup_chitiet
+                                                            dataLang={dataLang}
+                                                            className="3xl:text-base 2xl:text-[12.5px] hover:text-blue-600 transition-all ease-in-out xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer" name={e?.code}
+                                                            id={e?.id}
+                                                        />
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign='left'>
+                                                        {e.supplier_name}
+                                                    </RowItemTable >
+                                                    <RowItemTable colSpan={1} className={'flex justify-center items-end'}>
+                                                        {e?.order_type == "0" ? (
+                                                            <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px] min-w-[80px]">
+                                                                Tạo mới
+                                                            </span>
+                                                        ) : (
+                                                            <span className="min-w-[80px] font-normal 2xl:text-xs xl:text-xs text-[8px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
+                                                                YCMH
+                                                            </span>
+                                                        )}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
+                                                        {/* {e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')} */}
+                                                        {e?.purchases?.map((purchase, index) => (
+                                                            <React.Fragment key={purchase.id}>
+                                                                {index !== 0 && ","}
+                                                                <Popup_chitietThere
+                                                                    dataLang={dataLang}
+                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out" type={e?.order_type}
+                                                                    id={purchase.id}
+                                                                    name={purchase.code}
+                                                                />
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        {formatMoney(e.total_price)}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        {formatMoney(e.total_tax_price)}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        {formatMoney(e.total_amount)}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className="flex items-center justify-center text-center ">
+                                                        {(e?.import_status === "not_stocked" && (
+                                                            <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
+                                                                {dataLang[e?.import_status] || e?.import_status}{" "}
+                                                            </span>
+                                                        )) ||
+                                                            (e?.import_status === "stocked_part" && (
+                                                                <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
+                                                                    {dataLang[e?.import_status] ||
+                                                                        e?.import_status}
                                                                 </span>
                                                             )) ||
-                                                                (e?.import_status === "stocked_part" && (
-                                                                    <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
-                                                                        {dataLang[e?.import_status] ||
-                                                                            e?.import_status}
-                                                                    </span>
-                                                                )) ||
-                                                                (e?.import_status === "stocked" && (
-                                                                    <span className="flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
-                                                                        <TickCircle
-                                                                            className="bg-lime-500 rounded-full "
-                                                                            color="white"
-                                                                            size={15}
-                                                                        />
-                                                                        {dataLang[e?.import_status] ||
-                                                                            e?.import_status}
-                                                                    </span>
-                                                                ))}
-                                                        </h6>
-                                                        <h6 className="2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left truncate ">
-                                                            {e.note}
-                                                        </h6>
-                                                        <h6 className="col-span-1 w-fit mx-auto">
-                                                            <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                {e?.branch_name}
-                                                            </div>
-                                                        </h6>
-                                                        <div className="col-span-1 flex justify-center">
-                                                            <BtnAction
-                                                                onRefresh={_ServerFetching.bind(this)}
-                                                                dataLang={dataLang}
-                                                                id={e?.id}
-                                                                status={e?.import_status}
-                                                                status_pay={e?.status_pay}
-                                                                type="order"
-                                                                data={e}
-                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                            />
+                                                            (e?.import_status === "stocked" && (
+                                                                <span className="flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
+                                                                    <TickCircle
+                                                                        className="bg-lime-500 rounded-full "
+                                                                        color="white"
+                                                                        size={15}
+                                                                    />
+                                                                    {dataLang[e?.import_status] ||
+                                                                        e?.import_status}
+                                                                </span>
+                                                            ))}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} textAlign={"text-left"} className="truncate ">
+                                                        {e.note}
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className=" w-fit mx-auto">
+                                                        <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                            {e?.branch_name}
                                                         </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {dataLang?.purchase_order_table_item_not_found ||
-                                                        "purchase_order_table_item_not_found"}
-                                                </h1>
-                                                <div className="flex items-center justify-around mt-6 "></div>
-                                            </div>
+                                                    </RowItemTable>
+                                                    <RowItemTable colSpan={1} className=" flex justify-center">
+                                                        <BtnAction
+                                                            onRefresh={_ServerFetching.bind(this)}
+                                                            dataLang={dataLang}
+                                                            id={e?.id}
+                                                            status={e?.import_status}
+                                                            status_pay={e?.status_pay}
+                                                            type="order"
+                                                            data={e}
+                                                            className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                        />
+                                                    </RowItemTable>
+                                                </RowTable>
+                                            ))}
                                         </div>
+                                    ) : (
+                                        <NoData />
                                     )}
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <div className="grid grid-cols-12 bg-gray-100 items-center">
+                    <ContainerTotal>
                         <div className="col-span-5 p-2 text-center">
                             <h3 className="uppercase font-normal 2xl:text-base xl:text-xs text-[8px]">
                                 {dataLang?.purchase_order_table_total_outside ||
@@ -774,7 +746,7 @@ const Index = (props) => {
                                 {formatMoney(total?.total_amount)}
                             </h3>
                         </div>
-                    </div>
+                    </ContainerTotal>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
                             <TitlePagination
