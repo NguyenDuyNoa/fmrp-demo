@@ -46,6 +46,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import NoData from "@/components/UI/noData/nodata";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 
 const Index = (props) => {
@@ -817,9 +818,9 @@ const Index = (props) => {
                                                                         ))}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className="w-fit mx-auto">
-                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                <TagBranch>
                                                                     {e?.branch_name}
-                                                                </div>
+                                                                </TagBranch>
                                                             </RowItemTable>
 
                                                             <RowItemTable colSpan={4}>
@@ -966,20 +967,13 @@ const Index = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <ContainerTotal className={'grid-cols-13'}>
-                        <div className="col-span-3 p-2 text-center">
-                            <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                {dataLang?.total_outside || "total_outside"}
-                            </h3>
-                        </div>
-                        <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
-                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                {formatNumber(total?.total_amount)}
-                            </h3>
-                        </div>
-                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
-                        </div>
+                    <ContainerTotal className={'grid-cols-12'}>
+                        <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
+                            {dataLang?.total_outside || "total_outside"}
+                        </ColumnTable>
+                        <ColumnTable colSpan={2} textAlign={'right'} className="ustify-end pr-4 flex gap-2 flex-wrap ">
+                            {formatNumber(total?.total_amount)}
+                        </ColumnTable>
                     </ContainerTotal>
                     {initData.data?.length != 0 && (
                         <ContainerPagination>

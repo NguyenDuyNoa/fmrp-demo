@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
 import { _ServerInstance as Axios } from "/services/axios";
 import {
@@ -13,23 +14,27 @@ import {
 import moment from "moment/moment";
 import { useSelector } from "react-redux";
 import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { debounce } from "lodash";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import useActionRole from "@/hooks/useRole";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import useToast from "@/hooks/useToast";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import NoData from "@/components/UI/noData/nodata";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+
+import useToast from "@/hooks/useToast";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -343,75 +348,70 @@ const Index = (props) => {
                             <Customscrollbar className="min:h-[200px] h-[90%] max:h-[750px] pb-2">
                                 {/* <div className="h-[100%] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
                                 <div className="w-[100%] lg:w-[100%] ">
-                                    <div className="grid grid-cols-12 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_contact_table_fulname}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_contact_table_name}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.client_contact_table_phone}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_contact_table_mail}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.client_contact_table_pos}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.client_contact_table_hapy}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.client_contact_table_address}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_contact_table_brand}
-                                        </h4>
-                                    </div>
+                                    <HeaderTable display={'grid'} gridCols={12}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_fulname || "client_contact_table_fulname"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_name || "client_contact_table_name"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_phone || 'client_contact_table_phone'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_mail || 'client_contact_table_mail'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_pos || 'client_contact_table_pos'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_hapy || 'client_contact_table_hapy'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_address || 'client_contact_table_address'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.client_contact_table_brand || 'client_contact_table_brand'}
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                 {isState.data?.map((e) => (
-                                                    <div
-                                                        className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                        key={e.client_contact_id.toString()}
-                                                    >
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                    <RowTable gridCols={12} key={e.client_contact_id.toString()}>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.client_name}
-                                                        </h6>
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.contact_name}
-                                                        </h6>
-                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.phone_number}
-                                                        </h6>
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left ">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.email}
-                                                        </h6>
-                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.position}
-                                                        </h6>
-                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-center">
-                                                            {e.birthday != "0000-00-00"
-                                                                ? moment(e.birthday).format("DD/MM/YYYY")
-                                                                : ""}
-                                                        </h6>
-                                                        <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {e.birthday != "0000-00-00" ? moment(e.birthday).format("DD/MM/YYYY") : ""}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.address}
-                                                        </h6>
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2}>
                                                             <span className="flex gap-2 flex-wrap justify-start ">
                                                                 {e?.branch?.map((e) => (
-                                                                    <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                    <TagBranch key={e?.id ? e?.id : ""}>
                                                                         {e.name}
-                                                                    </span>
+                                                                    </TagBranch>
                                                                 ))}
                                                             </span>
-                                                        </h6>
-                                                    </div>
+                                                        </RowItemTable>
+                                                    </RowTable>
                                                 ))}
                                             </div>
                                         </>
@@ -423,23 +423,22 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
-                        <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                            <h6>
-                                {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                {/* {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
-                            </h6>
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItem?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 export default Index;

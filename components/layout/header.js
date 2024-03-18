@@ -139,8 +139,8 @@ const Header = () => {
                     img: "/icon/header/danhmuc/nv.png",
                     items: [
                         {
-                            viewOwn: auth?.staff?.is_view_own,
-                            view: auth?.staff?.is_view,
+                            viewOwn: 1,
+                            view: 1,
                             name: "Danh sách người dùng",
                             link: "/personnel/staff",
                         },

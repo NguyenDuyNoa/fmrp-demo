@@ -18,9 +18,11 @@ const useActionRole = (auth, type) => {
         "category_products": "category_products",
         "products": "products",
         "staff": "personnel_staff",
+        //   phần quyền ng dùng mà chỉ amdin mới sửa tọa axoas
         "department": "department",
         'purchases': "purchases",
-        "purchase_order": "order"
+        "purchase_order": "order",
+        "position": "personnel_roles"
         // Thêm các type ||  nameModel
 
 

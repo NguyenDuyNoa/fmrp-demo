@@ -46,6 +46,7 @@ import { routerDeliveryReceipt } from "routers/sellingGoods";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 const Index = (props) => {
 
     const dataLang = props.dataLang;
@@ -624,8 +625,7 @@ const Index = (props) => {
                                             {dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}
                                         </ColumnTable>
                                         <ColumnTable textAlign='center'>
-                                            {dataLang?.delivery_receipt_OrderNumber ||
-                                                "delivery_receipt_OrderNumber"}
+                                            {dataLang?.delivery_receipt_OrderNumber || "delivery_receipt_OrderNumber"}
                                         </ColumnTable>
                                         <ColumnTable textAlign='center'>
                                             {dataLang?.price_quote_into_money || "price_quote_into_money"}
@@ -634,8 +634,7 @@ const Index = (props) => {
                                             {dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}
                                         </ColumnTable>
                                         <ColumnTable textAlign='center'>
-                                            {dataLang?.delivery_receipt_BrowseStorekeepers ||
-                                                "delivery_receipt_BrowseStorekeepers"}
+                                            {dataLang?.delivery_receipt_BrowseStorekeepers || "delivery_receipt_BrowseStorekeepers"}
                                         </ColumnTable>
                                         <ColumnTable textAlign='center'>
                                             {dataLang?.price_quote_note || "price_quote_note"}
@@ -736,9 +735,9 @@ const Index = (props) => {
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className=" w-fit mx-auto">
-                                                            <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                            <TagBranch>
                                                                 {e?.name_branch}
-                                                            </div>
+                                                            </TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className=" flex items-center justify-center">
                                                             <BtnAction
@@ -763,16 +762,12 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     <ContainerTotal>
-                        <div className="col-span-5 p-2 text-center">
-                            <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                {dataLang?.total_outside || "total_outside"}
-                            </h3>
-                        </div>
-                        <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
-                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-1">
-                                {formatMoney(total?.grand_total)}
-                            </h3>
-                        </div>
+                        <ColumnTable colSpan={5} textAlign={'center'} className="p-2">
+                            {dataLang?.total_outside || "total_outside"}
+                        </ColumnTable>
+                        <ColumnTable colSpan={2} textAlign={'right'} className="justify-end pr-4 flex gap-2 flex-wrap ">
+                            {formatMoney(total?.grand_total)}
+                        </ColumnTable>
                         <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
                             <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
                         </div>

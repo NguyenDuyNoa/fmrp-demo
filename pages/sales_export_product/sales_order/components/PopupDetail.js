@@ -32,6 +32,7 @@ import formatMoney from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const PopupDetail = (props) => {
     const scrollAreaRef = useRef(null);
@@ -184,9 +185,9 @@ const PopupDetail = (props) => {
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.price_quote_branch || "price_quote_branch"}
                                             </h3>
-                                            <h3 className="mr-2 px-2 max-w-[250px] w-fit max-h-[100px] text-center text-[#0F4F9E] xl:text-base text-xs text-[13px] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] ">
+                                            <TagBranch className="w-fit">
                                                 {data?.branch_name}
-                                            </h3>
+                                            </TagBranch>
                                         </div>
                                         <div className="my-4 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">

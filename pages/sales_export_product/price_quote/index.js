@@ -44,6 +44,7 @@ import NoData from "@/components/UI/noData/nodata";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 registerLocale("vi", vi);
 
 
@@ -753,9 +754,9 @@ const Index = (props) => {
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="w-fit mx-auto">
-                                                            <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                            <TagBranch>
                                                                 {e?.branch_name}
-                                                            </div>
+                                                            </TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex items-center justify-center">
                                                             <BtnAction
@@ -778,26 +779,20 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     <ContainerTotal>
-                        <div className="col-span-4 p-2 text-left">
-                            <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
-                            </h3>
-                        </div>
-                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                        <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
+                            {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
                             <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                 {formatNumber(total?.total_price)}
                             </h3>
-                        </div>
-                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap ">
-                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                {formatNumber(total?.total_tax_price)}
-                            </h3>
-                        </div>
-                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                            <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                {formatNumber(total?.total_amount)}
-                            </h3>
-                        </div>
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                            {formatNumber(total?.total_tax_price)}
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                            {formatNumber(total?.total_amount)}
+                        </ColumnTable>
                     </ContainerTotal>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>

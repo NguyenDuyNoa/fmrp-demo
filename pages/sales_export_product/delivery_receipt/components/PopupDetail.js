@@ -22,6 +22,7 @@ import formatNumberConfig from '@/utils/helpers/formatnumber'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import useSetingServer from "@/hooks/useConfigNumber";
 import useFeature from "@/hooks/useConfigFeature";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
@@ -169,9 +170,11 @@ const PopupDetail = (props) => {
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.price_quote_branch || "price_quote_branch"}:
                                     </h3>
-                                    <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[10px]  col-span-4 mr-2 px-2 max-w-[250px] w-fit max-h-[100px] text-center text-[#0F4F9E]  font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] ">
-                                        {data?.branch_name}
-                                    </h3>
+                                    <div className="col-span-4">
+                                        <TagBranch className="w-fit">
+                                            {data?.branch_name}
+                                        </TagBranch>
+                                    </div>
                                 </div>
                             </div>
                         </div>

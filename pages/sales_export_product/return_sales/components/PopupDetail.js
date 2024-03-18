@@ -42,6 +42,7 @@ import { useEffect } from "react";
 import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -224,9 +225,9 @@ const PopupDetail = (props) => {
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
-                                            <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
+                                            <TagBranch className='w-fit'>
                                                 {data?.branch_name}
-                                            </h3>
+                                            </TagBranch>
                                         </div>
                                     </div>
                                 </div>

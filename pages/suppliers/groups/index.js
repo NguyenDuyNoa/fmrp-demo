@@ -31,6 +31,10 @@ import useActionRole from "@/hooks/useRole";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import BtnAction from "@/components/UI/BtnAction";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 const Index = (props) => {
     const router = useRouter();
 
@@ -259,42 +263,36 @@ const Index = (props) => {
                                 </div>
                             </div>
                             <Customscrollbar className="min:h-[200px] 3xl:h-[80%] xxl:h-[74%] 2xl:h-[76%] xl:h-[72%] lg:h-[82%] max:h-[400px] pb-2">
-                                <div className="w-[100%] lg:w-[100%] ">
-                                    <div className="grid grid-cols-12 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-6 text-left">
+                                <div className="w-full">
+                                    <HeaderTable gridCols={12}>
+                                        <ColumnTable colSpan={6} textAlign={'left'}>
                                             {dataLang?.suppliers_groups_name}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-left">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={4} textAlign={'center'}>
                                             {dataLang?.client_list_brand}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
                                             {dataLang?.branch_popup_properties}
-                                        </h4>
-                                    </div>
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                 {isState.data?.map((e) => (
-                                                    <div
-                                                        className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                        key={e.id.toString()}
-                                                    >
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-6 text-left">
+                                                    <RowTable gridCols={12} key={e.id.toString()}>
+                                                        <RowItemTable colSpan={6} textAlign={'left'}>
                                                             {e.name}
-                                                        </h6>
-                                                        <h6 className="flex col-span-4  gap-1 flex-wrap">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={4} className="flex items-center  gap-1 flex-wrap">
                                                             {e.branch?.map((i) => (
-                                                                <span
-                                                                    key={i}
-                                                                    className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
-                                                                >
+                                                                <TagBranch key={i}  >
                                                                     {i.name}
-                                                                </span>
+                                                                </TagBranch>
                                                             ))}
-                                                        </h6>
-                                                        <div className="col-span-2 space-x-2 text-center flex items-center justify-center my-auto">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} className="space-x-2 text-center flex items-center justify-center my-auto">
                                                             {role == true || checkEdit ?
                                                                 <Popup_groupKh
                                                                     onRefresh={_ServerFetching.bind(this)}
@@ -315,8 +313,8 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                                 type="suppliers_groups"
                                                             />
-                                                        </div>
-                                                    </div>
+                                                        </RowItemTable>
+                                                    </RowTable>
                                                 ))}
                                             </div>
                                         </>
@@ -328,19 +326,18 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
-                        <div className="flex space-x-5 my-2 items-center">
-                            <h6>
-                                {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                {/* {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
-                            </h6>
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItem?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>

@@ -30,6 +30,7 @@ import Popup from "reactjs-popup";
 import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -94,8 +95,8 @@ const Popup_chitiet = (props) => {
           <button
             onClick={_HandleSelectTab.bind(this, 0)}
             className={`${tab === 0
-                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                : "hover:text-[#0F4F9E] "
+              ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+              : "hover:text-[#0F4F9E] "
               }  px-4 py-2 outline-none font-semibold`}
           >
             {props.dataLang?.client_popup_general}
@@ -103,8 +104,8 @@ const Popup_chitiet = (props) => {
           <button
             onClick={_HandleSelectTab.bind(this, 1)}
             className={`${tab === 1
-                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                : "hover:text-[#0F4F9E] "
+              ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
+              : "hover:text-[#0F4F9E] "
               }  px-4 py-2 outline-none font-semibold`}
           >
             {props.dataLang?.client_popup_detailContact}
@@ -194,13 +195,12 @@ const Popup_chitiet = (props) => {
                         <span className="flex flex-wrap justify-between gap-1">
                           {data?.branch?.map((e) => {
                             return (
-                              <span
+                              <TagBranch
                                 key={e.id}
-                                className="last:ml-0 font-normal capitalize mb-1  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px]"
+                                className="last:ml-0 w-fit"
                               >
-                                {" "}
                                 {e.name}
-                              </span>
+                              </TagBranch>
                             );
                           })}
                         </span>

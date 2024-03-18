@@ -32,7 +32,12 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { debounce } from "lodash";
-
+import useSetingServer from "@/hooks/useConfigNumber";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 const Index = (props) => {
     const router = useRouter();
 
@@ -59,6 +64,8 @@ const Index = (props) => {
     const [onFetchingStaff, sOnFetchingStaff] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
+
+    const dataSeting = useSetingServer()
 
     const [option, sOption] = useState([
         {
@@ -117,9 +124,6 @@ const Index = (props) => {
 
     const [chietkhautong, sChietkhautong] = useState(0);
 
-    // const [selectedDate, sSelectedDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
-    // const [delivery_date, sDelivery_date] = useState(moment().format('YYYY-MM-DD'));
-
     const [idSupplier, sIdSupplier] = useState(null);
 
     const [idStaff, sIdStaff] = useState(null);
@@ -167,8 +171,7 @@ const Index = (props) => {
                         id: e.purchases_order_item_id,
                         mathang: {
                             e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
+                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
                             value: e.item?.id,
                         },
                         soluong: Number(e?.quantity),
@@ -178,8 +181,7 @@ const Index = (props) => {
                         donvitinh: e.item?.unit_name,
                         dongiasauck: Number(e?.price_after_discount),
                         note: e?.note,
-                        thanhtien:
-                            Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
+                        thanhtien: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
                     }))
                 );
 
@@ -471,9 +473,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_Supplier = () => {
-        Axios(
-            "GET",
-            "/api_web/api_supplier/supplier/?csrf_protection=true",
+        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch.value : null,
@@ -489,9 +489,7 @@ const Index = (props) => {
         sOnFetchingSupplier(false);
     };
     const _ServerFetching_Staff = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_staff/staffOption?csrf_protection=true",
+        Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch.value : null,
@@ -536,9 +534,7 @@ const Index = (props) => {
     }, [idSupplier]);
 
     const _ServerFetching_Purcher = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true",
+        Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch?.value : -1,
@@ -560,9 +556,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_Items = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
+        Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
             {
                 params: {
                     "filter[purchases_id]": idPurchases?.length > 0 ? idPurchases.map((e) => e.value) : -1,
@@ -587,9 +581,7 @@ const Index = (props) => {
     }, [idPurchases]);
 
     const _ServerFetching_ItemsAll = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_product/searchItemsVariant?csrf_protection=true",
+        Axios("GET", "/api_web/Api_product/searchItemsVariant?csrf_protection=true",
             {
                 params: {
                     purchase_order_id: id,
@@ -645,8 +637,9 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
+        const newDataOption = dataOption?.filter((e) => e?.item !== undefined)?.some((e) => e?.price == 0 || e?.price == "" || e?.quantity == 0 || e?.quantity == "");
         if (loai == "0") {
-            if (idSupplier == null || idStaff == null || idBranch == null) {
+            if (idSupplier == null || idStaff == null || idBranch == null || newDataOption) {
                 idSupplier == null && sErrSupplier(true);
                 idStaff == null && sErrStaff(true);
                 idBranch == null && sErrBranch(true) && sErrDateDelivery(true);
@@ -655,7 +648,7 @@ const Index = (props) => {
                 sOnSending(true);
             }
         } else {
-            if (idSupplier == null || idStaff == null || idBranch == null || idPurchases?.length == 0) {
+            if (idSupplier == null || idStaff == null || idBranch == null || idPurchases?.length == 0 || newDataOption) {
                 // selectedDate == null && sErrDate(true)
                 idSupplier == null && sErrSupplier(true);
                 idStaff == null && sErrStaff(true);
@@ -715,9 +708,12 @@ const Index = (props) => {
     const fakeDataPurchases = idBranch != null ? dataPurchases.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
+
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    }
 
     const _HandleChangeInputOption = (id, type, index3, value) => {
         var index = option.findIndex((x) => x.id === id);
@@ -961,11 +957,7 @@ const Index = (props) => {
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`
-                : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
+        Axios("POST", `${id ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true` : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -977,8 +969,6 @@ const Index = (props) => {
                     if (isSuccess) {
                         isShow("success", `${dataLang[message]}`);
                         sCode("");
-                        // sSelectedDate(new Date().toISOString().slice(0, 10))
-                        // sDelivery_date(new Date().toISOString().slice(0, 10))
                         sStartDate(new Date());
                         sDelivery_dateNew(new Date());
                         sIdStaff(null);
@@ -1002,7 +992,6 @@ const Index = (props) => {
                             },
                         ]);
                         router.push(routerOrder.home);
-                        // console.log(router.back());
                     } else {
                         if (tongTienState.tongTien == 0) {
                             isShow("error", `Chưa nhập thông tin mặt hàng`);
@@ -1058,8 +1047,7 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione ||
-                                    "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-12 gap-3 items-center mt-2">
                                 <div className="col-span-3">
@@ -1278,14 +1266,6 @@ const Index = (props) => {
                                         )}
                                         <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
                                     </div>
-
-                                    {/* <input
-                              value={selectedDate}    
-                              onChange={_HandleChangeInput.bind(this, "date")}
-                              name="fname"                      
-                              type="datetime-local"
-                              className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                              {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>} */}
                                 </div>
                                 <div className="col-span-3 relative">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
@@ -1293,15 +1273,6 @@ const Index = (props) => {
                                             "purchase_order_detail_delivery_date"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    {/* <input
-                              value={delivery_date}              
-                              onChange={_HandleChangeInput.bind(this, "delivery_date")}
-                              name="fname"                      
-                              type="date"
-                              placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
-                              className={`${errDateDelivery ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                              {errDateDelivery && <label className="text-sm text-red-500">{"purchase_err_Date"}</label>} */}
-
                                     <div className="custom-date-picker flex flex-row">
                                         <DatePicker
                                             selected={delivery_dateNew}
@@ -1532,29 +1503,27 @@ const Index = (props) => {
                                                                         <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                             {option.e?.product_variation}
                                                                         </h5>
+
                                                                     </div>
                                                                     <h5 className="text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                         {dataLang[option.e?.text_type]}{" "}
                                                                         {loai == "1" ? "-" : ""}{" "}
                                                                         {loai == "1" ? option.e?.purchases_code : ""}{" "}
-                                                                        {loai == "1" ? "- Số lượng:" : ""}{" "}
-                                                                        {loai == "1" ? option.e?.quantity_left : ""}
                                                                     </h5>
-                                                                </div>
-                                                            </div>
-                                                            <div className="">
-                                                                <div className="text-right opacity-0">{"0"}</div>
-                                                                <div className="flex gap-2">
-                                                                    <div className="flex items-center gap-2">
+                                                                    <div className="flex text-gray-400 items-center gap-2">
                                                                         <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {dataLang?.purchase_survive ||
-                                                                                "purchase_survive"}
+                                                                            {loai == "1" ? "Số lượng:" : ""}{" "}
+                                                                        </h5>
+                                                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                            {loai == "1" ? option.e?.quantity_left : ""}
+                                                                        </h5>
+                                                                        {"-"}
+                                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                            {dataLang?.purchase_survive || "purchase_survive"}
                                                                             :
                                                                         </h5>
-                                                                        <h5 className=" font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {option.e?.qty_warehouse
-                                                                                ? option.e?.qty_warehouse
-                                                                                : "0"}
+                                                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                            {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
                                                                         </h5>
                                                                     </div>
                                                                 </div>
@@ -1614,25 +1583,26 @@ const Index = (props) => {
                                                     >
                                                         <Minus size="16" />
                                                     </button>
-                                                    <NumericFormat
-                                                        className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200"
+                                                    <InPutNumericFormat
                                                         onValueChange={_HandleChangeInputOption.bind(
                                                             this,
                                                             e?.id,
                                                             "soluong",
                                                             e
                                                         )}
-                                                        value={e?.soluong || 1}
-                                                        thousandSeparator=","
-                                                        allowNegative={false}
+                                                        value={index === 0 ? 1 : e?.soluong}
                                                         readOnly={index === 0 ? readOnlyFirst : false}
-                                                        decimalScale={0}
-                                                        isNumericString={true}
-                                                        isAllowed={(values) => {
-                                                            const { floatValue } = values;
-                                                            return floatValue > 0;
+                                                        isAllowed={({ floatValue }) => {
+                                                            if (floatValue == 0) {
+                                                                return true;
+                                                            } else {
+                                                                return true;
+                                                            }
                                                         }}
-                                                    />
+                                                        className={`
+                                                        ${index === 0 ? "cursor-default" : "cursor-text"} 
+                                                        ${e?.soluong == 0 && 'border-red-500' || e?.soluong == "" && 'border-red-500'} 
+                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`} />
                                                     <button
                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                                         onClick={() => handleIncrease(e.id)}
@@ -1643,25 +1613,23 @@ const Index = (props) => {
                                                 </div>
                                             </div>
                                             <div className="col-span-1 text-center flex items-center justify-center">
-                                                <NumericFormat
-                                                    value={e?.dongia}
+                                                <InPutMoneyFormat
+                                                    value={index === 0 ? 1 : e?.dongia}
                                                     onValueChange={_HandleChangeInputOption.bind(
                                                         this,
                                                         e?.id,
                                                         "dongia",
                                                         index
                                                     )}
-                                                    allowNegative={false}
                                                     readOnly={index === 0 ? readOnlyFirst : false}
-                                                    decimalScale={0}
-                                                    isNumericString={true}
-                                                    className="appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200"
-                                                    thousandSeparator=","
+                                                    className={`${index === 0 ? "cursor-default" : "cursor-text"}
+                                                ${e?.dongia == 0 && 'border-red-500' || e?.dongia == "" && 'border-red-500'} 
+                                                appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                             </div>
                                             <div className="col-span-1 text-center flex items-center justify-center">
-                                                <NumericFormat
-                                                    value={e?.chietkhau}
+                                                <InPutNumericFormat
+                                                    value={index === 0 ? 1 : e?.chietkhau}
                                                     onValueChange={_HandleChangeInputOption.bind(
                                                         this,
                                                         e?.id,
@@ -1669,17 +1637,24 @@ const Index = (props) => {
                                                         index
                                                     )}
                                                     className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
-                                                    thousandSeparator=","
-                                                    allowNegative={false}
-                                                    // readOnly={index === 0 ? readOnlyFirst : false}
-                                                    // decimalScale={0}
-                                                    isNumericString={true}
+                                                    isAllowed={({ floatValue }) => {
+                                                        if (floatValue == 0) {
+                                                            return true;
+                                                        }
+                                                        if (floatValue > 100) {
+                                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                                            return false
+                                                        }
+                                                        else {
+                                                            return true;
+                                                        }
+                                                    }}
                                                 />
                                             </div>
 
                                             <div className="col-span-1 text-right flex items-center justify-end">
                                                 <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                    {formatNumber(e?.dongiasauck)}
+                                                    {formatNumber(e?.dongiasauck || 1)}
                                                 </h3>
                                             </div>
                                             <div className="col-span-1 flex justify-center items-center">
@@ -1749,7 +1724,7 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-1 text-right flex items-center justify-end">
                                                 <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                    {formatNumber(e?.thanhtien)}
+                                                    {formatNumber(index === 0 ? 1 : e?.thanhtien)}
                                                 </h3>
                                                 {/* <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3> */}
                                             </div>
@@ -1783,14 +1758,22 @@ const Index = (props) => {
                         <div className="col-span-2  flex items-center gap-2">
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
-                                <NumericFormat
+                                <InPutNumericFormat
                                     value={chietkhautong}
+                                    isAllowed={({ floatValue }) => {
+                                        if (floatValue == 0) {
+                                            return true;
+                                        }
+                                        if (floatValue > 100) {
+                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                            return false
+                                        }
+                                        else {
+                                            return true;
+                                        }
+                                    }}
                                     onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
                                     className=" text-center py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
-                                    thousandSeparator=","
-                                    allowNegative={false}
-                                    decimalScale={0}
-                                    isNumericString={true}
                                 />
                             </div>
                         </div>
@@ -1806,12 +1789,6 @@ const Index = (props) => {
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
                                 )}
-                                // formatOptionLabel={(option) => (
-                                //   <div className='flex justify-start items-center gap-4 '>
-                                //       <h2>{option?.e?.name}</h2>
-                                //       <h2>{`(${option?.e?.tax_rate})`}</h2>
-                                //   </div>
-                                //   )}
                                 placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
                                 hideSelectedOptions={false}
                                 className={` "border-transparent placeholder:text-slate-300 w-[70%] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
@@ -1882,7 +1859,7 @@ const Index = (props) => {
                                 <h3>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.tongTien)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.tongTien)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1892,7 +1869,7 @@ const Index = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.tienChietKhau)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.tienChietKhau)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1903,7 +1880,7 @@ const Index = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.tongTienSauCK)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.tongTienSauCK)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1913,7 +1890,7 @@ const Index = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.tienThue)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.tienThue)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
@@ -1923,7 +1900,7 @@ const Index = (props) => {
                                 </h3>
                             </div>
                             <div className="font-normal">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.tongThanhTien)}</h3>
+                                <h3 className="text-blue-600">{formatMoney(tongTienState.tongThanhTien)}</h3>
                             </div>
                         </div>
                         <div className="space-x-2">
@@ -1955,39 +1932,6 @@ const Index = (props) => {
             />
         </React.Fragment>
     );
-};
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
 };
 
 export default Index;

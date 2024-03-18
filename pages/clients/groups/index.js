@@ -33,6 +33,10 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { RowItemTable, RowTable } from "@/components/UI/common/Table";
 
 const Index = (props) => {
     const router = useRouter();
@@ -296,32 +300,30 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
                                                 {isState.data?.map((e) => (
-                                                    <div
-                                                        className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                        key={e.id.toString()}
-                                                    >
-                                                        <h6 className="col-span-4 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                    <RowTable gridCols={12} key={e.id.toString()} >
+                                                        <RowItemTable colSpan={4} textAlign={'left'}>
                                                             {e.name}
-                                                        </h6>
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={'center'}>
                                                             {e.color}
-                                                        </h6>
-                                                        <h6
-                                                            style={{
-                                                                backgroundColor: e.color,
-                                                            }}
-                                                            className="col-span-2 3xl:text-base 2xl:text-[12.5px] h-full xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left"
-                                                        ></h6>
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
-                                                            <span className="flex flex-wrap justify-start gap-2">
+                                                        </RowItemTable>
+                                                        <RowItemTable
+                                                            backgroundColor={e.color}
+                                                            colSpan={2}
+                                                            textAlign={'center'}
+                                                            className={'py-1 rounded-md'}
+                                                        > {e.color}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2}>
+                                                            <span className="flex items-center flex-wrap justify-start gap-2">
                                                                 {e?.branch?.map((e) => (
-                                                                    <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                    <TagBranch key={e.id}>
                                                                         {e.name}
-                                                                    </span>
+                                                                    </TagBranch>
                                                                 ))}
                                                             </span>
-                                                        </h6>
-                                                        <div className="col-span-2 space-x-2 text-center flex items-center justify-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} className="space-x-2 text-center flex items-center justify-center">
                                                             {role == true || checkEdit ?
                                                                 <Popup_groupKh
                                                                     onRefresh={_ServerFetching.bind(this)}
@@ -343,8 +345,8 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                                 type="client_group"
                                                             />
-                                                        </div>
-                                                    </div>
+                                                        </RowItemTable>
+                                                    </RowTable>
                                                 ))}
                                             </div>
                                         </>
@@ -356,19 +358,18 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
-                        <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                            <h6>
-                                {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                {/* {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
-                            </h6>
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItem?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>

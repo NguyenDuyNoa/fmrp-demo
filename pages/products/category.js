@@ -36,6 +36,10 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import Popup_ThanhPham from "./components/category/popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -366,24 +370,24 @@ const Index = (props) => {
 
                             <Customscrollbar className="min:h-[200px] h-[90%] max:h-[650px] pb-2">
                                 <div className="w-[100%] lg:w-[100%] ">
-                                    <div className="grid grid-cols-11 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10 ">
-                                        <h4 className="col-span-1" />
-                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                    <HeaderTable gridCols={11}>
+                                        <ColumnTable colSpan={1} />
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
                                             {dataLang?.category_material_group_code || "category_material_group_code"}
-                                        </h4>
-                                        <h4 className="col-span-3 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={3} textAlign={'center'}>
                                             {dataLang?.category_material_group_name || "category_material_group_name"}
-                                        </h4>
-                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
                                             {dataLang?.note || "note"}
-                                        </h4>
-                                        <h4 className="col-span-2 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
                                             {dataLang?.client_list_brand || "client_list_brand"}
-                                        </h4>
-                                        <h4 className="col-span-1 3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.branch_popup_properties || "branch_popup_properties"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     <div className="divide-y divide-slate-200">
                                         {
                                             onFetching ? (
@@ -408,20 +412,18 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     {data?.length != 0 && (
-                        <div className="flex space-x-5 my-2 items-center">
-                            <h6>
-                                {/* Hiển thị {totalItems?.iTotalDisplayRecords} thành phần */}
-                                {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.ingredient}
-
-                                {/* trong số {totalItems?.iTotalRecords} biến thể */}
-                            </h6>
+                        <ContainerPagination className="flex space-x-5 my-2 items-center">
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItems?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>
@@ -446,8 +448,8 @@ const Item = React.memo((props) => {
 
     return (
         <div key={props.data?.id}>
-            <div className="grid grid-cols-11 items-center py-2 px-2 bg-white hover:bg-slate-50 relative">
-                <div className="col-span-1 flex justify-center">
+            <RowTable gridCols={11} >
+                <RowItemTable colSpan={1} className="flex justify-center">
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
@@ -457,26 +459,26 @@ const Item = React.memo((props) => {
                         <IconMinus size={16} />
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
-                </div>
-                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                </RowItemTable>
+                <RowItemTable colSpan={2} textAlign={'left'}>
                     {props.data?.code}
-                </h6>
-                <h6 className="col-span-3 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                </RowItemTable>
+                <RowItemTable colSpan={3} textAlign={'left'}>
                     {props.data?.name}
-                </h6>
-                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                </RowItemTable>
+                <RowItemTable colSpan={2} textAlign={'left'}>
                     {props.data?.note}
-                </h6>
-                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                </RowItemTable>
+                <RowItemTable colSpan={2}>
                     <span className="flex gap-2 flex-wrap justify-start ">
                         {props.data?.branch?.map((e) => (
-                            <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                            <TagBranch key={e?.id}>
                                 {e.name}
-                            </span>
+                            </TagBranch>
                         ))}
                     </span>
-                </h6>
-                <div className="flex justify-center space-x-2 col-span-1 px-2">
+                </RowItemTable>
+                <RowItemTable colSpan={1} className="flex justify-center space-x-2 px-2">
                     {role == true || checkEdit ?
                         <Popup_ThanhPham
                             onRefresh={props.onRefresh}
@@ -494,8 +496,8 @@ const Item = React.memo((props) => {
                         id={props.data?.id}
                         type="category_products"
                     />
-                </div>
-            </div>
+                </RowItemTable>
+            </RowTable>
             {hasChild && (
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
@@ -542,45 +544,45 @@ const ItemsChild = React.memo((props) => {
     const { checkEdit } = useActionRole(auth, 'category_products');
     return (
         <React.Fragment key={props.data?.id}>
-            <div className={`grid grid-cols-11 items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
+            <RowTable gridCols={11}>
                 {props.data?.level == "3" && (
-                    <div className="col-span-1 h-full flex justify-center items-center pl-24">
+                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center pl-24">
                         <IconDown className="rotate-45" />
-                    </div>
+                    </RowItemTable>
                 )}
                 {props.data?.level == "2" && (
-                    <div className="col-span-1 h-full flex justify-center items-center pl-12">
+                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center pl-12">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
-                    </div>
+                    </RowItemTable>
                 )}
                 {props.data?.level == "1" && (
-                    <div className="col-span-1 h-full flex justify-center items-center ">
+                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center ">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
-                    </div>
+                    </RowItemTable>
                 )}
-                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                <RowItemTable colSpan={2} textAlign={'left'}>
                     {props.data?.code}
-                </h6>
-                <h6 className="col-span-3 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                </RowItemTable>
+                <RowItemTable colSpan={3} textAlign={'left'}>
                     {props.data?.name}
-                </h6>
-                <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                </RowItemTable>
+                <RowItemTable colSpan={2} textAlign={'left'}>
                     {props.data?.note}
-                </h6>
-                <div className="col-span-2 gap-2 flex flex-wrap px-2">
+                </RowItemTable>
+                <RowItemTable colSpan={2} className="gap-2 flex flex-wrap px-2">
                     {props.data?.branch.map((e) => (
-                        <span key={e?.id} className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                        <TagBranch key={e?.id}>
                             {e.name}
-                        </span>
+                        </TagBranch>
                     ))}
-                </div>
-                <div className="col-span-1 flex justify-center space-x-2">
+                </RowItemTable>
+                <RowItemTable colSpan={1} className="flex justify-center space-x-2">
                     {role == true || checkEdit ?
                         <Popup_ThanhPham
                             onRefresh={props.onRefresh}
@@ -599,8 +601,8 @@ const ItemsChild = React.memo((props) => {
                         id={props.data?.id}
                         type="category_products"
                     />
-                </div>
-            </div>
+                </RowItemTable>
+            </RowTable>
             {props.children}
         </React.Fragment>
     );

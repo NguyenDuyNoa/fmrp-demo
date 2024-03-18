@@ -19,6 +19,9 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { MdClear } from "react-icons/md";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 
 
 const Popup_dsnd = (props) => {
@@ -73,6 +76,8 @@ const Popup_dsnd = (props) => {
         }
         queryState({ isDeleteThumb: false });
     };
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const _DeleteThumb = (e) => {
         e.preventDefault();
@@ -397,7 +402,13 @@ const Popup_dsnd = (props) => {
                         {props.dataLang?.personnels_staff_popup_info}
                     </button>
                     <button
-                        onClick={() => queryState({ tab: 1 })}
+                        onClick={() => {
+                            if (role) {
+                                queryState({ tab: 1 })
+                            } else {
+                                isShow('warning', WARNING_STATUS_ROLE_ADMIN)
+                            }
+                        }}
                         className={`${isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                             }  px-4 py-2 outline-none font-semibold`}
                     >
@@ -533,7 +544,13 @@ const Popup_dsnd = (props) => {
                                                         id="checkbox-6"
                                                         value={isState.admin}
                                                         checked={isState.admin === "0" ? false : isState.admin === "1" && true}
-                                                        onChange={(e) => queryState({ admin: e.target?.checked ? "1" : "0" })}
+                                                        onChange={(e) => {
+                                                            if (role) {
+                                                                queryState({ admin: e.target?.checked ? "1" : "0" })
+                                                            } else {
+                                                                isShow('warning', WARNING_STATUS_ROLE_ADMIN)
+                                                            }
+                                                        }}
                                                     />
                                                     <div className="pointer-events-none absolute top-2/4 left-[10%]   -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                                         <svg

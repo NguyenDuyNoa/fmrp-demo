@@ -17,6 +17,8 @@ import NoData from "@/components/UI/noData/nodata";
 import Image from "next/image";
 import Popup_GiaiDoan from "./popupGiaiDoan";
 import Popup_Bom from "./popupBom";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 const Popup_ThongTin = React.memo((props) => {
     const dataSeting = useSetingServer()
 
@@ -27,6 +29,8 @@ const Popup_ThongTin = React.memo((props) => {
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting)
     }
+
+    const { isMoment } = formatMoment()
 
     const [open, sOpen] = useState(false);
 
@@ -180,9 +184,9 @@ const Popup_ThongTin = React.memo((props) => {
                                             </h5>
                                             <div className="w-[55%] flex flex-col items-end">
                                                 {list?.branch?.map((e) => (
-                                                    <h6 key={e.id.toString()} className="w-fit text-right">
+                                                    <TagBranch key={e.id.toString()} className="w-fit">
                                                         {e.name}
-                                                    </h6>
+                                                    </TagBranch>
                                                 ))}
                                             </div>
                                         </div>
@@ -286,13 +290,13 @@ const Popup_ThongTin = React.memo((props) => {
                                             <h5 className="text-slate-400 text-sm w-[30%]">
                                                 {props.dataLang?.creator || "creator"}:
                                             </h5>
-                                            <h6 className="w-[65%] text-right">ABC</h6>
+                                            <h6 className="w-[65%] text-right">{list?.name_created_by}</h6>
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[30%]">
                                                 {props.dataLang?.date_created || "date_created"}:
                                             </h5>
-                                            <h6 className="w-[65%] text-right">dasd</h6>
+                                            <h6 className="w-[65%] text-right">{isMoment(list?.date_created, 'DD/MM/YYYY, HH:mm:ss')}</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -300,10 +304,10 @@ const Popup_ThongTin = React.memo((props) => {
                         )}
                         {tab === 1 && (
                             <React.Fragment>
-                                {list?.variation?.length > 0 ? (
+                                {list?.variation_option_value?.length > 0 ? (
                                     <div className="space-y-0.5 min-h-[384px]">
                                         <div
-                                            className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-3"
+                                            className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-4"
                                                 } grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}
                                         >
                                             <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
@@ -312,11 +316,9 @@ const Popup_ThongTin = React.memo((props) => {
                                             <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]">
                                                 {list?.variation[0]?.name}
                                             </h5>
-                                            {list?.variation[1] && (
-                                                <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]">
-                                                    {list?.variation[1]?.name}
-                                                </h5>
-                                            )}
+                                            <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]">
+                                                {list?.variation[1]?.name ? list?.variation[1]?.name : ""}
+                                            </h5>
                                             <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-right">
                                                 {props.dataLang?.price || "price"}
                                             </h5>
@@ -328,10 +330,10 @@ const Popup_ThongTin = React.memo((props) => {
                                                         key={e?.id ? e?.id.toString() : ""}
                                                         className={`${e?.variation_option_2?.length > 0
                                                             ? "grid-cols-4"
-                                                            : "grid-cols-3"
+                                                            : "grid-cols-4"
                                                             } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
                                                     >
-                                                        <div className="flex justify-center self-center">
+                                                        <div className="flex justify-center items-center self-center">
                                                             {e?.image == null ? (
                                                                 <img
                                                                     src="/no_image.png"

@@ -49,7 +49,11 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
 
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -85,8 +89,6 @@ const Index = (props) => {
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'personnel_staff');
 
     const [status, sStatus] = useState("");
 
@@ -242,7 +244,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    const { isSuccess, message } = response.data;
                     if (isSuccess) {
                         isShow("success", dataLang[message] || message);
                     } else {
@@ -259,11 +261,11 @@ const Index = (props) => {
     }, [isState.onSending]);
 
     useEffect(() => {
-        queryState({ onSending: true });
-    }, [active]);
-    useEffect(() => {
-        queryState({ onSending: true });
-    }, [status]);
+        if (active || status) {
+            queryState({ onSending: true });
+        }
+    }, [active, status]);
+
     //excel
 
     const multiDataSet = [
@@ -404,7 +406,7 @@ const Index = (props) => {
                                 {dataLang?.personnels_staff_title}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role ?
                                     <Popup_dsnd
                                         isState={isState}
                                         onRefresh={_ServerFetching.bind(this)}
@@ -414,7 +416,7 @@ const Index = (props) => {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            isShow("warning", WARNING_STATUS_ROLE);
+                                            isShow("warning", WARNING_STATUS_ROLE_ADMIN);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >{dataLang?.branch_popup_create_new}
@@ -471,7 +473,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role ?
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
                                                         <ExcelFileComponent
@@ -498,49 +500,47 @@ const Index = (props) => {
                                 className="min:h-[500px] 2xl:h-[92%] xl:h-[69%] h-[72%] max:h-[800px] pb-2"
                             >
                                 <div className="w-full">
-                                    <div className="grid grid-cols-13 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.personnels_staff_table_avtar}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.personnels_staff_table_fullname}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.personnels_staff_table_code}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.personnels_staff_table_email}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.personnels_staff_table_depart}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.personnels_staff_position}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.personnels_staff_table_logged}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.personnels_staff_table_active}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.client_list_brand}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.branch_popup_properties}
-                                        </h4>
-                                    </div>
+                                    <HeaderTable gridCols={13}>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_table_avtar || 'personnels_staff_table_avtar'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_table_fullname || 'personnels_staff_table_fullname'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_table_code || 'personnels_staff_table_code'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_table_email || 'personnels_staff_table_email'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_table_depart || 'personnels_staff_table_depart'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_position || 'personnels_staff_position'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_table_logged || 'personnels_staff_table_logged'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.personnels_staff_table_active || 'personnels_staff_table_active'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.client_list_brand || 'client_list_brand'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.branch_popup_properties || 'branch_popup_properties'}
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                 {isState.data?.map((e) => (
-                                                    <div
-                                                        className="grid grid-cols-13 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                        key={e?.id.toString()}
+                                                    <RowTable gridCols={13} key={e?.id.toString()}
                                                     >
-                                                        <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center ">
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
                                                             <div className="w-[60px] h-[60px] mx-auto">
                                                                 {e?.profile_image == null ? (
                                                                     <ModalImage
@@ -555,41 +555,40 @@ const Index = (props) => {
                                                                             large={e?.profile_image}
                                                                             className="w-[60px] h-[60px]  rounded-[100%] object-cover"
                                                                         />
-                                                                        {/* <Image width={60} height={60} quality={100} src={e?.profile_image} alt="thumb type" className="w-[60px] h-[60px] rounded-[100%] object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/> */}
                                                                     </>
                                                                 )}
                                                             </div>
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:textx-blue-600 transition-all ease-linear px-2 col-span-1 text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1}>
                                                             <Popup_chitiet
                                                                 dataLang={dataLang}
-                                                                className="text-left"
+                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:textx-blue-600 transition-all ease-linear px-2 text-left"
                                                                 name={e.full_name}
                                                                 id={e?.id}
                                                             />
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={'center'}>
                                                             {e.code}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={'left'}>
                                                             {e.email}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {e.department?.map((e) => {
                                                                     return <span key={e.id}>{e.name}</span>;
                                                                 })}
                                                             </div>
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {e.position_name}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={'center'}>
                                                             {e.last_login != null
                                                                 ? moment(e.last_login).format("DD/MM/YYYY, h:mm:ss")
                                                                 : ""}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
                                                             <label
                                                                 htmlFor={e.id}
                                                                 className="relative inline-flex items-center cursor-pointer"
@@ -599,49 +598,47 @@ const Index = (props) => {
                                                                     className="sr-only peer"
                                                                     value={e.active}
                                                                     id={e.id}
-                                                                    // defaultChecked
                                                                     checked={e.active == "0" ? false : true}
-                                                                    // onChange={_ToggleStatus.bind(this, e.id)}
-                                                                    onChange={() =>
-                                                                        handleQueryId({
-                                                                            initialKey: e.id,
-                                                                            status: true,
-                                                                        })
+                                                                    onChange={() => {
+                                                                        if (role) {
+                                                                            handleQueryId({
+                                                                                initialKey: e.id,
+                                                                                status: true,
+                                                                            })
+                                                                        } else {
+                                                                            isShow('warning', WARNING_STATUS_ROLE_ADMIN)
+                                                                        }
+                                                                    }
                                                                     }
                                                                 />
 
                                                                 <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                                             </label>
-                                                        </h6>
-                                                        <h6 className="col-span-1 flex  gap-1 flex-wrap">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="flex  gap-1 flex-wrap">
                                                             {e.branch?.map((i) => (
-                                                                <span
+                                                                <TagBranch
                                                                     key={i}
-                                                                    className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
                                                                 >
                                                                     {i.name}
-                                                                </span>
+                                                                </TagBranch>
                                                             ))}
-                                                        </h6>
+                                                        </RowItemTable>
 
-                                                        <div className="col-span-1 space-x-2 text-center flex items-center justify-center">
-                                                            {role == true || checkEdit ?
-                                                                <Popup_dsnd
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    className="xl:text-base text-xs "
-                                                                    dataLang={dataLang}
-                                                                    name={e.name}
-                                                                    code={e.code}
-                                                                    phone_number={e.phone_number}
-                                                                    email={e.email}
-                                                                    id={e?.id}
-                                                                    department={e.department}
-                                                                    position_name={e.position_name}
-                                                                    last_login={e.last_login}
-                                                                />
-                                                                :
-                                                                <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                                                            }
+                                                        <RowItemTable colSpan={1} className="space-x-2 text-center flex items-center justify-center">
+                                                            <Popup_dsnd
+                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                className="xl:text-base text-xs "
+                                                                dataLang={dataLang}
+                                                                name={e.name}
+                                                                code={e.code}
+                                                                phone_number={e.phone_number}
+                                                                email={e.email}
+                                                                id={e?.id}
+                                                                department={e.department}
+                                                                position_name={e.position_name}
+                                                                last_login={e.last_login}
+                                                            />
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
                                                                 onRefreshGroup={() => { }}
@@ -649,8 +646,8 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                                 type="personnel_staff"
                                                             />
-                                                        </div>
-                                                    </div>
+                                                        </RowItemTable>
+                                                    </RowTable>
                                                 ))}
                                             </div>
                                         </>
@@ -662,19 +659,18 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
-                        <div className="flex space-x-5 my-2 items-center">
-                            <h6>
-                                {dataLang?.display} {totalItem?.iTotalDisplayRecords} thành phần
-                                {/* {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
-                            </h6>
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItem?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>

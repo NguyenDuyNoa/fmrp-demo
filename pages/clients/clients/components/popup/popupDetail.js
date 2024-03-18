@@ -22,6 +22,7 @@ import TableContact from "../table/tableContact";
 import TableDelivery from "../table/tableDelivery";
 import ImageErrors from "components/UI/imageErrors";
 import { Tooltip } from "react-tippy";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
@@ -235,25 +236,6 @@ const Popup_chitiet = (props) => {
                                                             (e) => {
                                                                 return (
                                                                     <span className="font-normal capitalize   ml-1">
-                                                                        {/* <Popup
-                                  className="dropdown-avt"
-                                  key={e.id}
-                                  trigger={(open) => (
-                                    <img
-                                      src={e.profile_image}
-                                      width={40}
-                                      height={40}
-                                      className="object-cover rounded-[100%]"
-                                    ></img>
-                                  )}
-                                  position="top center"
-                                  on={["hover"]}
-                                  arrow={false}
-                                >
-                                  <span className="bg-[#0f4f9e] text-white rounded p-1.5">
-                                    {e.full_name}{" "}
-                                  </span>
-                                </Popup> */}
                                                                         <Tooltip
                                                                             title={
                                                                                 e.full_name
@@ -262,18 +244,12 @@ const Popup_chitiet = (props) => {
                                                                             theme="dark"
                                                                         >
                                                                             <ImageErrors
-                                                                                src={
-                                                                                    e.profile_image
-                                                                                }
-                                                                                width={
-                                                                                    40
-                                                                                }
-                                                                                height={
-                                                                                    40
-                                                                                }
+                                                                                src={e.profile_image}
+                                                                                width={40}
+                                                                                height={40}
                                                                                 defaultSrc="/user-placeholder.jpg"
                                                                                 alt="Image"
-                                                                                className="object-cover rounded-[100%] text-left"
+                                                                                className="object-cover min-w-[40px] min-h-[40px] rounded-[100%] text-left"
                                                                             />
                                                                         </Tooltip>
                                                                     </span>
@@ -286,18 +262,16 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 flex justify-between  p-2 items-center flex-wrap">
                                                 <span className="text-slate-400 text-sm">
                                                     {
-                                                        props.dataLang
-                                                            ?.client_list_brand
+                                                        props.dataLang?.client_list_brand
                                                     }
                                                     :
                                                 </span>{" "}
                                                 <span className="flex justify-between space-x-1">
                                                     {data?.branch?.map((e) => {
                                                         return (
-                                                            <span className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px]">
-                                                                {" "}
+                                                            <TagBranch key={e?.id}>
                                                                 {e.name}
-                                                            </span>
+                                                            </TagBranch>
                                                         );
                                                     })}
                                                 </span>

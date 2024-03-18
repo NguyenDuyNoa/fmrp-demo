@@ -16,25 +16,28 @@ import "react-phone-input-2/lib/style.css";
 
 import Loading from "@/components/UI/loading";
 import Popup_status from "./components/popup";
+import NoData from "@/components/UI/noData/nodata";
 import BtnAction from "@/components/UI/BtnAction";
 import Pagination from "@/components/UI/pagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 
 import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import NoData from "@/components/UI/noData/nodata";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Index = (props) => {
     const isShow = useToast();
@@ -277,56 +280,50 @@ const Index = (props) => {
                                 </div>
                             </div>
                             <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[85%] xl:h-[82%] lg:h-[88%] max:h-[400px] pb-2">
-                                <div className="w-[100%] lg:w-[100%] ">
-                                    <div className="grid grid-cols-12 items-center sticky top-0  rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center">
-                                            {dataLang?.client_group_statusclient}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_group_colorcode}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_group_color}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_list_brand}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.branch_popup_properties}
-                                        </h4>
-                                    </div>
+                                <div className="w-full">
+                                    <HeaderTable gridCols={12}>
+                                        <ColumnTable colSpan={4} textAlign='center'>
+                                            {dataLang?.client_group_statusclient || 'client_group_statusclient'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign='center'>
+                                            {dataLang?.client_group_colorcode || 'client_group_colorcode'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign='center'>
+                                            {dataLang?.client_group_color || 'client_group_color'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign='center'>
+                                            {dataLang?.client_list_brand || 'client_list_brand'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign='center'>
+                                            {dataLang?.branch_popup_properties || 'branch_popup_properties'}
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                 {isState.data?.map((e) => (
-                                                    <div
-                                                        className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
-                                                        key={e.id.toString()}
-                                                    >
-                                                        <h6 className="col-span-4 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                    <RowTable gridCols={12} key={e.id.toString()} >
+                                                        <RowItemTable colSpan={4} textAlign='left'>
                                                             {e.name}
-                                                        </h6>
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign='center'>
                                                             {e.color}
-                                                        </h6>
-                                                        <h6
-                                                            style={{
-                                                                backgroundColor: e.color,
-                                                            }}
-                                                            className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5 h-full rounded-md text-center"
-                                                        ></h6>
-                                                        <h6 className="col-span-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5  rounded-md text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign='center' backgroundColor={e.color} className="rounded-md py-1">
+                                                            {e.color}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2}>
                                                             <span className="flex flex-wrap justify-start gap-2">
                                                                 {e?.branch?.map((e) => (
-                                                                    <span className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                        {e.name}
-                                                                    </span>
+                                                                    <TagBranch key={e?.id}>
+                                                                        {e?.name}
+                                                                    </TagBranch>
                                                                 ))}
                                                             </span>
-                                                        </h6>
-                                                        <div className="col-span-2 space-x-2 text-center flex items-center justify-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} className="space-x-2 text-center flex items-center justify-center">
                                                             {role == true || checkEdit ?
                                                                 <Popup_status
                                                                     listBr={isState.listBr}
@@ -347,8 +344,8 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                                 type="client_status"
                                                             />
-                                                        </div>
-                                                    </div>
+                                                        </RowItemTable>
+                                                    </RowTable>
                                                 ))}
                                             </div>
                                         </>
@@ -360,19 +357,18 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
-                        <div className="flex space-x-5 items-center my-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                            <h6>
-                                {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                {/* {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
-                            </h6>
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItem?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>

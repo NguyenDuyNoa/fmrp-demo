@@ -22,14 +22,16 @@ import { _ServerInstance as Axios } from "/services/axios";
 import ModalImage from "react-modal-image";
 import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
-
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
     const [onFetching, sOnFetching] = useState(false);
-
+    const dataSeting = useSetingServer()
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
@@ -39,10 +41,12 @@ const Popup_chitiet = (props) => {
     //   return Math.floor(num).toLocaleString("en");
     // };
     const formatNumber = (num) => {
-        if (!num && num !== 0) return 0;
-        const roundedNum = Number(num).toFixed(2);
-        return parseFloat(roundedNum).toLocaleString("en");
+        return formatNumberConfig(+num, dataSeting);
     };
+
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    }
 
     const _ServerFetching_detailUser = () => {
         Axios(
@@ -99,11 +103,7 @@ const Popup_chitiet = (props) => {
                                                     "purchase_order_detail_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null
-                                                    ? moment(data?.date).format(
-                                                          "DD/MM/YYYY, HH:mm:ss"
-                                                      )
-                                                    : ""}
+                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
@@ -115,8 +115,8 @@ const Popup_chitiet = (props) => {
                                             <h3 className=" text-[13px]  font-medium">
                                                 {data?.delivery_date != null
                                                     ? moment(
-                                                          data?.delivery_date
-                                                      ).format("DD/MM/YYYY")
+                                                        data?.delivery_date
+                                                    ).format("DD/MM/YYYY")
                                                     : ""}
                                             </h3>
                                         </div>
@@ -157,35 +157,35 @@ const Popup_chitiet = (props) => {
                                         <div className="flex flex-wrap  gap-2 items-center justify-start">
                                             {(data?.import_status ===
                                                 "not_stocked" && (
-                                                <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
-                                                    {props.dataLang[
-                                                        data?.import_status
-                                                    ] || data?.import_status}
-                                                </span>
-                                            )) ||
-                                                (data?.import_status ===
-                                                    "stocked_part" && (
-                                                    <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
+                                                    <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
                                                         {props.dataLang[
                                                             data?.import_status
-                                                        ] ||
-                                                            data?.import_status}
+                                                        ] || data?.import_status}
                                                     </span>
                                                 )) ||
                                                 (data?.import_status ===
+                                                    "stocked_part" && (
+                                                        <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
+                                                            {props.dataLang[
+                                                                data?.import_status
+                                                            ] ||
+                                                                data?.import_status}
+                                                        </span>
+                                                    )) ||
+                                                (data?.import_status ===
                                                     "stocked" && (
-                                                    <span className="flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
-                                                        <TickCircle
-                                                            className="bg-lime-500 rounded-full "
-                                                            color="white"
-                                                            size={15}
-                                                        />
-                                                        {props.dataLang[
-                                                            data?.import_status
-                                                        ] ||
-                                                            data?.import_status}
-                                                    </span>
-                                                ))}
+                                                        <span className="flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
+                                                            <TickCircle
+                                                                className="bg-lime-500 rounded-full "
+                                                                color="white"
+                                                                size={15}
+                                                            />
+                                                            {props.dataLang[
+                                                                data?.import_status
+                                                            ] ||
+                                                                data?.import_status}
+                                                        </span>
+                                                    ))}
                                         </div>
                                         <div className="my-4 font-medium text-[13px]">
                                             {props.dataLang
@@ -347,7 +347,7 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px] mx-auto   py-0.5 col-span-1  rounded-md text-center">
                                                                 {e?.item
                                                                     ?.images !=
-                                                                null ? (
+                                                                    null ? (
                                                                     <ModalImage
                                                                         small={
                                                                             e
@@ -379,14 +379,12 @@ const Popup_chitiet = (props) => {
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left break-words">
                                                                 {
-                                                                    e?.item
-                                                                        ?.product_variation
+                                                                    e?.item?.product_variation
                                                                 }
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center break-words">
                                                                 {
-                                                                    e?.item
-                                                                        ?.unit_name
+                                                                    e?.item?.unit_name
                                                                 }
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center mr-1">
@@ -395,7 +393,7 @@ const Popup_chitiet = (props) => {
                                                                 )}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center">
-                                                                {formatNumber(
+                                                                {formatMoney(
                                                                     e?.price
                                                                 )}
                                                             </h6>
@@ -404,7 +402,7 @@ const Popup_chitiet = (props) => {
                                                                     "%"}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-2  rounded-md text-center">
-                                                                {formatNumber(
+                                                                {formatMoney(
                                                                     e?.price_after_discount
                                                                 )}
                                                             </h6>
@@ -414,14 +412,14 @@ const Popup_chitiet = (props) => {
                                                                 ) + "%"}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-right mr-3.5">
-                                                                {formatNumber(
+                                                                {formatMoney(
                                                                     e?.amount
                                                                 )}
                                                             </h6>
 
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left ml-3.5 ">
                                                                 {e?.note !=
-                                                                undefined ? (
+                                                                    undefined ? (
                                                                     <ExpandableContent
                                                                         content={
                                                                             e?.note
@@ -511,33 +509,33 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3 space-y-2">
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(
+                                                {formatMoney(
                                                     data?.total_price
                                                 )}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(
+                                                {formatMoney(
                                                     data?.total_discount
                                                 )}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(
+                                                {formatMoney(
                                                     data?.total_price_after_discount
                                                 )}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(data?.total_tax)}
+                                                {formatMoney(data?.total_tax)}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(
+                                                {formatMoney(
                                                     data?.total_amount
                                                 )}
                                             </h3>

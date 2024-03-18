@@ -60,6 +60,7 @@ import useActionRole from "@/hooks/useRole";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import NoData from "@/components/UI/noData/nodata";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 
 const Index = (props) => {
@@ -83,7 +84,7 @@ const Index = (props) => {
         onFetchingGr: false,
         keySearch: "",
         listBr: [],
-        lisCode: [],
+        listCode: [],
         listSupplier: [],
         listOrderType: [],
         valueBr: null,
@@ -222,7 +223,7 @@ const Index = (props) => {
     }, [isState.onFetching_filter]);
 
     useEffect(() => {
-        queryState({ onFetching: true });
+        queryState({ onFetching: true, onFetchingGr: true });
     }, [
         limit,
         router.query?.page,
@@ -418,17 +419,17 @@ const Index = (props) => {
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.purchase_order || "purchase_order"}
+                            {dataLang?.purchase_purchase || "purchase_purchase"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.purchase_order_list || "purchase_order_list"}</h6>
+                        <h6>{dataLang?.purchase_order || "purchase_order"}</h6>
                     </div>
                 )}
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.delivery_receipt_list || "delivery_receipt_list"}
+                                {dataLang?.purchase_order || "purchase_order"}
                             </h2>
                             <button
                                 onClick={() => {
@@ -496,12 +497,10 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label:
-                                                            dataLang?.purchase_order_vouchercode ||
-                                                            "purchase_order_vouchercode",
+                                                        label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
-                                                    ...isState.lisCode,
+                                                    ...isState.listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ valueCode: e })}
                                                 value={isState.valueCode}
@@ -514,7 +513,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_supplier || "purchase_order_supplier",
+                                                        label: dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listSupplier,
@@ -601,7 +600,6 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}
                                         </ColumnTable>
-                                        {/* <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}
                                         </ColumnTable>
@@ -622,9 +620,7 @@ const Index = (props) => {
                                             {isState.data?.map((e) => (
                                                 <RowTable key={e?.id} gridCols={12}>
                                                     <RowItemTable colSpan={1} textAlign='center'>
-                                                        {e?.date != null
-                                                            ? moment(e?.date).format("DD/MM/YYYY")
-                                                            : ""}
+                                                        {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1}>
                                                         <Popup_chitiet
@@ -636,7 +632,7 @@ const Index = (props) => {
                                                     <RowItemTable colSpan={1} textAlign='left'>
                                                         {e.supplier_name}
                                                     </RowItemTable >
-                                                    <RowItemTable colSpan={1} className={'flex justify-center items-end'}>
+                                                    <RowItemTable colSpan={1} className={'flex justify-center text-center'}>
                                                         {e?.order_type == "0" ? (
                                                             <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px] min-w-[80px]">
                                                                 Tạo mới
@@ -648,7 +644,6 @@ const Index = (props) => {
                                                         )}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
-                                                        {/* {e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')} */}
                                                         {e?.purchases?.map((purchase, index) => (
                                                             <React.Fragment key={purchase.id}>
                                                                 {index !== 0 && ","}
@@ -672,7 +667,7 @@ const Index = (props) => {
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className="flex items-center justify-center text-center ">
                                                         {(e?.import_status === "not_stocked" && (
-                                                            <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
+                                                            <span className="font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
                                                                 {dataLang[e?.import_status] || e?.import_status}{" "}
                                                             </span>
                                                         )) ||
@@ -697,10 +692,10 @@ const Index = (props) => {
                                                     <RowItemTable colSpan={1} textAlign={"text-left"} className="truncate ">
                                                         {e.note}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className=" w-fit mx-auto">
-                                                        <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                    <RowItemTable colSpan={1} className="w-fit mx-auto">
+                                                        <TagBranch>
                                                             {e?.branch_name}
-                                                        </div>
+                                                        </TagBranch>
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className=" flex justify-center">
                                                         <BtnAction
@@ -725,27 +720,18 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     <ContainerTotal>
-                        <div className="col-span-5 p-2 text-center">
-                            <h3 className="uppercase font-normal 2xl:text-base xl:text-xs text-[8px]">
-                                {dataLang?.purchase_order_table_total_outside ||
-                                    "purchase_order_table_total_outside"}
-                            </h3>
-                        </div>
-                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                            <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
-                                {formatMoney(total?.total_price)}
-                            </h3>
-                        </div>
-                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap ">
-                            <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
-                                {formatMoney(total?.total_tax_price)}
-                            </h3>
-                        </div>
-                        <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                            <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
-                                {formatMoney(total?.total_amount)}
-                            </h3>
-                        </div>
+                        <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
+                            {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end pr-4 p-2 flex gap-2 flex-wrap">
+                            {formatMoney(total?.total_price)}
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end pr-4 p-2 flex gap-2 flex-wrap ">
+                            {formatMoney(total?.total_tax_price)}
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end pr-4 p-2 flex gap-2 flex-wrap ">
+                            {formatMoney(total?.total_amount)}
+                        </ColumnTable>
                     </ContainerTotal>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>

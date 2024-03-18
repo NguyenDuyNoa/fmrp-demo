@@ -1,8 +1,8 @@
-export const HeaderTable = ({ children, className, gridCols }) => {
+export const HeaderTable = ({ children, className, gridCols, display }) => {
     return (
         <div
             style={{
-                display: "grid",
+                display: display ? display : "grid",
                 gridTemplateColumns: `repeat(${gridCols ? gridCols : 12}, minmax(0, 1fr))`
             }}
             className={`

@@ -23,6 +23,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 
 const Index = (props) => {
     const router = useRouter();
@@ -1128,21 +1129,18 @@ const Index = (props) => {
                                                                             {option.e?.product_variation}
                                                                         </h5>
                                                                     </div>
-
-                                                                    <div className="flex 3xl:gap-4 2xl:gap-3 xl:gap-3 gap-1">
-                                                                        <h5 className="text-gray-400 3xl:min-w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+                                                                    <div className="flex text-gray-400 items-center gap-2">
+                                                                        <h5 className="text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                             {dataLang[option.e?.text_type]}
                                                                         </h5>
-
-                                                                        <div className="flex items-center">
-                                                                            <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                                                                {dataLang?.purchase_survive || "purchase_survive"} :
-                                                                            </h5>
-
-                                                                            <h5 className=" font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                                                                {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
-                                                                            </h5>
-                                                                        </div>
+                                                                        {"-"}
+                                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                            {dataLang?.purchase_survive || "purchase_survive"}
+                                                                            :
+                                                                        </h5>
+                                                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                            {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                        </h5>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1220,7 +1218,7 @@ const Index = (props) => {
                                                 </div>
                                             </div>
                                             <div className="col-span-1 text-center flex items-center justify-center">
-                                                <NumericFormat
+                                                <InPutMoneyFormat
                                                     value={index === 0 ? 1 : e?.price}
                                                     onValueChange={_HandleChangeInputOption.bind(
                                                         this,
@@ -1228,19 +1226,15 @@ const Index = (props) => {
                                                         "price",
                                                         index
                                                     )}
-                                                    allowNegative={false}
                                                     readOnly={index === 0 ? readOnlyFirst : false}
-                                                    decimalScale={0}
-                                                    isNumericString={true}
                                                     className={`
                                                     ${index === 0 ? "cursor-default" : "cursor-text"} 
                                                     ${e?.price == 0 && 'border-red-500' || e?.price == "" && 'border-red-500'} 
                                                     appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                                                    thousandSeparator=","
                                                 />
                                             </div>
                                             <div className="col-span-1 text-center flex items-center justify-center">
-                                                <NumericFormat
+                                                <InPutNumericFormat
                                                     value={index === 0 ? 0 : e?.discount}
                                                     onValueChange={_HandleChangeInputOption.bind(
                                                         this,

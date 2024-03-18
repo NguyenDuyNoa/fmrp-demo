@@ -715,12 +715,12 @@ const Index = (props) => {
                                                                             alt="Product Image"
                                                                             style={{
                                                                                 width: "40px",
-                                                                                height: "50px",
+                                                                                height: "40px",
                                                                             }}
                                                                             className="object-cover rounded"
                                                                         />
                                                                     ) : (
-                                                                        <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
+                                                                        <div className="w-[40px] h-[40px] object-cover  flex items-center justify-center rounded">
                                                                             <img
                                                                                 src="/no_img.png"
                                                                                 alt="Product Image"
@@ -734,32 +734,31 @@ const Index = (props) => {
                                                                     )}
                                                                 </div>
                                                                 <div>
-                                                                    <h3 className="font-normal">{option.e?.name}</h3>
+                                                                    <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                        {option.e?.name}
+                                                                    </h3>
                                                                     <div className="flex gap-2">
-                                                                        <h5 className="text-gray-400 font-normal">
+                                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                             {option.e?.code}
                                                                         </h5>
-                                                                        <h5 className="font-normal">
+                                                                        <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                             {option?.e?.product_variation}
                                                                         </h5>
                                                                     </div>
-                                                                    <h5 className="text-gray-400 font-normal text-xs">
-                                                                        {dataLang[option.e?.text_type]}
-                                                                    </h5>
-                                                                </div>
-                                                            </div>
-                                                            <div className="">
-                                                                <div className="text-right opacity-0">{"0"}</div>
-                                                                <div className="flex gap-2">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <h5 className="text-gray-400 font-normal">
-                                                                            {dataLang?.purchase_survive ||
-                                                                                "purchase_survive"}
-                                                                            :
+                                                                    <div className="flex items-center gap-2 text-gray-400">
+                                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                            {dataLang[option.e?.text_type]}
                                                                         </h5>
-                                                                        <h5 className="text-[#0F4F9E] font-normal">
-                                                                            {option.e?.qty_warehouse ?? 0}
-                                                                        </h5>
+                                                                        {"-"}
+                                                                        <div className="flex items-center gap-1">
+                                                                            <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                {dataLang?.purchase_survive || "purchase_survive"}
+                                                                                :
+                                                                            </h5>
+                                                                            <h5 className=" font-normal text-black 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                            </h5>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>

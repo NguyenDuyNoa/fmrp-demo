@@ -26,6 +26,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 const Index = (props) => {
     const router = useRouter();
 
@@ -2203,7 +2204,7 @@ const Index = (props) => {
                                             </div>
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
-                                            <InPutNumericFormat
+                                            <InPutMoneyFormat
                                                 value={e?.price}
                                                 onValueChange={(value) => handleOnChangeInputOption(e?.id, "price", value)}
                                                 isAllowed={({ floatValue }) => {

@@ -52,6 +52,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import Popup_GiaiDoan from "@/pages/products/components/product/popupGiaiDoan";
 import Popup_Bom from "@/pages/products/components/product/popupBom";
+import Popup_ThanhPham from "@/pages/products/components/product/popupThanhPham";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -347,6 +348,7 @@ const BtnAction = React.memo((props) => {
                     'personnel_staff',
                     'department',
                     'personnel_roles'
+
                 ].includes(props?.type) ?
                     <button
                         type="button"
@@ -434,6 +436,14 @@ const BtnAction = React.memo((props) => {
                                             type={props?.typeOpen}
                                             className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                                         />
+                                        <Popup_ThanhPham
+                                            onRefresh={props.onRefresh}
+                                            dataProductExpiry={props.dataProductExpiry}
+                                            dataLang={props.dataLang}
+                                            id={props?.id}
+                                            type={props?.typeOpen}
+                                            className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                        />
                                     </>
                                 }
 
@@ -469,7 +479,7 @@ const BtnAction = React.memo((props) => {
                                         </Popup_dspc>
                                     </div>
                                 )}
-                                {!["order", "serviceVoucher", "receipts", "payment"].includes(props.type) && (
+                                {!["order", 'products', "serviceVoucher", "receipts", "payment"].includes(props.type) && (
                                     <button
                                         onClick={() => {
                                             if (role) {

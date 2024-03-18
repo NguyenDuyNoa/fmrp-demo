@@ -33,6 +33,10 @@ import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -42,11 +46,9 @@ const Index = (props) => {
     const trangthaiExprired = useStatusExprired();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-    console.log("authX", auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'suppliers');
     // const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'contacts_suppliers');
-    console.log(checkExport);
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
 
@@ -66,7 +68,6 @@ const Index = (props) => {
     const [isState, sIsState] = useState(initalState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-    console.log(isState);
     const _ServerFetching = () => {
         Axios(
             "GET",
@@ -325,69 +326,64 @@ const Index = (props) => {
                                 </div>
                             </div>
                             <Customscrollbar>
-                                <div className="w-[100%] lg:w-[100%] ">
-                                    <div className="grid grid-cols-10 items-center sticky top-0  rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.suppliers_contacts_name}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.suppliers_contacts_fullname}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.suppliers_contacts_phone}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.suppliers_contacts_email}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.suppliers_contacts_pos}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                            {dataLang?.suppliers_contacts_address}
-                                        </h4>
-                                        <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                            {dataLang?.client_contact_table_brand}
-                                        </h4>
-                                    </div>
+                                <div className="w-full">
+                                    <HeaderTable gridCols={10}>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.suppliers_contacts_name || 'suppliers_contacts_name'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.suppliers_contacts_fullname || 'suppliers_contacts_fullname'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.suppliers_contacts_phone || 'suppliers_contacts_phone'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.suppliers_contacts_email || 'suppliers_contacts_email'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.suppliers_contacts_pos || 'suppliers_contacts_pos'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.suppliers_contacts_address || 'suppliers_contacts_address'}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.client_contact_table_brand || 'client_contact_table_brand'}
+                                        </ColumnTable>
+                                    </HeaderTable>
                                     {isState.onFetching ? (
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : isState.data?.length > 0 ? (
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                 {isState.data?.map((e) => (
-                                                    <div
-                                                        className="grid grid-cols-10 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                        key={e.supplier_contact_id.toString()}
+                                                    <RowTable gridCols={10} key={e.supplier_contact_id.toString()}
                                                     >
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left">
+                                                        <RowItemTable colSpan={2} textAlign={'left'}>
                                                             {e.supplier_name}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={'left'}>
                                                             {e.contact_name}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'}>
                                                             {e.phone_number}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left ">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'}>
                                                             {e.email}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'}>
                                                             {e.position}
-                                                        </h6>
-                                                        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left">
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'}>
                                                             {e.address}
-                                                        </h6>
-                                                        <h6 className="flex col-span-2  gap-1 flex-wrap">
+                                                        </RowItemTable>
+                                                        <RowItemTable textAlign={'left'} className="flex items-center  gap-1 flex-wrap">
                                                             {e.branch?.map((i) => (
-                                                                <span
-                                                                    key={i}
-                                                                    className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
-                                                                >
+                                                                <TagBranch key={i} >
                                                                     {i.name}
-                                                                </span>
+                                                                </TagBranch>
                                                             ))}
-                                                        </h6>
-                                                    </div>
+                                                        </RowItemTable>
+                                                    </RowTable>
                                                 ))}
                                             </div>
                                         </>
@@ -399,19 +395,18 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
-                        <div className="flex space-x-5 my-2 items-center">
-                            <h6>
-                                {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.ingredient}
-                                {/* {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient} */}
-                            </h6>
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItem?.iTotalDisplayRecords}
+                            />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
                             />
-                        </div>
+                        </ContainerPagination>
                     )}
                 </ContainerBody>
             </Container>

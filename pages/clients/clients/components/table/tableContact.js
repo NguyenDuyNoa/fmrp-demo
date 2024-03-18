@@ -12,7 +12,7 @@ const TableContact = (props) => {
     <div>
       <div className="w-[930px]">
         <Customscrollbar className="min:h-[200px] h-[72%] max:h-[400px] pb-2">
-          <div className="pr-2 w-[100%] lx:w-[110%] ">
+          <div className="w-full">
             <div className="flex items-center sticky top-0 bg-slate-100  z-10 ">
               <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[20%] font-[400] text-center">
                 {props?.dataLang?.client_popup_detailName}

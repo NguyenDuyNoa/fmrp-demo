@@ -16,6 +16,7 @@ import {
 import moment from "moment/moment";
 import Image from "next/image";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -227,8 +228,7 @@ const Popup_chitiet = (props) => {
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
                                                 <span className="text-slate-400 text-sm      w-[34%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_table_active
+                                                        props.dataLang?.personnels_staff_table_active
                                                     }
                                                     :
                                                 </span>{" "}
@@ -246,8 +246,7 @@ const Popup_chitiet = (props) => {
                                                 <div className="mb-4 flex justify-between flex-wrap p-2">
                                                     <span className="text-slate-400 text-sm  w-[25%]">
                                                         {
-                                                            props.dataLang
-                                                                ?.personnels_staff_table_avtar
+                                                            props.dataLang?.personnels_staff_table_avtar
                                                         }{" "}
                                                     </span>
                                                 </div>
@@ -294,15 +293,9 @@ const Popup_chitiet = (props) => {
                                                         {data?.branch?.map(
                                                             (e) => {
                                                                 return (
-                                                                    <span
-                                                                        key={
-                                                                            e.id
-                                                                        }
-                                                                        className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px] mb-2"
-                                                                    >
-                                                                        {" "}
+                                                                    <TagBranch key={e.id}>
                                                                         {e.name}
-                                                                    </span>
+                                                                    </TagBranch>
                                                                 );
                                                             }
                                                         )}

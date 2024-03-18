@@ -46,6 +46,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import NoData from "@/components/UI/noData/nodata";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 
 const Index = (props) => {
@@ -728,9 +729,9 @@ const Index = (props) => {
                                                                 />
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className="w-fit mx-auto">
-                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                <TagBranch>
                                                                     {e?.branch_name}
-                                                                </div>
+                                                                </TagBranch>
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className="flex justify-center">
                                                                 <BtnAction
@@ -755,26 +756,18 @@ const Index = (props) => {
                             </ContainerTable>
                         </div>
                         <ContainerTotal className='!grid-cols-10'>
-                            <div className="col-span-3 p-2 text-center">
-                                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
-                                    {dataLang?.import_total || "import_total"}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right">
-                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatMoney(total?.total_price)}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right ">
-                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatMoney(total?.total_tax_price)}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right">
-                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatMoney(total?.total_amount)}
-                                </h3>
-                            </div>
+                            <ColumnTable colSpan={3} textAlign={'center'} className="p-2">
+                                {dataLang?.import_total || "import_total"}
+                            </ColumnTable>
+                            <ColumnTable colSpan={1} textAlign={'right'}>
+                                {formatMoney(total?.total_price)}
+                            </ColumnTable>
+                            <ColumnTable colSpan={1} textAlign={'right'}>
+                                {formatMoney(total?.total_tax_price)}
+                            </ColumnTable>
+                            <ColumnTable colSpan={1} textAlign={'right'}>
+                                {formatMoney(total?.total_amount)}
+                            </ColumnTable>
                         </ContainerTotal>
                         {isState.data?.length != 0 && (
                             <ContainerPagination>

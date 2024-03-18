@@ -25,6 +25,10 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { BiEdit } from "react-icons/bi";
+import Image from "next/image";
 
 const Popup_ThanhPham = React.memo((props) => {
     const dataOptBranch = useSelector((state) => state.branch);
@@ -35,9 +39,15 @@ const Popup_ThanhPham = React.memo((props) => {
 
     const dataOptVariant = useSelector((state) => state.variant_NVL);
 
+    const [isOpen, sIsOpen] = useState(false);
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit } = useActionRole(auth, 'products');
+
     const isShow = useToast();
 
-    const { isOpen, isId, isIdChild, handleOpen, handleToggle, handleQueryId } = useToggle();
+    const { isOpen: openDelete, isId, isIdChild, handleOpen, handleToggle, handleQueryId } = useToggle();
 
     const scrollAreaRef = useRef(null);
 
@@ -46,7 +56,7 @@ const Popup_ThanhPham = React.memo((props) => {
         return { menuPortalTarget };
     };
 
-    const _ToggleModal = (e) => props.setOpen(e);
+    const _ToggleModal = (e) => sIsOpen(e);
 
     const [tab, sTab] = useState(0);
 
@@ -254,35 +264,35 @@ const Popup_ThanhPham = React.memo((props) => {
     const [errType, sErrType] = useState(false);
 
     useEffect(() => {
-        props.isOpen && sTab(0);
-        props.isOpen && sName("");
-        props.isOpen && sCode("");
-        props.isOpen && sNote("");
-        props.isOpen && sPrice(null);
-        props.isOpen && sExpiry();
-        props.isOpen && sMinimumAmount(null);
-        props.isOpen && sThumb(null);
-        props.isOpen && sThumbFile(null);
-        props.isOpen && sType(null);
-        props.isOpen && sCategory(null);
-        props.isOpen && sBranch([]);
-        props.isOpen && sDataCategory([]);
-        props.isOpen && sUnit(null);
-        props.isOpen && sOnFetchingCategory(false);
-        props.isOpen && sErrGroup(false);
-        props.isOpen && sErrName(false);
-        props.isOpen && sErrCode(false);
-        props.isOpen && sErrUnit(false);
-        props.isOpen && sErrBranch(false);
-        props.isOpen && sErrType(false);
-        props.isOpen && sDataTotalVariant([]);
-        props.isOpen && sDataVariantSending([]);
-        props.isOpen && sVariantMain(null);
-        props.isOpen && sVariantSub(null);
-        props.isOpen && sPrevVariantMain(null);
-        props.isOpen && sPrevVariantSub(null);
-        props.isOpen && props?.id && sOnFetching(true);
-    }, [props.isOpen]);
+        isOpen && sTab(0);
+        isOpen && sName("");
+        isOpen && sCode("");
+        isOpen && sNote("");
+        isOpen && sPrice(null);
+        isOpen && sExpiry();
+        isOpen && sMinimumAmount(null);
+        isOpen && sThumb(null);
+        isOpen && sThumbFile(null);
+        isOpen && sType(null);
+        isOpen && sCategory(null);
+        isOpen && sBranch([]);
+        isOpen && sDataCategory([]);
+        isOpen && sUnit(null);
+        isOpen && sOnFetchingCategory(false);
+        isOpen && sErrGroup(false);
+        isOpen && sErrName(false);
+        isOpen && sErrCode(false);
+        isOpen && sErrUnit(false);
+        isOpen && sErrBranch(false);
+        isOpen && sErrType(false);
+        isOpen && sDataTotalVariant([]);
+        isOpen && sDataVariantSending([]);
+        isOpen && sVariantMain(null);
+        isOpen && sVariantSub(null);
+        isOpen && sPrevVariantMain(null);
+        isOpen && sPrevVariantSub(null);
+        isOpen && props?.id && sOnFetching(true);
+    }, [isOpen]);
 
     const _HandleChangeInput = (type, value) => {
         if (type === "code") {
@@ -420,7 +430,7 @@ const Popup_ThanhPham = React.memo((props) => {
 
     useEffect(() => {
         setTimeout(() => {
-            props.isOpen && branch && sOnFetchingCategory(true);
+            isOpen && branch && sOnFetchingCategory(true);
         }, 500);
     }, [branch]);
 
@@ -478,7 +488,7 @@ const Popup_ThanhPham = React.memo((props) => {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
                         isShow("success", props.dataLang[message] || message);
-                        props.setOpen(false);
+                        sIsOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
                         isShow("error", props.dataLang[message] || message);
@@ -587,13 +597,39 @@ const Popup_ThanhPham = React.memo((props) => {
     return (
         <PopupEdit
             title={
-                props?.id
-                    ? `${props.dataLang?.edit_finishedProduct || "edit_finishedProduct"}`
-                    : `${props.dataLang?.addNew_finishedProduct || "addNew_finishedProduct"}`
+                props?.id ? `${props.dataLang?.edit_finishedProduct || "edit_finishedProduct"}` : `${props.dataLang?.addNew_finishedProduct || "addNew_finishedProduct"}`
             }
-            button={props?.id ? `${props.dataLang?.edit || "edit"}` : `${props.dataLang?.branch_popup_create_new}`}
-            onClickOpen={_ToggleModal.bind(this, true)}
-            open={props.isOpen}
+            button={
+                props?.id ?
+                    <div
+                        onClick={() => {
+                            if (role || checkEdit) {
+                                sIsOpen(true)
+                                console.log("e,1");
+                            } else {
+                                console.log("e,2");
+                                isShow("warning", WARNING_STATUS_ROLE)
+                            }
+                        }}
+                        className={props.type == 'add' && "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}>
+                        <BiEdit
+                            size={20}
+                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                        />
+                        <p className="group-hover:text-sky-500">
+                            {props.dataLang?.btn_table_edit || "btn_table_edit"}
+                        </p>
+
+                    </div>
+                    : props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'
+
+            }
+            onClickOpen={() => {
+                if (!props?.id) {
+                    sIsOpen(true)
+                }
+            }}
+            open={isOpen}
             onClose={_ToggleModal.bind(this, false)}
             classNameBtn={props.className}
         >
@@ -1437,7 +1473,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                 type="warning"
                                 title={TITLE_DELETE}
                                 subtitle={CONFIRM_DELETION}
-                                isOpen={isOpen}
+                                isOpen={openDelete}
                                 nameModel="product_variant"
                                 save={handleDeleteVariantItems}
                                 cancel={() => handleQueryId({ status: false })}

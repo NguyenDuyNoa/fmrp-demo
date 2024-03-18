@@ -32,6 +32,7 @@ import formatNumberConfig from '@/utils/helpers/formatnumber'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import useSetingServer from "@/hooks/useConfigNumber";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -2070,7 +2071,7 @@ const Index = (props) => {
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                    <InPutNumericFormat
+                                                                    <InPutMoneyFormat
                                                                         className={`${errPrice &&
                                                                             (ce?.price == null ||
                                                                                 ce?.price == "" ||
