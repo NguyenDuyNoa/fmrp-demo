@@ -22,7 +22,9 @@ const useActionRole = (auth, type) => {
         "department": "department",
         'purchases': "purchases",
         "purchase_order": "order",
-        "position": "personnel_roles"
+        "position": "personnel_roles",
+        "services": "serviceVoucher",
+        "import": "import"
         // Thêm các type ||  nameModel
 
 

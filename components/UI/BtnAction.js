@@ -30,8 +30,8 @@ import Popup_KeepStock from "@/pages/sales_export_product/sales_order/components
 import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/components/PopupDetailKeepStock";
 
 ///Đơn đặt hàng PO
-import Popup_TableValidateEdit from "@/pages/purchase_order/order/(popup)/validateEdit";
-import Popup_TableValidateDelete from "@/pages/purchase_order/order/(popup)/validateDelete";
+import Popup_TableValidateEdit from "@/pages/purchase_order/order/components/validateEdit";
+import Popup_TableValidateDelete from "@/pages/purchase_order/order/components/validateDelete";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
@@ -39,7 +39,7 @@ import { useSetData } from "@/hooks/useSetData";
 
 import PopupEdit from "@/components/UI/popup";
 
-import Popup_servie from "@/pages/purchase_order/serviceVoucher/(popup)/popup";
+import Popup_servie from "@/pages/purchase_order/serviceVoucher/components/popup";
 
 import Popup_dspc from "@/pages/accountant/payment/(popup)/popup";
 import Popup_dspt from "@/pages/accountant/receipts/(popup)/popup";

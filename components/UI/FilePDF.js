@@ -162,8 +162,6 @@ const FilePDF = ({
                 };
 
                 const dataKeys = Object.keys(dataPDF);
-                console.log("dataCompany", dataCompany);
-                console.log("dataServer", db);
                 if (dataKeys.includes(type) && dataPDF !== undefined && dataCompany !== undefined) {
                     const pdfGenerator = pdfMake.createPdf(dataPDF[type][props?.type]);
                     pdfGenerator.open((blob) => {

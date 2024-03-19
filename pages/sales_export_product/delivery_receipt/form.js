@@ -33,6 +33,9 @@ import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import useSetingServer from "@/hooks/useConfigNumber";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -1092,29 +1095,29 @@ const Index = (props) => {
                         : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
                 </title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+            <Container className="!h-auto">
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6> {id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
+                            : dataLang?.delivery_receipt_add || "delivery_receipt_add"}</h6>
+                    </div>
+                )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
-                            </h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit" : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
-                            </h6>
-                        </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
+                    <div className="flex justify-between items-center ">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                         </h2>
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerDeliveryReceipt.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
                             </button>
@@ -2111,7 +2114,7 @@ const Index = (props) => {
                                                                                 return true;
                                                                             }
                                                                             if (floatValue > 100) {
-                                                                                isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                                                                isShow("error", ERROR_DISCOUNT_MAX);
                                                                                 return false
                                                                             }
                                                                             return true
@@ -2448,7 +2451,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

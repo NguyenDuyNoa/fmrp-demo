@@ -25,6 +25,15 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { debounce } from "lodash";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
+import useFeature from "@/hooks/useConfigFeature";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -38,6 +47,8 @@ const Index = (props) => {
     const router = useRouter();
 
     const id = router.query?.id;
+
+    const dataSeting = useSetingServer()
 
     const dataLang = props?.dataLang;
 
@@ -89,12 +100,7 @@ const Index = (props) => {
 
     const [dataTasxes, sDataTasxes] = useState([]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
     //new
     const [listData, sListData] = useState([]);
 
@@ -162,36 +168,9 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetchingCondition(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
-
     useEffect(() => {
         id && sOnFetchingCondition(true);
     }, []);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
 
     const _ServerFetchingDetailPage = () => {
         Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
@@ -480,52 +459,6 @@ const Index = (props) => {
         }
     };
 
-    // useEffect(() => {
-    //       sOption(prevOption => {
-    //         const newOption = [...prevOption];
-    //         newOption.forEach((item, index) => {
-    //           if (index === 0 || !item?.id) return;
-    //           item.khohang = khotong
-    //         });
-    //         return newOption;
-    //       });
-    // }, [khotong]);
-
-    // useEffect(() => {
-    //   if (thuetong == null) return;
-    //   sOption(prevOption => {
-    //     const newOption = [...prevOption];
-    //     const thueValue = thuetong?.tax_rate || 0;
-    //     const chietKhauValue = chietkhautong || 0;
-    //     newOption.forEach((item, index) => {
-    //       if (index === 0 || !item?.id) return;
-    //       const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-    //       const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
-    //       item.thue = thuetong;
-    //       item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-    //     });
-    //     return newOption;
-    //   });
-    // }, [thuetong]);
-
-    // useEffect(() => {
-    //   if (chietkhautong == null) return;
-    //   sOption(prevOption => {
-    //     const newOption = [...prevOption];
-    //     const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
-    //     const chietKhauValue = chietkhautong ? chietkhautong : 0;
-    //     newOption.forEach((item, index) => {
-    //       if (index === 0 || !item?.id) return;
-    //       const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-    //       const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
-    //       item.chietkhau = Number(chietkhautong);
-    //       item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
-    //       item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-    //     });
-    //     return newOption;
-    //   });
-    // }, [chietkhautong]);
-
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const hasNullKho = listData.some((item) =>
@@ -548,6 +481,10 @@ const Index = (props) => {
             item.child?.some((childItem) => !childItem.disabledDate && childItem.date === null)
         );
 
+        const checkNumber = listData.some((item) =>
+            item.child?.some((childItem) => childItem.price == "" || childItem.price == 0 || childItem.amount == "" || childItem.amount == 0)
+        );
+
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
         if (
             idSupplier == null ||
@@ -556,7 +493,7 @@ const Index = (props) => {
             hasNullKho ||
             (dataProductSerial?.is_enable == "1" && hasNullSerial) ||
             ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullLot) ||
-            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullDate)
+            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && hasNullDate) || checkNumber
         ) {
             // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
             idSupplier == null && sErrSupplier(true);
@@ -679,150 +616,10 @@ const Index = (props) => {
         idBranch != null && sOnFetchingSupplier(true);
     }, [idBranch]);
 
-    // useEffect(() => {
-    //   idTheOrder == null && sIdSupplier(null)
-    // }, [idTheOrder]);
 
     useEffect(() => {
         idSupplier != null && sOnFetchingTheOrder(true);
     }, [idSupplier]);
-
-    // const _HandleChangeInputOption = (id, type,index3, value) => {
-    //   var index = option.findIndex(x => x.id === id);
-    //   if(type == "mathang"){
-    //     //  const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
-    //     //     if (hasSelectedOption) {
-    //     //       Toast.fire({
-    //     //         title: `${"Mặt hàng đã được chọn"}`,
-    //     //         icon: 'error',
-    //     //         confirmButtonColor: '#296dc1',
-    //     //         cancelButtonColor: '#d33',
-    //     //         confirmButtonText: `${dataLang?.aler_yes}`,
-    //     //         })
-    //     //       return
-    //     //     }
-
-    //     if(option[index]?.mathang){
-
-    //           option[index].mathang = value
-    //           option[index].donvitinh =  value?.e?.unit_name
-    //           sMathangAll(null)
-    //           option[index].dongia = value?.e?.price
-    //           option[index].khohang =  khotong ? khotong : null
-    //           option[index].soluong =  idTheOrder != null ? Number(value?.e?.quantity_left) : 1
-    //           option[index].chietkhau = chietkhautong ? chietkhautong : Number(value?.e?.discount_percent)
-    //           option[index].dongiasauck = Number(value?.e?.price_after_discount)
-    //           option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}
-    //           option[index].thanhtien = Number(value?.e?.amount)
-    //         }else{
-
-    //           // const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
-    //           const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: thuetong ? thuetong : {label: value?.e.tax_name,value:Number(value?.e.tax_id), tax_rate:Number(value?.e.tax_rate)}, thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
-    //           if (newData.chietkhau) {
-    //             // newData.dongiasauck *=  (1 - Number(newData.chietkhau) / 100);
-    //             newData.dongiasauck = Number(newData.dongia) * (1 - Number(newData.chietkhau) / 100);
-    //           }
-    //           if(newData?.thue?.tax_rate == undefined){
-    //             const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
-    //             newData.thanhtien = Number(tien.toFixed(2));
-    //           }else {
-    //             const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
-    //             newData.thanhtien = Number(tien.toFixed(2));
-    //           }
-    //           sMathangAll(null)
-    //           option.push(newData);
-    //         }
-    //   }else if(type ==="khohang"){
-    //     option[index].khohang = value
-    //     sCustomStyle(value)
-    //   }
-    //   else if(type == "donvitinh"){
-    //     option[index].donvitinh = value.target?.value;
-    //   }else if (type === "soluong") {
-    //     option[index].soluong = Number(value?.value);
-    //     if(option[index].thue?.tax_rate == undefined){
-    //       const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-    //       option[index].thanhtien = Number(tien.toFixed(2));
-    //     }else{
-    //       const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-    //       option[index].thanhtien = Number(tien.toFixed(2));
-    //     }
-    //     sOption([...option]);
-    //   }else if(type == "dongia"){
-    //       option[index].dongia = Number(value.value)
-    //       option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau/100);
-    //       option[index].dongiasauck = +(Math.round(option[index].dongiasauck + 'e+2') + 'e-2');
-    //       if(option[index].thue?.tax_rate == undefined){
-    //         const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-    //         option[index].thanhtien = Number(tien.toFixed(2));
-    //       }else{
-    //         const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-    //         option[index].thanhtien = Number(tien.toFixed(2));
-    //       }
-
-    //   }else if(type == "chietkhau"){
-    //       option[index].chietkhau = Number(value.value)
-    //       option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau/100);
-    //       option[index].dongiasauck = +(Math.round(option[index].dongiasauck + 'e+2') + 'e-2');
-    //       if(option[index].thue?.tax_rate == undefined){
-    //         const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-    //         option[index].thanhtien = Number(tien.toFixed(2));
-    //       }else{
-    //         const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-    //         option[index].thanhtien = Number(tien.toFixed(2));
-    //       }
-    //   }else if(type == "thue"){
-    //       option[index].thue = value
-    //       if(option[index].thue?.tax_rate == undefined){
-    //         const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-    //         option[index].thanhtien = Number(tien.toFixed(2));
-    //       }else{
-    //         const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-    //         option[index].thanhtien = Number(tien.toFixed(2));
-    //       }
-    //   }else if(type == "ghichu"){
-    //       option[index].ghichu = value?.target?.value;
-    //   }
-    //   sOption([...option])
-    // }
-
-    // const handleIncrease = (id) => {
-    //   const index = option.findIndex((x) => x.id === id);
-    //   const newQuantity = option[index].soluong + 1;
-    //   option[index].soluong = newQuantity;
-    //   if(option[index].thue?.tax_rate == undefined){
-    //     const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-    //     option[index].thanhtien = Number(tien.toFixed(2));
-    //   }else{
-    //     const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-    //     option[index].thanhtien = Number(tien.toFixed(2));
-    //   }
-    //   sOption([...option]);
-    // };
-
-    // const handleDecrease = (id) => {
-    //   const index = option.findIndex((x) => x.id === id);
-    //   const newQuantity = option[index].soluong - 1;
-    //   if (newQuantity >= 1) { // chỉ giảm số lượng khi nó lớn hơn hoặc bằng 1
-    //     option[index].soluong = newQuantity;
-    //     if(option[index].thue?.tax_rate == undefined){
-    //       const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-    //       option[index].thanhtien = Number(tien.toFixed(2));
-    //     }else{
-    //       const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-    //       option[index].thanhtien = Number(tien.toFixed(2));
-    //     }
-    //     sOption([...option]);
-    //   }else{
-    //     return  Toast.fire({
-    //       title: `${"Số lượng tối thiểu"}`,
-    //       icon: 'error',
-    //       confirmButtonColor: '#296dc1',
-    //       cancelButtonColor: '#d33',
-    //       confirmButtonText: `${dataLang?.aler_yes}`,
-    //       })
-    //   }
-    // };
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
@@ -929,18 +726,12 @@ const Index = (props) => {
         );
     };
 
-    // const formatNumber = (num) => {
-    //   if (!num && num !== 0) return 0;
-    //   const roundedNum = parseFloat(num?.toFixed(2));
-    //   return roundedNum.toLocaleString("en", {
-    //     minimumFractionDigits: 2,
-    //     maximumFractionDigits: 2,
-    //     useGrouping: true
-    //   });
-    // };
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
+    };
+
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
     };
 
     const tinhTongTien = (option) => {
@@ -1366,20 +1157,25 @@ const Index = (props) => {
             <Head>
                 <title>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+            <Container className="!h-auto">
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.import_title || "import_title"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</h6>
+
+                    </div>
+                )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.import_title || "import_title"}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</h6>
-                        </div>
-                    )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">{dataLang?.import_title || "import_title"}</h2>
-                        <div className="flex justify-end items-center">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            {dataLang?.import_title || "import_title"}
+                        </h2>
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerImport.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
@@ -1416,12 +1212,6 @@ const Index = (props) => {
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    {/* <input
-                              value={date}    
-                              onChange={_HandleChangeInput.bind(this, "date")}
-                              name="fname"                      
-                              type="datetime-local"
-                              className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/> */}
                                     <div className="custom-date-picker flex flex-row">
                                         <DatePicker
                                             blur
@@ -1702,7 +1492,7 @@ const Index = (props) => {
                                                                 {dataLang?.purchase_survive || "purchase_survive"}:
                                                             </h5>
                                                             <h5 className="text-[#0F4F9E] font-medium">
-                                                                {option.e?.qty_warehouse || 0}
+                                                                {formatNumber(option.e?.qty_warehouse || 0)}
                                                             </h5>
                                                         </div>
                                                     </div>
@@ -1823,16 +1613,11 @@ const Index = (props) => {
                         <div className="col-span-10">
                             <div
                                 className={`${dataProductSerial.is_enable == "1"
-                                        ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                            ? "grid-cols-13"
-                                            : dataMaterialExpiry.is_enable == "1"
-                                                ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                                : "grid-cols-11"
-                                        : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                            ? "grid-cols-12"
-                                            : dataMaterialExpiry.is_enable == "1"
-                                                ? "grid-cols-12"
-                                                : "grid-cols-10"
+                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                        ? "grid-cols-13"
+                                        : dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" : "grid-cols-11"
+                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                        ? "grid-cols-12" : dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" : "grid-cols-10"
                                     } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
@@ -1940,7 +1725,7 @@ const Index = (props) => {
                                                         {dataLang?.purchase_survive || "purchase_survive"}:
                                                     </h5>
                                                     <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                        {option.e?.qty_warehouse ?? 0}
+                                                        {formatNumber(option.e?.qty_warehouse ?? 0)}
                                                     </h5>
                                                 </div>
                                             </div>
@@ -1987,16 +1772,16 @@ const Index = (props) => {
                         <div className="col-span-10">
                             <div
                                 className={`${dataProductSerial.is_enable == "1"
-                                        ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                            ? "grid-cols-13"
-                                            : dataMaterialExpiry.is_enable == "1"
-                                                ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                                : "grid-cols-11"
-                                        : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                        ? "grid-cols-13"
+                                        : dataMaterialExpiry.is_enable == "1"
+                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]"
+                                            : "grid-cols-11"
+                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                        ? "grid-cols-12"
+                                        : dataMaterialExpiry.is_enable == "1"
                                             ? "grid-cols-12"
-                                            : dataMaterialExpiry.is_enable == "1"
-                                                ? "grid-cols-12"
-                                                : "grid-cols-10"
+                                            : "grid-cols-10"
                                     } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
@@ -2177,7 +1962,7 @@ const Index = (props) => {
                                                                                 :
                                                                             </h5>
                                                                             <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {option.e?.qty_warehouse ?? 0}
+                                                                                {formatNumber(option.e?.qty_warehouse ?? 0)}
                                                                             </h5>
                                                                         </div>
                                                                     </div>
@@ -2232,18 +2017,18 @@ const Index = (props) => {
                                             <div className="col-span-10  items-center">
                                                 <div
                                                     className={`${dataProductSerial.is_enable == "1"
-                                                            ? dataMaterialExpiry.is_enable !=
-                                                                dataProductExpiry.is_enable
-                                                                ? "grid-cols-13"
-                                                                : dataMaterialExpiry.is_enable == "1"
-                                                                    ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                                                    : "grid-cols-11"
-                                                            : dataMaterialExpiry.is_enable !=
-                                                                dataProductExpiry.is_enable
+                                                        ? dataMaterialExpiry.is_enable !=
+                                                            dataProductExpiry.is_enable
+                                                            ? "grid-cols-13"
+                                                            : dataMaterialExpiry.is_enable == "1"
+                                                                ? "grid-cols-[repeat(13_minmax(0_1fr))]"
+                                                                : "grid-cols-11"
+                                                        : dataMaterialExpiry.is_enable !=
+                                                            dataProductExpiry.is_enable
+                                                            ? "grid-cols-12"
+                                                            : dataMaterialExpiry.is_enable == "1"
                                                                 ? "grid-cols-12"
-                                                                : dataMaterialExpiry.is_enable == "1"
-                                                                    ? "grid-cols-12"
-                                                                    : "grid-cols-10"
+                                                                : "grid-cols-10"
                                                         } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r`}
                                                 >
                                                     {e?.child?.map((ce) => (
@@ -2259,11 +2044,11 @@ const Index = (props) => {
                                                                         "kho"
                                                                     )}
                                                                     className={`${(errWarehouse && ce?.kho == null) ||
-                                                                            (errWarehouse &&
-                                                                                (ce?.kho?.label == null ||
-                                                                                    ce?.kho?.warehouse_name == null))
-                                                                            ? "border-red-500 border"
-                                                                            : ""
+                                                                        (errWarehouse &&
+                                                                            (ce?.kho?.label == null ||
+                                                                                ce?.kho?.warehouse_name == null))
+                                                                        ? "border-red-500 border"
+                                                                        : ""
                                                                         }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={"Kho - vị trí kho"}
                                                                     menuPortalTarget={document.body}
@@ -2316,12 +2101,12 @@ const Index = (props) => {
                                                                                 e?.matHang?.e?.text_type != "products"
                                                                             }
                                                                             className={`border ${e?.matHang?.e?.text_type != "products"
-                                                                                    ? "bg-gray-50"
-                                                                                    : errSerial &&
-                                                                                        (ce?.serial == "" ||
-                                                                                            ce?.serial == null)
-                                                                                        ? "border-red-500"
-                                                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                                                ? "bg-gray-50"
+                                                                                : errSerial &&
+                                                                                    (ce?.serial == "" ||
+                                                                                        ce?.serial == null)
+                                                                                    ? "border-red-500"
+                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                                                                 //  && !ce?.disabledDate
                                                                                 //   ? ""
                                                                                 //   : ce?.disabledDate ? "" : ""
@@ -2355,12 +2140,12 @@ const Index = (props) => {
                                                                                 value={ce?.lot}
                                                                                 disabled={ce?.disabledDate}
                                                                                 className={`border ${ce?.disabledDate
-                                                                                        ? "bg-gray-50"
-                                                                                        : errLot &&
-                                                                                            (ce?.lot == "" ||
-                                                                                                ce?.lot == null)
-                                                                                            ? "border-red-500"
-                                                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                    ? "bg-gray-50"
+                                                                                    : errLot &&
+                                                                                        (ce?.lot == "" ||
+                                                                                            ce?.lot == null)
+                                                                                        ? "border-red-500"
+                                                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                     //  && !ce?.disabledDate
                                                                                     //   ? ""
                                                                                     //   : ce?.disabledDate ? "" : ""
@@ -2407,11 +2192,11 @@ const Index = (props) => {
                                                                                             "price_quote_system_default"
                                                                                         }
                                                                                         className={`border ${ce?.disabledDate
-                                                                                                ? "bg-gray-50"
-                                                                                                : errDateList &&
-                                                                                                    ce?.date == null
-                                                                                                    ? "border-red-500"
-                                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                            ? "bg-gray-50"
+                                                                                            : errDateList &&
+                                                                                                ce?.date == null
+                                                                                                ? "border-red-500"
+                                                                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                                                                             //  && !ce?.disabledDate
                                                                                             //   ? ""
                                                                                             //   : ce?.disabledDate ? "" : ""
@@ -2457,23 +2242,22 @@ const Index = (props) => {
                                                                         size="16"
                                                                     />
                                                                 </button>
-                                                                <NumericFormat
-                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200"
+                                                                <InPutNumericFormat
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
                                                                         ce?.id,
                                                                         "amount"
                                                                     )}
-                                                                    value={ce?.amount || 1}
-                                                                    allowNegative={false}
-                                                                    decimalScale={0}
-                                                                    isNumericString={true}
-                                                                    thousandSeparator=","
-                                                                    isAllowed={(values) => {
-                                                                        const { floatValue } = values;
-                                                                        return floatValue > 0;
+                                                                    value={ce?.amount}
+                                                                    isAllowed={({ floatValue }) => {
+                                                                        if (floatValue == 0) {
+                                                                            return true;
+                                                                        } else {
+                                                                            return true;
+                                                                        }
                                                                     }}
+                                                                    className={`${ce?.amount == 0 && 'border-red-500' || ce?.amount == "" && 'border-red-500'} appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200`}
                                                                 />
                                                                 <button
                                                                     className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
@@ -2491,8 +2275,10 @@ const Index = (props) => {
                                                                 </button>
                                                             </div>
                                                             <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                <NumericFormat
-                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b border-gray-200 h-fit"
+                                                                <InPutMoneyFormat
+                                                                    className={`
+                                                                    ${ce?.price == 0 && 'border-red-500' || ce?.price == "" && 'border-red-500'} 
+                                                                    appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b border-gray-200 h-fit`}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -2500,18 +2286,10 @@ const Index = (props) => {
                                                                         "price"
                                                                     )}
                                                                     value={ce?.price}
-                                                                    allowNegative={false}
-                                                                    decimalScale={0}
-                                                                    isNumericString={true}
-                                                                    thousandSeparator=","
-                                                                    isAllowed={(values) => {
-                                                                        const { floatValue } = values;
-                                                                        return floatValue > 0;
-                                                                    }}
                                                                 />
                                                             </div>
                                                             <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                <NumericFormat
+                                                                <InPutNumericFormat
                                                                     className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
@@ -2520,20 +2298,23 @@ const Index = (props) => {
                                                                         "chietKhau"
                                                                     )}
                                                                     value={ce?.chietKhau}
-                                                                    allowNegative={false}
-                                                                    decimalScale={0}
-                                                                    isNumericString={true}
-                                                                    thousandSeparator=","
                                                                     isAllowed={(values) => {
                                                                         const { floatValue } = values;
-                                                                        return floatValue >= 0;
+                                                                        if (floatValue == 0) {
+                                                                            return true;
+                                                                        }
+                                                                        if (floatValue > 100) {
+                                                                            isShow("error", ERROR_DISCOUNT_MAX);
+                                                                            return false
+                                                                        }
+                                                                        return true
                                                                     }}
                                                                 />
                                                             </div>
                                                             {/* <div>{ce?.priceAfter}</div> */}
                                                             <div className="col-span-1  text-right flex items-center justify-end  h-full p-0.5">
                                                                 <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                    {formatNumber(
+                                                                    {formatMoney(
                                                                         Number(ce?.price) *
                                                                         (1 - Number(ce?.chietKhau) / 100)
                                                                     )}
@@ -2580,7 +2361,7 @@ const Index = (props) => {
                                                             </div>
                                                             {/* <div>{ce?.thanhTien}</div> */}
                                                             <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                {formatNumber(
+                                                                {formatMoney(
                                                                     ce?.price *
                                                                     (1 - Number(ce?.chietKhau) / 100) *
                                                                     (1 + Number(ce?.tax?.tax_rate) / 100) *
@@ -2629,14 +2410,22 @@ const Index = (props) => {
                         <div className="col-span-2  flex items-center gap-2">
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
-                                <NumericFormat
+                                <InPutNumericFormat
                                     value={chietkhautong}
+                                    isAllowed={(values) => {
+                                        const { floatValue } = values;
+                                        if (floatValue == 0) {
+                                            return true;
+                                        }
+                                        if (floatValue > 100) {
+                                            isShow("error", ERROR_DISCOUNT_MAX);
+                                            return false
+                                        }
+                                        return true
+                                    }}
                                     onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
                                     className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
-                                    thousandSeparator=","
-                                    allowNegative={false}
-                                    decimalScale={0}
-                                    isNumericString={true}
+
                                 />
                             </div>
                         </div>
@@ -2722,7 +2511,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongTien)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product = Number(childItem?.price) * Number(childItem?.amount);
@@ -2743,7 +2532,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tienChietKhau)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
@@ -2761,14 +2550,13 @@ const Index = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_money_after_discount ||
-                                        "purchase_order_detail_money_after_discount"}
+                                    {dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongTienSauCK)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
@@ -2791,7 +2579,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tienThue)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
@@ -2817,7 +2605,7 @@ const Index = (props) => {
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongThanhTien)} */}
-                                    {formatNumber(
+                                    {formatMoney(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
                                                 const product =
@@ -2849,7 +2637,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

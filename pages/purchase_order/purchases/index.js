@@ -64,6 +64,7 @@ import NoData from "@/components/UI/noData/nodata";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 
 const Index = (props) => {
@@ -131,6 +132,7 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "" },
         });
+        queryState({ onFetchingFilter: true });
     }, []);
     const _ServerFetching = () => {
         Axios("GET", "/api_web/Api_purchases/purchases/?csrf_protection=true",
@@ -476,7 +478,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.client_list_filterbrand,
+                                                        label: dataLang?.client_list_brand || 'client_list_brand',
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
@@ -494,7 +496,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_code,
+                                                        label: dataLang?.purchase_code || 'purchase_code',
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listCode,
@@ -616,11 +618,7 @@ const Index = (props) => {
                                                             {e?.staff_create_name}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex items-center justify-center">
-                                                            {e?.status == "1" ? (
-                                                                <BtnStatusApproved type={1} onClick={() => handleQueryId({ id: e?.id, status: true })} />
-                                                            ) : (
-                                                                <BtnStatusApproved type={0} onClick={() => handleQueryId({ id: e?.id, status: true })} />
-                                                            )}
+                                                            <BtnStatusApproved type={e?.status == "1" ? 1 : 0} onClick={() => handleQueryId({ id: e?.id, status: true })} />
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {formatNumber(e?.total_item)}
@@ -628,18 +626,18 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={2} className="flex items-center justify-center ">
                                                             <div className="mx-auto">
                                                                 {(e?.order_status?.status === "purchase_ordered" && (
-                                                                    <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]">
+                                                                    <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center ">
                                                                         {dataLang[e?.order_status?.status]}
                                                                     </span>
                                                                 )) ||
                                                                     (e?.order_status?.status === "purchase_portion" && (
-                                                                        <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]">
+                                                                        <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center ">
                                                                             {dataLang[e?.order_status?.status]}{" "}
                                                                             {`(${e?.order_status?.count})`}
                                                                         </span>
                                                                     )) ||
                                                                     (e?.order_status?.status === "purchase_enough" && (
-                                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]">
+                                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center ">
                                                                             <TickCircle
                                                                                 className="bg-lime-500 rounded-full"
                                                                                 color="white"
@@ -655,9 +653,9 @@ const Index = (props) => {
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className=" w-fit mx-auto">
-                                                            <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                            <TagBranch>
                                                                 {e?.branch_name}
-                                                            </div>
+                                                            </TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="pl-2 py-2.5 flex space-x-2 justify-center">
                                                             <BtnAction

@@ -2,10 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import Popup from "reactjs-popup";
 import moment from "moment/moment";
 import dynamic from "next/dynamic";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 import PopupEdit from "/components/UI/popup";
 
 import {
@@ -25,8 +21,10 @@ import ImageErrors from "components/UI/imageErrors";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
+import NoData from "@/components/UI/noData/nodata";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 const Popup_chitiet = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
@@ -35,11 +33,6 @@ const Popup_chitiet = (props) => {
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
-
-    // const formatNumber = num => {
-    //   if (!num && num !== 0) return 0;
-    //   return Math.floor(num).toLocaleString("en");
-    // };
     const formatNumber = (num) => {
         return formatNumberConfig(+num, dataSeting);
     };
@@ -72,8 +65,7 @@ const Popup_chitiet = (props) => {
         <>
             <PopupEdit
                 title={
-                    props.dataLang?.purchase_order_detail_title ||
-                    "purchase_order_detail_title"
+                    props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title"
                 }
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -90,17 +82,13 @@ const Popup_chitiet = (props) => {
                         <div className="w-[1150px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang
-                                        ?.purchase_order_detail_general_informatione ||
-                                        "purchase_order_detail_general_informatione"}
+                                    {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                                 </h2>
                                 <div className="grid grid-cols-8  min-h-[170px] px-2">
                                     <div className="col-span-3">
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.purchase_order_detail_day_vouchers ||
-                                                    "purchase_order_detail_day_vouchers"}
+                                                {props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
                                                 {data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}
@@ -108,9 +96,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.purchase_order_detail_delivery_date ||
-                                                    "purchase_order_detail_delivery_date"}
+                                                {props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
                                                 {data?.delivery_date != null
@@ -122,9 +108,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.purchase_order_detail_voucher_code ||
-                                                    "purchase_order_detail_voucher_code"}
+                                                {props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium text-blue-600">
                                                 {data?.code}
@@ -132,9 +116,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.purchase_order_table_ordertype ||
-                                                    "purchase_order_table_ordertype"}
+                                                {props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                             </h3>
                                             <h3 className=" text-[13px] font-medium">
                                                 {data?.order_type == "0" ? (
@@ -215,9 +197,7 @@ const Popup_chitiet = (props) => {
                         </div> */}
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang
-                                                    ?.purchase_order_table_supplier ||
-                                                    "purchase_order_table_supplier"}
+                                                {props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium">
                                                 {data?.supplier_name}
@@ -225,9 +205,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2">
                                             <h3 className="col-span-1 text-[13px] font-medium">
-                                                {props.dataLang
-                                                    ?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             {/* <h3 className="col-span-1 text-[13px] font-normal">
                                                 {data?.user_create_name}
@@ -236,8 +214,7 @@ const Popup_chitiet = (props) => {
                                                 <div className="relative">
                                                     <ImageErrors
                                                         src={
-                                                            data?.staff_create
-                                                                ?.profile_image
+                                                            data?.staff_create?.profile_image
                                                         }
                                                         width={25}
                                                         height={25}
@@ -253,37 +230,31 @@ const Popup_chitiet = (props) => {
                                                 </div>
                                                 <h6 className="capitalize">
                                                     {
-                                                        data?.staff_create
-                                                            ?.full_name
+                                                        data?.staff_create?.full_name
                                                     }
                                                 </h6>
                                             </div>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang
-                                                    ?.purchase_order_table_branch ||
-                                                    "purchase_order_table_branch"}
+                                                {props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                             </h3>
-                                            <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
+                                            <TagBranch className='w-fit'>
                                                 {data?.branch_name}
-                                            </h3>
+                                            </TagBranch>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="pr-2 w-[100%] lx:w-[110%] ">
                                     <div className="grid grid-cols-12 sticky top-0  p-2  bg-white shadow-lg  z-10 rounded">
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {props.dataLang?.purchase_image ||
-                                                "purchase_image"}
+                                            {props.dataLang?.purchase_image || "purchase_image"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {props.dataLang?.purchase_items ||
-                                                "purchase_items"}
+                                            {props.dataLang?.purchase_items || "purchase_items"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {props.dataLang?.purchase_variant ||
-                                                "purchase_variant"}
+                                            {props.dataLang?.purchase_variant || "purchase_variant"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                                             {/* {props.dataLang?.purchase_order_purchase_from_unit ||
@@ -291,14 +262,10 @@ const Popup_chitiet = (props) => {
                                             {"ĐVT"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {props.dataLang
-                                                ?.purchase_quantity ||
-                                                "purchase_quantity"}
+                                            {props.dataLang?.purchase_quantity || "purchase_quantity"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {props.dataLang
-                                                ?.purchase_order_detail_unit_price ||
-                                                "purchase_order_detail_unit_price"}
+                                            {props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                                             {/* {props.dataLang?.purchase_order_detail_discount ||
@@ -311,19 +278,13 @@ const Popup_chitiet = (props) => {
                                             {"Đơn giá SCK"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {props.dataLang
-                                                ?.purchase_order_detail_tax ||
-                                                "purchase_order_detail_tax"}
+                                            {props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.purchase_order_detail_into_money ||
-                                                "purchase_order_detail_into_money"}
+                                            {props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {props.dataLang
-                                                ?.purchase_order_note ||
-                                                "purchase_order_note"}
+                                            {props.dataLang?.purchase_order_note || "purchase_order_note"}
                                         </h4>
                                     </div>
                                     {onFetching ? (
@@ -333,10 +294,8 @@ const Popup_chitiet = (props) => {
                                         />
                                     ) : data?.item?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[90px] max-h-[100px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
+                                            <Customscrollbar
+                                                className="min-h-[90px] max-h-[100px] 2xl:max-h-[250px]"
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                                     {data?.item?.map((e) => (
@@ -378,33 +337,22 @@ const Popup_chitiet = (props) => {
                                                                 {e?.item?.name}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left break-words">
-                                                                {
-                                                                    e?.item?.product_variation
-                                                                }
+                                                                {e?.item?.product_variation}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center break-words">
-                                                                {
-                                                                    e?.item?.unit_name
-                                                                }
+                                                                {e?.item?.unit_name}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center mr-1">
-                                                                {formatNumber(
-                                                                    e?.quantity
-                                                                )}
+                                                                {formatNumber(e?.quantity)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center">
-                                                                {formatMoney(
-                                                                    e?.price
-                                                                )}
+                                                                {formatMoney(e?.price)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center">
-                                                                {e?.discount_percent +
-                                                                    "%"}
+                                                                {e?.discount_percent + "%"}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-2  rounded-md text-center">
-                                                                {formatMoney(
-                                                                    e?.price_after_discount
-                                                                )}
+                                                                {formatMoney(e?.price_after_discount)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center ">
                                                                 {formatNumber(
@@ -412,9 +360,7 @@ const Popup_chitiet = (props) => {
                                                                 ) + "%"}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-right mr-3.5">
-                                                                {formatMoney(
-                                                                    e?.amount
-                                                                )}
+                                                                {formatMoney(e?.amount)}
                                                             </h6>
 
                                                             <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left ml-3.5 ">
@@ -432,36 +378,19 @@ const Popup_chitiet = (props) => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
                                     ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang
-                                                        ?.purchase_order_table_item_not_found ||
-                                                        "purchase_order_table_item_not_found"}
-                                                </h1>
-                                                <div className="flex items-center justify-around mt-6 ">
-                                                    {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <NoData />
                                     )}
                                 </div>
                                 <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
-                                    {props.dataLang?.purchase_total ||
-                                        "purchase_total"}
+                                    {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
                                 <div className="mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
                                     <div className="col-span-7">
                                         <h3 className="text-[13px] p-1 font-medium">
-                                            {props.dataLang
-                                                ?.purchase_order_note ||
-                                                "purchase_order_note"}
+                                            {props.dataLang?.purchase_order_note || "purchase_order_note"}
                                         </h3>
                                         <textarea
                                             className="resize-none text-[13px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
@@ -472,60 +401,44 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-2 space-y-2">
                                         <div className="font-semibold text-left text-[13px]">
                                             <h3>
-                                                {props.dataLang
-                                                    ?.purchase_order_table_total ||
-                                                    "purchase_order_table_total"}
+                                                {props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}
                                             </h3>
                                         </div>
                                         <div className="font-semibold text-left text-[13px]">
                                             <h3>
-                                                {props.dataLang
-                                                    ?.purchase_order_detail_discounty ||
-                                                    "purchase_order_detail_discounty"}
+                                                {props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}
                                             </h3>
                                         </div>
                                         <div className="font-semibold text-left text-[13px]">
                                             <h3>
-                                                {props.dataLang
-                                                    ?.purchase_order_detail_money_after_discount ||
-                                                    "purchase_order_detail_money_after_discount"}
+                                                {props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}
                                             </h3>
                                         </div>
                                         <div className="font-semibold text-left text-[13px]">
                                             <h3>
-                                                {props.dataLang
-                                                    ?.purchase_order_detail_tax_money ||
-                                                    "purchase_order_detail_tax_money"}
+                                                {props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}
                                             </h3>
                                         </div>
                                         <div className="font-semibold text-left text-[13px]">
                                             <h3>
-                                                {props.dataLang
-                                                    ?.purchase_order_detail_into_money ||
-                                                    "purchase_order_detail_into_money"}
+                                                {props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}
                                             </h3>
                                         </div>
                                     </div>
                                     <div className="col-span-3 space-y-2">
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatMoney(
-                                                    data?.total_price
-                                                )}
+                                                {formatMoney(data?.total_price)}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatMoney(
-                                                    data?.total_discount
-                                                )}
+                                                {formatMoney(data?.total_discount)}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatMoney(
-                                                    data?.total_price_after_discount
-                                                )}
+                                                {formatMoney(data?.total_price_after_discount)}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
@@ -535,9 +448,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatMoney(
-                                                    data?.total_amount
-                                                )}
+                                                {formatMoney(data?.total_amount)}
                                             </h3>
                                         </div>
                                     </div>

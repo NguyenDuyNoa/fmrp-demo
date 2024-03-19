@@ -24,6 +24,8 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
 const Index = (props) => {
     const router = useRouter();
@@ -232,9 +234,8 @@ const Index = (props) => {
                         id: e?.item?.id,
                         matHang: {
                             e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${
-                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
                             value: e.item?.id,
                         },
                         child: e?.child.map((ce) => ({
@@ -312,8 +313,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = () => {
@@ -685,10 +686,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_return_supplier/returnSupplier/${id}?csrf_protection=true`
-                    : "/api_web/Api_return_supplier/returnSupplier/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_return_supplier/returnSupplier/${id}?csrf_protection=true`
+                : "/api_web/Api_return_supplier/returnSupplier/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -757,10 +757,10 @@ const Index = (props) => {
                     tax: thuetong
                         ? thuetong
                         : {
-                              label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                              value: value?.e?.tax_id,
-                              tax_rate: value?.e?.tax_rate,
-                          },
+                            label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                            value: value?.e?.tax_id,
+                            tax_rate: value?.e?.tax_rate,
+                        },
                     thanhTien: Number(value?.e?.amount),
                     note: value?.e?.note,
                 };
@@ -800,10 +800,10 @@ const Index = (props) => {
                         tax: thuetong
                             ? thuetong
                             : {
-                                  label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                                  value: value?.e?.tax_id,
-                                  tax_rate: value?.e?.tax_rate,
-                              },
+                                label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                                value: value?.e?.tax_id,
+                                tax_rate: value?.e?.tax_rate,
+                            },
                         thanhTien: Number(value?.e?.amount),
                         note: value?.e?.note,
                     },
@@ -1027,10 +1027,10 @@ const Index = (props) => {
                                 tax: thuetong
                                     ? thuetong
                                     : {
-                                          label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                                          value: value?.e?.tax_id,
-                                          tax_rate: value?.e?.tax_rate,
-                                      },
+                                        label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                                        value: value?.e?.tax_id,
+                                        tax_rate: value?.e?.tax_rate,
+                                    },
                                 thanhTien: Number(value?.e?.amount),
                                 note: value?.e?.note,
                             },
@@ -1055,27 +1055,29 @@ const Index = (props) => {
                         : dataLang?.returns_title_child || "returns_title_child"}
                 </title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+            <Container className="!h-auto">
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.returns_title || "returns_title"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{id
+                            ? dataLang?.returns_title_edit || "returns_title_edit"
+                            : dataLang?.returns_title_child || "returns_title_child"}</h6>
+                    </div>
+                )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.returns_title || "returns_title"}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.returns_title_edit || "returns_title_edit"
-                                    : dataLang?.returns_title_child || "returns_title_child"}
-                            </h6>
-                        </div>
-                    )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">{dataLang?.returns_title || "returns_title"}</h2>
-                        <div className="flex justify-end items-center">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            {dataLang?.returns_title || "returns_title"}
+                        </h2>
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerReturns.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
                             </button>
@@ -1122,9 +1124,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -1151,9 +1152,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1207,9 +1207,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.import_supplier || "import_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errSupplier ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         menuPortalTarget={document.body}
@@ -1268,9 +1267,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.returns_treatment_methods || "returns_treatment_methods"}
-                                        className={`${
-                                            errTreatment ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errTreatment ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1419,7 +1417,7 @@ const Index = (props) => {
                                                         </div>
                                                     )}
                                                     {dataMaterialExpiry.is_enable === "1" ||
-                                                    dataProductExpiry.is_enable === "1" ? (
+                                                        dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
@@ -1428,8 +1426,8 @@ const Index = (props) => {
                                                                 Date:{" "}
                                                                 {option.e?.expiration_date
                                                                     ? moment(option.e?.expiration_date).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                        "DD/MM/YYYY"
+                                                                    )
                                                                     : "-"}
                                                             </div>
                                                         </>
@@ -1613,7 +1611,7 @@ const Index = (props) => {
                                                                                 </div>
                                                                             )}
                                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                                dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
@@ -1625,9 +1623,9 @@ const Index = (props) => {
                                                                                         Date:{" "}
                                                                                         {option.e?.expiration_date
                                                                                             ? moment(
-                                                                                                  option.e
-                                                                                                      ?.expiration_date
-                                                                                              ).format("DD/MM/YYYY")
+                                                                                                option.e
+                                                                                                    ?.expiration_date
+                                                                                            ).format("DD/MM/YYYY")
                                                                                             : "-"}
                                                                                     </div>
                                                                                 </>
@@ -1716,19 +1714,18 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "kho"
                                                                         )}
-                                                                        className={`${
-                                                                            (errWarehouse && ce?.kho == null) ||
+                                                                        className={`${(errWarehouse && ce?.kho == null) ||
                                                                             (errWarehouse &&
                                                                                 (ce?.kho?.label == null ||
                                                                                     ce?.kho?.warehouse_name == null))
-                                                                                ? "border-red-500 border"
-                                                                                : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
                                                                                 ? ""
                                                                                 : dataLang?.returns_point ||
-                                                                                  "returns_point"
+                                                                                "returns_point"
                                                                         }
                                                                         menuPortalTarget={document.body}
                                                                         formatOptionLabel={(option) => {
@@ -1829,16 +1826,15 @@ const Index = (props) => {
                                                                                 "amount"
                                                                             )}
                                                                             value={ce?.amount || null}
-                                                                            className={`${
-                                                                                errAmount &&
+                                                                            className={`${errAmount &&
                                                                                 (ce?.amount == null ||
                                                                                     ce?.amount == "" ||
                                                                                     ce?.amount == 0)
-                                                                                    ? "border-b border-red-500"
-                                                                                    : errSurvive
+                                                                                ? "border-b border-red-500"
+                                                                                : errSurvive
                                                                                     ? "border-b border-red-500"
                                                                                     : "border-b border-gray-200"
-                                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                                } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                                             allowNegative={false}
                                                                             decimalScale={0}
                                                                             isNumericString={true}
@@ -1856,10 +1852,9 @@ const Index = (props) => {
                                                                                 ) {
                                                                                     isShow(
                                                                                         "error",
-                                                                                        `${
-                                                                                            props.dataLang
-                                                                                                ?.returns_err_Qty ||
-                                                                                            "returns_err_Qty"
+                                                                                        `${props.dataLang
+                                                                                            ?.returns_err_Qty ||
+                                                                                        "returns_err_Qty"
                                                                                         } ${ce?.soluongcl?.toLocaleString(
                                                                                             "en"
                                                                                         )}`
@@ -1968,7 +1963,7 @@ const Index = (props) => {
                                                                     <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                         {formatNumber(
                                                                             Number(ce?.price) *
-                                                                                (1 - Number(ce?.chietKhau) / 100)
+                                                                            (1 - Number(ce?.chietKhau) / 100)
                                                                         )}
                                                                     </h3>
                                                                 </div>
@@ -2017,9 +2012,9 @@ const Index = (props) => {
                                                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                     {formatNumber(
                                                                         ce?.price *
-                                                                            (1 - Number(ce?.chietKhau) / 100) *
-                                                                            (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                                                            Number(ce?.amount)
+                                                                        (1 - Number(ce?.chietKhau) / 100) *
+                                                                        (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                                                        Number(ce?.amount)
                                                                     )}
                                                                 </div>
                                                                 {/* <div>{ce?.note}</div> */}
@@ -2285,7 +2280,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

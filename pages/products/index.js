@@ -430,36 +430,28 @@ const Index = (props) => {
                         <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                             <button
                                 onClick={_HandleSelectTab.bind(this, "all")}
-                                className={`${router.query?.tab === "all"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
+                                className={`${router.query?.tab === "all" ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {props.dataLang?.all_group}
                             </button>
                             <button
                                 onClick={_HandleSelectTab.bind(this, "products")}
-                                className={`${router.query?.tab === "products"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
+                                className={`${router.query?.tab === "products" ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {dataLang?.product}
                             </button>
                             <button
                                 onClick={_HandleSelectTab.bind(this, "semi_products")}
-                                className={`${router.query?.tab === "semi_products"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
+                                className={`${router.query?.tab === "semi_products" ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {dataLang?.catagory_finishedProduct_type_semi_products}
                             </button>
                             <button
                                 onClick={_HandleSelectTab.bind(this, "semi_products_outside")}
-                                className={`${router.query?.tab === "semi_products_outside"
-                                    ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                    : "hover:text-[#0F4F9E] "
+                                className={`${router.query?.tab === "semi_products_outside" ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                                     } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                             >
                                 {dataLang?.catagory_finishedProduct_type_semi_products_outside}
@@ -637,10 +629,8 @@ const Index = (props) => {
                                                                 <span
                                                                     className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit w-fit font-[300] break-words leading-relaxed ${(e?.type_products?.id === 0 &&
                                                                         "text-lime-500 border-lime-500") ||
-                                                                        (e?.type_products?.id === 1 &&
-                                                                            "text-orange-500 border-orange-500") ||
-                                                                        (e?.type_products?.id === 2 &&
-                                                                            "text-sky-500 border-sky-500")
+                                                                        (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") ||
+                                                                        (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")
                                                                         }`}
                                                                 >
                                                                     {dataLang[e?.type_products?.name] || ""}

@@ -578,9 +578,7 @@ const Index = (props) => {
                                                     isClearable={true}
                                                 />
                                             </div>
-                                            <div className="z-20 col-span-1">
-                                                <DatepickerComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
-                                            </div>
+                                            <DatepickerComponent colSpan={1} value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
@@ -610,7 +608,7 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar>
                                 {/* className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100" */}
-                                <div className="w-[100%] lg:w-[100%] ">
+                                <div className="w-full">
                                     <HeaderTable gridCols={12}>
                                         <ColumnTable textAlign='center'>
                                             {dataLang?.delivery_receipt_date || "delivery_receipt_date"}

@@ -50,7 +50,8 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                     className={`${warehouseman_id == "0" ? "text-blue-700" : "text-green-700"
                         }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] lg:text-[8px] text-[8px] font-medium cursor-pointer`}
                 >
-                    {warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}
+                    {warehouseman_id == "0" ? "Chưa duyệt" : "Đã duyệt"}
+                    {/* {warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"} */}
                 </label>
             </div>
         </Zoom>

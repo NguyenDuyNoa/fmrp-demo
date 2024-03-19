@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,22 +10,17 @@ import {
     SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
     TickCircle,
-    ArrowCircleDown,
-    Refresh2,
     Grid6,
 } from "iconsax-react";
 
-import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment/moment";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import ReactExport from "react-data-export";
 import { useEffect } from "react";
-import Popup_chitietThere from "../detailThere";
-import Popup_chitiet from "./(popup)/popup";
+import Popup_chitietThere from "../detaiCommon";
+import Popup_chitiet from "./components/popup";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -37,8 +31,6 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { debounce } from "lodash";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -684,15 +676,14 @@ const Index = (props) => {
                                                                         color="white"
                                                                         size={15}
                                                                     />
-                                                                    {dataLang[e?.import_status] ||
-                                                                        e?.import_status}
+                                                                    {dataLang[e?.import_status] || e?.import_status}
                                                                 </span>
                                                             ))}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={"text-left"} className="truncate ">
                                                         {e.note}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="w-fit mx-auto">
+                                                    <RowItemTable colSpan={1} className="w-fit">
                                                         <TagBranch>
                                                             {e?.branch_name}
                                                         </TagBranch>

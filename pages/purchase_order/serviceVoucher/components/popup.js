@@ -24,17 +24,22 @@ import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
 import PopupEdit from "@/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { v4 as uuidv4 } from "uuid";
 
 import useToast from "@/hooks/useToast";
-
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 const Popup_servie = (props) => {
     let id = props?.id;
 
@@ -42,27 +47,34 @@ const Popup_servie = (props) => {
 
     const scrollAreaRef = useRef(null);
 
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
-    };
-
     const [open, sOpen] = useState(false);
 
     const isShow = useToast();
 
+    const dataSeting = useSetingServer()
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'serviceVoucher');
+
     const _HandleOpenModal = (e) => {
         if (id) {
-            if (props?.status_pay != "not_spent") {
-                sOpen(false);
-                isShow("error", `${"Phiếu dịch vụ đã chi. Không thể sửa"}`);
+            if (role || checkEdit) {
+                if (props?.status_pay != "not_spent") {
+                    sOpen(false);
+                    isShow("error", `${"Phiếu dịch vụ đã chi. Không thể sửa"}`);
+                } else {
+                    sOpen(true);
+                }
             } else {
-                sOpen(true);
+                isShow("warning", WARNING_STATUS_ROLE);
             }
         } else {
             sOpen(true);
         }
     };
+
+
 
     const _HandleCloseModal = () => sOpen(false);
 
@@ -177,7 +189,7 @@ const Popup_servie = (props) => {
                         chietkhau: Number(e?.discount_percent),
                         dongiasauck: Number(e?.price) * (1 - Number(e?.discount_percent) / 100),
                         thue: {
-                            label: e?.tax_rate,
+                            label: e?.tax_name ? e?.tax_name : "Miễn thuế",
                             value: e?.tax_id,
                             tax_rate: Number(e?.tax_rate),
                         },
@@ -326,11 +338,12 @@ const Popup_servie = (props) => {
             return newOption;
         });
     }, [chietkhautong]);
-
     const _HandleSubmit = (e) => {
         e.preventDefault();
+
         const hasNullLabel = option.some((item) => item.dichvu === "");
-        if (date == null || valueSupplier == null || valueBr == null || hasNullLabel) {
+        const check = option.some((item) => item.soluong == 0 || item.soluong == "" || item.dongia == 0 || item.dongia == "");
+        if (date == null || valueSupplier == null || valueBr == null || hasNullLabel || check) {
             date == null && sErrDate(true);
             valueBr == null && sErrBranch(true);
             valueSupplier == null && sErrSupplier(true);
@@ -494,9 +507,12 @@ const Popup_servie = (props) => {
     // };
 
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
-    };
+        return formatNumberConfig(+number, dataSeting);
+    }
+
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    }
 
     const tinhTongTien = (option) => {
         const tongTien = option?.reduce(
@@ -561,10 +577,9 @@ const Popup_servie = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_service/service/${id}?csrf_protection=true`
-                    : "/api_web/Api_service/service/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_service/service/${id}?csrf_protection=true`
+                : "/api_web/Api_service/service/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -629,12 +644,12 @@ const Popup_servie = (props) => {
                 onClose={_HandleCloseModal.bind(this)}
                 classNameBtn={props.className}
             >
-                <div className="mt-4  max-w-[60vw] 2xl:max-w-[50vw] xl:max-w-[60vw]">
+                <div className="mt-4  max-w-[75vw] 2xl:max-w-[65vw] xl:max-w-[75vw]">
                     <h2 className="font-normal bg-[#ECF0F4] 2xl:text-[12px] xl:text-[13px] text-[12px] p-1">
                         {dataLang?.serviceVoucher_general_information || "serviceVoucher_general_information"}
                     </h2>
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
-                        <div className="max-w-[60vw] 2xl:max-w-[50vw] xl:max-w-[60vw] ">
+                        <div className="max-w-[75vw] 2xl:max-w-[65vw] xl:max-w-[75vw] ">
                             <div className="grid grid-cols-5 gap-5 items-center">
                                 <div className="col-span-2 max-h-[70px] min-h-[70px] relative">
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
@@ -696,7 +711,7 @@ const Popup_servie = (props) => {
                                         maxMenuHeight="200px"
                                         isClearable={true}
                                         menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
+
                                         theme={(theme) => ({
                                             ...theme,
                                             colors: {
@@ -717,9 +732,8 @@ const Popup_servie = (props) => {
                                                 position: "absolute",
                                             }),
                                         }}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                     />
                                     {errBranch && (
                                         <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -744,7 +758,7 @@ const Popup_servie = (props) => {
                                         maxMenuHeight="200px"
                                         isClearable={true}
                                         menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
+
                                         theme={(theme) => ({
                                             ...theme,
                                             colors: {
@@ -765,9 +779,8 @@ const Popup_servie = (props) => {
                                                 position: "absolute",
                                             }),
                                         }}
-                                        className={`${
-                                            errSupplier ? "border-red-500" : "border-transparent"
-                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] mb-2 rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] mb-2 rounded text-[#52575E] font-normal outline-none border `}
                                     />
                                     {errSupplier && (
                                         <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -817,11 +830,8 @@ const Popup_servie = (props) => {
                                 {dataLang?.serviceVoucher_operation || "serviceVoucher_operation"}
                             </h4>
                         </div>
-                        <ScrollArea
-                            ref={scrollAreaRef}
-                            className="min-h-[140px] xl:min-h-[140px] 2xl:min-h-[180px] max-h-[140px] xl:max-h-[140px] 2xl:max-h-[180px] overflow-hidden"
-                            speed={1}
-                            smoothScrolling={true}
+                        <Customscrollbar
+                            className="min-h-[140px] xl:min-h-[140px] 2xl:min-h-[180px] max-h-[140px] xl:max-h-[140px] 2xl:max-h-[180px]"
                         >
                             {sortedArr.map((e, index) => (
                                 <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
@@ -832,9 +842,8 @@ const Popup_servie = (props) => {
                                             name="optionEmail"
                                             placeholder="Dịch vụ"
                                             type="text"
-                                            className={`${
-                                                errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"
-                                            } placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
+                                            className={`${errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"
+                                                } placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
                                         />
                                     </div>
                                     <div className="col-span-2 flex items-center justify-center">
@@ -846,17 +855,18 @@ const Popup_servie = (props) => {
                                             >
                                                 <Minus className="scale-70" size="16" />
                                             </button>
-                                            <NumericFormat
-                                                className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200"
+                                            <InPutNumericFormat
+                                                className={`${e?.soluong == 0 && "border-red-500" ||
+                                                    e?.soluong == '' && "border-red-500"
+                                                    } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong", e)}
-                                                value={e?.soluong || 1}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                isAllowed={(values) => {
-                                                    const { floatValue } = values;
-                                                    return floatValue > 0;
+                                                value={e?.soluong}
+                                                isAllowed={({ floatValue }) => {
+                                                    if (floatValue == 0) {
+                                                        return true;
+                                                    } else {
+                                                        return true;
+                                                    }
                                                 }}
                                             />
                                             <button
@@ -869,18 +879,16 @@ const Popup_servie = (props) => {
                                         </div>
                                     </div>
                                     <div className="col-span-1 text-center flex items-center justify-center">
-                                        <NumericFormat
+                                        <InPutMoneyFormat
                                             value={e?.dongia}
                                             onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia", index)}
-                                            allowNegative={false}
-                                            decimalScale={0}
-                                            isNumericString={true}
-                                            className="appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200"
-                                            thousandSeparator=","
+                                            className={`
+                                            ${e?.dongia == 0 && 'border-red-500' || e?.dongia == "" && 'border-red-500'}
+                                            appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200`}
                                         />
                                     </div>
                                     <div className="col-span-1 text-center flex items-center justify-center">
-                                        <NumericFormat
+                                        <InPutNumericFormat
                                             value={e?.chietkhau}
                                             onValueChange={_HandleChangeInputOption.bind(
                                                 this,
@@ -889,9 +897,18 @@ const Popup_servie = (props) => {
                                                 index
                                             )}
                                             className="appearance-none text-center py-1 px-1 font-normal w-[90%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12px] border-gray-200"
-                                            thousandSeparator=","
-                                            allowNegative={false}
-                                            isNumericString={true}
+                                            isAllowed={({ floatValue }) => {
+                                                if (floatValue == 0) {
+                                                    return true;
+                                                }
+                                                if (floatValue > 100) {
+                                                    isShow("error", ERROR_DISCOUNT_MAX);
+                                                    return false
+                                                }
+                                                else {
+                                                    return true;
+                                                }
+                                            }}
                                         />
                                     </div>
                                     <div className="col-span-1 text-right flex items-center justify-end">
@@ -920,7 +937,7 @@ const Popup_servie = (props) => {
                                                     <h2 className="2xl:text-[12px] xl:text-[13px] text-[12px]">{`(${option?.tax_rate})`}</h2>
                                                 </div>
                                             )}
-                                            onMenuOpen={handleMenuOpen}
+
                                             theme={(theme) => ({
                                                 ...theme,
                                                 colors: {
@@ -946,7 +963,7 @@ const Popup_servie = (props) => {
                                     </div>
                                     <div className="col-span-1 text-right flex items-center justify-end">
                                         <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12px]">
-                                            {formatNumber(e?.thanhtien)}
+                                            {formatMoney(e?.thanhtien)}
                                         </h3>
                                     </div>
                                     <div className="col-span-1 flex items-center justify-center">
@@ -971,7 +988,7 @@ const Popup_servie = (props) => {
                                     </div>
                                 </div>
                             ))}
-                        </ScrollArea>
+                        </Customscrollbar>
                         <div className="grid grid-cols-11 mb-1 font-normal bg-[#ecf0f475] p-1.5 items-center">
                             <div className="col-span-3  flex items-center gap-2">
                                 <h2 className="2xl:text-[12px] xl:text-[13px] text-[12px]">
@@ -1013,7 +1030,7 @@ const Popup_servie = (props) => {
                                             <h2 className="2xl:text-[12px] xl:text-[13px] text-[12px]">{`(${option?.tax_rate})`}</h2>
                                         </div>
                                     )}
-                                    onMenuOpen={handleMenuOpen}
+
                                     theme={(theme) => ({
                                         ...theme,
                                         colors: {
@@ -1067,7 +1084,7 @@ const Popup_servie = (props) => {
                                         <h3>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatNumber(tongTienState.tongTien)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tongTien)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -1078,7 +1095,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatNumber(tongTienState.tienChietKhau)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tienChietKhau)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -1089,7 +1106,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatNumber(tongTienState.tongTienSauCK)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tongTienSauCK)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -1100,7 +1117,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatNumber(tongTienState.tienThue)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tienThue)}</h3>
                                     </div>
                                 </div>
                                 <div className="flex justify-between ">
@@ -1111,7 +1128,7 @@ const Popup_servie = (props) => {
                                         </h3>
                                     </div>
                                     <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[12.5px]">
-                                        <h3 className="text-blue-600">{formatNumber(tongTienState.tongThanhTien)}</h3>
+                                        <h3 className="text-blue-600">{formatMoney(tongTienState.tongThanhTien)}</h3>
                                     </div>
                                 </div>
                                 <div className="space-x-2">

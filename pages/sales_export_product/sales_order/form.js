@@ -27,6 +27,8 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 const Index = (props) => {
     const router = useRouter();
 
@@ -1465,31 +1467,26 @@ const Index = (props) => {
                         : dataLang?.sales_product_add_order || "sales_product_add_order"}
                 </title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+            <Container className="!h-auto">
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.sales_product_list || "sales_product_list"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6> {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                            : dataLang?.sales_product_add_order || "sales_product_add_order"}</h6>
+                    </div>
+                )}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.sales_product_list || "sales_product_list"}
-                            </h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6 className="">
-                                {" "}
-                                {id
-                                    ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                    : dataLang?.sales_product_add_order || "sales_product_add_order"}
-                            </h6>
-                        </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl">
-                            {id
-                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                    <div className="flex justify-between items-center ">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">                            {id
+                            ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                            : dataLang?.sales_product_add_order || "sales_product_add_order"}
                         </h2>
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerSalesOrder.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
@@ -2528,7 +2525,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

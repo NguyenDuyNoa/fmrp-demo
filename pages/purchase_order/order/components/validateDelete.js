@@ -1,30 +1,15 @@
 import React, { useRef, useState } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
-
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-} from "iconsax-react";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
+import { _ServerInstance as Axios } from "/services/axios";
 
 import Swal from "sweetalert2";
 
 import { useEffect } from "react";
-import { routerOrder } from "routers/buyImportGoods";
+import NoData from "@/components/UI/noData/nodata";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -34,35 +19,45 @@ const Toast = Swal.mixin({
     timerProgressBar: true,
 });
 
-const Popup_TableValidateEdit = (props) => {
-    const router = useRouter();
+const Popup_TableValidateDelete = (props) => {
+    const _ToggleModal = (e) => props.handleQueryId({ status: e });
     const [onFetching, sOnFetching] = useState(false);
-    const _ToggleModal = (e) => props.sIsOpenValidate(e);
-    const handleClick = () => {
-        if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
-            Toast.fire({
-                icon: "error",
-                title: `${
-                    (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
-                }`,
-            });
-        } else {
-            router.push(`${routerOrder.form}?id=${props.id}`);
-        }
+    useEffect(() => {
+        props.isOpenValidate && _HandleDelete();
+    }, [props.isOpenValidate]);
+    const _HandleDelete = () => {
+        Axios(
+            "DELETE",
+            `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
+            {},
+            (err, response) => {
+                if (!err) {
+                    var { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        Toast.fire({
+                            icon: "success",
+                            title: props.dataLang[message],
+                        });
+                        props.onRefresh && props.onRefresh();
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: props.dataLang[message],
+                        });
+                    }
+                }
+            }
+        );
+        props.handleQueryId({ status: false });
     };
 
     return (
         <>
             <PopupEdit
                 title={props.dataLang?.purchase_order_title || "purchase_order_title"}
-                button={
-                    <button onClick={handleClick.bind(this)} type="button">
-                        {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                    </button>
-                }
+                button={props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
                 onClickOpen={_ToggleModal.bind(this, true)}
-                open={props.isOpenValidate && props.data?.payment_code?.length > 0}
+                open={props.isOpen && props.data?.payment_code?.length > 0}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props?.className}
             >
@@ -88,10 +83,8 @@ const Popup_TableValidateEdit = (props) => {
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : props.data?.payment_code?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
+                                            <Customscrollbar
+                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]"
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                                     {props.data?.payment_code?.map((e, index) => (
@@ -108,23 +101,10 @@ const Popup_TableValidateEdit = (props) => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
                                     ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang?.purchase_order_table_item_not_found ||
-                                                        "purchase_order_table_item_not_found"}
-                                                </h1>
-                                                <div className="flex items-center justify-around mt-6 ">
-                                                    {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <NoData />
                                     )}
                                 </div>
                             </div>
@@ -135,4 +115,4 @@ const Popup_TableValidateEdit = (props) => {
         </>
     );
 };
-export default Popup_TableValidateEdit;
+export default Popup_TableValidateDelete;

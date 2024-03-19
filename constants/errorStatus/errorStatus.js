@@ -1,0 +1,1 @@
+export const ERROR_DISCOUNT_MAX = 'Vui lòng nhập số % chiết khấu nhỏ hơn 101'

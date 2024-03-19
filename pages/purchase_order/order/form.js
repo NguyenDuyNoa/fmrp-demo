@@ -38,12 +38,17 @@ import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyForma
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 const Index = (props) => {
     const router = useRouter();
 
     const id = router.query?.id;
 
     const isShow = useToast();
+
+    const trangthaiExprired = useStatusExprired();
 
     const { isId, isOpen, isKeyState, handleQueryId } = useToggle();
 
@@ -559,6 +564,7 @@ const Index = (props) => {
         Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
             {
                 params: {
+                    branch_id: idBranch != null ? +idBranch?.value : "",
                     "filter[purchases_id]": idPurchases?.length > 0 ? idPurchases.map((e) => e.value) : -1,
                     purchase_order_id: id ? id : "",
                 },
@@ -584,6 +590,7 @@ const Index = (props) => {
         Axios("GET", "/api_web/Api_product/searchItemsVariant?csrf_protection=true",
             {
                 params: {
+                    branch_id: idBranch != null ? +idBranch?.value : "",
                     purchase_order_id: id,
                 },
             },
@@ -635,11 +642,29 @@ const Index = (props) => {
         idPurchases?.length > 0 && sOnFetchingItems(true);
     }, [idPurchases]);
 
+
+    const dataOption = sortedArr?.map((e) => {
+        return {
+            item: e?.mathang?.value,
+            quantity: Number(e?.soluong),
+            price: e?.dongia,
+            discount_percent: e?.chietkhau,
+            tax_id: e?.thue?.value,
+            purchases_item_id: e?.mathang?.e?.purchases_item_id,
+            note: e?.note,
+            id: e?.id,
+            purchases_order_item_id: e?.purchases_order_item_id,
+        };
+    });
+
+
+    const newDataOption = dataOption?.filter((e) => e?.item !== undefined);
+
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const newDataOption = dataOption?.filter((e) => e?.item !== undefined)?.some((e) => e?.price == 0 || e?.price == "" || e?.quantity == 0 || e?.quantity == "");
+        const check = newDataOption.some((e) => e?.price == 0 || e?.price == "" || e?.quantity == 0 || e?.quantity == "");
         if (loai == "0") {
-            if (idSupplier == null || idStaff == null || idBranch == null || newDataOption) {
+            if (idSupplier == null || idStaff == null || idBranch == null || check) {
                 idSupplier == null && sErrSupplier(true);
                 idStaff == null && sErrStaff(true);
                 idBranch == null && sErrBranch(true) && sErrDateDelivery(true);
@@ -648,7 +673,7 @@ const Index = (props) => {
                 sOnSending(true);
             }
         } else {
-            if (idSupplier == null || idStaff == null || idBranch == null || idPurchases?.length == 0 || newDataOption) {
+            if (idSupplier == null || idStaff == null || idBranch == null || idPurchases?.length == 0 || check) {
                 // selectedDate == null && sErrDate(true)
                 idSupplier == null && sErrSupplier(true);
                 idStaff == null && sErrStaff(true);
@@ -680,11 +705,10 @@ const Index = (props) => {
 
     const _HandleSeachApi = debounce((inputValue) => {
         if (loai === "0")
-            Axios(
-                "POST",
-                `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
+            Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
                 {
                     data: {
+                        branch_id: idBranch != null ? +idBranch?.value : "",
                         term: inputValue,
                     },
                     params: {
@@ -909,21 +933,7 @@ const Index = (props) => {
         setTongTienState(tongTien);
     }, [option]);
 
-    const dataOption = sortedArr?.map((e) => {
-        return {
-            item: e?.mathang?.value,
-            quantity: Number(e?.soluong),
-            price: e?.dongia,
-            discount_percent: e?.chietkhau,
-            tax_id: e?.thue?.value,
-            purchases_item_id: e?.mathang?.e?.purchases_item_id,
-            note: e?.note,
-            id: e?.id,
-            purchases_order_item_id: e?.purchases_order_item_id,
-        };
-    });
 
-    let newDataOption = dataOption?.filter((e) => e?.item !== undefined);
 
     const _ServerSending = () => {
         let formData = new FormData();
@@ -1008,7 +1018,7 @@ const Index = (props) => {
         onSending && _ServerSending();
     }, [onSending]);
 
-    const trangthaiExprired = useStatusExprired();
+
 
     return (
         <React.Fragment>
@@ -1019,27 +1029,29 @@ const Index = (props) => {
                         : dataLang?.purchase_order_add_order || "purchase_order_add_order"}
                 </title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+            <Container className="!h-auto">
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.purchase_order || "purchase_order"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{dataLang?.purchase_order_information || "purchase_order_information"}</h6>
+                    </div>
+                )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.purchase_order || "purchase_order"}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>{dataLang?.purchase_order_information || "purchase_order_information"}</h6>
-                        </div>
-                    )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {dataLang?.purchase_order_information || "purchase_order_information"}
                         </h2>
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerOrder.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
-                                {"Quay lại"}
+                                {dataLang?.import_comeback || "import_comeback"}
                             </button>
                         </div>
                     </div>
@@ -1642,7 +1654,7 @@ const Index = (props) => {
                                                             return true;
                                                         }
                                                         if (floatValue > 100) {
-                                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                                            isShow("error", ERROR_DISCOUNT_MAX);
                                                             return false
                                                         }
                                                         else {
@@ -1765,7 +1777,7 @@ const Index = (props) => {
                                             return true;
                                         }
                                         if (floatValue > 100) {
-                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
+                                            isShow("error", ERROR_DISCOUNT_MAX);
                                             return false
                                         }
                                         else {
@@ -1920,7 +1932,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
