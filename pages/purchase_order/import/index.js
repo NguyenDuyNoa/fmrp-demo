@@ -620,7 +620,7 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar className="min:h-[200px] h-[75%] max:h-[500px]">
                                 <div className="w-full">
-                                    <HeaderTable gridCols={12}>
+                                    <HeaderTable gridCols={13}>
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                         </ColumnTable>
@@ -642,7 +642,7 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.import_into_money || "import_into_money"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
                                             {dataLang?.import_payment_status || "import_payment_status"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={'center'}>
@@ -661,7 +661,7 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={12} key={e.id.toString()} >
+                                                    <RowTable gridCols={13} key={e.id.toString()} >
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {e?.date != null
                                                                 ? moment(e?.date).format("DD/MM/YYYY")
@@ -698,7 +698,7 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'right'}>
                                                             {formatMoney(e.total_amount)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex items-center  mx-auto">
+                                                        <RowItemTable colSpan={2} className="flex items-center  mx-auto">
                                                             <div className="mx-auto">
                                                                 {(e?.status_pay === "not_spent" && (
                                                                     <span className=" font-normal text-sky-500  rounded-xl py-1 px-[19px]  bg-sky-200 text-center 3xl:items-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
@@ -758,8 +758,8 @@ const Index = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <ContainerTotal>
-                        <RowItemTable colSpan={4} textAlign={'center'} className="p-2">
+                    <ContainerTotal className={'!grid-cols-13'}>
+                        <RowItemTable colSpan={5} textAlign={'center'} className="p-2">
                             {dataLang?.import_total || "import_total"}
                         </RowItemTable>
                         <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
