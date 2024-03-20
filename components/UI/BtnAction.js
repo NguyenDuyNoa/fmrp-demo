@@ -120,6 +120,7 @@ const BtnAction = React.memo((props) => {
     const handleDelete = () => {
         //Báo giá
         const initialApiDelete = {
+            warehouse_location: `/api_web/api_warehouse/location/${props.id}?csrf_protection=true`,
             warehouse: `/api_web/api_warehouse/warehouse/${props.id}?csrf_protection=true`,
             personnel_roles: `/api_web/api_staff/position/${props.id}?csrf_protection=true`,
             department: `/api_web/api_staff/department/${props.id}?csrf_protection=true`,
@@ -350,7 +351,8 @@ const BtnAction = React.memo((props) => {
                     'personnel_staff',
                     'department',
                     'personnel_roles',
-                    'warehouse'
+                    'warehouse',
+                    'warehouse_location'
 
                 ].includes(props?.type) ?
                     <button
