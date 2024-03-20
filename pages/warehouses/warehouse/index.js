@@ -724,7 +724,7 @@ const Index = (props) => {
                                             arrow={false}
                                         >
                                             {isState.idWarehouse === item.id &&
-                                                <div className="ml-2 flex items-center gap-2  rounded-md bg-gray-200 py-2 px-4">
+                                                <div className="ml-2 flex items-center gap-2  rounded-md bg-gray-200 3xl:py-3 py-2 px-4">
                                                     {role == true || checkEdit ?
 
                                                         <Popup_kho
