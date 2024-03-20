@@ -80,7 +80,7 @@ const Popup_chitiet = (props) => {
                 <div className=" space-x-5 w-[1150px] h-auto">
                     <div>
                         <div className="w-[1150px]">
-                            <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]">
                                 <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                                     {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                                 </h2>
@@ -99,11 +99,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.delivery_date != null
-                                                    ? moment(
-                                                        data?.delivery_date
-                                                    ).format("DD/MM/YYYY")
-                                                    : ""}
+                                                {data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
@@ -120,11 +116,11 @@ const Popup_chitiet = (props) => {
                                             </h3>
                                             <h3 className=" text-[13px] font-medium">
                                                 {data?.order_type == "0" ? (
-                                                    <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
+                                                    <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
                                                         Tạo mới
                                                     </span>
                                                 ) : (
-                                                    <span className="font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
+                                                    <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
                                                         YCMH
                                                     </span>
                                                 )}
@@ -139,7 +135,7 @@ const Popup_chitiet = (props) => {
                                         <div className="flex flex-wrap  gap-2 items-center justify-start">
                                             {(data?.import_status ===
                                                 "not_stocked" && (
-                                                    <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
+                                                    <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
                                                         {props.dataLang[
                                                             data?.import_status
                                                         ] || data?.import_status}
@@ -147,7 +143,7 @@ const Popup_chitiet = (props) => {
                                                 )) ||
                                                 (data?.import_status ===
                                                     "stocked_part" && (
-                                                        <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
+                                                        <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
                                                             {props.dataLang[
                                                                 data?.import_status
                                                             ] ||
@@ -156,7 +152,7 @@ const Popup_chitiet = (props) => {
                                                     )) ||
                                                 (data?.import_status ===
                                                     "stocked" && (
-                                                        <span className="flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
+                                                        <span className="flex justify-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
                                                             <TickCircle
                                                                 className="bg-lime-500 rounded-full "
                                                                 color="white"
@@ -453,7 +449,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </div>
                     </div>
                 </div>

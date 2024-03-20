@@ -581,18 +581,18 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={2} className=" flex items-center w-fit mx-auto">
                                                             <div className="mx-auto">
                                                                 {(e?.status_pay === "not_spent" && (
-                                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 w-fit  bg-sky-200 text-center text-[13px]">
+                                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 w-fit  bg-sky-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                                         {"Chưa chi"}
                                                                     </span>
                                                                 )) ||
                                                                     (e?.status_pay === "spent_part" && (
-                                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 w-fit  bg-orange-200 text-center text-[13px]">
+                                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 w-fit  bg-orange-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                                             {"Chi 1 phần"}{" "}
                                                                             {`(${formatNumber(e?.amount_paid)})`}
                                                                         </span>
                                                                     )) ||
                                                                     (e?.status_pay === "spent" && (
-                                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center text-[13px]">
+                                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                                             <TickCircle
                                                                                 className="bg-lime-500 rounded-full"
                                                                                 color="white"
@@ -606,7 +606,7 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
                                                             {e.note}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1}>
+                                                        <RowItemTable colSpan={1} className={'mx-auto'}>
                                                             <TagBranch className='w-fit'>
                                                                 {e?.branch_name}
                                                             </TagBranch>

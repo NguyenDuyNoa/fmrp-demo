@@ -29,6 +29,7 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 const Index = (props) => {
     const router = useRouter();
 
@@ -2204,13 +2205,7 @@ const Index = (props) => {
                                             <InPutMoneyFormat
                                                 value={e?.price}
                                                 onValueChange={(value) => handleOnChangeInputOption(e?.id, "price", value)}
-                                                isAllowed={({ floatValue }) => {
-                                                    if (floatValue == 0) {
-                                                        return true;
-                                                    } else {
-                                                        return true;
-                                                    }
-                                                }}
+                                                isAllowed={isAllowedNumber}
                                                 allowNegative={false}
                                                 className={`${e?.price == 0 && 'border-red-500' || e?.price == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
@@ -2222,18 +2217,7 @@ const Index = (props) => {
                                                     handleOnChangeInputOption(e?.id, "discount", value)
                                                 }
                                                 className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                                                isAllowed={({ floatValue }) => {
-                                                    if (floatValue == 0) {
-                                                        return true;
-                                                    }
-                                                    if (floatValue > 100) {
-                                                        isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
-                                                        return false
-                                                    }
-                                                    else {
-                                                        return true;
-                                                    }
-                                                }}
+                                                isAllowed={isAllowedDiscount}
                                                 isNumericString={true}
                                             />
                                         </div>
@@ -2364,18 +2348,7 @@ const Index = (props) => {
                                     value={totalDiscount}
                                     onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
                                     className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] text-center py-1 px-2 bg-transparent font-normal xl:w-20 w-24 focus:outline-none border-b-2 border-gray-300"
-                                    isAllowed={({ floatValue }) => {
-                                        if (floatValue == 0) {
-                                            return true;
-                                        }
-                                        if (floatValue > 100) {
-                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
-                                            return false
-                                        }
-                                        else {
-                                            return true;
-                                        }
-                                    }}
+                                    isAllowed={isAllowedDiscount}
                                 />
 
                             </div>

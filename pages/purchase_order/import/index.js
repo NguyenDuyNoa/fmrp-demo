@@ -627,7 +627,7 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
                                             {dataLang?.import_supplier || "import_supplier"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={'center'}>
@@ -642,7 +642,7 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.import_into_money || "import_into_money"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.import_payment_status || "import_payment_status"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={'center'}>
@@ -675,13 +675,13 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'}>
+                                                        <RowItemTable colSpan={2} textAlign={'left'}>
                                                             {e.supplier_name}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex items-center w-fit mx-auto">
                                                             <div className="mx-auto">
                                                                 <Popup_chitietThere
-                                                                    className="py-1 px-2 bg-gradient-to-br font-normal text-lime-500 bg-lime-200 items-center rounded-full shadow-2xl cursor-pointer hover:scale-110 transition duration-300 ease-out hover:bg-lime-500 hover:text-white"
+                                                                    className="py-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] px-2 bg-gradient-to-br font-normal text-lime-500 bg-lime-200 items-center rounded-full shadow-2xl cursor-pointer hover:scale-105 transition duration-300 ease-out hover:bg-lime-500 hover:text-white"
                                                                     name={e?.purchase_order_code}
                                                                     dataLang={dataLang}
                                                                     id={e?.purchase_order_id}
@@ -698,21 +698,21 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'right'}>
                                                             {formatMoney(e.total_amount)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className="flex items-center  mx-auto">
+                                                        <RowItemTable colSpan={1} className="flex items-center  mx-auto">
                                                             <div className="mx-auto">
                                                                 {(e?.status_pay === "not_spent" && (
-                                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-[19px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-[19px]  bg-sky-200 text-center 3xl:items-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                                         {"Chưa chi"}
                                                                     </span>
                                                                 )) ||
                                                                     (e?.status_pay === "spent_part" && (
-                                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2   bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2   bg-orange-200 text-center 3xl:items-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                                             {"Chi 1 phần"}{" "}
                                                                             {`(${formatMoney(e?.amount_paid)})`}
                                                                         </span>
                                                                     )) ||
                                                                     (e?.status_pay === "spent" && (
-                                                                        <span className="flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2   bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  justify-center">
+                                                                        <span className="flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2   bg-lime-200 text-center 3xl:items-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]  justify-center">
                                                                             <TickCircle
                                                                                 className="bg-lime-500 rounded-full"
                                                                                 color="white"
@@ -730,7 +730,7 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="">
+                                                        <RowItemTable colSpan={1} className="mx-auto">
                                                             <TagBranch className="w-fit">
                                                                 {e?.branch_name}
                                                             </TagBranch>
@@ -791,7 +791,7 @@ const Index = (props) => {
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"returnSales"}
+                nameModel={"import"}
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}

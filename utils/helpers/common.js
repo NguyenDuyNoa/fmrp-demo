@@ -1,3 +1,6 @@
+import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
+import useToast from "@/hooks/useToast";
+const isShow = useToast()
 const convertArrayToObject = (array, key) => {
     const initialValue = {};
     return array.reduce((obj, item) => {
@@ -20,4 +23,35 @@ const parseStringToObject = (str) => {
     }, {});
 };
 
-export { convertArrayToObject, parseStringToArray, parseStringToObject, parseArrayToString };
+
+const isAllowedDiscount = (values) => {
+    const { floatValue } = values;
+    if (floatValue === 0) {
+        return true;
+    }
+    if (floatValue > 100) {
+        isShow("error", ERROR_DISCOUNT_MAX);
+        return false;
+    }
+    return true;
+}
+
+const isAllowedNumber = (values) => {
+    const { floatValue } = values;
+    if (floatValue == 0) {
+        return true;
+    } else {
+        return true;
+    }
+}
+
+
+
+export {
+    isAllowedDiscount,
+    isAllowedNumber,
+    convertArrayToObject,
+    parseStringToArray,
+    parseStringToObject,
+    parseArrayToString
+};

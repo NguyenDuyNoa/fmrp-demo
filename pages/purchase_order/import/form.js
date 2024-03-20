@@ -34,6 +34,7 @@ import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericF
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
 import useFeature from "@/hooks/useConfigFeature";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -2250,13 +2251,7 @@ const Index = (props) => {
                                                                         "amount"
                                                                     )}
                                                                     value={ce?.amount}
-                                                                    isAllowed={({ floatValue }) => {
-                                                                        if (floatValue == 0) {
-                                                                            return true;
-                                                                        } else {
-                                                                            return true;
-                                                                        }
-                                                                    }}
+                                                                    isAllowed={isAllowedNumber}
                                                                     className={`${ce?.amount == 0 && 'border-red-500' || ce?.amount == "" && 'border-red-500'} appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200`}
                                                                 />
                                                                 <button
@@ -2298,17 +2293,7 @@ const Index = (props) => {
                                                                         "chietKhau"
                                                                     )}
                                                                     value={ce?.chietKhau}
-                                                                    isAllowed={(values) => {
-                                                                        const { floatValue } = values;
-                                                                        if (floatValue == 0) {
-                                                                            return true;
-                                                                        }
-                                                                        if (floatValue > 100) {
-                                                                            isShow("error", ERROR_DISCOUNT_MAX);
-                                                                            return false
-                                                                        }
-                                                                        return true
-                                                                    }}
+                                                                    isAllowed={isAllowedDiscount}
                                                                 />
                                                             </div>
                                                             {/* <div>{ce?.priceAfter}</div> */}
@@ -2412,17 +2397,7 @@ const Index = (props) => {
                             <div className="col-span-1 text-center flex items-center justify-center">
                                 <InPutNumericFormat
                                     value={chietkhautong}
-                                    isAllowed={(values) => {
-                                        const { floatValue } = values;
-                                        if (floatValue == 0) {
-                                            return true;
-                                        }
-                                        if (floatValue > 100) {
-                                            isShow("error", ERROR_DISCOUNT_MAX);
-                                            return false
-                                        }
-                                        return true
-                                    }}
+                                    isAllowed={isAllowedDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
                                     className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
 

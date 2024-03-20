@@ -40,6 +40,7 @@ import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 const Popup_servie = (props) => {
     let id = props?.id;
 
@@ -861,13 +862,7 @@ const Popup_servie = (props) => {
                                                     } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong", e)}
                                                 value={e?.soluong}
-                                                isAllowed={({ floatValue }) => {
-                                                    if (floatValue == 0) {
-                                                        return true;
-                                                    } else {
-                                                        return true;
-                                                    }
-                                                }}
+                                                isAllowed={isAllowedNumber}
                                             />
                                             <button
                                                 type="button"
@@ -897,18 +892,7 @@ const Popup_servie = (props) => {
                                                 index
                                             )}
                                             className="appearance-none text-center py-1 px-1 font-normal w-[90%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12px] border-gray-200"
-                                            isAllowed={({ floatValue }) => {
-                                                if (floatValue == 0) {
-                                                    return true;
-                                                }
-                                                if (floatValue > 100) {
-                                                    isShow("error", ERROR_DISCOUNT_MAX);
-                                                    return false
-                                                }
-                                                else {
-                                                    return true;
-                                                }
-                                            }}
+                                            isAllowed={isAllowedDiscount}
                                         />
                                     </div>
                                     <div className="col-span-1 text-right flex items-center justify-end">
@@ -995,14 +979,12 @@ const Popup_servie = (props) => {
                                     {dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}
                                 </h2>
                                 <div className="col-span-1 text-center flex items-center justify-center">
-                                    <NumericFormat
+                                    <InPutNumericFormat
+                                        isAllowed={isAllowedDiscount}
                                         value={chietkhautong}
                                         onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
                                         className=" text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
-                                        thousandSeparator=","
-                                        allowNegative={false}
-                                        decimalScale={0}
-                                        isNumericString={true}
+
                                     />
                                 </div>
                             </div>

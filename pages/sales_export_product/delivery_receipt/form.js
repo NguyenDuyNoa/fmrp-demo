@@ -36,6 +36,7 @@ import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyForma
 import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -2095,6 +2096,7 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "price"
                                                                         )}
+                                                                        isAllowed={isAllowedNumber}
                                                                         value={ce?.price}
                                                                     />
                                                                 </div>
@@ -2108,17 +2110,7 @@ const Index = (props) => {
                                                                             "discount"
                                                                         )}
                                                                         value={ce?.discount}
-                                                                        isAllowed={(values) => {
-                                                                            const { floatValue } = values;
-                                                                            if (floatValue == 0) {
-                                                                                return true;
-                                                                            }
-                                                                            if (floatValue > 100) {
-                                                                                isShow("error", ERROR_DISCOUNT_MAX);
-                                                                                return false
-                                                                            }
-                                                                            return true
-                                                                        }}
+                                                                        isAllowed={isAllowedDiscount}
                                                                     />
                                                                 </div>
 
@@ -2228,17 +2220,7 @@ const Index = (props) => {
                                     value={generalDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "generalDiscount")}
                                     className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
-                                    isAllowed={(values) => {
-                                        const { floatValue } = values;
-                                        if (floatValue == 0) {
-                                            return true;
-                                        }
-                                        if (floatValue > 100) {
-                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
-                                            return false
-                                        }
-                                        return true
-                                    }}
+                                    isAllowed={isAllowedDiscount}
                                 />
                             </div>
                         </div>

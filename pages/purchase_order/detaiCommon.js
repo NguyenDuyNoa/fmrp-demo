@@ -107,7 +107,7 @@ const Popup_chitietThere = (props) => {
                     <div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[640px] h-[600px] ">
                         <div>
                             <div className="3xl:w-[1250px] 2xl:w-[1100px] w-[1050px]">
-                                <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]">
                                     <h2 className="font-normal bg-[#ECF0F4] p-2 text-[13px]">
                                         {props.dataLang?.import_detail_info || "import_detail_info"}
                                     </h2>
@@ -153,13 +153,13 @@ const Popup_chitietThere = (props) => {
                                                 <div className="flex flex-wrap  gap-2 items-center justify-center">
                                                     {(data?.status_pay ===
                                                         "not_spent" && (
-                                                            <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]">
+                                                            <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-sky-500  rounded-xl py-1 px-2 w-fit  bg-sky-200 text-center">
                                                                 {"Chưa chi"}
                                                             </span>
                                                         )) ||
                                                         (data?.status_pay ===
                                                             "spent_part" && (
-                                                                <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]">
+                                                                <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-orange-500 rounded-xl py-1 px-2 w-fit  bg-orange-200 text-center">
                                                                     {"Chi 1 phần"}{" "}
                                                                     {`(${formatNumber(
                                                                         data?.amount_paid
@@ -168,7 +168,7 @@ const Popup_chitietThere = (props) => {
                                                             )) ||
                                                         (data?.status_pay ===
                                                             "spent" && (
-                                                                <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
+                                                                <span className="flex items-center justify-center gap-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center">
                                                                     <TickCircle
                                                                         className="bg-lime-500 rounded-full"
                                                                         color="white"
@@ -186,13 +186,13 @@ const Popup_chitietThere = (props) => {
                                                 <div className="flex flex-wrap  gap-2 items-center justify-center">
                                                     {(data?.warehouseman_id ===
                                                         "0" && (
-                                                            <span className=" font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]">
+                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-[#3b82f6]  rounded-xl py-1 px-2 w-fit  bg-[#bfdbfe] text-center">
                                                                 {"Chưa duyệt kho"}
                                                             </span>
                                                         )) ||
                                                         (data?.warehouseman_id !=
                                                             "0" && (
-                                                                <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
+                                                                <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center">
                                                                     <TickCircle
                                                                         className="bg-lime-500 rounded-full"
                                                                         color="white"
@@ -510,7 +510,7 @@ const Popup_chitietThere = (props) => {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </div>
                         </div>
                     </div>
@@ -519,7 +519,7 @@ const Popup_chitietThere = (props) => {
                         <div className=" space-x-5 w-[1100px]  h-auto ">
                             <div>
                                 <div className="w-[1100px]">
-                                    <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                    <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]">
                                         <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                                             {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                                         </h2>
@@ -584,13 +584,13 @@ const Popup_chitietThere = (props) => {
                                                 <div className="flex flex-wrap  gap-2 items-center justify-center">
                                                     {(data?.status_pay ===
                                                         "not_spent" && (
-                                                            <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]">
+                                                            <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200 text-center w-fit">
                                                                 {"Chưa chi"}
                                                             </span>
                                                         )) ||
                                                         (data?.status_pay ===
                                                             "spent_part" && (
-                                                                <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]">
+                                                                <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200 text-center w-fit">
                                                                     {"Chi 1 phần"}{" "}
                                                                     {`(${formatNumber(
                                                                         data?.amount_paid
@@ -599,7 +599,7 @@ const Popup_chitietThere = (props) => {
                                                             )) ||
                                                         (data?.status_pay ===
                                                             "spent" && (
-                                                                <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
+                                                                <span className="flex items-center justify-center gap-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 text-center w-fit">
                                                                     <TickCircle
                                                                         className="bg-lime-500 rounded-full"
                                                                         color="white"
@@ -792,7 +792,7 @@ const Popup_chitietThere = (props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Customscrollbar>
                                 </div>
                             </div>
                         </div>
@@ -801,7 +801,7 @@ const Popup_chitietThere = (props) => {
                         <div className=" space-x-5 w-[1100px]  h-auto">
                             <div>
                                 <div className="w-[1100px]">
-                                    <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                    <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]">
                                         <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                                             {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                                         </h2>
@@ -835,14 +835,14 @@ const Popup_chitietThere = (props) => {
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                                     </h3>
-                                                    <h3 className=" text-[13px] font-medium">
+                                                    <h3 className="font-medium">
                                                         {data?.order_type ==
                                                             "0" ? (
-                                                            <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
+                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
                                                                 Tạo mới
                                                             </span>
                                                         ) : (
-                                                            <span className="font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
+                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
                                                                 YCMH
                                                             </span>
                                                         )}
@@ -856,17 +856,17 @@ const Popup_chitietThere = (props) => {
                                                 </div>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-start">
                                                     {(data?.import_status === "not_stocked" && (
-                                                        <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
+                                                        <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  w-fit bg-sky-200">
                                                             {props.dataLang[data?.import_status] || data?.import_status}
                                                         </span>
                                                     )) ||
                                                         (data?.import_status === "stocked_part" && (
-                                                            <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
+                                                            <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  w-fit bg-orange-200">
                                                                 {props.dataLang[data?.import_status] || data?.import_status}
                                                             </span>
                                                         )) ||
                                                         (data?.import_status === "stocked" && (
-                                                            <span className="flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
+                                                            <span className="flex justify-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  w-fit bg-lime-200">
                                                                 <TickCircle
                                                                     className="bg-lime-500 rounded-full "
                                                                     color="white"
@@ -1125,7 +1125,7 @@ const Popup_chitietThere = (props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Customscrollbar>
                                 </div>
                             </div>
                         </div>
@@ -1173,17 +1173,17 @@ const Popup_chitietThere = (props) => {
                                                 <div className="flex flex-wrap  gap-2 items-center justify-start">
                                                     {(data?.order_status
                                                         ?.status === "purchase_ordered" && (
-                                                            <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-sky-200">
+                                                            <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-sky-200">
                                                                 {props.dataLang[data?.order_status?.status]}
                                                             </span>
                                                         )) ||
                                                         (data?.order_status?.status === "purchase_portion" && (
-                                                            <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-orange-200">
+                                                            <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-orange-200">
                                                                 {props.dataLang[data?.order_status?.status]}{" "}{`(${data?.order_status?.count})`}
                                                             </span>
                                                         )) ||
                                                         (data?.order_status?.status === "purchase_enough" && (
-                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-lime-200">
+                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-lime-200">
                                                                 <TickCircle
                                                                     className="bg-lime-500 rounded-full"
                                                                     color="white"
@@ -1201,7 +1201,7 @@ const Popup_chitietThere = (props) => {
                                                     </h3>
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {data?.status == "1" ? (
-                                                            <div className="border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1">
+                                                            <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]  w-fit border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1">
                                                                 {props.dataLang?.purchase_approved || "purchase_approved"}{" "}
                                                                 <TickCircle
                                                                     className="bg-lime-500 rounded-full"
@@ -1210,7 +1210,7 @@ const Popup_chitietThere = (props) => {
                                                                 />
                                                             </div>
                                                         ) : (
-                                                            <div className="border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1">
+                                                            <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]  w-fit border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1">
                                                                 {props.dataLang?.purchase_notapproved || "purchase_notapproved"}{" "}
                                                                 <TickCircle
                                                                     size={22}
@@ -1436,13 +1436,13 @@ const Popup_chitietThere = (props) => {
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                                     </h3>
-                                                    <h3 className=" text-[13px] font-medium">
+                                                    <h3 className=" font-medium">
                                                         {data?.order_type == "0" ? (
-                                                            <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
+                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
                                                                 Tạo mới
                                                             </span>
                                                         ) : (
-                                                            <span className="font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
+                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
                                                                 YCMH
                                                             </span>
                                                         )}
@@ -1456,17 +1456,17 @@ const Popup_chitietThere = (props) => {
                                                 </div>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-start">
                                                     {(data?.import_status === "not_stocked" && (
-                                                        <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
+                                                        <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
                                                             {props.dataLang[data?.import_status] || data?.import_status}
                                                         </span>
                                                     )) ||
                                                         (data?.import_status === "stocked_part" && (
-                                                            <span className="flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
+                                                            <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
                                                                 {props.dataLang[data?.import_status] || data?.import_status}
                                                             </span>
                                                         )) ||
                                                         (data?.import_status === "stocked" && (
-                                                            <span className="flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
+                                                            <span className="flex justify-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
                                                                 <TickCircle
                                                                     className="bg-lime-500 rounded-full "
                                                                     color="white"

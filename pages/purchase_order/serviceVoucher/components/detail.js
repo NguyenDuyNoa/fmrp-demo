@@ -36,6 +36,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -91,17 +92,13 @@ const Popup_chitiet = (props) => {
                         <div className="w-[999px]">
                             <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]">
                                 <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang
-                                        ?.purchase_order_detail_general_informatione ||
-                                        "purchase_order_detail_general_informatione"}
+                                    {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                                 </h2>
                                 <div className="grid grid-cols-8  min-h-[100px] px-2">
                                     <div className="col-span-3">
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.serviceVoucher_day_vouchers ||
-                                                    "serviceVoucher_day_vouchers"}
+                                                {props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
                                                 {data?.date != null
@@ -113,17 +110,12 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-2 items-center font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang
-                                                    ?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
                                                 <div className="relative">
                                                     <ImageErrors
-                                                        src={
-                                                            data?.staff_create
-                                                                ?.profile_image
-                                                        }
+                                                        src={data?.staff_create?.profile_image}
                                                         width={25}
                                                         height={25}
                                                         defaultSrc="/user-placeholder.jpg"
@@ -164,13 +156,13 @@ const Popup_chitiet = (props) => {
                                         <div className="flex flex-wrap  gap-2 items-center justify-center">
                                             {(data?.status_pay ===
                                                 "not_spent" && (
-                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]">
+                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 w-fit  bg-sky-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                         {"Chưa chi"}
                                                     </span>
                                                 )) ||
                                                 (data?.status_pay ===
                                                     "spent_part" && (
-                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]">
+                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 w-fit  bg-orange-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                             {"Chi 1 phần"}{" "}
                                                             {`(${formatNumber(
                                                                 data?.amount_paid
@@ -179,7 +171,7 @@ const Popup_chitiet = (props) => {
                                                     )) ||
                                                 (data?.status_pay ===
                                                     "spent" && (
-                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
+                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                             <TickCircle
                                                                 className="bg-lime-500 rounded-full"
                                                                 color="white"
@@ -194,9 +186,7 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3 ">
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="text-[13px] ">
-                                                {props.dataLang
-                                                    ?.purchase_order_table_supplier ||
-                                                    "purchase_order_table_supplier"}
+                                                {props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium ">
                                                 {data?.supplier_name}
@@ -205,13 +195,11 @@ const Popup_chitiet = (props) => {
 
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang
-                                                    ?.purchase_order_table_branch ||
-                                                    "purchase_order_table_branch"}
+                                                {props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                             </h3>
-                                            <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
+                                            <TagBranch className=" w-fit">
                                                 {data?.branch_name}
-                                            </h3>
+                                            </TagBranch>
                                         </div>
                                     </div>
                                 </div>

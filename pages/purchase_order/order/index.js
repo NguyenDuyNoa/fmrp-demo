@@ -626,11 +626,11 @@ const Index = (props) => {
                                                     </RowItemTable >
                                                     <RowItemTable colSpan={1} className={'flex justify-center text-center'}>
                                                         {e?.order_type == "0" ? (
-                                                            <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px] min-w-[80px]">
+                                                            <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] min-w-[80px]">
                                                                 Tạo mới
                                                             </span>
                                                         ) : (
-                                                            <span className="min-w-[80px] font-normal 2xl:text-xs xl:text-xs text-[8px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
+                                                            <span className="min-w-[80px] font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
                                                                 YCMH
                                                             </span>
                                                         )}
@@ -641,7 +641,7 @@ const Index = (props) => {
                                                                 {index !== 0 && ","}
                                                                 <Popup_chitietThere
                                                                     dataLang={dataLang}
-                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out" type={e?.order_type}
+                                                                    className="3xl:text-base 2xl:text-[12.5px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out" type={e?.order_type}
                                                                     id={purchase.id}
                                                                     name={purchase.code}
                                                                 />
@@ -659,18 +659,18 @@ const Index = (props) => {
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className="flex items-center justify-center text-center ">
                                                         {(e?.import_status === "not_stocked" && (
-                                                            <span className="font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
+                                                            <span className="font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
                                                                 {dataLang[e?.import_status] || e?.import_status}{" "}
                                                             </span>
                                                         )) ||
                                                             (e?.import_status === "stocked_part" && (
-                                                                <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
+                                                                <span className=" font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
                                                                     {dataLang[e?.import_status] ||
                                                                         e?.import_status}
                                                                 </span>
                                                             )) ||
                                                             (e?.import_status === "stocked" && (
-                                                                <span className="flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
+                                                                <span className="flex 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
                                                                     <TickCircle
                                                                         className="bg-lime-500 rounded-full "
                                                                         color="white"
@@ -683,8 +683,8 @@ const Index = (props) => {
                                                     <RowItemTable colSpan={1} textAlign={"text-left"} className="truncate ">
                                                         {e.note}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="w-fit">
-                                                        <TagBranch>
+                                                    <RowItemTable colSpan={1} className="mx-auto">
+                                                        <TagBranch className='w-fit'>
                                                             {e?.branch_name}
                                                         </TagBranch>
                                                     </RowItemTable>

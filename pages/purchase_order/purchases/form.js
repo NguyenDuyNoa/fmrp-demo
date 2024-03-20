@@ -37,6 +37,7 @@ import { CONFIRMATION_OF_CHANGES } from "@/constants/changeStatus/changeStatus";
 import { useToggle } from "@/hooks/useToggle";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
+import { isAllowedNumber } from "@/utils/helpers/common";
 
 const Index = (props) => {
     const router = useRouter();
@@ -826,13 +827,7 @@ const Index = (props) => {
                                                             "soluong",
                                                             e
                                                         )}
-                                                        isAllowed={({ floatValue }) => {
-                                                            if (floatValue == 0) {
-                                                                return true;
-                                                            } else {
-                                                                return true;
-                                                            }
-                                                        }}
+                                                        isAllowed={isAllowedNumber}
                                                         allowNegative={false}
                                                         className={`${e?.soluong == 0 && 'border-red-500' || e?.soluong == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                     />

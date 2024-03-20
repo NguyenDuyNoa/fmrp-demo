@@ -33,6 +33,7 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 
 const Index = (props) => {
     const router = useRouter();
@@ -1603,13 +1604,7 @@ const Index = (props) => {
                                                                             "price"
                                                                         )}
                                                                         value={ce?.price}
-                                                                        isAllowed={({ floatValue }) => {
-                                                                            if (floatValue == 0) {
-                                                                                return true;
-                                                                            } else {
-                                                                                return true;
-                                                                            }
-                                                                        }}
+                                                                        isAllowed={isAllowedNumber}
                                                                     />
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
@@ -1622,18 +1617,7 @@ const Index = (props) => {
                                                                             "discount"
                                                                         )}
                                                                         value={ce?.discount}
-                                                                        isAllowed={({ floatValue }) => {
-                                                                            if (floatValue == 0) {
-                                                                                return true;
-                                                                            }
-                                                                            if (floatValue > 100) {
-                                                                                isShow("error", " % Chiết khấu chỉ được bé hơn hoặc bằng 100%");
-                                                                                return false
-                                                                            }
-                                                                            else {
-                                                                                return true;
-                                                                            }
-                                                                        }}
+                                                                        isAllowed={isAllowedDiscount}
                                                                     />
                                                                 </div>
 
@@ -1740,18 +1724,7 @@ const Index = (props) => {
                             <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
                                 <InPutNumericFormat
-                                    isAllowed={({ floatValue }) => {
-                                        if (floatValue == 0) {
-                                            return true;
-                                        }
-                                        if (floatValue > 100) {
-                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
-                                            return false
-                                        }
-                                        else {
-                                            return true;
-                                        }
-                                    }}
+                                    isAllowed={isAllowedDiscount}
                                     value={generalDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "generalDiscount")}
                                     className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"

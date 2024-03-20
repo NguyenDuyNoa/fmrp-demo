@@ -25,6 +25,7 @@ import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApprov
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
@@ -83,29 +84,21 @@ const Popup_chitiet = (props) => {
                         <div className="w-[1050px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang?.purchase_general ||
-                                        "purchase_general"}
+                                    {props?.dataLang?.purchase_general || "purchase_general"}
                                 </h2>
                                 <div className="grid grid-cols-8  min-h-[140px] p-2">
                                     <div className="col-span-3">
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="col-span-1 text-[13px]">
-                                                {props.dataLang?.purchase_day ||
-                                                    "purchase_day"}
+                                                {props.dataLang?.purchase_day || "purchase_day"}
                                             </h3>
                                             <h3 className="col-span-1 font-medium text-[13px]">
-                                                {data?.date != null
-                                                    ? moment(data?.date).format(
-                                                        "DD/MM/YYYY"
-                                                    )
-                                                    : ""}
+                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="col-span-1 text-[13px]">
-                                                {props.dataLang
-                                                    ?.purchase_code ||
-                                                    "purchase_code"}
+                                                {props.dataLang?.purchase_code || "purchase_code"}
                                             </h3>
                                             <h3 className="col-span-1 font-medium text-[13px] text-blue-600">
                                                 {data?.code}
@@ -113,13 +106,11 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="col-span-1 text-[13px]">
-                                                {props.dataLang
-                                                    ?.purchase_planNumber ||
-                                                    "purchase_planNumber"}
+                                                {props.dataLang?.purchase_planNumber || "purchase_planNumber"}
                                             </h3>
-                                            <h3 className="col-span-1 font-medium text-[13px]">
+                                            <div className="col-span-1 font-medium text-[13px]">
                                                 {data?.reference_no}
-                                            </h3>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -132,7 +123,7 @@ const Popup_chitiet = (props) => {
                                         <div className="flex flex-wrap  gap-2 items-center justify-start">
                                             {(data?.order_status?.status ===
                                                 "purchase_ordered" && (
-                                                    <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-sky-200">
+                                                    <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-sky-200">
                                                         {
                                                             props.dataLang[
                                                             data?.order_status
@@ -143,7 +134,7 @@ const Popup_chitiet = (props) => {
                                                 )) ||
                                                 (data?.order_status?.status ===
                                                     "purchase_portion" && (
-                                                        <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-orange-200">
+                                                        <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-orange-200">
                                                             {
                                                                 props.dataLang[
                                                                 data
@@ -156,7 +147,7 @@ const Popup_chitiet = (props) => {
                                                     )) ||
                                                 (data?.order_status?.status ===
                                                     "purchase_enough" && (
-                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px] text-[13px]  bg-lime-200">
+                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-lime-200">
                                                             <TickCircle
                                                                 className="bg-lime-500 rounded-full"
                                                                 color="white"
@@ -173,31 +164,22 @@ const Popup_chitiet = (props) => {
                                                         </span>
                                                     ))}
                                         </div>
-                                        {/* <div className=' font-normal text-sky-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-sky-200'>{props.dataLang?.purchase_ordered || "purchase_ordered"}</div>
-                          <div className=' font-normal text-orange-500 rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-orange-200'>{props.dataLang?.purchase_portion || "purchase_portion"} (0)</div>
-                          <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_enough || "purchase_enough"} (0)</div> */}
                                     </div>
                                     <div className="col-span-3 ">
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="col-span-1 text-[13px]">
-                                                {props.dataLang
-                                                    ?.purchase_status ||
-                                                    "purchase_status"}
+                                                {props.dataLang?.purchase_status || "purchase_status"}
                                             </h3>
                                             <h3 className="col-span-1 text-[13px]">
-                                                {data?.status == "1" ? (
-                                                    <BtnStatusApproved className={``} type={1} onClick={() => { }} />
-                                                ) : (
-                                                    <BtnStatusApproved className={``} type={0} onClick={() => { }} />
-                                                )}
+                                                <TagWarehouse data={{
+                                                    warehouseman_id: data?.status
+                                                }} />
                                             </h3>
                                         </div>
                                         {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
                                         <div className="my-4 font-semibold grid grid-cols-2">
                                             <h3 className="col-span-1 text-[13px]">
-                                                {props.dataLang
-                                                    ?.purchase_propnent ||
-                                                    "purchase_propnent"}
+                                                {props.dataLang?.purchase_propnent || "purchase_propnent"}
                                             </h3>
                                             {/* <h3 className="col-span-1 text-[13px] font-normal">
                                                 {data?.user_create_name}
@@ -253,13 +235,9 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.purchase_quantity || "purchase_quantity"}
                                         </h4>
                                         <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {/* {props.dataLang?.purchase_quantity_purchased ||
-                          "purchase_quantity_purchased"} */}
                                             {"SL đã mua"}
                                         </h4>
                                         <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                            {/* {props.dataLang?.purchase_reaining_amout ||
-                          "purchase_reaining_amout"} */}
                                             {"SL còn lại"}
                                         </h4>
                                         <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">

@@ -26,6 +26,7 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 
 const Index = (props) => {
     const router = useRouter();
@@ -1197,13 +1198,7 @@ const Index = (props) => {
                                                             "quantity",
                                                             e
                                                         )}
-                                                        isAllowed={({ floatValue }) => {
-                                                            if (floatValue == 0) {
-                                                                return true;
-                                                            } else {
-                                                                return true;
-                                                            }
-                                                        }}
+                                                        isAllowed={isAllowedNumber}
                                                         allowNegative={false}
                                                         className={`
                                                         ${index === 0 ? "cursor-default" : "cursor-text"} 
@@ -1227,6 +1222,7 @@ const Index = (props) => {
                                                         "price",
                                                         index
                                                     )}
+                                                    isAllowed={isAllowedNumber}
                                                     readOnly={index === 0 ? readOnlyFirst : false}
                                                     className={`
                                                     ${index === 0 ? "cursor-default" : "cursor-text"} 
@@ -1246,18 +1242,7 @@ const Index = (props) => {
                                                     className={`${index === 0 ? "cursor-default" : "cursor-text"
                                                         } appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
                                                     readOnly={index === 0 ? readOnlyFirst : false}
-                                                    isAllowed={({ floatValue }) => {
-                                                        if (floatValue == 0) {
-                                                            return true;
-                                                        }
-                                                        if (floatValue > 100) {
-                                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
-                                                            return false
-                                                        }
-                                                        else {
-                                                            return true;
-                                                        }
-                                                    }}
+                                                    isAllowed={isAllowedDiscount}
                                                 />
                                             </div>
 
@@ -1364,18 +1349,7 @@ const Index = (props) => {
                                     value={discounttong}
                                     onValueChange={_HandleChangeInput.bind(this, "discounttong")}
                                     className=" text-center py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
-                                    isAllowed={({ floatValue }) => {
-                                        if (floatValue == 0) {
-                                            return true;
-                                        }
-                                        if (floatValue > 100) {
-                                            isShow("error", "Vui lòng nhập số % chiết khấu nhỏ hơn 101");
-                                            return false;
-                                        }
-                                        else {
-                                            return true;
-                                        }
-                                    }}
+                                    isAllowed={isAllowedDiscount}
                                 />
                             </div>
                         </div>

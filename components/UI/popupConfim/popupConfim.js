@@ -250,7 +250,7 @@ const PopupConfim = (props) => {
                                 'personnel_staff',
                                 'personnel_staff_status',
                                 'department',
-                                'personnel_roles'
+                                'personnel_roles',
                             ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">
@@ -264,6 +264,7 @@ const PopupConfim = (props) => {
                                         <Zoom className="w-1/2">
                                             <button
                                                 onClick={() => {
+                                                    console.log(role, checkAuth);
                                                     if (role) {
                                                         props.save()
                                                     } else if (checkAuth) {

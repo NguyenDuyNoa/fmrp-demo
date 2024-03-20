@@ -41,6 +41,7 @@ import MultiValue from "@/components/UI/mutiValue/multiValue";
 import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
 import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 const Index = (props) => {
     const router = useRouter();
 
@@ -1604,13 +1605,7 @@ const Index = (props) => {
                                                         )}
                                                         value={index === 0 ? 1 : e?.soluong}
                                                         readOnly={index === 0 ? readOnlyFirst : false}
-                                                        isAllowed={({ floatValue }) => {
-                                                            if (floatValue == 0) {
-                                                                return true;
-                                                            } else {
-                                                                return true;
-                                                            }
-                                                        }}
+                                                        isAllowed={isAllowedNumber}
                                                         className={`
                                                         ${index === 0 ? "cursor-default" : "cursor-text"} 
                                                         ${e?.soluong == 0 && 'border-red-500' || e?.soluong == "" && 'border-red-500'} 
@@ -1649,18 +1644,7 @@ const Index = (props) => {
                                                         index
                                                     )}
                                                     className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
-                                                    isAllowed={({ floatValue }) => {
-                                                        if (floatValue == 0) {
-                                                            return true;
-                                                        }
-                                                        if (floatValue > 100) {
-                                                            isShow("error", ERROR_DISCOUNT_MAX);
-                                                            return false
-                                                        }
-                                                        else {
-                                                            return true;
-                                                        }
-                                                    }}
+                                                    isAllowed={isAllowedDiscount}
                                                 />
                                             </div>
 
@@ -1772,18 +1756,7 @@ const Index = (props) => {
                             <div className="col-span-1 text-center flex items-center justify-center">
                                 <InPutNumericFormat
                                     value={chietkhautong}
-                                    isAllowed={({ floatValue }) => {
-                                        if (floatValue == 0) {
-                                            return true;
-                                        }
-                                        if (floatValue > 100) {
-                                            isShow("error", ERROR_DISCOUNT_MAX);
-                                            return false
-                                        }
-                                        else {
-                                            return true;
-                                        }
-                                    }}
+                                    isAllowed={isAllowedDiscount}
                                     onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
                                     className=" text-center py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
                                 />
