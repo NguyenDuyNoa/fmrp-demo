@@ -195,7 +195,7 @@ const Index = (props) => {
         Axios("GET", "/api_web/Api_import/importCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 const { result } = response?.data;
-                queryState({ listCode: result?.map((e) => ({ label: `${e.code}`, value: e.id })) || [] });
+                queryState({ lisCode: result?.map((e) => ({ label: `${e.code}`, value: e.id })) || [] });
             }
         });
         queryState({ onFetchingFilter: true });
