@@ -21,7 +21,8 @@ const SelectComponent = ({
     defaultValue,
     noOptionsMessage,
     menuShouldBlockScroll,
-    classParent
+    classParent,
+    onMenuOpen
 }) => {
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
@@ -31,6 +32,7 @@ const SelectComponent = ({
                 onInputChange={onInputChange ? onInputChange : ""}
                 onChange={onChange}
                 placeholder={placeholder}
+                onMenuOpen={onMenuOpen}
                 {...configSelectFillter}
                 defaultValue={defaultValue}
                 className={className ? className : configSelectFillter.className}

@@ -32,6 +32,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import { PopupParent } from "@/utils/lib/Popup";
 const Index = (props) => {
     const router = useRouter();
 
@@ -1805,7 +1806,7 @@ const Index = (props) => {
                                                                         </button>
                                                                     </div>
                                                                     <div className="absolute top-0 right-0 p-1 cursor-pointer ">
-                                                                        <Popup
+                                                                        <PopupParent
                                                                             className=""
                                                                             trigger={
                                                                                 <div className="relative ">
@@ -1835,7 +1836,7 @@ const Index = (props) => {
                                                                                     {dataLang?.returns_slcl || "returns_slcl"}: {formatNumber(ce?.soluongcl)}
                                                                                 </span>
                                                                             </div>
-                                                                        </Popup>
+                                                                        </PopupParent>
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">

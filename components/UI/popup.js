@@ -1,6 +1,5 @@
 import React from "react";
-import Popup from "reactjs-popup";
-import Head from "next/head";
+import { PopupParent } from "@/utils/lib/Popup";
 
 import { Add as IconClose } from "iconsax-react";
 import { Lexend_Deca } from "@next/font/google";
@@ -15,7 +14,7 @@ const Index = (props) => {
             <button className={props.classNameBtn} onClick={props.onClickOpen}>
                 {props.button}
             </button>
-            <Popup
+            <PopupParent
                 open={props.open}
                 closeOnDocumentClick={false}
                 onClose={props.onClose}
@@ -29,9 +28,8 @@ const Index = (props) => {
                         className={`${deca.className} bg-[#ffffff] ${props?.classNameModeltime} p-4 shadow-xl rounded-xl `}
                     >
                         <div
-                            className={`${
-                                props.classNameTittle ? props.classNameTittle : "items-center"
-                            } flex justify-between`}
+                            className={`${props.classNameTittle ? props.classNameTittle : "items-center"
+                                } flex justify-between`}
                         >
                             <h1 className="text-[#101828] font-medium 3xl:text-[22px] 2xl:text-[18px] text-lg">
                                 {props.title}
@@ -50,7 +48,7 @@ const Index = (props) => {
                         {props.children}
                     </div>
                 </div>
-            </Popup>
+            </PopupParent>
         </React.Fragment>
     );
 };

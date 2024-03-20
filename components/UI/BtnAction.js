@@ -101,6 +101,7 @@ const BtnAction = React.memo((props) => {
                             "exportToOther",
                             "client_customers",
                             "suppliers",
+                            'warehouse'
                         ];
 
                         checkType.includes(props.type) &&
@@ -119,6 +120,7 @@ const BtnAction = React.memo((props) => {
     const handleDelete = () => {
         //Báo giá
         const initialApiDelete = {
+            warehouse: `/api_web/api_warehouse/warehouse/${props.id}?csrf_protection=true`,
             personnel_roles: `/api_web/api_staff/position/${props.id}?csrf_protection=true`,
             department: `/api_web/api_staff/department/${props.id}?csrf_protection=true`,
             personnel_staff: `/api_web/api_staff/staff/${props.id}?csrf_protection=true`,
@@ -347,13 +349,14 @@ const BtnAction = React.memo((props) => {
                     'category_products',
                     'personnel_staff',
                     'department',
-                    'personnel_roles'
+                    'personnel_roles',
+                    'warehouse'
 
                 ].includes(props?.type) ?
                     <button
                         type="button"
                         onClick={() => handleQueryId({ id: props?.id, status: true })}
-                        className="xl:text-base text-xs "
+                        className="xl:text-base text-xs outline-none hover:scale-110 transition-all ease-linear"
                     >
                         <Trash color="red" />
                     </button>

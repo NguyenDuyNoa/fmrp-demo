@@ -208,7 +208,8 @@ const PopupConfim = (props) => {
                                     'personnel_staff',
                                     'personnel_staff_status',
                                     'department',
-                                    'personnel_roles'
+                                    'personnel_roles',
+                                    'warehouse'
                                 ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">
@@ -251,6 +252,7 @@ const PopupConfim = (props) => {
                                 'personnel_staff_status',
                                 'department',
                                 'personnel_roles',
+                                'warehouse'
                             ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">

@@ -57,6 +57,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -95,11 +96,9 @@ const Index = (props) => {
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
-    const [totalItems, sTotalItems] = useState([]);
-
-    const [limit, sLimit] = useState(15);
-
     const [total, sTotal] = useState({});
+
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
