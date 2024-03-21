@@ -44,7 +44,7 @@ import { useEffect } from "react";
 
 import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
-import LinkWarehouse from "pages/manufacture/(linkWarehouse)/linkWarehouse";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -326,7 +326,7 @@ const Popup_chitiet = (props) => {
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                             {e?.lot == null ||
-                                                                                            e?.lot == ""
+                                                                                                e?.lot == ""
                                                                                                 ? "-"
                                                                                                 : e?.lot}
                                                                                         </h6>
@@ -338,8 +338,8 @@ const Popup_chitiet = (props) => {
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                             {e?.expiration_date
                                                                                                 ? moment(
-                                                                                                      e?.expiration_date
-                                                                                                  ).format("DD/MM/YYYY")
+                                                                                                    e?.expiration_date
+                                                                                                ).format("DD/MM/YYYY")
                                                                                                 : "-"}
                                                                                         </h6>
                                                                                     </div>

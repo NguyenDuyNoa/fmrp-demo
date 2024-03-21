@@ -3,11 +3,11 @@ import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment/moment"
 import { _ServerInstance as Axios } from "/services/axios";
-import LinkWarehouse from "pages/manufacture/(linkWarehouse)/linkWarehouse";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
 import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";

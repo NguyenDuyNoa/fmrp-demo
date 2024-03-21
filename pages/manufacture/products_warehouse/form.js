@@ -1,37 +1,34 @@
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { v4 as uuidv4 } from "uuid";
-import React, { useState, useEffect } from "react";
-
-import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
-
+import { debounce } from "lodash";
+import Select from "react-select";
 import moment from "moment/moment";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/router";
 import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
-import Select, { components } from "react-select";
 import { BsCalendarEvent } from "react-icons/bs";
-import { NumericFormat } from "react-number-format";
+import React, { useState, useEffect } from "react";
+import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import Loading from "@/components/UI/loading";
+import { Container } from "@/components/UI/common/layout";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
-import { routerProductsWarehouse } from "@/routers/manufacture";
-import { debounce } from "lodash";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
-import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { isAllowedNumber } from "@/utils/helpers/common";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { routerProductsWarehouse } from "@/routers/manufacture";
 
 const Index = (props) => {
     const router = useRouter();
@@ -49,8 +46,6 @@ const Index = (props) => {
     const [onFetching, sOnFetching] = useState(false);
 
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
 
@@ -102,8 +97,6 @@ const Index = (props) => {
     const [errExportWarehouse, sErrExportWarehouse] = useState(false);
 
     const [errQty, sErrQty] = useState(false);
-
-    const [locationtong, sKhotong] = useState(null);
 
     const [errLot, sErrLot] = useState(false);
 
@@ -210,16 +203,8 @@ const Index = (props) => {
     }, [onFetchingDetail]);
 
     useEffect(() => {
-        id &&
-            JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}" &&
-            sOnFetchingDetail(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) !== "{}" &&
-        JSON.stringify(dataProductExpiry) !== "{}" &&
-        JSON.stringify(dataProductSerial) !== "{}",
-    ]);
+        id && JSON.stringify(dataMaterialExpiry) !== "{}" && JSON.stringify(dataProductExpiry) !== "{}" && JSON.stringify(dataProductSerial) !== "{}" && sOnFetchingDetail(true);
+    }, [JSON.stringify(dataMaterialExpiry) !== "{}" && JSON.stringify(dataProductExpiry) !== "{}" && JSON.stringify(dataProductSerial) !== "{}",]);
 
     const _ServerFetching_ItemsAll = () => {
         Axios(
@@ -368,27 +353,13 @@ const Index = (props) => {
 
         const hasNullKho = hasNullOrCondition(listData, (item, childItem) => childItem.location === null);
 
-        const hasNullSerial = hasNullOrCondition(
-            listData,
-            (item, childItem) =>
-                item?.matHang.e?.text_type === "products" && (childItem.serial === "" || childItem.serial == null)
-        );
+        const hasNullSerial = hasNullOrCondition(listData, (item, childItem) => item?.matHang.e?.text_type === "products" && (childItem.serial === "" || childItem.serial == null));
 
-        const hasNullLot = hasNullOrCondition(
-            listData,
-            (item, childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null)
-        );
+        const hasNullLot = hasNullOrCondition(listData, (item, childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null));
 
-        const hasNullDate = hasNullOrCondition(
-            listData,
-            (item, childItem) => !childItem.disabledDate && childItem.date === null
-        );
+        const hasNullDate = hasNullOrCondition(listData, (item, childItem) => !childItem.disabledDate && childItem.date === null);
 
-        const hasNullQty = hasNullOrCondition(
-            listData,
-            (item, childItem) =>
-                childItem.importQuantity === null || childItem.importQuantity === "" || childItem.importQuantity == 0
-        );
+        const hasNullQty = hasNullOrCondition(listData, (item, childItem) => childItem.importQuantity === null || childItem.importQuantity === "" || childItem.importQuantity == 0);
 
         const isEmpty = listData?.length === 0;
 
@@ -478,43 +449,18 @@ const Index = (props) => {
 
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
-
             formData.append(`items[${index}][item]`, item?.matHang?.value);
-
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
-
-                formData.append(
-                    `items[${index}][child][${childIndex}][serial]`,
-                    childItem?.serial === null ? "" : childItem?.serial
-                );
-
-                formData.append(
-                    `items[${index}][child][${childIndex}][lot]`,
-                    childItem?.lot === null ? "" : childItem?.lot
-                );
-
-                formData.append(
-                    `items[${index}][child][${childIndex}][expiration_date]`,
-                    childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss")
-                );
-
-                formData.append(
-                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.location?.value || 0
-                );
-
+                formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
+                formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
+                formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss"));
+                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
-
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.importQuantity);
             });
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true`
-                : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`
-            }`,
+        Axios("POST", `${id ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true` : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },

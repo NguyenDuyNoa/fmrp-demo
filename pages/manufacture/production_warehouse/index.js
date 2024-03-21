@@ -25,8 +25,8 @@ import { _ServerInstance as Axios } from "/services/axios";
 import ReactExport from "react-data-export";
 
 import Popup_chitiet from "./components/pupup";
-import TabStatus from "../(filterTab)/filterTab";
-import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
+import TabStatus from "../components/filterTab";
+import LinkWarehouse from "../components/linkWarehouse";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";

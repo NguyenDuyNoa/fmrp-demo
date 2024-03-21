@@ -1,5 +1,5 @@
-import { debounce } from "lodash";
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
@@ -20,8 +20,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Popup_chitiet from "./components/pupup";
-import Popup_status from "../(popupStatus)/popupStatus";
-import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
+import Popup_status from "../components/popupStatus";
+import LinkWarehouse from "../components/linkWarehouse";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -103,13 +103,10 @@ const Index = (props) => {
 
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-    // thay type
-    console.log("auth", auth);
+
     const { checkAdd, checkExport } = useActionRole(auth, "productsWarehouse")
-    // purchase_products
 
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);

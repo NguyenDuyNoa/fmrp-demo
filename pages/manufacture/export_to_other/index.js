@@ -28,9 +28,9 @@ import Swal from "sweetalert2";
 import ReactExport from "react-data-export";
 
 import Popup_chitiet from "./(popup)/pupup";
-import Popup_status from "../(popupStatus)/popupStatus";
-import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
-import TabStatus from "../(filterTab)/filterTab";
+import Popup_status from "../components/popupStatus";
+import LinkWarehouse from "../components/linkWarehouse";
+import TabStatus from "../components/filterTab";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";

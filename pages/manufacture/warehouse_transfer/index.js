@@ -20,8 +20,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Popup_chitiet from "./components/pupup";
-import Popup_status from "../(popupStatus)/popupStatus";
-import LinkWarehouse from "../(linkWarehouse)/linkWarehouse";
+import Popup_status from "../components/popupStatus";
+import LinkWarehouse from "../components/linkWarehouse";
 
 
 

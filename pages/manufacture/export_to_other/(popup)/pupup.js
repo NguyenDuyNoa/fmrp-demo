@@ -29,7 +29,7 @@ import { useEffect } from "react";
 
 import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
-import LinkWarehouse from "pages/manufacture/(linkWarehouse)/linkWarehouse";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
@@ -145,8 +145,8 @@ const Popup_chitiet = (props) => {
                                             <h3 className=" text-[13px]  font-medium">
                                                 {data?.date != null
                                                     ? moment(data?.date).format(
-                                                          "DD/MM/YYYY"
-                                                      )
+                                                        "DD/MM/YYYY"
+                                                    )
                                                     : ""}
                                             </h3>
                                         </div>
@@ -190,23 +190,23 @@ const Popup_chitiet = (props) => {
                                             <div className="flex flex-wrap  gap-2 items-center ">
                                                 {(data?.warehouseman_id ===
                                                     "0" && (
-                                                    <div className=" font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                        {"Chưa duyệt kho"}
-                                                    </div>
-                                                )) ||
+                                                        <div className=" font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
+                                                            {"Chưa duyệt kho"}
+                                                        </div>
+                                                    )) ||
                                                     (data?.warehouseman_id !=
                                                         "0" && (
-                                                        <div className=" font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center">
-                                                            <TickCircle
-                                                                className="bg-lime-500 rounded-full animate-pulse "
-                                                                color="white"
-                                                                size={15}
-                                                            />
-                                                            <span>
-                                                                Đã duyệt kho
-                                                            </span>
-                                                        </div>
-                                                    ))}
+                                                            <div className=" font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center">
+                                                                <TickCircle
+                                                                    className="bg-lime-500 rounded-full animate-pulse "
+                                                                    color="white"
+                                                                    size={15}
+                                                                />
+                                                                <span>
+                                                                    Đã duyệt kho
+                                                                </span>
+                                                            </div>
+                                                        ))}
                                             </div>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -340,7 +340,7 @@ const Popup_chitiet = (props) => {
                                                                     <div>
                                                                         {e?.item
                                                                             ?.images !=
-                                                                        null ? (
+                                                                            null ? (
                                                                             <ModalImage
                                                                                 small={
                                                                                     e
@@ -384,7 +384,7 @@ const Popup_chitiet = (props) => {
                                                                         </h6>
                                                                         <div className="flex items-center font-oblique flex-wrap">
                                                                             {dataProductSerial.is_enable ===
-                                                                            "1" ? (
+                                                                                "1" ? (
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
                                                                                         Serial:
@@ -392,7 +392,7 @@ const Popup_chitiet = (props) => {
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                         {e.serial ==
                                                                                             null ||
-                                                                                        e.serial ==
+                                                                                            e.serial ==
                                                                                             ""
                                                                                             ? "-"
                                                                                             : e.serial}
@@ -403,7 +403,7 @@ const Popup_chitiet = (props) => {
                                                                             )}
                                                                             {dataMaterialExpiry.is_enable ===
                                                                                 "1" ||
-                                                                            dataProductExpiry.is_enable ===
+                                                                                dataProductExpiry.is_enable ===
                                                                                 "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
@@ -413,7 +413,7 @@ const Popup_chitiet = (props) => {
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                             {e.lot ==
                                                                                                 null ||
-                                                                                            e.lot ==
+                                                                                                e.lot ==
                                                                                                 ""
                                                                                                 ? "-"
                                                                                                 : e.lot}
@@ -428,10 +428,10 @@ const Popup_chitiet = (props) => {
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                             {e.expiration_date
                                                                                                 ? moment(
-                                                                                                      e.expiration_date
-                                                                                                  ).format(
-                                                                                                      "DD/MM/YYYY"
-                                                                                                  )
+                                                                                                    e.expiration_date
+                                                                                                ).format(
+                                                                                                    "DD/MM/YYYY"
+                                                                                                )
                                                                                                 : "-"}
                                                                                         </h6>
                                                                                     </div>
@@ -472,7 +472,7 @@ const Popup_chitiet = (props) => {
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
                                                                 {e?.note !=
-                                                                undefined ? (
+                                                                    undefined ? (
                                                                     <ExpandableContent
                                                                         content={
                                                                             e?.note

@@ -16,7 +16,7 @@ import ImageErrors from "@/components/UI/imageErrors";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 
-import LinkWarehouse from "pages/manufacture/(linkWarehouse)/linkWarehouse";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";

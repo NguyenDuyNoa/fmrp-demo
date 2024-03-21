@@ -17,7 +17,7 @@ import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 
 import useFeature from "@/hooks/useConfigFeature";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import LinkWarehouse from "pages/manufacture/(linkWarehouse)/linkWarehouse";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
