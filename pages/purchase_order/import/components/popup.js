@@ -33,6 +33,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { TagSingle } from "@/components/UI/common/Tag/TagSingle";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -128,44 +129,26 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3">
                                         <div className="my-4 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.import_payment_status ||
-                                                    "import_payment_status"}
+                                                {props.dataLang?.import_payment_status || "import_payment_status"}
                                             </h3>
                                             <div className="flex flex-wrap  gap-2 items-center justify-center">
                                                 {(data?.status_pay ===
                                                     "not_spent" && (
-                                                        <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                            {"Chưa chi"}
-                                                        </span>
+                                                        <TagColorSky className={'!py-1'} name={'Chưa chi'} />
                                                     )) ||
                                                     (data?.status_pay ===
                                                         "spent_part" && (
-                                                            <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                {"Chi 1 phần"}{" "}
-                                                                {`(${formatNumber(
-                                                                    data?.amount_paid
-                                                                )})`}
-                                                            </span>
+                                                            <TagColorOrange className={'!py-1'} name={`Chi 1 phần ${formatNumber()}`} />
                                                         )) ||
                                                     (data?.status_pay ===
                                                         "spent" && (
-                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                <TickCircle
-                                                                    className="bg-lime-500 rounded-full"
-                                                                    color="white"
-                                                                    size={15}
-                                                                />
-                                                                {"Đã chi đủ"}
-                                                            </span>
+                                                            <TagColorLime className={'!py-1'} name={'Đã chi đủ'} />
                                                         ))}
                                             </div>
                                         </div>
                                         <div className="my-4 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.import_from_browse ||
-                                                    "import_from_browse"}
+                                                {props.dataLang?.import_from_browse || "import_from_browse"}
                                             </h3>
                                             <div className="flex flex-wrap  gap-2 items-center justify-center">
                                                 <TagWarehouse data={data} />

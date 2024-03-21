@@ -23,7 +23,12 @@ const Popup_status = (props) => {
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
-
+    useEffect(() => {
+        open && sOnFetching(true)
+        setTimeout(() => {
+            sOnFetching(false)
+        }, 500)
+    }, [open]);
 
     useEffect(() => {
         sData([]);

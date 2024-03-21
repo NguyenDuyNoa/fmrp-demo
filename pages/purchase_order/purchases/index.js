@@ -65,6 +65,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
 
 const Index = (props) => {
@@ -624,30 +625,16 @@ const Index = (props) => {
                                                             {formatNumber(e?.total_item)}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2} className="flex items-center justify-center ">
-                                                            <div className="mx-auto">
-                                                                {(e?.order_status?.status === "purchase_ordered" && (
-                                                                    <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center ">
-                                                                        {dataLang[e?.order_status?.status]}
-                                                                    </span>
+                                                            {(e?.order_status?.status === "purchase_ordered" && (
+                                                                <TagColorSky name={dataLang[e?.order_status?.status]} />
+                                                            )) ||
+                                                                (e?.order_status?.status === "purchase_portion" && (
+                                                                    <TagColorOrange name={`${dataLang[e?.order_status?.status]} (${formatNumber(e?.order_status?.count)})`} />
                                                                 )) ||
-                                                                    (e?.order_status?.status === "purchase_portion" && (
-                                                                        <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center ">
-                                                                            {dataLang[e?.order_status?.status]}{" "}
-                                                                            {`(${e?.order_status?.count})`}
-                                                                        </span>
-                                                                    )) ||
-                                                                    (e?.order_status?.status === "purchase_enough" && (
-                                                                        <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center ">
-                                                                            <TickCircle
-                                                                                className="bg-lime-500 rounded-full"
-                                                                                color="white"
-                                                                                size={15}
-                                                                            />
-                                                                            {dataLang[e?.order_status?.status]}{" "}
-                                                                            {`(${e?.order_status?.count})`}
-                                                                        </span>
-                                                                    ))}
-                                                            </div>
+                                                                (e?.order_status?.status === "purchase_enough" && (
+                                                                    <TagColorLime name={`${dataLang[e?.order_status?.status]} (${e?.order_status?.count})`} />
+
+                                                                ))}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2} textAlign={'left'}>
                                                             {e?.note}

@@ -24,6 +24,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
@@ -114,15 +115,11 @@ const Popup_chitiet = (props) => {
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
                                             </h3>
-                                            <h3 className=" text-[13px] font-medium">
+                                            <h3 className=" text-[13px] font-medium flex items-center">
                                                 {data?.order_type == "0" ? (
-                                                    <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
-                                                        Tạo mới
-                                                    </span>
+                                                    <TagColorRed className={'!py-0.5'} name={'Tạo mới'} />
                                                 ) : (
-                                                    <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
-                                                        YCMH
-                                                    </span>
+                                                    <TagColorOrange className={'!py-0.5'} name='YCMH' />
                                                 )}
                                             </h3>
                                         </div>
@@ -132,43 +129,23 @@ const Popup_chitiet = (props) => {
                                         <div className="my-4 font-medium text-[13px]">
                                             {"Trạng thái nhập hàng"}
                                         </div>
-                                        <div className="flex flex-wrap  gap-2 items-center justify-start">
+                                        <div className="flex items-center">
                                             {(data?.import_status ===
                                                 "not_stocked" && (
-                                                    <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
-                                                        {props.dataLang[
-                                                            data?.import_status
-                                                        ] || data?.import_status}
-                                                    </span>
+                                                    <TagColorSky className={'!py-1'} name={props.dataLang?.stocked_part || "stocked_part"} />
                                                 )) ||
                                                 (data?.import_status ===
                                                     "stocked_part" && (
-                                                        <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
-                                                            {props.dataLang[
-                                                                data?.import_status
-                                                            ] ||
-                                                                data?.import_status}
-                                                        </span>
+                                                        <TagColorOrange className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                     )) ||
                                                 (data?.import_status ===
                                                     "stocked" && (
-                                                        <span className="flex justify-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
-                                                            <TickCircle
-                                                                className="bg-lime-500 rounded-full "
-                                                                color="white"
-                                                                size={15}
-                                                            />
-                                                            {props.dataLang[
-                                                                data?.import_status
-                                                            ] ||
-                                                                data?.import_status}
-                                                        </span>
+                                                        <TagColorLime className={'!py-0.5'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                     ))}
                                         </div>
                                         <div className="my-4 font-medium text-[13px]">
                                             {props.dataLang
-                                                ?.purchase_order_table_number ||
-                                                "purchase_order_table_number"}
+                                                ?.purchase_order_table_number || "purchase_order_table_number"}
                                         </div>
                                         <div className="flex flex-wrap  gap-2 items-center justify-start text-[13px]">
                                             {data?.purchases

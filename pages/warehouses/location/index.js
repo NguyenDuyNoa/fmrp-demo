@@ -15,13 +15,8 @@ import {
     Grid6,
 } from "iconsax-react";
 
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 import { _ServerInstance as Axios } from "/services/axios";
 
-import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
@@ -35,7 +30,6 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import NoData from "@/components/UI/noData/nodata";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

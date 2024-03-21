@@ -55,6 +55,7 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -578,30 +579,16 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'right'}>
                                                             {formatMoney(e.total_amount)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className=" flex items-center w-fit mx-auto">
-                                                            <div className="mx-auto">
-                                                                {(e?.status_pay === "not_spent" && (
-                                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 w-fit  bg-sky-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                        {"Chưa chi"}
-                                                                    </span>
+                                                        <RowItemTable colSpan={2} className=" flex items-center justify-center w-fit mx-auto">
+                                                            {(e?.status_pay === "not_spent" && (
+                                                                <TagColorSky name={"Chưa chi"} />
+                                                            )) ||
+                                                                (e?.status_pay === "spent_part" && (
+                                                                    <TagColorOrange name={`Chi 1 phần (${formatNumber(e?.amount_paid)})`} />
                                                                 )) ||
-                                                                    (e?.status_pay === "spent_part" && (
-                                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 w-fit  bg-orange-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                            {"Chi 1 phần"}{" "}
-                                                                            {`(${formatNumber(e?.amount_paid)})`}
-                                                                        </span>
-                                                                    )) ||
-                                                                    (e?.status_pay === "spent" && (
-                                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                            <TickCircle
-                                                                                className="bg-lime-500 rounded-full"
-                                                                                color="white"
-                                                                                size={15}
-                                                                            />
-                                                                            {"Đã chi đủ"}
-                                                                        </span>
-                                                                    ))}
-                                                            </div>
+                                                                (e?.status_pay === "spent" && (
+                                                                    <TagColorLime name={"Đã chi đủ"} />
+                                                                ))}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
                                                             {e.note}

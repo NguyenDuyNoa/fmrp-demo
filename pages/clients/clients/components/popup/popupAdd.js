@@ -372,9 +372,12 @@ const Popup_dskh = (props) => {
                 if (!err) {
                     const { isSuccess, message, branch_name } = response.data;
                     if (isSuccess) {
-                        isShow("success", typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message); props.onRefresh && props.onRefresh();
+                        // isShow("success", typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message);
+                        isShow("success", typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message);
+                        props.onRefresh && props.onRefresh();
                         queryState({ open: false })
                     } else {
+                        // isShow("error", typeof props?.dataLang[message] !== "undefined" ? props.dataLang[message] : message);
                         isShow("error", typeof props?.dataLang[message] !== "undefined" ? props.dataLang[message] + " " + branch_name : message);
                     }
                 }

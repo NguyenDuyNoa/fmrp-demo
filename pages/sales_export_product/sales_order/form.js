@@ -1123,10 +1123,7 @@ const Index = (props) => {
             formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-            formData.append(
-                `items[${index}][delivery_date]`,
-                item?.delivery_date != undefined ? moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss") : ""
-            );
+            formData.append(`items[${index}][delivery_date]`, item?.delivery_date != undefined ? moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss") : "");
         });
 
         if (

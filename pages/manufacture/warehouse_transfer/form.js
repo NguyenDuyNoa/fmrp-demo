@@ -1,32 +1,33 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
-
 import React, { useState, useEffect } from "react";
-
+import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
 import Select, { components } from "react-select";
+import { NumericFormat } from "react-number-format";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 
-import moment from "moment/moment";
-import { NumericFormat } from "react-number-format";
 
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import useFeature from "@/hooks/useConfigFeature";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { routerWarehouseTransfer } from "routers/manufacture";
 
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { debounce } from "lodash";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 /// Hậu viết API
 const Index = (props) => {
@@ -37,25 +38,27 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const { isOpen, isKeyState, handleQueryId } = useToggle();
+    const dataSeting = useSetingServer()
 
     const [onFetching, sOnFetching] = useState(false);
 
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+    const { isOpen, isKeyState, handleQueryId } = useToggle();
 
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
+    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
 
     const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] = useState(false);
 
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+
     const [onFetchingReceivingLocation, sOnFetchingReceivingLocation] = useState(false);
 
     const [onLoading, sOnLoading] = useState(false);
 
-    const [onLoadingChild, sOnLoadingChild] = useState(false);
-
     const [onSending, sOnSending] = useState(false);
+
+    const [onLoadingChild, sOnLoadingChild] = useState(false);
 
     const [code, sCode] = useState("");
 
@@ -77,11 +80,6 @@ const Index = (props) => {
 
     const [dataReceivingLocation, sDataReceivingLocation] = useState([]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
     //new
     const [listData, sListData] = useState([]);
 
@@ -128,9 +126,7 @@ const Index = (props) => {
                 sOnLoading(false);
             }
         });
-        Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseCombobox_not_system/?csrf_protection=true",
+        Axios("GET", "/api_web/Api_warehouse/warehouseCombobox_not_system/?csrf_protection=true",
             {},
             (err, response) => {
                 if (!err) {
@@ -151,55 +147,20 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetchingCondition(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
-
-    useEffect(() => {
-        id && sOnFetchingCondition(true);
-    }, []);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
-
     const options = dataItems?.map((e) => ({
         label: `${e.name}
-     <span style={{display: none}}>${e.code}</span>
-     <span style={{display: none}}>${e.product_variation} </span>
-     <span style={{display: none}}>${e.serial} </span>
-     <span style={{display: none}}>${e.lot} </span>
-     <span style={{display: none}}>${e.expiration_date} </span>
-     <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                <span style={{display: none}}>${e.code}</span>
+                <span style={{display: none}}>${e.product_variation} </span>
+                <span style={{display: none}}>${e.serial} </span>
+                <span style={{display: none}}>${e.lot} </span>
+                <span style={{display: none}}>${e.expiration_date} </span>
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
         value: e.id,
         e,
     }));
 
     const _ServerFetchingDetailPage = () => {
-        Axios(
-            "GET",
-
-            `/api_web/Api_transfer/getTransferDetail/${id}?csrf_protection=true`,
-            {},
+        Axios("GET", `/api_web/Api_transfer/getTransferDetail/${id}?csrf_protection=true`, {},
             (err, response) => {
                 if (!err) {
                     let rResult = response.data;
@@ -224,8 +185,7 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                    }</span>`,
+                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
                                 value: e.item?.id,
                             },
                             child: e?.child.map((ce) => ({
@@ -294,9 +254,7 @@ const Index = (props) => {
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
+        await Axios("GET", "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -313,9 +271,7 @@ const Index = (props) => {
         sOnFetchingItemsAll(false);
     };
     const _ServerFetching_ExportWarehouse = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
+        await Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -337,9 +293,7 @@ const Index = (props) => {
         sOnFetchingExportWarehouse(false);
     };
     const _ServerFetching_ReceivingLocation = async () => {
-        await Axios(
-            "GET",
-            `/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true`,
+        await Axios("GET", `/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true`,
             {
                 params: {
                     "filter[warehouse_id]": idReceiveWarehouse ? idReceiveWarehouse?.value : null,
@@ -364,9 +318,7 @@ const Index = (props) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+            Axios("POST", `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
                 {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -385,40 +337,6 @@ const Index = (props) => {
             );
         }
     }, 500)
-    // // Khai báo biến để theo dõi timeout
-    // let searchTimeout;
-
-    // const _HandleSeachApi = (inputValue) => {
-    //     if (idBranch == null || idExportWarehouse == null || inputValue == "") {
-    //         return;
-    //     } else {
-    //         // Hủy timeout cũ nếu có
-    //         clearTimeout(searchTimeout);
-
-    //         // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
-    //         searchTimeout = setTimeout(() => {
-    //             Axios(
-    //                 "POST",
-    //                 `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
-    //                 {
-    //                     params: {
-    //                         "filter[branch_id]": idBranch ? idBranch?.value : null,
-    //                     },
-
-    //                     data: {
-    //                         term: inputValue,
-    //                     },
-    //                 },
-    //                 (err, response) => {
-    //                     if (!err) {
-    //                         let { result } = response.data.data;
-    //                         sDataItems(result);
-    //                     }
-    //                 }
-    //             );
-    //         }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
-    //     }
-    // };
 
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
@@ -582,8 +500,7 @@ const Index = (props) => {
     }, [idReceiveWarehouse]);
 
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting)
     };
     const _ServerSending = () => {
         var formData = new FormData();
@@ -1550,8 +1467,8 @@ const Index = (props) => {
                                                                             "location"
                                                                         )}
                                                                         className={`${errWarehouse && ce?.location == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
+                                                                            ? "border-red-500 border"
+                                                                            : ""
                                                                             } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
@@ -1637,9 +1554,9 @@ const Index = (props) => {
                                                                             "receivingLocation"
                                                                         )}
                                                                         className={`${errReceivingLocation &&
-                                                                                ce?.receivingLocation == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
+                                                                            ce?.receivingLocation == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
                                                                             }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
@@ -1707,11 +1624,11 @@ const Index = (props) => {
                                                                             ce?.location == null || ce?.unit == null
                                                                         }
                                                                         className={`${errQty &&
-                                                                                (ce?.exportQuantity == null ||
-                                                                                    ce?.exportQuantity == "" ||
-                                                                                    ce?.exportQuantity == 0)
-                                                                                ? "border-red-500 border-b"
-                                                                                : ""
+                                                                            (ce?.exportQuantity == null ||
+                                                                                ce?.exportQuantity == "" ||
+                                                                                ce?.exportQuantity == 0)
+                                                                            ? "border-red-500 border-b"
+                                                                            : ""
                                                                             } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 disabled:bg-transparent font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                         onValueChange={_HandleChangeChild.bind(
                                                                             this,

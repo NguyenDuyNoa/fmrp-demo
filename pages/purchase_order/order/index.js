@@ -53,6 +53,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import NoData from "@/components/UI/noData/nodata";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
 
 const Index = (props) => {
@@ -626,13 +627,9 @@ const Index = (props) => {
                                                     </RowItemTable >
                                                     <RowItemTable colSpan={1} className={'flex justify-center text-center'}>
                                                         {e?.order_type == "0" ? (
-                                                            <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] min-w-[80px]">
-                                                                Tạo mới
-                                                            </span>
+                                                            <TagColorRed name={'Tạo mới'} />
                                                         ) : (
-                                                            <span className="min-w-[80px] font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
-                                                                YCMH
-                                                            </span>
+                                                            <TagColorOrange name={'YCMH'} />
                                                         )}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
@@ -659,25 +656,13 @@ const Index = (props) => {
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className="flex items-center justify-center text-center ">
                                                         {(e?.import_status === "not_stocked" && (
-                                                            <span className="font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
-                                                                {dataLang[e?.import_status] || e?.import_status}{" "}
-                                                            </span>
+                                                            <TagColorSky name={dataLang[e?.import_status]} />
                                                         )) ||
                                                             (e?.import_status === "stocked_part" && (
-                                                                <span className=" font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
-                                                                    {dataLang[e?.import_status] ||
-                                                                        e?.import_status}
-                                                                </span>
+                                                                <TagColorOrange name={dataLang[e?.import_status]} />
                                                             )) ||
                                                             (e?.import_status === "stocked" && (
-                                                                <span className="flex 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
-                                                                    <TickCircle
-                                                                        className="bg-lime-500 rounded-full "
-                                                                        color="white"
-                                                                        size={15}
-                                                                    />
-                                                                    {dataLang[e?.import_status] || e?.import_status}
-                                                                </span>
+                                                                <TagColorLime name={dataLang[e?.import_status]} />
                                                             ))}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={"text-left"} className="truncate ">

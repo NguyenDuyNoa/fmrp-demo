@@ -58,6 +58,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -672,16 +673,12 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'right'}>
                                                             {formatMoney(e.total_amount)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="mx-auto">
+                                                        <RowItemTable colSpan={1} className="mx-auto flex items-center w-fit">
                                                             {(e?.treatment_methods === "1" && (
-                                                                <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2">
-                                                                    {dataLang?.pay_down || "pay_down"}
-                                                                </div>
+                                                                <TagColorSky name={dataLang?.pay_down || "pay_down"} />
                                                             )) ||
                                                                 (e?.treatment_methods === "2" && (
-                                                                    <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2">
-                                                                        {dataLang?.debt_reduction || "debt_reduction"}
-                                                                    </div>
+                                                                    <TagColorOrange name={dataLang?.debt_reduction || "debt_reduction"} />
                                                                 ))}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>

@@ -37,6 +37,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -156,29 +157,17 @@ const Popup_chitiet = (props) => {
                                         <div className="flex flex-wrap  gap-2 items-center justify-center">
                                             {(data?.status_pay ===
                                                 "not_spent" && (
-                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 w-fit  bg-sky-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                        {"Chưa chi"}
-                                                    </span>
+                                                    <TagColorSky className={'!py-1'} name={"Chưa chi"} />
                                                 )) ||
                                                 (data?.status_pay ===
                                                     "spent_part" && (
-                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 w-fit  bg-orange-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                            {"Chi 1 phần"}{" "}
-                                                            {`(${formatNumber(
-                                                                data?.amount_paid
-                                                            )})`}
-                                                        </span>
+                                                        <TagColorOrange name={`Chi 1 phần ${formatNumber(
+                                                            data?.amount_paid
+                                                        )}`} />
                                                     )) ||
                                                 (data?.status_pay ===
                                                     "spent" && (
-                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                            <TickCircle
-                                                                className="bg-lime-500 rounded-full"
-                                                                color="white"
-                                                                size={15}
-                                                            />
-                                                            {"Đã chi đủ"}
-                                                        </span>
+                                                        <TagColorLime className={'!py-1'} name={"Đã chi đủ"} />
                                                     ))}
                                         </div>
                                     </div>

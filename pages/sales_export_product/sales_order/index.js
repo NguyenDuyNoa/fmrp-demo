@@ -47,6 +47,7 @@ import NoData from "@/components/UI/noData/nodata";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
 
 const Index = (props) => {
@@ -727,7 +728,7 @@ const Index = (props) => {
                                                                         whileHover={{ scale: 1.1 }}
                                                                         whileTap={{ scale: 0.9 }}
                                                                     >
-                                                                        <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500 ">
+                                                                        <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] border font-medium flex justify-center items-center rounded-2xl mx-auto  px-3 py-0 bg-lime-200 border-lime-200 text-lime-500 ">
                                                                             {/* <div>Phiếu báo giá</div> */}
                                                                             {/* {"("}
                                                                             <PopupDetailQuote
@@ -747,7 +748,7 @@ const Index = (props) => {
                                                                         </div>
                                                                     </Zoom>
                                                                 ) : (
-                                                                    <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
+                                                                    <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] border font-medium flex justify-center items-center rounded-2xl mx-auto w-fit px-3 py-0 bg-red-200 border-red-200 text-red-500">
                                                                         Tạo mới
                                                                     </div>
                                                                 )}
@@ -785,36 +786,23 @@ const Index = (props) => {
                                                                         ))}
                                                                 </h6>
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1}>
+                                                            <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
                                                                 {(["payment_unpaid"].includes(
                                                                     e?.status_payment
                                                                 ) && (
-                                                                        <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
-                                                                            {dataLang[e?.status_payment] ||
-                                                                                e?.status_payment}
-                                                                        </span>
+                                                                        <TagColorSky className={''} name={dataLang[e?.status_payment] || e?.status_payment} />
                                                                     )) ||
                                                                     (["payment_partially_paid"].includes(
                                                                         e?.status_payment
                                                                     ) && (
-                                                                            <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
-                                                                                {dataLang[e?.status_payment] ||
-                                                                                    e?.status_payment}{" "}
-                                                                                {`(${formatNumber(e?.total_payment)})`}
-                                                                            </span>
+                                                                            <TagColorOrange className={''} name={`${dataLang[e?.status_payment] ||
+                                                                                e?.status_payment} (${formatNumber(e?.total_payment)})`} />
                                                                         )) ||
                                                                     (["payment_paid"].includes(
                                                                         e?.status_payment
                                                                     ) && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                                <TickCircle
-                                                                                    className="bg-lime-500 rounded-full"
-                                                                                    color="white"
-                                                                                    size={15}
-                                                                                />
-                                                                                {dataLang[e?.status_payment] ||
-                                                                                    e?.status_payment}
-                                                                            </span>
+                                                                            <TagColorLime name={dataLang[e?.status_payment] || e?.status_payment} />
+
                                                                         ))}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className="w-fit mx-auto">

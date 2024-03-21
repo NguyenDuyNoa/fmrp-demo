@@ -50,6 +50,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -169,14 +170,10 @@ const Popup_chitiet = (props) => {
                                             </h3>
                                             <div className="flex flex-wrap  gap-2 items-center">
                                                 {(data?.treatment_methods === "1" && (
-                                                    <div className="cursor-default w-fit min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-1 border  rounded-2xl">
-                                                        {props.dataLang?.pay_down || "pay_down"}
-                                                    </div>
+                                                    <TagColorSky className={'!py-1'} name={props.dataLang?.pay_down || "pay_down"} />
                                                 )) ||
                                                     (data?.treatment_methods === "2" && (
-                                                        <div className="cursor-default w-fit text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-1 border   rounded-2xl">
-                                                            {props.dataLang?.debt_reduction || "debt_reduction"}
-                                                        </div>
+                                                        <TagColorOrange className={'!py-1'} name={props.dataLang?.debt_reduction || "debt_reduction"} />
                                                     ))}
                                             </div>
                                         </div>

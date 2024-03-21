@@ -47,6 +47,7 @@ import NoData from "@/components/UI/noData/nodata";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
 
 const Index = (props) => {
@@ -709,16 +710,10 @@ const Index = (props) => {
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className=" mx-auto">
                                                                 {(e?.handling_solution === "pay_down" && (
-                                                                    <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2">
-                                                                        {dataLang[e?.handling_solution] ||
-                                                                            e?.handling_solution}
-                                                                    </div>
+                                                                    <TagColorSky className={'!py-1'} name={dataLang[e?.handling_solution] || e?.handling_solution} />
                                                                 )) ||
                                                                     (e?.handling_solution === "debt_reduction" && (
-                                                                        <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2">
-                                                                            {dataLang[e?.handling_solution] ||
-                                                                                e?.handling_solution}
-                                                                        </div>
+                                                                        <TagColorOrange className={'!py-1'} name={dataLang[e?.handling_solution] || e?.handling_solution} />
                                                                     ))}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1}>

@@ -25,6 +25,8 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 const Popup_chitietThere = (props) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
@@ -153,29 +155,15 @@ const Popup_chitietThere = (props) => {
                                                 <div className="flex flex-wrap  gap-2 items-center justify-center">
                                                     {(data?.status_pay ===
                                                         "not_spent" && (
-                                                            <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-sky-500  rounded-xl py-1 px-2 w-fit  bg-sky-200 text-center">
-                                                                {"Chưa chi"}
-                                                            </span>
+                                                            <TagColorSky className={'!py-1'} name={"Chưa chi"} />
                                                         )) ||
                                                         (data?.status_pay ===
                                                             "spent_part" && (
-                                                                <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-orange-500 rounded-xl py-1 px-2 w-fit  bg-orange-200 text-center">
-                                                                    {"Chi 1 phần"}{" "}
-                                                                    {`(${formatNumber(
-                                                                        data?.amount_paid
-                                                                    )})`}
-                                                                </span>
+                                                                <TagColorOrange className={'!py-1'} name={`Chi 1 phần (${formatNumber(data?.amount_paid)})`} />
                                                             )) ||
                                                         (data?.status_pay ===
                                                             "spent" && (
-                                                                <span className="flex items-center justify-center gap-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center">
-                                                                    <TickCircle
-                                                                        className="bg-lime-500 rounded-full"
-                                                                        color="white"
-                                                                        size={15}
-                                                                    />
-                                                                    {"Đã chi đủ"}
-                                                                </span>
+                                                                <TagColorLime name={'Đã chi đủ'} />
                                                             ))}
                                                 </div>
                                             </div>
@@ -184,23 +172,7 @@ const Popup_chitietThere = (props) => {
                                                     {props.dataLang?.import_from_browse || "import_from_browse"}
                                                 </h3>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-center">
-                                                    {(data?.warehouseman_id ===
-                                                        "0" && (
-                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-[#3b82f6]  rounded-xl py-1 px-2 w-fit  bg-[#bfdbfe] text-center">
-                                                                {"Chưa duyệt kho"}
-                                                            </span>
-                                                        )) ||
-                                                        (data?.warehouseman_id !=
-                                                            "0" && (
-                                                                <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-fit  bg-lime-200 text-center">
-                                                                    <TickCircle
-                                                                        className="bg-lime-500 rounded-full"
-                                                                        color="white"
-                                                                        size={15}
-                                                                    />
-                                                                    {"Đã duyệt kho"}
-                                                                </span>
-                                                            ))}
+                                                    <TagWarehouse data={data} />
                                                 </div>
                                             </div>
                                         </div>
@@ -217,9 +189,6 @@ const Popup_chitietThere = (props) => {
                                                 <h3 className="col-span-1 text-[13px] font-medium">
                                                     {props.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                                 </h3>
-                                                {/* <h3 className="col-span-1 text-[13px] font-normal">
-                                                {data?.user_create_name}
-                                            </h3> */}
                                                 <div className="flex items-center gap-2">
                                                     <div className="relative">
                                                         <ImageErrors
@@ -582,31 +551,18 @@ const Popup_chitietThere = (props) => {
                                                     {props.dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}
                                                 </div>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-center">
+
                                                     {(data?.status_pay ===
                                                         "not_spent" && (
-                                                            <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200 text-center w-fit">
-                                                                {"Chưa chi"}
-                                                            </span>
+                                                            <TagColorSky className={'!py-1'} name={"Chưa chi"} />
                                                         )) ||
                                                         (data?.status_pay ===
                                                             "spent_part" && (
-                                                                <span className=" 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200 text-center w-fit">
-                                                                    {"Chi 1 phần"}{" "}
-                                                                    {`(${formatNumber(
-                                                                        data?.amount_paid
-                                                                    )})`}
-                                                                </span>
+                                                                <TagColorOrange className={'!py-1'} name={`Chi 1 phần (${formatNumber(data?.amount_paid)})`} />
                                                             )) ||
                                                         (data?.status_pay ===
                                                             "spent" && (
-                                                                <span className="flex items-center justify-center gap-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 text-center w-fit">
-                                                                    <TickCircle
-                                                                        className="bg-lime-500 rounded-full"
-                                                                        color="white"
-                                                                        size={15}
-                                                                    />
-                                                                    {"Đã chi đủ"}
-                                                                </span>
+                                                                <TagColorLime name={'Đã chi đủ'} />
                                                             ))}
                                                 </div>
                                             </div>
@@ -838,13 +794,9 @@ const Popup_chitietThere = (props) => {
                                                     <h3 className="font-medium">
                                                         {data?.order_type ==
                                                             "0" ? (
-                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
-                                                                Tạo mới
-                                                            </span>
+                                                            <TagColorRed name={'Tạo mới'} />
                                                         ) : (
-                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
-                                                                YCMH
-                                                            </span>
+                                                            <TagColorOrange name='YCHM' />
                                                         )}
                                                     </h3>
                                                 </div>
@@ -856,24 +808,15 @@ const Popup_chitietThere = (props) => {
                                                 </div>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-start">
                                                     {(data?.import_status === "not_stocked" && (
-                                                        <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  w-fit bg-sky-200">
-                                                            {props.dataLang[data?.import_status] || data?.import_status}
-                                                        </span>
+                                                        <TagColorSky className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                     )) ||
                                                         (data?.import_status === "stocked_part" && (
-                                                            <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  w-fit bg-orange-200">
-                                                                {props.dataLang[data?.import_status] || data?.import_status}
-                                                            </span>
+                                                            <TagColorOrange className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
+
                                                         )) ||
                                                         (data?.import_status === "stocked" && (
-                                                            <span className="flex justify-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  w-fit bg-lime-200">
-                                                                <TickCircle
-                                                                    className="bg-lime-500 rounded-full "
-                                                                    color="white"
-                                                                    size={15}
-                                                                />
-                                                                {props.dataLang[data?.import_status] || data?.import_status}
-                                                            </span>
+                                                            <TagColorLime className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
+
                                                         ))}
                                                 </div>
                                                 <div className="my-4 font-medium text-[13px]">
@@ -926,13 +869,13 @@ const Popup_chitietThere = (props) => {
                                                     <h3 className="text-[13px]">
                                                         {props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                                     </h3>
-                                                    <TagBranch className="w-fit">
+                                                    <TagBranch className="w-fit col-span-1">
                                                         {data?.branch_name}
                                                     </TagBranch>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="pr-2 w-[100%] lx:w-[110%] ">
+                                        <div className="w-full">
                                             <div className="grid grid-cols-12 sticky top-0  p-2  bg-white shadow-lg  z-10 rounded">
                                                 <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                                                     {props.dataLang?.purchase_image || "purchase_image"}
@@ -1173,24 +1116,14 @@ const Popup_chitietThere = (props) => {
                                                 <div className="flex flex-wrap  gap-2 items-center justify-start">
                                                     {(data?.order_status
                                                         ?.status === "purchase_ordered" && (
-                                                            <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-sky-200">
-                                                                {props.dataLang[data?.order_status?.status]}
-                                                            </span>
+                                                            <TagColorSky className={'!py-1'} name={props.dataLang[data?.order_status?.status]} />
                                                         )) ||
                                                         (data?.order_status?.status === "purchase_portion" && (
-                                                            <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-orange-200">
-                                                                {props.dataLang[data?.order_status?.status]}{" "}{`(${data?.order_status?.count})`}
-                                                            </span>
+                                                            <TagColorOrange className={'!py-1'} name={`${props.dataLang[data?.order_status?.status]} (${data?.order_status?.count})`} />
                                                         )) ||
                                                         (data?.order_status?.status === "purchase_enough" && (
-                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-lime-200">
-                                                                <TickCircle
-                                                                    className="bg-lime-500 rounded-full"
-                                                                    color="white"
-                                                                    size={15}
-                                                                />
-                                                                {props.dataLang[data?.order_status?.status]}{" "}{`(${data?.order_status?.count})`}
-                                                            </span>
+                                                            <TagColorLime className={'!py-1'} name={`${props.dataLang[data?.order_status?.status]} (${data?.order_status?.count})`} />
+
                                                         ))}
                                                 </div>
                                             </div>
@@ -1438,13 +1371,11 @@ const Popup_chitietThere = (props) => {
                                                     </h3>
                                                     <h3 className=" font-medium">
                                                         {data?.order_type == "0" ? (
-                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200">
-                                                                Tạo mới
-                                                            </span>
+
+                                                            <TagColorRed className={'!py-1'} name='Tạo mới' />
                                                         ) : (
-                                                            <span className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200">
-                                                                YCMH
-                                                            </span>
+                                                            <TagColorOrange className={'!py-1'} name={'YCMH'} />
+
                                                         )}
                                                     </h3>
                                                 </div>
@@ -1456,24 +1387,13 @@ const Popup_chitietThere = (props) => {
                                                 </div>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-start">
                                                     {(data?.import_status === "not_stocked" && (
-                                                        <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
-                                                            {props.dataLang[data?.import_status] || data?.import_status}
-                                                        </span>
+                                                        <TagColorSky className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                     )) ||
                                                         (data?.import_status === "stocked_part" && (
-                                                            <span className="flex justify-center items-center font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
-                                                                {props.dataLang[data?.import_status] || data?.import_status}
-                                                            </span>
+                                                            <TagColorOrange className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                         )) ||
                                                         (data?.import_status === "stocked" && (
-                                                            <span className="flex justify-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
-                                                                <TickCircle
-                                                                    className="bg-lime-500 rounded-full "
-                                                                    color="white"
-                                                                    size={15}
-                                                                />
-                                                                {props.dataLang[data?.import_status] || data?.import_status}
-                                                            </span>
+                                                            <TagColorLime className={'!py-1'} name={props.dataLang[data?.import_status] || data?.import_status} />
                                                         ))}
                                                 </div>
                                                 <div className="my-4 font-medium text-[13px]">

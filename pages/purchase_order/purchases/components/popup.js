@@ -26,6 +26,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
@@ -123,45 +124,16 @@ const Popup_chitiet = (props) => {
                                         <div className="flex flex-wrap  gap-2 items-center justify-start">
                                             {(data?.order_status?.status ===
                                                 "purchase_ordered" && (
-                                                    <span className="text-center font-normal text-sky-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-sky-200">
-                                                        {
-                                                            props.dataLang[
-                                                            data?.order_status
-                                                                ?.status
-                                                            ]
-                                                        }
-                                                    </span>
+                                                    <TagColorSky className={'!py-1'} name={props.dataLang[data?.order_status?.status]} />
                                                 )) ||
                                                 (data?.order_status?.status ===
                                                     "purchase_portion" && (
-                                                        <span className="text-center font-normal text-orange-500 rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-orange-200">
-                                                            {
-                                                                props.dataLang[
-                                                                data
-                                                                    ?.order_status
-                                                                    ?.status
-                                                                ]
-                                                            }{" "}
-                                                            {`(${data?.order_status?.count})`}
-                                                        </span>
+                                                        <TagColorOrange className={'!py-1'} name={`${props.dataLang[data?.order_status?.status]} (${data?.order_status?.count})`} />
                                                     )) ||
                                                 (data?.order_status?.status ===
                                                     "purchase_enough" && (
-                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] w-fit  bg-lime-200">
-                                                            <TickCircle
-                                                                className="bg-lime-500 rounded-full"
-                                                                color="white"
-                                                                size={15}
-                                                            />
-                                                            {
-                                                                props.dataLang[
-                                                                data
-                                                                    ?.order_status
-                                                                    ?.status
-                                                                ]
-                                                            }{" "}
-                                                            {`(${data?.order_status?.count})`}
-                                                        </span>
+                                                        <TagColorLime className={'!py-1'} name={`${props.dataLang[data?.order_status?.status]} (${data?.order_status?.count})`} />
+
                                                     ))}
                                         </div>
                                     </div>

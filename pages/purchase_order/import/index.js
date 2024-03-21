@@ -61,6 +61,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -681,7 +682,7 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} className="flex items-center w-fit mx-auto">
                                                             <div className="mx-auto">
                                                                 <Popup_chitietThere
-                                                                    className="py-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] px-2 bg-gradient-to-br font-normal text-lime-500 bg-lime-200 items-center rounded-full shadow-2xl cursor-pointer hover:scale-105 transition duration-300 ease-out hover:bg-lime-500 hover:text-white"
+                                                                    className="3xl:py-0 py-1 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] px-2 bg-gradient-to-br font-normal text-orange-500 bg-orange-200 items-center rounded-full shadow-2xl cursor-pointer hover:scale-105 transition duration-300 ease-out hover:bg-orange-500 hover:text-white"
                                                                     name={e?.purchase_order_code}
                                                                     dataLang={dataLang}
                                                                     id={e?.purchase_order_id}
@@ -698,30 +699,16 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'right'}>
                                                             {formatMoney(e.total_amount)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className="flex items-center  mx-auto">
-                                                            <div className="mx-auto">
-                                                                {(e?.status_pay === "not_spent" && (
-                                                                    <span className=" font-normal text-sky-500  rounded-xl py-1 px-[19px]  bg-sky-200 text-center 3xl:items-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                        {"Chưa chi"}
-                                                                    </span>
+                                                        <RowItemTable colSpan={2} className="flex items-center w-fit mx-auto">
+                                                            {(e?.status_pay === "not_spent" && (
+                                                                <TagColorSky name={"Chưa chi"} />
+                                                            )) ||
+                                                                (e?.status_pay === "spent_part" && (
+                                                                    <TagColorOrange name={`Chi 1 phần (${formatMoney(e?.amount_paid)})`} />
                                                                 )) ||
-                                                                    (e?.status_pay === "spent_part" && (
-                                                                        <span className=" font-normal text-orange-500 rounded-xl py-1 px-2   bg-orange-200 text-center 3xl:items-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                                            {"Chi 1 phần"}{" "}
-                                                                            {`(${formatMoney(e?.amount_paid)})`}
-                                                                        </span>
-                                                                    )) ||
-                                                                    (e?.status_pay === "spent" && (
-                                                                        <span className="flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2   bg-lime-200 text-center 3xl:items-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]  justify-center">
-                                                                            <TickCircle
-                                                                                className="bg-lime-500 rounded-full"
-                                                                                color="white"
-                                                                                size={15}
-                                                                            />
-                                                                            {"Đã chi đủ"}
-                                                                        </span>
-                                                                    ))}
-                                                            </div>
+                                                                (e?.status_pay === "spent" && (
+                                                                    <TagColorLime name={'Đã chi đủ'} />
+                                                                ))}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="cursor-pointer">
                                                             <ButtonWarehouse
