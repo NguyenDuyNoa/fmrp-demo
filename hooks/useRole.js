@@ -28,7 +28,8 @@ const useActionRole = (auth, type) => {
         "return_suppliers": 'returns',
         "warehouse": "warehouse",
         'warehouse_location': "warehouse_location",
-        "transfer": "warehouseTransfer"
+        "transfer": "warehouseTransfer",
+        "suggest_exporting": "production_warehouse"
         // Thêm các type ||  nameModel
 
 

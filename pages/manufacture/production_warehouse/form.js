@@ -1,35 +1,42 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
-
+import { debounce } from "lodash";
+import Select from "react-select";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import Select, { components } from "react-select";
-import { NumericFormat } from "react-number-format";
-
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import Loading from "@/components/UI/loading";
+import { Container } from "@/components/UI/common/layout";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 
 import { routerProductionWarehouse } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { debounce } from "lodash";
+
+import { isAllowedNumber } from "@/utils/helpers/common";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Index = (props) => {
     const router = useRouter();
 
     const isShow = useToast();
+
+    const dataSeting = useSetingServer()
 
     const id = router.query?.id;
 
@@ -40,8 +47,6 @@ const Index = (props) => {
     const [onFetching, sOnFetching] = useState(false);
 
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
 
@@ -69,11 +74,10 @@ const Index = (props) => {
 
     const [dataWarehouse, sDataWarehouse] = useState([]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const trangthaiExprired = useStatusExprired();
 
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
-    const [dataProductSerial, sDataProductSerial] = useState({});
     //new
     const [listData, sListData] = useState([]);
 
@@ -101,7 +105,6 @@ const Index = (props) => {
         router.query && sStartDate(new Date());
         router.query && sNote("");
     }, [router.query]);
-    const trangthaiExprired = useStatusExprired();
 
     const _ServerFetching = () => {
         sOnLoading(true);
@@ -119,45 +122,14 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetchingCondition(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
-
-    useEffect(() => {
-        id && sOnFetchingCondition(true);
-    }, []);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
-
     const options = dataItems?.map((e) => ({
         label: `${e.name}
-     <span style={{display: none}}>${e.code}</span>
-     <span style={{display: none}}>${e.product_variation} </span>
-     <span style={{display: none}}>${e.serial} </span>
-     <span style={{display: none}}>${e.lot} </span>
-     <span style={{display: none}}>${e.expiration_date} </span>
-     <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                <span style={{display: none}}>${e.code}</span>
+                <span style={{display: none}}>${e.product_variation} </span>
+                <span style={{display: none}}>${e.serial} </span>
+                <span style={{display: none}}>${e.lot} </span>
+                <span style={{display: none}}>${e.expiration_date} </span>
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
         value: e.id,
         e,
     }));
@@ -250,21 +222,11 @@ const Index = (props) => {
     }, [onFetchingDetail]);
 
     useEffect(() => {
-        id &&
-            JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}" &&
-            sOnFetchingDetail(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) !== "{}" &&
-        JSON.stringify(dataProductExpiry) !== "{}" &&
-        JSON.stringify(dataProductSerial) !== "{}",
-    ]);
+        id && JSON.stringify(dataMaterialExpiry) !== "{}" && JSON.stringify(dataProductExpiry) !== "{}" && JSON.stringify(dataProductSerial) !== "{}" && sOnFetchingDetail(true);
+    }, [JSON.stringify(dataMaterialExpiry) !== "{}" && JSON.stringify(dataProductExpiry) !== "{}" && JSON.stringify(dataProductSerial) !== "{}"]);
 
     const _ServerFetching_ItemsAll = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
+        await Axios("GET", "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -282,9 +244,7 @@ const Index = (props) => {
     };
 
     const _ServerFetching_ExportWarehouse = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
+        await Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -312,14 +272,11 @@ const Index = (props) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+            Axios("POST", `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
                 {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
                     },
-
                     data: {
                         term: inputValue,
                     },
@@ -333,47 +290,14 @@ const Index = (props) => {
             );
         }
     }, 500)
-    // // Khai báo biến để theo dõi timeout
-    // let searchTimeout;
 
-    // const _HandleSeachApi = (inputValue) => {
-    //     if (idBranch == null || idExportWarehouse == null || inputValue == "") {
-    //         return;
-    //     } else {
-    //         // Hủy timeout cũ nếu có
-    //         clearTimeout(searchTimeout);
-
-    //         // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
-    //         searchTimeout = setTimeout(() => {
-    //             Axios(
-    //                 "POST",
-    //                 `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
-    //                 {
-    //                     params: {
-    //                         "filter[branch_id]": idBranch ? idBranch?.value : null,
-    //                     },
-
-    //                     data: {
-    //                         term: inputValue,
-    //                     },
-    //                 },
-    //                 (err, response) => {
-    //                     if (!err) {
-    //                         var { result } = response.data.data;
-    //                         sDataItems(result);
-    //                     }
-    //                 }
-    //             );
-    //         }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
-    //     }
-    // };
 
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
             sDataItems([]);
             sListData([]);
-            sIdBranch(isKeyState?.value);
             sIdExportWarehouse(null);
+            sIdBranch(isKeyState?.value);
         }
         if (isKeyState?.type === "idExportWarehouse") {
             sDataItems([]);
@@ -382,6 +306,7 @@ const Index = (props) => {
         }
         handleQueryId({ status: false });
     };
+
 
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
@@ -397,6 +322,7 @@ const Index = (props) => {
                 }
             } else {
                 sDataItems([]);
+                sIdExportWarehouse(null);
                 sIdBranch(value);
             }
         } else if (type == "idExportWarehouse" && idExportWarehouse != value) {
@@ -427,14 +353,7 @@ const Index = (props) => {
 
         const hasNullUnit = listData.some((item) => item.child?.some((childItem) => childItem.unit === null));
 
-        const hasNullQty = listData.some((item) =>
-            item.child?.some(
-                (childItem) =>
-                    childItem.exportQuantity === null ||
-                    childItem.exportQuantity === "" ||
-                    childItem.exportQuantity == 0
-            )
-        );
+        const hasNullQty = listData.some((item) => item.child?.some((childItem) => childItem.exportQuantity === null || childItem.exportQuantity === "" || childItem.exportQuantity == 0));
 
         const isEmpty = listData?.length === 0 ? true : false;
 
@@ -481,21 +400,17 @@ const Index = (props) => {
         idBranch != null && sOnFetchingExportWarehouse(true);
         idBranch == null && sIdExportWarehouse(null);
         idBranch == null && sDataWarehouse([]);
+        // sIdExportWarehouse(null);
     }, [idBranch]);
 
     useEffect(() => {
         idExportWarehouse != null && sOnFetchingItemsAll(true);
         idExportWarehouse == null && sDataItems([]);
     }, [idExportWarehouse]);
-    // useEffect(() => {
-    //     idBranch != null &&
-    //         idExportWarehouse != null &&
-    //         sOnFetchingItemsAll(true);
-    // }, [idBranch, idExportWarehouse]);
+
 
     const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
 
     const _ServerSending = () => {
@@ -512,19 +427,11 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
                 formData.append(`items[${index}][child][${childIndex}][unit]`, childItem?.unit?.value);
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
-                formData.append(
-                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.location?.value || 0
-                );
+                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.exportQuantity);
             });
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true`
-                : `/api_web/Api_stock/exportProduction/?csrf_protection=true`
-            }`,
+        Axios("POST", `${id ? `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true` : `/api_web/Api_stock/exportProduction/?csrf_protection=true`}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -533,7 +440,7 @@ const Index = (props) => {
                 if (!err) {
                     let { isSuccess, message, item } = response.data;
                     if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
+                        isShow("success", `${dataLang[message]}` || message);
                         sCode("");
                         sStartDate(new Date());
                         sIdBranch(null);
@@ -546,9 +453,7 @@ const Index = (props) => {
                         sListData([]);
                         router.push(routerProductionWarehouse.home);
                     } else {
-                        handleCheckError(
-                            `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
-                        );
+                        handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
                     }
                 }
                 sOnSending(false);
@@ -713,9 +618,7 @@ const Index = (props) => {
                         updatedChild.numberOfConversions = newSoluongquydoi;
                     }
                 } else if (type === "location") {
-                    const checkKho = newData[parentIndex].child
-                        .map((house) => house)
-                        .some((i) => i?.location?.value === value?.value);
+                    const checkKho = newData[parentIndex].child.map((house) => house).some((i) => i?.location?.value === value?.value);
                     if (checkKho) {
                         handleCheckError("Vị trí xuất đã được chọn");
                     } else {
@@ -736,8 +639,7 @@ const Index = (props) => {
                         handleQuantityError(updatedChild?.location?.qty);
                     } else {
                         updatedChild.exportQuantity = Number(updatedChild.exportQuantity) + 1;
-                        updatedChild.numberOfConversions =
-                            Number(updatedChild.exportQuantity) * Number(updatedChild.exchangeValue);
+                        updatedChild.numberOfConversions = Number(updatedChild.exportQuantity) * Number(updatedChild.exchangeValue);
                     }
                 } else if (type === "decrease") {
                     if (updatedChild.location == null) {
@@ -746,8 +648,7 @@ const Index = (props) => {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (updatedChild.exportQuantity >= 2) {
                         updatedChild.exportQuantity = Number(updatedChild.exportQuantity) - 1;
-                        updatedChild.numberOfConversions =
-                            Number(updatedChild.exportQuantity) * Number(updatedChild.exchangeValue);
+                        updatedChild.numberOfConversions = Number(updatedChild.exportQuantity) * Number(updatedChild.exchangeValue);
                     }
                 } else if (type === "note") {
                     updatedChild.note = value?.target.value;
@@ -789,18 +690,10 @@ const Index = (props) => {
                                     qty: e?.quantity,
                                 })),
                                 disabledDate:
-                                    (value?.e?.text_type === "material" &&
-                                        dataMaterialExpiry?.is_enable === "1" &&
-                                        false) ||
-                                    (value?.e?.text_type === "material" &&
-                                        dataMaterialExpiry?.is_enable === "0" &&
-                                        true) ||
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "1" &&
-                                        false) ||
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "0" &&
-                                        true),
+                                    (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                                    (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
+                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
                                 unit: {
                                     label: value?.e?.unit[0].unit,
                                     value: value?.e?.unit[0].id,
@@ -839,27 +732,30 @@ const Index = (props) => {
             <Head>
                 <title>{id ? dataLang?.production_warehouse_edit : dataLang?.production_warehouse_add}</title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
-                <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+            <Container className={'!h-auto'}>
+                {trangthaiExprired ? (
+                    <EmptyExprired />) :
+                    (
+                        <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                             <h6 className="text-[#141522]/40">
                                 {dataLang?.production_warehouse || "production_warehouse"}
                             </h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6>{id ? dataLang?.production_warehouse_edit : dataLang?.production_warehouse_add}</h6>
+                            <h6> {id ? dataLang?.production_warehouse_edit || "production_warehouse_edit"
+                                : dataLang?.production_warehouse_add || "production_warehouse_add"}</h6>
                         </div>
                     )}
+                <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
-                            {id ? dataLang?.production_warehouse_edit : dataLang?.production_warehouse_add}
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            {id
+                                ? dataLang?.production_warehouse_edit || "production_warehouse_edit"
+                                : dataLang?.production_warehouse_add || "production_warehouse_add"}
                         </h2>
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center mr-2">
                             <button
-                                onClick={() => router.push("/manufacture/production_warehouse?tab=all")}
-                                className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                                onClick={() => router.push(routerProductionWarehouse.home)}
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
                             </button>
@@ -869,8 +765,7 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione ||
-                                    "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
@@ -979,8 +874,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.production_warehouse_expWarehouse ||
-                                            "production_warehouse_expWarehouse"}{" "}
+                                        {dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
@@ -992,10 +886,7 @@ const Index = (props) => {
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.production_warehouse_expWarehouse ||
-                                            "production_warehouse_expWarehouse"
-                                        }
+                                        placeholder={dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}
                                         className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
                                             } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
@@ -1107,16 +998,13 @@ const Index = (props) => {
                                     {"ĐVT"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_export_quantity ||
-                                        "production_warehouse_export_quantity"}
+                                    {dataLang?.production_warehouse_export_quantity || "production_warehouse_export_quantity"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_exchange_value ||
-                                        "production_warehouse_exchange_value"}
+                                    {dataLang?.production_warehouse_exchange_value || "production_warehouse_exchange_value"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_amount_of_conversion ||
-                                        "production_warehouse_amount_of_conversion"}
+                                    {dataLang?.production_warehouse_amount_of_conversion || "production_warehouse_amount_of_conversion"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {dataLang?.production_warehouse_note || "production_warehouse_note"}
@@ -1179,19 +1067,14 @@ const Index = (props) => {
                                                             Serial: {option.e?.serial ? option.e?.serial : "-"}
                                                         </div>
                                                     )}
-                                                    {dataMaterialExpiry.is_enable === "1" ||
-                                                        dataProductExpiry.is_enable === "1" ? (
+                                                    {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
                                                             </div>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Date:{" "}
-                                                                {option.e?.expiration_date
-                                                                    ? moment(option.e?.expiration_date).format(
-                                                                        "DD/MM/YYYY"
-                                                                    )
-                                                                    : "-"}
+                                                                {option.e?.expiration_date ? moment(option.e?.expiration_date).format("DD/MM/YYYY") : "-"}
                                                             </div>
                                                         </>
                                                     ) : (
@@ -1260,11 +1143,6 @@ const Index = (props) => {
                                         isDisabled={true}
                                     />
                                 </div>
-                                {/* <input
-                  placeholder={"Số lượng xuất"}
-                  disabled
-                  className=" disabled:bg-gray-50 text-center col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
-                /> */}
                                 <div className="col-span-1 flex items-center justify-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
                                         <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
@@ -1357,28 +1235,18 @@ const Index = (props) => {
                                                                             {dataProductSerial.is_enable === "1" && (
                                                                                 <div className="text-[11px] text-[#667085] font-[500]">
                                                                                     Serial:{" "}
-                                                                                    {option.e?.serial
-                                                                                        ? option.e?.serial
-                                                                                        : "-"}
+                                                                                    {option.e?.serial ? option.e?.serial : "-"}
                                                                                 </div>
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                                dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
-                                                                                        {option.e?.lot
-                                                                                            ? option.e?.lot
-                                                                                            : "-"}
+                                                                                        {option.e?.lot ? option.e?.lot : "-"}
                                                                                     </div>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Date:{" "}
-                                                                                        {option.e?.expiration_date
-                                                                                            ? moment(
-                                                                                                option.e
-                                                                                                    ?.expiration_date
-                                                                                            ).format("DD/MM/YYYY")
-                                                                                            : "-"}
+                                                                                        {option.e?.expiration_date ? moment(option.e?.expiration_date).format("DD/MM/YYYY") : "-"}
                                                                                     </div>
                                                                                 </>
                                                                             ) : (
@@ -1436,14 +1304,14 @@ const Index = (props) => {
                                                         <Add className="" />
                                                     </button>
                                                 </div>
-                                                {e?.child?.filter((e) => e?.location == null).length >= 2 && (
+                                                {e?.child?.filter((e) => e?.location == null)?.length >= 2 && (
                                                     <button
                                                         onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
                                                         className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
                                                     >
                                                         <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                                         <span className="relative text-xs">
-                                                            Xóa {e?.child?.filter((e) => e?.location == null).length}{" "}
+                                                            Xóa {e?.child?.filter((e) => e?.location == null)?.length}{" "}
                                                             hàng chưa chọn vị trí
                                                         </span>
                                                     </button>
@@ -1461,30 +1329,12 @@ const Index = (props) => {
                                                                     <Select
                                                                         options={ce?.dataWarehouse}
                                                                         value={ce?.location}
-                                                                        isLoading={
-                                                                            ce?.location != null
-                                                                                ? false
-                                                                                : onLoadingChild
-                                                                        }
-                                                                        onChange={_HandleChangeChild.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            ce?.id,
-                                                                            "location"
-                                                                        )}
-                                                                        className={`${errWarehouse && ce?.location == null
-                                                                            ? "border-red-500 border"
-                                                                            : ""
+                                                                        isLoading={ce?.location != null ? false : onLoadingChild}
+                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "location")}
+                                                                        className={`${errWarehouse && ce?.location == null ? "border-red-500 border" : ""
                                                                             }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                        placeholder={
-                                                                            onLoadingChild
-                                                                                ? ""
-                                                                                : dataLang?.production_warehouse_expLoca ||
-                                                                                "production_warehouse_expLoca"
-                                                                        }
-                                                                        noOptionsMessage={() =>
-                                                                            dataLang?.returns_nodata || "returns_nodata"
-                                                                        }
+                                                                        placeholder={onLoadingChild ? "" : dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"}
+                                                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                                                         menuPortalTarget={document.body}
                                                                         formatOptionLabel={(option) =>
                                                                             option?.label != null && (
@@ -1498,8 +1348,7 @@ const Index = (props) => {
                                                                                     <div className="flex gap-1">
                                                                                         {
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                                {dataLang?.returns_survive ||
-                                                                                                    "returns_survive"}
+                                                                                                {dataLang?.returns_survive || "returns_survive"}
                                                                                                 :
                                                                                             </h2>
                                                                                         }
@@ -1531,25 +1380,15 @@ const Index = (props) => {
                                                                     <Select
                                                                         options={ce?.dataUnit}
                                                                         value={ce?.unit}
-                                                                        isLoading={
-                                                                            ce?.unit == null ? onLoadingChild : false
-                                                                        }
-                                                                        onChange={_HandleChangeChild.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            ce?.id,
-                                                                            "unit"
-                                                                        )}
+                                                                        isLoading={ce?.unit == null ? onLoadingChild : false}
+                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "unit")}
                                                                         noOptionsMessage={() =>
                                                                             dataLang?.returns_nodata || "returns_nodata"
                                                                         }
                                                                         placeholder={
-                                                                            dataLang?.production_warehouse_unit ||
-                                                                            "production_warehouse_unit"
+                                                                            dataLang?.production_warehouse_unit || "production_warehouse_unit"
                                                                         }
-                                                                        className={`${errUnit && ce?.unit == null
-                                                                            ? "border-red-500 border"
-                                                                            : ""
+                                                                        className={`${errUnit && ce?.unit == null ? "border-red-500 border" : ""
                                                                             }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
                                                                         menuPortalTarget={document.body}
                                                                         style={{
@@ -1560,13 +1399,11 @@ const Index = (props) => {
                                                                         formatOptionLabel={(option) => (
                                                                             <div className="flex justify-start flex-wrap items-center">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full ">
-                                                                                    {dataLang?.production_warehouse_unit ||
-                                                                                        "production_warehouse_unit"}
+                                                                                    {dataLang?.production_warehouse_unit || "production_warehouse_unit"}
                                                                                     : {option?.label}
                                                                                 </h2>
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">{`${dataLang?.production_warehouse_exchange_value ||
-                                                                                    "production_warehouse_exchange_value"
-                                                                                    }: (${option?.coefficient})`}</h2>
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
+                                                                                    {`${dataLang?.production_warehouse_exchange_value || "production_warehouse_exchange_value"}: (${option?.coefficient})`}</h2>
                                                                             </div>
                                                                         )}
                                                                         theme={(theme) => ({
@@ -1584,12 +1421,7 @@ const Index = (props) => {
                                                                 <div className="flex items-center justify-center  h-full p-0.5">
                                                                     <button
                                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                        onClick={_HandleChangeChild.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            ce?.id,
-                                                                            "decrease"
-                                                                        )}
+                                                                        onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}
                                                                     >
                                                                         <Minus
                                                                             className="2xl:scale-100 xl:scale-100 scale-50"
@@ -1597,46 +1429,20 @@ const Index = (props) => {
                                                                         />
                                                                     </button>
 
-                                                                    <NumericFormat
-                                                                        placeholder={
-                                                                            (ce?.location == null ||
-                                                                                ce?.unit == null) &&
-                                                                            "Chọn vị trí và Đvt trước"
-                                                                        }
-                                                                        disabled={
-                                                                            ce?.location == null || ce?.unit == null
-                                                                        }
-                                                                        className={`${errQty &&
-                                                                            (ce?.exportQuantity == null ||
-                                                                                ce?.exportQuantity == "" ||
-                                                                                ce?.exportQuantity == 0)
-                                                                            ? "border-red-500 border-b"
-                                                                            : ""
-                                                                            }  placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
-                                                                        onValueChange={_HandleChangeChild.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            ce?.id,
-                                                                            "exportQuantity"
-                                                                        )}
+                                                                    <InPutNumericFormat
+                                                                        placeholder={(ce?.location == null || ce?.unit == null) && "Chọn vị trí và Đvt trước"}
+                                                                        disabled={ce?.location == null || ce?.unit == null}
+                                                                        className={`${errQty && (ce?.exportQuantity == null || ce?.exportQuantity == "" || ce?.exportQuantity == 0) ? "border-red-500 border-b" : ""}
+                                                                            ${(ce?.exportQuantity == null || ce?.exportQuantity == "" || ce?.exportQuantity == 0) && 'border-b border-red-500'}
+                                                                            placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
+                                                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "exportQuantity")}
                                                                         value={ce?.exportQuantity}
-                                                                        allowNegative={false}
-                                                                        // decimalScale={
-                                                                        //     0
-                                                                        // }
-                                                                        isNumericString={true}
-                                                                        // decimalSeparator=","
-                                                                        thousandSeparator=","
+                                                                        isAllowed={isAllowedNumber}
                                                                     />
 
                                                                     <button
                                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                        onClick={_HandleChangeChild.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            ce?.id,
-                                                                            "increase"
-                                                                        )}
+                                                                        onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}
                                                                     >
                                                                         <Add
                                                                             className="2xl:scale-100 xl:scale-100 scale-50"
@@ -1648,21 +1454,13 @@ const Index = (props) => {
                                                                     {ce?.exchangeValue}
                                                                 </div>
                                                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                    {formatNumber(
-                                                                        // ce?.exportQuantity * Number(ce?.exchangeValue)
-                                                                        ce?.exportQuantity / ce?.exchangeValue || 0
-                                                                    )}{" "}
+                                                                    {formatNumber(ce?.exportQuantity / ce?.exchangeValue || 0)}{" "}
                                                                     {ce?.unit?.label}
                                                                 </div>
                                                                 <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
                                                                     <input
                                                                         value={ce?.note}
-                                                                        onChange={_HandleChangeChild.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            ce?.id,
-                                                                            "note"
-                                                                        )}
+                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
                                                                         placeholder="Ghi chú"
                                                                         type="text"
                                                                         className="  placeholder:text-slate-300  w-full bg-white rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none"
@@ -1671,11 +1469,7 @@ const Index = (props) => {
                                                                 <div className=" h-full p-0.5 flex flex-col items-center justify-center">
                                                                     <button
                                                                         title="Xóa"
-                                                                        onClick={_HandleDeleteChild.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            ce?.id
-                                                                        )}
+                                                                        onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
                                                                         className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
                                                                     >
                                                                         <IconDelete />
@@ -1729,10 +1523,7 @@ const Index = (props) => {
                                     {formatNumber(
                                         listData?.reduce((total, item) => {
                                             item?.child?.forEach((childItem) => {
-                                                if (
-                                                    childItem.exportQuantity !== undefined &&
-                                                    childItem.exportQuantity !== null
-                                                ) {
+                                                if (childItem.exportQuantity !== undefined && childItem.exportQuantity !== null) {
                                                     total += childItem.exportQuantity;
                                                 }
                                             });
@@ -1759,7 +1550,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
@@ -1773,35 +1564,5 @@ const Index = (props) => {
     );
 };
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    // const label = `+ ${length}`;
-    const label = ``;
-
-    return <div title={title}>{label}</div>;
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 0;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 
 export default Index;

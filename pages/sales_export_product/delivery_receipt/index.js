@@ -523,61 +523,54 @@ const Index = (props) => {
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
-                                            <div className="col-span-1">
-                                                <SearchComponent dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleOnChangeKeySearch.bind(this)} />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <SelectComponent
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label: dataLang?.price_quote_branch || "price_quote_branch",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...isState.listBr,
-                                                    ]}
-                                                    onChange={(e) => queryState({ idBranch: e })}
-                                                    value={isState.idBranch}
-                                                    placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
-                                                    // placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
-                                                    isClearable={true}
-                                                />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <SelectComponent
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label: dataLang?.delivery_receipt_code || "delivery_receipt_code",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...isState.listDelivery,
-                                                    ]}
-                                                    onInputChange={handleSearchApiOrders.bind(this)}
-                                                    onChange={(e) => queryState({ idDelivery: e })}
-                                                    value={isState.idDelivery}
-                                                    placeholder={dataLang?.delivery_receipt_code || "delivery_receipt_code"}
-                                                    isClearable={true}
-                                                />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <SelectComponent
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label: dataLang?.price_quote_customer || "price_quote_customer",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...isState.listCustomer,
-                                                    ]}
-                                                    onChange={(e) => queryState({ idCustomer: e })}
-                                                    value={isState.idCustomer}
-                                                    onInputChange={handleSearchApiClient.bind(this)}
-                                                    placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
-                                                    // placeholder={dataLang?.price_quote_select_customer || "price_quote_select_customer"}
-                                                    isClearable={true}
-                                                />
-                                            </div>
+                                            <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleOnChangeKeySearch.bind(this)} />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...isState.listBr,
+                                                ]}
+                                                onChange={(e) => queryState({ idBranch: e })}
+                                                value={isState.idBranch}
+                                                placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
+                                                isClearable={true}
+                                                colSpan={1}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.delivery_receipt_code || "delivery_receipt_code",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...isState.listDelivery,
+                                                ]}
+                                                onInputChange={handleSearchApiOrders.bind(this)}
+                                                onChange={(e) => queryState({ idDelivery: e })}
+                                                value={isState.idDelivery}
+                                                placeholder={dataLang?.delivery_receipt_code || "delivery_receipt_code"}
+                                                isClearable={true}
+                                                colSpan={1}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.price_quote_customer || "price_quote_customer",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...isState.listCustomer,
+                                                ]}
+                                                onChange={(e) => queryState({ idCustomer: e })}
+                                                value={isState.idCustomer}
+                                                onInputChange={handleSearchApiClient.bind(this)}
+                                                placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
+                                                isClearable={true}
+                                                colSpan={1}
+                                            />
                                             <DatepickerComponent colSpan={1} value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
                                         </div>
                                     </div>

@@ -563,7 +563,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_branch || "purchase_order_branch",
+                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
@@ -580,7 +580,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode",
+                                                        label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.lisCode,
@@ -649,7 +649,7 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px]">
+                            <Customscrollbar>
                                 <div className="w-full">
                                     <HeaderTable gridCols={11} display={'grid'}>
                                         <ColumnTable colSpan={1} textAlign={'center'}>
