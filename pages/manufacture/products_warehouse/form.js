@@ -25,11 +25,20 @@ import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/
 
 import { routerProductsWarehouse } from "@/routers/manufacture";
 import { debounce } from "lodash";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useFeature from "@/hooks/useConfigFeature";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { isAllowedNumber } from "@/utils/helpers/common";
 
 const Index = (props) => {
     const router = useRouter();
 
     const isShow = useToast();
+
+    const dataSeting = useSetingServer()
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
@@ -69,11 +78,7 @@ const Index = (props) => {
 
     const [dataItems, sDataItems] = useState([]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
     //new
 
     const trangthaiExprired = useStatusExprired();
@@ -129,53 +134,20 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetchingCondition(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
-
-    useEffect(() => {
-        id && sOnFetchingCondition(true);
-    }, []);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
-
     const options = dataItems?.map((e) => ({
         label: `${e.name}
-     <span style={{display: none}}>${e.code}</span>
-     <span style={{display: none}}>${e.product_variation} </span>
-     <span style={{display: none}}>${e.serial} </span>
-     <span style={{display: none}}>${e.lot} </span>
-     <span style={{display: none}}>${e.expiration_date} </span>
-     <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                <span style={{display: none}}>${e.code}</span>
+                <span style={{display: none}}>${e.product_variation} </span>
+                <span style={{display: none}}>${e.serial} </span>
+                <span style={{display: none}}>${e.lot} </span>
+                <span style={{display: none}}>${e.expiration_date} </span>
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
         value: e.id,
         e,
     }));
 
     const _ServerFetchingDetailPage = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_product_receipt/getProductReceiptDetail/${id}?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_product_receipt/getProductReceiptDetail/${id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
@@ -205,9 +177,7 @@ const Index = (props) => {
                                     (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
                                     (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                                 location:
-                                    ce?.warehouse_location?.location_name ||
-                                        ce?.warehouse_location?.id ||
-                                        ce?.warehouse_location?.warehouse_name
+                                    ce?.warehouse_location?.location_name || ce?.warehouse_location?.id || ce?.warehouse_location?.warehouse_name
                                         ? {
                                             label: ce?.warehouse_location?.location_name || null,
                                             value: ce?.warehouse_location?.id || null,
@@ -262,7 +232,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
+                    const { result } = response.data.data;
                     sDataItems(result);
                 }
             }
@@ -270,9 +240,7 @@ const Index = (props) => {
         sOnFetchingItemsAll(false);
     };
     const _ServerFetching_ExportWarehouse = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
+        await Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -294,9 +262,7 @@ const Index = (props) => {
         sOnFetchingExportWarehouse(false);
     };
     const _ServerFetching_Location = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true",
+        await Axios("GET", "/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -322,9 +288,7 @@ const Index = (props) => {
         if (idBranch == null || idImportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+            Axios("POST", `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
                 {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -343,40 +307,7 @@ const Index = (props) => {
             );
         }
     }, 500)
-    // // Khai báo biến để theo dõi timeout
-    // let searchTimeout;
 
-    // const _HandleSeachApi = (inputValue) => {
-    //     if (idBranch == null || idImportWarehouse == null || inputValue == "") {
-    //         return;
-    //     } else {
-    //         // Hủy timeout cũ nếu có
-    //         clearTimeout(searchTimeout);
-
-    //         // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
-    //         searchTimeout = setTimeout(() => {
-    //             Axios(
-    //                 "POST",
-    //                 `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
-    //                 {
-    //                     params: {
-    //                         "filter[branch_id]": idBranch ? idBranch?.value : null,
-    //                     },
-
-    //                     data: {
-    //                         term: inputValue,
-    //                     },
-    //                 },
-    //                 (err, response) => {
-    //                     if (!err) {
-    //                         let { result } = response?.data?.data;
-    //                         sDataItems(result);
-    //                     }
-    //                 }
-    //             );
-    //         }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
-    //     }
-    // };
 
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
@@ -408,6 +339,7 @@ const Index = (props) => {
                 }
             } else {
                 sIdBranch(value);
+                sIdImportWarehouse(null)
             }
         } else if (type == "idImportWarehouse" && idImportWarehouse != value) {
             if (listData?.length > 0) {
@@ -528,8 +460,7 @@ const Index = (props) => {
     }, [idImportWarehouse]);
 
     const formatNumber = (number) => {
-        // const integerPart = Math.floor(number);
-        return number.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
 
     const _ServerSending = () => {
@@ -590,9 +521,9 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    const { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
+                        isShow("success", `${dataLang[message]}` || message);
                         sCode("");
                         sStartDate(new Date());
                         sIdBranch(null);
@@ -605,7 +536,7 @@ const Index = (props) => {
                         sListData([]);
                         router.push(routerProductsWarehouse.home);
                     } else {
-                        handleCheckError(dataLang[message]);
+                        handleCheckError(dataLang[message] || message);
                     }
                 }
                 sOnSending(false);
@@ -736,29 +667,6 @@ const Index = (props) => {
                         updatedChild.location = value;
                     }
                 }
-                // else if (type === "lot") {
-                //     const isLotExists = newData[parentIndex].child.find(
-                //         (ce, idx) =>
-                //             idx !== childIndex && ce.lot === value?.target.value
-                //     );
-
-                //     if (isLotExists) {
-                //         handleQuantityError("Giá trị Lot đã tồn tại");
-                //     } else {
-                //         updatedChild.lot = value?.target.value;
-                //     }
-                // } else if (type === "serial") {
-                //     const isLotExists = newData[parentIndex].child.find(
-                //         (ce, idx) =>
-                //             idx !== childIndex &&
-                //             ce.serial === value?.target.value
-                //     );
-                //     if (isLotExists) {
-                //         handleQuantityError("Giá trị serial đã tồn tại");
-                //     } else {
-                //         updatedChild.serial = value?.target.value;
-                //     }
-                // }
                 else if (type === "serial") {
                     const newTypeValue = value?.target.value;
                     // Kiểm tra xem giá trị mới đã tồn tại trong cả phần tử cha và các phần tử con
@@ -811,12 +719,8 @@ const Index = (props) => {
                                 idChildBackEnd: null,
                                 id: uuidv4(),
                                 disabledDate:
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "1" &&
-                                        false) ||
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "0" &&
-                                        true),
+                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
                                 unit: value?.e?.unit_name,
                                 importQuantity: null,
                                 numberOfConversions: null,
@@ -843,38 +747,33 @@ const Index = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
-                        : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
+                    {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
                 </title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
-                <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+            <Container className={'!h-auto'}>
+                {trangthaiExprired ? (
+                    <EmptyExprired />) :
+                    (
+                        <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                             <h6 className="text-[#141522]/40">
-                                {dataLang?.productsWarehouse_title || "productsWarehouse_title"}
+                                {dataLang?.production_warehouse || "production_warehouse"}
                             </h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
-                                    : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
-                            </h6>
+                            <h6> {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
+                                : dataLang?.productsWarehouse_add || "productsWarehouse_add"}</h6>
                         </div>
                     )}
+                <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {id
                                 ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
                                 : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
                         </h2>
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerProductsWarehouse.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
                             </button>
@@ -884,8 +783,7 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione ||
-                                    "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
@@ -1289,7 +1187,7 @@ const Index = (props) => {
                                 </div>
                                 {dataProductSerial.is_enable === "1" ? (
                                     <div className=" col-span-1 ">
-                                        <NumericFormat
+                                        <InPutNumericFormat
                                             className="w-full appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none border-b-2 border-gray-200"
                                             allowNegative={false}
                                             decimalScale={0}
@@ -1306,7 +1204,7 @@ const Index = (props) => {
                                     dataProductExpiry.is_enable === "1" ? (
                                         <>
                                             <div className=" col-span-1 flex items-center">
-                                                <NumericFormat
+                                                <InPutNumericFormat
                                                     className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none border-b-2 border-gray-200"
                                                     allowNegative={false}
                                                     decimalScale={0}
@@ -1701,14 +1599,16 @@ const Index = (props) => {
                                                                     />
                                                                 </button>
 
-                                                                <NumericFormat
+                                                                <InPutNumericFormat
                                                                     className={`${errQty &&
                                                                         (ce?.importQuantity == null ||
                                                                             ce?.importQuantity == "" ||
                                                                             ce?.importQuantity == 0)
                                                                         ? "border-red-500 border-b"
                                                                         : ""
-                                                                        } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
+                                                                        }
+                                                                        ${(ce?.importQuantity == null || ce?.importQuantity == "" || ce?.importQuantity == 0) && "border-red-500 border-b"}
+                                                                        placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -1716,9 +1616,7 @@ const Index = (props) => {
                                                                         "importQuantity"
                                                                     )}
                                                                     value={ce?.importQuantity}
-                                                                    allowNegative={false}
-                                                                    isNumericString={true}
-                                                                    thousandSeparator=","
+                                                                    isAllowed={isAllowedNumber}
                                                                 />
 
                                                                 <button
@@ -1841,7 +1739,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
@@ -1855,35 +1753,5 @@ const Index = (props) => {
     );
 };
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    // const label = `+ ${length}`;
-    const label = ``;
-
-    return <div title={title}>{label}</div>;
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 0;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 
 export default Index;
