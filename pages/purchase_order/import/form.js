@@ -322,10 +322,16 @@ const Index = (props) => {
             sDataItems([]);
             sDataWarehouse([]);
             sListData([]);
-            sIdBranch(value);
+            sIdBranch(isKeyState.value);
         }
         handleQueryId({ status: false });
     };
+
+    useEffect(() => {
+        sIdTheOrder(null);
+        sIdSupplier(null);
+        sKhotong(null);
+    }, [idBranch])
 
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
@@ -1713,24 +1719,25 @@ const Index = (props) => {
                                                         {option.e?.product_variation}
                                                     </h5>
                                                 </div>
-                                                <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                    {dataLang[option.e?.text_type]}
-                                                </h5>
-                                            </div>
-                                        </div>
-                                        <div className="">
-                                            <div className="text-right opacity-0">{"0"}</div>
-                                            <div className="flex gap-2">
-                                                <div className="flex items-center gap-2">
-                                                    <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                        {dataLang?.purchase_survive || "purchase_survive"}:
-                                                    </h5>
-                                                    <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                        {formatNumber(option.e?.qty_warehouse ?? 0)}
-                                                    </h5>
+                                                <div className="flex gap-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                            {dataLang[option.e?.text_type]}
+                                                        </h5>
+                                                        {"-"}
+                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                            {dataLang?.purchase_survive || "purchase_survive"}:
+                                                        </h5>
+                                                        <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                            {formatNumber(option.e?.qty_warehouse ?? 0)}
+                                                        </h5>
+
+                                                    </div>
                                                 </div>
+
                                             </div>
                                         </div>
+
                                     </div>
                                 )}
                                 style={{
@@ -1942,29 +1949,30 @@ const Index = (props) => {
                                                                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                             {option.e?.name}
                                                                         </h3>
-                                                                        <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {option.e?.code}
-                                                                        </h5>
-                                                                        <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {option.e?.product_variation}
-                                                                        </h5>
-                                                                        <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {dataLang[option.e?.text_type]}
-                                                                        </h5>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="">
-                                                                    <div className="text-right opacity-0">{"0"}</div>
-                                                                    <div className="flex gap-2">
-                                                                        <div className="flex items-center gap-2">
-                                                                            <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {dataLang?.purchase_survive ||
-                                                                                    "purchase_survive"}
-                                                                                :
-                                                                            </h5>
-                                                                            <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {formatNumber(option.e?.qty_warehouse ?? 0)}
-                                                                            </h5>
+                                                                        <div className="flex gap-2">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                                    {option.e?.code}
+                                                                                </h5>
+                                                                                <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                                    {option.e?.product_variation}
+                                                                                </h5>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex gap-2">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                                    {dataLang[option.e?.text_type]}
+                                                                                </h5>
+                                                                                {"-"}
+                                                                                <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                    {dataLang?.purchase_survive || "purchase_survive"}:
+                                                                                </h5>
+                                                                                <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                    {formatNumber(option.e?.qty_warehouse ?? 0)}
+                                                                                </h5>
+
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>

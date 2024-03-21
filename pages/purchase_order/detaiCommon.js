@@ -1134,21 +1134,9 @@ const Popup_chitietThere = (props) => {
                                                     </h3>
                                                     <h3 className="col-span-1 text-[13px]">
                                                         {data?.status == "1" ? (
-                                                            <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]  w-fit border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1">
-                                                                {props.dataLang?.purchase_approved || "purchase_approved"}{" "}
-                                                                <TickCircle
-                                                                    className="bg-lime-500 rounded-full"
-                                                                    color="white"
-                                                                    size={19}
-                                                                />
-                                                            </div>
+                                                            <TagColorLime className={'!py-1'} name={props.dataLang?.purchase_approved || "purchase_approved"} />
                                                         ) : (
-                                                            <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]  w-fit border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1">
-                                                                {props.dataLang?.purchase_notapproved || "purchase_notapproved"}{" "}
-                                                                <TickCircle
-                                                                    size={22}
-                                                                />
-                                                            </div>
+                                                            <TagColorRed name={props.dataLang?.purchase_notapproved || "purchase_notapproved"} />
                                                         )}
                                                     </h3>
                                                 </div>

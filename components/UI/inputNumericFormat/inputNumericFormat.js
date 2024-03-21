@@ -4,7 +4,7 @@ const InPutNumericFormat = ({ className,
     value, onValueChange, isAllowed,
     allowNegative, isNumericString, readOnly,
     decimalScale, thousandSeparator,
-    decimalSeparator }) => {
+    decimalSeparator, disabled, placeholder }) => {
     const dataSeting = useSetingServer()
     return <NumericFormat
         className={`${className}`}
@@ -17,6 +17,8 @@ const InPutNumericFormat = ({ className,
         isNumericString={isNumericString}
         decimalScale={decimalScale}
         readOnly={readOnly}
+        disabled={disabled}
+        placeholder={placeholder}
     />
 }
 export default InPutNumericFormat
