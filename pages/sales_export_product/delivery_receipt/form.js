@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Popup from "reactjs-popup";
+import { PopupParent } from "@/utils/lib/Popup";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
@@ -18,25 +18,25 @@ import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } fr
 
 import PopupAddress from "./components/PopupAddress";
 
-import Loading from "@/components/UI/loading";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import { routerDeliveryReceipt } from "routers/sellingGoods";
-
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import useFeature from "@/hooks/useConfigFeature";
-import formatNumberConfig from '@/utils/helpers/formatnumber'
-import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import useSetingServer from "@/hooks/useConfigNumber";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import useStatusExprired from "@/hooks/useStatusExprired";
+
+import Loading from "@/components/UI/loading";
 import { Container } from "@/components/UI/common/layout";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+
+import formatMoneyConfig from '@/utils/helpers/formatMoney'
+import formatNumberConfig from '@/utils/helpers/formatnumber'
+import { routerDeliveryReceipt } from "routers/sellingGoods";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -2030,7 +2030,7 @@ const Index = (props) => {
                                                                         </button>
                                                                     </div>
                                                                     <div className="absolute top-0 right-0 p-1 cursor-pointer ">
-                                                                        <Popup
+                                                                        <PopupParent
                                                                             className=""
                                                                             trigger={
                                                                                 <div className="relative ">
@@ -2071,7 +2071,7 @@ const Index = (props) => {
                                                                                     )}
                                                                                 </span>
                                                                             </div>
-                                                                        </Popup>
+                                                                        </PopupParent>
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">

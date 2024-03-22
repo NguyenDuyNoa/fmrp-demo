@@ -45,6 +45,12 @@ const routerExportToOther = {
     form: `${url}/export_to_other/form`,
 };
 
+// kiểm kê kho
+const routerInventory = {
+    home: `${url}/inventory`,
+    form: `${url}/inventory/form`,
+};
+
 export {
     routerPproductionPlan,
     routerInternalPlan,
@@ -53,4 +59,5 @@ export {
     routerProductsWarehouse,
     routerRecall,
     routerExportToOther,
+    routerInventory
 };

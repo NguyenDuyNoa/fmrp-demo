@@ -1,60 +1,23 @@
 import React, { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
-import Popup from "reactjs-popup";
-import { SearchNormal1 as IconSearch } from "iconsax-react";
-import { _ServerInstance as Axios } from "/services/axios";
-import dynamic from "next/dynamic";
 import moment from "moment";
-import ModalImage from "react-modal-image";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import NoData from "@/components/UI/noData/nodata";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
     const [onFetching, sOnFetching] = useState(false);
     const [open, sOpen] = useState(false);
     const [data, sData] = useState([]);
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
+    const dataSeting = useSetingServer()
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
-
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
-                sOnFetching(false);
-            }
-        );
-    };
-    useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
 
     useEffect(() => {
         open && sOnFetching(true);
@@ -82,24 +45,23 @@ const Popup_status = (props) => {
             classNameBtn={props.className}
         >
             <div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
-                <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <Customscrollbar className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2">
                     <div className="pr-2 w-[100%] lx:w-[120%] ">
                         <div
-                            className={`${
-                                dataProductSerial.is_enable == "1"
-                                    ? dataMaterialExpiry.is_enable !=
-                                      dataProductExpiry.is_enable
-                                        ? "grid-cols-12"
-                                        : dataMaterialExpiry.is_enable == "1"
+                            className={`${dataProductSerial.is_enable == "1"
+                                ? dataMaterialExpiry.is_enable !=
+                                    dataProductExpiry.is_enable
+                                    ? "grid-cols-12"
+                                    : dataMaterialExpiry.is_enable == "1"
                                         ? "grid-cols-12"
                                         : "grid-cols-10"
-                                    : dataMaterialExpiry.is_enable !=
-                                      dataProductExpiry.is_enable
+                                : dataMaterialExpiry.is_enable !=
+                                    dataProductExpiry.is_enable
                                     ? "grid-cols-11"
                                     : dataMaterialExpiry.is_enable == "1"
-                                    ? "grid-cols-11"
-                                    : "grid-cols-9"
-                            }  grid sticky top-0 bg-white shadow items-center z-10`}
+                                        ? "grid-cols-11"
+                                        : "grid-cols-9"
+                                }  grid sticky top-0 bg-white shadow items-center z-10`}
                         >
                             <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold  whitespace-nowrap col-span-2  text-center">
                                 {props.dataLang?.inventory_dayvouchers ||
@@ -119,7 +81,7 @@ const Popup_status = (props) => {
                                 </h4>
                             )}
                             {dataMaterialExpiry.is_enable === "1" ||
-                            dataProductExpiry.is_enable === "1" ? (
+                                dataProductExpiry.is_enable === "1" ? (
                                 <>
                                     <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-semibold text-center whitespace-nowrap">
                                         {"Lot"}
@@ -153,30 +115,29 @@ const Popup_status = (props) => {
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px] mt-2 ">
                                     {data?.map((e) => (
                                         <div
-                                            className={`${
-                                                dataProductSerial.is_enable ==
+                                            className={`${dataProductSerial.is_enable ==
                                                 "1"
-                                                    ? dataMaterialExpiry.is_enable !=
-                                                      dataProductExpiry.is_enable
-                                                        ? "grid-cols-12"
-                                                        : dataMaterialExpiry.is_enable ==
-                                                          "1"
+                                                ? dataMaterialExpiry.is_enable !=
+                                                    dataProductExpiry.is_enable
+                                                    ? "grid-cols-12"
+                                                    : dataMaterialExpiry.is_enable ==
+                                                        "1"
                                                         ? "grid-cols-12"
                                                         : "grid-cols-10"
-                                                    : dataMaterialExpiry.is_enable !=
-                                                      dataProductExpiry.is_enable
+                                                : dataMaterialExpiry.is_enable !=
+                                                    dataProductExpiry.is_enable
                                                     ? "grid-cols-11"
                                                     : dataMaterialExpiry.is_enable ==
-                                                      "1"
-                                                    ? "grid-cols-11"
-                                                    : "grid-cols-9"
-                                            }  grid hover:bg-slate-50 items-center`}
+                                                        "1"
+                                                        ? "grid-cols-11"
+                                                        : "grid-cols-9"
+                                                }  grid hover:bg-slate-50 items-center`}
                                         >
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-2 text-center">
                                                 {e?.date_coupon != null
                                                     ? moment(
-                                                          e?.date_coupon
-                                                      ).format("DD/MM/YYYY")
+                                                        e?.date_coupon
+                                                    ).format("DD/MM/YYYY")
                                                     : ""}
                                             </h6>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer">
@@ -187,11 +148,11 @@ const Popup_status = (props) => {
                                             </h6>
 
                                             {dataProductSerial.is_enable ===
-                                            "1" ? (
+                                                "1" ? (
                                                 <div className=" col-span-1 ">
                                                     <h6 className="text-[13px] px-2 py-1.5  w-[full] text-center">
                                                         {e.serial == null ||
-                                                        e.serial == ""
+                                                            e.serial == ""
                                                             ? "-"
                                                             : e.serial}
                                                     </h6>
@@ -201,13 +162,13 @@ const Popup_status = (props) => {
                                             )}
                                             {dataMaterialExpiry.is_enable ===
                                                 "1" ||
-                                            dataProductExpiry.is_enable ===
+                                                dataProductExpiry.is_enable ===
                                                 "1" ? (
                                                 <>
                                                     <div className=" col-span-1  ">
                                                         <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">
                                                             {e.lot == null ||
-                                                            e.lot == ""
+                                                                e.lot == ""
                                                                 ? "-"
                                                                 : e.lot}
                                                         </h6>
@@ -216,10 +177,10 @@ const Popup_status = (props) => {
                                                         <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">
                                                             {e.expiration_date
                                                                 ? moment(
-                                                                      e.expiration_date
-                                                                  ).format(
-                                                                      "DD-MM-YYYY"
-                                                                  )
+                                                                    e.expiration_date
+                                                                ).format(
+                                                                    "DD-MM-YYYY"
+                                                                )
                                                                 : "-"}
                                                         </h6>
                                                     </div>
@@ -240,10 +201,10 @@ const Popup_status = (props) => {
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-2 text-left hover:font-normal cursor-pointer">
                                                 <div className="flex flex-col">
                                                     <span className="">
-                                                        {e?.warehouse_name}
+                                                        Kho: {e?.warehouse_name}
                                                     </span>
                                                     <span className="">
-                                                        {e?.local_name}
+                                                        Vị trí kho:  {e?.local_name}
                                                     </span>
                                                 </div>
                                             </h6>
@@ -254,24 +215,9 @@ const Popup_status = (props) => {
                                     ))}
                                 </div>
                             </>
-                        ) : (
-                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                <div className="text-center">
-                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                        <IconSearch />
-                                    </div>
-                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                        {dataLang?.purchase_order_table_item_not_found ||
-                                            "purchase_order_table_item_not_found"}
-                                    </h1>
-                                    <div className="flex items-center justify-around mt-6 ">
-                                        {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        ) : <NoData />}
                     </div>
-                </div>
+                </Customscrollbar>
             </div>
         </PopupEdit>
     );

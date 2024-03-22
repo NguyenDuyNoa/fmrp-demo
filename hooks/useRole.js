@@ -33,6 +33,7 @@ const useActionRole = (auth, type) => {
         "purchase_products": "productsWarehouse",
         "purchase_internal": 'recall',
         "export_different": "exportToOther",
+        "inventory": "inventory"
         // Thêm các type ||  nameModel
 
 

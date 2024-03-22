@@ -334,7 +334,7 @@ const Header = () => {
                     view: auth?.inventory?.is_view,
                     title: "Kiểm kê kho",
                     img: "/icon/header/kho/kk.png",
-                    link: "/inventory",
+                    link: "/manufacture/inventory",
                 },
             ],
         },
