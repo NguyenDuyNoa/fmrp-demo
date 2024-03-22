@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/router";
 
 import { _ServerInstance as Axios } from "/services/axios";
 import PopupEdit from "@/components/UI/popup";
@@ -20,32 +19,16 @@ import {
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import Select from "react-select";
-import Swal from "sweetalert2";
 import { debounce } from "lodash";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 import useToast from "@/hooks/useToast";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import NoData from "@/components/UI/noData/nodata";
-import { Container } from "@/components/UI/common/layout";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 
 import { SelectCore } from "@/utils/lib/Select";
-import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
 const Popup_Product = React.memo((props) => {
     const dataPstWH = useSelector((state) => state.vitrikho_kiemke);
 
