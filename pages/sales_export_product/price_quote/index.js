@@ -782,15 +782,15 @@ const Index = (props) => {
                         <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
                             {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap mr-1">
                             <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                 {formatNumber(total?.total_price)}
                             </h3>
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap mr-1">
                             {formatNumber(total?.total_tax_price)}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap mr-1">
                             {formatNumber(total?.total_amount)}
                         </ColumnTable>
                     </ContainerTotal>

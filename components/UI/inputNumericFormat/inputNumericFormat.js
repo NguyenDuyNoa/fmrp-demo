@@ -1,12 +1,12 @@
-import useSetingServer from "@/hooks/useConfigNumber"
-import { NumericFormat } from "react-number-format"
+import useSetingServer from "@/hooks/useConfigNumber";
+import { NumericFormatCore } from '@/utils/lib/NumericFormat'
 const InPutNumericFormat = ({ className,
     value, onValueChange, isAllowed,
     allowNegative, isNumericString, readOnly,
     decimalScale, thousandSeparator,
     decimalSeparator, disabled, placeholder }) => {
     const dataSeting = useSetingServer()
-    return <NumericFormat
+    return <NumericFormatCore
         className={`${className}`}
         value={value}
         onValueChange={onValueChange}

@@ -1,3 +1,4 @@
+import { color } from "framer-motion"
 import { TickCircle } from "iconsax-react"
 const TagColorSky = ({ name, className }) => {
     return <span className={`${className} font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] text-sky-500  rounded-xl 3xl:py-0 py-0.5 px-3  w-fit bg-sky-200`}>
@@ -28,4 +29,15 @@ const TagColorRed = ({ name, className }) => {
     </span>
 }
 
-export { TagColorSky, TagColorOrange, TagColorLime, TagColorRed }
+const TagColorMore = ({ name, className, backgroundColor, color }) => {
+    return <span
+        style={{
+            backgroundColor: backgroundColor,
+            color: color
+        }}
+        className={`${className} font-normal 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] rounded-xl 3xl:py-0 py-0.5 px-3  w-fit `}>
+        {name}
+    </span>
+}
+
+export { TagColorSky, TagColorOrange, TagColorLime, TagColorRed, TagColorMore }

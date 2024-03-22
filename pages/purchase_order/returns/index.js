@@ -716,17 +716,17 @@ const Index = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <ContainerTotal className="grid-cols-10">
+                    <ContainerTotal className="!grid-cols-10">
                         <RowItemTable colSpan={3} textAlign={'center'} className="p-2">
                             {dataLang?.import_total || "import_total"}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'}>
+                        <RowItemTable colSpan={1} textAlign={'right'} className={'mr-1'}>
                             {formatMoney(total?.total_price)}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'}>
+                        <RowItemTable colSpan={1} textAlign={'right'} className={'mr-1'}>
                             {formatMoney(total?.total_tax_price)}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'}>
+                        <RowItemTable colSpan={1} textAlign={'right'} className={'mr-1'}>
                             {formatMoney(total?.total_amount)}
                         </RowItemTable>
                     </ContainerTotal>

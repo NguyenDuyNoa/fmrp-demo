@@ -749,13 +749,13 @@ const Index = (props) => {
                         <RowItemTable colSpan={5} textAlign={'center'} className="p-2">
                             {dataLang?.import_total || "import_total"}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 mr-1 flex gap-2 flex-wrap">
                             {formatNumber(total?.total_price)}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap ">
+                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 mr-1 flex gap-2 flex-wrap ">
                             {formatNumber(total?.total_tax_price)}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap ">
+                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 mr-1 flex gap-2 flex-wrap ">
                             {formatNumber(total?.total_amount)}
                         </RowItemTable>
                     </ContainerTotal>

@@ -720,7 +720,7 @@ const Index = (props) => {
                         <ColumnTable colSpan={4} textAlign={'center'} className="p-2">
                             {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
                             {formatNumber(total?.total_count_item)}
                         </ColumnTable>
                     </ContainerTotal>

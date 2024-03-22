@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import { debounce } from "lodash";
-import Select from "react-select";
+import { SelectCore } from "@/utils/lib/Select";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { MdClear } from "react-icons/md";
@@ -820,7 +820,7 @@ const Index = (props) => {
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
@@ -877,7 +877,7 @@ const Index = (props) => {
                                         {dataLang?.production_warehouse_expWarehouse || "production_warehouse_expWarehouse"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataWarehouse}
                                         onChange={_HandleChangeInput.bind(this, "idExportWarehouse")}
                                         isLoading={idBranch != null ? false : onLoading}
@@ -931,7 +931,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={[]}
                                         onChange={_HandleChangeInput.bind(this, "")}
                                         isLoading={idBranch != null ? false : onLoading}
@@ -1017,7 +1017,7 @@ const Index = (props) => {
                     </div>
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
                         <div className="col-span-3">
-                            <Select
+                            <SelectCore
                                 onInputChange={_HandleSeachApi.bind(this)}
                                 options={options}
                                 value={null}
@@ -1126,7 +1126,7 @@ const Index = (props) => {
                             <div className="grid grid-cols-8 divide-x border-t border-b border-r border-l">
                                 <div className="col-span-2">
                                     {" "}
-                                    <Select
+                                    <SelectCore
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
                                             dataLang?.production_warehouse_expLoca || "production_warehouse_expLoca"
@@ -1136,7 +1136,7 @@ const Index = (props) => {
                                     />
                                 </div>
                                 <div className="col-span-1">
-                                    <Select
+                                    <SelectCore
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={dataLang?.production_warehouse_unit || "production_warehouse_unit"}
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
@@ -1189,7 +1189,7 @@ const Index = (props) => {
                                         >
                                             <div className="col-span-3 border border-r p-2 pb-1 h-full">
                                                 <div className="relative mt-5">
-                                                    <Select
+                                                    <SelectCore
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
@@ -1326,7 +1326,7 @@ const Index = (props) => {
                                                             <React.Fragment key={ce?.id?.toString()}>
                                                                 {console.log("ce?.location", ce?.location)}
                                                                 <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
-                                                                    <Select
+                                                                    <SelectCore
                                                                         options={ce?.dataWarehouse}
                                                                         value={ce?.location}
                                                                         isLoading={ce?.location != null ? false : onLoadingChild}
@@ -1377,7 +1377,7 @@ const Index = (props) => {
                                                                     />
                                                                 </div>
                                                                 <div className=" flex flex-col items-center p-1 h-full justify-center">
-                                                                    <Select
+                                                                    <SelectCore
                                                                         options={ce?.dataUnit}
                                                                         value={ce?.unit}
                                                                         isLoading={ce?.unit == null ? onLoadingChild : false}

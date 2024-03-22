@@ -718,7 +718,7 @@ const Index = (props) => {
                         <ColumnTable colSpan={4} textAlign={'center'} className="p-2">
                             {dataLang?.import_total || "import_total"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign='right'>
+                        <ColumnTable colSpan={1} textAlign='right' className={'p-2 mr-1'}>
                             {formatNumber(total?.grand_total)}
                         </ColumnTable>
                     </ContainerTotal>

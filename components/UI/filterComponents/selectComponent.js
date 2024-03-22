@@ -1,4 +1,4 @@
-import Select from "react-select";
+import { SelectCore } from "@/utils/lib/Select";
 import configSelectFillter from "@/configs/configSelectFillter";
 
 const SelectComponent = ({
@@ -26,7 +26,7 @@ const SelectComponent = ({
 }) => {
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
-            <Select
+            <SelectCore
                 options={options}
                 value={value}
                 onInputChange={onInputChange ? onInputChange : ""}

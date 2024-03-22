@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { debounce } from "lodash";
-import Select from "react-select";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
@@ -29,6 +28,7 @@ import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { routerProductsWarehouse } from "@/routers/manufacture";
+import { SelectCore } from "@/utils/lib/Select";
 
 const Index = (props) => {
     const router = useRouter();
@@ -784,7 +784,7 @@ const Index = (props) => {
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
@@ -842,7 +842,7 @@ const Index = (props) => {
                                             "productsWarehouse_warehouseImport"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataWarehouse}
                                         onChange={_HandleChangeInput.bind(this, "idImportWarehouse")}
                                         isLoading={idBranch != null ? false : onLoading}
@@ -899,7 +899,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={[]}
                                         onChange={_HandleChangeInput.bind(this, "")}
                                         isLoading={idBranch != null ? false : onLoading}
@@ -1024,7 +1024,7 @@ const Index = (props) => {
                     </div>
                     <div className="grid grid-cols-13 items-center gap-1 py-2">
                         <div className="col-span-3">
-                            <Select
+                            <SelectCore
                                 options={options}
                                 value={null}
                                 onInputChange={_HandleSeachApi.bind(this)}
@@ -1121,7 +1121,7 @@ const Index = (props) => {
                             >
                                 <div className="col-span-1">
                                     {" "}
-                                    <Select
+                                    <SelectCore
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
                                             dataLang?.productsWarehouse_warehouseLocaImport ||
@@ -1222,7 +1222,7 @@ const Index = (props) => {
                                         >
                                             <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-5 mt-5">
-                                                    <Select
+                                                    <SelectCore
                                                         onInputChange={_HandleSeachApi.bind(this)}
                                                         options={options}
                                                         value={e?.matHang}
@@ -1341,7 +1341,7 @@ const Index = (props) => {
                                                         <React.Fragment key={ce?.id?.toString()}>
                                                             {console.log(ce?.location)}
                                                             <div className="flex justify-center border-t border-l  h-full p-1 flex-col items-center ">
-                                                                <Select
+                                                                <SelectCore
                                                                     options={dataLocation}
                                                                     value={ce?.location}
                                                                     isLoading={

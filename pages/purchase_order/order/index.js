@@ -699,13 +699,13 @@ const Index = (props) => {
                         <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
                             {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end pr-4 p-2 flex gap-2 flex-wrap">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap">
                             {formatMoney(total?.total_price)}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end pr-4 p-2 flex gap-2 flex-wrap ">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap ">
                             {formatMoney(total?.total_tax_price)}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end pr-4 p-2 flex gap-2 flex-wrap ">
+                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap ">
                             {formatMoney(total?.total_amount)}
                         </ColumnTable>
                     </ContainerTotal>

@@ -1,75 +1,54 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
+import moment from "moment/moment";
+import React, { useState, useEffect } from "react";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
 
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-} from "iconsax-react";
 
-import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment/moment";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { useEffect } from "react";
-
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
+import useFeature from "@/hooks/useConfigFeature";
+import NoData from "@/components/UI/noData/nodata";
+import ExpandableContent from "@/components/UI/more";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+
 
 const Popup_chitiet = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [data, sData] = useState();
+
+    const dataSeting = useSetingServer()
+
     const [onFetching, sOnFetching] = useState(false);
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
 
-    // const formatNumber = (number) => {
-    //     if (!number && number !== 0) return 0;
-    //     const integerPart = Math.floor(number);
-    //     const decimalPart = number - integerPart;
-    //     const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-    //     const roundedNumber = integerPart + roundedDecimalPart;
-    //     return roundedNumber?.toLocaleString("en");
-    // };
+
     const formatNumber = (number) => {
-        if (!number && number !== 0) return "0";
+        return formatNumberConfig(+number, dataSeting);
+    };
 
-        const roundedNumber = Math.round(number * 100) / 100;
-        const [integerPart, decimalPart] = roundedNumber.toFixed(2).split(".");
-
-        const formattedIntegerPart = integerPart.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            ","
-        );
-        const formattedDecimalPart =
-            decimalPart === "00" ? "" : `.${decimalPart}`;
-
-        return `${formattedIntegerPart}${formattedDecimalPart}`;
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
     };
 
     const _ServerFetching_detailOrder = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
@@ -82,37 +61,11 @@ const Popup_chitiet = (props) => {
     };
     useEffect(() => {
         setTimeout(() => {
-            (onFetching && _ServerFetching_detailOrder()) ||
-                (onFetching && _ServerFetching());
+            (onFetching && _ServerFetching_detailOrder())
         }, 400);
     }, [open]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
-                sOnFetching(false);
-            }
-        );
-    };
     return (
         <>
             <PopupEdit
@@ -129,32 +82,23 @@ const Popup_chitiet = (props) => {
                 <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] w-[1100px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
                     <div>
                         <div className="3xl:w-[1200px] 2xl:w-[1150px] w-[1100px]">
-                            <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px] overflow-auto pb-1">
                                 <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props.dataLang?.import_detail_info ||
-                                        "import_detail_info"}
+                                    {props.dataLang?.import_detail_info || "import_detail_info"}
                                 </h2>
                                 <div className="grid grid-cols-9  min-h-[100px] px-2 items-center bg-zinc-50">
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.import_day_vouchers ||
-                                                    "import_day_vouchers"}
+                                                {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null
-                                                    ? moment(data?.date).format(
-                                                        "DD/MM/YYYY"
-                                                    )
-                                                    : ""}
+                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.import_code_vouchers ||
-                                                    "import_code_vouchers"}
+                                                {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium text-blue-600 capitalize">
                                                 {data?.code}
@@ -162,58 +106,30 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.exportToOthe_object ||
-                                                    "exportToOthe_object"}
+                                                {props.dataLang?.exportToOthe_object || "exportToOthe_object"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium text-green-600 capitalize">
-                                                {props.dataLang[
-                                                    data?.object_text
-                                                ] || data?.object_text}
+                                                {props.dataLang[data?.object_text] || data?.object_text}
                                             </h3>
                                         </div>
                                     </div>
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang
-                                                    ?.production_warehouse_LSX ||
-                                                    "production_warehouse_LSX"}
+                                                {props?.dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang
-                                                    ?.import_from_browse ||
-                                                    "import_from_browse"}
+                                                {props.dataLang?.import_from_browse || "import_from_browse"}
                                             </h3>
                                             <div className="flex flex-wrap  gap-2 items-center ">
-                                                {(data?.warehouseman_id ===
-                                                    "0" && (
-                                                        <div className=" font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                            {"Chưa duyệt kho"}
-                                                        </div>
-                                                    )) ||
-                                                    (data?.warehouseman_id !=
-                                                        "0" && (
-                                                            <div className=" font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center">
-                                                                <TickCircle
-                                                                    className="bg-lime-500 rounded-full animate-pulse "
-                                                                    color="white"
-                                                                    size={15}
-                                                                />
-                                                                <span>
-                                                                    Đã duyệt kho
-                                                                </span>
-                                                            </div>
-                                                        ))}
+                                                <TagWarehouse data={data} />
                                             </div>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang
-                                                    ?.exportToOthe_warehouse ||
-                                                    "exportToOthe_warehouse"}
+                                                {props?.dataLang?.exportToOthe_warehouse || "exportToOthe_warehouse"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {/* {data?.warehouse_name} */}
@@ -232,56 +148,27 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3 ">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang
-                                                    ?.production_warehouse_Total_value ||
-                                                    "production_warehouse_Total_value"}
+                                                {props?.dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
-                                                {formatNumber(data?.amount)}
+                                                {formatMoney(data?.amount)}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang
-                                                    ?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
-                                                <div className="relative">
-                                                    <ImageErrors
-                                                        src={
-                                                            data?.staff_create
-                                                                ?.profile_image
-                                                        }
-                                                        width={25}
-                                                        height={25}
-                                                        defaultSrc="/user-placeholder.jpg"
-                                                        alt="Image"
-                                                        className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                    />
-                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                                <h6 className="capitalize">
-                                                    {
-                                                        data?.staff_create
-                                                            ?.full_name
-                                                    }
-                                                </h6>
+                                                <CustomAvatar data={data} profileImage={data?.staff_create?.profile_image} fullName={data?.staff_create?.full_name} />
                                             </div>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang
-                                                    ?.import_branch ||
-                                                    "import_branch"}
+                                                {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
-                                            <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
+                                            <TagBranch className="w-fit">
                                                 {data?.branch_name}
-                                            </h3>
+                                            </TagBranch>
                                         </div>
                                     </div>
                                 </div>
@@ -290,31 +177,22 @@ const Popup_chitiet = (props) => {
                                         className={`grid-cols-9  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
                                     >
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.import_detail_items ||
-                                                "import_detail_items"}
+                                            {props.dataLang?.import_detail_items || "import_detail_items"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.exportToOthe_location ||
-                                                "exportToOthe_location"}
+                                            {props.dataLang?.exportToOthe_location || "exportToOthe_location"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {"ĐVT"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.production_warehouse_inventory ||
-                                                "production_warehouse_inventory"}
+                                            {props.dataLang?.production_warehouse_inventory || "production_warehouse_inventory"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.recall_revenueQty ||
-                                                "recall_revenueQty"}
+                                            {props.dataLang?.recall_revenueQty || "recall_revenueQty"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang?.import_from_note ||
-                                                "import_from_note"}
+                                            {props.dataLang?.import_from_note || "import_from_note"}
                                         </h4>
                                     </div>
                                     {onFetching ? (
@@ -324,10 +202,8 @@ const Popup_chitiet = (props) => {
                                         />
                                     ) : data?.items?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
+                                            <Customscrollbar
+                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]"
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
@@ -343,14 +219,10 @@ const Popup_chitiet = (props) => {
                                                                             null ? (
                                                                             <ModalImage
                                                                                 small={
-                                                                                    e
-                                                                                        ?.item
-                                                                                        ?.images
+                                                                                    e?.item?.images
                                                                                 }
                                                                                 large={
-                                                                                    e
-                                                                                        ?.item
-                                                                                        ?.images
+                                                                                    e?.item?.images
                                                                                 }
                                                                                 alt="Product Image"
                                                                                 className="custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto"
@@ -370,53 +242,35 @@ const Popup_chitiet = (props) => {
                                                                     <div>
                                                                         <h6 className="text-[13px] text-left font-medium capitalize">
                                                                             {
-                                                                                e
-                                                                                    ?.item
-                                                                                    ?.name
+                                                                                e?.item?.name
                                                                             }
                                                                         </h6>
                                                                         <h6 className="text-[13px] text-left font-medium capitalize">
                                                                             {
-                                                                                e
-                                                                                    ?.item
-                                                                                    ?.product_variation
+                                                                                e?.item?.product_variation
                                                                             }
                                                                         </h6>
                                                                         <div className="flex items-center font-oblique flex-wrap">
-                                                                            {dataProductSerial.is_enable ===
-                                                                                "1" ? (
+                                                                            {dataProductSerial.is_enable === "1" ? (
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
                                                                                         Serial:
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e.serial ==
-                                                                                            null ||
-                                                                                            e.serial ==
-                                                                                            ""
-                                                                                            ? "-"
-                                                                                            : e.serial}
+                                                                                        {e.serial == null || e.serial == "" ? "-" : e.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable ===
-                                                                                "1" ||
-                                                                                dataProductExpiry.is_enable ===
-                                                                                "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
                                                                                             Lot:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e.lot ==
-                                                                                                null ||
-                                                                                                e.lot ==
-                                                                                                ""
-                                                                                                ? "-"
-                                                                                                : e.lot}
+                                                                                            {e.lot == null || e.lot == "" ? "-" : e.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className="flex gap-0.5">
@@ -426,13 +280,7 @@ const Popup_chitiet = (props) => {
                                                                                             dụng:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e.expiration_date
-                                                                                                ? moment(
-                                                                                                    e.expiration_date
-                                                                                                ).format(
-                                                                                                    "DD/MM/YYYY"
-                                                                                                )
-                                                                                                : "-"}
+                                                                                            {e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY") : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>
@@ -446,29 +294,20 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
                                                                 <h6 className="font-medium">
                                                                     {
-                                                                        e
-                                                                            ?.warehouse_location
-                                                                            ?.location_name
+                                                                        e?.warehouse_location?.location_name
                                                                     }
                                                                 </h6>
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
                                                                 {
-                                                                    e?.item
-                                                                        ?.unit_name
+                                                                    e?.item?.unit_name
                                                                 }
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
-                                                                {formatNumber(
-                                                                    e
-                                                                        ?.warehouse_location
-                                                                        ?.quantity
-                                                                )}
+                                                                {formatNumber(e?.warehouse_location?.quantity)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center mr-1">
-                                                                {formatNumber(
-                                                                    e?.quantity
-                                                                )}
+                                                                {formatNumber(e?.quantity)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
                                                                 {e?.note !=
@@ -485,35 +324,17 @@ const Popup_chitiet = (props) => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
-                                    ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang
-                                                        ?.purchase_order_table_item_not_found ||
-                                                        "purchase_order_table_item_not_found"}
-                                                </h1>
-                                                <div className="flex items-center justify-around mt-6 ">
-                                                    {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                                    ) : <NoData />}
                                 </div>
                                 <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
-                                    {props.dataLang?.purchase_total ||
-                                        "purchase_total"}
+                                    {props.dataLang?.purchase_total || "purchase_total"}
                                 </h2>
                                 <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
                                     <div className="col-span-7">
                                         <h3 className="text-[13px] p-1">
-                                            {props.dataLang?.returns_reason ||
-                                                "returns_reason"}
+                                            {props.dataLang?.returns_reason || "returns_reason"}
                                         </h3>
                                         <textarea
                                             className="resize-none text-[13px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
@@ -524,25 +345,19 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-2 space-y-1 text-right">
                                         <div className="font-medium text-left text-[13px]">
                                             <h3>
-                                                {props?.dataLang
-                                                    ?.production_warehouse_totalItem ||
-                                                    "production_warehouse_totalItem"}
+                                                {props?.dataLang?.production_warehouse_totalItem || "production_warehouse_totalItem"}
                                             </h3>
                                         </div>
                                         <div className="font-medium text-left text-[13px]">
                                             <h3>
-                                                {props.dataLang
-                                                    ?.exportToOthe_totalQuantity ||
-                                                    "exportToOthe_totalQuantity"}
+                                                {props.dataLang?.exportToOthe_totalQuantity || "exportToOthe_totalQuantity"}
                                             </h3>
                                         </div>
                                     </div>
                                     <div className="col-span-3 space-y-1 text-right">
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(
-                                                    data?.items?.length
-                                                )}
+                                                {formatNumber(data?.items?.length)}
                                             </h3>
                                         </div>
                                         <div className="font-medium mr-2.5">
@@ -561,7 +376,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </div>
                     </div>
                 </div>

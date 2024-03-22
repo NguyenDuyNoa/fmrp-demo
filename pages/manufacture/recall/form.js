@@ -1,6 +1,7 @@
 import Head from "next/head";
-import { useRouter } from "next/router";
+import { debounce } from "lodash";
 import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/router";
 import React, { useCallback, useState, useEffect } from "react";
 
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
@@ -9,7 +10,6 @@ import moment from "moment/moment";
 import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import Select, { components } from "react-select";
 import { NumericFormat } from "react-number-format";
 
 import { _ServerInstance as Axios } from "/services/axios";
@@ -24,8 +24,14 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { routerRecall } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { debounce } from "lodash";
-
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import { SelectCore } from "@/utils/lib/Select";
 const Index = (props) => {
     const router = useRouter();
 
@@ -35,13 +41,13 @@ const Index = (props) => {
 
     const isShow = useToast();
 
+    const dataSeting = useSetingServer()
+
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     const [onFetching, sOnFetching] = useState(false);
 
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
 
@@ -71,11 +77,7 @@ const Index = (props) => {
 
     const [dataLocation, sDataLocation] = useState([]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-
-    const [dataProductSerial, sDataProductSerial] = useState({});
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
     //new
 
     const trangthaiExprired = useStatusExprired();
@@ -126,45 +128,15 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response?.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetchingCondition(false);
-        });
-    };
-
-    useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
-
-    useEffect(() => {
-        id && sOnFetchingCondition(true);
-    }, []);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
 
     const options = dataItems?.map((e) => ({
         label: `${e.name}
-     <span style={{display: none}}>${e.code}</span>
-     <span style={{display: none}}>${e.product_variation} </span>
-     <span style={{display: none}}>${e.serial} </span>
-     <span style={{display: none}}>${e.lot} </span>
-     <span style={{display: none}}>${e.expiration_date} </span>
-     <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                <span style={{display: none}}>${e.code}</span>
+                <span style={{display: none}}>${e.product_variation} </span>
+                <span style={{display: none}}>${e.serial} </span>
+                <span style={{display: none}}>${e.lot} </span>
+                <span style={{display: none}}>${e.expiration_date} </span>
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
         value: e.id,
         e,
     }));
@@ -199,9 +171,7 @@ const Index = (props) => {
                                 idChildBackEnd: Number(ce?.id),
                                 id: Number(ce?.id),
                                 disabledDate:
-                                    (e.item?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "1" &&
-                                        false) ||
+                                    (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
                                     (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true),
                                 location:
                                     ce?.warehouse?.location_name || ce?.warehouse?.id || ce?.warehouse?.warehouse_name
@@ -316,40 +286,6 @@ const Index = (props) => {
             );
         }
     }, 500)
-    // // Khai báo biến để theo dõi timeout
-    // let searchTimeout;
-
-    // const _HandleSeachApi = (inputValue) => {
-    //     if (idBranch == null || inputValue == "") {
-    //         return;
-    //     } else {
-    //         // Hủy timeout cũ nếu có
-    //         clearTimeout(searchTimeout);
-
-    //         // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
-    //         searchTimeout = setTimeout(() => {
-    //             Axios(
-    //                 "POST",
-    //                 `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
-    //                 {
-    //                     params: {
-    //                         "filter[branch_id]": idBranch ? idBranch?.value : null,
-    //                     },
-
-    //                     data: {
-    //                         term: inputValue,
-    //                     },
-    //                 },
-    //                 (err, response) => {
-    //                     if (!err) {
-    //                         var { result } = response.data.data;
-    //                         sDataItems(result);
-    //                     }
-    //                 }
-    //             );
-    //         }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
-    //     }
-    // };
 
     const _ServerFetching_Location = async () => {
         await Axios(
@@ -533,7 +469,7 @@ const Index = (props) => {
 
     const formatNumber = (number) => {
         // const integerPart = Math.floor(number);
-        return number.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
     const _ServerSending = () => {
         var formData = new FormData();
@@ -567,21 +503,16 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.recallQuantity);
             });
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true`
-                : `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`
-            }`,
+        Axios("POST", `${id ? `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true` : `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    const { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
+                        isShow("success", `${dataLang[message]}` || message);
                         sCode("");
                         sStartDate(new Date());
                         sIdBranch(null);
@@ -592,7 +523,7 @@ const Index = (props) => {
                         sListData([]);
                         router.push(routerRecall.home);
                     } else {
-                        handleCheckError(dataLang[message]);
+                        handleCheckError(dataLang[message] || message);
                     }
                 }
                 sOnSending(false);
@@ -650,9 +581,7 @@ const Index = (props) => {
                             idChildBackEnd: null,
                             id: uuidv4(),
                             disabledDate:
-                                (value?.e?.text_type === "material" &&
-                                    dataMaterialExpiry?.is_enable === "1" &&
-                                    false) ||
+                                (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
                                 (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true),
                             location: null,
                             serial: "",
@@ -722,9 +651,7 @@ const Index = (props) => {
                         const newQtyImport = Number(value?.value);
                         updatedChild.recallQuantity = newQtyImport;
                     } else if (type === "location") {
-                        const checkKho = newData[parentIndex].child
-                            .map((house) => house)
-                            .some((i) => i?.location?.value === value?.value);
+                        const checkKho = newData[parentIndex].child.map((house) => house).some((i) => i?.location?.value === value?.value);
                         if (checkKho) {
                             handleCheckError("Vị trí thu hồi đã được chọn");
                         } else {
@@ -734,9 +661,7 @@ const Index = (props) => {
                         const newTypeValue = value?.target.value;
                         // Kiểm tra xem giá trị mới đã tồn tại trong cả phần tử cha và các phần tử con
                         const existsInParent = newData[parentIndex].child.some((ce) => ce[type] === newTypeValue);
-                        const existsInOtherParents = newData.some(
-                            (e) => e.id !== parentId && e.child.some((ce) => ce[type] === newTypeValue)
-                        );
+                        const existsInOtherParents = newData.some((e) => e.id !== parentId && e.child.some((ce) => ce[type] === newTypeValue));
                         if (existsInParent || existsInOtherParents) {
                             handleQuantityError(`Giá trị ${type} đã tồn tại`);
                             return; // Dừng việc cập nhật nếu có lỗi
@@ -785,12 +710,8 @@ const Index = (props) => {
                                     id: uuidv4(),
                                     location: null,
                                     disabledDate:
-                                        (value?.e?.text_type === "material" &&
-                                            dataMaterialExpiry?.is_enable === "1" &&
-                                            false) ||
-                                        (value?.e?.text_type === "material" &&
-                                            dataMaterialExpiry?.is_enable === "0" &&
-                                            true),
+                                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true),
                                     unit: value?.e?.unit_name,
                                     price: null,
                                     recallQuantity: null,
@@ -821,32 +742,32 @@ const Index = (props) => {
                         : dataLang?.recall_title_add || "recall_title_add"}
                 </title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+            <Container className='!h-auto'>
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     {trangthaiExprired ? (
-                        <div className="p-2"></div>
+                        <EmptyExprired />
                     ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.recall_title || "recall_title"}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.recall_title_edit || "recall_title_edit"
-                                    : dataLang?.recall_title_add || "recall_title_add"}
+
+                        <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                            <h6 className="text-[#141522]/40">
+                                {dataLang?.recall_title || "recall_title"}
                             </h6>
+                            <span className="text-[#141522]/40">/</span>
+                            <h6> {id ? dataLang?.recall_title_edit || "recall_title_edit"
+                                : dataLang?.recall_title_add || "recall_title_add"}</h6>
                         </div>
                     )}
+
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {id
                                 ? dataLang?.recall_title_edit || "recall_title_edit"
                                 : dataLang?.recall_title_add || "recall_title_add"}
                         </h2>
-
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerRecall.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
                             </button>
@@ -912,7 +833,7 @@ const Index = (props) => {
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
@@ -970,7 +891,7 @@ const Index = (props) => {
                                             "productsWarehouse_warehouseImport"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={warehouse}
                                         onChange={_HandleChangeInput.bind(this, "idRecalltWarehouse")}
                                         isLoading={idBranch != null ? false : onLoading}
@@ -1027,7 +948,7 @@ const Index = (props) => {
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={[]}
                                         onChange={_HandleChangeInput.bind(this, "")}
                                         isLoading={idBranch != null ? false : onLoading}
@@ -1131,7 +1052,7 @@ const Index = (props) => {
                     </div>
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
                         <div className="col-span-3">
-                            <Select
+                            <SelectCore
                                 options={options}
                                 value={null}
                                 onInputChange={_HandleSeachApi.bind(this)}
@@ -1224,7 +1145,7 @@ const Index = (props) => {
                             >
                                 <div className="col-span-1">
                                     {" "}
-                                    <Select
+                                    <SelectCore
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
                                             dataLang?.productsWarehouse_warehouseLocaImport ||
@@ -1302,7 +1223,7 @@ const Index = (props) => {
                                         >
                                             <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-1 mt-5">
-                                                    <Select
+                                                    <SelectCore
                                                         onInputChange={_HandleSeachApi.bind(this)}
                                                         options={options}
                                                         value={e?.matHang}
@@ -1333,12 +1254,14 @@ const Index = (props) => {
                                                                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                             {option.e?.name}
                                                                         </h3>
-                                                                        <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {option.e?.code}
-                                                                        </h5>
-                                                                        <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {option.e?.product_variation}
-                                                                        </h5>
+                                                                        <div className="flex gap-2">
+                                                                            <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                                {option.e?.code}
+                                                                            </h5>
+                                                                            <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                                {option.e?.product_variation}
+                                                                            </h5>
+                                                                        </div>
                                                                         <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                             {dataLang[option.e?.text_type]}
                                                                         </h5>
@@ -1418,7 +1341,7 @@ const Index = (props) => {
                                                     {e?.child?.map((ce) => (
                                                         <React.Fragment key={ce?.id?.toString()}>
                                                             <div className="flex justify-center border-t border-l  h-full p-1 flex-col items-center ">
-                                                                <Select
+                                                                <SelectCore
                                                                     options={dataLocation}
                                                                     value={ce?.location}
                                                                     isLoading={
@@ -1572,14 +1495,10 @@ const Index = (props) => {
                                                                     />
                                                                 </button>
 
-                                                                <NumericFormat
-                                                                    className={`${errQty &&
-                                                                        (ce?.recallQuantity == null ||
-                                                                            ce?.recallQuantity == "" ||
-                                                                            ce?.recallQuantity == 0)
-                                                                        ? "border-red-500 border-b"
-                                                                        : ""
-                                                                        } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
+                                                                <InPutNumericFormat
+                                                                    className={`${errQty && (ce?.recallQuantity == null || ce?.recallQuantity == "" || ce?.recallQuantity == 0) ? "border-red-500 border-b" : ""}
+                                                                        ${(ce?.recallQuantity == null || ce?.recallQuantity == "" || ce?.recallQuantity == 0) && "border-red-500 border-b"}
+                                                                        placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -1587,9 +1506,7 @@ const Index = (props) => {
                                                                         "recallQuantity"
                                                                     )}
                                                                     value={ce?.recallQuantity}
-                                                                    allowNegative={false}
-                                                                    isNumericString={true}
-                                                                    thousandSeparator=","
+                                                                    isAllowed={isAllowedNumber}
                                                                 />
 
                                                                 <button
@@ -1713,7 +1630,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
@@ -1725,37 +1642,6 @@ const Index = (props) => {
             />
         </React.Fragment>
     );
-};
-
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    // const label = `+ ${length}`;
-    const label = ``;
-
-    return <div title={title}>{label}</div>;
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 0;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
 };
 
 export default Index;

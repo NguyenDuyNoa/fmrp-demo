@@ -1,8 +1,5 @@
 import React, { useRef, useState } from "react";
-import Head from "next/head";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -15,74 +12,50 @@ import {
     TickCircle,
 } from "iconsax-react";
 
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
-
-import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from "reactjs-popup";
+
 import moment from "moment/moment";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import PopupEdit from "/components/UI/popup";
+import PopupEdit from "@/components/UI/popup";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
 
-import Swal from "sweetalert2";
-
-import ReactExport from "react-data-export";
 import { useEffect } from "react";
 
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
+import ExpandableContent from "@/components/UI/more";
+import ImageErrors from "@/components/UI/imageErrors";
 import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useFeature from "@/hooks/useConfigFeature";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import NoData from "@/components/UI/noData/nodata";
 
 const Popup_chitiet = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const [data, sData] = useState();
+
+    const dataSeting = useSetingServer()
+
+    const { dataMaterialExpiry } = useFeature()
+
     const [onFetching, sOnFetching] = useState(false);
 
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
 
-    // const formatNumber = (number) => {
-    //     if (!number && number !== 0) return 0;
-    //     const integerPart = Math.floor(number);
-    //     const decimalPart = number - integerPart;
-    //     const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-    //     const roundedNumber = integerPart + roundedDecimalPart;
-    //     return roundedNumber?.toLocaleString("en");
-    // };
     const formatNumber = (number) => {
-        if (!number && number !== 0) return "0";
-
-        const roundedNumber = Math.round(number * 100) / 100;
-        const [integerPart, decimalPart] = roundedNumber.toFixed(2).split(".");
-
-        const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        const formattedDecimalPart = decimalPart === "00" ? "" : `.${decimalPart}`;
-
-        return `${formattedIntegerPart}${formattedDecimalPart}`;
+        return formatNumberConfig(+number, dataSeting)
     };
 
     const _ServerFetching_detailOrder = () => {
@@ -99,34 +72,12 @@ const Popup_chitiet = (props) => {
             }
         );
     };
-
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         (onFetching && _ServerFetching_detailOrder()) ||
-    //             (onFetching && _ServerFetching());
-    //     }, 400);
-    // }, [open, props.id, onFetching]);
     useEffect(() => {
         setTimeout(() => {
-            (onFetching && _ServerFetching_detailOrder()) || (onFetching && _ServerFetching());
+            (onFetching && _ServerFetching_detailOrder())
         }, 400);
     }, [open]);
 
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetching(false);
-        });
-    };
     return (
         <>
             <PopupEdit
@@ -176,27 +127,12 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.import_from_browse || "import_from_browse"}
                                             </h3>
                                             <div className="flex flex-wrap  gap-2 items-center ">
-                                                {(data?.warehouseman_id === "0" && (
-                                                    <div className=" font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                        {"Chưa duyệt kho"}
-                                                    </div>
-                                                )) ||
-                                                    (data?.warehouseman_id != "0" && (
-                                                        <div className=" font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center">
-                                                            <TickCircle
-                                                                className="bg-lime-500 rounded-full animate-pulse "
-                                                                color="white"
-                                                                size={15}
-                                                            />
-                                                            <span>Đã duyệt kho</span>
-                                                        </div>
-                                                    ))}
+                                                <TagWarehouse data={data} />
                                             </div>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang?.productsWarehouse_warehouseImport ||
-                                                    "productsWarehouse_warehouseImport"}
+                                                {props?.dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {/* {data?.warehouse_name} */}
@@ -211,8 +147,7 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3 ">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang?.production_warehouse_Total_value ||
-                                                    "production_warehouse_Total_value"}
+                                                {props?.dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {formatNumber(data?.grand_total)}
@@ -220,26 +155,10 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
-                                                <div className="relative">
-                                                    <ImageErrors
-                                                        src={data?.staff_create?.profile_image}
-                                                        width={25}
-                                                        height={25}
-                                                        defaultSrc="/user-placeholder.jpg"
-                                                        alt="Image"
-                                                        className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                    />
-                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                                <h6 className="capitalize">{data?.staff_create?.full_name}</h6>
+                                                <CustomAvatar data={data} fullName={data?.staff_create?.full_name} profileImage={data?.staff_create?.profile_image} />
                                             </div>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -277,10 +196,8 @@ const Popup_chitiet = (props) => {
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
+                                            <Customscrollbar
+                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]"
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
@@ -372,23 +289,10 @@ const Popup_chitiet = (props) => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
                                     ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang?.purchase_order_table_item_not_found ||
-                                                        "purchase_order_table_item_not_found"}
-                                                </h1>
-                                                <div className="flex items-center justify-around mt-6 ">
-                                                    {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <NoData />
                                     )}
                                 </div>
                                 <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
