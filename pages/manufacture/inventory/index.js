@@ -377,117 +377,117 @@ const Index = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <Customscrollbar className="min:h-[500px] 2xl:h-[90%] xl:h-[69%] h-[82%] max:h-[800px]">
-                                    <div className="w-full">
-                                        <HeaderTable gridCols={11} display={'grid'}>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_vouchercode || "inventory_vouchercode"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_warehouse || "inventory_warehouse"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_total_item || "inventory_total_item"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_status || "inventory_status"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_creator || "inventory_creator"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_branch || "inventory_branch"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={3} textAlign={'center'}>
-                                                {dataLang?.inventory_note || "inventory_note"}
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                {dataLang?.inventory_operatione || "inventory_operatione"}
-                                            </ColumnTable>
-                                        </HeaderTable>
-                                        {isState.onFetching ? (
-                                            <Loading className="h-80" color="#0f4f9e" />
-                                        ) : isState.data?.length > 0 ? (
-                                            <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
-                                                    {isState.data?.map((e) => (
-                                                        <RowTable gridCols={11} key={e?.id.toString()}>
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
-                                                                {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
-                                                                <Popup_chitiet
-                                                                    dataLang={dataLang}
-                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-linear cursor-pointer"
-                                                                    name={e?.code}
-                                                                    id={e?.id}
-                                                                />
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'left'} >
-                                                                {e?.waidname}
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'right'}>
-                                                                {formatNumber(e?.total_item)}
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} className={"mx-auto"}>
-                                                                <PopupParent
-                                                                    className="dropdown-avt "
-                                                                    key={e?.staff_create_id}
-                                                                    trigger={(open) => (
-                                                                        <span className="border border-orange-500 text-orange-500 p-1 rounded-md">
-                                                                            {" "}
-                                                                            {e?.adjusted.split("|||").length +
-                                                                                " " +
-                                                                                " Điều chỉnh"}
-                                                                        </span>
-                                                                    )}
-                                                                    position="top center"
-                                                                    on={["hover"]}
-                                                                    arrow={false}
-                                                                >
-                                                                    <span className="bg-[#0f4f9e] text-white rounded p-1.5 ">
-                                                                        {e?.adjusted
-                                                                            ?.split("|||")
-                                                                            ?.map((item) => item?.split("--")[1])
-                                                                            ?.map((e) => e)
-                                                                            .join(", ")}{" "}
-                                                                    </span>
-                                                                </PopupParent>
-                                                            </RowItemTable>
-                                                            <RowItemTable>
-                                                                <CustomAvatar data={e} fullName={e?.staff_create_name} profileImage={e?.staff_create_image} />
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} className={'mx-auto'}>
-                                                                <TagBranch className="w-fit">
-                                                                    {e?.branch_name}
-                                                                </TagBranch>
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={3} textAlign={'left'}>
-                                                                {e?.note}
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
-                                                                <button
-                                                                    onClick={() =>
-                                                                        handleQueryId({ id: e.id, status: true })
-                                                                    }
-                                                                    className="xl:text-base text-xs "
-                                                                >
-                                                                    <IconDelete color="red" />
-                                                                </button>
-                                                            </RowItemTable>
-                                                        </RowTable>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <NoData />
-                                        )}
-                                    </div>
-                                </Customscrollbar>
                             </div>
+                            <Customscrollbar className="min:h-[200px] h-[90%] max:h-[750px] pb-2">
+                                <div className="w-full">
+                                    <HeaderTable gridCols={11} display={'grid'}>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_vouchercode || "inventory_vouchercode"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_warehouse || "inventory_warehouse"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_total_item || "inventory_total_item"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_status || "inventory_status"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_creator || "inventory_creator"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_branch || "inventory_branch"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={3} textAlign={'center'}>
+                                            {dataLang?.inventory_note || "inventory_note"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.inventory_operatione || "inventory_operatione"}
+                                        </ColumnTable>
+                                    </HeaderTable>
+                                    {isState.onFetching ? (
+                                        <Loading className="h-80" color="#0f4f9e" />
+                                    ) : isState.data?.length > 0 ? (
+                                        <>
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
+                                                {isState.data?.map((e) => (
+                                                    <RowTable gridCols={11} key={e?.id.toString()}>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <Popup_chitiet
+                                                                dataLang={dataLang}
+                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-linear cursor-pointer"
+                                                                name={e?.code}
+                                                                id={e?.id}
+                                                            />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'} >
+                                                            {e?.waidname}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            {formatNumber(e?.total_item)}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className={"mx-auto"}>
+                                                            <PopupParent
+                                                                className="dropdown-avt "
+                                                                key={e?.staff_create_id}
+                                                                trigger={(open) => (
+                                                                    <span className="border border-orange-500 text-orange-500 p-1 rounded-md">
+                                                                        {" "}
+                                                                        {e?.adjusted.split("|||").length +
+                                                                            " " +
+                                                                            " Điều chỉnh"}
+                                                                    </span>
+                                                                )}
+                                                                position="top center"
+                                                                on={["hover"]}
+                                                                arrow={false}
+                                                            >
+                                                                <span className="bg-[#0f4f9e] text-white rounded p-1.5 ">
+                                                                    {e?.adjusted
+                                                                        ?.split("|||")
+                                                                        ?.map((item) => item?.split("--")[1])
+                                                                        ?.map((e) => e)
+                                                                        .join(", ")}{" "}
+                                                                </span>
+                                                            </PopupParent>
+                                                        </RowItemTable>
+                                                        <RowItemTable>
+                                                            <CustomAvatar data={e} fullName={e?.staff_create_name} profileImage={e?.staff_create_image} />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className={'mx-auto'}>
+                                                            <TagBranch className="w-fit">
+                                                                {e?.branch_name}
+                                                            </TagBranch>
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={3} textAlign={'left'}>
+                                                            {e?.note}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleQueryId({ id: e.id, status: true })
+                                                                }
+                                                                className="xl:text-base text-xs "
+                                                            >
+                                                                <IconDelete color="red" />
+                                                            </button>
+                                                        </RowItemTable>
+                                                    </RowTable>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <NoData />
+                                    )}
+                                </div>
+                            </Customscrollbar>
                         </ContainerTable>
                     </div>
                     {isState.data?.length != 0 && (
