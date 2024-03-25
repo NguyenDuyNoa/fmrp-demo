@@ -12,18 +12,16 @@ const ParentControls = ({
 }) => {
   return (
     <div
-      className={`${
-        listData?.length > 1 && !onLoadingListData
-          ? "grid-cols-14"
-          : "grid-cols-12"
-      } grid gap-2 items-center`}
+      className={`${listData?.length > 1 && !onLoadingListData
+        ? "grid-cols-14"
+        : "grid-cols-12"
+        } grid gap-2 items-center`}
     >
       <div
-        className={`${
-          listData?.length > 1 && !onLoadingListData
-            ? "col-span-11"
-            : "col-span-12"
-        }`}
+        className={`${listData?.length > 1 && !onLoadingListData
+          ? "col-span-11"
+          : "col-span-12"
+          }`}
       >
         <div className="b flex items-center justify-center w-full pt-5">
           <button

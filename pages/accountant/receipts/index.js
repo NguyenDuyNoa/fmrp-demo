@@ -1,36 +1,53 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
 
 import moment from "moment/moment";
-import ModalImage from "react-modal-image";
-import { Grid6 as IconExcel, ArrowDown2 as IconDown, SearchNormal1 as IconSearch } from "iconsax-react";
+import { Grid6 as IconExcel, ArrowDown2 as IconDown, SearchNormal1 as IconSearch, Grid6 } from "iconsax-react";
 
-import Popup_chitietThere from "../detailThere";
-import Popup_chitiet from "./(popup)/detail";
-import Popup_dspt from "./(popup)/popup";
+import Popup_chitietThere from "../components/detailThere";
+import Popup_chitiet from "./components/detail";
+import Popup_dspt from "./components/popup";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
+import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
+import useToast from "@/hooks/useToast";
+import useActionRole from "@/hooks/useRole";
 import { useSetData } from "@/hooks/useSetData";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import { debounce } from "lodash";
-
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
+
+    const dataSeting = useSetingServer()
 
     const trangthaiExprired = useStatusExprired();
 
@@ -41,15 +58,21 @@ const Index = (props) => {
         valueDate: { startDate: null, endDate: null },
     };
 
+    const isShow = useToast()
+
     const initstialData = { table: [], excel: [], total: {}, listBr: [], dataMethod: [], dataObject: [] };
 
     const inistialFetch = { onFetching: false, onFetching_filter: false };
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+    console.log("auth", auth);
+    //thay type
+    // other_payslips_coupon
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'receipts');
 
-    const [totalItem, sTotalItems] = useState([]);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
 
     const [fetching, sFetching] = useState(inistialFetch);
 
@@ -131,12 +154,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        // setTimeout(() => {
-        //     if (!value) {
-        //         updateFetch({ onFetching: true });
-        //     }
-        //     updateFetch({ onFetching: true });
-        // }, 500);
         updateFetch({ onFetching: true });
     }, 500)
 
@@ -165,10 +182,7 @@ const Index = (props) => {
 
     useEffect(() => {
         if (
-            value.idBranch != null ||
-            (value.valueDate.startDate != null && value.valueDate.endDate != null) ||
-            value.idMethod != null ||
-            value.idObject != null
+            value.idBranch != null || (value.valueDate.startDate != null && value.valueDate.endDate != null) || value.idMethod != null || value.idObject != null
         ) {
             router.push({
                 pathname: router.route,
@@ -190,13 +204,8 @@ const Index = (props) => {
         }
     }, [value.idBranch, value.valueDate.endDate, value.valueDate.startDate, value.idMethod, value.idObject]);
 
-    const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
     };
 
     const multiDataSet = [
@@ -309,7 +318,7 @@ const Index = (props) => {
                 { value: `${e?.type_vouchers ? dataLang[e?.type_vouchers] || e?.type_vouchers : ""}` },
                 { value: `${e?.voucher ? e?.voucher.map((e) => e.code).join(", ") : ""}` },
                 { value: `${e?.payment_mode_name ? e?.payment_mode_name : ""}` },
-                { value: `${e?.total ? formatNumber(e?.total) : ""}` },
+                { value: `${e?.total ? formatMoney(e?.total) : ""}` },
                 { value: `${e?.staff_name ? e?.staff_name : ""}` },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -322,340 +331,292 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.receipts_title || "receipts_title"}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.receipts_title || "receipts_title"}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.receipts_title || "receipts_title"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.receipts_title || "receipts_title"}</h6>
                     </div>
                 )}
 
-                <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-3 h-[96%] overflow-hidden">
-                            <div className="flex justify-between items-center">
-                                <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.receipts_title || "receipts_title"}
-                                </h2>
-                                <div className="flex justify-end items-center mr-1 mt-1">
+                <ContainerBody>
+                    <div className="space-y-3 h-[96%] overflow-hidden">
+                        <div className="flex justify-between  mt-1 mr-2">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                {dataLang?.receipts_title}
+                            </h2>
+                            <div className="flex justify-end items-center gap-2">
+                                {role == true || checkAdd ?
                                     <Popup_dspt
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    />
-                                </div>
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            isShow("warning", WARNING_STATUS_ROLE);
+                                        }}
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    >{dataLang?.branch_popup_create_new}
+                                    </button>
+                                }
                             </div>
-                            <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
-                                <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded grid grid-cols-8 justify-between xl:p-3 p-2">
-                                        <div className="col-span-7">
-                                            <div className="grid grid-cols-10 items-center space-x-1">
-                                                <SearchComponent
-                                                    dataLang={dataLang}
-                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                    colSpan={2}
-                                                />
-                                                <SelectComponent
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label:
-                                                                dataLang?.payment_select_branch ||
-                                                                "payment_select_branch",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...dataTable.listBr,
-                                                    ]}
-                                                    isClearable={true}
-                                                    value={value.idBranch}
-                                                    onChange={onChangeValue("idBranch")}
-                                                    placeholder={dataLang?.client_list_filterbrand}
-                                                    colSpan={2}
-                                                />
-                                                <SelectComponent
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label: dataLang?.payment_TT_method || "payment_TT_method",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...dataTable.dataMethod,
-                                                    ]}
-                                                    isClearable={true}
-                                                    onChange={onChangeValue("idMethod")}
-                                                    value={value.idMethod}
-                                                    placeholder={dataLang?.payment_TT_method || "payment_TT_method"}
-                                                    colSpan={2}
-                                                />
-                                                <SelectComponent
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label: dataLang?.payment_select_ob || "payment_select_ob",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...dataTable.dataObject,
-                                                    ]}
-                                                    isClearable={true}
-                                                    onChange={onChangeValue("idObject")}
-                                                    value={value.idObject}
-                                                    placeholder={dataLang?.payment_ob || "payment_ob"}
-                                                    colSpan={2}
-                                                />
-                                                <DatepickerComponent
-                                                    colSpan={2}
-                                                    value={value.valueDate}
-                                                    onChange={onChangeValue("valueDate")}
-                                                />
-                                            </div>
+                        </div>
+                        <ContainerTable>
+                            <div className="xl:space-y-3 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-8 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-6">
+                                        <div className="grid grid-cols-10 gap-2">
+                                            <SearchComponent
+                                                dataLang={dataLang}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                colSpan={2}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...dataTable.listBr,
+                                                ]}
+                                                isClearable={true}
+                                                value={value.idBranch}
+                                                onChange={onChangeValue("idBranch")}
+                                                placeholder={dataLang?.price_quote_branch || 'price_quote_branch'}
+                                                colSpan={2}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.payment_TT_method || "payment_TT_method",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...dataTable.dataMethod,
+                                                ]}
+                                                isClearable={true}
+                                                onChange={onChangeValue("idMethod")}
+                                                value={value.idMethod}
+                                                placeholder={dataLang?.payment_TT_method || "payment_TT_method"}
+                                                colSpan={2}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.payment_ob || "payment_ob",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...dataTable.dataObject,
+                                                ]}
+                                                isClearable={true}
+                                                onChange={onChangeValue("idObject")}
+                                                value={value.idObject}
+                                                placeholder={dataLang?.payment_ob || "payment_ob"}
+                                                colSpan={2}
+                                            />
+                                            <DatepickerComponent
+                                                colSpan={2}
+                                                value={value.valueDate}
+                                                onChange={onChangeValue("valueDate")}
+                                            />
                                         </div>
-                                        <div className="col-span-1">
-                                            <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={sFetching} />
-                                                <div>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <div className="flex justify-end items-center gap-2">
+                                            <OnResetData sOnFetching={sFetching} />
+                                            {(role == true || checkExport) ?
+                                                <div className={``}>
                                                     {dataTable.excel?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename={dataLang?.receipts_lits || "receipts_lits"}
                                                             title="DSPT"
                                                             dataLang={dataLang}
-                                                        />
-                                                    )}
+                                                        />)}
                                                 </div>
-                                                <div className="">
-                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                                </div>
+                                                :
+                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                </button>
+                                            }
+                                            <div className="">
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                        <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_date || "payment_date"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_code || "payment_code"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_obType || "payment_obType"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_ob || "payment_ob"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_voucherCode || "payment_voucherCode"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {"PTTT"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_creator || "payment_creator"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_branch || "payment_branch"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_note || "payment_note"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.payment_action || "payment_action"}
-                                            </h4>
-                                        </div>
-                                        {fetching.onFetching ? (
-                                            <Loading className="h-80" color="#0f4f9e" />
-                                        ) : dataTable.table?.length > 0 ? (
-                                            <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {dataTable.table?.map((e) => (
-                                                        <div
-                                                            className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                            key={e.id.toString()}
-                                                        >
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  rounded-md text-center">
-                                                                {e?.date != null
-                                                                    ? moment(e?.date).format("DD/MM/YYYY")
-                                                                    : ""}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]">
-                                                                <Popup_chitiet
-                                                                    dataLang={dataLang}
-                                                                    className="text-center"
-                                                                    name={e?.code}
-                                                                    id={e?.id}
-                                                                />
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 flex items-center w-fit mx-auto">
-                                                                <div className="mx-auto">
-                                                                    {(e?.objects === "client" && (
-                                                                        <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {dataLang[e?.objects] || e?.objects}
-                                                                        </span>
-                                                                    )) ||
-                                                                        (e?.objects === "supplier" && (
-                                                                            <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.objects] || e?.objects}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (e?.objects === "other" && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.objects] || e?.objects}
-                                                                            </span>
-                                                                        ))}
-                                                                </div>
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left">
-                                                                {e?.object_text}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 flex items-center w-fit mx-auto">
-                                                                <div className="mx-auto">
-                                                                    {(e?.type_vouchers === "import" && (
-                                                                        <span className="flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {dataLang[e?.type_vouchers] ||
-                                                                                e?.type_vouchers}
-                                                                        </span>
-                                                                    )) ||
-                                                                        (e?.type_vouchers === "deposit" && (
-                                                                            <span className=" flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.type_vouchers] ||
-                                                                                    e?.type_vouchers}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (e?.type_vouchers === "service" && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.type_vouchers] ||
-                                                                                    e?.type_vouchers}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (e?.type_vouchers === "order" && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-green-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-green-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.type_vouchers] ||
-                                                                                    e?.type_vouchers}
-                                                                            </span>
-                                                                        ))}
-                                                                </div>
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 py-1  rounded-md text-center text-[#0F4F9E]">
-                                                                {e?.voucher?.map((code, index) => (
-                                                                    <Popup_chitietThere
-                                                                        key={code?.id}
-                                                                        dataLang={dataLang}
-                                                                        className="text-left hover:text-blue-600 transition-all ease-in-out"
-                                                                        type={code.voucher_type}
-                                                                        id={code.id}
-                                                                        name={code?.code}
-                                                                    >
-                                                                        {code?.code}
-                                                                    </Popup_chitietThere>
+                            </div>
+                            <Customscrollbar className="min:h-[200px] h-[88%] max:h-[500px]">
+                                <div className="w-full">
+                                    <HeaderTable gridCols={12} display={'grid'}>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_date || "payment_date"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_code || "payment_code"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_obType || "payment_obType"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_ob || "payment_ob"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_voucherCode || "payment_voucherCode"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {"PTTT"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_creator || "payment_creator"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_branch || "payment_branch"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_note || "payment_note"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.payment_action || "payment_action"}
+                                        </ColumnTable>
+                                    </HeaderTable>
+                                    {fetching.onFetching ? (
+                                        <Loading className="h-80" color="#0f4f9e" />
+                                    ) : dataTable.table?.length > 0 ? (
+                                        <>
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                                {dataTable.table?.map((e) => (
+                                                    <RowTable gridCols={12} key={e.id.toString()}  >
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            {e?.date != null
+                                                                ? moment(e?.date).format("DD/MM/YYYY")
+                                                                : ""}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'} >
+                                                            <Popup_chitiet
+                                                                dataLang={dataLang}
+                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
+                                                                name={e?.code}
+                                                                id={e?.id}
+                                                            />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'} className={'flex items-center justify-center'}>
+                                                            {(e?.objects === "client" && (
+                                                                <TagColorSky name={dataLang[e?.objects] || e?.objects} />
+                                                            )) ||
+                                                                (e?.objects === "supplier" && (
+                                                                    <TagColorOrange name={dataLang[e?.objects] || e?.objects} />
+                                                                )) ||
+                                                                (e?.objects === "other" && (
+                                                                    <TagColorRed name={dataLang[e?.objects] || e?.objects} />
                                                                 ))}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center">
-                                                                {e?.payment_mode_name}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-right">
-                                                                {formatNumber(e?.total)}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
-                                                                <div className="relative">
-                                                                    <ModalImage
-                                                                        small={
-                                                                            e?.profile_image
-                                                                                ? e?.profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        large={
-                                                                            e?.profile_image
-                                                                                ? e?.profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        className="h-6 w-6 rounded-full object-cover "
-                                                                    />
-                                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                                        </span>
-                                                                    </span>
-                                                                </div>
-                                                                <h6 className="capitalize">{e?.staff_name}</h6>
-                                                            </h6>
-                                                            <h6 className="col-span-1 w-fit mx-auto">
-                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {e?.branch_name}
-                                                                </div>
-                                                            </h6>
-                                                            <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left truncate">
-                                                                {e?.note}
-                                                            </h6>
-                                                            <div className="col-span-1 flex justify-center">
-                                                                <BtnAction
-                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'}>
+                                                            {e?.object_text}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
+                                                            {(e?.type_vouchers === "import" && (
+                                                                <TagColorMore color={'#a855f7'} backgroundColor={"#e9d5ff"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
+                                                            )) ||
+                                                                (e?.type_vouchers === "deposit" && (
+                                                                    <TagColorMore color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
+                                                                )) ||
+                                                                (e?.type_vouchers === "service" && (
+                                                                    <TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
+                                                                )) ||
+                                                                (e?.type_vouchers === "order" && (
+                                                                    <TagColorMore color={'#22c55e'} backgroundColor={'#bbf7d0'} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
+
+                                                                ))}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="" textAlign={'left'}>
+                                                            {e?.voucher?.map((code, index) => (
+                                                                <Popup_chitietThere
+                                                                    key={code?.id}
                                                                     dataLang={dataLang}
-                                                                    id={e?.id}
-                                                                    type="receipts"
-                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        Không tìm thấy các mục
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 "></div>
-                                                </div>
+                                                                    className=" hover:text-blue-600 transition-all ease-in-out 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 py-1  rounded-md text-center text-[#0F4F9E]"
+                                                                    type={code.voucher_type}
+                                                                    id={code.id}
+                                                                    name={code?.code}
+                                                                >
+                                                                    {code?.code}
+                                                                </Popup_chitietThere>
+                                                            ))}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            {e?.payment_mode_name}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            {formatMoney(e?.total)}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className={''}>
+                                                            <CustomAvatar fullName={e?.staff_name} profileImage={e?.profile_image} />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="col-span-1 mx-auto">
+                                                            <TagBranch className='w-fit'>
+                                                                {e?.branch_name}
+                                                            </TagBranch>
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
+                                                            {e?.note}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="flex justify-center">
+                                                            <BtnAction
+                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                dataLang={dataLang}
+                                                                id={e?.id}
+                                                                type="receipts"
+                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                            />
+                                                        </RowItemTable>
+                                                    </RowTable>
+                                                ))}
                                             </div>
-                                        )}
-                                    </div>
+                                        </>
+                                    ) : <NoData />}
                                 </div>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-12 bg-gray-100 items-center">
-                            <div className="col-span-7 p-2 text-center">
-                                <h3 className="uppercase font-normal 2xl:text-base xl:text-xs text-[8px]">
-                                    {dataLang?.purchase_order_table_total_outside ||
-                                        "purchase_order_table_total_outside"}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                                <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
-                                    {formatNumber(dataTable.total?.sum_total)}
-                                </h3>
-                            </div>
-                        </div>
-                        {dataTable.table?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
-                                <h6>
-                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
-                                </h6>
-                                <Pagination
-                                    postsPerPage={limit}
-                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
-                                    paginate={paginate}
-                                    currentPage={router.query?.page || 1}
-                                />
-                            </div>
-                        )}
+                            </Customscrollbar>
+                        </ContainerTable>
                     </div>
-                </div>
-            </div>
+                    <ContainerTotal>
+                        <ColumnTable colSpan={7} className="p-2" textAlign={'center'}>
+                            {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
+                        </ColumnTable>
+                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+                            {formatMoney(dataTable.total?.sum_total)}
+                        </ColumnTable>
+                    </ContainerTotal>
+                    {dataTable.table?.length != 0 && (
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItem?.iTotalDisplayRecords}
+                            />
+                            <Pagination
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItem?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page || 1}
+                            />
+                        </ContainerPagination>
+                    )}
+                </ContainerBody>
+            </Container>
         </React.Fragment>
     );
 };

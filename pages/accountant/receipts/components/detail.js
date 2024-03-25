@@ -1,35 +1,29 @@
-import React, { useState, useEffect } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import Link from "next/link";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import ModalImage from "react-modal-image";
-import { SearchNormal1 as IconSearch } from "iconsax-react";
-
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import dynamic from "next/dynamic";
 import moment from "moment/moment";
+import React, { useState, useEffect } from "react";
+
 import { getdataDetail } from "../../../../Api/apiReceipts/api";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
     const [onFetching, sOnFetching] = useState(false);
-
+    const dataSeting = useSetingServer()
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        return formatMoneyConfig(+number, dataSeting);
     };
 
     const _ServerFetching_detail = () => {
@@ -58,12 +52,12 @@ const Popup_chitiet = (props) => {
                 <div className=" space-x-5 w-[530px] h-auto">
                     <div>
                         <div className="w-[530px]">
-                            <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]  pb-1">
                                 <h2 className="font-semibold bg-[#ECF0F4] p-2 text-[13px]">
                                     {props.dataLang?.import_detail_info || "import_detail_info"}
                                 </h2>
                                 <div className="min-h-[130px] px-2 bg-gray-50 ">
-                                    <div className="grid grid-cols-2 space-x-4 3xl:max-h-[400px] xxl:max-h-[300px] 2xl:max-h-[350px] xl:max-h-[300px] lg:max-h-[280px] max-h-[300px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                    <Customscrollbar className="grid grid-cols-2 space-x-4 3xl:max-h-[400px] xxl:max-h-[300px] 2xl:max-h-[350px] xl:max-h-[300px] lg:max-h-[280px] max-h-[300px]">
                                         <div className="col-span-1">
                                             <div className="my-4 font-semibold grid grid-cols-2">
                                                 <h3 className=" text-[13px] ">
@@ -78,27 +72,7 @@ const Popup_chitiet = (props) => {
                                                     {props.dataLang?.payment_creator || "payment_creator"}
                                                 </h3>
                                                 <div className="flex flex-wrap  gap-2 items-center justify-start relative">
-                                                    <div className="relative">
-                                                        <ModalImage
-                                                            small={
-                                                                data?.profile_image
-                                                                    ? data?.profile_image
-                                                                    : "/user-placeholder.jpg"
-                                                            }
-                                                            large={
-                                                                data?.profile_image
-                                                                    ? data?.profile_image
-                                                                    : "/user-placeholder.jpg"
-                                                            }
-                                                            className="h-6 w-6 rounded-full object-cover"
-                                                        />
-                                                        <span className="h-1.5 w-1.5 absolute bottom-1/2 left-1/2 translate-x-[100%]">
-                                                            <span className="inline-flex relative rounded-full h-1.5 w-1.5 bg-lime-500">
-                                                                <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <h6 className="capitalize font-medium">{data?.staff_name}</h6>
+                                                    <CustomAvatar fullName={data?.staff_name} profileImage={data?.profile_image} />
                                                 </div>
                                             </div>
                                             <div className=" font-semibold grid grid-cols-2">
@@ -106,19 +80,13 @@ const Popup_chitiet = (props) => {
                                                     {props.dataLang?.payment_obType || "payment_obType"}
                                                 </h3>
                                                 {(data?.objects === "client" && (
-                                                    <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-1 bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                        {props.dataLang[data?.objects] || data?.objects}
-                                                    </span>
+                                                    <TagColorSky name={props.dataLang[data?.objects] || data?.objects} />
                                                 )) ||
                                                     (data?.objects === "supplier" && (
-                                                        <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-1 bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  ">
-                                                            {props.dataLang[data?.objects] || data?.objects}
-                                                        </span>
+                                                        <TagColorOrange name={props.dataLang[data?.objects] || data?.objects} />
                                                     )) ||
                                                     (data?.objects === "other" && (
-                                                        <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-1 bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                            {props.dataLang[data?.objects] || data?.objects}
-                                                        </span>
+                                                        <TagColorRed name={props.dataLang[data?.objects] || data?.objects} />
                                                     ))}
                                             </div>
                                             <div className="my-4 font-semibold grid grid-cols-2">
@@ -126,24 +94,17 @@ const Popup_chitiet = (props) => {
                                                     {props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                                 </h3>
                                                 {(data?.type_vouchers === "import" && (
-                                                    <span className="flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                        {props.dataLang[data?.type_vouchers] || data?.type_vouchers}
-                                                    </span>
+                                                    <TagColorMore color={'#a855f7'} backgroundColor={"#e9d5ff"} name={props.dataLang[data?.type_vouchers] || data?.type_vouchers} />
                                                 )) ||
                                                     (data?.type_vouchers === "deposit" && (
-                                                        <span className=" flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                            {props.dataLang[data?.type_vouchers] || data?.type_vouchers}
-                                                        </span>
+                                                        <TagColorMore color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={props.dataLang[data?.type_vouchers] || data?.type_vouchers} />
                                                     )) ||
                                                     (data?.type_vouchers === "service" && (
-                                                        <span className="flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                            {props.dataLang[data?.type_vouchers] || data?.type_vouchers}
-                                                        </span>
+                                                        <TagColorRed name={props.dataLang[data?.type_vouchers] || data?.type_vouchers} />
                                                     )) ||
                                                     (data?.type_vouchers === "order" && (
-                                                        <span className="flex items-center justify-center gap-1 font-normal text-green-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-green-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                            {props.dataLang[data?.type_vouchers] || data?.type_vouchers}
-                                                        </span>
+                                                        <TagColorMore color={'#22c55e'} backgroundColor={'#bbf7d0'} name={props.dataLang[data?.type_vouchers] || data?.type_vouchers} />
+
                                                     ))}
                                             </div>
                                         </div>
@@ -172,12 +133,12 @@ const Popup_chitiet = (props) => {
                                             </div>
                                             <div className=" font-semibold grid grid-cols-2">
                                                 <h3 className=" text-[13px] ">{"Chi nhánh"}</h3>
-                                                <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
+                                                <TagBranch className="w-fit">
                                                     {data?.branch_name}
-                                                </h3>
+                                                </TagBranch>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Customscrollbar>
                                     <div className="mb-4 font-semibold col-span-2 grid grid-cols-4 ">
                                         <h3 className=" text-[13px] col-span-1 ">
                                             {props.dataLang?.payment_voucherCode || "payment_voucherCode"}
@@ -212,10 +173,8 @@ const Popup_chitiet = (props) => {
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.voucher?.length > 0 ? (
                                         <>
-                                            <ScrollArea
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                                speed={1}
-                                                smoothScrolling={true}
+                                            <Customscrollbar
+                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]"
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.voucher?.map((e, index) => (
@@ -235,22 +194,9 @@ const Popup_chitiet = (props) => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </ScrollArea>
+                                            </Customscrollbar>
                                         </>
-                                    ) : (
-                                        <div className=" max-w-[352px] mt-24 mx-auto">
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                    <IconSearch />
-                                                </div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang?.purchase_order_table_item_not_found ||
-                                                        "purchase_order_table_item_not_found"}
-                                                </h1>
-                                                <div className="flex items-center justify-around mt-6 "></div>
-                                            </div>
-                                        </div>
-                                    )}
+                                    ) : <NoData />}
                                 </div>
                                 <h2 className="font-semibold p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                                     {props.dataLang?.purchase_total || "purchase_total"}
@@ -269,8 +215,7 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-2 space-y-1 text-right">
                                         <div className="font-semibold text-left text-[13px]">
                                             <h3>
-                                                {props.dataLang?.import_detail_total_amount ||
-                                                    "import_detail_total_amount"}
+                                                {props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}
                                             </h3>
                                         </div>
                                     </div>
@@ -282,7 +227,7 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Customscrollbar>
                         </div>
                     </div>
                 </div>

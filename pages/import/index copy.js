@@ -42,10 +42,10 @@ import { TiTick } from "react-icons/ti";
 
 import { urlApi } from "services/URL";
 
-import Popup_status from "./(popup)/popup";
-import Popup_stages from "./(popup)/popupStages";
+import Popup_status from "./components/popup/popup";
+import Popup_stages from "./components/popup/popupStages";
 import { flatMap } from "lodash";
-import FormClient from "./(form)/formClient";
+import FormClient from "./components/formClient";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -811,12 +811,11 @@ const Index = (props) => {
                 else if (!ObError?.name) {
                     Toast.fire({
                         icon: "error",
-                        title: `${
-                            (tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
+                        title: `${(tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
                             (tabPage == 2 && !ObError?.name && dataLang?.import_ERR_add_nameDataSuplier) ||
                             (tabPage == 3 && !ObError?.name && dataLang?.import_ERR_add_nameMterial) ||
                             (tabPage == 4 && !ObError?.name && dataLang?.import_ERR_add_nameProduct)
-                        }`,
+                            }`,
                     });
                 }
                 //bắt buộc phải có cột chi nhánh
@@ -1284,8 +1283,8 @@ const Index = (props) => {
                         // className=""
                         router={router.query?.tab}
                         data={dataFailStages}
-                        // totalFalse={totalFalse}
-                        // listData={listData}
+                    // totalFalse={totalFalse}
+                    // listData={listData}
                     />
                 )}
                 <div className="">
@@ -1507,9 +1506,8 @@ const Index = (props) => {
                                                         position: "absolute",
                                                     }),
                                                 }}
-                                                className={`${
-                                                    errValueCheck ? "border-red-500" : "border-transparent"
-                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${errValueCheck ? "border-red-500" : "border-transparent"
+                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                             {errValueCheck && (
                                                 <label className="text-sm text-red-500">
@@ -1537,12 +1535,11 @@ const Index = (props) => {
                                             </label>
                                             <label
                                                 for="importFile"
-                                                className={`${
-                                                    (errFileImport && dataImport.length == 0) ||
+                                                className={`${(errFileImport && dataImport.length == 0) ||
                                                     (errFileImport && fileImport == null)
-                                                        ? "border-red-500"
-                                                        : "border-gray-200"
-                                                } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
+                                                    ? "border-red-500"
+                                                    : "border-gray-200"
+                                                    } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
                                             >
                                                 <input
                                                     accept=".xlsx, .xls"
@@ -1584,11 +1581,10 @@ const Index = (props) => {
                                                     {dataLang?.import_line_starts || "import_line_starts"}
                                                 </label>
                                                 <NumericFormat
-                                                    className={`${
-                                                        errRowStart && (row_tarts == null || row_tarts == "")
-                                                            ? "border-red-500"
-                                                            : "border-gray-200"
-                                                    } border py-2.5 outline-none px-4  block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                                                    className={`${errRowStart && (row_tarts == null || row_tarts == "")
+                                                        ? "border-red-500"
+                                                        : "border-gray-200"
+                                                        } border py-2.5 outline-none px-4  block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
                                                     onValueChange={_HandleChange.bind(this, "row_tarts")}
                                                     value={row_tarts}
                                                     allowNegative={false}
@@ -1611,11 +1607,10 @@ const Index = (props) => {
                                                     {dataLang?.import_finished_row || "import_finished_row"}
                                                 </label>
                                                 <NumericFormat
-                                                    className={`${
-                                                        errEndRow && (end_row == null || end_row == "")
-                                                            ? "border-red-500"
-                                                            : "border-gray-200"
-                                                    } border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                                                    className={`${errEndRow && (end_row == null || end_row == "")
+                                                        ? "border-red-500"
+                                                        : "border-gray-200"
+                                                        } border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
                                                     onValueChange={_HandleChange.bind(this, "end_row")}
                                                     value={end_row}
                                                     disabled={row_tarts == null}
@@ -1686,11 +1681,10 @@ const Index = (props) => {
                                 <div className="col-span-4 -mt-2">
                                     {tabPage != 5 && (
                                         <div
-                                            className={`${
-                                                listData?.length > 1 && !onLoadingListData
-                                                    ? "grid-cols-14"
-                                                    : "grid-cols-12"
-                                            } grid  gap-2 items-center`}
+                                            className={`${listData?.length > 1 && !onLoadingListData
+                                                ? "grid-cols-14"
+                                                : "grid-cols-12"
+                                                } grid  gap-2 items-center`}
                                         >
                                             {listData?.length > 1 && !onLoadingListData && (
                                                 <div className="col-span-3 pt-5">
@@ -1712,11 +1706,10 @@ const Index = (props) => {
                                                 </div>
                                             )}
                                             <div
-                                                className={`${
-                                                    listData?.length > 1 && !onLoadingListData
-                                                        ? "col-span-11"
-                                                        : "col-span-12"
-                                                } `}
+                                                className={`${listData?.length > 1 && !onLoadingListData
+                                                    ? "col-span-11"
+                                                    : "col-span-12"
+                                                    } `}
                                             >
                                                 <div className="b  flex items-center justify-center w-full  pt-5">
                                                     <button
@@ -1758,21 +1751,18 @@ const Index = (props) => {
                                     )}
                                     {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
                                         <div
-                                            className={`flex items-center justify-center  gap-2 pt-5 ${
-                                                save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
-                                            }`}
+                                            className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                                }`}
                                         >
                                             <div className="flex items-center gap-1 group">
                                                 <ColorsSquare
                                                     size="22"
-                                                    className={`${
-                                                        stepper.main ? "text-blue-600" : "text-gray-500"
-                                                    } group-hover:scale-105 transition-all ease-linear animate-pulse duration-700`}
+                                                    className={`${stepper.main ? "text-blue-600" : "text-gray-500"
+                                                        } group-hover:scale-105 transition-all ease-linear animate-pulse duration-700`}
                                                 />
                                                 <h3
-                                                    className={`${
-                                                        stepper.main ? "text-blue-600" : "text-gray-600"
-                                                    } font-semibold duration-700 3xl:text-sm 2xl:text-sm xl:text-xs text-xs`}
+                                                    className={`${stepper.main ? "text-blue-600" : "text-gray-600"
+                                                        } font-semibold duration-700 3xl:text-sm 2xl:text-sm xl:text-xs text-xs`}
                                                 >
                                                     {dataLang?.import_variation || "import_variation"}
                                                 </h3>
@@ -1782,13 +1772,12 @@ const Index = (props) => {
                                             >
                                                 <div
                                                     style={{
-                                                        width: `${
-                                                            stepper.main && !stepper.extra
-                                                                ? "50%"
-                                                                : stepper.main && stepper.extra
+                                                        width: `${stepper.main && !stepper.extra
+                                                            ? "50%"
+                                                            : stepper.main && stepper.extra
                                                                 ? "100%"
                                                                 : "0%"
-                                                        }`,
+                                                            }`,
                                                     }}
                                                     className={`absolute  bg-blue-600 top-0 left-0 h-full rounded transition-all duration-500`}
                                                 ></div>
@@ -1796,18 +1785,16 @@ const Index = (props) => {
                                             <div className="flex items-center gap-1 group">
                                                 <Colorfilter
                                                     size="22"
-                                                    className={`${
-                                                        stepper?.main && stepper?.extra
-                                                            ? "text-blue-600"
-                                                            : "text-gray-500"
-                                                    } group-hover:scale-105 duration-700 transition-all ease-linear animate-pulse`}
+                                                    className={`${stepper?.main && stepper?.extra
+                                                        ? "text-blue-600"
+                                                        : "text-gray-500"
+                                                        } group-hover:scale-105 duration-700 transition-all ease-linear animate-pulse`}
                                                 />
                                                 <h3
-                                                    className={`${
-                                                        stepper?.main && stepper?.extra
-                                                            ? "text-blue-600"
-                                                            : "text-gray-600"
-                                                    } font-semibold 3xl:text-sm 2xl:text-sm xl:text-xs text-xs duration-700`}
+                                                    className={`${stepper?.main && stepper?.extra
+                                                        ? "text-blue-600"
+                                                        : "text-gray-600"
+                                                        } font-semibold 3xl:text-sm 2xl:text-sm xl:text-xs text-xs duration-700`}
                                                 >
                                                     {dataLang?.import_subvariant || "import_subvariant"}
                                                 </h3>
@@ -1819,9 +1806,8 @@ const Index = (props) => {
 
                                 <div className="col-span-2"></div>
                                 <div
-                                    className={`${listData?.length > 2 ? "mt-3" : ""} ${
-                                        onLoadingListData ? "col-span-8" : "col-span-6"
-                                    }`}
+                                    className={`${listData?.length > 2 ? "mt-3" : ""} ${onLoadingListData ? "col-span-8" : "col-span-6"
+                                        }`}
                                 >
                                     {onLoadingListData ? (
                                         <Loading className="h-2" color="#0f4f9e" />
@@ -1887,11 +1873,10 @@ const Index = (props) => {
                                                                         position: "absolute",
                                                                     }),
                                                                 }}
-                                                                className={`${
-                                                                    errFiles && e.dataFields == null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                                className={`${errFiles && e.dataFields == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                             />
                                                         </div>
                                                         <div className="col-span-6">
@@ -1944,11 +1929,10 @@ const Index = (props) => {
                                                                         position: "absolute",
                                                                     }),
                                                                 }}
-                                                                className={`${
-                                                                    errColumn && e?.column == null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                                className={`${errColumn && e?.column == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                             />
                                                         </div>
                                                     </div>
@@ -1960,12 +1944,12 @@ const Index = (props) => {
                                                         </h5>
                                                     )}
                                                     {e?.dataFields?.value == "group_id" ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "category_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "unit_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "unit_convert_id") ? (
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "category_id") ||
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "unit_id") ||
+                                                        ((tabPage == 3 || tabPage == 4) &&
+                                                            e?.dataFields?.value == "unit_convert_id") ? (
                                                         <div className="flex items-center space-x-2 rounded p-2 ">
                                                             <TiTick color="green" />
                                                             <label
@@ -2060,9 +2044,8 @@ const Index = (props) => {
                                                                 strokeLinecap: "butt",
                                                                 textSize: "16px",
                                                                 pathTransitionDuration: 0.5,
-                                                                pathColor: `rgba(236, 64, 122, ${
-                                                                    multipleProgress / 100
-                                                                })`,
+                                                                pathColor: `rgba(236, 64, 122, ${multipleProgress / 100
+                                                                    })`,
                                                                 pathColor: `green`,
                                                                 textColor: "green",
                                                                 textAnchor: "middle",
@@ -2072,9 +2055,8 @@ const Index = (props) => {
                                                         />
                                                         <div className=" grid grid-cols-12 group items-center justify-center mt-4">
                                                             <div
-                                                                className={`${
-                                                                    multipleProgress ? "animate-spin" : "animate-pulse"
-                                                                } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                                                                className={`${multipleProgress ? "animate-spin" : "animate-pulse"
+                                                                    } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
                                                             ></div>
                                                             <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
                                                                 dataSuccess
@@ -2082,9 +2064,8 @@ const Index = (props) => {
                                                         </div>
                                                         <div className=" grid grid-cols-12 group items-center justify-center mt-4">
                                                             <div
-                                                                className={`${
-                                                                    multipleProgress ? "animate-spin" : "animate-pulse"
-                                                                } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                                                                className={`${multipleProgress ? "animate-spin" : "animate-pulse"
+                                                                    } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
                                                             ></div>
                                                             <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
                                                                 totalFalse
@@ -2108,9 +2089,8 @@ const Index = (props) => {
                                                                 strokeLinecap: "butt",
                                                                 textSize: "16px",
                                                                 pathTransitionDuration: 0.5,
-                                                                pathColor: `rgba(236, 64, 122, ${
-                                                                    multipleProgress / 100
-                                                                })`,
+                                                                pathColor: `rgba(236, 64, 122, ${multipleProgress / 100
+                                                                    })`,
                                                                 pathColor: `green`,
                                                                 textColor: "green",
                                                                 textAnchor: "middle",
@@ -2120,9 +2100,8 @@ const Index = (props) => {
                                                         />
                                                         <div className=" grid grid-cols-12 group items-center justify-center mt-4">
                                                             <div
-                                                                className={`${
-                                                                    multipleProgress ? "animate-spin" : "animate-pulse"
-                                                                } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                                                                className={`${multipleProgress ? "animate-spin" : "animate-pulse"
+                                                                    } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
                                                             ></div>
                                                             <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
                                                                 totalSuccessStages
@@ -2130,9 +2109,8 @@ const Index = (props) => {
                                                         </div>
                                                         <div className=" grid grid-cols-12 group items-center justify-center mt-4">
                                                             <div
-                                                                className={`${
-                                                                    multipleProgress ? "animate-spin" : "animate-pulse"
-                                                                } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                                                                className={`${multipleProgress ? "animate-spin" : "animate-pulse"
+                                                                    } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
                                                             ></div>
                                                             <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
                                                                 dataFailStages?.length
@@ -2505,11 +2483,10 @@ const Index = (props) => {
                                         className="xl:text-sm text-xs p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
                                     >
                                         <div
-                                            className={`${
-                                                multipleProgress
-                                                    ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
-                                                    : ""
-                                            }`}
+                                            className={`${multipleProgress
+                                                ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
+                                                : ""
+                                                }`}
                                         ></div>
                                         <span>{"Import"}</span>
                                     </button>
@@ -2534,9 +2511,8 @@ const TabClient = React.memo((props) => {
         <button
             style={props.style}
             onClick={props.onClick}
-            className={`${props.className} ${
-                router.query?.tab === `${props.active}` ? "bg-blue-400 text-white" : ""
-            } justify-center 3xl:w-[230px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:h-10 2xl:h-8 xl:h-8 lg:h-7 3xl:text-[16px] 2xl:text-[14px] xl:text-[14px] lg:text-[12px] flex gap-2 items-center rounded-md px-2 py-2 outline-none`}
+            className={`${props.className} ${router.query?.tab === `${props.active}` ? "bg-blue-400 text-white" : ""
+                } justify-center 3xl:w-[230px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:h-10 2xl:h-8 xl:h-8 lg:h-7 3xl:text-[16px] 2xl:text-[14px] xl:text-[14px] lg:text-[12px] flex gap-2 items-center rounded-md px-2 py-2 outline-none`}
         >
             {router.query?.tab === `${props.active}` && <TiTick size="20" color="white" />}
             {props.children}

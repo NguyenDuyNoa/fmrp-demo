@@ -34,25 +34,27 @@ import { TiTick } from "react-icons/ti";
 
 import { urlApi } from "services/URL";
 
-import Popup_status from "./(popup)/popup";
-import Popup_stages from "./(popup)/popupStages";
-import FormClient from "./(form)/formClient";
-import Progress from "./(progress)/progress";
-import ParentControls from "./(button)/buttonAddParent";
-import DeleteButton from "./(button)/buttonDeleteSlect";
-import TabClient from "./(tab)/tabImport";
-import Stepper from "./(stepper)/stepper";
-import FormSupplier from "./(form)/formSupplier";
-import ImportFileTemplate from "./(inputDowStages_Bom)/inputTab";
-import SampleImport from "./(sample_guide)/sample";
-import Row from "./(row)/row";
-import Radio from "./(radio)/radio";
-import Popup_bom from "./(popup)/popupBom";
+import Popup_status from "./components/popup/popup";
+import Popup_stages from "./components/popup/popupStages";
+import FormClient from "./components/formClient";
+import Progress from "./components/progress";
+import ParentControls from "./components/button/buttonAddParent";
+import DeleteButton from "./components/button/buttonDeleteSlect";
+import TabClient from "./components/tabImport";
+import Stepper from "./components/stepper";
+import FormSupplier from "./components/formSupplier";
+import ImportFileTemplate from "./components/inputTab";
+import SampleImport from "./components/sample";
+import Row from "./components/row";
+import Radio from "./components/radio";
+import Popup_bom from "./components/popup/popupBom";
 import { useSelector } from "react-redux";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -151,7 +153,9 @@ const Index = (props) => {
         router.query?.tab == 1 && "client_customers" ||
         router.query?.tab == 2 && "suppliers" ||
         router.query?.tab == 3 && "materials" ||
-        router.query?.tab == 4 && "products"
+        router.query?.tab == 4 && "products" ||
+        router.query?.tab == 5 && "products" ||
+        router.query?.tab == 6 && "products"
         // ... thêm các type
     )
     const _ServerFetching = () => {
@@ -526,59 +530,6 @@ const Index = (props) => {
         });
         sListData([...newData]);
     };
-
-    // const _HandleChangeChildContact = (childId, type, value) => {
-    //   const newData = listDataContact.map((e) => {
-    //     if (e?.id == childId) {
-    //       if (type == "dataFieldsContact") {
-    //         const isDuplicate =
-    //           value &&
-    //           listDataContact.some(
-    //             (data) =>
-    //               data?.dataFieldsContact?.value === value?.value &&
-    //               data.id !== childId
-    //           );
-    //         //Lỗi trùng nhau
-    //         if (isDuplicate && e?.dataFieldsContact?.value !== value?.value) {
-    //           Toast.fire({
-    //             title: `${
-    //               dataLang?.import_ERR_selected || "import_ERR_selected"
-    //             }`,
-    //             icon: "error",
-    //           });
-
-    //           return { ...e, dataFieldsContact: null };
-    //         }
-    //         return { ...e, dataFieldsContact: value };
-    //       } else if (type == "columnContact") {
-    //         //Trùng cột
-    //         const isDuplicate =
-    //           value &&
-    //           listDataContact.some(
-    //             (data) =>
-    //               data?.columnContact?.value === value?.value &&
-    //               data.id !== childId
-    //           );
-
-    //         if (isDuplicate && e?.columnContact?.value !== value?.value) {
-    //           Toast.fire({
-    //             title: `${
-    //               dataLang?.import_ERR_selectedColumn ||
-    //               "import_ERR_selectedColumn"
-    //             }`,
-    //             icon: "error",
-    //           });
-    //           return e;
-    //         } else {
-    //           return { ...e, columnContact: value };
-    //         }
-    //       }
-    //     } else {
-    //       return e;
-    //     }
-    //   });
-    //   sListDataContat([...newData]);
-    // };
 
     const _HandleChangeChildContact = (childId, type, value) => {
         const newData = listDataContact.map((e) => {
@@ -1061,78 +1012,74 @@ const Index = (props) => {
                 dataChunks.push(chunk);
             }
         } else if (tabPage == 2) {
-            const dataClientContact = dataImport
-                ?.filter((item) => item)
-                .map((item, index) => {
-                    const result = {};
-                    for (const listDataItem of mergedListData) {
-                        const { column, dataFields, columnContact, dataFieldsContact } = listDataItem;
-                        const columnValue = column?.value;
-                        const dataFieldsValue = dataFields?.value;
-                        const columnContactValue = columnContact?.value;
-                        const dataFieldsContactValue = dataFieldsContact?.value;
+            const dataClientContact = dataImport?.filter((item) => item).map((item, index) => {
+                const result = {};
+                for (const listDataItem of mergedListData) {
+                    const { column, dataFields, columnContact, dataFieldsContact } = listDataItem;
+                    const columnValue = column?.value;
+                    const dataFieldsValue = dataFields?.value;
+                    const columnContactValue = columnContact?.value;
+                    const dataFieldsContactValue = dataFieldsContact?.value;
 
-                        if (columnValue && item[columnValue]) {
-                            result[dataFieldsValue] = item[columnValue];
-                        }
-
-                        if (columnContactValue && item[columnContactValue]) {
-                            result[dataFieldsContactValue] = item[columnContactValue];
-                        }
-                        if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
-                            const fieldKey = dataFieldsValue;
-                            const fieldValue = item[dataFields.label];
-                            result[fieldKey] = fieldValue;
-                        }
-
-                        if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
-                            const fieldKey = dataFieldsContactValue;
-                            const fieldValue = item[dataFieldsContact.label];
-                            result[fieldKey] = fieldValue;
-                        }
-                    }
-                    if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
-                        return result;
+                    if (columnValue && item[columnValue]) {
+                        result[dataFieldsValue] = item[columnValue];
                     }
 
-                    return null;
-                })
+                    if (columnContactValue && item[columnContactValue]) {
+                        result[dataFieldsContactValue] = item[columnContactValue];
+                    }
+                    if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
+                        const fieldKey = dataFieldsValue;
+                        const fieldValue = item[dataFields.label];
+                        result[fieldKey] = fieldValue;
+                    }
+
+                    if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
+                        const fieldKey = dataFieldsContactValue;
+                        const fieldValue = item[dataFieldsContact.label];
+                        result[fieldKey] = fieldValue;
+                    }
+                }
+                if (Object.keys(result).length > 0) {
+                    result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
+                    return result;
+                }
+
+                return null;
+            })
                 .filter((item) => item !== null);
             for (let i = 0; i < dataClientContact.length; i += chunkSize) {
                 const chunk = dataClientContact.slice(i, i + chunkSize);
                 dataChunks.push(chunk);
             }
         } else {
-            const data = dataImport
-                ?.filter((item) => item)
-                .map((item) => {
-                    const result = {};
+            const data = dataImport?.filter((item) => item).map((item) => {
+                const result = {};
 
-                    for (const listDataItem of listData) {
-                        const columnValue = listDataItem.column?.value;
-                        const dataFieldsValue = listDataItem.dataFields?.value;
-                        if (columnValue && item[columnValue]) {
-                            result[dataFieldsValue] = item[columnValue];
-                        }
-                        if (
-                            listDataItem?.dataFields &&
-                            listDataItem?.dataFields.label &&
-                            listDataItem?.dataFields?.value &&
-                            item[listDataItem?.dataFields?.label]
-                        ) {
-                            const fieldKey = listDataItem?.dataFields?.value;
-                            const fieldValue = item[listDataItem?.dataFields?.label];
-                            result[fieldKey] = fieldValue;
-                        }
+                for (const listDataItem of listData) {
+                    const columnValue = listDataItem.column?.value;
+                    const dataFieldsValue = listDataItem.dataFields?.value;
+                    if (columnValue && item[columnValue]) {
+                        result[dataFieldsValue] = item[columnValue];
                     }
-                    if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
-                        return result;
+                    if (
+                        listDataItem?.dataFields &&
+                        listDataItem?.dataFields.label &&
+                        listDataItem?.dataFields?.value &&
+                        item[listDataItem?.dataFields?.label]
+                    ) {
+                        const fieldKey = listDataItem?.dataFields?.value;
+                        const fieldValue = item[listDataItem?.dataFields?.label];
+                        result[fieldKey] = fieldValue;
                     }
+                }
+                if (Object.keys(result).length > 0) {
+                    result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
+                    return result;
+                }
 
-                    return null;
-                })
+                return null;
+            })
                 .filter((item) => item !== null);
             for (let i = 0; i < data.length; i += chunkSize) {
                 const chunk = data.slice(i, i + chunkSize);
@@ -1189,9 +1136,7 @@ const Index = (props) => {
             );
         } else {
             for (const data of dataChunks) {
-                Axios(
-                    "POST",
-                    `${apiUrl}`,
+                Axios("POST", `${apiUrl}`,
                     {
                         data: {
                             data,
@@ -1261,9 +1206,7 @@ const Index = (props) => {
             });
         }
         formData.append(`tab`, tabPage);
-        Axios(
-            "POST",
-            `${"/api_web/Api_import_data/add_tempate_import?csrf_protection=true"}`,
+        Axios("POST", `${"/api_web/Api_import_data/add_tempate_import?csrf_protection=true"}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -1303,155 +1246,84 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.import_data || "import_data"}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10">
+
+            <Container className={'!h-auto'}>
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.import_data || "import_data"}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.import_data || "import_data"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.import_category || "import_category"}</h6>
                     </div>
                 )}
-                {(tabPage != 5 && tabPage != 6 && (
-                    <Popup_status
-                        dataLang={dataLang}
-                        className=""
-                        router={router.query?.tab}
-                        data={dataFail}
-                        totalFalse={totalFalse}
-                        listData={listData}
-                        listDataContact={listDataContact}
-                        listDataDelivery={listDataDelivery}
-                    />
-                )) ||
-                    (tabPage == 5 && (
-                        <Popup_stages dataLang={dataLang} router={router.query?.tab} data={dataFailStages} />
-                    )) ||
-                    (tabPage == 6 && <Popup_bom dataLang={dataLang} router={router.query?.tab} data={dataFailBom} />)}
-                <div className="">
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-3 h-[96%] overflow-hidden">
-                            <h2 className="text-2xl text-[#52575E] capitalize">
-                                {dataLang?.import_catalog || "import_catalog"}
-                            </h2>
 
-                            <div className="grid grid-cols-12 items-center justify-center mx-auto space-x-3">
-                                <div className="col-span-2"></div>
-                                <div className="col-span-8 flex flex-nowrap gap-4 items-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    {dataTab &&
-                                        dataTab.map((e) => {
-                                            return (
-                                                <div>
-                                                    <TabClient
-                                                        key={e.id}
-                                                        onClick={_HandleSelectTab.bind(this, `${e.id}`)}
-                                                        active={e.id}
-                                                        className="text-[#0F4F9E] my-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
-                                                    >
-                                                        {e.name}
-                                                    </TabClient>
-                                                </div>
-                                            );
-                                        })}
-                                </div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-8 border-b">
-                                    <h2 className="py-2">{dataName[tabPage] || ""}</h2>
-                                </div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-4 mb-2 mt-2">
-                                    {(tabPage == 5 && (
-                                        <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} urlApi={urlApi} />
+                <ContainerBody>
+                    <div className="space-y-3 h-[96%] overflow-hidden">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            {dataLang?.import_catalog || 'import_catalog'}
+                        </h2>
+
+                        <div className="grid grid-cols-12 items-center justify-center mx-auto space-x-3">
+                            <div className="col-span-2"></div>
+                            <div className="col-span-8 flex flex-nowrap gap-4 items-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                {dataTab &&
+                                    dataTab.map((e) => {
+                                        return (
+                                            <div>
+                                                <TabClient
+                                                    key={e.id}
+                                                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                                                    active={e.id}
+                                                    className="text-[#0F4F9E] my-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
+                                                >
+                                                    {e.name}
+                                                </TabClient>
+                                            </div>
+                                        );
+                                    })}
+                            </div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-8 border-b">
+                                <h2 className="py-2">{dataName[tabPage] || ""}</h2>
+                            </div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-4 mb-2 mt-2">
+                                {(tabPage == 5 && (
+                                    <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} urlApi={urlApi} />
+                                )) ||
+                                    (tabPage == 6 && (
+                                        <ImportFileTemplate dataLang={dataLang} urlApi={urlApi} tabPage={tabPage} />
                                     )) ||
-                                        (tabPage == 6 && (
-                                            <ImportFileTemplate dataLang={dataLang} urlApi={urlApi} tabPage={tabPage} />
-                                        )) ||
-                                        (tabPage != 5 && tabPage != 6 && (
-                                            <React.Fragment>
-                                                <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                    {dataLang?.import_form || "import_form"}
-                                                </h5>
-                                                <Select
-                                                    closeMenuOnSelect={true}
-                                                    placeholder={dataLang?.import_form || "import_form"}
-                                                    options={dataSampleImport}
-                                                    isLoading={sampleImport != null ? false : onLoading}
-                                                    formatOptionLabel={(option) => (
-                                                        <div className="flex justify-start items-center gap-1 ">
-                                                            <h2 className="font-medium">
-                                                                {option?.label}{" "}
-                                                                <span className="italic text-sm">{`(${option?.date})`}</span>
-                                                            </h2>
-                                                        </div>
-                                                    )}
-                                                    isSearchable={true}
-                                                    onChange={_HandleChange.bind(this, "sampleImport")}
-                                                    value={sampleImport}
-                                                    LoadingIndicator
-                                                    noOptionsMessage={() =>
-                                                        dataLang?.import_no_data || "import_no_data"
-                                                    }
-                                                    maxMenuHeight="200px"
-                                                    isClearable={true}
-                                                    menuPortalTarget={document.body}
-                                                    onMenuOpen={handleMenuOpen}
-                                                    theme={(theme) => ({
-                                                        ...theme,
-                                                        colors: {
-                                                            ...theme.colors,
-                                                            primary25: "#EBF5FF",
-                                                            primary50: "#92BFF7",
-                                                            primary: "#0F4F9E",
-                                                        },
-                                                    })}
-                                                    styles={{
-                                                        placeholder: (base) => ({
-                                                            ...base,
-                                                            color: "#cbd5e1",
-                                                        }),
-                                                        menuPortal: (base) => ({
-                                                            ...base,
-                                                            zIndex: 9999,
-                                                            position: "absolute",
-                                                        }),
-                                                    }}
-                                                    className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border "
-                                                />
-                                            </React.Fragment>
-                                        ))}
-                                </div>
-
-                                <Radio
-                                    dataLang={dataLang}
-                                    valueCheck={valueCheck}
-                                    _HandleChange={_HandleChange.bind(this)}
-                                    tabPage={tabPage}
-                                />
-
-                                <div className="col-span-2"></div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-4">
-                                    {tabPage != 5 && tabPage != 6 && valueCheck === "edit" ? (
-                                        <>
+                                    (tabPage != 5 && tabPage != 6 && (
+                                        <React.Fragment>
                                             <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                {dataLang?.import_condition_column || "import_condition_column"}
-                                                <span className="text-red-500">*</span>
+                                                {dataLang?.import_form || "import_form"}
                                             </h5>
                                             <Select
                                                 closeMenuOnSelect={true}
-                                                placeholder={
-                                                    dataLang?.import_condition_column || "import_condition_column"
-                                                }
-                                                isLoading={onLoading}
-                                                options={dataConditionColumn}
+                                                placeholder={dataLang?.import_form || "import_form"}
+                                                options={dataSampleImport}
+                                                isLoading={sampleImport != null ? false : onLoading}
+                                                formatOptionLabel={(option) => (
+                                                    <div className="flex justify-start items-center gap-1 ">
+                                                        <h2 className="font-medium">
+                                                            {option?.label}{" "}
+                                                            <span className="italic text-sm">{`(${option?.date})`}</span>
+                                                        </h2>
+                                                    </div>
+                                                )}
                                                 isSearchable={true}
-                                                onChange={_HandleChange.bind(this, "condition_column")}
-                                                value={condition_column}
+                                                onChange={_HandleChange.bind(this, "sampleImport")}
+                                                value={sampleImport}
                                                 LoadingIndicator
-                                                noOptionsMessage={() => dataLang?.import_no_data || "import_no_data"}
+                                                noOptionsMessage={() =>
+                                                    dataLang?.import_no_data || "import_no_data"
+                                                }
                                                 maxMenuHeight="200px"
                                                 isClearable={true}
                                                 menuPortalTarget={document.body}
@@ -1476,519 +1348,585 @@ const Index = (props) => {
                                                         position: "absolute",
                                                     }),
                                                 }}
-                                                className={`${errValueCheck ? "border-red-500" : "border-transparent"
-                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border "
                                             />
-                                            {errValueCheck && (
-                                                <label className="text-sm text-red-500">
-                                                    {dataLang?.import_ERR_condition_column ||
-                                                        "import_ERR_condition_column"}
-                                                </label>
-                                            )}
-                                        </>
-                                    ) : (
-                                        ""
-                                    )}
-                                </div>
-                                <div className="col-span-4"></div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-4 ">
-                                    <div className="grid-cols-12 grid items-center gap-1">
-                                        <div className={`${!showDeleteButton ? "col-span-12" : "col-span-11"}`}>
-                                            <label
-                                                for="importFile"
-                                                className="block text-sm font-medium mb-2 dark:text-white"
-                                            >
-                                                {dataLang?.import_file || "import_file"}{" "}
-                                                <span className="text-red-500">*</span>
-                                            </label>
-                                            <label
-                                                for="importFile"
-                                                className={`${(errFileImport && dataImport.length == 0) ||
-                                                    (errFileImport && fileImport == null)
-                                                    ? "border-red-500"
-                                                    : "border-gray-200"
-                                                    } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
-                                            >
-                                                <input
-                                                    accept=".xlsx, .xls"
-                                                    id="importFile"
-                                                    onChange={_HandleChange.bind(this, "importFile")}
-                                                    type="file"
-                                                    className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
-                                                />
-                                            </label>
-                                            {(errFileImport && dataImport.length == 0) ||
-                                                (errFileImport && fileImport == null && (
-                                                    <label className="text-sm text-red-500">
-                                                        {dataLang?.import_ERR_file || "import_ERR_file"}
-                                                    </label>
-                                                ))}
-                                        </div>
+                                        </React.Fragment>
+                                    ))}
+                            </div>
 
-                                        <div className="col-span-1  mx-auto">
-                                            {showDeleteButton && (
-                                                <button
-                                                    type="button"
-                                                    onClick={_HandleDeleteFile.bind(this)}
-                                                    className="mt-8 hover:bg-red-200 group animate-bounce  bg-red-100  rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
-                                                >
-                                                    <IconDelete size={20} color="red" />
-                                                </button>
-                                            )}
-                                        </div>
+                            <Radio
+                                dataLang={dataLang}
+                                valueCheck={valueCheck}
+                                _HandleChange={_HandleChange.bind(this)}
+                                tabPage={tabPage}
+                            />
+
+                            <div className="col-span-2"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-4">
+                                {tabPage != 5 && tabPage != 6 && valueCheck === "edit" ? (
+                                    <>
+                                        <h5 className="mb-1 block text-sm font-medium text-gray-700">
+                                            {dataLang?.import_condition_column || "import_condition_column"}
+                                            <span className="text-red-500">*</span>
+                                        </h5>
+                                        <Select
+                                            closeMenuOnSelect={true}
+                                            placeholder={
+                                                dataLang?.import_condition_column || "import_condition_column"
+                                            }
+                                            isLoading={onLoading}
+                                            options={dataConditionColumn}
+                                            isSearchable={true}
+                                            onChange={_HandleChange.bind(this, "condition_column")}
+                                            value={condition_column}
+                                            LoadingIndicator
+                                            noOptionsMessage={() => dataLang?.import_no_data || "import_no_data"}
+                                            maxMenuHeight="200px"
+                                            isClearable={true}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: "#EBF5FF",
+                                                    primary50: "#92BFF7",
+                                                    primary: "#0F4F9E",
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                            className={`${errValueCheck ? "border-red-500" : "border-transparent"
+                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                        />
+                                        {errValueCheck && (
+                                            <label className="text-sm text-red-500">
+                                                {dataLang?.import_ERR_condition_column ||
+                                                    "import_ERR_condition_column"}
+                                            </label>
+                                        )}
+                                    </>
+                                ) : (
+                                    ""
+                                )}
+                            </div>
+                            <div className="col-span-4"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-4 ">
+                                <div className="grid-cols-12 grid items-center gap-1">
+                                    <div className={`${!showDeleteButton ? "col-span-12" : "col-span-11"}`}>
+                                        <label
+                                            for="importFile"
+                                            className="block text-sm font-medium mb-2 "
+                                        >
+                                            {dataLang?.import_file || "import_file"}{" "}
+                                            <span className="text-red-500">*</span>
+                                        </label>
+                                        <label
+                                            for="importFile"
+                                            className={`${(errFileImport && dataImport.length == 0) ||
+                                                (errFileImport && fileImport == null)
+                                                ? "border-red-500" : "border-gray-200"
+                                                } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
+                                        >
+                                            <input
+                                                accept=".xlsx, .xls"
+                                                id="importFile"
+                                                onChange={_HandleChange.bind(this, "importFile")}
+                                                type="file"
+                                                className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
+                                            />
+                                        </label>
+                                        {(errFileImport && dataImport.length == 0) ||
+                                            (errFileImport && fileImport == null && (
+                                                <label className="text-sm text-red-500">
+                                                    {dataLang?.import_ERR_file || "import_ERR_file"}
+                                                </label>
+                                            ))}
+                                    </div>
+
+                                    <div className="col-span-1  mx-auto">
+                                        {showDeleteButton && (
+                                            <button
+                                                type="button"
+                                                onClick={_HandleDeleteFile.bind(this)}
+                                                className="mt-8 hover:bg-red-200 group animate-bounce  bg-red-100  rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                                            >
+                                                <IconDelete size={20} color="red" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="col-span-4  ">
-                                    {(tabPage != 5 && tabPage != 6 && (
-                                        <Row
-                                            dataLang={dataLang}
-                                            _HandleChange={_HandleChange.bind(this)}
-                                            errRowStart={errRowStart}
-                                            row_tarts={row_tarts}
-                                            errEndRow={errEndRow}
-                                            end_row={end_row}
-                                        />
-                                    )) ||
-                                        ((tabPage == 5 || tabPage == 6) && (
-                                            <SampleImport dataLang={dataLang} tabPage={tabPage} />
-                                        ))}
-                                </div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-4 -mt-2">
-                                    {tabPage != 5 && tabPage != 6 && (
-                                        <ParentControls
-                                            listData={listData}
-                                            onLoadingListData={onLoadingListData}
-                                            dataLang={dataLang}
-                                            _HandleAddParent={_HandleAddParent.bind(this)}
-                                            _HandleDeleteParent={_HandleDeleteParent.bind(this, "main")}
-                                            color="bg-pink-600"
-                                            colorIcon="red"
-                                        />
-                                    )}
-                                </div>
-                                <div className="col-span-4 -mt-2 relative">
-                                    {save_template && onLoadingDataBack && (
-                                        <div className={`b  flex items-center justify-center w-full  pt-5`}>
-                                            <button
-                                                onClick={_HandleLoadDataBackup.bind(this)}
-                                                className="i flex justify-center gap-2 bg-green-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
-                                            >
-                                                <RefreshCircle
-                                                    size="20"
-                                                    color="green"
-                                                    ref={hiRef}
-                                                    className="bg-gray-50 rounded-full hi "
-                                                />
-                                                <p className="text-sm">
-                                                    {dataLang?.import_updateImport || "import_updateImport"}
-                                                </p>
-                                            </button>
-                                        </div>
-                                    )}
-                                    {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
-                                        <div
-                                            className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
-                                                }`}
+                            </div>
+                            <div className="col-span-4  ">
+                                {(tabPage != 5 && tabPage != 6 && (
+                                    <Row
+                                        dataLang={dataLang}
+                                        _HandleChange={_HandleChange.bind(this)}
+                                        errRowStart={errRowStart}
+                                        row_tarts={row_tarts}
+                                        errEndRow={errEndRow}
+                                        end_row={end_row}
+                                    />
+                                )) ||
+                                    ((tabPage == 5 || tabPage == 6) && (
+                                        <SampleImport dataLang={dataLang} tabPage={tabPage} />
+                                    ))}
+                            </div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-4 -mt-2">
+                                {tabPage != 5 && tabPage != 6 && (
+                                    <ParentControls
+                                        listData={listData}
+                                        onLoadingListData={onLoadingListData}
+                                        dataLang={dataLang}
+                                        _HandleAddParent={_HandleAddParent.bind(this)}
+                                        _HandleDeleteParent={_HandleDeleteParent.bind(this, "main")}
+                                        color="bg-pink-600"
+                                        colorIcon="red"
+                                    />
+                                )}
+                            </div>
+                            <div className="col-span-4 -mt-2 relative">
+                                {save_template && onLoadingDataBack && (
+                                    <div className={`b  flex items-center justify-center w-full  pt-5`}>
+                                        <button
+                                            onClick={_HandleLoadDataBackup.bind(this)}
+                                            className="i flex justify-center gap-2 bg-green-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
                                         >
-                                            <Stepper
-                                                stepper={stepper}
-                                                dataLang={dataLang}
-                                                label1={dataLang?.import_variation || "import_variation"}
-                                                tabPage={tabPage}
-                                                label2={dataLang?.import_subvariant || "import_subvariant"}
+                                            <RefreshCircle
+                                                size="20"
+                                                color="green"
+                                                ref={hiRef}
+                                                className="bg-gray-50 rounded-full hi "
                                             />
-                                        </div>
-                                    )}
-                                    {(tabPage == 1 || tabPage == 2) && (
-                                        <div
-                                            className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
-                                                }`}
-                                        >
-                                            <Stepper
-                                                stepper={stepper}
-                                                dataLang={dataLang}
-                                                label1={dataLang?.import_contactInfo || "import_contactInfo"}
-                                                tabPage={tabPage}
-                                                label2={dataLang?.import_deliveryAdress || "import_deliveryAdress"}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-2"></div>
-                                <div
-                                    className={`${listData?.length > 2 ? "mt-3" : ""} ${onLoadingListData ? "col-span-8" : "col-span-6"
-                                        }`}
-                                >
-                                    {onLoadingListData ? (
-                                        <Loading className="h-2" color="#0f4f9e" />
-                                    ) : (
-                                        listData?.map((e, index) => (
-                                            <div className="grid grid-cols-6 gap-2.5 mb-2" key={e?.id}>
-                                                <div className="col-span-4">
-                                                    <div className="grid-cols-13 grid items-end justify-center gap-2.5">
-                                                        <div className="col-span-6">
-                                                            {index == 0 && (
-                                                                <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                                    {dataLang?.import_data_fields ||
-                                                                        "import_data_fields"}{" "}
-                                                                    <span className="text-red-500">*</span>
-                                                                </h5>
+                                            <p className="text-sm">
+                                                {dataLang?.import_updateImport || "import_updateImport"}
+                                            </p>
+                                        </button>
+                                    </div>
+                                )}
+                                {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
+                                    <div
+                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                            }`}
+                                    >
+                                        <Stepper
+                                            stepper={stepper}
+                                            dataLang={dataLang}
+                                            label1={dataLang?.import_variation || "import_variation"}
+                                            tabPage={tabPage}
+                                            label2={dataLang?.import_subvariant || "import_subvariant"}
+                                        />
+                                    </div>
+                                )}
+                                {(tabPage == 1 || tabPage == 2) && (
+                                    <div
+                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                            }`}
+                                    >
+                                        <Stepper
+                                            stepper={stepper}
+                                            dataLang={dataLang}
+                                            label1={dataLang?.import_contactInfo || "import_contactInfo"}
+                                            tabPage={tabPage}
+                                            label2={dataLang?.import_deliveryAdress || "import_deliveryAdress"}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-2"></div>
+                            <div
+                                className={`${listData?.length > 2 ? "mt-3" : ""} ${onLoadingListData ? "col-span-8" : "col-span-6"
+                                    }`}
+                            >
+                                {onLoadingListData ? (
+                                    <Loading className="h-2" color="#0f4f9e" />
+                                ) : (
+                                    listData?.map((e, index) => (
+                                        <div className="grid grid-cols-6 gap-2.5 mb-2" key={e?.id}>
+                                            <div className="col-span-4">
+                                                <div className="grid-cols-13 grid items-end justify-center gap-2.5">
+                                                    <div className="col-span-6">
+                                                        {index == 0 && (
+                                                            <h5 className="mb-1 block text-sm font-medium text-gray-700">
+                                                                {dataLang?.import_data_fields ||
+                                                                    "import_data_fields"}{" "}
+                                                                <span className="text-red-500">*</span>
+                                                            </h5>
+                                                        )}
+                                                        <Select
+                                                            closeMenuOnSelect={true}
+                                                            placeholder={
+                                                                dataLang?.import_data_fields || "import_data_fields"
+                                                            }
+                                                            options={dataClient}
+                                                            isSearchable={true}
+                                                            onChange={_HandleChangeChild.bind(
+                                                                this,
+                                                                e?.id,
+                                                                "data_fields"
                                                             )}
-                                                            <Select
-                                                                closeMenuOnSelect={true}
-                                                                placeholder={
-                                                                    dataLang?.import_data_fields || "import_data_fields"
-                                                                }
-                                                                options={dataClient}
-                                                                isSearchable={true}
-                                                                onChange={_HandleChangeChild.bind(
-                                                                    this,
-                                                                    e?.id,
-                                                                    "data_fields"
-                                                                )}
-                                                                value={e?.dataFields}
-                                                                LoadingIndicator
-                                                                noOptionsMessage={() =>
-                                                                    dataLang?.import_no_data || "import_no_data"
-                                                                }
-                                                                maxMenuHeight="200px"
-                                                                isClearable={true}
-                                                                menuPortalTarget={document.body}
-                                                                onMenuOpen={handleMenuOpen}
-                                                                theme={(theme) => ({
-                                                                    ...theme,
-                                                                    colors: {
-                                                                        ...theme.colors,
-                                                                        primary25: "#EBF5FF",
-                                                                        primary50: "#92BFF7",
-                                                                        primary: "#0F4F9E",
-                                                                    },
-                                                                })}
-                                                                styles={{
-                                                                    placeholder: (base) => ({
-                                                                        ...base,
-                                                                        color: "#cbd5e1",
-                                                                    }),
-                                                                    menuPortal: (base) => ({
-                                                                        ...base,
-                                                                        zIndex: 9999,
-                                                                        position: "absolute",
-                                                                    }),
-                                                                }}
-                                                                className={`${errFiles && e.dataFields == null
-                                                                    ? "border-red-500"
-                                                                    : "border-transparent"
-                                                                    }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
-                                                            />
-                                                        </div>
-                                                        <div className="col-span-6">
-                                                            {index == 0 && (
-                                                                <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                                    {dataLang?.import_data_column ||
-                                                                        "import_data_column"}
-                                                                    <span className="text-red-500">*</span>
-                                                                </h5>
+                                                            value={e?.dataFields}
+                                                            LoadingIndicator
+                                                            noOptionsMessage={() =>
+                                                                dataLang?.import_no_data || "import_no_data"
+                                                            }
+                                                            maxMenuHeight="200px"
+                                                            isClearable={true}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: "#EBF5FF",
+                                                                    primary50: "#92BFF7",
+                                                                    primary: "#0F4F9E",
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                    ...base,
+                                                                    color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                            className={`${errFiles && e.dataFields == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-6">
+                                                        {index == 0 && (
+                                                            <h5 className="mb-1 block text-sm font-medium text-gray-700">
+                                                                {dataLang?.import_data_column ||
+                                                                    "import_data_column"}
+                                                                <span className="text-red-500">*</span>
+                                                            </h5>
+                                                        )}
+                                                        <Select
+                                                            closeMenuOnSelect={true}
+                                                            placeholder={
+                                                                dataLang?.import_data_column || "import_data_column"
+                                                            }
+                                                            options={dataColumn}
+                                                            isSearchable={true}
+                                                            onChange={_HandleChangeChild.bind(
+                                                                this,
+                                                                e?.id,
+                                                                "column"
                                                             )}
-                                                            <Select
-                                                                closeMenuOnSelect={true}
-                                                                placeholder={
-                                                                    dataLang?.import_data_column || "import_data_column"
-                                                                }
-                                                                options={dataColumn}
-                                                                isSearchable={true}
-                                                                onChange={_HandleChangeChild.bind(
-                                                                    this,
-                                                                    e?.id,
-                                                                    "column"
-                                                                )}
-                                                                value={e?.column}
-                                                                LoadingIndicator
-                                                                noOptionsMessage={() =>
-                                                                    dataLang?.import_no_data || "import_no_data"
-                                                                }
-                                                                maxMenuHeight="200px"
-                                                                isClearable={true}
-                                                                menuPortalTarget={document.body}
-                                                                onMenuOpen={handleMenuOpen}
-                                                                theme={(theme) => ({
-                                                                    ...theme,
-                                                                    colors: {
-                                                                        ...theme.colors,
-                                                                        primary25: "#EBF5FF",
-                                                                        primary50: "#92BFF7",
-                                                                        primary: "#0F4F9E",
-                                                                    },
-                                                                })}
-                                                                styles={{
-                                                                    placeholder: (base) => ({
-                                                                        ...base,
-                                                                        color: "#cbd5e1",
-                                                                    }),
-                                                                    menuPortal: (base) => ({
-                                                                        ...base,
-                                                                        zIndex: 9999,
-                                                                        position: "absolute",
-                                                                    }),
-                                                                }}
-                                                                className={`${errColumn && e?.column == null
-                                                                    ? "border-red-500"
-                                                                    : "border-transparent"
-                                                                    } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
-                                                            />
-                                                        </div>
-                                                        <div className="col-span-1 mx-auto">
-                                                            <DeleteButton onClick={_HandleDelete.bind(this, e?.id)} />
-                                                        </div>
+                                                            value={e?.column}
+                                                            LoadingIndicator
+                                                            noOptionsMessage={() =>
+                                                                dataLang?.import_no_data || "import_no_data"
+                                                            }
+                                                            maxMenuHeight="200px"
+                                                            isClearable={true}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: "#EBF5FF",
+                                                                    primary50: "#92BFF7",
+                                                                    primary: "#0F4F9E",
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                    ...base,
+                                                                    color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                            className={`${errColumn && e?.column == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1 mx-auto">
+                                                        <DeleteButton onClick={_HandleDelete.bind(this, e?.id)} />
                                                     </div>
                                                 </div>
-                                                <div className="col-span-2 ">
-                                                    {index == 0 && (
-                                                        <h5 className="mb-1 block text-sm font-medium text-gray-700 opacity-0">
-                                                            {dataLang?.import_operation || "import_operation"}
-                                                        </h5>
-                                                    )}
-                                                    {e?.dataFields?.value == "group_id" ||
-                                                        ((tabPage == 3 || tabPage == 4) &&
-                                                            e?.dataFields?.value == "category_id") ||
-                                                        ((tabPage == 3 || tabPage == 4) &&
-                                                            e?.dataFields?.value == "unit_id") ||
-                                                        ((tabPage == 3 || tabPage == 4) &&
-                                                            e?.dataFields?.value == "unit_convert_id") ? (
-                                                        <div className="flex items-center space-x-2 rounded p-2 ">
-                                                            <TiTick color="green" />
-                                                            <label
-                                                                for="example11"
-                                                                className="flex w-full space-x-2 text-sm"
-                                                            >
-                                                                {dataLang?.import_add || "import_add"}
-                                                            </label>
-                                                        </div>
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                    {e?.dataFields?.value == "type_products" && (
-                                                        <div
-                                                            className={` shadow-2xl rounded-xl  bg-slate-700 relative`}
+                                            </div>
+                                            <div className="col-span-2 ">
+                                                {index == 0 && (
+                                                    <h5 className="mb-1 block text-sm font-medium text-gray-700 opacity-0">
+                                                        {dataLang?.import_operation || "import_operation"}
+                                                    </h5>
+                                                )}
+                                                {e?.dataFields?.value == "group_id" ||
+                                                    ((tabPage == 3 || tabPage == 4) &&
+                                                        e?.dataFields?.value == "category_id") ||
+                                                    ((tabPage == 3 || tabPage == 4) &&
+                                                        e?.dataFields?.value == "unit_id") ||
+                                                    ((tabPage == 3 || tabPage == 4) &&
+                                                        e?.dataFields?.value == "unit_convert_id") ? (
+                                                    <div className="flex items-center space-x-2 rounded p-2 ">
+                                                        <TiTick color="green" />
+                                                        <label
+                                                            for="example11"
+                                                            className="flex w-full space-x-2 text-sm"
                                                         >
-                                                            <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
-                                                                <Notification
-                                                                    size="22"
-                                                                    color="red"
-                                                                    className=" animate-bounce"
-                                                                />
-                                                            </div>
+                                                            {dataLang?.import_add || "import_add"}
+                                                        </label>
+                                                    </div>
+                                                ) : (
+                                                    ""
+                                                )}
+                                                {e?.dataFields?.value == "type_products" && (
+                                                    <div
+                                                        className={` shadow-2xl rounded-xl  bg-slate-700 relative`}
+                                                    >
+                                                        <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
+                                                            <Notification
+                                                                size="22"
+                                                                color="red"
+                                                                className=" animate-bounce"
+                                                            />
+                                                        </div>
 
-                                                            <div className="grid grid-cols-2 items-center p-1 gap-2 ">
-                                                                <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white font-medium col-span-2">
-                                                                    {dataLang?.import_ERR_format || "import_ERR_format"}
-                                                                </h2>
-                                                                <div className="col-span-2">
-                                                                    <div className="flex items-center gap-1">
-                                                                        <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
-                                                                            <ArrowRight
-                                                                                size="16"
-                                                                                color="white"
-                                                                                className="animate-bounce 3xl:scale-100 2xl:scale-95"
-                                                                            />
-                                                                            products:
-                                                                        </p>
-                                                                        <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                            {e?.dataFields?.note?.products}
-                                                                        </h2>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1">
-                                                                        <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
-                                                                            <ArrowRight
-                                                                                size="16"
-                                                                                color="white"
-                                                                                className="animate-bounce 3xl:scale-100 2xl:scale-95"
-                                                                            />{" "}
-                                                                            semi_products:
-                                                                        </p>
-                                                                        <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                            {e?.dataFields?.note?.semi_products}
-                                                                        </h2>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1">
-                                                                        <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
-                                                                            <ArrowRight
-                                                                                size="16"
-                                                                                color="white"
-                                                                                className="animate-bounce 3xl:scale-100 2xl:scale-95"
-                                                                            />{" "}
-                                                                            semi_products_outside:
-                                                                        </p>
-                                                                        <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                            {e?.dataFields?.note?.semi_products_outside}
-                                                                        </h2>
-                                                                    </div>
+                                                        <div className="grid grid-cols-2 items-center p-1 gap-2 ">
+                                                            <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white font-medium col-span-2">
+                                                                {dataLang?.import_ERR_format || "import_ERR_format"}
+                                                            </h2>
+                                                            <div className="col-span-2">
+                                                                <div className="flex items-center gap-1">
+                                                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                                                        <ArrowRight
+                                                                            size="16"
+                                                                            color="white"
+                                                                            className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                                                        />
+                                                                        products:
+                                                                    </p>
+                                                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                                                        {e?.dataFields?.note?.products}
+                                                                    </h2>
+                                                                </div>
+                                                                <div className="flex items-center gap-1">
+                                                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                                                        <ArrowRight
+                                                                            size="16"
+                                                                            color="white"
+                                                                            className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                                                        />{" "}
+                                                                        semi_products:
+                                                                    </p>
+                                                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                                                        {e?.dataFields?.note?.semi_products}
+                                                                    </h2>
+                                                                </div>
+                                                                <div className="flex items-center gap-1">
+                                                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                                                        <ArrowRight
+                                                                            size="16"
+                                                                            color="white"
+                                                                            className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                                                        />{" "}
+                                                                        semi_products_outside:
+                                                                    </p>
+                                                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                                                        {e?.dataFields?.note?.semi_products_outside}
+                                                                    </h2>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    )}
-                                                </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                        ))
-                                    )}
-                                </div>
-                                {!onLoadingListData && (
-                                    <React.Fragment>
-                                        <Progress
-                                            tabPage={tabPage}
-                                            listData={listData}
-                                            multipleProgress={multipleProgress}
-                                            dataSuccess={dataSuccess}
-                                            totalFalse={totalFalse}
-                                            totalSuccessStages={totalSuccessStages}
-                                            totalSuccessBom={totalSuccessBom}
-                                            dataFailStages={dataFailStages}
-                                            dataFailBom={dataFailBom}
-                                            dataLang={dataLang}
-                                            formatNumber={formatNumber}
-                                        />
-                                    </React.Fragment>
+                                        </div>
+                                    ))
                                 )}
-                                <div className="col-span-2"></div>
-                                <div className="col-span-2"></div>
-                                <div className="col-span-8 border-b"></div>
-                                <div className="col-span-2"></div>
-                                {(tabPage == 1 || tabPage == 2) && (
-                                    <React.Fragment>
-                                        <div className="col-span-2"></div>
-                                        <div className="col-span-8 border-b flex justify-between divide-x ">
-                                            {(tabPage == 1 || tabPage == 2) && (
-                                                <h2 className="py-2 w-1/2">
-                                                    {dataLang?.import_contactInfo || "import_contactInfo"}
-                                                </h2>
-                                            )}
-                                            {tabPage == 1 && (
-                                                <h2 className="py-2 w-1/2 text-right">
-                                                    {dataLang?.import_deliveryAdress || "import_deliveryAdress"}
-                                                </h2>
-                                            )}
-                                        </div>
-                                        <div className="col-span-2"></div>
-
-                                        <div className="col-span-2"></div>
-                                        <div className="col-span-4 ">
-                                            {(tabPage == 1 || tabPage == 2) && (
-                                                <ParentControls
-                                                    listData={listDataContact}
-                                                    onLoadingListData={onLoadingListData}
-                                                    dataLang={dataLang}
-                                                    _HandleAddParent={_HandleAddContact.bind(this)}
-                                                    _HandleDeleteParent={_HandleDeleteParent.bind(this, "contact")}
-                                                    color="bg-green-600"
-                                                    colorIcon="green"
-                                                />
-                                            )}
-                                        </div>
-                                        <div className="col-span-4">
-                                            {tabPage == 1 && (
-                                                <ParentControls
-                                                    listData={listDataDelivery}
-                                                    onLoadingListData={onLoadingListData}
-                                                    dataLang={dataLang}
-                                                    _HandleAddParent={_HandleAddDelivery.bind(this)}
-                                                    _HandleDeleteParent={_HandleDeleteParent.bind(this, "delivery")}
-                                                    color="bg-orange-600"
-                                                    colorIcon="red"
-                                                />
-                                            )}
-                                        </div>
-                                        <div className="col-span-2"></div>
-
-                                        <div className="col-span-2"></div>
-                                        {tabPage == 1 && (
-                                            <FormClient
-                                                onLoadingListData={onLoadingListData}
-                                                dataContact={dataContact}
-                                                dataDelivery={dataDelivery}
-                                                dataColumn={dataColumn}
-                                                listDataContact={listDataContact}
-                                                listDataDelivery={listDataDelivery}
-                                                dataLang={dataLang}
-                                                handleMenuOpen={handleMenuOpen.bind(this)}
-                                                _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
-                                                _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(this)}
-                                                _HandleDeleteContact={_HandleDeleteContact.bind(this)}
-                                                _HandleDeleteDelivery={_HandleDeleteDelivery.bind(this)}
-                                            />
-                                        )}
-                                        {tabPage == 2 && (
-                                            <FormSupplier
-                                                onLoadingListData={onLoadingListData}
-                                                dataContact={dataContact}
-                                                dataColumn={dataColumn}
-                                                listDataContact={listDataContact}
-                                                dataLang={dataLang}
-                                                handleMenuOpen={handleMenuOpen.bind(this)}
-                                                _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
-                                                _HandleDeleteContact={_HandleDeleteContact.bind(this)}
-                                            />
-                                        )}
-                                        <div className="col-span-2"></div>
-                                    </React.Fragment>
-                                )}
-                                <div className="col-span-4"></div>
-                                <div className="col-span-4 mt-4 grid-cols-2 grid gap-2.5">
-                                    {tabPage != 5 && tabPage != 6 ? (
-                                        <div className="flex items-center  space-x-2 rounded p-2 hover:bg-gray-200 bg-gray-100 cursor-pointer btn-animation hover:scale-[1.02]">
-                                            <input
-                                                type="checkbox"
-                                                onChange={_HandleChange.bind(this, "save_template")}
-                                                checked={save_template}
-                                                value={save_template}
-                                                id="example12"
-                                                name="checkGroup1"
-                                                className="h-4 w-4 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
-                                            />
-                                            <label htmlFor="example12" className=" space-x-2 text-sm cursor-pointer">
-                                                {dataLang?.import_save_template || "import_save_template"}
-                                            </label>
-                                        </div>
-                                    ) : (
-                                        <div></div>
-                                    )}
-                                    <button
-                                        onClick={(e) => {
-                                            if (role) {
-                                                _HandleSubmit(e)
-                                                return
-                                            } else if (checkAdd) {
-                                                _HandleSubmit(e)
-                                                return
-                                            } else if (checkEdit) {
-                                                _HandleSubmit(e)
-                                                return
-                                            }
-                                            else {
-                                                return isShow("warning", WARNING_STATUS_ROLE)
-                                            }
-                                        }}
-                                        type="button"
-                                        className="xl:text-sm text-xs p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
-                                    >
-                                        <div
-                                            className={`${multipleProgress
-                                                ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
-                                                : ""
-                                                }`}
-                                        ></div>
-                                        <span>{"Import"}</span>
-                                    </button>
-                                </div>
-                                <div className="col-span-4 "></div>
                             </div>
+                            {!onLoadingListData && (
+                                <React.Fragment>
+                                    <Progress
+                                        tabPage={tabPage}
+                                        listData={listData}
+                                        multipleProgress={multipleProgress}
+                                        dataSuccess={dataSuccess}
+                                        totalFalse={totalFalse}
+                                        totalSuccessStages={totalSuccessStages}
+                                        totalSuccessBom={totalSuccessBom}
+                                        dataFailStages={dataFailStages}
+                                        dataFailBom={dataFailBom}
+                                        dataLang={dataLang}
+                                        formatNumber={formatNumber}
+                                    />
+                                </React.Fragment>
+                            )}
+                            <div className="col-span-2"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-8 border-b"></div>
+                            <div className="col-span-2"></div>
+                            {(tabPage == 1 || tabPage == 2) && (
+                                <React.Fragment>
+                                    <div className="col-span-2"></div>
+                                    <div className="col-span-8 border-b flex justify-between divide-x ">
+                                        {(tabPage == 1 || tabPage == 2) && (
+                                            <h2 className="py-2 w-1/2">
+                                                {dataLang?.import_contactInfo || "import_contactInfo"}
+                                            </h2>
+                                        )}
+                                        {tabPage == 1 && (
+                                            <h2 className="py-2 w-1/2 text-right">
+                                                {dataLang?.import_deliveryAdress || "import_deliveryAdress"}
+                                            </h2>
+                                        )}
+                                    </div>
+                                    <div className="col-span-2"></div>
+
+                                    <div className="col-span-2"></div>
+                                    <div className="col-span-4 ">
+                                        {(tabPage == 1 || tabPage == 2) && (
+                                            <ParentControls
+                                                listData={listDataContact}
+                                                onLoadingListData={onLoadingListData}
+                                                dataLang={dataLang}
+                                                _HandleAddParent={_HandleAddContact.bind(this)}
+                                                _HandleDeleteParent={_HandleDeleteParent.bind(this, "contact")}
+                                                color="bg-green-600"
+                                                colorIcon="green"
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="col-span-4">
+                                        {tabPage == 1 && (
+                                            <ParentControls
+                                                listData={listDataDelivery}
+                                                onLoadingListData={onLoadingListData}
+                                                dataLang={dataLang}
+                                                _HandleAddParent={_HandleAddDelivery.bind(this)}
+                                                _HandleDeleteParent={_HandleDeleteParent.bind(this, "delivery")}
+                                                color="bg-orange-600"
+                                                colorIcon="red"
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="col-span-2"></div>
+
+                                    <div className="col-span-2"></div>
+                                    {tabPage == 1 && (
+                                        <FormClient
+                                            onLoadingListData={onLoadingListData}
+                                            dataContact={dataContact}
+                                            dataDelivery={dataDelivery}
+                                            dataColumn={dataColumn}
+                                            listDataContact={listDataContact}
+                                            listDataDelivery={listDataDelivery}
+                                            dataLang={dataLang}
+                                            handleMenuOpen={handleMenuOpen.bind(this)}
+                                            _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
+                                            _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(this)}
+                                            _HandleDeleteContact={_HandleDeleteContact.bind(this)}
+                                            _HandleDeleteDelivery={_HandleDeleteDelivery.bind(this)}
+                                        />
+                                    )}
+                                    {tabPage == 2 && (
+                                        <FormSupplier
+                                            onLoadingListData={onLoadingListData}
+                                            dataContact={dataContact}
+                                            dataColumn={dataColumn}
+                                            listDataContact={listDataContact}
+                                            dataLang={dataLang}
+                                            handleMenuOpen={handleMenuOpen.bind(this)}
+                                            _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
+                                            _HandleDeleteContact={_HandleDeleteContact.bind(this)}
+                                        />
+                                    )}
+                                    <div className="col-span-2"></div>
+                                </React.Fragment>
+                            )}
+                            <div className="col-span-4"></div>
+                            <div className="col-span-4 mt-4 grid-cols-2 grid gap-2.5">
+                                {tabPage != 5 && tabPage != 6 ? (
+                                    <div className="flex items-center  space-x-2 rounded p-2 hover:bg-gray-200 bg-gray-100 cursor-pointer btn-animation hover:scale-[1.02]">
+                                        <input
+                                            type="checkbox"
+                                            onChange={_HandleChange.bind(this, "save_template")}
+                                            checked={save_template}
+                                            value={save_template}
+                                            id="example12"
+                                            name="checkGroup1"
+                                            className="h-4 w-4 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
+                                        />
+                                        <label htmlFor="example12" className=" space-x-2 text-sm cursor-pointer">
+                                            {dataLang?.import_save_template || "import_save_template"}
+                                        </label>
+                                    </div>
+                                ) : (
+                                    <div></div>
+                                )}
+                                <button
+                                    onClick={(e) => {
+                                        if (role || checkAdd || checkEdit) {
+                                            _HandleSubmit(e)
+                                            return
+                                        }
+                                        else {
+                                            return isShow("warning", WARNING_STATUS_ROLE)
+                                        }
+                                    }}
+                                    type="button"
+                                    className="xl:text-sm text-xs p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
+                                >
+                                    <div
+                                        className={`${multipleProgress
+                                            ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
+                                            : ""
+                                            }`}
+                                    ></div>
+                                    <span>{"Import"}</span>
+                                </button>
+                            </div>
+                            <div className="col-span-4 "></div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </ContainerBody>
+            </Container>
+            {(tabPage != 5 && tabPage != 6 && (
+                <Popup_status
+                    dataLang={dataLang}
+                    className=""
+                    router={router.query?.tab}
+                    data={dataFail}
+                    totalFalse={totalFalse}
+                    listData={listData}
+                    listDataContact={listDataContact}
+                    listDataDelivery={listDataDelivery}
+                />
+            )) ||
+                (tabPage == 5 && (
+                    <Popup_stages dataLang={dataLang} router={router.query?.tab} data={dataFailStages} />
+                )) ||
+                (tabPage == 6 && <Popup_bom dataLang={dataLang} router={router.query?.tab} data={dataFailBom} />)}
         </React.Fragment>
     );
 };

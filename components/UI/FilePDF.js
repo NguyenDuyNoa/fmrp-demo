@@ -162,13 +162,14 @@ const FilePDF = ({
                 };
 
                 const dataKeys = Object.keys(dataPDF);
-                if (dataKeys.includes(type) && dataPDF !== undefined && dataCompany !== undefined) {
+                if (dataKeys.includes(type) && dataPDF[type][props?.type]) {
+                    // if (dataKeys.includes(type) && dataPDF !== undefined && dataCompany !== undefined) {
                     const pdfGenerator = pdfMake.createPdf(dataPDF[type][props?.type]);
                     pdfGenerator.open((blob) => {
                         const url = URL.createObjectURL(blob);
-
                         setUrl(url);
                     });
+
                 }
             } else {
                 console.log("err", err);

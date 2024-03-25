@@ -1,7 +1,7 @@
 import React from "react";
 import Select, { components } from "react-select";
 import Loading from "components/UI/loading";
-import DeleteButton from "../(button)/buttonDeleteSlect";
+import DeleteButton from "./button/buttonDeleteSlect";
 
 const FormSupplier = ({
   onLoadingListData,
@@ -20,12 +20,11 @@ const FormSupplier = ({
         <Loading className="h-2 col-span-2" color="#0f4f9e" />
       ) : (
         <div
-          className={`${
-            onLoadingListData
+          className={`${onLoadingListData
               ? "bg-white"
               : (listDataContact?.length > 0 || listDataDelivery?.length > 0) &&
-                "bg-zinc-100 mt-2 "
-          } grid grid-cols-8 items-start 3xl:gap-2 xxl:gap-2 2xl:gap-4 p-4  rounded-xl  transition-all ease-linear`}
+              "bg-zinc-100 mt-2 "
+            } grid grid-cols-8 items-start 3xl:gap-2 xxl:gap-2 2xl:gap-4 p-4  rounded-xl  transition-all ease-linear`}
         >
           {listDataContact?.map((e) => (
             <div className={`col-span-4   rounded-lg`}>

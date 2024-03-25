@@ -1,27 +1,36 @@
-import React, { useState, useEffect } from "react";
+import moment from "moment";
 import Head from "next/head";
-import dynamic from "next/dynamic";
+import { debounce } from "lodash";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
 import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
-import Popup_chitietPhatsinh from "./(popup)/details_arises";
-import Popup_chitietDauki from "./(popup)/details_first";
-import moment from "moment";
-import { useSelector } from "react-redux";
-import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import SearchComponent from "components/UI/filterComponents/searchComponent";
-import SelectComponent from "components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
-import OnResetData from "components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { debounce } from "lodash";
+import Popup_chitietPhatsinh from "./components/details_arises";
+import Popup_chitietDauki from "./components/details_first";
 
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable } from "@/components/UI/common/Table";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+
+
+
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 const Index = (props) => {
     const initialData = {
         data: [],
@@ -37,15 +46,16 @@ const Index = (props) => {
             endDate: null,
         },
     };
-    const trangthaiExprired = useStatusExprired();
-    const dataLang = props.dataLang;
     const router = useRouter();
+    const dataLang = props.dataLang;
+    const dataSeting = useSetingServer()
+    const [total, sTotal] = useState({});
+    const [keySearch, sKeySearch] = useState("");
+    const trangthaiExprired = useStatusExprired();
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
-    const [totalItems, sTotalItems] = useState([]);
-    const [keySearch, sKeySearch] = useState("");
-    const [limit, sLimit] = useState(15);
-    const [total, sTotal] = useState({});
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
     const [dataTable, sDataTable] = useState(initialData);
     const [valueChange, sValueChange] = useState(initialValue);
 
@@ -169,12 +179,7 @@ const Index = (props) => {
     ]);
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        return formatMoneyConfig(+number, dataSeting);
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -185,12 +190,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
         sOnFetching(true);
     }, 500)
 
@@ -307,319 +306,312 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.customerDebt_title || "customerDebt_title"} </title>
             </Head>
-            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-3"></div>
+                    <EmptyExprired />
+
                 ) : (
-                    <div className={` flex space-x-3 xl:text-[14.5px] text-[12px]`}>
-                        <h6 className="text-[#141522]/40">{dataLang?.customerDebt_title || "customerDebt_title"}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.customerDebt_title || "customerDebt_title"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.customerDebt_lits || "customerDebt_lits"}</h6>
                     </div>
                 )}
 
-                <div className="grid grid-cols gap-1 h-[100%] overflow-hidden ">
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-0.5 h-[96%] overflow-hidden">
-                            <div className="flex justify-between">
-                                <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.customerDebt_lits || "customerDebt_lits"}
-                                </h2>
-                            </div>
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
-                                <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded-lg grid grid-cols-6 justify-between xl:p-3 p-2">
-                                        <div className="col-span-5">
-                                            <div className="grid grid-cols-5">
-                                                <SearchComponent
-                                                    dataLang={dataLang}
-                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                />
-                                                <SelectComponent
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label:
-                                                                dataLang?.purchase_order_branch ||
-                                                                "purchase_order_branch",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...dataTable.listBr,
-                                                    ]}
-                                                    isClearable={true}
-                                                    value={valueChange.idBranch}
-                                                    onChange={onchangFilter("idBranch")}
-                                                    placeholder={
-                                                        dataLang?.purchase_order_table_branch ||
-                                                        "purchase_order_table_branch"
-                                                    }
-                                                />
-                                                <SelectComponent
-                                                    // onInputChange={_HandleSeachApi.bind(this)}
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label:
-                                                                dataLang?.customerDebt_suppliert ||
-                                                                "customerDebt_suppliert",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...dataTable.listClients,
-                                                    ]}
-                                                    isClearable={true}
-                                                    onChange={onchangFilter("idClient")}
-                                                    value={valueChange.idClient}
-                                                    placeholder={
-                                                        dataLang?.customerDebt_suppliert || "customerDebt_suppliert"
-                                                    }
-                                                />
-                                                <DatepickerComponent
-                                                    value={valueChange.valueDate}
-                                                    onChange={onchangFilter("valueDate")}
-                                                />
-                                            </div>
+                <ContainerBody>
+                    <div className="space-y-3 h-[96%] overflow-hidden">
+                        <div className="flex justify-between mt-1">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                {dataLang?.customerDebt_lits || 'customerDebt_lits'}
+                            </h2>
+                        </div>
+                        <ContainerTable>
+                            <div className="xl:space-y-3 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-4">
+                                        <div className="grid grid-cols-4">
+                                            <SearchComponent
+                                                dataLang={dataLang}
+                                                colSpan={1}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...dataTable.listBr,
+                                                ]}
+                                                isClearable={true}
+                                                value={valueChange.idBranch}
+                                                onChange={onchangFilter("idBranch")}
+                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                                                colSpan={1}
+                                            />
+                                            <SelectComponent
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.customerDebt_suppliert || "customerDebt_suppliert",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...dataTable.listClients,
+                                                ]}
+                                                colSpan={1}
+                                                isClearable={true}
+                                                onChange={onchangFilter("idClient")}
+                                                value={valueChange.idClient}
+                                                placeholder={
+                                                    dataLang?.customerDebt_suppliert || "customerDebt_suppliert"
+                                                }
+                                            />
+                                            <DatepickerComponent
+                                                colSpan={1}
+                                                value={valueChange.valueDate}
+                                                onChange={onchangFilter("valueDate")}
+                                            />
                                         </div>
-                                        <div className="col-span-1">
-                                            <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={sOnFetching} />
-                                                <div>
-                                                    {dataTable.dataExcel?.length > 0 && (
-                                                        <ExcelFileComponent
-                                                            multiDataSet={multiDataSet}
-                                                            filename={
-                                                                dataLang?.customerDebt_lits || "customerDebt_lits"
-                                                            }
-                                                            title="DSCNKH"
-                                                            dataLang={dataLang}
-                                                        />
-                                                    )}
-                                                </div>
-                                                <div className="">
-                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
-                                                </div>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <div className="flex justify-end items-center gap-2">
+                                            <OnResetData sOnFetching={sOnFetching} />
+                                            <div>
+                                                {dataTable.dataExcel?.length > 0 && (
+                                                    <ExcelFileComponent
+                                                        multiDataSet={multiDataSet}
+                                                        filename={
+                                                            dataLang?.customerDebt_lits || "customerDebt_lits"
+                                                        }
+                                                        title="DSCNKH"
+                                                        dataLang={dataLang}
+                                                    />
+                                                )}
+                                            </div>
+                                            <div className="">
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] 3xl:h-[92%] 2xl:h-[92%] xl:h-[82%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%]">
-                                        <div className="grid grid-cols-12  sticky top-0 z-10 rounded-xl shadow-md bg-gray-50 divide-x">
-                                            <div className="col-span-1 grid items-center">
-                                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
-                                                    {dataLang?.customerDebt_code || "customerDebt_code"}
-                                                </h4>
-                                            </div>
-                                            <div className="col-span-2 grid items-center">
-                                                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
-                                                    {dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}
-                                                </h4>
-                                            </div>
-                                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                                                    {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
-                                                </h4>
-                                                <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
-                                                </h4>
-                                                <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.customerDebt_collect || "customerDebt_collect"}
-                                                </h4>
-                                            </div>
-                                            <div className="col-span-3 grid grid-cols-4   items-center justify-center">
-                                                <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                                                    {dataLang?.debt_suppliers_Arise || "debt_suppliers_Arise"}
-                                                </h4>
-                                                <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
-                                                </h4>
-                                                <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.customerDebt_collect || "customerDebt_collect"}
-                                                </h4>
-                                            </div>
-                                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                                                    {dataLang?.debt_suppliers_Ending || "debt_suppliers_Ending"}
-                                                </h4>
-                                                <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
-                                                </h4>
-                                                <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.customerDebt_collect || "customerDebt_collect"}
-                                                </h4>
-                                            </div>
+                            </div>
+                            <Customscrollbar className="min:h-[200px] 3xl:h-[92%] 2xl:h-[92%] xl:h-[82%] lg:h-[82%] max:h-[400px]">
+                                <div className="w-[100%]">
+                                    <HeaderTable gridCols={12} >
+                                        <div className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] col-span-1 text-center text-gray-600 uppercase font-semibold">
+                                            {dataLang?.customerDebt_code || "customerDebt_code"}
                                         </div>
-                                        {onFetching ? (
-                                            <Loading className="h-80" color="#0f4f9e" />
-                                        ) : dataTable.data?.length > 0 ? (
-                                            <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {dataTable.data?.map((e) => (
-                                                        <div
-                                                            className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                            key={e.id.toString()}
-                                                        >
-                                                            <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
-                                                                {e.code}
-                                                            </h6>
-                                                            <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                {e.name}
-                                                            </h6>
-                                                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.no_start == "0" ? (
-                                                                        "-"
-                                                                    ) : (
-                                                                        <Popup_chitietDauki
-                                                                            name={
-                                                                                e.no_start == "0"
-                                                                                    ? "-"
-                                                                                    : formatNumber(e.no_start)
-                                                                            }
-                                                                            id={e?.id}
-                                                                            type={"no_start"}
-                                                                            className="text-left"
-                                                                            supplier_name={e.name}
-                                                                            {...propsPopup}
-                                                                        />
-                                                                    )}
-                                                                </h4>
-                                                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.thu_start == "0" ? (
-                                                                        "-"
-                                                                    ) : (
-                                                                        <Popup_chitietDauki
-                                                                            name={
-                                                                                e.thu_start == "0"
-                                                                                    ? "-"
-                                                                                    : formatNumber(e.thu_start)
-                                                                            }
-                                                                            id={e?.id}
-                                                                            className="text-left"
-                                                                            supplier_name={e.name}
-                                                                            {...propsPopup}
-                                                                        />
-                                                                    )}
-                                                                </h4>
-                                                            </div>
-                                                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.no_debt == "0" ? (
-                                                                        "-"
-                                                                    ) : (
-                                                                        <Popup_chitietPhatsinh
-                                                                            name={
-                                                                                e.no_debt == "0"
-                                                                                    ? "-"
-                                                                                    : formatNumber(e.no_debt)
-                                                                            }
-                                                                            className="text-left uppercase"
-                                                                            id={e?.id}
-                                                                            type={"no_debt"}
-                                                                            supplier_name={e.name}
-                                                                            {...propsPopup}
-                                                                        />
-                                                                    )}
-                                                                </h4>
-
-                                                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.thu_debt == "0" ? (
-                                                                        "-"
-                                                                    ) : (
-                                                                        <Popup_chitietPhatsinh
-                                                                            className="text-left uppercase"
-                                                                            name={
-                                                                                e.thu_debt == "0"
-                                                                                    ? "-"
-                                                                                    : formatNumber(e.thu_debt)
-                                                                            }
-                                                                            id={e?.id}
-                                                                            type={"thu_debt"}
-                                                                            supplier_name={e.name}
-                                                                            {...propsPopup}
-                                                                        />
-                                                                    )}
-                                                                </h4>
-                                                            </div>
-
-                                                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                    {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
-                                                                </h4>
-                                                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                    {e.thu_end == "0" ? "-" : formatNumber(e.thu_end)}
-                                                                </h4>
-                                                            </div>
+                                        <div className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] col-span-2 text-center text-gray-600 uppercase font-semibold">
+                                            {dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}
+                                        </div>
+                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
+                                                {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] pt-1 border-r border-gray-200 px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                                                {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] pt-1 px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                                                {dataLang?.customerDebt_collect || "customerDebt_collect"}
+                                            </h4>
+                                        </div>
+                                        <div className="col-span-3 grid grid-cols-4   items-center justify-center">
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
+                                                {dataLang?.debt_suppliers_Arise || "debt_suppliers_Arise"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] border-r border-gray-200 px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                                                {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] pt-1 px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                                                {dataLang?.customerDebt_collect || "customerDebt_collect"}
+                                            </h4>
+                                        </div>
+                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
+                                                {dataLang?.debt_suppliers_Ending || "debt_suppliers_Ending"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] border-r border-gray-200 px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                                                {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] pt-1 px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                                                {dataLang?.customerDebt_collect || "customerDebt_collect"}
+                                            </h4>
+                                        </div>
+                                    </HeaderTable>
+                                    {onFetching ? (
+                                        <Loading className="h-80" color="#0f4f9e" />
+                                    ) : dataTable.data?.length > 0 ? (
+                                        <>
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                                {dataTable.data?.map((e) => (
+                                                    <div
+                                                        className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                        key={e.id.toString()}
+                                                    >
+                                                        <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
+                                                            {e.code}
+                                                        </h6>
+                                                        <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                            {e.name}
+                                                        </h6>
+                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                                {e.no_start == "0" ? (
+                                                                    "-"
+                                                                ) : (
+                                                                    <Popup_chitietDauki
+                                                                        name={
+                                                                            e.no_start == "0"
+                                                                                ? "-"
+                                                                                : formatNumber(e.no_start)
+                                                                        }
+                                                                        id={e?.id}
+                                                                        type={"no_start"}
+                                                                        className="text-left"
+                                                                        supplier_name={e.name}
+                                                                        {...propsPopup}
+                                                                    />
+                                                                )}
+                                                            </h4>
+                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                                {e.thu_start == "0" ? (
+                                                                    "-"
+                                                                ) : (
+                                                                    <Popup_chitietDauki
+                                                                        name={
+                                                                            e.thu_start == "0"
+                                                                                ? "-"
+                                                                                : formatNumber(e.thu_start)
+                                                                        }
+                                                                        id={e?.id}
+                                                                        className="text-left"
+                                                                        supplier_name={e.name}
+                                                                        {...propsPopup}
+                                                                    />
+                                                                )}
+                                                            </h4>
                                                         </div>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        {dataLang?.purchase_order_table_item_not_found ||
-                                                            "purchase_order_table_item_not_found"}
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 "></div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-12 bg-slate-100 shadow items-center rounded-md">
-                            <div className="col-span-3 p-2 text-center">
-                                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
-                                    {dataLang?.import_total || "import_total"}
-                                </h3>
-                            </div>
+                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                                {e.no_debt == "0" ? (
+                                                                    "-"
+                                                                ) : (
+                                                                    <Popup_chitietPhatsinh
+                                                                        name={
+                                                                            e.no_debt == "0"
+                                                                                ? "-"
+                                                                                : formatNumber(e.no_debt)
+                                                                        }
+                                                                        className="text-left uppercase"
+                                                                        id={e?.id}
+                                                                        type={"no_debt"}
+                                                                        supplier_name={e.name}
+                                                                        {...propsPopup}
+                                                                    />
+                                                                )}
+                                                            </h4>
 
-                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                    {formatNumber(total?.no_start)}
-                                </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                    {formatNumber(total?.thu_start)}
-                                </h3>
-                            </div>
-                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                    {formatNumber(total?.no_debt)}
-                                </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                    {formatNumber(total?.thu_debt)}
-                                </h3>
-                            </div>
-                            <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                    {formatNumber(total?.no_end)}
-                                </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right ">
-                                    {formatNumber(total?.thu_end)}
-                                </h3>
-                            </div>
-                        </div>
-                        {dataTable.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
-                                <h6 className="">
-                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
-                                </h6>
-                                <Pagination
-                                    postsPerPage={limit}
-                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                                    paginate={paginate}
-                                    currentPage={router.query?.page || 1}
-                                />
-                            </div>
-                        )}
+                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                                                {e.thu_debt == "0" ? (
+                                                                    "-"
+                                                                ) : (
+                                                                    <Popup_chitietPhatsinh
+                                                                        className="text-left uppercase"
+                                                                        name={
+                                                                            e.thu_debt == "0"
+                                                                                ? "-"
+                                                                                : formatNumber(e.thu_debt)
+                                                                        }
+                                                                        id={e?.id}
+                                                                        type={"thu_debt"}
+                                                                        supplier_name={e.name}
+                                                                        {...propsPopup}
+                                                                    />
+                                                                )}
+                                                            </h4>
+                                                        </div>
+
+                                                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                                {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
+                                                            </h4>
+                                                            <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                                                {e.thu_end == "0" ? "-" : formatNumber(e.thu_end)}
+                                                            </h4>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className=" max-w-[352px] mt-24 mx-auto">
+                                            <div className="text-center">
+                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
+                                                    <IconSearch />
+                                                </div>
+                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">
+                                                    {dataLang?.purchase_order_table_item_not_found ||
+                                                        "purchase_order_table_item_not_found"}
+                                                </h1>
+                                                <div className="flex items-center justify-around mt-6 "></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </Customscrollbar>
+                        </ContainerTable>
                     </div>
-                </div>
-            </div>
+                    <div className="grid grid-cols-12 bg-slate-100 shadow items-center rounded-md">
+                        <div className="col-span-3 p-2 text-center">
+                            <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
+                                {dataLang?.import_total || "import_total"}
+                            </h3>
+                        </div>
+
+                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                                {formatNumber(total?.no_start)}
+                            </h3>
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                                {formatNumber(total?.thu_start)}
+                            </h3>
+                        </div>
+                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                                {formatNumber(total?.no_debt)}
+                            </h3>
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                                {formatNumber(total?.thu_debt)}
+                            </h3>
+                        </div>
+                        <div className="col-span-3 grid grid-cols-4  items-center justify-center">
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                                {formatNumber(total?.no_end)}
+                            </h3>
+                            <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right ">
+                                {formatNumber(total?.thu_end)}
+                            </h3>
+                        </div>
+                    </div>
+                    {dataTable.data?.length != 0 && (
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItems?.iTotalDisplayRecords}
+                            />
+                            <Pagination
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page || 1}
+                            />
+                        </ContainerPagination>
+                    )}
+                </ContainerBody>
+            </Container>
         </React.Fragment>
     );
 };

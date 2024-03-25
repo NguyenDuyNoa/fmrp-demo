@@ -343,7 +343,7 @@ const Popup_chitietThere = (props) => {
                                                                             ""
                                                                         )}
                                                                         {dataMaterialExpiry.is_enable === "1" ||
-                                                                        dataProductExpiry.is_enable === "1" ? (
+                                                                            dataProductExpiry.is_enable === "1" ? (
                                                                             <>
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
@@ -362,8 +362,8 @@ const Popup_chitietThere = (props) => {
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                         {e.expiration_date
                                                                                             ? moment(
-                                                                                                  e.expiration_date
-                                                                                              ).format("DD/MM/YYYY")
+                                                                                                e.expiration_date
+                                                                                            ).format("DD/MM/YYYY")
                                                                                             : "-"}
                                                                                     </h6>
                                                                                 </div>
@@ -1378,10 +1378,10 @@ const Popup_chitietThere = (props) => {
                                                                     <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-center">
                                                                         {Number(e?.quantity_left) < 0
                                                                             ? "Đặt dư" +
-                                                                              " " +
-                                                                              formatNumber(
-                                                                                  Number(Math.abs(e?.quantity_left))
-                                                                              )
+                                                                            " " +
+                                                                            formatNumber(
+                                                                                Number(Math.abs(e?.quantity_left))
+                                                                            )
                                                                             : formatNumber(e?.quantity_left)}
                                                                     </h6>
                                                                     <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">

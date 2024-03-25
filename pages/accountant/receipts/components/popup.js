@@ -17,9 +17,10 @@ import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import formatNumber from "@/utils/helpers/formatnumber";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import configSelectPopup from "configs/configSelectPopup";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import {
     getListBranch,
     getListLisObject,
@@ -32,6 +33,15 @@ import {
     postdataListTypeofDoc,
 } from "Api/apiReceipts/api";
 import { debounce } from "lodash";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { SelectCore } from "@/utils/lib/Select";
+import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { BiEdit } from "react-icons/bi";
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
 const Popup_dspt = (props) => {
     let id = props?.id;
     const dataLang = props.dataLang;
@@ -40,6 +50,14 @@ const Popup_dspt = (props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit } = useActionRole(auth, 'receipts');
+
+    const isShow = useToast()
+
     const inistialFetch = {
         onSending: false,
         onFetching: false,
@@ -79,6 +97,8 @@ const Popup_dspt = (props) => {
         note: null,
     };
 
+    const dataSeting = useSetingServer();
+
     const [open, sOpen] = useState(false);
     const [error, sError] = useState(inistialError);
     const [data, sData] = useState(inistialArrr);
@@ -96,6 +116,10 @@ const Popup_dspt = (props) => {
         sError(inistialError);
         sData(inistialArrr);
     };
+
+    const formatNumber = (number) => {
+        return formatMoneyConfig(+number, dataSeting);
+    }
 
     useEffect(() => {
         open && initstialState();
@@ -496,11 +520,37 @@ const Popup_dspt = (props) => {
                         : `${props.dataLang?.receipts_add || "receipts_add"}`
                 }
                 button={
-                    props.id
-                        ? props.dataLang?.payment_editVotes || "payment_editVotes"
-                        : `${props.dataLang?.branch_popup_create_new}`
+                    props?.id ?
+                        <div
+                            onClick={() => {
+                                if (role || checkEdit) {
+                                    sOpen(true)
+                                } else {
+                                    isShow("warning", WARNING_STATUS_ROLE)
+                                }
+                            }}
+                            className={"group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}>
+                            <BiEdit
+                                size={20}
+                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                            />
+                            <p className="group-hover:text-sky-500">
+                                {props.dataLang?.payment_editVotes || "payment_editVotes"}
+                            </p>
+
+                        </div>
+
+                        : <div
+                            onClick={() => {
+                                if (role || checkAdd) {
+                                    sOpen(true)
+                                } else {
+                                    isShow("warning", WARNING_STATUS_ROLE)
+                                }
+                            }}
+                        >{props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'}</div>
+
                 }
-                onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props.className}
@@ -562,7 +612,7 @@ const Popup_dspt = (props) => {
                                             {props.dataLang?.payment_branch || "payment_branch"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             placeholder={props.dataLang?.payment_branch || "payment_branch"}
                                             options={data.dataBranch}
                                             onChange={_HandleChangeInput.bind(this, "branch")}
@@ -583,7 +633,7 @@ const Popup_dspt = (props) => {
                                             {props.dataLang?.payment_method || "payment_method"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             placeholder={props.dataLang?.payment_method || "payment_method"}
                                             options={data.dataMethod}
                                             onChange={_HandleChangeInput.bind(this, "method")}
@@ -605,7 +655,7 @@ const Popup_dspt = (props) => {
                                             {props.dataLang?.payment_ob || "payment_ob"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             placeholder={props.dataLang?.payment_ob || "payment_ob"}
                                             options={data.dataObject}
                                             onChange={_HandleChangeInput.bind(this, "object")}
@@ -629,7 +679,7 @@ const Popup_dspt = (props) => {
                                             <span className="text-red-500">*</span>
                                         </label>
                                         {listValue.object?.value == "other" ? (
-                                            <CreatableSelect
+                                            <CreatableSelectCore
                                                 options={data.dataListObject}
                                                 placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
                                                 onChange={_HandleChangeInput.bind(this, "listObject")}
@@ -681,7 +731,7 @@ const Popup_dspt = (props) => {
                                                 }}
                                             />
                                         ) : (
-                                            <Select
+                                            <SelectCore
                                                 placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
                                                 options={data.dataListObject}
                                                 onChange={_HandleChangeInput.bind(this, "listObject")}
@@ -704,7 +754,7 @@ const Popup_dspt = (props) => {
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                             {props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             placeholder={
                                                 props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"
                                             }
@@ -722,7 +772,7 @@ const Popup_dspt = (props) => {
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                             {props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             placeholder={props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                             options={data.dataListTypeofDoc}
                                             closeMenuOnSelect={false}
@@ -736,10 +786,10 @@ const Popup_dspt = (props) => {
                                             menuPortalTarget={document.body}
                                             onMenuOpen={handleMenuOpen}
                                             className={`${error.errListTypeDoc &&
-                                                    listValue.typeOfDocument != null &&
-                                                    listValue.listTypeOfDocument?.length == 0
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
+                                                listValue.typeOfDocument != null &&
+                                                listValue.listTypeOfDocument?.length == 0
+                                                ? "border-red-500"
+                                                : "border-transparent"
                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
@@ -755,7 +805,7 @@ const Popup_dspt = (props) => {
                                             {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <NumericFormat
+                                        <InPutMoneyFormat
                                             value={listValue.price}
                                             disabled={listValue.object === null || listValue.listObject === null}
                                             onChange={_HandleChangeInput.bind(this, "price")}
@@ -766,8 +816,6 @@ const Popup_dspt = (props) => {
                                                 (listValue.object != null && props.dataLang?.payment_amountOfMoney) ||
                                                 "payment_amountOfMoney"
                                             }
-                                            decimalScale={0}
-                                            isNumericString={true}
                                             isAllowed={(values) => {
                                                 if (!values.value) return true;
                                                 const { floatValue } = values;
@@ -788,7 +836,8 @@ const Popup_dspt = (props) => {
                                                                 } ${formatNumber(totalMoney)}`
                                                             );
                                                         }
-                                                        return floatValue <= totalMoney;
+                                                        return false;
+                                                        // return floatValue <= totalMoney;
                                                     } else {
                                                         return true;
                                                     }
@@ -797,10 +846,9 @@ const Popup_dspt = (props) => {
                                                 }
                                             }}
                                             className={`${error.errPrice && (listValue.price == null || listValue.price == "")
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
                                                 } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
-                                            thousandSeparator=","
                                         />
                                         {error.errPrice && (
                                             <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -839,8 +887,8 @@ const Popup_dspt = (props) => {
                                     <div className="col-span-12 border border-b-0 rounded transition-all duration-200 ease-linear">
                                         <div
                                             className={`${listValue.listTypeOfDocument.length > 5
-                                                    ? " h-[170px] overflow-auto"
-                                                    : ""
+                                                ? " h-[170px] overflow-auto"
+                                                : ""
                                                 } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
                                         >
                                             {listValue.listTypeOfDocument.map((e, index) => {
@@ -892,37 +940,4 @@ const Popup_dspt = (props) => {
     );
 };
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 1;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 export default Popup_dspt;

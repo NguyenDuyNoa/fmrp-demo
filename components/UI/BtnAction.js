@@ -41,8 +41,8 @@ import PopupEdit from "@/components/UI/popup";
 
 import Popup_servie from "@/pages/purchase_order/serviceVoucher/components/popup";
 
-import Popup_dspc from "@/pages/accountant/payment/(popup)/popup";
-import Popup_dspt from "@/pages/accountant/receipts/(popup)/popup";
+import Popup_dspc from "@/pages/accountant/payment/components/popup";
+import Popup_dspt from "@/pages/accountant/receipts/components/popup";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import useFeature from "@/hooks/useConfigFeature";
@@ -453,36 +453,52 @@ const BtnAction = React.memo((props) => {
                                 }
 
                                 {props.type == "receipts" && (
-                                    <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
-                                        <BiEdit
-                                            size={20}
-                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                        />
-                                        <Popup_dspt
-                                            onRefresh={props.onRefresh}
-                                            dataLang={props.dataLang}
-                                            id={props?.id}
-                                            className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
-                                        >
-                                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                                        </Popup_dspt>
-                                    </div>
+                                    // <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
+                                    //     <BiEdit
+                                    //         size={20}
+                                    //         className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                                    //     />
+                                    //     <Popup_dspt
+                                    //         onRefresh={props.onRefresh}
+                                    //         dataLang={props.dataLang}
+                                    //         id={props?.id}
+                                    //         className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
+                                    //     >
+                                    //         {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                                    //     </Popup_dspt>
+                                    // </div>
+                                    <Popup_dspt
+                                        onRefresh={props.onRefresh}
+                                        dataLang={props.dataLang}
+                                        id={props?.id}
+                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                    >
+                                        {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                                    </Popup_dspt>
                                 )}
                                 {props.type == "payment" && (
-                                    <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
-                                        <BiEdit
-                                            size={20}
-                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                        />
-                                        <Popup_dspc
-                                            onRefresh={props.onRefresh}
-                                            dataLang={props.dataLang}
-                                            id={props?.id}
-                                            className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
-                                        >
-                                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                                        </Popup_dspc>
-                                    </div>
+                                    // <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 ">
+                                    //     <BiEdit
+                                    //         size={20}
+                                    //         className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                                    //     />
+                                    //     <Popup_dspc
+                                    //         onRefresh={props.onRefresh}
+                                    //         dataLang={props.dataLang}
+                                    //         id={props?.id}
+                                    //         className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                    //         >
+                                    //         {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                                    //     </Popup_dspc>
+                                    // </div>
+                                    <Popup_dspc
+                                        onRefresh={props.onRefresh}
+                                        dataLang={props.dataLang}
+                                        id={props?.id}
+                                        className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                                    >
+                                        {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
+                                    </Popup_dspc>
                                 )}
                                 {!["order", 'products', "serviceVoucher", "receipts", "payment"].includes(props.type) && (
                                     <button

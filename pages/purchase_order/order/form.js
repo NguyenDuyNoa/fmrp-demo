@@ -588,20 +588,37 @@ const Index = (props) => {
     }, [idPurchases]);
 
     const _ServerFetching_ItemsAll = () => {
-        Axios("GET", "/api_web/Api_product/searchItemsVariant?csrf_protection=true",
-            {
-                params: {
-                    branch_id: idBranch != null ? +idBranch?.value : "",
-                    purchase_order_id: id,
+        if (loai == '0') {
+            let form = new FormData()
+            form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "")
+            Axios("POST", `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
+                {
+                    data: form,
+                    headers: { "Content-Type": "multipart/form-data" },
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    sDataItems(result);
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response?.data.data;
+                        sDataItems(result);
+                    }
                 }
-            }
-        );
+            );
+        } else {
+            Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
+                {
+                    params: {
+                        branch_id: idBranch != null ? +idBranch?.value : "",
+                        purchase_order_id: id,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response.data.data;
+                        sDataItems(result);
+                    }
+                }
+            );
+        }
         sOnFetchingItemsAll(false);
     };
 
@@ -623,16 +640,21 @@ const Index = (props) => {
 
     useEffect(() => {
         router.query && sOnFetching(true);
-        router.query && sOnFetchingItemsAll(true);
     }, [router.query]);
 
-    ///Đang lỗi
     useEffect(() => {
-        idBranch != null && sOnFetchingItemsAll(true);
-    }, [idBranch]);
+        const check = () => {
+            sOnFetchingItemsAll(true);
+        }
 
-    useEffect(() => {
-        idBranch != null && sOnFetchingPurcher(true);
+        if (loai == "1") {
+            idBranch != null && check();
+            idPurchases?.length == 0 && sDataItems([]);
+            idBranch != null && sOnFetchingPurcher(true);
+        } else {
+            idBranch == null && sDataItems([]);
+            idBranch != null && check();
+        }
     }, [idBranch]);
 
     useEffect(() => {
@@ -641,6 +663,7 @@ const Index = (props) => {
 
     useEffect(() => {
         idPurchases?.length > 0 && sOnFetchingItems(true);
+        idPurchases?.length == 0 && sDataItems([]);
     }, [idPurchases]);
 
 
@@ -705,16 +728,33 @@ const Index = (props) => {
     }, [idPurchases?.length > 0]);
 
     const _HandleSeachApi = debounce((inputValue) => {
-        if (loai === "0")
-            Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
+        if (loai === "0" && idBranch != null)
+        // Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`,
+        //     // Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
+        //     {
+        //         data: {
+        //             branch_id: idBranch != null ? +idBranch?.value : "",
+        //             term: inputValue,
+        //         },
+        //         params: {
+        //             purchase_order_id: id,
+        //         },
+        //     },
+        //     (err, response) => {
+        //         if (!err) {
+        //             var { result } = response?.data.data;
+        //             sDataItems(result);
+        //         }
+        //     }
+        // );
+        {
+            let form = new FormData()
+            form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "")
+            form.append(`term`, inputValue)
+            Axios("POST", `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
                 {
-                    data: {
-                        branch_id: idBranch != null ? +idBranch?.value : "",
-                        term: inputValue,
-                    },
-                    params: {
-                        purchase_order_id: id,
-                    },
+                    data: form,
+                    headers: { "Content-Type": "multipart/form-data" },
                 },
                 (err, response) => {
                     if (!err) {
@@ -723,6 +763,8 @@ const Index = (props) => {
                     }
                 }
             );
+        }
+
         else {
             return;
         }
@@ -1518,27 +1560,42 @@ const Index = (props) => {
                                                                         </h5>
 
                                                                     </div>
-                                                                    <h5 className="text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                    <h5 className={`${loai == "1" ? "" : 'flex items-center gap-1'} text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
                                                                         {dataLang[option.e?.text_type]}{" "}
                                                                         {loai == "1" ? "-" : ""}{" "}
                                                                         {loai == "1" ? option.e?.purchases_code : ""}{" "}
+                                                                        {loai != "1" &&
+                                                                            <>
+                                                                                <h5>-</h5>
+                                                                                <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                    {dataLang?.purchase_survive || "purchase_survive"}
+                                                                                    :
+                                                                                </h5>
+                                                                                <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                    {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                                </h5>
+                                                                            </>
+                                                                        }
                                                                     </h5>
-                                                                    <div className="flex text-gray-400 items-center gap-2">
-                                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {loai == "1" ? "Số lượng:" : ""}{" "}
-                                                                        </h5>
-                                                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {loai == "1" ? option.e?.quantity_left : ""}
-                                                                        </h5>
-                                                                        {"-"}
-                                                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {dataLang?.purchase_survive || "purchase_survive"}
-                                                                            :
-                                                                        </h5>
-                                                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                            {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
-                                                                        </h5>
-                                                                    </div>
+                                                                    {loai == "1" &&
+                                                                        <div className="flex text-gray-400 items-center gap-2">
+                                                                            <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                Số lượng:
+                                                                            </h5>
+                                                                            <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                {option.e?.quantity_left}
+                                                                            </h5>
+                                                                            {"-"}
+                                                                            <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                {dataLang?.purchase_survive || "purchase_survive"}
+                                                                                :
+                                                                            </h5>
+                                                                            <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                                {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                            </h5>
+                                                                        </div>
+
+                                                                    }
                                                                 </div>
                                                             </div>
                                                         </div>

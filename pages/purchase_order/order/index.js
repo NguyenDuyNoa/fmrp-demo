@@ -1,6 +1,8 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import "react-datepicker/dist/react-datepicker.css";
 
 import {
@@ -22,40 +24,37 @@ import { useEffect } from "react";
 import Popup_chitietThere from "../detaiCommon";
 import Popup_chitiet from "./components/popup";
 
-import Loading from "@/components/UI/loading";
-import BtnAction from "@/components/UI/BtnAction";
-import Pagination from "@/components/UI/pagination";
 import { routerOrder } from "routers/buyImportGoods";
 
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import TabFilter from "@/components/UI/TabFilter";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+
+import useActionRole from "@/hooks/useRole";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import { debounce } from "lodash";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import TabFilter from "@/components/UI/TabFilter";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import NoData from "@/components/UI/noData/nodata";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-
-
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -474,7 +473,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_branch || "purchase_order_branch",
+                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
@@ -632,10 +631,10 @@ const Index = (props) => {
                                                             <TagColorOrange name={'YCMH'} />
                                                         )}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
+                                                    <RowItemTable colSpan={1} className={'flex-col items-center justify-center'}>
                                                         {e?.purchases?.map((purchase, index) => (
                                                             <React.Fragment key={purchase.id}>
-                                                                {index !== 0 && ","}
+                                                                {/* {index !== 0 && ","} */}
                                                                 <Popup_chitietThere
                                                                     dataLang={dataLang}
                                                                     className="3xl:text-base 2xl:text-[12.5px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out" type={e?.order_type}

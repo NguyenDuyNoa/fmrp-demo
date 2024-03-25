@@ -1,23 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import Link from "next/link";
 import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
 import ReactExport from "react-data-export";
 
 import Swal from "sweetalert2";
-import { NumericFormat } from "react-number-format";
 import { v4 as uuidv4 } from "uuid";
 
 import { MdClear } from "react-icons/md";
 import { BsCalendarEvent } from "react-icons/bs";
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
 import DatePicker, { registerLocale } from "react-datepicker";
-import ModalImage from "react-modal-image";
 
 import {
     Edit as IconEdit,
@@ -30,25 +21,23 @@ import {
 } from "iconsax-react";
 
 import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
 
 import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import { useDispatch } from "react-redux";
-import CreatableSelect from "react-select/creatable";
+import { components } from "react-select";
+import { useSelector } from "react-redux";
 import formatNumber from "@/utils/helpers/formatnumber";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { debounce } from "lodash";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useToast from "@/hooks/useToast";
+import { SelectCore } from "@/utils/lib/Select";
+import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -79,6 +68,12 @@ const Popup_dspc = (props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
+    const isShow = useToast()
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit } = useActionRole(auth, 'payment');
 
     const [open, sOpen] = useState(false);
 
@@ -350,53 +345,6 @@ const Popup_dspc = (props) => {
         fetch.onFetchingDetail && props?.id && _ServerFetching_detail();
     }, [open]);
 
-    // useEffect(() => {
-    //     fetch.onFetching_ListCost && _ServerFetching_ListCost();
-    // }, [fetch.onFetching_ListCost]);
-
-    // useEffect(() => {
-    //     fetch.onFetchingTable && _ServerFetching_ListTable();
-    // }, [fetch.onFetchingTable]);
-    // useEffect(() => {
-    //     fetch.onFetching_TypeOfDocument && _ServerFetching_TypeOfDocument();
-    // }, [fetch.onFetching_TypeOfDocument]);
-    // useEffect(() => {
-    //     fetch.onFetching_ListTypeOfDocument && _ServerFetching_ListTypeOfDocument();
-    // }, [fetch.onFetching_ListTypeOfDocument]);
-    // useEffect(() => {
-    //     fetch.onFetching_LisObject && _ServerFetching_LisObject();
-    // }, [fetch.onFetching_LisObject]);
-    // useEffect(() => {
-    //     fetch.onFetching && _ServerFetching();
-    // }, [fetch.onFetching]);
-    // useEffect(() => {
-    //     fetch.onSending && _ServerSending();
-    // }, [fetch.onSending]);
-
-    // useEffect(() => {
-    //     if (typeOfDocument?.value == "import" && listTypeOfDocument) {
-    //         sFetch((e) => ({ ...e, onFetchingTable: true }));
-    //     }
-    //     if (branch != null) {
-    //         sFetch((e) => ({ ...e, onFetching_ListCost: true }));
-    //     }
-    //     if (object != null) {
-    //         sFetch((e) => ({ ...e, onFetching_TypeOfDocument: true }));
-    //     }
-    //     if (typeOfDocument) {
-    //         sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
-    //     }
-    //     if (open) {
-    //         sFetch((e) => ({ ...e, onFetching: true }));
-    //     }
-    //     if (branch != null && object != null) {
-    //         sFetch((e) => ({ ...e, onFetching_LisObject: true }));
-    //     }
-    //     if (open && fetch.onFetchingDetail && props?.id) {
-    //         _ServerFetching_detail();
-    //     }
-    // }, [listTypeOfDocument, branch, object, typeOfDocument, open]);
-
     useEffect(() => {
         if (fetch.onFetching) {
             _ServerFetching();
@@ -495,45 +443,6 @@ const Popup_dspc = (props) => {
             }
         );
     }, 500)
-    // let searchTimeout;
-
-    // const _HandleSeachApi = (inputValue) => {
-    //     if (inputValue == "") return;
-    //     else {
-    //         clearTimeout(searchTimeout);
-    //         searchTimeout = setTimeout(() => {
-    //             Axios(
-    //                 "POST",
-    //                 `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
-    //                 {
-    //                     data: {
-    //                         term: inputValue,
-    //                     },
-    //                     params: {
-    //                         type: object?.value ? object?.value : null,
-    //                         voucher_type: typeOfDocument?.value ? typeOfDocument?.value : null,
-    //                         object_id: listObject?.value ? listObject?.value : null,
-    //                         "filter[branch_id]": branch?.value ? branch?.value : null,
-    //                         expense_voucher_id: id ? id : "",
-    //                     },
-    //                 },
-    //                 (err, response) => {
-    //                     if (!err) {
-    //                         let db = response.data;
-    //                         sData((e) => ({
-    //                             ...e,
-    //                             dataListTypeofDoc: db?.map((e) => ({
-    //                                 label: e?.code,
-    //                                 value: e?.id,
-    //                                 money: e?.money,
-    //                             })),
-    //                         }));
-    //                     }
-    //                 }
-    //             );
-    //         }, 500);
-    //     }
-    // };
 
     //Loại chi phí
     const _ServerFetching_ListCost = () => {
@@ -957,11 +866,37 @@ const Popup_dspc = (props) => {
                         : `${props.dataLang?.payment_add || "payment_add"}`
                 }
                 button={
-                    props.id
-                        ? props.dataLang?.payment_editVotes || "payment_editVotes"
-                        : `${props.dataLang?.branch_popup_create_new}`
+                    props?.id ?
+                        <div
+                            onClick={() => {
+                                if (role || checkEdit) {
+                                    sOpen(true)
+                                } else {
+                                    isShow("warning", WARNING_STATUS_ROLE)
+                                }
+                            }}
+                            className={"group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}>
+                            <BiEdit
+                                size={20}
+                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                            />
+                            <p className="group-hover:text-sky-500">
+                                {props.dataLang?.payment_editVotes || "payment_editVotes"}
+                            </p>
+
+                        </div>
+
+                        : <div
+                            onClick={() => {
+                                if (role || checkAdd) {
+                                    sOpen(true)
+                                } else {
+                                    isShow("warning", WARNING_STATUS_ROLE)
+                                }
+                            }}
+                        >{props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'}</div>
+
                 }
-                onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props.className}
@@ -1023,7 +958,7 @@ const Popup_dspc = (props) => {
                                             {props.dataLang?.payment_branch || "payment_branch"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             closeMenuOnSelect={true}
                                             placeholder={props.dataLang?.payment_branch || "payment_branch"}
                                             options={data.dataBranch}
@@ -1070,7 +1005,7 @@ const Popup_dspc = (props) => {
                                             {props.dataLang?.payment_method || "payment_method"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             closeMenuOnSelect={true}
                                             placeholder={props.dataLang?.payment_method || "payment_method"}
                                             options={data.dataMethod}
@@ -1117,7 +1052,7 @@ const Popup_dspc = (props) => {
                                             {props.dataLang?.payment_ob || "payment_ob"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             closeMenuOnSelect={true}
                                             placeholder={props.dataLang?.payment_ob || "payment_ob"}
                                             options={data.dataObject}
@@ -1165,7 +1100,7 @@ const Popup_dspc = (props) => {
                                             <span className="text-red-500">*</span>
                                         </label>
                                         {object?.value == "other" ? (
-                                            <CreatableSelect
+                                            <CreatableSelectCore
                                                 options={data.dataList_Object}
                                                 placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
                                                 onChange={_HandleChangeInput.bind(this, "listObject")}
@@ -1217,7 +1152,7 @@ const Popup_dspc = (props) => {
                                                 }}
                                             />
                                         ) : (
-                                            <Select
+                                            <SelectCore
                                                 closeMenuOnSelect={true}
                                                 placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
                                                 options={data.dataList_Object}
@@ -1264,7 +1199,7 @@ const Popup_dspc = (props) => {
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                             {props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             closeMenuOnSelect={true}
                                             placeholder={
                                                 props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"
@@ -1306,7 +1241,7 @@ const Popup_dspc = (props) => {
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                             {props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                         </label>
-                                        <Select
+                                        <SelectCore
                                             closeMenuOnSelect={false}
                                             placeholder={props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                             onInputChange={_HandleSeachApi.bind(this)}
@@ -1343,10 +1278,10 @@ const Popup_dspc = (props) => {
                                                 }),
                                             }}
                                             className={`${error.errListTypeDoc &&
-                                                    typeOfDocument != null &&
-                                                    listTypeOfDocument?.length == 0
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
+                                                typeOfDocument != null &&
+                                                listTypeOfDocument?.length == 0
+                                                ? "border-red-500"
+                                                : "border-transparent"
                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
@@ -1373,12 +1308,9 @@ const Popup_dspc = (props) => {
                                                     {props.dataLang?.payment_cashInReturn || "payment_cashInReturn"}
                                                 </h1>
                                             </div>
-                                            <div
-                                                // ref={scrollAreaRef}
-                                                // speed={1}
-                                                // smoothScrolling={true}
+                                            <Customscrollbar
                                                 className={`${data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
-                                                    } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+                                                    } cursor-pointer`}
                                             >
                                                 {data.dataTable.map((e) => {
                                                     return (
@@ -1402,7 +1334,7 @@ const Popup_dspc = (props) => {
                                                         </div>
                                                     );
                                                 })}
-                                            </div>
+                                            </Customscrollbar>
                                         </div>
                                     )}
                                     <div className="col-span-6">
@@ -1410,19 +1342,16 @@ const Popup_dspc = (props) => {
                                             {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
-                                        <NumericFormat
+                                        <InPutMoneyFormat
                                             value={price}
                                             disabled={object === null || listObject === null}
                                             onChange={_HandleChangeInput.bind(this, "price")}
-                                            allowNegative={false}
                                             placeholder={
                                                 ((object == null || listObject == null) &&
                                                     (props.dataLang?.payment_errObList || "payment_errObList")) ||
                                                 (object != null && props.dataLang?.payment_amountOfMoney) ||
                                                 "payment_amountOfMoney"
                                             }
-                                            decimalScale={0}
-                                            isNumericString={true}
                                             isAllowed={(values) => {
                                                 if (!values.value) return true;
                                                 const { floatValue } = values;
@@ -1440,7 +1369,7 @@ const Popup_dspc = (props) => {
                                                                     } ${totalMoney.toLocaleString("en")}`,
                                                             });
                                                         }
-                                                        return floatValue <= totalMoney;
+                                                        return false
                                                     } else {
                                                         return true;
                                                     }
@@ -1449,10 +1378,9 @@ const Popup_dspc = (props) => {
                                                 }
                                             }}
                                             className={`${error.errPrice && price == null
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
                                                 } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
-                                            thousandSeparator=","
                                         />
                                         {error.errPrice && (
                                             <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1496,16 +1424,13 @@ const Popup_dspc = (props) => {
                                             {props.dataLang?.payment_operation || "payment_operation"}
                                         </h4>
                                     </div>
-                                    <ScrollArea
-                                        ref={scrollAreaRef}
-                                        className="min-h-[100px] max-h-[100px]  overflow-hidden"
-                                        speed={1}
-                                        smoothScrolling={true}
+                                    <Customscrollbar
+                                        className="min-h-[100px] max-h-[100px]"
                                     >
                                         {sortedArr.map((e, index) => (
                                             <div className="grid grid-cols-12 items-center gap-1 py-1 " key={e?.id}>
                                                 <div className="col-span-6  my-auto ">
-                                                    <Select
+                                                    <SelectCore
                                                         closeMenuOnSelect={true}
                                                         placeholder={
                                                             props.dataLang?.payment_expense || "payment_expense"
@@ -1543,13 +1468,13 @@ const Popup_dspc = (props) => {
                                                             }),
                                                         }}
                                                         className={`${error.errCosts && e?.chiphi === ""
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
+                                                            ? "border-red-500"
+                                                            : "border-transparent"
                                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                                     />
                                                 </div>
                                                 <div className="col-span-4 text-center flex items-center justify-center">
-                                                    <NumericFormat
+                                                    <InPutMoneyFormat
                                                         value={e?.sotien}
                                                         disabled={price == null}
                                                         placeholder={
@@ -1562,8 +1487,6 @@ const Popup_dspc = (props) => {
                                                             e?.id,
                                                             "sotien"
                                                         )}
-                                                        allowNegative={false}
-                                                        decimalScale={0}
                                                         isAllowed={(values) => {
                                                             if (!values.value) return true;
                                                             const { floatValue } = values;
@@ -1576,17 +1499,15 @@ const Popup_dspc = (props) => {
                                                                             } ${price.toLocaleString("en")}`,
                                                                     });
                                                                 }
-                                                                return floatValue <= price;
+                                                                return false;
                                                             } else {
                                                                 return true;
                                                             }
                                                         }}
-                                                        isNumericString={true}
                                                         className={`${error.errSotien && (e?.sotien === "" || e?.sotien === null)
-                                                                ? "border-b-red-500"
-                                                                : " border-gray-200"
+                                                            ? "border-b-red-500"
+                                                            : " border-gray-200"
                                                             } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
-                                                        thousandSeparator=","
                                                     />
                                                 </div>
                                                 <div className="col-span-2 flex items-center justify-center">
@@ -1601,7 +1522,7 @@ const Popup_dspc = (props) => {
                                                 </div>
                                             </div>
                                         ))}
-                                    </ScrollArea>
+                                    </Customscrollbar>
                                 </div>
                             </div>
                         </div>
@@ -1627,37 +1548,4 @@ const Popup_dspc = (props) => {
     );
 };
 
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
-
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 1;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 export default Popup_dspc;
