@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -9,26 +10,29 @@ import PhoneInput from "react-phone-input-2";
 import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 
-import PopupEdit from "@/components/UI/popup";
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { debounce } from "lodash";
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 
 const Index = (props) => {
     const router = useRouter();
 
     const dataLang = props.dataLang;
-
-    const { isOpen, isId, handleQueryId } = useToggle();
-
-    const isShow = useToast();
 
     const trangthaiExprired = useStatusExprired();
 
@@ -38,14 +42,11 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems()
 
-    const [totalItem, sTotalItem] = useState([]);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch?csrf_protection=true`,
+        Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
@@ -72,22 +73,6 @@ const Index = (props) => {
         sOnFetching(true) || (keySearch && sOnFetching(true));
     }, [limit, router.query?.page]);
 
-    const handleDelete = async () => {
-        Axios("DELETE", `/api_web/Api_Branch/branch/${isId}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var { isSuccess, message } = response.data;
-                if (isSuccess) {
-                    isShow("success", dataLang[message]);
-                } else {
-                    isShow("error", dataLang[message]);
-                }
-            }
-            _ServerFetching();
-        });
-
-        handleQueryId({ status: false });
-    };
-
     const paginate = (pageNumber) => {
         router.push({
             pathname: "/settings/branch",
@@ -98,12 +83,6 @@ const Index = (props) => {
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/settings/branch");
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
         sOnFetching(true);
     }, 500)
     return (
@@ -111,97 +90,80 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.branch_title}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <Container className="">
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.branch_seting || "branch_seting"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.branch_title}</h6>
+                        <h6>{dataLang?.branch_title || "branch_title"}</h6>
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5 h-[99%] overflow-hidden">
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
                     </div>
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
+                    <ContainerBody>
                         <div className="space-y-3 h-[96%] overflow-hidden">
-                            <h2 className="text-2xl text-[#52575E]">{dataLang?.branch_title}</h2>
-                            <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
-                                <div className="flex justify-end items-center">
+                            <div className="flex justify-between  mt-1 mr-2">
+                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                    {dataLang?.branch_title}
+                                </h2>
+                                <div className="flex justify-end items-center gap-2">
                                     <Popup_ChiNhanh
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    />
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                                 </div>
+                            </div>
+                            <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                                        <form className="flex items-center relative">
-                                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                                            <input
-                                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                                                type="text"
-                                                onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                placeholder={dataLang?.branch_search}
-                                            />
-                                        </form>
-                                        <div className="flex space-x-2">
-                                            <label className="font-[300] text-slate-400">Hiển thị :</label>
-                                            <select
-                                                className="outline-none"
-                                                onChange={(e) => sLimit(e.target.value)}
-                                                value={limit}
-                                            >
-                                                <option disabled className="hidden">
-                                                    {limit == -1 ? "Tất cả" : limit}
-                                                </option>
-                                                <option value={15}>15</option>
-                                                <option value={20}>20</option>
-                                                <option value={40}>40</option>
-                                                <option value={60}>60</option>
-                                                <option value={-1}>Tất cả</option>
-                                            </select>
+                                        <SearchComponent
+                                            dataLang={dataLang}
+                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                        />
+                                        <div>
+                                            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] h-[82%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="xl:w-[100%] w-[110%] pr-2">
-                                        <div className="flex items-center sticky top-0 bg-white p-2 z-10">
-                                            <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[23%] font-[300] text-left">
+                                <Customscrollbar className="min:h-[200px] h-[83%] max:h-[500px] overflow-auto pb-2">
+                                    <div className="w-full">
+                                        <HeaderTable gridCols={12}>
+                                            <ColumnTable colSpan={4} textAlign={'left'}>
                                                 {dataLang?.branch_popup_name}
-                                            </h4>
-                                            <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[50%] font-[300] text-left">
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={3} textAlign={'left'}>
                                                 {dataLang?.branch_popup_address}
-                                            </h4>
-                                            <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={3} textAlign={'left'}>
                                                 {dataLang?.branch_popup_phone}
-                                            </h4>
-                                            <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-center">
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={2} textAlign={'center'}>
                                                 {dataLang?.branch_popup_properties}
-                                            </h4>
-                                        </div>
+                                            </ColumnTable>
+                                        </HeaderTable>
                                         {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : data.length > 0 ? (
                                             <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
+                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
                                                     {data.map((e) => (
-                                                        <div
-                                                            className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                            key={e.id.toString()}
-                                                        >
-                                                            <h6 className="xl:text-base text-xs px-2 w-[23%] text-left">
+                                                        <RowTable gridCols={12} key={e.id.toString()} >
+                                                            <RowItemTable colSpan={4} textAlign={'left'}>
                                                                 {e.name}
-                                                            </h6>
-                                                            <h6 className="xl:text-base text-xs px-2 w-[50%]">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={3} textAlign={'left'}>
                                                                 {e.address}
-                                                            </h6>
-                                                            <h6 className="xl:text-base text-xs px-2 w-[20%] text-left">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={3} textAlign={'left'}>
                                                                 {e.number_phone}
-                                                            </h6>
-                                                            <div className="space-x-2 w-[20%] text-center">
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={2} className="flex justify-center items-center gap-2">
                                                                 <Popup_ChiNhanh
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs"
@@ -211,68 +173,40 @@ const Index = (props) => {
                                                                     address={e.address}
                                                                     id={e.id}
                                                                 />
-                                                                <button
-                                                                    onClick={() =>
-                                                                        handleQueryId({ id: e.id, status: true })
-                                                                    }
-                                                                    className="xl:text-base text-xs"
-                                                                >
-                                                                    <IconDelete color="red" />
-                                                                </button>
-                                                            </div>
-                                                        </div>
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGroup={() => { }}
+                                                                    dataLang={dataLang}
+                                                                    id={e?.id}
+                                                                    type="settings_branch"
+                                                                />
+                                                            </RowItemTable>
+                                                        </RowTable>
                                                     ))}
                                                 </div>
                                             </>
-                                        ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        Không tìm thấy các mục
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 ">
-                                                        <Popup_ChiNhanh
-                                                            onRefresh={_ServerFetching.bind(this)}
-                                                            dataLang={dataLang}
-                                                            className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
+                                        ) : <NoData />}
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </div>
                         </div>
                         {data?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
-                                <h6>
-                                    Hiển thị {totalItem?.iTotalDisplayRecords} trong số {totalItem?.iTotalRecords} biến
-                                    thể
-                                </h6>
+                            <ContainerPagination>
+                                <TitlePagination
+                                    dataLang={dataLang}
+                                    totalItems={totalItem?.iTotalDisplayRecords}
+                                />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
-                            </div>
+                            </ContainerPagination>
                         )}
-                    </div>
+                    </ContainerBody>
                 </div>
-            </div>
-            <PopupConfim
-                dataLang={dataLang}
-                type="warning"
-                title={TITLE_DELETE}
-                subtitle={CONFIRM_DELETION}
-                isOpen={isOpen}
-                save={handleDelete}
-                cancel={() => handleQueryId({ status: false })}
-            />
+            </Container>
         </React.Fragment>
     );
 };

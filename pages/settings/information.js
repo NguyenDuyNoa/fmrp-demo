@@ -11,6 +11,8 @@ import { Camera as IconCamera } from "iconsax-react";
 
 import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -138,18 +140,18 @@ const Index = (props) => {
             <Head>
                 <title>Cài đặt</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4">
+            <Container className={'!h-auto'}>
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>Thông Tin Doanh Nghiệp</h6>
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5">
-                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky top-20">
+                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky top-11">
                         <ListBtn_Setting dataLang={dataLang} />
                     </div>
                     <div className="col-span-7 space-y-3">
@@ -400,7 +402,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
         </React.Fragment>
     );
 };
@@ -448,16 +450,14 @@ const Btn_Setting = React.memo((props) => {
     return (
         <Link href={props.url ? props.url : "#"} alt={props.children}>
             <button
-                className={`${
-                    router.asPath.includes(props.isActive)
-                        ? "text-white bg-[#11315B]"
-                        : "text-[#11315B] hover:bg-[#11315B]/5"
-                } flex items-center space-x-2 rounded w-full text-left font-[400] py-2 px-3 my-1`}
+                className={`${router.asPath.includes(props.isActive)
+                    ? "text-white bg-[#11315B]"
+                    : "text-[#11315B] hover:bg-[#11315B]/5"
+                    } flex items-center space-x-2 rounded w-full text-left font-[400] py-2 px-3 my-1`}
             >
                 <div
-                    className={`${
-                        router.asPath.includes(props.isActive) ? "bg-white" : "bg-[#11315B]"
-                    } w-1.5 h-1.5 rounded `}
+                    className={`${router.asPath.includes(props.isActive) ? "bg-white" : "bg-[#11315B]"
+                        } w-1.5 h-1.5 rounded `}
                 />
                 <span>{props.children}</span>
             </button>

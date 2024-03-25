@@ -7,6 +7,8 @@ import { Money2 as IconMoney, Refresh as IconRefresh, Clock as IconClock } from 
 import { useSelector } from "react-redux";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -50,13 +52,16 @@ const Index = (props) => {
             <Head>
                 <title>Thông tin dịch vụ FMRP</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 min-h-screen">
-                {trangthaiExprired ? <div className='p-2'></div> :
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+            <Container className={'!h-auto'}>
+                {trangthaiExprired ?
+                    <EmptyExprired />
+                    :
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>Thông Tin Dịch Vụ FMRP</h6>
-                    </div>}
+                    </div>
+                }
                 <div className="grid grid-cols-9 gap-5 h-[99%]">
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
@@ -315,7 +320,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
         </>
     );
 }

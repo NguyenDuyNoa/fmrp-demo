@@ -119,7 +119,16 @@ const BtnAction = React.memo((props) => {
 
     const handleDelete = () => {
         //Báo giá
+
         const initialApiDelete = {
+            settings_variant: `/api_web/Api_variation/variation/${props.id}?csrf_protection=true`,
+            units: `/api_web/Api_unit/unit/${props.id}?csrf_protection=true`,
+            stages: `/api_web/api_product/stage/${props.id}?csrf_protection=true`,
+            costs: `/api_web/Api_cost/cost/${props.id}?csrf_protection=true`,
+            paymentmodes: `/api_web/Api_payment_method/payment_method/${props.id}?csrf_protection=true`,
+            currencies: `/api_web/Api_currency/currency/${props.id}?csrf_protection=true`,
+            taxes: `/api_web/Api_tax/tax/${props.id}?csrf_protection=true`,
+            settings_branch: `/api_web/Api_Branch/branch/${props.id}?csrf_protection=true`,
             warehouse_location: `/api_web/api_warehouse/location/${props.id}?csrf_protection=true`,
             warehouse: `/api_web/api_warehouse/warehouse/${props.id}?csrf_protection=true`,
             personnel_roles: `/api_web/api_staff/position/${props.id}?csrf_protection=true`,
@@ -352,8 +361,15 @@ const BtnAction = React.memo((props) => {
                     'department',
                     'personnel_roles',
                     'warehouse',
-                    'warehouse_location'
-
+                    'warehouse_location',
+                    'settings_branch',
+                    'taxes',
+                    'currencies',
+                    'paymentmodes',
+                    "units",
+                    "stages",
+                    "costs",
+                    'settings_variant'
                 ].includes(props?.type) ?
                     <button
                         type="button"

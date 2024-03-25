@@ -1,36 +1,47 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 
 import { ListBtn_Setting } from "./information";
 import { _ServerInstance as Axios } from "/services/axios";
-import { NumericFormat } from "react-number-format";
 
 //daupdate
 import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch } from "iconsax-react";
 
-import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
-import Pagination from "@/components/UI/pagination";
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { debounce } from "lodash";
+
+import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
+import BtnAction from "@/components/UI/BtnAction";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
-    const isShow = useToast();
+    const datasSeting = useSetingServer()
 
     const trangthaiExprired = useStatusExprired();
-
-    const { isOpen, isId, handleQueryId } = useToggle();
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -50,15 +61,16 @@ const Index = (props) => {
 
     const [onFetching, sOnFetching] = useState(true);
 
-    const [totalItems, sTotalItems] = useState([]);
-
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
+    const formatnumber = (number) => {
+        return formatNumberConfig(+number, datasSeting)
+    }
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
+        Axios("GET",
             `/api_web/${(router.query?.tab === "taxes" && "Api_tax/tax?csrf_protection=true") ||
             (router.query?.tab === "currencies" && "Api_currency/currency?csrf_protection=true") ||
             (router.query?.tab === "paymentmodes" && "Api_payment_method/payment_method?csrf_protection=true")
@@ -88,32 +100,6 @@ const Index = (props) => {
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) || (keySearch && sOnFetching(true));
     }, [limit, router.query?.page, router.query?.tab]);
-
-    const handleDelete = async () => {
-        Axios(
-            "DELETE",
-            `${(router.query.tab === "taxes" && `/api_web/Api_tax/tax/${id}?csrf_protection=true`) ||
-            (router.query.tab === "currencies" && `/api_web/Api_currency/currency/${id}?csrf_protection=true`) ||
-            (router.query.tab === "paymentmodes" &&
-                `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`)
-            } `,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang?.aler_success_delete);
-                    } else {
-                        isShow("error", dataLang[message] || message);
-                    }
-                }
-                _ServerFetching();
-            }
-        );
-
-        handleQueryId({ status: false });
-    };
-
     const paginate = (pageNumber) => {
         router.push({
             pathname: "/settings/finance",
@@ -131,12 +117,6 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
         sOnFetching(true);
     }, 500)
 
@@ -145,29 +125,41 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.btn_seting_finance}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.branch_seting || "branch_seting"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.list_btn_seting_finance}</h6>
+                        <h6>{dataLang?.list_btn_seting_finance || "list_btn_seting_finance"}</h6>
                     </div>
                 )}
                 <div className="grid grid-cols-9 gap-5 h-[99%]">
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
                     </div>
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
+                    <ContainerBody>
                         <div className="space-y-3 h-[96%] overflow-hidden">
-                            <h2 className="text-2xl text-[#52575E]">{dataLang?.btn_seting_finance}</h2>
+                            <div className="flex items-center justify-between  mt-1 mr-2">
+                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                    {dataLang?.btn_seting_finance || 'btn_seting_finance'}
+                                </h2>
+                                <div className="flex justify-end items-center gap-2">
+                                    <Popup_TaiChinh
+                                        onRefresh={_ServerFetching.bind(this)}
+                                        dataLang={dataLang}
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                                </div>
+                            </div>
                             <div className="flex space-x-3 items-center justify-start">
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "taxes")}
                                     className={`${router.query?.tab === "taxes"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
                                         } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.branch_popup_finance_exchange_rate}
@@ -175,8 +167,8 @@ const Index = (props) => {
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "currencies")}
                                     className={`${router.query?.tab === "currencies"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
                                         } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.branch_popup_finance_unittitle}
@@ -184,222 +176,152 @@ const Index = (props) => {
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "paymentmodes")}
                                     className={`${router.query?.tab === "paymentmodes"
-                                            ? "text-[#0F4F9E] bg-[#e2f0fe]"
-                                            : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
+                                        ? "text-[#0F4F9E] bg-[#e2f0fe]"
+                                        : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"
                                         } rounded-lg px-4 py-2 outline-none`}
                                 >
                                     {dataLang?.branch_popup_finance_payment}
                                 </button>
                             </div>
-                            <div className="3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2">
-                                <div className="flex justify-end">
-                                    <Popup_TaiChinh
-                                        onRefresh={_ServerFetching.bind(this)}
-                                        dataLang={dataLang}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    />
-                                </div>
+                            <div className="h-[93%] space-y-2">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                                        <form className="flex items-center relative">
-                                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                                            <input
-                                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                                                type="text"
-                                                onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                placeholder={dataLang?.branch_search}
-                                            />
-                                        </form>
-                                        <div className="flex space-x-2">
-                                            <label className="font-[300] text-slate-400">Hiển thị :</label>
-                                            <select
-                                                className="outline-none"
-                                                onChange={(e) => sLimit(e.target.value)}
-                                                value={limit}
-                                            >
-                                                <option disabled className="hidden">
-                                                    {limit == -1 ? "Tất cả" : limit}
-                                                </option>
-                                                <option value={15}>15</option>
-                                                <option value={20}>20</option>
-                                                <option value={40}>40</option>
-                                                <option value={60}>60</option>
-                                                <option value={-1}>Tất cả</option>
-                                            </select>
+                                        <SearchComponent
+                                            dataLang={dataLang}
+                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                        />
+                                        <div className="">
+                                            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <Customscrollbar className="min:h-[200px] h-[100%] max:h-[500px]">
                                     <div
-                                        className={`${router.query?.tab === "taxes" || router.query?.tab === "currencies"
-                                                ? "w-[100%]"
-                                                : "w-[110%]"
-                                            } 2xl:w-[100%] pr-2`}
+                                        className={`w-full`}
                                     >
-                                        <div
-                                            className={`${router.query?.tab === "taxes" || router.query?.tab === "currencies"
-                                                    ? "grid-cols-6"
-                                                    : "grid-cols-9"
-                                                } grid gap-5 sticky top-0 bg-white p-2 z-10`}
+                                        <HeaderTable
+                                            gridCols={router.query?.tab === "taxes" || router.query?.tab === "currencies"
+                                                ? 6
+                                                : 9}
                                         >
                                             {(router.query?.tab === "taxes" || router.query?.tab === "currencies") && (
                                                 <React.Fragment>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">
-                                                        {router.query?.tab === "taxes" &&
-                                                            dataLang?.branch_popup_finance_name}
-                                                        {router.query?.tab === "currencies" &&
-                                                            dataLang?.branch_popup_currency_name}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-center text-[12px] col-span-2 text-[#667085] uppercase font-[300] ">
-                                                        {router.query?.tab === "taxes" &&
-                                                            dataLang?.branch_popup_finance_rate}
-                                                        {router.query?.tab === "currencies" &&
-                                                            dataLang?.branch_popup_curency_symbol}
-                                                    </h4>
+                                                    <ColumnTable colSpan={3} textAlign={'left'}>
+                                                        {router.query?.tab === "taxes" && dataLang?.branch_popup_finance_name}
+                                                        {router.query?.tab === "currencies" && dataLang?.branch_popup_currency_name}
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'center'}>
+                                                        {router.query?.tab === "taxes" && dataLang?.branch_popup_finance_rate}
+                                                        {router.query?.tab === "currencies" && dataLang?.branch_popup_curency_symbol}
+                                                    </ColumnTable>
                                                 </React.Fragment>
                                             )}
                                             {router.query?.tab === "paymentmodes" && (
                                                 <React.Fragment>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">
+                                                    <ColumnTable colSpan={3} textAlign={'left'}>
                                                         {dataLang?.branch_popup_payment_name}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-left">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={1} textAlign={'left'}>
                                                         {dataLang?.branch_popup_payment_type}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'center'}>
                                                         {dataLang?.branch_popup_payment_balance}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'left'}>
                                                         {dataLang?.branch_popup_payment_bank}
-                                                    </h4>
+                                                    </ColumnTable>
                                                 </React.Fragment>
                                             )}
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
                                                 {dataLang?.branch_popup_properties}
-                                            </h4>
-                                        </div>
+                                            </ColumnTable>
+                                        </HeaderTable>
                                         {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : (
                                             <React.Fragment>
                                                 {data.length == 0 && (
-                                                    <div className=" max-w-[352px] mt-24 mx-auto">
-                                                        <div className="text-center">
-                                                            <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                                <IconSearch />
-                                                            </div>
-                                                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                                Không tìm thấy các mục
-                                                            </h1>
-                                                            <div className="flex items-center justify-around mt-6 ">
-                                                                <Popup_TaiChinh
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    <NoData />
                                                 )}
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                     {data.map((e) => (
-                                                        <div
+                                                        <RowTable
                                                             key={e.id.toString()}
-                                                            className={`${router.query?.tab === "taxes" ||
-                                                                    router.query?.tab === "currencies"
-                                                                    ? "grid-cols-6"
-                                                                    : "grid-cols-9"
-                                                                } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
+                                                            gridCols={router.query?.tab === "taxes" || router.query?.tab === "currencies" ? 6 : 9}
                                                         >
                                                             {(router.query?.tab === "taxes" ||
                                                                 router.query?.tab === "currencies") && (
                                                                     <React.Fragment>
-                                                                        <h6 className="xl:text-base text-xs px-2 col-span-3">
+                                                                        <RowItemTable colSpan={3} >
                                                                             {router.query?.tab === "taxes" && e?.name}
                                                                             {router.query?.tab === "currencies" && e?.code}
-                                                                        </h6>
-                                                                        <h6 className="xl:text-base text-xs px-2 col-span-2 text-center ">
-                                                                            {router.query?.tab === "taxes" && e?.tax_rate}
+                                                                        </RowItemTable>
+                                                                        <RowItemTable colSpan={2} textAlign={'center'}>
+                                                                            {router.query?.tab === "taxes" && formatnumber(e?.tax_rate)}
                                                                             {router.query?.tab === "currencies" &&
                                                                                 e?.symbol}
-                                                                        </h6>
+                                                                        </RowItemTable>
                                                                     </React.Fragment>
                                                                 )}
                                                             {router.query?.tab === "paymentmodes" && (
                                                                 <React.Fragment>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-3">
-                                                                        {router.query?.tab === "paymentmodes" &&
-                                                                            e?.name}
-                                                                    </h6>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-1">
-                                                                        {router.query?.tab === "paymentmodes" &&
-                                                                            e?.cash_bank == "1"
+                                                                    <RowItemTable colSpan={3} >
+                                                                        {router.query?.tab === "paymentmodes" && e?.name}
+                                                                    </RowItemTable>
+                                                                    <RowItemTable colSpan={2}>
+                                                                        {router.query?.tab === "paymentmodes" && e?.cash_bank == "1"
                                                                             ? dataLang?.paymethod_cash
                                                                             : dataLang?.paymethod_bank}
-                                                                    </h6>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">
-                                                                        {router.query?.tab === "paymentmodes" &&
-                                                                            e?.opening_balance
-                                                                                ?.toString()
-                                                                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                                                    </h6>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-2">
-                                                                        {router.query?.tab === "paymentmodes" &&
-                                                                            e?.description}
-                                                                    </h6>
+                                                                    </RowItemTable>
+                                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                                        {router.query?.tab === "paymentmodes" && formatnumber(e?.opening_balance)}
+                                                                    </RowItemTable>
+                                                                    <RowItemTable colSpan={2}>
+                                                                        {router.query?.tab === "paymentmodes" && e?.description}
+                                                                    </RowItemTable>
                                                                 </React.Fragment>
                                                             )}
-                                                            <div className="flex space-x-2 justify-center ">
+                                                            <RowItemTable colSpan={1} className="flex space-x-2 items-center justify-center ">
                                                                 <Popup_TaiChinh
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
                                                                     dataLang={dataLang}
                                                                     data={e}
                                                                 />
-                                                                <button className="xl:text-base text-xs  ">
-                                                                    <IconDelete
-                                                                        onClick={() =>
-                                                                            handleQueryId({ id: e.id, status: true })
-                                                                        }
-                                                                        color="red"
-                                                                    />
-                                                                </button>
-                                                            </div>
-                                                        </div>
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGroup={() => { }}
+                                                                    dataLang={dataLang}
+                                                                    id={e?.id}
+                                                                    type={router.query?.tab}
+                                                                />
+                                                            </RowItemTable>
+                                                        </RowTable>
                                                     ))}
                                                 </div>{" "}
-                                                <PopupConfim
-                                                    dataLang={dataLang}
-                                                    type="warning"
-                                                    title={TITLE_DELETE}
-                                                    subtitle={CONFIRM_DELETION}
-                                                    isOpen={isOpen}
-                                                    save={handleDelete}
-                                                    cancel={() => handleQueryId({ status: false })}
-                                                />
                                             </React.Fragment>
                                         )}
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </div>
                         </div>
                         {data?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
-                                <h6>
-                                    Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords}{" "}
-                                    thành phần
-                                </h6>
+                            <ContainerPagination>
+                                <TitlePagination
+                                    dataLang={dataLang}
+                                    totalItems={totalItems?.iTotalDisplayRecords}
+                                />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
-                            </div>
+                            </ContainerPagination>
                         )}
-                    </div>
+                    </ContainerBody>
                 </div>
-            </div>
+            </Container>
         </React.Fragment>
     );
 };
@@ -619,14 +541,10 @@ const Popup_TaiChinh = (props) => {
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {props.dataLang?.branch_popup_finance_rate}{" "}
                                     </label>
-                                    <input
+                                    <InPutNumericFormat
                                         value={rateTax}
+                                        isAllowed={isAllowedNumber}
                                         onChange={_HandleChangeInput.bind(this, "rateTax")}
-                                        name="tax_rate"
-                                        type="number"
-                                        min={0}
-                                        max={100}
-                                        step="0.01"
                                         className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
                                     />
                                 </div>
@@ -666,8 +584,8 @@ const Popup_TaiChinh = (props) => {
                                         name="symbol"
                                         type="text"
                                         className={`${errInputCusynm
-                                                ? "border-red-500"
-                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            ? "border-red-500"
+                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
                                     />
                                     {errInputCusynm && (
@@ -713,11 +631,9 @@ const Popup_TaiChinh = (props) => {
                       className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-6"
                       /> */}
 
-                                    <NumericFormat
-                                        thousandSeparator=","
-                                        name="opening_balance"
+                                    <InPutMoneyFormat
                                         value={balanceMe}
-                                        //  onValueChange={_HandleChangeInput.bind(this, "balanceMe")}
+                                        isAllowed={isAllowedNumber}
                                         onValueChange={_HandleChangeInput.bind(this, "balanceMe")}
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
                                     />

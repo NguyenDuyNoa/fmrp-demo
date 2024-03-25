@@ -1,6 +1,7 @@
 import Head from "next/head";
-import React, { useEffect, useRef, useState } from "react";
+import { debounce } from "lodash";
 import { useRouter } from "next/router";
+import React, { useEffect, useRef, useState } from "react";
 
 import Select, { components } from "react-select";
 import { ListBtn_Setting } from "./information";
@@ -26,8 +27,13 @@ import { useToggle } from "@/hooks/useToggle";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { debounce } from "lodash";
-
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 const CustomSelectOption = ({ value, label, level, code }) => (
     <div className="flex space-x-2 truncate">
         {level == 1 && <span>--</span>}
@@ -37,6 +43,12 @@ const CustomSelectOption = ({ value, label, level, code }) => (
         <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 );
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import NoData from "@/components/UI/noData/nodata";
+import BtnAction from "@/components/UI/BtnAction";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -69,11 +81,10 @@ const Index = (props) => {
 
     const [onFetchingOpt, sOnFetchingOpt] = useState(false);
 
-    const [totalItems, sTotalItems] = useState([]);
-
     const [keySearch, sKeySearch] = useState("");
 
-    const [limit, sLimit] = useState(15);
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
 
     const _ServerFetching = () => {
         Axios(
@@ -150,23 +161,10 @@ const Index = (props) => {
                 tab: router.query?.tab,
             },
         });
-        // setTimeout(() => {
-        //     if (!value) {
-        //         sOnFetching(true);
-        //     }
-        //     sOnFetching(true);
-        // }, 500);
         sOnFetching(true);
     }, 500)
 
     const _ServerFetchingOtp = () => {
-        // Axios("GET", "/api_web/Api_cost/costCombobox/?csrf_protection=true", {}, (err, response) => {
-        //     if(!err){
-        //         var {rResult} = response.data;
-        //         console.log();
-        //         sDataOption(rResult.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
-        //     }
-        // })
         Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
@@ -197,22 +195,22 @@ const Index = (props) => {
                 <title>
                     {(router.query.tab === "units" && dataLang?.category_unit) ||
                         (router.query.tab === "stages" && dataLang?.settings_category_stages_title) ||
-                        (router.query.tab === "costs" && dataLang?.expense_costs) ||
-                        "expense_costs"}
+                        (router.query.tab === "costs" && dataLang?.expense_costs) || "expense_costs"}
                 </title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.branch_seting || "branch_seting"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>
                             {(router.query.tab === "units" && dataLang?.category_unit) ||
                                 (router.query.tab === "stages" && dataLang?.settings_category_stages_title) ||
-                                (router.query.tab === "costs" && dataLang?.expense_costs) ||
-                                "expense_costs"}
+                                (router.query.tab === "costs" && dataLang?.expense_costs) || "expense_costs"}
                         </h6>
                     </div>
                 )}
@@ -220,9 +218,19 @@ const Index = (props) => {
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
                     </div>
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
+                    <ContainerBody>
                         <div className="space-y-3 h-[96%] overflow-hidden">
-                            <h2 className="text-2xl text-[#52575E]">{dataLang?.category_titel}</h2>
+                            <div className="flex items-center justify-between  mt-1 mr-2">
+                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                    {dataLang?.category_titel || 'category_titel'}
+                                </h2>
+                                <div className="flex justify-end items-center gap-2">
+                                    <Popup_danhmuc
+                                        onRefresh={_ServerFetching.bind(this)}
+                                        dataLang={dataLang}
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                                </div>
+                            </div>
                             <div className="flex space-x-3 items-center justify-start">
                                 <button
                                     onClick={_HandleSelectTab.bind(this, "units")}
@@ -252,257 +260,188 @@ const Index = (props) => {
                                     {dataLang?.expense_costs || "expense_costs"}
                                 </button>
                             </div>
-                            <div className="3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2">
-                                <div className="flex justify-end">
-                                    <Popup_danhmuc
-                                        onRefresh={_ServerFetching.bind(this)}
-                                        dataLang={dataLang}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    />
-                                </div>
+                            <div className="h-[93%] space-y-2">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                                        <form className="flex items-center relative">
-                                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                                            <input
-                                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                                                type="text"
-                                                onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                placeholder={dataLang?.branch_search}
-                                            />
-                                        </form>
-                                        <div className="flex space-x-2">
-                                            <label className="font-[300] text-slate-400">Hiển thị :</label>
-                                            <select
-                                                className="outline-none"
-                                                onChange={(e) => sLimit(e.target.value)}
-                                                value={limit}
-                                            >
-                                                <option disabled className="hidden">
-                                                    {limit == -1 ? "Tất cả" : limit}
-                                                </option>
-                                                <option value={15}>15</option>
-                                                <option value={20}>20</option>
-                                                <option value={40}>40</option>
-                                                <option value={60}>60</option>
-                                                <option value={-1}>Tất cả</option>
-                                            </select>
+                                        <SearchComponent
+                                            dataLang={dataLang}
+                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                        />
+                                        <div className="">
+                                            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                         </div>
+
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <Customscrollbar className="min:h-[200px] h-[72%] max:h-[500px]">
                                     <div
-                                        className={`${router.query?.tab === "units" ? "w-[100%]" : "w-[110%]"
-                                            } 2xl:w-[100%] pr-2`}
+                                        className={`w-full`}
                                     >
-                                        <div
-                                            className={`${router.query?.tab === "units"
-                                                ? "grid-cols-6"
-                                                : router.query?.tab === "stages"
-                                                    ? "grid-cols-9"
-                                                    : "grid-cols-11"
-                                                } grid  sticky top-0 bg-white p-2 z-10`}
+                                        <HeaderTable
+                                            gridCols={router.query?.tab === "units" ? 6 : router.query?.tab === "stages" ? 9 : 11}
                                         >
                                             {router.query?.tab === "units" && (
                                                 <React.Fragment>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">
+                                                    <ColumnTable colSpan={5} textAlign={'left'}>
                                                         {router.query?.tab === "units" && dataLang?.category_unit_name}
-                                                    </h4>
+                                                    </ColumnTable>
                                                 </React.Fragment>
                                             )}
                                             {router.query?.tab === "stages" && (
                                                 <React.Fragment>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
+                                                    <ColumnTable colSpan={2} textAlign={'left'}>
                                                         {dataLang?.settings_category_stages_code}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'left'}>
                                                         {dataLang?.settings_category_stages_name}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'center'}>
                                                         {dataLang?.settings_category_stages_status}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'left'}>
                                                         {dataLang?.settings_category_stages_note}
-                                                    </h4>
+                                                    </ColumnTable>
                                                 </React.Fragment>
                                             )}
                                             {router.query?.tab === "costs" && (
                                                 <React.Fragment>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">
+                                                    <ColumnTable colSpan={1} textAlign={'center'}>
                                                         {"#"}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={3} textAlign={'left'}>
                                                         {dataLang?.expense_code || "expense_code"}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'left'}>
                                                         {dataLang?.expense_name || "expense_name"}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'center'}>
                                                         {dataLang?.expense_grant || "expense_grant"}
-                                                    </h4>
-                                                    <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">
+                                                    </ColumnTable>
+                                                    <ColumnTable colSpan={2} textAlign={'center'}>
                                                         {dataLang?.expense_branch || "expense_branch"}
-                                                    </h4>
+                                                    </ColumnTable>
                                                 </React.Fragment>
                                             )}
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
                                                 {dataLang?.branch_popup_properties}
-                                            </h4>
-                                        </div>
+                                            </ColumnTable>
+                                        </HeaderTable>
                                         {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : (
                                             <React.Fragment>
                                                 {data.length == 0 && (
-                                                    <div className=" max-w-[352px] mt-24 mx-auto">
-                                                        <div className="text-center">
-                                                            <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                                <IconSearch />
-                                                            </div>
-                                                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                                Không tìm thấy các mục
-                                                            </h1>
-                                                            <div className="flex items-center justify-around mt-6 ">
-                                                                <Popup_danhmuc
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    <NoData />
                                                 )}
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                     {data.map((e) => (
-                                                        <div
+                                                        <RowTable
                                                             key={e.id.toString()}
-                                                            className={`${router.query?.tab === "units"
-                                                                ? "grid-cols-6"
-                                                                : router.query?.tab === "stages"
-                                                                    ? "grid-cols-9"
-                                                                    : "grid-cols-11"
-                                                                } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}
+                                                            className={router.query?.tab === "units" && '' || router.query?.tab === "stages" && '' || router.query?.tab === "costs" && '!px-0'}
+                                                            gridCols={router.query?.tab === "units" ? 6 : router.query?.tab === "stages" ? 9 : 11}
                                                         >
                                                             {(router.query?.tab === "units" ||
                                                                 router.query?.tab === "currencies") && (
                                                                     <React.Fragment>
-                                                                        <h6 className="xl:text-base text-xs px-2 col-span-5">
+                                                                        <RowItemTable colSpan={5}>
                                                                             {router.query?.tab === "units" && e?.unit}
-                                                                        </h6>
+                                                                        </RowItemTable>
                                                                     </React.Fragment>
                                                                 )}
                                                             {router.query?.tab === "stages" && (
                                                                 <React.Fragment>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-2">
+                                                                    <RowItemTable colSpan={2}>
                                                                         {router.query?.tab === "stages" && e?.code}
-                                                                    </h6>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-2">
+                                                                    </RowItemTable>
+                                                                    <RowItemTable colSpan={2}>
                                                                         {router.query?.tab === "stages" && e?.name}
-                                                                    </h6>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-2 mx-auto">
-                                                                        {router.query?.tab === "stages" &&
-                                                                            e?.status_qc === "1" ? (
+                                                                    </RowItemTable>
+                                                                    <RowItemTable colSpan={2} className="mx-auto">
+                                                                        {router.query?.tab === "stages" && e?.status_qc === "1" ? (
                                                                             <TickCircle size={32} color="#0BAA2E" />
                                                                         ) : (
                                                                             <CloseCircle size={32} color="#EE1E1E" />
                                                                         )}
-                                                                    </h6>
-                                                                    <h6 className="xl:text-base text-xs px-2 col-span-2">
+                                                                    </RowItemTable>
+                                                                    <RowItemTable colSpan={2}>
                                                                         {router.query?.tab === "stages" && e?.note}
-                                                                    </h6>
+                                                                    </RowItemTable>
                                                                 </React.Fragment>
                                                             )}
                                                             {router.query?.tab === "costs" && (
                                                                 <React.Fragment>
-                                                                    <div className="col-span-11">
+                                                                    <RowItemTable colSpan={11} className={'!p-0'}>
                                                                         <Items
                                                                             onRefresh={_ServerFetching.bind(this)}
                                                                             onRefreshOpt={_ServerFetchingOtp.bind(this)}
                                                                             dataLang={dataLang}
                                                                             key={e.id}
                                                                             data={e}
-                                                                            className="col-span-11"
+                                                                            className="col-span-11 "
                                                                         />
-                                                                    </div>
+                                                                    </RowItemTable>
                                                                 </React.Fragment>
                                                             )}
                                                             {router.query?.tab === "units" && (
-                                                                <div className="flex space-x-2 justify-center ">
+                                                                <RowItemTable colSpan={1} className="flex space-x-2 items-center justify-center ">
                                                                     <Popup_danhmuc
                                                                         onRefresh={_ServerFetching.bind(this)}
                                                                         className="xl:text-base text-xs "
                                                                         dataLang={dataLang}
                                                                         data={e}
                                                                     />
-                                                                    <button className="xl:text-base text-xs  ">
-                                                                        <IconDelete
-                                                                            onClick={() =>
-                                                                                handleQueryId({
-                                                                                    id: e.id,
-                                                                                    status: true,
-                                                                                })
-                                                                            }
-                                                                            color="red"
-                                                                        />
-                                                                    </button>
-                                                                </div>
+                                                                    <BtnAction
+                                                                        onRefresh={_ServerFetching.bind(this)}
+                                                                        onRefreshGroup={() => { }}
+                                                                        dataLang={dataLang}
+                                                                        id={e?.id}
+                                                                        type={router.query?.tab}
+                                                                    />
+                                                                </RowItemTable>
                                                             )}
                                                             {router.query?.tab === "stages" && (
-                                                                <div className="flex space-x-2 justify-center ">
+                                                                <RowItemTable colSpan={1} className="flex space-x-2 justify-center items-center">
                                                                     <Popup_danhmuc
                                                                         onRefresh={_ServerFetching.bind(this)}
                                                                         className="xl:text-base text-xs "
                                                                         dataLang={dataLang}
                                                                         data={e}
                                                                     />
-                                                                    <button className="xl:text-base text-xs  ">
-                                                                        <IconDelete
-                                                                            onClick={() =>
-                                                                                handleQueryId({
-                                                                                    id: e.id,
-                                                                                    status: true,
-                                                                                })
-                                                                            }
-                                                                            color="red"
-                                                                        />
-                                                                    </button>
-                                                                </div>
+                                                                    <BtnAction
+                                                                        onRefresh={_ServerFetching.bind(this)}
+                                                                        onRefreshGroup={() => { }}
+                                                                        dataLang={dataLang}
+                                                                        id={e?.id}
+                                                                        type={router.query?.tab}
+                                                                    />
+                                                                </RowItemTable>
                                                             )}
-                                                        </div>
+                                                        </RowTable>
                                                     ))}
                                                 </div>
                                             </React.Fragment>
                                         )}
                                     </div>
-                                </div>
+                                </Customscrollbar>
                             </div>
                         </div>
                         {data?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
-                                <h6>
-                                    Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords}{" "}
-                                    thành phần
-                                </h6>
+                            <ContainerPagination>
+                                <TitlePagination
+                                    dataLang={dataLang}
+                                    totalItems={totalItems?.iTotalDisplayRecords}
+                                />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
-                            </div>
+                            </ContainerPagination>
                         )}
-                    </div>
+                    </ContainerBody>
                 </div>
-            </div>
-            <PopupConfim
-                dataLang={dataLang}
-                type="warning"
-                title={TITLE_DELETE}
-                subtitle={CONFIRM_DELETION}
-                isOpen={isOpen}
-                save={handleDelete}
-                cancel={() => handleQueryId({ status: false })}
-            />
+            </Container>
         </React.Fragment>
     );
 };
@@ -512,35 +451,14 @@ const Items = React.memo((props) => {
 
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
-    const isShow = useToast();
-
-    const { isOpen, isId, handleQueryId } = useToggle();
-
-    const handleDelete = async () => {
-        Axios("DELETE", `/api_web/Api_cost/cost/${isId}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var { isSuccess, message } = response.data;
-                if (isSuccess) {
-                    isShow("success", props.dataLang[message]);
-                } else {
-                    isShow("error", props.dataLang[message]);
-                }
-            }
-            props.onRefresh && props.onRefresh();
-            props.onRefreshOpt && props.onRefreshOpt();
-        });
-
-        handleQueryId({ status: false });
-    };
-
     useEffect(() => {
         sHasChild(false);
     }, [props.data?.children?.length == null]);
 
     return (
         <div key={props.data?.id}>
-            <div className="grid grid-cols-11 py-2  bg-white hover:bg-slate-50 relative">
-                <div className="col-span-1 flex justify-center">
+            <RowTable gridCols={11}>
+                <RowItemTable colSpan={1} className="flex justify-center">
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
@@ -550,21 +468,21 @@ const Items = React.memo((props) => {
                         <IconMinus size={16} />
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
-                </div>
-                <h6 className="xl:text-base text-xs px-2 col-span-3">{props.data?.code}</h6>
-                <h6 className="xl:text-base text-xs px-2 col-span-2">{props.data?.name}</h6>
-                <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">{props.data?.level}</h6>
-                <div className=" col-span-2 flex flex-wrap px-2">
+                </RowItemTable>
+                <RowItemTable colSpan={3}>{props.data?.code}</RowItemTable>
+                <RowItemTable colSpan={2}>{props.data?.name}</RowItemTable>
+                <RowItemTable colSpan={2} textAlign={'center'}>{props.data?.level}</RowItemTable>
+                <RowItemTable colSpan={2} className="flex flex-wrap gap-1">
                     {props.data?.branch?.map((e) => (
-                        <h6
+                        <TagBranch
                             key={e?.id.toString()}
-                            className="text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit"
+                            className='w-fit h-fit'
                         >
                             {e?.name}
-                        </h6>
+                        </TagBranch>
                     ))}
-                </div>
-                <div className="col-span-1 flex justify-center space-x-3">
+                </RowItemTable>
+                <RowItemTable colSpan={1} className="flex justify-center items-center gap-1 mx-auto">
                     <Popup_danhmuc
                         onRefresh={props.onRefresh}
                         onRefreshOpt={props.onRefreshOpt}
@@ -572,19 +490,19 @@ const Items = React.memo((props) => {
                         data={props.data}
                         dataOption={props.dataOption}
                     />
-                    <button
-                        onClick={() => handleQueryId({ id: props.data?.id, status: true })}
-                        className="xl:text-base text-xs outline-none"
-                    >
-                        <IconDelete color="red" />
-                    </button>
-                </div>
-            </div>
+                    <BtnAction
+                        onRefresh={props.onRefresh}
+                        onRefreshGroup={props.onRefreshOpt}
+                        dataLang={props.dataLang}
+                        id={props.data?.id}
+                        type={'costs'}
+                    />
+                </RowItemTable>
+            </RowTable>
             {hasChild && (
                 <div className="bg-slate-50/50">
                     {props.data?.children?.map((e) => (
                         <ItemsChild
-                            onClick={() => handleQueryId({ id: e.id, status: true })}
                             onRefresh={props.onRefresh}
                             onRefreshOpt={props.onRefreshOpt}
                             dataLang={props.dataLang}
@@ -593,7 +511,6 @@ const Items = React.memo((props) => {
                             grandchild="0"
                             children={e?.children?.map((e) => (
                                 <ItemsChild
-                                    onClick={() => handleQueryId({ id: e.id, status: true })}
                                     onRefresh={props.onRefresh}
                                     onRefreshOpt={props.onRefreshOpt}
                                     dataLang={props.dataLang}
@@ -602,7 +519,6 @@ const Items = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={() => handleQueryId({ id: e.id, status: true })}
                                             onRefresh={props.onRefresh}
                                             onRefreshOpt={props.onRefreshOpt}
                                             dataLang={props.dataLang}
@@ -624,48 +540,52 @@ const Items = React.memo((props) => {
 const ItemsChild = React.memo((props) => {
     return (
         <React.Fragment key={props.data?.id}>
-            <div className={`grid grid-cols-11 py-2.5  hover:bg-slate-100/40 `}>
+            <RowTable gridCols={11}>
                 {props.data?.level == "3" && (
-                    <div className="col-span-1 h-full flex justify-center items-center pl-24">
+                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center pl-24">
                         <IconDown className="rotate-45" />
-                    </div>
+                    </RowItemTable>
                 )}
                 {props.data?.level == "2" && (
-                    <div className="col-span-1 h-full flex justify-center items-center pl-12">
+                    <RowItemTable colSpan={1} className=" h-full flex justify-center items-center pl-12">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
-                    </div>
+                    </RowItemTable>
                 )}
                 {props.data?.level == "1" && (
-                    <div className="col-span-1 h-full flex justify-center items-center ">
+                    <RowItemTable colSpan={1} className="h-full flex justify-center items-center ">
                         <IconDown className="rotate-45" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
                         <IconMinus className="mt-1.5" />
-                    </div>
+                    </RowItemTable>
                 )}
-                <h6 className="xl:text-base text-xs col-span-3 px-[7px] ">{props.data?.code}</h6>
-                <h6 className="xl:text-base text-xs col-span-2 px-[7px]  truncate">{props.data?.name}</h6>
-                <h6 className="xl:text-base text-xs col-span-2 px-[7px] text-center truncate">{props.data?.level}</h6>
-                <div className="col-span-2 flex flex-wrap ">
+                <RowItemTable colSpan={3}>{props.data?.code}</RowItemTable>
+                <RowItemTable colSpan={2} className={'truncate'} textAlign={'left'}>{props.data?.name}</RowItemTable>
+                <RowItemTable colSpan={2} className={'truncate'} textAlign={'center'}>{props.data?.level}</RowItemTable>
+                <RowItemTable colSpan={2} className="flex flex-wrap gap-1">
                     {props.data?.branch.map((e) => (
-                        <h6
+                        <TagBranch
                             key={e?.id.toString()}
-                            className="text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit"
+                            className='w-fit h-fit'
                         >
                             {e?.name}
-                        </h6>
+                        </TagBranch>
                     ))}
-                </div>
-                <div className="col-span-1 flex justify-center space-x-2">
+                </RowItemTable>
+                <RowItemTable colSpan={1} className="flex justify-center gap-1 items-center mx-auto">
                     <Popup_danhmuc onRefresh={props.onRefresh} dataLang={props.dataLang} data={props.data} />
-                    <button onClick={props.onClick} className="xl:text-base text-xs">
-                        <IconDelete color="red" />
-                    </button>
-                </div>
-            </div>
+                    <BtnAction
+                        onRefresh={props.onRefresh}
+                        onRefreshGroup={props.onRefreshOpt}
+                        dataLang={props.dataLang}
+                        id={props.data?.id}
+                        type={'costs'}
+                    />
+                </RowItemTable>
+            </RowTable>
             {props.children}
         </React.Fragment>
     );
@@ -1282,38 +1202,6 @@ const Popup_danhmuc = (props) => {
         </PopupEdit>
     );
 };
-const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
 
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-
-    return (
-        <div style={style} title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 3;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 
 export default Index;

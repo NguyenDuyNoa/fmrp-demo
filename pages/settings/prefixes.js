@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 
 import { ListBtn_Setting } from "./information";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Swal from "sweetalert2";
-import { useSelector } from "react-redux";
 import useStatusExprired from "@/hooks/useStatusExprired";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -111,13 +109,14 @@ const Index = (props) => {
             <Head>
                 <title>Thiết lập tiếp đầu ngữ</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.branch_seting}
+                            {dataLang?.branch_seting || "branch_seting"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>Thiết lập tiếp đầu ngữ</h6>
@@ -127,15 +126,13 @@ const Index = (props) => {
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
                     </div>
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
+                    <ContainerBody>
                         <div className="space-y-7 h-[96%] overflow-hidden">
-                            <h2 className="text-2xl text-[#52575E]">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 Thiết Lập Tiếp Đầu Ngữ
                             </h2>
-                            <ScrollArea
-                                className="max-h-[600px] min:h-[500px] h-[90%] max:h-[800px]"
-                                speed={1}
-                                smoothScrolling={true}
+                            <Customscrollbar
+                                className="max-h-[600px] min:h-[500px] h-[85%] max:h-[800px]"
                             >
                                 <div className="grid grid-cols-2 gap-5">
                                     {data.map((e) => (
@@ -172,9 +169,9 @@ const Index = (props) => {
                                         </div>
                                     ))}
                                 </div>
-                            </ScrollArea>
+                            </Customscrollbar>
                         </div>
-                        <div className="flex space-x-5 py-5">
+                        <div className="flex space-x-5 py-5 ml-1">
                             <button
                                 onClick={_HandleSubmit.bind(this)}
                                 className="px-8 py-2.5 rounded transition hover:scale-105 bg-[#0F4F9E] text-white"
@@ -182,9 +179,9 @@ const Index = (props) => {
                                 Lưu
                             </button>
                         </div>
-                    </div>
+                    </ContainerBody>
                 </div>
-            </div>
+            </Container>
         </React.Fragment>
     );
 };
