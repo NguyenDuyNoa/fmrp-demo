@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 
 import { Dropdown, DropdownThongBao } from "../UI/dropdown";
 import { _ServerInstance as Axios } from "/services/axios";
@@ -12,9 +12,14 @@ import { ArrowUp, ArrowDown2 as IconDown } from "iconsax-react";
 import { Tooltip } from "react-tippy";
 import "react-tippy/dist/tippy.css";
 import Expirred from "components/UI/expired";
-import PopupModelTime from "components/UI/modelTime";
+import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
+import useToast from "@/hooks/useToast";
 const Header = () => {
-    const { permissions_current: auth } = useSelector((state) => state.auth);
+    const router = useRouter();
+
+    const isShow = useToast()
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const ListDanhMuc = [
         {
@@ -1247,9 +1252,15 @@ const Header = () => {
                                 placeholder="Tìm kiếm"
                             />
                         </form>
-                        <Link
-                            href="/settings"
+                        <button
                             title="Cài đặt"
+                            onClick={() => {
+                                if (role) {
+                                    router.push("/settings");
+                                } else {
+                                    isShow('warning', WARNING_STATUS_ROLE_ADMIN)
+                                }
+                            }}
                             className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition"
                         // className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
                         >
@@ -1264,7 +1275,7 @@ const Header = () => {
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
-                        </Link>
+                        </button>
                         {/* <a
               href="#"
               title="Thông báo"
