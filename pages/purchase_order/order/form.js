@@ -657,6 +657,13 @@ const Index = (props) => {
         }
     }, [idBranch]);
 
+
+    useEffect(() => {
+        if (loai == "1") {
+            sOnFetchingPurcher(true);
+        }
+    }, [loai])
+
     useEffect(() => {
         idBranch == null && sIdPurchases([]);
     }, [idBranch]);
