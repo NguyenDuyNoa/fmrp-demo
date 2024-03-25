@@ -310,9 +310,7 @@ const Index = (props) => {
                 }
             });
         }
-        Axios(
-            "POST",
-            `${apiUrl}`,
+        Axios("POST", `${apiUrl}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -554,8 +552,9 @@ const Index = (props) => {
                     </div>
                 )}
                 <div className="mx-auto flex-col flex gap-3">
-                    <h2 className="text-2xl text-[#52575E] capitalize">{"Export dữ liệu danh mục"}</h2>
-
+                    <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                        Export dữ liệu danh mục
+                    </h2>
                     <div className="col-span-6 flex flex-nowrap gap-4 items-center ">
                         {dataTab &&
                             dataTab.map((e) => {
