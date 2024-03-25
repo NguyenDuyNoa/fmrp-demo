@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import BtnClickAddItem from "../(children)/addDelete/btnAdd";
-import BtnClickDeleteItem from "../(children)/addDelete/btnDelete";
-import TitleForm from "../(children)/title/titleForm";
-import ListItem from "../(children)/listItem/listItem";
-import TitleHeader from "../(children)/titleHeader/titleHeader";
+import BtnClickAddItem from "../common/btnAdd";
+import BtnClickDeleteItem from "../common/btnDelete";
+import TitleForm from "../common/titleForm";
+import ListItem from "../common/listItem";
+import TitleHeader from "../common/titleHeader";
 
 const Client = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, dataEmty, sDataEmty }) => {
     return (

@@ -1,9 +1,9 @@
 import React from "react";
-import BtnClickAddItem from "../(children)/addDelete/btnAdd";
-import BtnClickDeleteItem from "../(children)/addDelete/btnDelete";
-import TitleForm from "../(children)/title/titleForm";
-import ListItem from "../(children)/listItem/listItem";
-const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, dataEmty, sDataEmty }) => {
+import BtnClickAddItem from "../common/btnAdd";
+import BtnClickDeleteItem from "../common/btnDelete";
+import TitleForm from "../common/titleForm";
+import ListItem from "../common/listItem";
+const Products = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, dataEmty, sDataEmty }) => {
     return (
         <div>
             <div className="grid grid-cols-12 gap-2">
@@ -13,18 +13,18 @@ const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, da
                             <TitleForm title={"Trường dữ liệu"} />
                             <BtnClickAddItem
                                 dataEmty={dataEmty}
-                                dataBe={dataColumnNew.materials}
+                                dataBe={dataColumnNew.products}
                                 HandleCheckAll={HandleCheckAll}
                                 sDataEmty={sDataEmty}
                                 type="addAll"
-                                parent="materials"
+                                parent="products"
                             />
                             <ListItem
                                 dataEmty={dataEmty}
                                 dataLang={dataLang}
                                 sDataEmty={sDataEmty}
-                                type={"materials"}
-                                dataColumnNew={dataColumnNew.materials}
+                                type={"products"}
+                                dataColumnNew={dataColumnNew.products}
                                 HandlePushItem={HandlePushItem}
                             />
                         </div>
@@ -32,19 +32,19 @@ const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, da
                             <TitleForm title={"Trường dữ liệu xuất"} />
                             <BtnClickDeleteItem
                                 sDataEmty={sDataEmty}
-                                dataBe={dataEmty?.materials}
+                                dataBe={dataEmty?.products}
                                 dataEmty={dataEmty}
                                 type="deleteAll"
                                 HandleCheckAll={HandleCheckAll}
-                                parent="materials"
+                                parent="products"
                             />
                             <ListItem
                                 sDataEmty={sDataEmty}
                                 dataEmty={dataEmty}
                                 dataLang={dataLang}
-                                type={"materials"}
+                                type={"products"}
                                 isShow={true}
-                                dataColumnNew={dataEmty.materials}
+                                dataColumnNew={dataEmty.products}
                                 HandlePushItem={HandlePushItem}
                             />
                         </div>
@@ -55,4 +55,4 @@ const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, da
     );
 };
 
-export default Materials;
+export default Products;

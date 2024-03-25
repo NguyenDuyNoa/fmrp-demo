@@ -1,8 +1,8 @@
 import React from "react";
-import BtnClickAddItem from "../(children)/addDelete/btnAdd";
-import BtnClickDeleteItem from "../(children)/addDelete/btnDelete";
-import TitleForm from "../(children)/title/titleForm";
-import ListItem from "../(children)/listItem/listItem";
+import BtnClickAddItem from "../common/btnAdd";
+import BtnClickDeleteItem from "../common/btnDelete";
+import TitleForm from "../common/titleForm";
+import ListItem from "../common/listItem";
 const Supplier = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, dataEmty, sDataEmty }) => {
     return (
         <div>

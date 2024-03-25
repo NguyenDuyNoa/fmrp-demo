@@ -1,30 +1,25 @@
+import moment from "moment";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
-import TabClient from "./(tab)/tabExport";
-import { useState } from "react";
+import { useCallback, useRef, useState, useEffect, useMemo } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-import { useRef } from "react";
-import Loading from "components/UI/loading";
+import Loading from "@/components/UI/loading";
 
-import ReactExport from "react-data-export";
-import Client from "./(client)/client";
-import TitleHeader from "./(children)/titleHeader/titleHeader";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import Supplier from "./(supplier)/supplier";
-import Materials from "./(materials)/materials";
-import Products from "./(products)/products";
-import { useMemo } from "react";
-import { Grid6 } from "iconsax-react";
-import { NumericFormat } from "react-number-format";
-import BtnParent from "./(children)/(btnParent)/btnParent";
-import Progress from "./(children)/(progress)/progress";
-import moment from "moment";
+import TabClient from "./components/tabExport";
+import Client from "./components/client/client";
+import Progress from "./components/common/progress";
+import Products from "./components/products/products";
+import BtnParent from "./components/common/btnParent";
+import Supplier from "./components/supplier/supplier";
+import Materials from "./components/materials/materials";
+import TitleHeader from "./components/common/titleHeader";
+import { Container } from "@/components/UI/common/layout";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const initsArr = {
@@ -71,6 +66,7 @@ const Index = (props) => {
     const [sampleImport, sSampleImport] = useState(null);
 
     const [onFetchTemple, sOnFetchTemple] = useState(false);
+
 
     const dataTab = [
         {
@@ -508,9 +504,7 @@ const Index = (props) => {
             });
         }
         formData.append(`tab`, tabPage);
-        Axios(
-            "POST",
-            `${"/api_web/Api_export_data/add_tempate_export?csrf_protection=true"}`,
+        Axios("POST", `${"/api_web/Api_export_data/add_tempate_export?csrf_protection=true"}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -547,12 +541,14 @@ const Index = (props) => {
             <Head>
                 <title>{"Export dữ liệu"}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 h-screen overflow-hidden">
+            <Container className="!h-auto">
                 {trangthaiExprired ? (
-                    <div className="p-2"></div>
+                    <EmptyExprired />
                 ) : (
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">{"Export dữ liệu"}</h6>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            Export dữ liệu
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.import_category || "import_category"}</h6>
                     </div>
@@ -607,7 +603,7 @@ const Index = (props) => {
                         _HandleSubmit={_HandleSubmit}
                     />
                 </div>
-            </div>
+            </Container>
         </div>
     );
 };

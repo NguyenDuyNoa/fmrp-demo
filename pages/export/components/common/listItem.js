@@ -1,5 +1,5 @@
 import { TiTick, TiTimes, TiArrowRight } from "react-icons/ti";
-import Zoom from "../zoomElement/zoomElement";
+import Zoom from "./zoomElement";
 const ListItem = ({ dataColumnNew, type, dataLang, HandlePushItem, isShow, dataEmty, sDataEmty }) => {
     return (
         <div className="scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 overflow-auto 3xl:h-[50vh] xxl:h-[26vh] 2xl:h-[40vh] xl:h-[26vh] lg:h-[28vh]">

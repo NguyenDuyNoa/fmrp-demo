@@ -8,6 +8,10 @@ const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
 // import * as XLSX from "xlsx";
 import * as XLSX from "xlsx-js-style";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useToast from "@/hooks/useToast";
 
 const BtnParent = ({
     sPageLimit,
@@ -27,6 +31,22 @@ const BtnParent = ({
     sIsShow,
     sMultipleProgress,
 }) => {
+
+    const isShowToat = useToast()
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkExport } = useActionRole(auth,
+        tabPage == 1 && "client_customers" ||
+        tabPage == 2 && "suppliers" ||
+        tabPage == 3 && "materials" ||
+        tabPage == 4 && "products" ||
+        tabPage == 5 && "products" ||
+        tabPage == 6 && "products"
+        // ... thêm các type
+    );
+
+
     useEffect(() => {
         if (isShow) {
             handleExportExcel();
@@ -114,11 +134,10 @@ const BtnParent = ({
 
         XLSX.writeFile(
             wb,
-            `${"Export dữ liệu"}${
-                (tabPage == 1 && "danh mục khách hàng") ||
-                (tabPage == 2 && "danh mục nhà cung cấp") ||
-                (tabPage == 3 && "danh mục nguyên vật liệu") ||
-                (tabPage == 4 && "danh mục thành phẩm")
+            `${"Export dữ liệu"}${(tabPage == 1 && "danh mục khách hàng") ||
+            (tabPage == 2 && "danh mục nhà cung cấp") ||
+            (tabPage == 3 && "danh mục nguyên vật liệu") ||
+            (tabPage == 4 && "danh mục thành phẩm")
             }.xlsx`
         );
     };
@@ -291,7 +310,13 @@ const BtnParent = ({
                 </div>
             ) : (
                 <button
-                    onClick={(e) => _HandleSubmit(e)}
+                    onClick={(e) => {
+                        if (role || checkExport) {
+                            _HandleSubmit(e)
+                        } else {
+                            isShowToat('warning', WARNING_STATUS_ROLE)
+                        }
+                    }}
                     type="button"
                     className="col-span-2  p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
                 >
