@@ -2,7 +2,6 @@ import useToast from "@/hooks/useToast";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import PopupEdit from "@/components/UI/popup";
-import { useToggle } from "@/hooks/useToggle";
 import Select from "react-select";
 import {
     SearchNormal1 as IconSearch,
@@ -18,8 +17,6 @@ import {
     TickCircle as IconTick,
     AttachCircle,
 } from "iconsax-react";
-import { NumericFormat } from "react-number-format";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import Loading from "@/components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
@@ -220,27 +217,32 @@ const Popup_Bom = React.memo((props) => {
         sValueVariant([]);
     };
     const _HandleAddNew = (id) => {
-        const index = dataSelectedVariant.findIndex((obj) => obj?.value === id);
+        const index = dataSelectedVariant.findIndex((obj) => obj?.value == id);
         const newData = [...dataSelectedVariant];
-        newData[index] = {
-            ...newData[index],
-            child: [
-                ...newData[index]?.child,
-                {
-                    id: Date.now(),
-                    type: null,
-                    name: null,
-                    dataName: [],
-                    unit: null,
-                    dataUnit: [],
-                    norm: 0,
-                    loss: 0,
-                    stage: null,
-                },
-            ],
-        };
+        if (newData[index]) {
+            newData[index] = {
+                ...newData[index],
+                child: [
+                    ...newData[index]?.child,
+                    {
+                        id: Date.now(),
+                        type: null,
+                        name: null,
+                        dataName: [],
+                        unit: null,
+                        dataUnit: [],
+                        norm: 0,
+                        loss: 0,
+                        stage: null,
+                    },
+                ],
+            };
 
-        sDataSelectedVariant(newData);
+            sDataSelectedVariant(newData);
+        } else {
+            isShow('error', 'Vui lòng chọn biến thể');
+        }
+
     };
 
     const _HandleDeleteItemBOM = (parentId, id) => {
@@ -251,14 +253,12 @@ const Popup_Bom = React.memo((props) => {
         sDataSelectedVariant(newData);
     };
 
-    const _HandleSeachApi = debounce((value, inputValue, type, id) => {
-        Axios(
-            "POST",
-            `/api_web/api_product/searchItemsVariants?csrf_protection=true`,
+    const _HandleSeachApi = debounce((value, Idparent, type, id, name) => {
+        Axios("POST", `/api_web/api_product/searchItemsVariants?csrf_protection=true`,
             {
                 data: {
-                    term: type,
-                    type: inputValue?.value,
+                    term: value,
+                    type: type?.value,
                 },
             },
             (err, response) => {
@@ -269,16 +269,27 @@ const Popup_Bom = React.memo((props) => {
                         value: item.id,
                         product_variation: item?.product_variation,
                     }));
-                    const newDb = dataSelectedVariant.map((e) => ({
-                        ...e,
-                        child: e.child.map((ce, ceIndex) => ({
-                            ...ce,
-                            dataName: getdata,
-                            // dataName: ceIndex === childIndex ? getdata : ce.dataName,
-                        })),
-                    }));
+                    if (value) {
+                        const newDb = dataSelectedVariant.map((e) => {
+                            if (e.value == Idparent) {
+                                return {
+                                    ...e,
+                                    child: e.child.map((x) => {
+                                        if (x.id == id) {
+                                            return {
+                                                ...x,
+                                                dataName: getdata,
+                                            };
+                                        }
+                                        return x
+                                    }),
+                                }
+                            }
+                            return e
+                        });
+                        sDataSelectedVariant([...newDb]);
+                    }
 
-                    sDataSelectedVariant(newDb);
                 }
             }
         );
@@ -292,6 +303,7 @@ const Popup_Bom = React.memo((props) => {
                             ...child,
                             [type]: type === "norm" || type === "loss" ? Number(value.value) : value,
                         };
+
                     }
                     return child;
                 });
@@ -373,6 +385,8 @@ const Popup_Bom = React.memo((props) => {
                                             if (child.id === childId) {
                                                 return {
                                                     ...child,
+                                                    name: value,
+                                                    unit: null,
                                                     dataUnit: data?.units
                                                         ? data?.units.map((e) => ({
                                                             label: e.unit,
@@ -417,9 +431,7 @@ const Popup_Bom = React.memo((props) => {
             dataSelectedVariant.forEach((e) => {
                 e.child.forEach((ce) => {
                     if (ce.name !== null) {
-                        Axios(
-                            "POST",
-                            "/api_web/api_product/searchItemsVariants?csrf_protection=true",
+                        Axios("POST", "/api_web/api_product/searchItemsVariants?csrf_protection=true",
                             {
                                 data: {
                                     type: ce.type.value,
@@ -437,9 +449,7 @@ const Popup_Bom = React.memo((props) => {
                         );
                     }
                     if (ce.unit !== null) {
-                        Axios(
-                            "POST",
-                            "/api_web/api_product/rowItem?csrf_protection=true",
+                        Axios("POST", "/api_web/api_product/rowItem?csrf_protection=true",
                             {
                                 data: {
                                     item_id: ce.name.value,
@@ -721,7 +731,7 @@ const Popup_Bom = React.memo((props) => {
                                                                 e.id,
                                                                 "name"
                                                             )}
-                                                            onInputChange={_HandleSeachApi.bind(this, e.id, e?.type)}
+                                                            onInputChange={(x) => _HandleSeachApi(x, selectedList?.value, e?.type, e.id, e.name)}
                                                             formatOptionLabel={(option) => (
                                                                 <div className="">
                                                                     <div className="flex gap-1">

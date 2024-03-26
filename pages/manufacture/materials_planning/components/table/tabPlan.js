@@ -4,13 +4,17 @@ import dynamic from "next/dynamic";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import ModalImage from "react-modal-image";
+import useSetingServer from "@/hooks/useConfigNumber";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
-
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const TabPlan = ({ dataTable, isFetching }) => {
     const { dataBom } = dataTable.listDataRight
     console.log("dataBom", dataBom);
     // productsBom bán tp
+    const dataSeting = useSetingServer();
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
         <>
             <div className="flex items-start">
@@ -89,10 +93,8 @@ const TabPlan = ({ dataTable, isFetching }) => {
                     {isFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : dataBom?.productsBom.length > 0 ? (
-                        <ScrollArea
+                        <Customscrollbar
                             className="3xl:h-[49.5vh] xxl:h-[30vh] 2xl:h-[38.5vh] xl:h-[31.5vh] lg:h-[33vh] h-[34vh]"
-                            speed={1}
-                            smoothScrolling={true}
                         >
                             {dataBom?.productsBom.map(
                                 (e, index) =>
@@ -121,17 +123,17 @@ const TabPlan = ({ dataTable, isFetching }) => {
                                             {e.unit}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.use}
+                                            {formatNumber(e.use)}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.exist}
+                                            {formatNumber(e.exist)}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.lack}
+                                            {formatNumber(e.lack)}
                                         </h4>
                                     </div>
                             )}
-                        </ScrollArea>
+                        </Customscrollbar>
                     ) : (
                         <NoData />
                     )}
@@ -224,10 +226,8 @@ const TabPlan = ({ dataTable, isFetching }) => {
                     {isFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : dataBom?.materialsBom?.length > 0 ? (
-                        <ScrollArea
+                        <Customscrollbar
                             className="3xl:h-[49.5vh] xxl:h-[30vh] 2xl:h-[38.5vh] xl:h-[31.5vh] lg:h-[33vh] h-[34vh]"
-                            speed={1}
-                            smoothScrolling={true}
                         >
                             {dataBom?.materialsBom.map(
                                 (e, index) =>
@@ -256,21 +256,21 @@ const TabPlan = ({ dataTable, isFetching }) => {
                                             {e.unit}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.use}
+                                            {formatNumber(e.use)}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.exist}
+                                            {formatNumber(e.exist)}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.exchange}
+                                            {formatNumber(e.exchange)}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.lack}
+                                            {formatNumber(e.lack)}
                                         </h4>
                                     </div>
 
                             )}
-                        </ScrollArea>
+                        </Customscrollbar>
                     ) : (
                         <NoData />
                     )}

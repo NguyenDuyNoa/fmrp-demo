@@ -4,8 +4,12 @@ import { motion } from "framer-motion";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const TabKeepStock = ({ filterItem, handShowItem, handDeleteItem, isFetching }) => {
+    const dataSeting = useSetingServer();
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
         <>
             <div className="flex justify-start items-center gap-8">
@@ -116,9 +120,8 @@ const TabKeepStock = ({ filterItem, handShowItem, handDeleteItem, isFetching }) 
                                                         {e.arrListData.map((i, index) => (
                                                             <div
                                                                 key={i.id}
-                                                                className={`grid grid-cols-12 items-center ${
-                                                                    e.arrListData?.length - 1 == index ? "" : "border-b"
-                                                                } `}
+                                                                className={`grid grid-cols-12 items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"
+                                                                    } `}
                                                             >
                                                                 <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
                                                                     <Image
@@ -132,7 +135,7 @@ const TabKeepStock = ({ filterItem, handShowItem, handDeleteItem, isFetching }) 
                                                                     </h1>
                                                                 </h4>
                                                                 <h4 className="col-span-2 text-center text-[#141522] font-semibold 3xl:text-base text-xs">
-                                                                    {i.quantity}
+                                                                    {formatNumber(i.quantity)}
                                                                 </h4>
                                                                 <h4 className="col-span-2 text-center text-[#52575E] font-normal 3xl:text-sm text-xs">
                                                                     {i.unit}
@@ -148,51 +151,46 @@ const TabKeepStock = ({ filterItem, handShowItem, handDeleteItem, isFetching }) 
                                                                                 <div className="flex items-center">
                                                                                     {index === 0 && (
                                                                                         <div
-                                                                                            className={`${
-                                                                                                j.active
-                                                                                                    ? "bg-[#00C170]"
-                                                                                                    : "bg-gray-500"
-                                                                                            } w-[10px] h-[10px] rounded-full`}
+                                                                                            className={`${j.active
+                                                                                                ? "bg-[#00C170]"
+                                                                                                : "bg-gray-500"
+                                                                                                } w-[10px] h-[10px] rounded-full`}
                                                                                         />
                                                                                     )}
                                                                                     <div
-                                                                                        className={` ${
-                                                                                            j.active
-                                                                                                ? "bg-[#00C170]"
-                                                                                                : "bg-gray-500"
-                                                                                        } 3xl:w-[167px] xxl:w-[110px] 2xl:w-[127px] xl:w-[100px] lg:w-[65px] w-[110px] h-[2px]`}
+                                                                                        className={` ${j.active
+                                                                                            ? "bg-[#00C170]"
+                                                                                            : "bg-gray-500"
+                                                                                            } 3xl:w-[167px] xxl:w-[110px] 2xl:w-[127px] xl:w-[100px] lg:w-[65px] w-[110px] h-[2px]`}
                                                                                     />
                                                                                     {index ===
                                                                                         i.processBar.length - 1 && (
-                                                                                        <div
-                                                                                            className={`${
-                                                                                                j.active
+                                                                                            <div
+                                                                                                className={`${j.active
                                                                                                     ? "bg-[#00C170]"
                                                                                                     : "bg-gray-500"
-                                                                                            } w-[10px] h-[10px] rounded-full`}
-                                                                                        />
-                                                                                    )}
+                                                                                                    } w-[10px] h-[10px] rounded-full`}
+                                                                                            />
+                                                                                        )}
                                                                                 </div>
                                                                             </motion.div>
                                                                             <div
-                                                                                className={`mt-1 ${
-                                                                                    index === i.processBar.length - 1 &&
+                                                                                className={`mt-1 ${index === i.processBar.length - 1 &&
                                                                                     "relative -right-[94%]"
-                                                                                }`}
+                                                                                    }`}
                                                                             >
                                                                                 <p
-                                                                                    className={`${
-                                                                                        j.active
-                                                                                            ? "text-[#0BAA2E]"
-                                                                                            : "text-gray-500"
-                                                                                    } font-normal text-[10px] uppercase`}
+                                                                                    className={`${j.active
+                                                                                        ? "text-[#0BAA2E]"
+                                                                                        : "text-gray-500"
+                                                                                        } font-normal text-[10px] uppercase`}
                                                                                 >
                                                                                     {j.title}
                                                                                 </p>
                                                                                 <p className="text-[#667085] font-normal text-[10px]">
                                                                                     SL:
                                                                                     <span className="text-[#141522] font-semibold text-[10px] px-1">
-                                                                                        {j.quantity}
+                                                                                        {formatNumber(j.quantity)}
                                                                                     </span>
                                                                                 </p>
                                                                             </div>

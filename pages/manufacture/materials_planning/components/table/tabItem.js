@@ -8,8 +8,13 @@ import NoData from "@/components/UI/noData/nodata";
 import ModalImage from "react-modal-image";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const TabItem = ({ dataTable, handShowItem, isFetching }) => {
+    const dataSeting = useSetingServer();
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
         <>
             <h1 className="text-[#11315B] font-normal 3xl:text-lg text-base">Danh sách sản phẩm (theo đơn hàng)</h1>
@@ -28,10 +33,8 @@ const TabItem = ({ dataTable, handShowItem, isFetching }) => {
             {isFetching ? (
                 <Loading className="h-80" color="#0f4f9e" />
             ) : (
-                <ScrollArea
-                    className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
-                    speed={1}
-                    smoothScrolling={true}
+                <Customscrollbar
+                    className="3xl:h-[47.7vh] xxl:h-[27.5vh] 2xl:h-[36vh] xl:h-[29vh] lg:h-[30.5vh] h-[34vh] overflow-y-auto"
                 >
                     {dataTable?.listDataRight?.dataPPItems?.length > 0 ? (
                         dataTable?.listDataRight?.dataPPItems?.map((e) => (
@@ -83,7 +86,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching }) => {
                                                     {i.unit}
                                                 </h4>
                                                 <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                    {i.quantity}
+                                                    {formatNumber(i.quantity)}
                                                 </h4>
                                                 <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
                                                     {i.timeline.start} - {i.timeline.end}
@@ -96,7 +99,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching }) => {
                     ) : (
                         <NoData />
                     )}
-                </ScrollArea>
+                </Customscrollbar>
             )}
         </>
     );
