@@ -71,7 +71,7 @@ const Popup_TableValidateDelete = (props) => {
                     <div
                         onClick={() => {
                             if (role || checkDelete) {
-                                _ToggleModal.bind(this, true)
+                                _ToggleModal(true)
                             } else {
                                 isShow("warning", WARNING_STATUS_ROLE);
                             }
