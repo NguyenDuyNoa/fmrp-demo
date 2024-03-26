@@ -18,7 +18,6 @@ const PopupConfim = (props) => {
     const { checkBrowser: checkAuth, checkDelete } = useActionRole(auth, props?.nameModel)
 
     const showToat = useToast()
-
     const handleConfimDelete = () => {
         switch (props?.nameModel) {
             case "client_contact":
@@ -37,6 +36,10 @@ const PopupConfim = (props) => {
                 // } else {
                 //     showToat('warning', 'Bạn không có quyền truy cập');
                 // }
+                props.save();
+                break;
+            case "change_item":
+                //Xóa các item ở form change_item
                 props.save();
                 break;
             case "material_variation":
@@ -211,7 +214,8 @@ const PopupConfim = (props) => {
                                     'personnel_roles',
                                     'warehouse',
                                     'warehouse_location',
-                                    'inventory'
+                                    'inventory',
+                                    'change_item'
                                 ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">
@@ -256,7 +260,8 @@ const PopupConfim = (props) => {
                                 'personnel_roles',
                                 'warehouse',
                                 'warehouse_location',
-                                'inventory'
+                                'inventory',
+                                'change_item'
                             ].includes(props.nameModel) && (
                                     <>
                                         <Zoom className="w-1/2">

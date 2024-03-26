@@ -345,6 +345,7 @@ const FormAdd = (props) => {
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
                 save={handleConfim}
+                nameModel={'change_item'}
                 cancel={() => handleQueryId({ status: false })}
             />
         </>

@@ -1027,7 +1027,7 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
+                        isShow("success", dataLang[message] || message);
                         sCode("");
                         sStartDate(new Date());
                         sDelivery_dateNew(new Date());
@@ -1056,7 +1056,7 @@ const Index = (props) => {
                         if (tongTienState.tongTien == 0) {
                             isShow("error", `Chưa nhập thông tin mặt hàng`);
                         } else {
-                            isShow("error", `${dataLang[message]}`);
+                            isShow("error", dataLang[message] || message);
                         }
                     }
                 }
@@ -1977,6 +1977,7 @@ const Index = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
+                nameModel={'change_item'}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>

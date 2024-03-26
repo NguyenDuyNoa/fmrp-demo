@@ -1941,6 +1941,7 @@ const Index = (props) => {
                 dataLang={dataLang}
                 type="warning"
                 title={TITLE_DELETE_ITEMS}
+                nameModel={'change_item'}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={handleSaveStatus}

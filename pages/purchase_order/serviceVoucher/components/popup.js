@@ -590,7 +590,7 @@ const Popup_servie = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
+                        isShow("success", dataLang[message] || message);
                         sDate(new Date());
                         sCode("");
                         sValueBr(null);
@@ -616,7 +616,7 @@ const Popup_servie = (props) => {
                         props.onRefreshGr && props.onRefreshGr();
                         sOpen(false);
                     } else {
-                        isShow("error", `${dataLang[message]}`);
+                        isShow("error", dataLang[message] || message);
                     }
                 }
                 sOnSending(false);

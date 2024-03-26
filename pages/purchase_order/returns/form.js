@@ -709,7 +709,7 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
+                        isShow("success", dataLang[message] || message);
                         sCode("");
                         sStartDate(new Date());
                         sIdSupplier(null);
@@ -730,7 +730,7 @@ const Index = (props) => {
                         //     icon: 'error',
                         //     title: `Chưa nhập thông tin mặt hàng`
                         // })
-                        isShow("error", `${dataLang[message]}`);
+                        isShow("error", dataLang[message] || message);
                         //  }
                     }
                 }
@@ -2151,6 +2151,7 @@ const Index = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
+                nameModel={'change_item'}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>

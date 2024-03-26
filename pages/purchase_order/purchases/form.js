@@ -378,7 +378,7 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", `${props.dataLang[message]}` || message);
+                        isShow("success", dataLang[message] || message);
                         sCode("");
                         sNamePromis("Yêu cầu mua hàng (PR)");
                         sStartDate(new Date());
@@ -403,7 +403,7 @@ const Index = (props) => {
                         if (totalQty == 0) {
                             isShow("success", `Chưa nhập thông tin mặt hàng`);
                         } else {
-                            isShow("error", `${props.dataLang[message]}` || message);
+                            isShow("error", dataLang[message] || message);
                         }
                     }
                 }

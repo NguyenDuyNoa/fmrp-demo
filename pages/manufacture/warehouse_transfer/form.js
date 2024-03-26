@@ -1634,6 +1634,7 @@ const Index = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
+                nameModel={'change_item'}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>

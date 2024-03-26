@@ -687,9 +687,9 @@ const Index = (props) => {
                 dataLang={dataLang}
                 type="warning"
                 title={TITLE_STATUS}
-                nameModel={"purchases"}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
+                nameModel={'change_item'}
                 save={_ToggleStatus}
                 cancel={() => handleQueryId({ status: false })}
             />
