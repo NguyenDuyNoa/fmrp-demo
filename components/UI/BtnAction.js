@@ -345,7 +345,7 @@ const BtnAction = React.memo((props) => {
     const shareProps = { dataMaterialExpiry, dataProductExpiry, dataProductSerial, dataSeting };
 
     console.log("products", props.type);
-
+    console.log('aaa', checkEdit);
     return (
         <div className="flex items-center justify-center">
             {
@@ -402,20 +402,15 @@ const BtnAction = React.memo((props) => {
                         <div className="w-auto rounded">
                             <div className="bg-white rounded-b-xl flex flex-col overflow-hidden">
                                 {props.type == "order" && (
-                                    <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded">
-                                        <BiEdit
-                                            size={20}
-                                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                                        />
-                                        <Popup_TableValidateEdit
-                                            {...props}
-                                            {...shareProps}
-                                            isOpenValidate={isOpenValidate}
-                                            sIsOpenValidate={sIsOpenValidate}
-                                            data={isData}
-                                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
-                                        />
-                                    </div>
+
+                                    <Popup_TableValidateEdit
+                                        {...props}
+                                        {...shareProps}
+                                        isOpenValidate={isOpenValidate}
+                                        sIsOpenValidate={sIsOpenValidate}
+                                        data={isData}
+                                        className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
+                                    />
                                 )}
                                 {props.type == "serviceVoucher" && (
                                     <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full">
@@ -606,19 +601,13 @@ const BtnAction = React.memo((props) => {
                                     }
                                 </>}
                                 {props.type == "order" ? (
-                                    <div className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
-                                        <RiDeleteBin6Line
-                                            size={20}
-                                            className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
-                                        />
-                                        <Popup_TableValidateDelete
-                                            {...shareProps}
-                                            isOpen={isOpen}
-                                            handleQueryId={handleQueryId}
-                                            {...props}
-                                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
-                                        />
-                                    </div>
+                                    <Popup_TableValidateDelete
+                                        {...shareProps}
+                                        isOpen={isOpen}
+                                        handleQueryId={handleQueryId}
+                                        {...props}
+                                        className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"
+                                    />
                                 ) : (
                                     <>
                                         {

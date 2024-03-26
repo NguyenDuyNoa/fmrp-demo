@@ -931,6 +931,7 @@ const Index = (props) => {
                 title={TITLE_DELETE_ITEMS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
+                nameModel={'change_item'}
                 save={resetValue}
                 cancel={() => handleQueryId({ status: false })}
             />

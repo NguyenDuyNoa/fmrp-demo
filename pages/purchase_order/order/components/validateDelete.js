@@ -10,6 +10,11 @@ import Swal from "sweetalert2";
 import { useEffect } from "react";
 import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useToast from "@/hooks/useToast";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -22,6 +27,13 @@ const Toast = Swal.mixin({
 const Popup_TableValidateDelete = (props) => {
     const _ToggleModal = (e) => props.handleQueryId({ status: e });
     const [onFetching, sOnFetching] = useState(false);
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkDelete, checkEdit } = useActionRole(auth, props?.type);
+
+    const isShow = useToast()
+
     useEffect(() => {
         props.isOpenValidate && _HandleDelete();
     }, [props.isOpenValidate]);
@@ -55,8 +67,27 @@ const Popup_TableValidateDelete = (props) => {
         <>
             <PopupEdit
                 title={props.dataLang?.purchase_order_title || "purchase_order_title"}
-                button={props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                onClickOpen={_ToggleModal.bind(this, true)}
+                button={
+                    <div
+                        onClick={() => {
+                            if (role || checkDelete) {
+                                _ToggleModal.bind(this, true)
+                            } else {
+                                isShow("warning", WARNING_STATUS_ROLE);
+                            }
+                        }}
+                        className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
+                        <RiDeleteBin6Line
+                            size={20}
+                            className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
+                        />
+                        <div
+                            className="group-hover:text-[#f87171]"
+                        >
+                            {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
+                        </div>
+                    </div>}
+                // onClickOpen={_ToggleModal.bind(this, true)}
                 open={props.isOpen && props.data?.payment_code?.length > 0}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props?.className}
