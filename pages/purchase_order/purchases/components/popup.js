@@ -27,6 +27,7 @@ import NoData from "@/components/UI/noData/nodata";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
@@ -157,26 +158,7 @@ const Popup_chitiet = (props) => {
                                                 {data?.user_create_name}
                                             </h3> */}
                                             <div className="flex items-center gap-2">
-                                                <div className="relative">
-                                                    <ImageErrors
-                                                        src={
-                                                            data?.profile_image
-                                                        }
-                                                        width={25}
-                                                        height={25}
-                                                        defaultSrc="/user-placeholder.jpg"
-                                                        alt="Image"
-                                                        className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                    />
-                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                                <h6 className="capitalize">
-                                                    {data?.user_create_name}
-                                                </h6>
+                                                <CustomAvatar profileImage={data?.profile_image} fullName={data?.user_create_name} />
                                             </div>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">

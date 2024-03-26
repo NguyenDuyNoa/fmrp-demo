@@ -9,7 +9,7 @@ const CustomAvatar = ({ profileImage, fullName, data }) => {
                 <ModalImage
                     small={profileImage ? profileImage : "/user-placeholder.jpg"}
                     large={profileImage ? profileImage : "/user-placeholder.jpg"}
-                    className="h-6 w-6 rounded-full object-cover "
+                    className="h-6 w-6 min-h-6 min-w-6 rounded-full object-cover "
                 >
                     <div className="">
                         <ImageErrors
