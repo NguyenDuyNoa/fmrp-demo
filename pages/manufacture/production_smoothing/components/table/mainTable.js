@@ -2,7 +2,7 @@ import Zoom from "components/UI/zoomElement/zoomElement";
 import { Add, SearchNormal1 } from "iconsax-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import PopupAdd from "../(popupAdd)/popup";
+import PopupAdd from "../popup/popup";
 import Loading from "components/UI/loading";
 
 const MainTable = ({
@@ -74,9 +74,8 @@ const MainTable = ({
                         <div className={`border-[#E7EAEE] bg-white ${index == 0 ? "" : ""} border-b`}>
                             <div
                                 onClick={() => handleShowProgress(e.id)}
-                                className={` ${
-                                    isOpen && e.id == idParent ? "bg-[#EBF5FF]/100" : ""
-                                }  cursor-pointer hover:bg-[#EBF5FF]  transition-all    duration-200 ease-linear flex   items-center`}
+                                className={` ${isOpen && e.id == idParent ? "bg-[#EBF5FF]/100" : ""
+                                    }  cursor-pointer hover:bg-[#EBF5FF]  transition-all    duration-200 ease-linear flex   items-center`}
                             >
                                 <div className="p-5">
                                     <div className="grid grid-cols-13 items-center gap-1 justify-center">
@@ -101,26 +100,23 @@ const MainTable = ({
                                                     {e.process.map((i, index) => (
                                                         <>
                                                             <div
-                                                                className={`${
-                                                                    i.active
-                                                                        ? `h-2 w-2 rounded-full bg-green-500`
-                                                                        : `h-2 w-2 rounded-full bg-[#CCCCCC]`
-                                                                } `}
+                                                                className={`${i.active
+                                                                    ? `h-2 w-2 rounded-full bg-green-500`
+                                                                    : `h-2 w-2 rounded-full bg-[#CCCCCC]`
+                                                                    } `}
                                                             />
                                                             <div
-                                                                className={`${
-                                                                    i.active
-                                                                        ? `w-[13%] bg-green-500 h-0.5 `
-                                                                        : `w-[13%] bg-[#CCCCCC] h-0.5 `
-                                                                }`}
+                                                                className={`${i.active
+                                                                    ? `w-[13%] bg-green-500 h-0.5 `
+                                                                    : `w-[13%] bg-[#CCCCCC] h-0.5 `
+                                                                    }`}
                                                             />
                                                             {index === e.process.length - 1 && (
                                                                 <div
-                                                                    className={`${
-                                                                        i.active
-                                                                            ? `h-2 w-2 rounded-full bg-green-500`
-                                                                            : `h-2 w-2 rounded-full bg-[#CCCCCC]`
-                                                                    } `}
+                                                                    className={`${i.active
+                                                                        ? `h-2 w-2 rounded-full bg-green-500`
+                                                                        : `h-2 w-2 rounded-full bg-[#CCCCCC]`
+                                                                        } `}
                                                                 />
                                                             )}
                                                         </>

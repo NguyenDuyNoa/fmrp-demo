@@ -1,15 +1,13 @@
 import React from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import DatePicker from "react-datepicker";
 
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
-
 import useToast from "@/hooks/useToast";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
     const showToat = useToast();
@@ -233,10 +231,8 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                             {tab == "order" ? "Đơn hàng bán" : "Kế hoạch nội bộ"}
                         </label>
                         <div className="text-[#344054] font-normal 3xl:text-sm text-xs mt-0.5">
-                            <ScrollArea
-                                className="3xl:max-h-[10.5vh] xxl:max-h-[8vh] 2xl:max-h-[12vh] xl:max-h-[10vh] lg:max-h-[9vh] max-h-[10vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
-                                speed={1}
-                                smoothScrolling={true}
+                            <Customscrollbar
+                                className="3xl:max-h-[10.5vh] xxl:max-h-[8vh] 2xl:max-h-[12vh] xl:max-h-[10vh] lg:max-h-[9vh] max-h-[10vh] overflow-y-auto overflow-hidden"
                             >
                                 <div className="flex items-center justify-start gap-x-4 gap-y-2 flex-wrap">
                                     {newArray?.map((e) => (
@@ -276,7 +272,7 @@ const InFo = ({ data, handleRemoveBtn, isValue, onChangeValue, tab }) => {
                                         </Zoom>
                                     )}
                                 </div>
-                            </ScrollArea>
+                            </Customscrollbar>
                         </div>
                     </div>
                 </div>

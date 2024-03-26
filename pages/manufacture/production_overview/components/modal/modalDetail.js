@@ -127,9 +127,8 @@ const ModalDetail = ({ data, isShow, fetch, handleIsShowModel, handleIsShow }) =
                                 type="button"
                                 onClick={() => handleIsShow(1)}
                                 className={`text-[#11315B] font-medium 3xl:text-sm xxl:text-xs 2xl:text-xs xl:text-[11px] lg:text-[10px]  3xl:py-3 3xl:px-4 xxl:py-2 xxl:px-3 2xl:py-1.5 2xl:px-2.5 xl:py-1.5 xl:px-3lg:py-1.5 lg:px-3 py-3 px-4
-                                 hover:bg-white hover:shadow-xl  transition-all duration-200 ease-linear  rounded-xl ${
-                                     isShow.showHistory == 1 ? "bg-white shadow-xl" : ""
-                                 }`}
+                                 hover:bg-white hover:shadow-xl  transition-all duration-200 ease-linear  rounded-xl ${isShow.showHistory == 1 ? "bg-white shadow-xl" : ""
+                                    }`}
                             >
                                 Lịch sử xuất NVL/BTP
                             </button>
@@ -139,9 +138,8 @@ const ModalDetail = ({ data, isShow, fetch, handleIsShowModel, handleIsShow }) =
                                 type="button"
                                 onClick={() => handleIsShow(2)}
                                 className={`text-[#11315B] font-medium 3xl:text-sm xxl:text-xs 2xl:text-xs xl:text-[11px] lg:text-[10px]  3xl:py-3 3xl:px-4 xxl:py-2 xxl:px-3 2xl:py-1.5 2xl:px-2.5 xl:py-1.5 xl:px-3 lg:py-1.5 lg:px-3 py-3 px-4
-                                 hover:bg-white hover:shadow-xl  transition-all duration-200 ease-linear rounded-xl ${
-                                     isShow.showHistory == 2 ? "bg-white shadow-xl" : ""
-                                 }`}
+                                 hover:bg-white hover:shadow-xl  transition-all duration-200 ease-linear rounded-xl ${isShow.showHistory == 2 ? "bg-white shadow-xl" : ""
+                                    }`}
                             >
                                 Lịch sử hoạt động
                             </button>

@@ -2,18 +2,18 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 
 const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
-const Header = ({}) => {
+const Header = ({ }) => {
     return (
         <>
-            <div className="flex items-center justify-between">
-                <div className={` flex space-x-3  xl:text-[14.5px] text-[12px]`}>
-                    <h6 className="text-[#141522]/40">{"Sản xuất"}</h6>
-                    <span className="text-[#141522]/40">/</span>
-                    <h6>{"Kế hoạch nguyên vật liệu"}</h6>
-                </div>
+            <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                <h6 className="text-[#141522]/40">{"Sản xuất"}</h6>
+                <span className="text-[#141522]/40">/</span>
+                <h6>{"Kế hoạch nguyên vật liệu"}</h6>
             </div>
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-medium text-[#11315B]">Kế hoạch nguyên vật liệu</h1>
+                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                    Kế hoạch nguyên vật liệu
+                </h2>
                 <div>
                     <Zoom>
                         <button

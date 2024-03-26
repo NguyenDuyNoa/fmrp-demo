@@ -1,16 +1,17 @@
 import Head from "next/head";
-import Header from "./(header)/header";
+import Header from "./components/header/header";
 import { useSelector } from "react-redux";
-import Main from "./(mainTable)/main";
+import Main from "./components/table/main";
 import { useState } from "react";
 import Image from "next/image";
 import Zoom from "components/UI/zoomElement/zoomElement";
 import { v4 as uuid } from "uuid";
 import Loading from "components/UI/loading";
-import Step from "./(modalDetail)/steps";
-import ModalDetail from "./(modalDetail)/modalDetail";
+import Step from "./components/modal/steps";
+import ModalDetail from "./components/modal/modalDetail";
 import { useMemo } from "react";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { Container } from "@/components/UI/common/layout";
 const Index = (props) => {
     const dataLang = props.dataLang;
     const trangthaiExprired = useStatusExprired();
@@ -1217,11 +1218,11 @@ const Index = (props) => {
             <Head>
                 <title>{"Tổng quan sản xuất"}</title>
             </Head>
-            <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 lg:pb-10 overflow-hidden h-screen">
                 {trangthaiExprired ? <div className="p-4"></div> : <Header {...propsDetail} />}
                 <Main {...propsDetail} />
                 <ModalDetail {...propsDetail} />
-            </div>
+            </Container>
         </>
     );
 };

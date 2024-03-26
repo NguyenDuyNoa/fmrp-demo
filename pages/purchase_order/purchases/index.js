@@ -153,7 +153,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     let { output, rResult } = response.data;
-                    queryState({ data: rResult, dataExcel: rResult, onFetching: false });
+                    queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
                     sTotalItems(output);
                 }
             }
@@ -164,21 +164,21 @@ const Index = (props) => {
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) });
+                queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
             }
         });
 
         Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                queryState({ listCode: rResult?.map((e) => ({ label: e.code, value: e.id })) });
+                queryState({ listCode: rResult?.map((e) => ({ label: e.code, value: e.id || [] })) });
             }
         });
 
         Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                queryState({ listUser: rResult?.map((e) => ({ label: e.name, value: e.staffid })) });
+                queryState({ listUser: rResult?.map((e) => ({ label: e.name, value: e.staffid })) || [] });
             }
         });
         queryState({ onFetchingFilter: false });
@@ -201,7 +201,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     let data = response.data;
-                    queryState({ listDs: data });
+                    queryState({ listDs: data || [] });
                 }
                 queryState({ onFetchingGroup: false });
             }

@@ -9,17 +9,17 @@ import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
 
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
 import { routerPproductionPlan } from "@/routers/manufacture";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import Zoom from "@/components/UI/zoomElement/zoomElement";
-import moment from "moment/moment";
 
-const InFo = dynamic(() => import("./(form)/info"), { ssr: false });
-const Table = dynamic(() => import("./(form)/table"), { ssr: false });
+const InFo = dynamic(() => import("./components/form/info"), { ssr: false });
+const Table = dynamic(() => import("./components/form/table"), { ssr: false });
 import { _ServerInstance as Axios } from "/services/axios";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 const FormAdd = (props) => {
@@ -101,9 +101,7 @@ const FormAdd = (props) => {
             form.append(tab == "plan" ? "dataBusinessitemId[]" : "dataOrderItemId[]", e?.id);
         });
 
-        Axios(
-            "POST",
-            `/api_web/api_manufactures/getDataHandlingManufacture?csrf_protection=true`,
+        Axios("POST", `/api_web/api_manufactures/getDataHandlingManufacture?csrf_protection=true`,
             {
                 data: form,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -216,7 +214,7 @@ const FormAdd = (props) => {
                 if (!item.stage == "1") {
                     acc.hasMissingStage = true;
                 }
-                if (!item.quantityRemaining || (!item.date.startDate && !item.date.endDate)) {
+                if (!item.quantityRemaining || item.quantityRemaining == 0 || (!item.date.startDate && !item.date.endDate)) {
                     acc.hasMissingQuantityDate = true;
                 }
                 return acc;
@@ -268,9 +266,7 @@ const FormAdd = (props) => {
 
             formData.append(`items[${index}][object_item_id]`, e?.object_item_id ? e?.object_item_id : "")
         })
-        await Axios(
-            "POST",
-            `/api_web/api_manufactures/handlingProductionPlans?csrf_protection=true`,
+        await Axios("POST", `/api_web/api_manufactures/handlingProductionPlans?csrf_protection=true`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -308,53 +304,40 @@ const FormAdd = (props) => {
             <Head>
                 <title>{"Thêm kế hoạch nguyên vật liệu"}</title>
             </Head>
-            <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-4"></div>
+                    <EmptyExprired />
                 ) : (
-                    <>
-                        <div className="flex items-center justify-between">
-                            <div className={` flex space-x-3  xl:text-[14.5px] text-[12px]`}>
-                                <h6 className="text-[#141522]/40">{"Sản xuất"}</h6>
-                                <span className="text-[#141522]/40">/</span>
-                                <h6 className="text-[#141522]/40">{"Kế hoạch nguyên vật liệu"}</h6>
-                                <span className="text-[#141522]/40">/</span>
-                                <h6>{"Thêm kế hoạch NVL"}</h6>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <h1 className="text-2xl font-medium text-[#11315B] capitalize">
-                                Thêm kế hoạch nguyên vật liệu
-                            </h1>
-                            <div className="flex items-center gap-4">
-                                <div>
-                                    <Zoom>
-                                        <button
-                                            type="button"
-                                            className="bg-white border-[#D0D5DD] border rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
-                                        >
-                                            Lưu nháp
-                                        </button>
-                                    </Zoom>
-                                </div>
-                                <div>
-                                    <Zoom>
-                                        <button
-                                            onClick={() => handSavePlan()}
-                                            type="button"
-                                            className="bg-[#0F4F9E] text-white  rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
-                                        >
-                                            Lưu lại
-                                        </button>
-                                    </Zoom>
-                                </div>
-                            </div>
-                        </div>
-                    </>
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">{"Kế hoạch nguyên vật liệu"}</h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{"Thêm kế hoạch NVL"}</h6>
+                    </div>
                 )}
-                <InFo {...shareProps} />
-                <Table {...shareProps} />
-            </div>
+                <ContainerBody>
+                    <div className="flex justify-between items-center mr-2 mt-1">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            Thêm kế hoạch nguyên vật liệu
+                        </h2>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => router.push('/manufacture/production_plan?tab=order')}
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                            >
+                                {dataLang?.import_comeback || "import_comeback"}
+                            </button>
+                            <button
+                                onClick={() => handSavePlan()}
+                                className="bg-[#0F4F9E] text-white  rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
+                            >
+                                Lưu lại
+                            </button>
+                        </div>
+                    </div>
+                    <InFo {...shareProps} />
+                    <Table {...shareProps} />
+                </ContainerBody>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

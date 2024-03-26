@@ -12,11 +12,11 @@ import { useSetData } from "@/hooks/useSetData";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
+const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 
-const Header = dynamic(() => import("./(header)/header"), { ssr: false });
+const Header = dynamic(() => import("./components/header"), { ssr: false });
 
-const FilterHeader = dynamic(() => import("./(filterHeader)/filterHeader"), { ssr: false });
+const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
 
 const Index = (props) => {
     const dataLang = props.dataLang;

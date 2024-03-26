@@ -1,6 +1,6 @@
+import moment from "moment/moment";
 import React, { useEffect, useRef, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-import moment from "moment/moment";
 
 import {
     Edit as IconEdit,
@@ -19,14 +19,14 @@ import NoData from "@/components/UI/noData/nodata";
 import ExpandableContent from "@/components/UI/more";
 import ImageErrors from "@/components/UI/imageErrors";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 const Popup_chitietThere = (props) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 

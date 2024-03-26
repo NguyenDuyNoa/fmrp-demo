@@ -35,7 +35,10 @@ const useActionRole = (auth, type) => {
         "export_different": "exportToOther",
         "inventory": "inventory",
         "other_payslips_coupon": "receipts",
-        "other_payslips": "payment"
+        "other_payslips": "payment",
+        "internal_plans": "internal_plan",
+        "production_plans_fmrp": "production_plans_fmrp"
+
         // Thêm các type ||  nameModel
 
 

@@ -269,7 +269,6 @@ const Popup_Bom = React.memo((props) => {
                         value: item.id,
                         product_variation: item?.product_variation,
                     }));
-                    console.log("dataSelectedVariant", dataSelectedVariant);
                     const newDb = dataSelectedVariant.map((e) => ({
                         ...e,
                         child: e.child.map((ce, ceIndex) => ({

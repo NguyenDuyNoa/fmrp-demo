@@ -1,41 +1,53 @@
 import Head from "next/head";
-import Link from "next/link";
+import { debounce } from "lodash";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import { useRouter } from "next/router";
-import ModalImage from "react-modal-image";
+import { useSelector } from "react-redux";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
 import React, { useState, useEffect, useTransition } from "react";
 
-import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { Grid6, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import ImageErrors from "@/components/UI/imageErrors";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 
+import useToast from "@/hooks/useToast";
+import useActionRole from "@/hooks/useRole";
+import { useToggle } from "@/hooks/useToggle";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { routerInternalPlan } from "routers/manufacture";
-import { useToggle } from "@/hooks/useToggle";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-import useToast from "@/hooks/useToast";
-import { debounce } from "lodash";
 
-const PopupDetail = dynamic(() => import("./(popupDetail)/PopupDetail"), { ssr: false });
+const PopupDetail = dynamic(() => import("./components/PopupDetail"), { ssr: false });
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
+
+    const isShow = useToast();
 
     const initsArr = { data: [], dataExcel: [], listBr: [] };
 
@@ -52,21 +64,21 @@ const Index = (props) => {
 
     const [onFetching, sOnFetching] = useState(false);
 
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
-
-    const [limit, sLimit] = useState(15);
-
-    const [total, sTotal] = useState({});
-
     const [keySearch, sKeySearch] = useState("");
-
-    const [totalItems, sTotalItems] = useState([]);
-
-    const isShow = useToast();
 
     const [isEvent, startEvent] = useTransition();
 
+    const [onFetching_filter, sOnFetching_filter] = useState(false);
+
     const { isOpen, isId, isIdChild: status, handleQueryId } = useToggle();
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'internal_plan');
+
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+
+
 
     useEffect(() => {
         router.push({
@@ -76,23 +88,15 @@ const Index = (props) => {
     }, []);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_internal_plan/getInternalPlan?csrf_protection=true`,
+        Axios("GET", `/api_web/api_internal_plan/getInternalPlan?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
                     branch_id: idFillter.idBranch != null ? idFillter.idBranch.value : null,
-                    start_date:
-                        idFillter?.valueDate?.startDate != null
-                            ? moment(idFillter?.valueDate?.startDate).format("DD/MM/YYYY")
-                            : null,
-                    end_date:
-                        idFillter?.valueDate?.endDate != null
-                            ? moment(idFillter?.valueDate?.endDate).format("DD/MM/YYYY")
-                            : null,
+                    start_date: idFillter?.valueDate?.startDate != null ? moment(idFillter?.valueDate?.startDate).format("DD/MM/YYYY") : null,
+                    end_date: idFillter?.valueDate?.endDate != null ? moment(idFillter?.valueDate?.endDate).format("DD/MM/YYYY") : null,
                 },
             },
             (err, response) => {
@@ -104,7 +108,6 @@ const Index = (props) => {
                         dataExcel: rResult,
                     }));
                     sTotalItems(output);
-                    sTotal(rTotal);
                     sOnFetching(false);
                 }
             }
@@ -136,20 +139,7 @@ const Index = (props) => {
     }, []);
 
     useEffect(() => {
-        if (
-            idFillter.idBranch != null ||
-            (idFillter.valueDate.startDate != null && idFillter.valueDate.endDate != null)
-        ) {
-            setTimeout(() => {
-                (idFillter.idBranch != null && sOnFetching(true)) ||
-                    (idFillter.valueDate.startDate != null &&
-                        idFillter.valueDate.endDate != null &&
-                        sOnFetching(true)) ||
-                    (keySearch && sOnFetching(true));
-            }, 300);
-        } else {
-            sOnFetching(true);
-        }
+        sOnFetching(true)
     }, [limit, idFillter.idBranch, idFillter.valueDate.endDate, idFillter.valueDate.startDate]);
 
     const onChangeFilter = (type) => (event) => sIdFillter((e) => ({ ...e, [type]: event }));
@@ -182,14 +172,11 @@ const Index = (props) => {
     };
 
     const handlePostStatus = (id, newStatus) => {
-        Axios(
-            "GET",
-            `/api_web/api_internal_plan/agree?id=${id}&status=${newStatus}&csrf_protection=true`,
+        Axios("GET", `/api_web/api_internal_plan/agree?id=${id}&status=${newStatus}&csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
                     let { isSuccess, message } = response.data;
-                    console.log("response", response);
                     if (isSuccess == 1) {
                         isShow("success", `${dataLang[message] || message}`);
                         handleQueryId({ status: false });
@@ -289,75 +276,81 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.internal_plan || "internal_plan"} </title>
             </Head>
-            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+            <Container>
                 {trangthaiExprired ? (
-                    <div className="p-4"></div>
+                    <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.internal_planEnd || "internal_planEnd"}
+                        </h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.internal_plan || "internal_plan"}</h6>
                     </div>
                 )}
-                <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
-                    <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-0.5 h-[96%] overflow-hidden">
-                            <div className="flex justify-between  mt-1 mr-2">
-                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                    {dataLang?.internal_plan || "internal_plan"}
-                                </h2>
-                                <div className="flex justify-end items-center">
-                                    <Link
-                                        href={routerInternalPlan.form}
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E]  via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >
-                                        {dataLang?.btn_new || "btn_new"}
-                                    </Link>
-                                </div>
+                <ContainerBody>
+                    <div className="space-y-3 h-[96%] overflow-hidden">
+                        <div className="flex justify-between  mt-1 mr-2">
+                            <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                {dataLang?.internal_plan || 'internal_plan'}
+                            </h2>
+                            <div className="flex justify-end items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (role || checkAdd) {
+                                            router.push(routerInternalPlan.form)
+                                        } else {
+                                            isShow("warning", WARNING_STATUS_ROLE);
+                                        }
+                                    }}
+                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                >
+                                    {dataLang?.branch_popup_create_new}
+                                </button>
                             </div>
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
-                                <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded-lg grid grid-cols-7 justify-between xl:p-3 p-2">
-                                        <div className="col-span-6">
-                                            <div className="grid grid-cols-5 gap-2">
-                                                <SearchComponent
-                                                    dataLang={dataLang}
-                                                    colSpan={1}
-                                                    onChange={handleOnChangeKeySearch.bind(this)}
-                                                />
-                                                <SelectComponent
-                                                    colSpan={1}
-                                                    options={[
-                                                        {
-                                                            value: "",
-                                                            label: dataLang?.price_quote_branch || "price_quote_branch",
-                                                            isDisabled: true,
-                                                        },
-                                                        ...listData.listBr,
-                                                    ]}
-                                                    onChange={onChangeFilter("idBranch")}
-                                                    value={idFillter.idBranch}
-                                                    placeholder={
-                                                        dataLang?.price_quote_select_branch ||
-                                                        "price_quote_select_branch"
-                                                    }
-                                                    hideSelectedOptions={false}
-                                                    isClearable={true}
-                                                    isSearchable={true}
-                                                    noOptionsMessage={() => "Không có dữ liệu"}
-                                                    closeMenuOnSelect={true}
-                                                />
-                                                <DatepickerComponent
-                                                    value={idFillter.valueDate}
-                                                    onChange={onChangeFilter("valueDate")}
-                                                    colSpan={1}
-                                                />
-                                            </div>
+                        </div>
+                        <ContainerTable>
+                            <div className="xl:space-y-3 space-y-2">
+                                <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-6 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="col-span-4">
+                                        <div className="grid grid-cols-9 gap-2">
+                                            <SearchComponent
+                                                dataLang={dataLang}
+                                                colSpan={3}
+                                                onChange={handleOnChangeKeySearch.bind(this)}
+                                            />
+                                            <SelectComponent
+                                                colSpan={3}
+                                                options={[
+                                                    {
+                                                        value: "",
+                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                        isDisabled: true,
+                                                    },
+                                                    ...listData.listBr,
+                                                ]}
+                                                onChange={onChangeFilter("idBranch")}
+                                                value={idFillter.idBranch}
+                                                placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
+                                                hideSelectedOptions={false}
+                                                isClearable={true}
+                                                isSearchable={true}
+                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                closeMenuOnSelect={true}
+                                            />
+                                            <DatepickerComponent
+                                                value={idFillter.valueDate}
+                                                onChange={onChangeFilter("valueDate")}
+                                                colSpan={3}
+                                            />
                                         </div>
-                                        <div className="col-span-1">
-                                            <div className="flex justify-end items-center gap-2">
-                                                <OnResetData sOnFetching={sOnFetching} />
-                                                <div>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <div className="flex justify-end items-center gap-2">
+                                            <OnResetData sOnFetching={sOnFetching} />
+                                            {(role == true || checkExport) ?
+                                                <div className={``}>
                                                     {listData.dataExcel?.length > 0 && (
                                                         <ExcelFileComponent
                                                             dataLang={dataLang}
@@ -367,206 +360,145 @@ const Index = (props) => {
                                                         />
                                                     )}
                                                 </div>
-                                                <div>
-                                                    <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
-                                                </div>
+                                                :
+                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                                    <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
+                                                </button>
+                                            }
+                                            <div>
+                                                <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] 3xl:h-[90%] 2xl:h-[87%] xl:h-[78%] lg:h-[90%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-9 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_day_vouchers || "import_day_vouchers"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_code_vouchers || "import_code_vouchers"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                {dataLang?.internal_plan_name || "internal_plan_name"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.internal_plan_status || "internal_plan_status"}
-                                            </h4>
-                                            {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.internal_plan_status || "internal_plan_status"}
-                                            </h4> */}
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.internal_plan_creators || "internal_plan_creators"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_branch || "import_branch"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.recall_noteChild || "recall_noteChild"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_action || "import_action"}
-                                            </h4>
-                                        </div>
-                                        {onFetching ? (
-                                            <Loading className="h-80" color="#0f4f9e" />
-                                        ) : listData.data?.length > 0 ? (
-                                            <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[900px]">
-                                                    {listData?.data?.map((e, index) => (
-                                                        <div
-                                                            className="relative  grid grid-cols-9 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                            key={e.id.toString()}
-                                                        >
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
-                                                                {e?.date != null
-                                                                    ? moment(e?.date).format("DD/MM/YYYY")
-                                                                    : ""}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
-                                                                <PopupDetail
-                                                                    dataLang={dataLang}
-                                                                    className="text-left"
-                                                                    name={e?.reference_no}
-                                                                    id={e?.id}
+                            </div>
+                            <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[87%] xl:h-[78%] lg:h-[90%] max:h-[400px]">
+                                <div className="w-full">
+                                    <HeaderTable gridCols={9}>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.import_day_vouchers || "import_day_vouchers"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.import_code_vouchers || "import_code_vouchers"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                            {dataLang?.internal_plan_name || "internal_plan_name"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.internal_plan_status || "internal_plan_status"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.internal_plan_creators || "internal_plan_creators"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.import_branch || "import_branch"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.recall_noteChild || "recall_noteChild"}
+                                        </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.import_action || "import_action"}
+                                        </ColumnTable>
+                                    </HeaderTable>
+                                    {onFetching ? (
+                                        <Loading className="h-80" color="#0f4f9e" />
+                                    ) : listData.data?.length > 0 ? (
+                                        <>
+                                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[900px]">
+                                                {listData?.data?.map((e, index) => (
+                                                    <RowTable key={e.id.toString()} gridCols={9}>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <PopupDetail
+                                                                dataLang={dataLang}
+                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer " name={e?.reference_no}
+                                                                id={e?.id}
+                                                            />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={'left'}>
+                                                            {e.plan_name}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="mx-auto">
+                                                            {e.status == "1" && (
+                                                                <BtnStatusApproved
+                                                                    onClick={() =>
+                                                                        handleQueryId({
+                                                                            id: e?.id,
+                                                                            status: true,
+                                                                            idChild: "0",
+                                                                        })
+                                                                    }
+                                                                    type="1"
                                                                 />
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
-                                                                {e.plan_name}
-                                                            </h6>
-                                                            <h6 className="col-span-1 mx-auto">
-                                                                {e.status == "1" && (
-                                                                    <div
-                                                                        onClick={() =>
-                                                                            handleQueryId({
-                                                                                id: e?.id,
-                                                                                status: true,
-                                                                                idChild: "0",
-                                                                            })
-                                                                        }
-                                                                        className="cursor-pointer 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 transition-all duration-300 ease-in-out text-green-500 hover:bg-green-500 hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
-                                                                    >
-                                                                        Đã Duyệt
-                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
-                                                                    </div>
-                                                                )}
-                                                                {e.status == "0" && (
-                                                                    <div
-                                                                        onClick={() =>
-                                                                            handleQueryId({
-                                                                                id: e?.id,
-                                                                                status: true,
-                                                                                idChild: "1",
-                                                                            })
-                                                                        }
-                                                                        className="cursor-pointer 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 transition-all duration-300 ease-in-out hover:text-white border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
-                                                                    >
-                                                                        Chưa Duyệt
-                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
-                                                                    </div>
-                                                                )}
-                                                            </h6>
-                                                            {/* <h6 className="3xl:text-base mx-auto 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                {index % 2 === 0 ? (
-                                                                    <span className="block font-normal text-orange-500  rounded-xl py-[1px] px-2 w-fit min-w-[136px] bg-orange-200 text-center text-[13px]">
-                                                                        {"Chưa lập KHNVL"}
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-[1px] px-2 w-fit min-w-[136px]  bg-lime-200 text-center text-[13px]">
-                                                                        <TickCircle
-                                                                            className="bg-lime-500 rounded-full"
-                                                                            color="white"
-                                                                            size={15}
-                                                                        />
-                                                                        {"Đã lập KHNVL"}
-                                                                    </span>
-                                                                )}
-                                                            </h6> */}
-
-                                                            <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
-                                                                <div className="relative">
-                                                                    <ModalImage
-                                                                        small={
-                                                                            e?.created_by_profile_image
-                                                                                ? e?.created_by_profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        large={
-                                                                            e?.created_by_profile_image
-                                                                                ? e?.created_by_profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        className="h-6 w-6 rounded-full object-cover "
-                                                                    >
-                                                                        <div className="">
-                                                                            <ImageErrors
-                                                                                src={e?.created_by_profile_image}
-                                                                                width={25}
-                                                                                height={25}
-                                                                                defaultSrc="/user-placeholder.jpg"
-                                                                                alt="Image"
-                                                                                className="object-cover  rounded-[100%] text-left cursor-pointer"
-                                                                            />
-                                                                        </div>
-                                                                    </ModalImage>
-                                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                                        </span>
-                                                                    </span>
-                                                                </div>
-                                                                <h6 className="capitalize">
-                                                                    {e?.created_by_full_name}
-                                                                </h6>
-                                                            </h6>
-
-                                                            <h6 className="col-span-1 w-fit mx-auto">
-                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
-                                                                    {e?.name_branch}
-                                                                </div>
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                {e.note}
-                                                            </h6>
-                                                            <div className="col-span-1 flex justify-center">
-                                                                <BtnAction
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    id={e?.id}
-                                                                    status={e?.status}
-                                                                    type="internal_plan"
-                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                            )}
+                                                            {e.status == "0" && (
+                                                                <BtnStatusApproved
+                                                                    onClick={() =>
+                                                                        handleQueryId({
+                                                                            id: e?.id,
+                                                                            status: true,
+                                                                            idChild: "1",
+                                                                        })
+                                                                    }
+                                                                    type="0"
                                                                 />
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <NoData />
-                                        )}
-                                    </div>
+                                                            )}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'} className="flex items-center space-x-1">
+                                                            <CustomAvatar profileImage={e?.created_by_profile_image} fullName={e?.created_by_full_name} />
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="mx-auto">
+                                                            <TagBranch className="w-fit">
+                                                                {e?.name_branch}
+                                                            </TagBranch>
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
+                                                            {e.note}
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={1} className="flex justify-center">
+                                                            <BtnAction
+                                                                onRefresh={_ServerFetching.bind(this)}
+                                                                dataLang={dataLang}
+                                                                id={e?.id}
+                                                                status={e?.status}
+                                                                type="internal_plan"
+                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                            />
+                                                        </RowItemTable>
+                                                    </RowTable>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <NoData />
+                                    )}
                                 </div>
-                            </div>
-                        </div>
-                        {listData.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center">
-                                <h6 className="">
-                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
-                                </h6>
-                                <Pagination
-                                    postsPerPage={limit}
-                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                                    paginate={paginate}
-                                    currentPage={router.query?.page || 1}
-                                />
-                            </div>
-                        )}
+                            </Customscrollbar>
+                        </ContainerTable>
                     </div>
-                </div>
-            </div>
+                    {listData.data?.length != 0 && (
+                        <ContainerPagination>
+                            <TitlePagination
+                                dataLang={dataLang}
+                                totalItems={totalItems?.iTotalDisplayRecords}
+                            />
+                            <Pagination
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page || 1}
+                            />
+                        </ContainerPagination>
+                    )}
+                </ContainerBody>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
-                nameModel={"salesOrder"}
+                nameModel={"internal_plan"}
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}

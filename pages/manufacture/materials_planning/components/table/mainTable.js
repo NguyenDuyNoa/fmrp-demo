@@ -12,7 +12,7 @@ import { useToggle } from "@/hooks/useToggle";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import FilterHeader from "../(filterHeader)/filterHeader";
+import FilterHeader from "../header/filterHeader";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 

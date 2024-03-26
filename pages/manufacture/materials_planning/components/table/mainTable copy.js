@@ -1530,11 +1530,9 @@ const MainTable = ({ dataLang }) => {
                                 <div
                                     key={e.id}
                                     onClick={() => handleFindDataTable(e.id)}
-                                    className={`py-2 pl-2 pr-3 ${
-                                        e.showParent && "bg-[#F0F7FF]"
-                                    } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${
-                                        dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
-                                    } `}
+                                    className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"
+                                        } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
+                                        } `}
                                 >
                                     <div className="flex justify-between">
                                         <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
@@ -1638,14 +1636,12 @@ const MainTable = ({ dataLang }) => {
                                         <button
                                             key={e.id}
                                             onClick={() => handleActiveTab(e.type)}
-                                            className={`hover:bg-[#F7FBFF] ${
-                                                isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
-                                            } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                            className={`hover:bg-[#F7FBFF] ${isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
+                                                } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
                                         >
                                             <h3
-                                                className={`py-[10px] px-2  font-normal ${
-                                                    isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
-                                                } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
+                                                className={`py-[10px] px-2  font-normal ${isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
+                                                    } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
                                             >
                                                 {e.name}
                                             </h3>

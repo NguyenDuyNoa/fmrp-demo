@@ -18,11 +18,20 @@ import ExpandableContent from "@/components/UI/more";
 import ImageErrors from "@/components/UI/imageErrors";
 import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
-
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 const PopupDetail = (props) => {
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
+
+    const [open, sOpen] = useState(false);
+
+    const dataSeting = useSetingServer();
+
+    const _ToggleModal = (e) => sOpen(e);
+
     const [onFetching, sOnFetching] = useState(false);
 
     useEffect(() => {
@@ -30,23 +39,15 @@ const PopupDetail = (props) => {
     }, [open]);
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
 
     const _ServerFetching_detailOrder = () => {
-        Axios(
-            "GET",
-            `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
+        Axios("GET", `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
                     let { data } = response?.data;
-                    console.log("db", data);
                     sData(data);
                 }
                 sOnFetching(false);
@@ -83,37 +84,15 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.internalPlans?.date != null
-                                                    ? moment(data?.internalPlans?.date).format("DD/MM/YYYY")
-                                                    : ""}
+                                                {data?.internalPlans?.date != null ? moment(data?.internalPlans?.date).format("DD/MM/YYYY") : ""}
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2 items-center">
                                             <h3 className=" text-[13px] font-medium">
-                                                {props?.dataLang?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="font-medium grid grid-cols-2">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="relative">
-                                                        <ImageErrors
-                                                            src={data?.internalPlans?.created_by_profile_image}
-                                                            width={25}
-                                                            height={25}
-                                                            defaultSrc="/user-placeholder.jpg"
-                                                            alt="Image"
-                                                            className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                        />
-                                                        <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <h6 className="capitalize">
-                                                        {data?.internalPlans?.created_by_full_name}
-                                                    </h6>
-                                                </div>
+                                                <CustomAvatar profileImage={data?.internalPlans?.created_by_profile_image} fullName={data?.internalPlans?.created_by_full_name} />
                                             </div>
                                         </div>
                                     </div>
@@ -150,14 +129,11 @@ const PopupDetail = (props) => {
                                                     {"Đã lập KHNVL"}
                                                 </span> */}
                                                 {data?.internalPlans.status == "1" && (
-                                                    <span className="border text-xs flex justify-center items-center rounded-2xl 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-[68px] 3xl:h-6 2xl:h-6 xl:h-5 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500">
-                                                        Đã Duyệt
-                                                    </span>
+                                                    <TagColorLime name={"Đã Duyệt"} />
                                                 )}
                                                 {data?.internalPlans.status == "0" && (
-                                                    <span className="border text-xs flex justify-center items-center rounded-2xl 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-[68px] 3xl:h-6 2xl:h-6 xl:h-5 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
-                                                        Chưa duyệt
-                                                    </span>
+
+                                                    <TagColorRed name={"Chưa Duyệt"} />
                                                 )}
                                             </h3>
                                         </div>
@@ -165,9 +141,9 @@ const PopupDetail = (props) => {
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
-                                            <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
+                                            <TagBranch className="w-fit">
                                                 {data?.internalPlans?.name_branch}
-                                            </h3>
+                                            </TagBranch>
                                         </div>
                                     </div>
                                 </div>

@@ -21,11 +21,11 @@ import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
-const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
+const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 
-const Header = dynamic(() => import("./(header)/header"), { ssr: false });
+const Header = dynamic(() => import("./components/header"), { ssr: false });
 
-const FilterHeader = dynamic(() => import("./(filterHeader)/filterHeader"), { ssr: false });
+const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
 
 const Index = (props) => {
     const dataLang = props.dataLang;

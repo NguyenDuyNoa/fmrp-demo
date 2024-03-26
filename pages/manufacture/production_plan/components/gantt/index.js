@@ -7,10 +7,10 @@ import { SearchNormal1 as IconSearch } from "iconsax-react";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 
-import formatNumber from "@/utils/helpers/formatnumber";
-import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import useToast from "@/hooks/useToast";
-
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
 const BodyGantt = ({
     handleShowSub,
     handleCheked,
@@ -33,12 +33,9 @@ const BodyGantt = ({
     const container2Ref = useRef();
     const container3Ref = useRef();
 
-    //chiều cao của mặt hàng 
+    const dataSeting = useSetingServer()
 
-    const heightItems = useRef(null)
-
-
-    const { getItem } = FnlocalStorage();
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
     const handleScroll = (e) => {
         const container1Element = container1Ref.current;
@@ -54,16 +51,12 @@ const BodyGantt = ({
         container3Ref.current.scrollTop = e.target.scrollTop;
     };
 
-    const tab = getItem("tab");
-
     const [checkCkecked, sCheckCkecked] = useState(false);
 
 
-    console.log("daaa", data);
     const divRefs = useRef([]);
-    const [heights, setHeights] = useState([]);
 
-    console.log("heights", heights);
+    const [heights, setHeights] = useState([]);
 
     useEffect(() => {
         const newHeights = divRefs.current.map(ref => ref?.offsetHeight);

@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import { v4 as uuid } from "uuid";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -14,19 +15,25 @@ import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
-import Pagination from "@/components/UI/pagination";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { debounce } from "lodash";
 
-const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import { useSelector } from "react-redux";
+import useActionRole from "@/hooks/useRole";
 
-const Header = dynamic(() => import("./(header)/header"), { ssr: false });
+const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 
-const FilterHeader = dynamic(() => import("./(filterHeader)/filterHeader"), { ssr: false });
+const Header = dynamic(() => import("./components/header"), { ssr: false });
+
+const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -79,13 +86,16 @@ const Index = (props) => {
 
     const { isValue, onChangeValue } = useChangeValue(initialValues);
 
-    const { limit, totalItems, updateTotalItems } = useLimitAndTotalItems(15, {});
+    const { limit, totalItems, updateTotalItems } = useLimitAndTotalItems();
+
+    const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
+
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'production_plans_fmrp');
+
 
     const [data, sData] = useState([]);
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `${router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"}`,
+        Axios("GET", `${router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"}`,
             {
                 params: {
                     page: router.query?.page || 1,
@@ -184,9 +194,7 @@ const Index = (props) => {
             }
         });
 
-        Axios(
-            "POST",
-            "/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true&term",
+        Axios("POST", "/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true&term",
             {
                 params: {
                     "filter[branch_id]": 0,
@@ -202,8 +210,7 @@ const Index = (props) => {
     };
 
     const _HandleSeachApi = debounce((inputValue) => {
-        Axios(
-            "POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+        Axios("POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
             {
                 params: {
                     "filter[branch_id]": 0,
@@ -221,35 +228,7 @@ const Index = (props) => {
             }
         );
     }, 500)
-    // let searchTimeout;
 
-    // const _HandleSeachApi = (inputValue) => {
-    //     if (inputValue == "") return;
-    //     else {
-    //         clearTimeout(searchTimeout);
-
-    //         searchTimeout = setTimeout(() => {
-    //             Axios(
-    //                 "POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
-    //                 {
-    //                     params: {
-    //                         "filter[branch_id]": 0,
-    //                     },
-    //                     data: {
-    //                         term: inputValue,
-    //                     },
-    //                 },
-    //                 (err, response) => {
-    //                     if (!err) {
-    //                         let { result } = response.data.data;
-
-    //                         updateData({ product: result });
-    //                     }
-    //                 }
-    //             );
-    //         }, 500);
-    //     }
-    // };
 
     const options = isData?.product?.map((e) => ({
         label: `${e.name}
@@ -434,8 +413,8 @@ const Index = (props) => {
             <Head>
                 <title>{"Kế hoạch sản xuất"}</title>
             </Head>
-            <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                {trangthaiExprired ? <div className="p-4"></div> : <Header {...shareProps} />}
+            <Container>
+                {trangthaiExprired ? <EmptyExprired /> : <Header {...shareProps} />}
                 <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
 
                 <BodyGantt
@@ -449,20 +428,20 @@ const Index = (props) => {
                 />
 
                 {data?.length > 0 && (
-                    <div className="flex space-x-5 items-center">
-                        <h6 className="">
-                            {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
-                            {totalItems?.iTotalRecords} {dataLang?.ingredient}
-                        </h6>
+                    <ContainerPagination className="flex space-x-5 items-center">
+                        <TitlePagination
+                            dataLang={dataLang}
+                            totalItems={totalItems?.iTotalDisplayRecords}
+                        />
                         <Pagination
                             postsPerPage={limit}
                             totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                             paginate={paginate}
                             currentPage={router.query?.page || 1}
                         />
-                    </div>
+                    </ContainerPagination>
                 )}
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

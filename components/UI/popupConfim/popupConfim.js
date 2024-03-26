@@ -270,7 +270,6 @@ const PopupConfim = (props) => {
                                         <Zoom className="w-1/2">
                                             <button
                                                 onClick={() => {
-                                                    console.log(role, checkAuth);
                                                     if (role) {
                                                         props.save()
                                                     } else if (checkAuth) {

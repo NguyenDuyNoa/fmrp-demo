@@ -1,23 +1,21 @@
+import React from "react";
 import Image from "next/image";
 import ModalImage from "react-modal-image";
-import { NumericFormat } from "react-number-format";
-
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import React from "react";
-import PopupEditer from "./popup";
 
+import { TickCircle as IconTick } from "iconsax-react";
+import formatNumber from "@/utils/helpers/formatnumber";
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
+
+
+import useToast from "@/hooks/useToast";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import useToast from "@/hooks/useToast";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import moment from "moment/moment";
-import { FnlocalStorage } from "@/utils/helpers/localStorage";
-import formatNumber from "@/utils/helpers/formatnumber";
-import { TickCircle as IconTick } from "iconsax-react";
+import { TagColorRed } from "@/components/UI/common/Tag/TagStatus";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
     const showToast = useToast();
     const { getItem } = FnlocalStorage();
@@ -157,9 +155,7 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                     {i?.bom == "1" ? (
                                         <IconTick className="text-green-500" />
                                     ) : (
-                                        <span className="bg-rose-200 py-1 px-1 rounded-xl 3xl:text-[10px] text-[9px] text-rose-500 border-rose-300 border">
-                                            Biến thể không có BOM
-                                        </span>
+                                        <TagColorRed name={'Biến thể không có BOM'} className={'w-fit truncate flex items-center'} />
                                     )}
                                 </h3>
                                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize ">
@@ -218,35 +214,37 @@ const Table = ({ data, isLoading, handleRemoveItem, handChangeTable }) => {
                                     {i?.stage == "1" ? (
                                         <IconTick className="text-green-500" />
                                     ) : (
-                                        <span className="bg-red-200 py-1 px-1 rounded-xl 3xl:text-[10px] text-[9px] text-red-500 border-red-300 border">
-                                            Không có CĐ
-                                        </span>
+                                        <TagColorRed name={'Không có CĐ'} className={'w-fit truncate flex items-center'} />
                                     )}
                                 </h3>
                                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
                                     {formatNumber(i?.quantityWarehouse)}
                                 </h3>
                                 <h3 className="text-[#64748B] py-2 text-center font-medium 3xl:text-sm text-xs capitalize">
-                                    <NumericFormat
+                                    <InPutNumericFormat
                                         className={`appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]
-                                        focus:outline-none border ${i?.quantityRemaining == null || i?.quantityRemaining == ""
+                                        focus:outline-none border ${i?.quantityRemaining == null || i?.quantityRemaining == "" || i?.quantityRemaining == 0
                                                 ? "border-red-500"
                                                 : "border-[#D8DAE5]"
                                             }  px-3 py-[7px] rounded-md`}
                                         value={i?.quantityRemaining}
-                                        allowNegative={false}
-                                        decimalScale={0}
-                                        thousandSeparator=","
                                         onValueChange={(e) => {
                                             handChangeTable(i.idParent, i.id, e?.value, "quantityRemaining");
                                         }}
                                         isAllowed={({ floatValue }) => {
-                                            if (floatValue == 0) {
+                                            if (floatValue < 0) {
                                                 showToast("error", `Số lượng cần phải lớn hơn 0.`);
                                                 return false;
                                             }
                                             return true;
                                         }}
+                                    // isAllowed={({ floatValue }) => {
+                                    //     if (floatValue == 0) {
+                                    //         showToast("error", `Số lượng cần phải lớn hơn 0.`);
+                                    //         return false;
+                                    //     }
+                                    //     return true;
+                                    // }}
                                     />
                                 </h3>
                                 <h3 className="text-[#64748B] col-span-2 py-2 text-center font-medium 3xl:text-sm text-xs capitalize">

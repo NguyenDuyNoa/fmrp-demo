@@ -1,6 +1,6 @@
 import Zoom from "components/UI/zoomElement/zoomElement";
 import Image from "next/image";
-import ModalFilter from "../(modealFilter)/modalFilter";
+import ModalFilter from "../modal/modalFilter";
 
 const Header = ({ isShow, handleIsShowFilter }) => {
     const data = [
@@ -12,7 +12,9 @@ const Header = ({ isShow, handleIsShowFilter }) => {
     return (
         <>
             <div className="flex items-center justify-between">
-                <h1 className="text-lg font-medium text-[#11315B]">Tổng quản sản xuất</h1>
+                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                    Tổng quản sản xuất
+                </h2>
                 {data.map((e, index) => (
                     <div key={index} className="flex gap-1 items-center">
                         <div className="h-[16px] w-[16px]">

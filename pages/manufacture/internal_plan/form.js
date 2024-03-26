@@ -1,12 +1,11 @@
 import Head from "next/head";
+import { debounce } from "lodash";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import Select, { components } from "react-select";
-import { NumericFormat } from "react-number-format";
 import React, { useState, useEffect } from "react";
 
 import { _ServerInstance as Axios } from "/services/axios";
@@ -15,16 +14,23 @@ import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-rea
 
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import Loading from "@/components/UI/loading";
+import { Container } from "@/components/UI/common/layout";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+
+
+import { SelectCore } from "@/utils/lib/Select";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 import { routerInternalPlan } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { debounce } from "lodash";
-
 const Index = (props) => {
     const initsFetching = {
         onFetching: false,
@@ -61,6 +67,8 @@ const Index = (props) => {
 
     const dataLang = props?.dataLang;
 
+    const dataSeting = useSetingServer()
+
     const trangthaiExprired = useStatusExprired();
 
     const isShow = useToast();
@@ -76,6 +84,10 @@ const Index = (props) => {
     const [errors, sErrors] = useState(initsErors);
 
     const [listData, sListData] = useState([]);
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting)
+    };
 
     const resetAllStates = () => {
         sIdChange(initsValue);
@@ -132,8 +144,7 @@ const Index = (props) => {
                                 idParenBackend: e?.id,
                                 matHang: {
                                     e: e,
-                                    label: `${e?.item_name} <span style={{display: none}}>${e?.code + e?.product_variation + e?.text_type + e?.unit_name
-                                        }</span>`,
+                                    label: `${e?.item_name} <span style={{display: none}}>${e?.code + e?.product_variation + e?.text_type + e?.unit_name}</span>`,
                                     value: e?.item_id,
                                 },
                                 unit: e?.unit_name,
@@ -164,9 +175,7 @@ const Index = (props) => {
     }, [fetChingData.onFetchingDetail]);
 
     const _ServerFetching_ItemsAll = () => {
-        Axios(
-            "POST",
-            "/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true&term",
+        Axios("POST", "/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true&term",
             {
                 params: {
                     "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
@@ -184,9 +193,7 @@ const Index = (props) => {
 
 
     const _HandleSeachApi = debounce((inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
+        Axios("POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
             {
                 params: {
                     "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
@@ -203,34 +210,6 @@ const Index = (props) => {
             }
         );
     }, 500)
-    // let searchTimeout;
-
-    // const _HandleSeachApi = (inputValue) => {
-    //     if (inputValue == "") return;
-    //     else {
-    //         clearTimeout(searchTimeout);
-    //         searchTimeout = setTimeout(() => {
-    //             Axios(
-    //                 "POST",
-    //                 `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
-    //                 {
-    //                     params: {
-    //                         "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
-    //                     },
-    //                     data: {
-    //                         term: inputValue,
-    //                     },
-    //                 },
-    //                 (err, response) => {
-    //                     if (!err) {
-    //                         let { result } = response.data.data;
-    //                         sDataSelect((e) => ({ ...e, dataItems: result }));
-    //                     }
-    //                 }
-    //             );
-    //         }, 500);
-    //     }
-    // };
 
     const handleSaveStatus = () => {
         isKeyState?.sDataSelect((e) => ({ ...e, dataItems: [] }));
@@ -338,10 +317,7 @@ const Index = (props) => {
         fetChingData.onFetchingItemsAll && _ServerFetching_ItemsAll();
     }, [fetChingData.onFetchingItemsAll]);
 
-    const formatNumber = (number) => {
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
-    };
+
 
     const _DataValueItem = (value) => {
         return {
@@ -557,31 +533,34 @@ const Index = (props) => {
                         : dataLang?.internal_plan_add || "internal_plan_add"}
                 </title>
             </Head>
-            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+            <Container className={'!h-auto'}>
+                {trangthaiExprired ? (
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.internal_planEnd || "internal_planEnd"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>
+                            {id
+                                ? dataLang?.internal_plan_edit || "internal_plan_edit"
+                                : dataLang?.internal_plan_add || "internal_plan_add"}
+                        </h6>
+                    </div>
+                )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
-                        <div className="p-2"></div>
-                    ) : (
-                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.internal_plan_edit || "internal_plan_edit"
-                                    : dataLang?.internal_plan_add || "internal_plan_add"}
-                            </h6>
-                        </div>
-                    )}
+
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {id
                                 ? dataLang?.internal_plan_edit || "internal_plan_edit"
                                 : dataLang?.internal_plan_add || "internal_plan_add"}
                         </h2>
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center mr-2">
                             <button
                                 onClick={() => router.push(routerInternalPlan.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
                             </button>
@@ -590,7 +569,7 @@ const Index = (props) => {
 
                     <div className=" w-full rounded">
                         <div className="">
-                            <h2 className="font-normal bg-[#ECF0F4] p-2">
+                            <h2 className="font-normal bg-[#ECF0F4] p-2 ">
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
@@ -646,7 +625,7 @@ const Index = (props) => {
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <Select
+                                    <SelectCore
                                         options={dataSelect.dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idChange.idBranch}
@@ -751,7 +730,7 @@ const Index = (props) => {
                     </div>
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
                         <div className="col-span-3">
-                            <Select
+                            <SelectCore
                                 options={options}
                                 value={null}
                                 onInputChange={_HandleSeachApi.bind(this)}
@@ -842,7 +821,7 @@ const Index = (props) => {
                                         <div key={e?.id?.toString()} className="grid grid-cols-12  my-1 items-center ">
                                             <div className="col-span-3 h-full ">
                                                 <div className="relative">
-                                                    <Select
+                                                    <SelectCore
                                                         options={options}
                                                         value={e?.matHang}
                                                         onInputChange={_HandleSeachApi.bind(this)}
@@ -909,7 +888,7 @@ const Index = (props) => {
                                                                 size="16"
                                                             />
                                                         </button>
-                                                        <NumericFormat
+                                                        <InPutNumericFormat
                                                             onValueChange={_HandleChangeChild.bind(
                                                                 this,
                                                                 e.id,
@@ -922,17 +901,14 @@ const Index = (props) => {
                                                                     e.quantity == 0)
                                                                 ? "border-b border-red-500"
                                                                 : "border-b border-gray-200"
-                                                                } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                                            allowNegative={false}
-                                                            decimalScale={0}
-                                                            isNumericString={true}
-                                                            thousandSeparator=","
-                                                            isAllowed={(values) => {
-                                                                const { value } = values;
-                                                                const newValue = +value;
-
-                                                                return true;
-                                                            }}
+                                                                }
+                                                                ${e.quantity == null ||
+                                                                    e.quantity == "" ||
+                                                                    e.quantity == 0
+                                                                    ? "border-b border-red-500"
+                                                                    : "border-b border-gray-200"}
+                                                                appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                            isAllowed={isAllowedNumber}
                                                         />
                                                         <button
                                                             className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
@@ -1057,7 +1033,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
@@ -1070,30 +1046,6 @@ const Index = (props) => {
         </React.Fragment>
     );
 };
-const MoreSelectedBadge = ({ items }) => {
-    const title = items.join(", ");
-    const length = items.length;
-    const label = `+ ${length}`;
-    // const label = ``;
 
-    return (
-        <div className="ml-auto bg-sky-500 rounded-md text-xs px-1 py-1 order-[99] text-white" title={title}>
-            {label}
-        </div>
-    );
-};
-
-const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 0;
-    const overflow = getValue()
-        .slice(maxToShow)
-        .map((x) => x.label);
-
-    return index < maxToShow ? (
-        <components.MultiValue {...props} />
-    ) : index === maxToShow ? (
-        <MoreSelectedBadge items={overflow} />
-    ) : null;
-};
 
 export default Index;
