@@ -28,6 +28,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
@@ -85,9 +86,7 @@ const Popup_chitiet = (props) => {
                     <div>
                         <div className="w-[1050px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang?.purchase_general || "purchase_general"}
-                                </h2>
+                                <GeneralInformation  {...props} />
                                 <div className="grid grid-cols-8  min-h-[140px] p-2">
                                     <div className="col-span-3">
                                         <div className="my-4 font-semibold grid grid-cols-2">
@@ -171,33 +170,33 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                    <div className="grid grid-cols-8 sticky top-0 bg-white  p-2 z-10 rounded shadow-md  ">
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                <div className="pr-2 w-[100%]">
+                                    <HeaderTablePopup gridCols={8}>
+                                        <ColumnTablePopup>
                                             {props.dataLang?.purchase_image || "purchase_image"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {props.dataLang?.purchase_items || "purchase_items"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {props.dataLang?.purchase_variant || "purchase_variant"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {props.dataLang?.purchase_unit || "purchase_unit"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {props.dataLang?.purchase_quantity || "purchase_quantity"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {"SL đã mua"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {"SL còn lại"}
-                                        </h4>
-                                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {props.dataLang?.purchase_note || "purchase_note"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTablePopup>
+                                    </HeaderTablePopup>
                                     {onFetching ? (
                                         <Loading
                                             className="max-h-28"
@@ -205,7 +204,7 @@ const Popup_chitiet = (props) => {
                                         />
                                     ) : data?.items?.length > 0 ? (
                                         <>
-                                            <Customscrollbar className="min-h-[90px] max-h-[200px] 2xl:max-h-[166px] overflow-y-auto overflow-x-hidden">
+                                            <Customscrollbar className="min-h-[150px] max-h-[200px] 2xl:max-h-[166px] overflow-y-auto overflow-x-hidden">
                                                 <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                                     {data?.items?.map((e) => (
                                                         <div

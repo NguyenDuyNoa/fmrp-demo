@@ -3,6 +3,7 @@ import Loading from "components/UI/loading";
 import { Map, IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
@@ -12,24 +13,23 @@ const TableDelivery = (props) => {
       <div className="w-[930px]">
         <Customscrollbar className="min:h-[200px] h-[72%] max:h-[400px] pb-2">
           <div className="pr-2 w-[100%] ">
-            <div className="grid grid-cols-12 items-center sticky top-0 bg-slate-100  z-10">
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-1  font-semibold text-center">
+            <HeaderTablePopup gridCols={5}>
+              <ColumnTablePopup>
                 {"STT"}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-2  font-semibold text-center">
-                {props?.dataLang.client_popup_devivelyName ||
-                  "client_popup_devivelyName"}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-2  font-semibold text-center">
-                {props.dataLang?.client_popup_phone}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-4 font-semibold text-center">
-                {props.dataLang?.client_popup_adress}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-3  font-semibold text-center">
-                {props.dataLang?.client_popup_devivelyAddres}
-              </h4>
-            </div>
+              </ColumnTablePopup>
+              <ColumnTablePopup>
+                {props?.dataLang.client_popup_devivelyName || "client_popup_devivelyName"}
+              </ColumnTablePopup>
+              <ColumnTablePopup>
+                {props.dataLang?.client_popup_phone || 'client_popup_phone'}
+              </ColumnTablePopup>
+              <ColumnTablePopup>
+                {props.dataLang?.client_popup_adress || 'client_popup_adress'}
+              </ColumnTablePopup>
+              <ColumnTablePopup>
+                {props.dataLang?.client_popup_devivelyAddres || 'client_popup_devivelyAddres'}
+              </ColumnTablePopup>
+            </HeaderTablePopup>
             {props.onFetching ? (
               <Loading className="h-80" color="#0f4f9e" />
             ) : props?.data?.clients_address_delivery?.length > 0 ? (

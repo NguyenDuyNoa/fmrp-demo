@@ -38,6 +38,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -92,9 +93,7 @@ const Popup_chitiet = (props) => {
                     <div>
                         <div className="w-[999px]">
                             <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]">
-                                <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
-                                </h2>
+                                <GeneralInformation  {...props} />
                                 <div className="grid grid-cols-8  min-h-[100px] px-2">
                                     <div className="col-span-3">
                                         <div className="my-4 font-semibold grid grid-cols-2">
@@ -192,47 +191,35 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className=" w-[100%] lx:w-[110%] ">
-                                    <div className="grid grid-cols-12 sticky top-0 bg-white shadow-lg  p-2 z-10 ">
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2  text-left">
-                                            {props.dataLang
-                                                ?.serviceVoucher_services_arising ||
-                                                "serviceVoucher_services_arising"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
+                                <div className=" w-[100%] ">
+                                    <HeaderTablePopup gridCols={12}>
+                                        <ColumnTablePopup colSpan={2} textAlign={"left"}>
+                                            {props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {/* {props.dataLang?.serviceVoucher_quantity ||
                           "serviceVoucher_quantity"} */}
                                             {"SL"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
-                                            {props.dataLang
-                                                ?.serviceVoucher_unit_price ||
-                                                "serviceVoucher_unit_price"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
+                                            {props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {"% CK"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2  text-center">
-                                            {props.dataLang
-                                                ?.import_from_price_affter ||
-                                                "import_from_price_affter"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
-                                            {props.dataLang
-                                                ?.serviceVoucher_tax ||
-                                                "serviceVoucher_tax"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2  text-center">
-                                            {props.dataLang
-                                                ?.serviceVoucher_into_money ||
-                                                "serviceVoucher_into_money"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2  text-center">
-                                            {props.dataLang
-                                                ?.serviceVoucher_note ||
-                                                "serviceVoucher_note"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2} >
+                                            {props.dataLang?.import_from_price_affter || "import_from_price_affter"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
+                                            {props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2} >
+                                            {props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
+                                            {props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}
+                                        </ColumnTablePopup>
+                                    </HeaderTablePopup>
                                     {onFetching ? (
                                         <Loading
                                             className="max-h-28"

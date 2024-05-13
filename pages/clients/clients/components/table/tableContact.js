@@ -4,6 +4,7 @@ import Loading from "components/UI/loading";
 import dynamic from "next/dynamic";
 import moment from "moment";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
@@ -13,26 +14,26 @@ const TableContact = (props) => {
       <div className="w-[930px]">
         <Customscrollbar className="min:h-[200px] h-[72%] max:h-[400px] pb-2">
           <div className="w-full">
-            <div className="flex items-center sticky top-0 bg-slate-100  z-10 ">
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[20%] font-[400] text-center">
+            <HeaderTablePopup gridCols={6}>
+              <ColumnTablePopup>
                 {props?.dataLang?.client_popup_detailName}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[20%] font-[400] text-center">
+              </ColumnTablePopup>
+              <ColumnTablePopup>
                 {props?.dataLang?.client_popup_phone}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[15%] font-[400] text-center">
+              </ColumnTablePopup>
+              <ColumnTablePopup>
                 {props?.dataLang?.client_popup_mail}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[10%] font-[400] text-center">
+              </ColumnTablePopup>
+              <ColumnTablePopup>
                 {props?.dataLang?.client_popup_position}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[15%] font-[400] text-center">
+              </ColumnTablePopup>
+              <ColumnTablePopup>
                 {props?.dataLang?.client_popup_birthday}
-              </h4>
-              <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase w-[20%] font-[400] text-center">
+              </ColumnTablePopup>
+              <ColumnTablePopup>
                 {props?.dataLang?.client_popup_adress}
-              </h4>
-            </div>
+              </ColumnTablePopup>
+            </HeaderTablePopup>
             {props?.onFetching ? (
               <Loading className="h-80" color="#0f4f9e" />
             ) : props?.data?.contact?.length > 0 ? (

@@ -31,6 +31,7 @@ import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -287,23 +288,23 @@ const Popup_chitiet = (props) => {
               <div className="w-[930px]">
                 <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] ">
-                    <div className="grid grid-cols-12 items-center sticky top-0 bg-slate-100 p-2 z-10">
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-3 font-[400] text-center">
+                    <HeaderTablePopup gridCols={12}>
+                      <ColumnTablePopup colSpan={3}>
                         {props.dataLang?.suppliers_supplier_fullname}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">
+                      </ColumnTablePopup>
+                      <ColumnTablePopup colSpan={2}>
                         {props.dataLang?.suppliers_supplier_phone}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">
+                      </ColumnTablePopup>
+                      <ColumnTablePopup colSpan={2}>
                         {props.dataLang?.suppliers_supplier_email}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-3 font-[400] text-center">
+                      </ColumnTablePopup>
+                      <ColumnTablePopup colSpan={3}>
                         {props.dataLang?.suppliers_supplier_pos}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">
+                      </ColumnTablePopup>
+                      <ColumnTablePopup colSpan={2}>
                         {props.dataLang?.suppliers_supplier_adress}
-                      </h4>
-                    </div>
+                      </ColumnTablePopup>
+                    </HeaderTablePopup>
                     {onFetching ? (
                       <Loading className="h-80" color="#0f4f9e" />
                     ) : data?.contact?.length > 0 ? (

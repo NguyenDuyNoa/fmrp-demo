@@ -27,6 +27,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useFeature from "@/hooks/useConfigFeature";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
@@ -362,36 +363,32 @@ const Popup_DetailKeepStock = (props) => {
                             </div>
                         </div>
                         <div className=" w-[100%]">
-                            <div
-                                className={`grid-cols-10 divide-x p-2 grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
-                            >
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                            <HeaderTablePopup gridCols={10} className={'!rounded-none'}>
+                                <ColumnTablePopup>
                                     {dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
-                                </h4>
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.inventory_vouchercode || "inventory_vouchercode"}
-                                </h4>
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.salesOrder_code_orders || "salesOrder_code_orders"}
-                                </h4>
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                    {dataLang?.warehouseTransfer_transferWarehouse ||
-                                        "warehouseTransfer_transferWarehouse"}
-                                </h4>
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                    {dataLang?.warehouseTransfer_receivingWarehouse ||
-                                        "warehouseTransfer_receivingWarehouse"}
-                                </h4>
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={2}>
+                                    {dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={2}>
+                                    {dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}
-                                </h4>
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.inventory_note || "inventory_note"}
-                                </h4>
-                                <h4 className="text-[13px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.salesOrder_action || "salesOrder_action"}
-                                </h4>
-                            </div>
+                                </ColumnTablePopup>
+                            </HeaderTablePopup>
                             {isFetching.onFetching ? (
                                 <Loading className="max-h-28" color="#0f4f9e" />
                             ) : dataClone?.transfer?.length > 0 ? (

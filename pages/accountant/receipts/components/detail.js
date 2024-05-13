@@ -12,6 +12,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
@@ -53,9 +54,7 @@ const Popup_chitiet = (props) => {
                     <div>
                         <div className="w-[530px]">
                             <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]  pb-1">
-                                <h2 className="font-semibold bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props.dataLang?.import_detail_info || "import_detail_info"}
-                                </h2>
+                                <GeneralInformation {...props} />
                                 <div className="min-h-[130px] px-2 bg-gray-50 ">
                                     <Customscrollbar className="grid grid-cols-2 space-x-4 3xl:max-h-[400px] xxl:max-h-[300px] 2xl:max-h-[350px] xl:max-h-[300px] lg:max-h-[280px] max-h-[300px]">
                                         <div className="col-span-1">
@@ -104,7 +103,6 @@ const Popup_chitiet = (props) => {
                                                     )) ||
                                                     (data?.type_vouchers === "order" && (
                                                         <TagColorMore color={'#22c55e'} backgroundColor={'#bbf7d0'} name={props.dataLang[data?.type_vouchers] || data?.type_vouchers} />
-
                                                     ))}
                                             </div>
                                         </div>
@@ -144,7 +142,7 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.payment_voucherCode || "payment_voucherCode"}
                                         </h3>
                                         <div className="flex flex-wrap col-span-3 gap-2 items-center justify-start font-medium">
-                                            {data?.voucher?.map((code, index) => (
+                                            {data?.voucher?.length > 0 && data?.voucher?.map((code, index) => (
                                                 <React.Fragment key={code?.id}>
                                                     {code.code}
                                                     {index !== data?.voucher.length - 1 && ", "}
@@ -157,18 +155,18 @@ const Popup_chitiet = (props) => {
                                 <h2 className="font-semibold bg-[#ECF0F4]  p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
                                     {props.dataLang?.receipts_info || "receipts_info"}
                                 </h2>
-                                <div className=" w-[100%] lx:w-[110%] ">
-                                    <div className={`grid-cols-5 grid sticky top-0  bg-white shadow-lg  z-10 rounded`}>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
+                                <div className=" w-[100%]">
+                                    <HeaderTablePopup gridCols={5} className={'!rounded-none'}>
+                                        <ColumnTablePopup>
                                             #
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2  text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.receipts_code || "receipts_code"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {props.dataLang?.receipts_money || "receipts_money"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTablePopup>
+                                    </HeaderTablePopup>
                                     {onFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.voucher?.length > 0 ? (

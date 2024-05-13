@@ -28,7 +28,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { SelectCore } from "@/utils/lib/Select";
-import { routerExportToOther } from "@/routers/manufacture";
+import { routerExportToOther, routerProductionWarehouse } from "@/routers/manufacture";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
 

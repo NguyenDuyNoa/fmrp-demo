@@ -2,7 +2,7 @@ import React from "react";
 import ButtoonDelete from "../button/buttonDelete";
 const FormContactInfo = ({ option, dataLang, onChangOptions, onDelete, children }) => {
     return (
-        <div className="w-[48%] bg-white shadow-lg rounded-xl mb-2 hover:scale-[1.01] hover:shadow-2xl transition-all duration-200 ease-linear">
+        <div className="w-[48%] bg-white shadow-lg rounded-xl mb-2">
             <div key={option.idFe?.toString()}>
                 <div className="w-full p-3 pt-0">
                     <div className="" key={option.idFe?.toString()}>

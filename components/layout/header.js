@@ -1215,7 +1215,7 @@ const Header = () => {
             </Dropdown> */}
                     </div>
                     <div className="flex 3xl:space-x-5 2xl:space-x-4 xl:space-x-3 lg:space-x-2  items-center">
-                        <a
+                        {/* <a
                             href="#"
                             title="Thông báo"
                             className="hover:scale-105 transition 3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px]   "
@@ -1231,7 +1231,7 @@ const Header = () => {
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
-                        </a>
+                        </a> */}
                         <form className="flex items-center relative">
                             <div className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] absolute left-3">
                                 <Image

@@ -36,6 +36,7 @@ import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -93,9 +94,7 @@ const Popup_chitiet = (props) => {
                     <div>
                         <div className="3xl:w-[1200px] 2xl:w-[1150px] w-[1100px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props.dataLang?.import_detail_info || "import_detail_info"}
-                                </h2>
+                                <GeneralInformation {...props} />
                                 <div className="grid grid-cols-9  min-h-[100px] px-2 items-center bg-zinc-50">
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -172,26 +171,23 @@ const Popup_chitiet = (props) => {
                                     </div>
                                 </div>
                                 <div className=" w-[100%]">
-                                    <div
-                                        className={`grid-cols-11  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
-                                    >
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
+                                    <HeaderTablePopup gridCols={11}>
+                                        <ColumnTablePopup colSpan={3}>
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                "productsWarehouse_warehouseLocaImport"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
+                                            {props.dataLang?.productsWarehouse_warehouseLocaImport || "productsWarehouse_warehouseLocaImport"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {"ĐVT"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.recall_revenueQty || "recall_revenueQty"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.import_from_note || "import_from_note"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTablePopup>
+                                    </HeaderTablePopup>
                                     {onFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (

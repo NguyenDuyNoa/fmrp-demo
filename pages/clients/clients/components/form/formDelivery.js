@@ -4,7 +4,7 @@ import ButtoonDelete from "../button/buttonDelete";
 import Link from "next/link";
 const FormContactDelivery = ({ optionDelivery, dataLang, onChangOptionsDelivery, onDelete, children }) => {
     return (
-        <div className="w-[48%] bg-white shadow-lg rounded-xl mb-3 hover:scale-[1.01] hover:shadow-2xl transition-all duration-200 ease-linear">
+        <div className="w-[48%] bg-white shadow-lg rounded-xl mb-3">
             <div className="p-3 pt-0" key={optionDelivery.idFe?.toString()}>
                 <label className="text-[#344054] font-normal text-sm mb-1 ">
                     {dataLang?.client_popup_devivelyName || "client_popup_devivelyName"}

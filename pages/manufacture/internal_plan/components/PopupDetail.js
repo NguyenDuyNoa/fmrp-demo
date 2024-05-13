@@ -23,6 +23,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const PopupDetail = (props) => {
     const [data, sData] = useState();
 
@@ -74,9 +75,7 @@ const PopupDetail = (props) => {
                     <div>
                         <div className="3xl:w-[1000px] 2xl:w-[900px] w-[900px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props.dataLang?.import_detail_info || "import_detail_info"}
-                                </h2>
+                                <GeneralInformation {...props} />
                                 <div className="grid grid-cols-9  min-h-[70px] px-2  bg-zinc-50">
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -148,25 +147,23 @@ const PopupDetail = (props) => {
                                     </div>
                                 </div>
                                 <div className=" w-[100%]">
-                                    <div
-                                        className={`grid-cols-12  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
-                                    >
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-4 text-center whitespace-nowrap">
+                                    <HeaderTablePopup gridCols={12}  >
+                                        <ColumnTablePopup colSpan={4}>
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {"ĐVT"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.import_from_quantity || "import_from_quantity"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.internal_plan_date || "internal_plan_date"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.import_from_note || "import_from_note"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTablePopup>
+                                    </HeaderTablePopup>
                                     {onFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.internalPlansItems?.length > 0 ? (

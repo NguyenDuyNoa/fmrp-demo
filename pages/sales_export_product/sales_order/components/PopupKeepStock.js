@@ -23,6 +23,7 @@ import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useFeature from "@/hooks/useConfigFeature";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
@@ -393,36 +394,35 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                             </div>
                         </div>
                         <div className="w-[100%] lx:w-[110%] ">
-                            <div className="grid grid-cols-13 items-center sticky rounded-t-xl top-0 bg-slate-100 p-2 z-10">
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-3 font-[500] text-center whitespace-nowrap">
+                            <HeaderTablePopup gridCols={13}>
+                                <ColumnTablePopup colSpan={3}>
                                     {dataLang?.price_quote_item || "price_quote_item"}
-                                </h4>
-
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.price_quote_from_unit || "price_quote_from_unit"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.price_quote_quantity || "price_quote_quantity"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.salesOrder_qty_delivered || "salesOrder_qty_delivered"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center ">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.salesOrder_qty_production || "salesOrder_qty_production"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.salesOrder_qty_kept || "salesOrder_qty_kept"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.salesOrder_qty_nedds_kept || "salesOrder_qty_nedds_kept"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-3 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={3}>
                                     {dataLang?.salesOrder_warehouse || "salesOrder_warehouse"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {dataLang?.salesOrder_action || "salesOrder_action"}
-                                </h4>
-                            </div>
+                                </ColumnTablePopup>
+                            </HeaderTablePopup>
                             {isFetching.onFetching ? (
                                 <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (

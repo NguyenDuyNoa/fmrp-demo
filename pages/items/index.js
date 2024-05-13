@@ -54,6 +54,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -795,22 +796,21 @@ const Popup_ThongTin = React.memo((props) => {
                             <React.Fragment>
                                 {list?.variation?.length > 0 ? (
                                     <div className="space-y-2 min-h-[384px]">
-                                        <div
-                                            className={`${list?.variation[1] ? "grid-cols-3" : "grid-cols-2"
-                                                } grid gap-2 px-2 py-1 `}
+                                        <HeaderTablePopup
+                                            gridCols={list?.variation[1] ? 3 : 2}
                                         >
-                                            <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
+                                            <ColumnTablePopup>
                                                 Hình đại diện
-                                            </h5>
-                                            <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]">
+                                            </ColumnTablePopup>
+                                            <ColumnTablePopup>
                                                 {list?.variation[0]?.name}
-                                            </h5>
+                                            </ColumnTablePopup>
                                             {list?.variation[1] && (
-                                                <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]">
+                                                <ColumnTablePopup>
                                                     {list?.variation[1]?.name}
-                                                </h5>
+                                                </ColumnTablePopup>
                                             )}
-                                        </div>
+                                        </HeaderTablePopup>
                                         <ScrollArea
                                             className="min-h-[400px] max-h-[450px]"
                                             speed={1}
@@ -845,14 +845,14 @@ const Popup_ThongTin = React.memo((props) => {
                                                                 />
                                                             )}
                                                         </div>
-                                                        <h6 className="px-2 xl:text-base text-xs self-center">
+                                                        <h6 className="px-2 xl:text-base text-xs self-center text-center">
                                                             {e?.name}
                                                         </h6>
                                                         {e?.variation_option_2?.length > 0 && (
                                                             <div className="self-center space-y-0.5">
                                                                 {e?.variation_option_2?.map((ce) => (
                                                                     <React.Fragment key={ce.id?.toString()}>
-                                                                        <h6 className="px-2 xl:text-base text-xs">
+                                                                        <h6 className="px-2 xl:text-base text-xs  text-center">
                                                                             {ce.name}
                                                                         </h6>
                                                                     </React.Fragment>

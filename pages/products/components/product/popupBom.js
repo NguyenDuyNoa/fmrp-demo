@@ -25,6 +25,7 @@ import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Popup_Bom = React.memo((props) => {
     const scrollAreaRef = useRef(null);
 
@@ -641,29 +642,26 @@ const Popup_Bom = React.memo((props) => {
                             </div>
                         )}
                         <div className="space-y-1 -pt-5">
-                            <div className="grid grid-cols-13 w-full items-center bg-slate-100 p-2 z-10">
-                                {/* <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-1 font-[400] text-center">
-                  {props.dataLang?.no || "no"}
-                </h4> */}
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-4 font-[400]">
+                            <HeaderTablePopup gridCols={13}>
+                                <ColumnTablePopup colSpan={4}>
                                     {props.dataLang?.bom_name_finishedProduct}
-                                </h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-2 font-[400] text-center">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={2}>
                                     {props.dataLang?.unit}
-                                </h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-2 font-[400] text-left">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={2} textAlign={'left'}>
                                     {props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}
-                                </h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-2 font-[400] text-left">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={2} textAlign={'left'}>
                                     %{props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
-                                </h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-2 font-[400] text-left">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={2} textAlign={'left'}>
                                     {props.dataLang?.stage_usage_finishedProduct || "stage_usage_finishedProduct"}
-                                </h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-1 font-[400] text-center">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.branch_popup_properties || "branch_popup_properties"}
-                                </h4>
-                            </div>
+                                </ColumnTablePopup>
+                            </HeaderTablePopup>
                             <Customscrollbar
                                 className="max-h-[250px]"
                             >

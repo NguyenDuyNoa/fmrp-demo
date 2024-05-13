@@ -14,6 +14,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -95,10 +96,7 @@ const Popup_chitiet = (props) => {
                     <div>
                         <div className="3xl:w-[1250px] 2xl:w-[1100px] w-[1050px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                <h2 className="font-medium bg-[#ECF0F4] p-2">
-                                    {props?.dataLang?.purchase_general ||
-                                        "purchase_general"}
-                                </h2>
+                                <GeneralInformation {...props} />
                                 <div className="grid grid-cols-13 gap-2  min-h-[110px] p-2">
                                     <div className="col-span-3">
                                         <div className="my-4 font-medium grid grid-cols-2">
@@ -215,53 +213,36 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                    <div
-                                        className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10 items-center`}
-                                    >
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-3 text-center whitespace-nowrap">
-                                            {props.dataLang?.inventory_items ||
-                                                "inventory_items"}
-                                        </h4>
-
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-1 text-center whitespace-nowrap">
+                                <div className="pr-2 w-[100%]">
+                                    <HeaderTablePopup gridCols={14} >
+                                        <ColumnTablePopup colSpan={3}>
+                                            {props.dataLang?.inventory_items || "inventory_items"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
                                             {"Kho - VTK"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang?.inventory_unit ||
-                                                "inventory_unit"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.inventory_unit_price ||
-                                                "inventory_unit_price"}
-                                        </h4>
-
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-1 text-center">
-                                            {props.dataLang
-                                                ?.inventory_qty_inventory ||
-                                                "inventory_qty_inventory"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.inventory_actual_quantity ||
-                                                "inventory_actual_quantity"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.inventory_qty_difference ||
-                                                "inventory_qty_difference"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.inventory_qty_into_money ||
-                                                "inventory_qty_into_money"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang?.inventory_handle ||
-                                                "inventory_handle"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
+                                            {props.dataLang?.inventory_unit || "inventory_unit"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
+                                            {props.dataLang?.inventory_unit_price || "inventory_unit_price"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
+                                            {props.dataLang?.inventory_qty_inventory || "inventory_qty_inventory"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
+                                            {props.dataLang?.inventory_actual_quantity || "inventory_actual_quantity"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
+                                            {props.dataLang?.inventory_qty_difference || "inventory_qty_difference"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
+                                            {props.dataLang?.inventory_qty_into_money || "inventory_qty_into_money"}
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>
+                                            {props.dataLang?.inventory_handle || "inventory_handle"}
+                                        </ColumnTablePopup>
+                                    </HeaderTablePopup>
                                     {onFetching ? (
                                         <Loading
                                             className="max-h-28"
@@ -275,7 +256,7 @@ const Popup_chitiet = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
                                                         <div
-                                                            className="grid grid-cols-13 hover:bg-slate-50 items-center border-b"
+                                                            className="grid grid-cols-14 hover:bg-slate-50 items-center border-b"
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
@@ -401,7 +382,7 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
                                                                 {formatNumber(e?.price)}
                                                             </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
+                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center break-words">
                                                                 {formatNumber(
                                                                     e?.quantity
                                                                 )}

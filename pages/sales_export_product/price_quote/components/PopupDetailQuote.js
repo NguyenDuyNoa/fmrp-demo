@@ -26,6 +26,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 
 
@@ -92,9 +93,7 @@ const PopupDetailQuote = (props) => {
 
                 <div className="3xl:w-[1200px] 2xl:w-[1100px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
                     <div className="overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
-                        <h2 className="font-normal bg-[#ECF0F4] 3xl:p-2 p-1 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
-                            {props?.dataLang?.detail_general_information || "detail_general_information"}
-                        </h2>
+                        <GeneralInformation  {...props} />
                         <div className="grid grid-cols-12 min-h-[100px]">
                             <div className="col-span-4">
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
@@ -181,42 +180,42 @@ const PopupDetailQuote = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="pr-2 w-[100%] lx:w-[110%] ">
-                            <div className="grid grid-cols-12 items-center sticky rounded-t-xl top-0 bg-slate-100 p-2 z-10">
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                        <div className="pr-2 w-full">
+                            <HeaderTablePopup gridCols={12} display="grid">
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_image || "price_quote_image"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_item || "price_quote_item"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-2 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup colSpan={2}>
                                     {props.dataLang?.price_quote_variant || "price_quote_variant"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_from_unit || "price_quote_from_unit"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_quantity || "price_quote_quantity"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_unit_price || "price_quote_unit_price"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_person || "price_quote_person"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_after_discount || "price_quote_after_discount"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_tax || "price_quote_tax"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_into_money || "price_quote_into_money"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
+                                </ColumnTablePopup>
+                                <ColumnTablePopup>
                                     {props.dataLang?.price_quote_note_item || "price_quote_note_item"}
-                                </h4>
-                            </div>
+                                </ColumnTablePopup>
+                            </HeaderTablePopup>
                             {loading ? (
                                 <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (

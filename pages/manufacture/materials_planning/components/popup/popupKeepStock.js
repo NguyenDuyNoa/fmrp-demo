@@ -1,0 +1,657 @@
+import { useEffect, useState } from "react";
+
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import PopupEdit from "@/components/UI/popup";
+import useToast from "@/hooks/useToast";
+import Image from "next/image";
+import DatePicker from "react-datepicker";
+import { BsCalendarEvent } from "react-icons/bs";
+import { Controller, useForm } from "react-hook-form";
+import { MdClear } from "react-icons/md";
+import NoData from "@/components/UI/noData/nodata";
+import ModalImage from "react-modal-image";
+import { v4 as uuidv4 } from "uuid";
+import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import useSetingServer from "@/hooks/useConfigNumber";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import useFeature from "@/hooks/useConfigFeature";
+const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }) => {
+    const [open, sOpen] = useState(false);
+
+    const isShow = useToast();
+
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+
+    const _ToggleModal = (e) => sOpen(e);
+
+    const initialState = {
+        onFetching: false,
+        formData: [
+            {
+                id: uuidv4(),
+                item: {
+                    name: "Chỉ đen test",
+                    type: "material",
+                    image: null
+
+                },
+                unit: 'Cái',
+                //sl cần
+                quantityNeed: 10,
+                // sl giữ
+                quantityKept: 10,
+                // sl tồn
+                quantityInventory: 10,
+                warehouse: [
+                    {
+                        id: uuidv4(),
+                        label: "Kho giữ test",
+                        value: 10
+                    },
+                    {
+                        id: uuidv4(),
+                        label: "Kho 1",
+                        value: 1
+                    }
+                ],
+
+                valueWarehouse: null,
+                warehouseLocation: [
+                    {
+                        id: uuidv4(),
+                        label: 'Vị trí 1',
+                        value: "10",
+                        qty: 10,
+                        show: false,
+                        serial: null,
+                        lot: null,
+                        expiration_date: null,
+                    },
+                    {
+                        id: uuidv4(),
+                        label: 'Vị trí 2',
+                        value: "10",
+                        qty: 10,
+                        show: false,
+                        serial: null,
+                        lot: null,
+                        expiration_date: null,
+                    }
+                ],
+                valueLocation:
+                    []
+
+            },
+            {
+                id: uuidv4(),
+                item: {
+                    name: "Chỉ đen",
+                    type: "material",
+                    image: null
+
+                },
+                unit: 'Cái',
+                //sl cần
+                quantityNeed: 10,
+                // sl giữ
+                quantityKept: 10,
+                // sl tồn
+                quantityInventory: 10,
+                warehouse: [
+                    {
+                        id: uuidv4(),
+                        label: "Kho giữ",
+                        value: 10
+                    },
+                    {
+                        id: uuidv4(),
+                        label: "Kho 1",
+                        value: 1
+                    }
+                ],
+                valueWarehouse: null,
+                warehouseLocation: [
+                    {
+                        id: uuidv4(),
+                        label: 'Vị trí 1',
+                        value: "10",
+                        qty: 10,
+                        show: false,
+                        serial: null,
+                        lot: null,
+                        expiration_date: null,
+                    },
+                    {
+                        id: uuidv4(),
+                        label: 'Vị trí 2',
+                        value: "10",
+                        qty: 10,
+                        show: false,
+                        serial: null,
+                        lot: null,
+                        expiration_date: null,
+                    }
+                ],
+                valueLocation:
+                    []
+
+            }
+        ],
+        type: [
+            {
+                id: uuidv4(),
+                label: "Thành phẩm",
+                value: "product",
+            },
+            {
+                id: uuidv4(),
+                label: "Nguyên vật liệu",
+                value: "material",
+            }
+        ]
+    }
+
+    const dataSeting = useSetingServer()
+
+    const [isState, sIsState] = useState(initialState);
+
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
+
+    const shhowToat = useToast();
+
+    const form = useForm({
+        defaultValues: {
+            date: new Date(),
+            note: '',
+            type: 'material',
+            arrayItem: []
+        }
+    });
+
+    const valuesForm = form.watch()
+
+    const onSubmit = async (e) => {
+        if (e.arrayItem.length == 0) {
+            return shhowToat('error', 'Không có mặt hàng cần giữ kho. VUi lòng thêm mặt hàng')
+        }
+    }
+
+    useEffect(() => {
+        if (open) {
+            form.setValue('arrayItem', isState.formData)
+            return
+        }
+        form.reset()
+    }, [open])
+
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    }
+
+    const removeItem = (id) => {
+        const updatedData = form.getValues("arrayItem").filter((item) => item.id !== id);
+        form.setValue("arrayItem", updatedData);
+        queryState({ formData: updatedData });
+    };
+
+
+    const handleShow = (idParent, idChild) => {
+        const newData = isState.formData?.map((e) => {
+            if (e?.id == idParent) {
+                return {
+                    ...e,
+                    warehouseLocation: e.warehouseLocation?.map((i) => {
+                        if (i.id == idChild) {
+                            return {
+                                ...i,
+                                show: !i.show,
+                            };
+                        }
+                        return i;
+                    })
+                }
+            }
+            return e;
+        })
+        queryState({ formData: newData });
+    };
+
+
+    useEffect(() => {
+        if (open) {
+            console.log("valuesForm.type", valuesForm.type);
+        }
+    }, [valuesForm.type])
+
+    return (
+        <>
+            <PopupEdit
+                title={'Giữ kho nguyên vật liệu'}
+                button={
+                    <button
+                        className=" bg-[#F3F4F6] rounded-lg  outline-none focus:outline-none"
+                        onClick={() => {
+                            if (+dataTable?.countAll == 0) {
+                                return isShow('error', 'Vui lòng thêm kế hoạch sản xuất')
+                            }
+                            _ToggleModal(true)
+                        }}
+                    >
+                        <div className="flex items-center gap-2 py-2 px-3 ">
+                            <Image height={16} width={16} src={icon} className="object-cover" />
+                            <h3 className="text-[#141522] font-medium 3xl:text-base text-xs">
+                                {title}
+                            </h3>
+                        </div>
+                    </button>
+                }
+                open={open}
+                onClose={_ToggleModal.bind(this, false)}
+                classNameBtn={className}
+            >
+                <div className="mt-4">
+                    <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-4 flex flex-col">
+                            <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
+                                Ngày giữ kho  <span className=" text-red-500">*</span>
+                            </div>
+                            <Controller
+                                name="date"
+                                control={form.control}
+                                rules={{
+                                    required: {
+                                        value: true,
+                                        message: 'Vui lòng chọn ngày giữ kho'
+                                    }
+                                }}
+                                render={({ field, fieldState }) => {
+                                    return (
+                                        <>
+                                            <div className="custom-date-picker flex flex-row  relative">
+                                                <DatePicker
+                                                    {...field}
+                                                    ref={(ref) => {
+                                                        if (ref !== null) {
+                                                            field.ref({
+                                                                focus: ref.setFocus
+                                                            });
+                                                        }
+                                                    }}
+                                                    fixedHeight
+                                                    id={field.name}
+                                                    showTimeSelect
+                                                    selected={field.value}
+                                                    placeholderText="DD/MM/YYYY HH:mm:ss"
+                                                    dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                                    timeInputLabel={"Time: "}
+                                                    className={`border ${fieldState.error ? 'border-red-500' : 'border-[#d0d5dd]'} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                                />
+                                                {
+                                                    field.value && (
+                                                        <>
+                                                            <MdClear
+                                                                className="absolute right-10 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                                onClick={() => form.setValue('date', null)}
+                                                            />
+                                                        </>
+                                                    )
+                                                }
+                                                <BsCalendarEvent className="absolute right-5 top-1/2 -translate-y-1/2 text-[#CCCCCC] scale-110 cursor-pointer" />
+                                            </div >
+                                            {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
+                                        </>
+                                    )
+                                }}
+                            />
+                            <Controller
+                                name="type"
+                                control={form.control}
+                                render={({ field }) => {
+                                    return (
+                                        <div className="mt-6 flex items-centerem gap-8">
+                                            {isState.type.map((e) => {
+                                                return (
+                                                    <div className="flex items-center cursor-pointer">
+                                                        <input
+                                                            id={e.value}
+                                                            type="radio"
+                                                            {...field}
+                                                            checked={field.value === e.value}
+                                                            onChange={() => field.onChange(e.value)}
+                                                            className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500  focus:ring-2"
+                                                        />
+                                                        <label
+                                                            htmlFor={e.value}
+                                                            className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
+                                                        >
+                                                            {e.label}
+                                                        </label>
+                                                    </div >
+                                                )
+                                            })}
+                                        </div>
+                                    )
+                                }}
+                            />
+                        </div>
+                        <div className="col-span-8">
+                            <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
+                                {dataLang?.sales_product_note || "sales_product_note"}
+                            </div>
+                            <Controller
+                                name="note"
+                                control={form.control}
+                                render={({ field, fieldState }) => {
+                                    return (
+                                        <textarea
+                                            {...field}
+                                            placeholder={dataLang?.sales_product_note || "sales_product_note"}
+                                            name="fname"
+                                            type="text"
+                                            className="focus:border-[#92BFF7] border-[#d0d5dd] resize-none placeholder:text-slate-300 w-full min-h-[100px] max-h-[100px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
+                                        />
+                                    )
+                                }}
+                            />
+                        </div>
+                    </div >
+                    <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
+                        <HeaderTablePopup gridCols={13}>
+                            <ColumnTablePopup colSpan={3}>
+                                {dataLang?.price_quote_item || "price_quote_item"}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {dataLang?.price_quote_from_unit || "price_quote_from_unit"}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {'SL Cần'}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {'SL Đã giữ'}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {"SL tồn kho"}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup colSpan={2}>
+                                {dataLang?.salesOrder_warehouse || "salesOrder_warehouse"}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup colSpan={3}>
+                                {'Vị trí kho'}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {'Thao tác'}
+                            </ColumnTablePopup>
+                        </HeaderTablePopup>
+                        {isState.onFetching ? (
+                            <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
+                        ) : isState.formData?.length > 0 ? (
+                            <>
+                                <Customscrollbar
+                                    className="min-h-[300px] max-h-[300px] overflow-hidden"
+                                >
+                                    <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
+                                        {isState.formData?.map((e, index) => (
+                                            <div
+                                                className="grid items-center grid-cols-13 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
+                                                key={e?.id?.toString()}
+                                            >
+                                                <h6 className="text-[13px] font-medium py-1 col-span-3 text-left">
+                                                    <div className="flex items-center gap-2">
+                                                        <div>
+                                                            {e?.item.image != null ? (
+                                                                <ModalImage
+                                                                    small={e?.item.image}
+                                                                    large={e?.item.image}
+                                                                    alt="Product Image"
+                                                                    className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-[50px] h-[50px] object-cover  mx-auto">
+                                                                    <ModalImage
+                                                                        small="/no_img.png"
+                                                                        large="/no_img.png"
+                                                                        className="w-full h-full rounded object-contain p-1"
+                                                                    ></ModalImage>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                {e?.item?.name}
+                                                            </h6>
+                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                {e?.item.type}
+                                                            </h6>
+                                                        </div>
+                                                    </div>
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                    {e?.unit}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                    {formatNumber(e?.quantityNeed)}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                    {formatNumber(e?.quantityKept)}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                    {formatNumber(e?.quantityInventory)}
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
+                                                    <Controller
+                                                        name={`arrayItem.${index}.valueWarehouse`}
+                                                        control={form.control}
+                                                        rules={{
+                                                            required: {
+                                                                value: true,
+                                                                message: 'Vui lòng chọn kho'
+                                                            }
+                                                        }}
+                                                        render={({ field, fieldState }) => {
+                                                            const arrWareHouse = isState.formData.find(x => x.id == e.id).warehouse
+                                                            return (
+                                                                <>
+                                                                    <SelectComponent
+                                                                        className={`${fieldState.error ? 'border-red-500' : 'border-gray-400'} border  rounded`}
+                                                                        isClearable={true}
+                                                                        placeholder={dataLang?.salesOrder_select_warehouse || "salesOrder_select_warehouse"}
+                                                                        options={arrWareHouse}
+                                                                        formatOptionLabel={(option) => (
+                                                                            <div className="flex justify-start items-center gap-1 z-[99]">
+                                                                                <h2>{option?.label}</h2>
+                                                                                <h2>{`(${option?.value})`}</h2>
+                                                                            </div>
+                                                                        )}
+                                                                        {...field}
+                                                                        onValueChange={(event) =>
+                                                                            field.onChange({
+                                                                                newValue: event,
+                                                                                ...e
+                                                                            })
+                                                                        }
+
+                                                                        value={field.value?.newValue}
+                                                                        maxMenuHeight={150}
+                                                                    />
+                                                                    {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
+                                                                </>
+                                                            )
+                                                        }}
+                                                    />
+
+                                                </h6>
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-3 flex gap-2  rounded-md text-center break-words">
+                                                    <Controller
+                                                        name={`arrayItem.${index}.valueLocation`}
+                                                        control={form.control}
+                                                        render={({ field, fieldState }) => {
+                                                            const arrWareHouse = isState.formData.find(x => x.id == e.id).warehouseLocation
+                                                            return (
+                                                                arrWareHouse.map((x, Iindex) => {
+                                                                    return (
+                                                                        <Controller
+                                                                            name={`arrayItem.${index}.valueLocation.${Iindex}`}
+                                                                            control={form.control}
+                                                                            rules={{
+                                                                                required: {
+                                                                                    value: x.show,
+                                                                                    message: 'Nhập số lượng'
+                                                                                }
+                                                                            }}
+                                                                            render={({ field, fieldState }) => {
+                                                                                return (
+                                                                                    <div
+                                                                                        key={x.id}
+                                                                                        className="w-full grid grid-cols-1 items-start z-[99]"
+                                                                                    >
+                                                                                        <Zoom>
+                                                                                            <div
+                                                                                                onClick={() => handleShow(e.id, x.id)}
+                                                                                                className={`border-gray-400  w-full text-[10px] font-medium bg-white hover:bg-gray-100 transition-all ease-in-out  border rounded-2xl py-1 px-2 flex items-center gap-1`}
+                                                                                            >
+                                                                                                <div>
+                                                                                                    {x.show ? (
+                                                                                                        <TickCircle
+                                                                                                            className="bg-blue-600 rounded-full "
+                                                                                                            color="white"
+                                                                                                            size={15}
+                                                                                                        />
+                                                                                                    ) : (
+                                                                                                        <div className="h-4 w-4 rounded-full bg-transparent border border-gray-300" />
+                                                                                                    )}
+                                                                                                </div>
+                                                                                                <div className="flex flex-col items-start jus">
+                                                                                                    <h3>
+                                                                                                        {x.label} -
+                                                                                                        <span className="text-blue-500 pl-1">
+                                                                                                            {x.value}
+                                                                                                        </span>
+                                                                                                    </h3>
+                                                                                                    <div className="flex items-center font-oblique flex-wrap">
+                                                                                                        {dataProductSerial.is_enable === "1" ? (
+                                                                                                            <div className="flex gap-0.5">
+                                                                                                                <h6 className="text-[8px]">
+                                                                                                                    Serial:
+                                                                                                                </h6>
+                                                                                                                <h6 className="text-[9px] px-1  w-[full] text-left ">
+                                                                                                                    {x.serial == null || x.serial == "" ? "-" : x?.serial}
+                                                                                                                </h6>
+                                                                                                            </div>
+                                                                                                        ) : (
+                                                                                                            ""
+                                                                                                        )}
+                                                                                                        {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                                                                            <>
+                                                                                                                <div className="flex gap-0.5">
+                                                                                                                    <h6 className="text-[8px]">
+                                                                                                                        Lot:
+                                                                                                                    </h6>{" "}
+                                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-left ">
+                                                                                                                        {x.lot == null || x.lot == "" ? "-" : x?.lot}
+                                                                                                                    </h6>
+                                                                                                                </div>
+                                                                                                                <div className="flex gap-0.5">
+                                                                                                                    <h6 className="text-[8px]">
+                                                                                                                        Date:
+                                                                                                                    </h6>{" "}
+                                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-center ">
+                                                                                                                        {x?.expiration_date ? moment(x?.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                                                    </h6>
+                                                                                                                </div>
+                                                                                                            </>
+                                                                                                        ) : (
+                                                                                                            ""
+                                                                                                        )}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                        </Zoom>
+                                                                                        {
+                                                                                            x.show &&
+                                                                                            <InPutNumericFormat
+                                                                                                className={`py-1 px-2 my-1 ${fieldState.error ? 'border-red-500' : 'border-gray-400'}  border outline-none rounded-3xl w-full`}
+                                                                                                {...field}
+                                                                                                onChange={(event) =>
+                                                                                                    field.onChange({
+                                                                                                        newValue: event.target.value,
+                                                                                                        ...x
+                                                                                                    })
+                                                                                                }
+                                                                                                value={field.value?.newValue}
+                                                                                                isAllowed={(values) => {
+                                                                                                    const { floatValue, value } = values;
+                                                                                                    if (floatValue == 0) {
+                                                                                                        return true;
+                                                                                                    }
+                                                                                                    if (floatValue < 0) {
+                                                                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                                                        return false
+                                                                                                    }
+                                                                                                    return true
+                                                                                                }}
+                                                                                            />
+                                                                                        }
+                                                                                        {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
+                                                                                    </div>
+                                                                                )
+                                                                            }}
+
+                                                                        />
+
+                                                                    )
+                                                                })
+                                                            )
+                                                        }}
+                                                    />
+
+                                                </h6>
+                                                <div className="col-span-1 flex items-center justify-center">
+                                                    <button
+                                                        onClick={(event) => removeItem(e.id)}
+                                                        type="button"
+                                                        title="Xóa"
+                                                        className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                                    >
+                                                        <IconDelete />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Customscrollbar>
+                            </>
+                        ) : (
+                            <NoData />
+                        )}
+                        <div className="text-right mt-5 space-x-2">
+                            <button
+                                type="button"
+                                onClick={_ToggleModal.bind(this, false)}
+                                className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
+                            >
+                                {dataLang?.branch_popup_exit}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => form.handleSubmit((data) => onSubmit(data))()}
+                                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                            >
+                                {dataLang?.branch_popup_save}
+                            </button>
+                        </div>
+                    </div>
+                </div >
+            </PopupEdit >
+        </>
+    );
+};
+
+export default PopupKeepStock

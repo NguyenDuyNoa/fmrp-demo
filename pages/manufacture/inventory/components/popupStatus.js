@@ -7,6 +7,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
@@ -47,67 +48,58 @@ const Popup_status = (props) => {
             <div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
                 <Customscrollbar className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2">
                     <div className="pr-2 w-[100%] lx:w-[120%] ">
-                        <div
-                            className={`${dataProductSerial.is_enable == "1"
-                                ? dataMaterialExpiry.is_enable !=
-                                    dataProductExpiry.is_enable
-                                    ? "grid-cols-12"
-                                    : dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-12"
-                                        : "grid-cols-10"
-                                : dataMaterialExpiry.is_enable !=
-                                    dataProductExpiry.is_enable
-                                    ? "grid-cols-11"
-                                    : dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-11"
-                                        : "grid-cols-9"
-                                }  grid sticky top-0 bg-white shadow items-center z-10`}
+                        <HeaderTablePopup
+                            gridCols={
+                                dataProductSerial.is_enable == "1"
+                                    ? dataMaterialExpiry.is_enable !=
+                                        dataProductExpiry.is_enable
+                                        ? 12
+                                        : dataMaterialExpiry.is_enable == "1"
+                                            ? 12 : 10
+                                    : dataMaterialExpiry.is_enable !=
+                                        dataProductExpiry.is_enable
+                                        ? 11
+                                        : dataMaterialExpiry.is_enable == "1"
+                                            ? 11 : 9
+                            }
                         >
-                            <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold  whitespace-nowrap col-span-2  text-center">
-                                {props.dataLang?.inventory_dayvouchers ||
-                                    "inventory_dayvouchers"}
-                            </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang?.inventory_vouchercode ||
-                                    "inventory_vouchercode"}
-                            </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang?.import_ballot ||
-                                    "import_ballot"}
-                            </h4>
+                            <ColumnTablePopup colSpan={2}>
+                                {props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {props.dataLang?.import_ballot || "import_ballot"}
+                            </ColumnTablePopup>
                             {dataProductSerial.is_enable === "1" && (
-                                <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-semibold text-center whitespace-nowrap">
+                                <ColumnTablePopup>
                                     {"Serial"}
-                                </h4>
+                                </ColumnTablePopup>
                             )}
                             {dataMaterialExpiry.is_enable === "1" ||
                                 dataProductExpiry.is_enable === "1" ? (
                                 <>
-                                    <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-semibold text-center whitespace-nowrap">
+                                    <ColumnTablePopup>
                                         {"Lot"}
-                                    </h4>
-                                    <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-semibold text-center whitespace-nowrap">
-                                        {props.dataLang
-                                            ?.warehouses_detail_date ||
-                                            "warehouses_detail_date"}
-                                    </h4>
+                                    </ColumnTablePopup>
+                                    <ColumnTablePopup>
+                                        {props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}
+                                    </ColumnTablePopup>
                                 </>
                             ) : (
                                 ""
                             )}
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang
-                                    ?.purchase_order_purchase_from_item ||
-                                    "purchase_order_purchase_from_item"}
-                            </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-semibold text-center whitespace-nowrap">
+                            <ColumnTablePopup colSpan={2}>
+                                {props.dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}
+                            </ColumnTablePopup>
+                            <ColumnTablePopup colSpan={2}>
                                 {props.dataLang?.PDF_house || "PDF_house"}
-                            </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-semibold text-center whitespace-nowrap">
-                                {props.dataLang?.purchase_quantity ||
-                                    "purchase_quantity"}
-                            </h4>
-                        </div>
+                            </ColumnTablePopup>
+                            <ColumnTablePopup>
+                                {props.dataLang?.purchase_quantity || "purchase_quantity"}
+                            </ColumnTablePopup>
+                        </HeaderTablePopup>
                         {onFetching ? (
                             <Loading className="h-50" color="#0f4f9e" />
                         ) : data?.length > 0 ? (

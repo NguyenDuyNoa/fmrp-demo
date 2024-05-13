@@ -13,6 +13,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Popup_chitietPhatsinh = (props) => {
     const dataLang = props?.dataLang;
     const dataSeting = useSetingServer()
@@ -106,28 +107,27 @@ const Popup_chitietPhatsinh = (props) => {
                         <div className="3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px]">
                             <Customscrollbar className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1">
                                 <div className=" w-[100%]">
-                                    <div
-                                        className={`grid-cols-12  grid sticky top-0 rounded-xl shadow-md bg-white   z-10  divide-x`}
+                                    <HeaderTablePopup gridCols={12}
                                     >
-                                        <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        <ColumnTablePopup colSpan={2}>
                                             {dataLang?.debt_suppliers_day_vouchers || "debt_suppliers_day_vouchers"}
-                                        </h4>
-                                        <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {dataLang?.debt_suppliers_code_vouchers || "debt_suppliers_code_vouchers"}
-                                        </h4>
-                                        <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {dataLang?.debt_suppliers_type || "debt_suppliers_type"}
-                                        </h4>
-                                        <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {dataLang?.debt_suppliers_into_money || "debt_suppliers_into_money"}
-                                        </h4>
-                                        <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {dataLang?.debt_suppliers_note || "debt_suppliers_note"}
-                                        </h4>
-                                        <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>
                                             {dataLang?.import_branch || "import_branch"}
-                                        </h4>
-                                    </div>
+                                        </ColumnTablePopup>
+                                    </HeaderTablePopup>
                                     {onFetching ? (
                                         <Loading
                                             className="3xl:max-h-auto  2xl:max-h-auto xl:max-h-auto lg:max-h-[400px] max-h-[500px]"

@@ -19,6 +19,7 @@ import Popup_GiaiDoan from "./popupGiaiDoan";
 import Popup_Bom from "./popupBom";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Popup_ThongTin = React.memo((props) => {
     const dataSeting = useSetingServer()
 
@@ -306,23 +307,20 @@ const Popup_ThongTin = React.memo((props) => {
                             <React.Fragment>
                                 {list?.variation_option_value?.length > 0 ? (
                                     <div className="space-y-0.5 min-h-[384px]">
-                                        <div
-                                            className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-4"
-                                                } grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}
-                                        >
-                                            <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
+                                        <HeaderTablePopup gridCols={4} >
+                                            <ColumnTablePopup textAlign={'center'}>
                                                 {props.dataLang?.avatar}
-                                            </h5>
-                                            <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]">
+                                            </ColumnTablePopup>
+                                            <ColumnTablePopup textAlign={'center'}>
                                                 {list?.variation[0]?.name}
-                                            </h5>
-                                            <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]">
+                                            </ColumnTablePopup>
+                                            <ColumnTablePopup textAlign={'center'}>
                                                 {list?.variation[1]?.name ? list?.variation[1]?.name : ""}
-                                            </h5>
-                                            <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-right">
+                                            </ColumnTablePopup>
+                                            <ColumnTablePopup textAlign={'right'}>
                                                 {props.dataLang?.price || "price"}
-                                            </h5>
-                                        </div>
+                                            </ColumnTablePopup>
+                                        </HeaderTablePopup>
                                         <Customscrollbar className="max-h-[450px]">
                                             <div className="divide-y divide-slate-200">
                                                 {list?.variation_option_value?.map((e) => (
@@ -353,14 +351,14 @@ const Popup_ThongTin = React.memo((props) => {
                                                                 />
                                                             )}
                                                         </div>
-                                                        <h6 className="px-2 xl:text-base text-xs self-center">
+                                                        <h6 className="px-2 xl:text-base text-xs self-center text-center">
                                                             {e?.name}
                                                         </h6>
                                                         {e?.variation_option_2?.length > 0 ? (
                                                             <div className="self-center space-y-0.5 col-span-2 grid grid-cols-2">
                                                                 {e?.variation_option_2?.map((ce) => (
                                                                     <React.Fragment key={ce.id ? ce.id?.toString() : ""}>
-                                                                        <h6 className="px-2 xl:text-base text-xs">
+                                                                        <h6 className="px-2 xl:text-base text-xs text-center">
                                                                             {ce.name}
                                                                         </h6>
                                                                         <h6 className="px-2 xl:text-base text-xs text-right">
@@ -420,30 +418,27 @@ const Popup_ThongTin = React.memo((props) => {
                                                         </button>
                                                     ))}
                                                 </div>
-                                                <div
-                                                    className={`grid grid-cols-13 px-2 py-1.5 bg-slate-100/40 rounded items-center text-[14px]`}
-                                                >
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
-                                                        {props.dataLang?.warehouses_detail_type ||
-                                                            "warehouses_detail_type"}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
+                                                <HeaderTablePopup gridCols={13}    >
+                                                    <ColumnTablePopup colSpan={2}>
+                                                        {props.dataLang?.warehouses_detail_type || "warehouses_detail_type"}
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={2}>
                                                         {props.dataLang?.name || "name"}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center text-center col-span-2">
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={2}>
                                                         {props.dataLang?.unit}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={2}>
                                                         {props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={2}>
                                                         %
                                                         {props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-3">
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={3}>
                                                         {props.dataLang?.stage_usage_finishedProduct}
-                                                    </h5>
-                                                </div>
+                                                    </ColumnTablePopup>
+                                                </HeaderTablePopup>
 
                                                 <Customscrollbar className="min-h-[250px] max-h-[450px]">
                                                     <div className="divide-y divide-slate-200">
@@ -512,22 +507,20 @@ const Popup_ThongTin = React.memo((props) => {
                                     <React.Fragment>
                                         {dataStage?.length > 0 ? (
                                             <div className="space-y-0.5 min-h-[384px]">
-                                                <div
-                                                    className={`grid-cols-8 grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}
-                                                >
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
+                                                <HeaderTablePopup gridCols={8}>
+                                                    <ColumnTablePopup>
                                                         {props.dataLang?.no || "no"}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-2">
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={2}>
                                                         {props.dataLang?.stage_finishedProduct}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-3">
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={3}>
                                                         {props.dataLang?.check_first_stage_finishedProduct}
-                                                    </h5>
-                                                    <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
+                                                    </ColumnTablePopup>
+                                                    <ColumnTablePopup colSpan={2}>
                                                         {props.dataLang?.stage_last_finishedProduct}
-                                                    </h5>
-                                                </div>
+                                                    </ColumnTablePopup>
+                                                </HeaderTablePopup>
                                                 <Customscrollbar className="min-h-[250px] max-h-[450px]" >
                                                     <div className="divide-y divide-slate-200">
                                                         {dataStage?.map((e, index) => (

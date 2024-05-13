@@ -160,7 +160,7 @@ const Index = (props) => {
         Axios("GET", `/api_web/api_warehouse/warehouse/?csrf_protection=true`,
             {
                 params: {
-                    limit: limit,
+                    limit: undefined,
                     page: router.query?.page || 1,
                     "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
                 },
@@ -696,20 +696,28 @@ const Index = (props) => {
                                         <PopupParent
                                             trigger={<div key={item.id} className="grid grid-cols-12 relative">
                                                 <li
-                                                    className={`col-span-12 ${isState.idWarehouse === item.id ? "bg-[#3276FA] text-white" : ""} font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
+                                                    className={`group col-span-12 ${isState.idWarehouse === item.id ? "bg-[#3276FA] text-white" : ""} font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
                                                     onClick={() => handleClickChooseWarehouse(item)}
                                                 >
                                                     <div className='flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2'>
                                                         <div className='w-[6px] h-[6px] rounded-full bg-[#6C9AC4]' />
-                                                        <div className='w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs '>
-                                                            {item.name}
+                                                        <div className="flex flex-col items-start w-full">
+                                                            <div className='w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs '>
+                                                                {item.name}
+                                                                {/* {item.is_system == 1 && <span className={`${isState.idWarehouse === item.id ? "text-white" : "text-[#6C9AC4] group-hover:text-white"} lowercase`}>(Kho hệ thống)</span>} */}
+                                                            </div>
+                                                            {item.is_system == 1 &&
+                                                                <div class="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
+                                                                    Kho hệ thống
+                                                                </div>
+                                                            }
                                                         </div>
                                                     </div>
                                                     <div className='xl:w-[10%] xl:max-w-[10%] w-[15%] max-w-[15%] bg-[#E1ECFC]/80 p-1 3xl:text-base xl:text-xs text-xs text-center rounded-md text-black'>
                                                         {item.totalItems}
                                                     </div>
                                                 </li>
-                                                {isState.idWarehouse === item.id &&
+                                                {isState.idWarehouse === item.id && item.is_system == 0 &&
                                                     <div className="absolute right-0 -top-1">
                                                         <span class="relative flex h-3 w-3">
                                                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
@@ -723,7 +731,7 @@ const Index = (props) => {
                                             on={['hover']}
                                             arrow={false}
                                         >
-                                            {isState.idWarehouse === item.id &&
+                                            {isState.idWarehouse === item.id && item.is_system == 0 &&
                                                 <div className="ml-2 flex items-center gap-2  rounded-md bg-gray-200 3xl:py-3 py-2 px-4">
                                                     {role == true || checkEdit ?
 
