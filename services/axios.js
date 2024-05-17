@@ -1,7 +1,8 @@
 import axios from "axios";
-import { urlApi as url } from "/services/URL";
 import useToast from "@/hooks/useToast";
-axios.defaults.baseURL = `${url}`;
+import { CookieCore } from "@/utils/lib/cookie";
+import Cookies from "js-cookie";
+axios.defaults.baseURL = `${process.env.NEXT_PUBLIC_URL_API}`;
 
 axios.defaults.withCredentials = false;
 
@@ -36,14 +37,16 @@ const _ServerInstance = (method, url, dataObject, callback) => {
     const showToat = useToast()
     var token = null;
     try {
-        token = localStorage?.getItem("tokenFMRP");
+        // token = localStorage?.getItem("tokenFMRP");
+        token = Cookies.get("tokenFMRP") ?? ""
     } catch (err) {
         token = null;
     }
 
     var databaseApp = null;
     try {
-        databaseApp = localStorage?.getItem("databaseappFMRP");
+        databaseApp = Cookies.get("databaseappFMRP") ?? ""
+        // databaseApp = localStorage?.getItem("databaseappFMRP");
     } catch (err) {
         databaseApp = null;
     }

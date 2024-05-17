@@ -17,6 +17,7 @@ import Popup from "reactjs-popup";
 import { useRouter } from "next/router";
 import { Lexend_Deca } from "@next/font/google";
 import { More as IconMore, Eye as IconEye, EyeSlash as IconEyeSlash } from "iconsax-react";
+import { CookieCore } from "@/utils/lib/cookie";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -64,15 +65,15 @@ function MainPage({ Component, pageProps }) {
 
 
     // kiểm tra khi chuyển tab trình duyệt nếu đăng xuất thì tất cả tab đăng xuất
-    if (typeof document !== 'undefined') {
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                console.log('Tab không được nhìn thấy');
-            } else {
-                sOnChecking(true);
-            }
-        });
-    }
+    // if (typeof document !== 'undefined') {
+    //     document.addEventListener('visibilitychange', () => {
+    //         if (document.visibilityState === 'hidden') {
+    //             console.log('Tab không được nhìn thấy');
+    //         } else {
+    //             sOnChecking(true);
+    //         }
+    //     });
+    // }
 
 
     const _ServerLang = async () => {
@@ -126,7 +127,7 @@ function MainPage({ Component, pageProps }) {
 
     const auth = useSelector((state) => state.auth);
 
-    const [onChecking, sOnChecking] = useState(true);
+    const [onChecking, sOnChecking] = useState(false);
 
     const ServerFetching = () => {
         Axios("GET", "/api_web/Api_Authentication/authentication?csrf_protection=true", {}, (err, response) => {
@@ -149,8 +150,13 @@ function MainPage({ Component, pageProps }) {
     }, [onChecking]);
 
     useEffect(() => {
-        auth === null && sOnChecking(true);
+        if (auth == null) {
+            sOnChecking(true);
+        }
     }, [auth]);
+    // useEffect(() => {
+    //     auth === null && sOnChecking(true);
+    // }, [auth]);
 
 
     if (auth == null) {
@@ -192,12 +198,20 @@ const LoginPage = React.memo((props) => {
     const _TogglePassword = () => sTypePassword(!typePassword);
 
     const [rememberMe, sRememberMe] = useState(
-        localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false
+        // localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false
+        CookieCore.get("remembermeFMRP") ? CookieCore.get("remembermeFMRP") : false
     );
     const _ToggleRememberMe = () => sRememberMe(!rememberMe);
 
-    const [code, sCode] = useState(localStorage?.getItem("usercodeFMRP") ? localStorage?.getItem("usercodeFMRP") : "");
-    const [name, sName] = useState(localStorage?.getItem("usernameFMRP") ? localStorage?.getItem("usernameFMRP") : "");
+    const [code, sCode] = useState(
+        // localStorage?.getItem("usercodeFMRP") ? localStorage?.getItem("usercodeFMRP") : ""
+        CookieCore.get("usercodeFMRP") ? CookieCore.get("usercodeFMRP") : ""
+
+    );
+    const [name, sName] = useState(
+        // localStorage?.getItem("usernameFMRP") ? localStorage?.getItem("usernameFMRP") : ""
+        CookieCore.get("usernameFMRP") ? CookieCore.get("usernameFMRP") : ""
+    );
     const [password, sPassword] = useState("");
     const [onSending, sOnSending] = useState(false);
 
@@ -252,18 +266,46 @@ const LoginPage = React.memo((props) => {
                         FetchSetingServer()
                         dispatch({ type: "auth/update", payload: response.data?.data });
 
-                        localStorage.setItem("tokenFMRP", token);
-                        localStorage.setItem("databaseappFMRP", database_app);
+                        // localStorage.setItem("tokenFMRP", token);
+
+                        // localStorage.setItem("databaseappFMRP", database_app);
+
+                        CookieCore.set("tokenFMRP", token, {
+                            path: "/",
+                            expires: new Date(Date.now() + 86400 * 1000),
+                            sameSite: true,
+                        })
+                        CookieCore.set("databaseappFMRP", database_app, {
+                            path: "/",
+                            expires: new Date(Date.now() + 86400 * 1000),
+                            sameSite: true,
+                        })
 
                         showToat("success", message);
 
                         if (rememberMe) {
-                            localStorage.setItem("usernameFMRP", name);
-                            localStorage.setItem("usercodeFMRP", code);
-                            localStorage.setItem("remembermeFMRP", rememberMe);
+                            CookieCore.set('usernameFMRP', name, {
+                                path: "/",
+                                expires: new Date(Date.now() + 86400 * 1000),
+                                sameSite: true,
+                            })
+                            CookieCore.set('usercodeFMRP', code, {
+                                path: "/",
+                                expires: new Date(Date.now() + 86400 * 1000),
+                                sameSite: true,
+                            })
+                            CookieCore.set('remembermeFMRP', rememberMe, {
+                                path: "/",
+                                expires: new Date(Date.now() + 86400 * 1000),
+                                sameSite: true,
+                            })
+                            // localStorage.setItem("usernameFMRP", name);
+                            // localStorage.setItem("usercodeFMRP", code);
+                            // localStorage.setItem("remembermeFMRP", rememberMe);
                         } else {
                             ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) =>
-                                localStorage.removeItem(key)
+                                // localStorage.removeItem(key)
+                                CookieCore.remove(key)
                             );
                         }
                     } else {

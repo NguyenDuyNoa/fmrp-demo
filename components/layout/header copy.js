@@ -558,7 +558,7 @@ const Header = () => {
                         {
                             hidden: 0,
                             disble: 0,
-                            name: "Tồn quỷ"
+                            name: "Tồn quỹ"
                         },
                         {
                             hidden: 0,

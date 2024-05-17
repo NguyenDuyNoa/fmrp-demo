@@ -1,26 +1,21 @@
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import moment from "moment";
-import { debounce } from "lodash";
-import { _ServerInstance as Axios } from "/services/axios";
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import PopupEdit from "@/components/UI/popup";
+import { debounce } from "lodash";
+import moment from "moment";
+import { _ServerInstance as Axios } from "/services/axios";
 
 import {
-    SearchNormal1 as IconSearch,
-    Trash as IconDelete,
-    Edit as IconEdit,
-    UserEdit as IconUserEdit,
-    Grid6 as IconExcel,
-    Image as IconImage,
-    GalleryEdit as IconEditImg,
     Grid6,
+    Edit as IconEdit,
+    UserEdit as IconUserEdit
 } from "iconsax-react";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -28,35 +23,37 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 
-import useToast from "@/hooks/useToast";
-import useFeature from "@/hooks/useConfigFeature";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import Popup_NVL from "./components/items/popupNvl";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import useActionRole from "@/hooks/useRole";
-import NoData from "@/components/UI/noData/nodata";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumber from "@/utils/helpers/formatnumber";
-import formatMoney from "@/utils/helpers/formatMoney";
 import BtnAction from "@/components/UI/BtnAction";
-import ModalImage from "react-modal-image";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import ModalImage from "react-modal-image";
+import Popup_NVL from "./components/items/popupNvl";
 const Index = (props) => {
     const dataLang = props.dataLang;
+
+
 
     const router = useRouter();
 
@@ -89,6 +86,10 @@ const Index = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'materials');
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting)
+    }
 
     const _HandleFilterOpt = (type, value) => {
         if (type == "category") {
@@ -314,8 +315,8 @@ const Index = (props) => {
                 { value: `${e.code}` },
                 { value: `${e.name}` },
                 { value: `${e.unit}` },
-                { value: `${formatNumber(+e.stock_quantity, dataSeting)}` },
-                { value: `${formatNumber(+e.minimum_quantity, dataSeting)}` },
+                { value: formatNumber(e.stock_quantity) },
+                { value: formatNumber(e.minimum_quantity) },
                 { value: `${e.note}` },
                 { value: `${e.variation?.length}` },
                 { value: `${JSON.stringify(e.branch?.map((e) => e.name))}` },
@@ -522,7 +523,7 @@ const Index = (props) => {
                                                         {e?.unit}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={'center'}>
-                                                        {formatNumber(+e?.stock_quantity, dataSeting)}
+                                                        {formatNumber(e?.stock_quantity)}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} textAlign={'left'}>
                                                         {e?.note}
@@ -592,6 +593,13 @@ const Popup_ThongTin = React.memo((props) => {
     const _ToggleModal = (e) => sOpen(e);
 
     const dataSeting = useSetingServer();
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting)
+    }
+    const formatMoney = (number) => {
+        return formatMoneyConfig(+number, dataSeting)
+    }
 
     const [tab, sTab] = useState(0);
     const _HandleSelectTab = (e) => sTab(e);
@@ -692,7 +700,7 @@ const Popup_ThongTin = React.memo((props) => {
                                             :
                                         </h5>
                                         <h6 className="w-[55%] text-right">
-                                            {formatMoney(+list?.import_price, dataSeting)}
+                                            {formatMoney(list?.import_price)}
                                         </h6>
                                     </div>
                                     <div className="flex justify-between">
@@ -700,7 +708,7 @@ const Popup_ThongTin = React.memo((props) => {
                                             {props.dataLang?.minimum_amount || "minimum_amount"}:
                                         </h5>
                                         <h6 className="w-[55%] text-right">
-                                            {formatNumber(+list?.minimum_quantity, dataSeting)}
+                                            {formatNumber(list?.minimum_quantity)}
                                         </h6>
                                     </div>
                                     {props.dataMaterialExpiry?.is_enable === "1" ? (
@@ -742,7 +750,7 @@ const Popup_ThongTin = React.memo((props) => {
                                             :
                                         </h5>
                                         <h6 className="w-[55%] text-right">
-                                            {formatNumber(+list?.coefficient, dataSeting)}
+                                            {formatNumber(list?.coefficient)}
                                         </h6>
                                     </div>
                                 </div>

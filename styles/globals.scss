@@ -478,3 +478,35 @@ body::-webkit-scrollbar-thumb:hover {
 .clip-arrow {
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 15% 50%, 0% 0%);
 }
+/// css phân trang
+.disabled-page {
+    color: #808e9b;
+}
+
+.page-item.active {
+    color: white;
+    background-color: #0f4f9e;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.page-item {
+    background-color: #e2e8f0;
+    padding: 8px;
+    color: black;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+.page-item:hover {
+    background-color: #e3e3e3;
+}
+
+.pagination {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+}

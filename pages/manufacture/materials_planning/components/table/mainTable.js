@@ -28,6 +28,7 @@ import formatNumber from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 
 
@@ -133,6 +134,7 @@ const MainTable = ({ dataLang }) => {
                             title: e?.reference_no,
                             time: isMoment(e?.date, 'DD/MM/YYYY'),
                             name: e?.created_by_full_name,
+                            nameBranch: e?.name_branch,
                             productionOrder: [],
                             followUp: e?.listObject?.map(i => {
                                 return {
@@ -167,7 +169,7 @@ const MainTable = ({ dataLang }) => {
                         queryState({
                             listDataRight: {
                                 ...dataTable.listDataRight,
-                                title: "Không có kế hoạch NVL",
+                                title: null,
                                 dataPPItems: [],
                                 dataBom: {
                                     productsBom: [],
@@ -226,9 +228,9 @@ const MainTable = ({ dataLang }) => {
                                             name: e?.item_name,
                                             image: e?.images ? e?.images : "/no_img.png",
                                             unit: e?.unit_name,
-                                            use: formatNumber(e?.total_quota),//sl sử dụng
-                                            exist: formatNumber(e?.quantity_warehouse), //sl tồn
-                                            lack: formatNumber(e?.quantity_rest), //sl thiếu
+                                            use: formatNumber(+e?.total_quota),//sl sử dụng
+                                            exist: formatNumber(+e?.quantity_warehouse), //sl tồn
+                                            lack: formatNumber(+e?.quantity_rest), //sl thiếu
                                             code: e?.item_code,
                                             itemVariation: e?.item_variation
                                         }
@@ -239,10 +241,10 @@ const MainTable = ({ dataLang }) => {
                                             name: e?.item_name,
                                             image: e?.images ? e?.images : "/no_img.png",
                                             unit: e?.unit_name,
-                                            use: formatNumber(e?.total_quota),//sl sử dụng
-                                            exchange: formatNumber(e?.quota_primary), //sl quy đổi
-                                            exist: formatNumber(e?.quantity_warehouse), //sl tồn
-                                            lack: formatNumber(e?.quantity_rest), //sl thiếu
+                                            use: formatNumber(+e?.total_quota),//sl sử dụng
+                                            exchange: formatNumber(+e?.quota_primary), //sl quy đổi
+                                            exist: formatNumber(+e?.quantity_warehouse), //sl tồn
+                                            lack: formatNumber(+e?.quantity_rest), //sl thiếu
                                             code: e?.item_code,
                                             itemVariation: e?.item_variation
                                         }
@@ -318,6 +320,7 @@ const MainTable = ({ dataLang }) => {
                     queryState({
                         listDataRight: {
                             ...dataTable.listDataRight,
+                            title: null,
                             dataPPItems: [],
                             dataBom: {
                                 productsBom: [],
@@ -400,6 +403,7 @@ const MainTable = ({ dataLang }) => {
         fetDataOrder,
         fetchDataPlan
     };
+    console.log(dataTable);
 
 
     return (
@@ -437,9 +441,12 @@ const MainTable = ({ dataLang }) => {
                                         } `}
                                 >
                                     <div className="flex justify-between">
-                                        <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
-                                            {e.title}
-                                        </h1>
+                                        <div className="flex flex-col gap-1">
+                                            <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
+                                                {e.title}
+                                            </h1>
+                                            <TagBranch className='w-fit'>{e?.nameBranch}</TagBranch>
+                                        </div>
                                         <div className="flex flex-col items-end 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0 my-0">
                                             <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
                                                 Tạo vào{" "}
@@ -488,7 +495,7 @@ const MainTable = ({ dataLang }) => {
                             <div>
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">Kế hoạch NVL</h1>
                                 <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                    {dataTable.listDataRight?.title}
+                                    {dataTable.listDataRight?.title ?? "Không có kế hoạch NVL"}
                                 </h1>
                             </div>
                             <div className="flex gap-4">

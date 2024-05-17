@@ -1,14 +1,14 @@
-import Image from "next/image";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
-import ModalImage from "react-modal-image";
 import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import ModalImage from "react-modal-image";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const TabPlan = ({ dataTable, isFetching }) => {
     const { dataBom } = dataTable.listDataRight
     console.log("dataBom", dataBom);
@@ -123,13 +123,13 @@ const TabPlan = ({ dataTable, isFetching }) => {
                                             {e.unit}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.use)}
+                                            {e.use}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.exist)}
+                                            {e.exist}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.lack)}
+                                            {e.lack}
                                         </h4>
                                     </div>
                             )}
@@ -256,16 +256,16 @@ const TabPlan = ({ dataTable, isFetching }) => {
                                             {e.unit}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.use)}
+                                            {e.use}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.exist)}
+                                            {e.exist}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.exchange)}
+                                            {e.exchange}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.lack)}
+                                            {e.lack}
                                         </h4>
                                     </div>
 

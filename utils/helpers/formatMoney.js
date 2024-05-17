@@ -1,5 +1,8 @@
 
 const formatMoney = (number, dataSeting, _d = 0) => {
+    if (isNaN(number)) {
+        return 0
+    }
     if (typeof number !== 'number' || isNaN(number)) {
         console.error('Invalid number:', number);
         return '0';

@@ -493,7 +493,7 @@ const Index = (props) => {
                     if (isSuccess) {
                         isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}` || message);
                     } else {
-                        isShow("error", `${dataLang[message]}` || message);
+                        isShow("error", `${dataLang[message] || message}` || message);
                     }
                     _ServerFetching();
                     _ServerFetching_group();

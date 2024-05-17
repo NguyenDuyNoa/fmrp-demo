@@ -14,6 +14,7 @@ import "react-tippy/dist/tippy.css";
 import Expirred from "components/UI/expired";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
+import { CookieCore } from "@/utils/lib/cookie";
 const Header = () => {
     const router = useRouter();
 
@@ -563,20 +564,22 @@ const Header = () => {
                     title: "Báo cáo",
                     img: "/icon/header/khac/bc.png",
                     items: [
+                        // {
+                        //     viewOwn: -1,
+                        //     view: -1,
+                        //     name: "Báo cáo QC"
+                        // },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Báo cáo QC"
+                            name: "Báo cáo bán hàng",
+                            link: "/report_statistical/sales_report"
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Báo cáo bán hàng"
-                        },
-                        {
-                            viewOwn: -1,
-                            view: -1,
-                            name: "Báo cáo mua hàng"
+                            name: "Báo cáo mua hàng",
+                            link: "/report_statistical/purchase_report"
                         },
                         {
                             viewOwn: -1,
@@ -586,7 +589,12 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Tồn quỷ"
+                            name: "Công nợ phải trả"
+                        },
+                        {
+                            viewOwn: -1,
+                            view: -1,
+                            name: "Tồn quỹ"
                         },
                         {
                             viewOwn: -1,
@@ -1361,8 +1369,10 @@ const DropdownAvatar = React.memo(() => {
         Axios("POST", "/api_web/Api_Login/logout?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 dispatch({ type: "auth/update", payload: false });
-                localStorage.removeItem("tokenFMRP");
-                localStorage.removeItem("databaseappFMRP");
+                // localStorage.removeItem("tokenFMRP");
+                // localStorage.removeItem("databaseappFMRP");
+                CookieCore.remove("tokenFMRP");
+                CookieCore.remove("databaseappFMRP");
                 router.push("/");
             }
             sOnSending(false);

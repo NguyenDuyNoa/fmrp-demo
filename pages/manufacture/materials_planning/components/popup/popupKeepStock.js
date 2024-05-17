@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
 import PopupEdit from "@/components/UI/popup";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { Add, Trash as IconDelete, ArrowDown2 as IconDown, TickCircle } from "iconsax-react";
+import moment from "moment";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
-import { BsCalendarEvent } from "react-icons/bs";
 import { Controller, useForm } from "react-hook-form";
+import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
-import NoData from "@/components/UI/noData/nodata";
 import ModalImage from "react-modal-image";
 import { v4 as uuidv4 } from "uuid";
-import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import Zoom from "@/components/UI/zoomElement/zoomElement";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import useFeature from "@/hooks/useConfigFeature";
+import { _ServerInstance as Axios } from "/services/axios";
 const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }) => {
     const [open, sOpen] = useState(false);
 
@@ -31,121 +33,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
 
     const initialState = {
         onFetching: false,
-        formData: [
-            {
-                id: uuidv4(),
-                item: {
-                    name: "Chỉ đen test",
-                    type: "material",
-                    image: null
-
-                },
-                unit: 'Cái',
-                //sl cần
-                quantityNeed: 10,
-                // sl giữ
-                quantityKept: 10,
-                // sl tồn
-                quantityInventory: 10,
-                warehouse: [
-                    {
-                        id: uuidv4(),
-                        label: "Kho giữ test",
-                        value: 10
-                    },
-                    {
-                        id: uuidv4(),
-                        label: "Kho 1",
-                        value: 1
-                    }
-                ],
-
-                valueWarehouse: null,
-                warehouseLocation: [
-                    {
-                        id: uuidv4(),
-                        label: 'Vị trí 1',
-                        value: "10",
-                        qty: 10,
-                        show: false,
-                        serial: null,
-                        lot: null,
-                        expiration_date: null,
-                    },
-                    {
-                        id: uuidv4(),
-                        label: 'Vị trí 2',
-                        value: "10",
-                        qty: 10,
-                        show: false,
-                        serial: null,
-                        lot: null,
-                        expiration_date: null,
-                    }
-                ],
-                valueLocation:
-                    []
-
-            },
-            {
-                id: uuidv4(),
-                item: {
-                    name: "Chỉ đen",
-                    type: "material",
-                    image: null
-
-                },
-                unit: 'Cái',
-                //sl cần
-                quantityNeed: 10,
-                // sl giữ
-                quantityKept: 10,
-                // sl tồn
-                quantityInventory: 10,
-                warehouse: [
-                    {
-                        id: uuidv4(),
-                        label: "Kho giữ",
-                        value: 10
-                    },
-                    {
-                        id: uuidv4(),
-                        label: "Kho 1",
-                        value: 1
-                    }
-                ],
-                valueWarehouse: null,
-                warehouseLocation: [
-                    {
-                        id: uuidv4(),
-                        label: 'Vị trí 1',
-                        value: "10",
-                        qty: 10,
-                        show: false,
-                        serial: null,
-                        lot: null,
-                        expiration_date: null,
-                    },
-                    {
-                        id: uuidv4(),
-                        label: 'Vị trí 2',
-                        value: "10",
-                        qty: 10,
-                        show: false,
-                        serial: null,
-                        lot: null,
-                        expiration_date: null,
-                    }
-                ],
-                valueLocation:
-                    []
-
-            }
-        ],
         type: [
             {
                 id: uuidv4(),
-                label: "Thành phẩm",
+                label: "Bán thành phẩm",
                 value: "product",
             },
             {
@@ -153,7 +44,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                 label: "Nguyên vật liệu",
                 value: "material",
             }
-        ]
+        ],
+        arrayItem: []
     }
 
     const dataSeting = useSetingServer()
@@ -173,21 +65,64 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
         }
     });
 
-    const valuesForm = form.watch()
+    /// lắng nghe thay đổi
+    const findValue = form.watch()
 
-    const onSubmit = async (e) => {
-        if (e.arrayItem.length == 0) {
+    const onSubmit = async (value) => {
+        if (value.arrayItem.length == 0) {
             return shhowToat('error', 'Không có mặt hàng cần giữ kho. VUi lòng thêm mặt hàng')
         }
+
+        let formData = new FormData();
+        formData.append('note', value.note)
+        formData.append('type', value.type == "material" ? 1 : 2)
+        formData.append('plan_id', dataTable?.listDataRight?.idCommand)
+        formData.append('date', moment(value.date).format('DD/MM/YYYY'))
+        value.arrayItem.forEach((e, index) => {
+            formData.append(`items[${index}][id]`, e?.idParent);
+            formData.append(`items[${index}][item_id]`, e?.item?.item_id);
+            formData.append(`items[${index}][item_code]`, e?.item?.item_code);
+            formData.append(`items[${index}][item_name]`, e?.item?.name);
+            formData.append(`items[${index}][item_variation]`, e?.item?.variation);
+            formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
+            formData.append(`items[${index}][warehouse_id]`, e?.valueWarehouse?.id);
+            e?.valueLocation?.forEach((i, locaitonIndex) => {
+                formData.append(`items[${index}][location][${locaitonIndex}][location_id]`, i?.location_id);
+                formData.append(`items[${index}][location][${locaitonIndex}][location_value]`, i?.newValue);
+                formData.append(`items[${index}][location][${locaitonIndex}][location_lot]`, i?.lot);
+                formData.append(`items[${index}][location][${locaitonIndex}][location_expiration_date]`, i?.expiration_date);
+                formData.append(`items[${index}][location][${locaitonIndex}][location_serial]`, i?.serial);
+            })
+        })
+        Axios("POST", "/api_web/api_manufactures/handlingKeepProductionsPlan",
+            {
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    const data = response.data;
+                    if (data?.isSuccess) {
+                        isShow('success', data?.message)
+                    } else {
+                        isShow('error', data?.message)
+                    }
+                }
+            }
+        );
     }
 
     useEffect(() => {
         if (open) {
-            form.setValue('arrayItem', isState.formData)
-            return
+            form.reset()
         }
-        form.reset()
     }, [open])
+
+    useEffect(() => {
+        if (open) {
+            fetchListItem()
+        }
+    }, [findValue.type, open])
 
 
     const formatNumber = (number) => {
@@ -197,12 +132,103 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
     const removeItem = (id) => {
         const updatedData = form.getValues("arrayItem").filter((item) => item.id !== id);
         form.setValue("arrayItem", updatedData);
-        queryState({ formData: updatedData });
     };
 
+    const fetchListItem = async () => {
+        queryState({ onFetching: true });
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        let formData = new FormData()
+        // type: 1 nvl, 2 BTP
+        formData.append('type', findValue.type == "material" ? 1 : 2)
+        formData.append('pPlan_id', dataTable.listDataRight.idCommand)
+        Axios("POST", `/api_web/api_manufactures/keepItemsWarehouses`, {
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" },
+        },
+            (err, response) => {
+                if (!err) {
+                    const { isSuccess, message, data } = response?.data
+                    const newData = data?.items?.map((e) => {
+                        return {
+                            child: false,
+                            id: uuidv4(),
+                            idParent: e?.id,
+                            item: {
+                                item_id: e?.item_id,
+                                item_code: e?.item_code,
+                                name: e?.item_name,
+                                type: e?.type_item,
+                                image: e?.images,
+                                variation: e?.item_variation,
+
+                            },
+                            unit: e?.unit_name_parent,
+                            //sl cần
+                            quantityNeed: formatNumber(e?.quota_primary),
+                            // sl giữ
+                            quantityKept: formatNumber(e?.quantity_keep),
+                            // sl tồn
+                            quantityInventory: formatNumber(e?.quantity_warehouse),
+                            warehouse: e?.arrW?.map((i) => {
+                                return {
+                                    id: i?.w_id,
+                                    variation_id: i?.item_variation_id,
+                                    label: i?.name_warehouse,
+                                    value: formatNumber(i?.quantity_warehouse)
+                                }
+                            }),
+                            valueWarehouse: null,
+                            warehouseLocation: [],
+                            valueLocation: [],
+                            itemVariationOptionValueId: e?.item_variation_option_value_id
+                        }
+                    })
+                    form.setValue("arrayItem", newData);
+                    queryState({ onFetching: false });
+                }
+            }
+        );
+    }
+    const fetchListLocationWarehouse = async (item, idWarehouse) => {
+        let formData = new FormData()
+        formData.append('w_id', idWarehouse)
+        formData.append('type_item', item?.item?.type)
+        formData.append('item_variation_option_value_id', item.itemVariationOptionValueId)
+        Axios("POST", `/api_web/api_manufactures/getLocationItemsWarehouse`, {
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" },
+        },
+            (err, response) => {
+                if (!err) {
+                    const { isSuccess, message, data } = response?.data
+                    if (data?.locationsWarehouse) {
+                        const newData = findValue.arrayItem.map((e) => {
+                            if (e.id == item.id) {
+                                return {
+                                    ...e,
+                                    warehouseLocation: data?.locationsWarehouse?.map((i) => {
+                                        return {
+                                            ...i,
+                                            id: i?.location_id,
+                                            label: i?.name_location,
+                                            value: formatNumber(i?.quantity_warehouse),
+                                            qty: formatNumber(i?.quantity_warehouse),
+                                            show: false,
+                                        }
+                                    })
+                                }
+                            }
+                            return e
+                        })
+                        form.setValue("arrayItem", newData);
+                    }
+                }
+            }
+        );
+    }
 
     const handleShow = (idParent, idChild) => {
-        const newData = isState.formData?.map((e) => {
+        const newData = findValue.arrayItem?.map((e) => {
             if (e?.id == idParent) {
                 return {
                     ...e,
@@ -219,15 +245,24 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
             }
             return e;
         })
-        queryState({ formData: newData });
+        form.setValue("arrayItem", newData);
     };
 
-
-    useEffect(() => {
-        if (open) {
-            console.log("valuesForm.type", valuesForm.type);
-        }
-    }, [valuesForm.type])
+    const handleIncrease = (e) => {
+        const newData = [...findValue.arrayItem
+        ];
+        const insertIndex = newData.findIndex(item => item.id === e?.id) + 1;
+        newData.splice(insertIndex, 0, {
+            ...e,
+            id: uuidv4(),
+            idParent: e?.idParent,
+            valueLocation: null,
+            valueWarehouse: null,
+            warehouseLocation: [],
+            child: true,
+        });
+        form.setValue("arrayItem", newData);
+    }
 
     return (
         <>
@@ -294,14 +329,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                     className={`border ${fieldState.error ? 'border-red-500' : 'border-[#d0d5dd]'} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                                 />
                                                 {
-                                                    field.value && (
-                                                        <>
-                                                            <MdClear
-                                                                className="absolute right-10 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                                onClick={() => form.setValue('date', null)}
-                                                            />
-                                                        </>
-                                                    )
+                                                    field.value && <MdClear
+                                                        className="absolute right-10 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                        onClick={() => form.setValue('date', null)}
+                                                    />
                                                 }
                                                 <BsCalendarEvent className="absolute right-5 top-1/2 -translate-y-1/2 text-[#CCCCCC] scale-110 cursor-pointer" />
                                             </div >
@@ -348,7 +379,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                             <Controller
                                 name="note"
                                 control={form.control}
-                                render={({ field, fieldState }) => {
+                                render={({ field }) => {
                                     return (
                                         <textarea
                                             {...field}
@@ -368,7 +399,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                 {dataLang?.price_quote_item || "price_quote_item"}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
-                                {dataLang?.price_quote_from_unit || "price_quote_from_unit"}
+                                {'Đơn vị mua'}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
                                 {'SL Cần'}
@@ -391,24 +422,37 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                         </HeaderTablePopup>
                         {isState.onFetching ? (
                             <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
-                        ) : isState.formData?.length > 0 ? (
+                        ) : findValue.arrayItem && findValue.arrayItem?.length > 0 ? (
                             <>
                                 <Customscrollbar
                                     className="min-h-[300px] max-h-[300px] overflow-hidden"
                                 >
                                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
-                                        {isState.formData?.map((e, index) => (
+                                        {findValue.arrayItem?.map((e, index) => (
                                             <div
                                                 className="grid items-center grid-cols-13 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
                                                 key={e?.id?.toString()}
                                             >
-                                                <h6 className="text-[13px] font-medium py-1 col-span-3 text-left">
-                                                    <div className="flex items-center gap-2">
+
+                                                <h6 className="text-[13px] flex items-center font-medium py-1 col-span-3 text-left">
+                                                    {!e?.child &&
+                                                        <button
+                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                                            onClick={() => {
+                                                                console.log(e)
+                                                                handleIncrease(e);
+                                                            }}
+                                                        >
+                                                            <Add size="20" />
+                                                        </button>
+                                                    }
+                                                    {e?.child && <IconDown className="rotate-45" />}
+                                                    <div className={`flex items-center gap-2`}>
                                                         <div>
-                                                            {e?.item.image != null ? (
+                                                            {e?.item?.image != null ? (
                                                                 <ModalImage
-                                                                    small={e?.item.image}
-                                                                    large={e?.item.image}
+                                                                    small={e?.item?.image}
+                                                                    large={e?.item?.image}
                                                                     alt="Product Image"
                                                                     className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
                                                                 />
@@ -427,7 +471,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                 {e?.item?.name}
                                                             </h6>
                                                             <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                {e?.item.type}
+                                                                {e?.item?.variation}
                                                             </h6>
                                                         </div>
                                                     </div>
@@ -436,13 +480,13 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                     {e?.unit}
                                                 </h6>
                                                 <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                    {formatNumber(e?.quantityNeed)}
+                                                    {e?.quantityNeed == 0 ? "-" : e?.quantityNeed}
                                                 </h6>
                                                 <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                    {formatNumber(e?.quantityKept)}
+                                                    {e?.quantityKept == 0 ? "-" : e?.quantityKept}
                                                 </h6>
                                                 <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                    {formatNumber(e?.quantityInventory)}
+                                                    {e?.quantityInventory == 0 ? "-" : e?.quantityInventory}
                                                 </h6>
                                                 <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-2  rounded-md text-center break-words">
                                                     <Controller
@@ -450,12 +494,12 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                         control={form.control}
                                                         rules={{
                                                             required: {
-                                                                value: true,
+                                                                value: findValue.arrayItem.find(x => x?.id == e?.id)?.valueWarehouse ? false : true,
                                                                 message: 'Vui lòng chọn kho'
-                                                            }
+                                                            },
                                                         }}
                                                         render={({ field, fieldState }) => {
-                                                            const arrWareHouse = isState.formData.find(x => x.id == e.id).warehouse
+                                                            const arrWareHouse = findValue.arrayItem.find(x => x?.id == e?.id)?.warehouse
                                                             return (
                                                                 <>
                                                                     <SelectComponent
@@ -466,18 +510,28 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                         formatOptionLabel={(option) => (
                                                                             <div className="flex justify-start items-center gap-1 z-[99]">
                                                                                 <h2>{option?.label}</h2>
-                                                                                <h2>{`(${option?.value})`}</h2>
+                                                                                <h2>{`(Tồn: ${option?.value})`}</h2>
                                                                             </div>
                                                                         )}
                                                                         {...field}
-                                                                        onValueChange={(event) =>
-                                                                            field.onChange({
-                                                                                newValue: event,
-                                                                                ...e
-                                                                            })
-                                                                        }
+                                                                        onChange={(event) => {
+                                                                            const check = findValue.arrayItem.some(x => x?.valueWarehouse?.id == event?.id)
+                                                                            if (check) {
+                                                                                return isShow("error", "Kho đã được chọn")
+                                                                            }
 
-                                                                        value={field.value?.newValue}
+                                                                            fetchListLocationWarehouse(e, event?.id)
+                                                                            field.onChange(event)
+                                                                        }
+                                                                        }
+                                                                        styles={{
+                                                                            menu: (provided, state) => ({
+                                                                                ...provided,
+                                                                                width: "150%",
+                                                                                zIndex: 999,
+                                                                            }),
+                                                                        }}
+                                                                        value={findValue.arrayItem.find(x => x?.id == e?.id)?.valueWarehouse}
                                                                         maxMenuHeight={150}
                                                                     />
                                                                     {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
@@ -485,16 +539,15 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                             )
                                                         }}
                                                     />
-
                                                 </h6>
-                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-3 flex gap-2  rounded-md text-center break-words">
+                                                <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-3 grid grid-cols-1 gap-2  rounded-md text-center break-words">
                                                     <Controller
                                                         name={`arrayItem.${index}.valueLocation`}
                                                         control={form.control}
                                                         render={({ field, fieldState }) => {
-                                                            const arrWareHouse = isState.formData.find(x => x.id == e.id).warehouseLocation
+                                                            const arrWareHouse = findValue.arrayItem.find(x => x?.id == e?.id)?.warehouseLocation
                                                             return (
-                                                                arrWareHouse.map((x, Iindex) => {
+                                                                arrWareHouse?.map((x, Iindex) => {
                                                                     return (
                                                                         <Controller
                                                                             name={`arrayItem.${index}.valueLocation.${Iindex}`}
@@ -503,13 +556,30 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                 required: {
                                                                                     value: x.show,
                                                                                     message: 'Nhập số lượng'
+                                                                                },
+                                                                                validate: {
+                                                                                    fn: (value) => {
+                                                                                        console.log(value);
+                                                                                        try {
+                                                                                            let mss = ''
+                                                                                            if (x.show && value.newValue == null) {
+                                                                                                mss = 'Nhập số lượng'
+                                                                                            }
+                                                                                            if (x.show && value.newValue == 0) {
+                                                                                                mss = 'Số lượng phải lớn hơn 0'
+                                                                                            }
+                                                                                            return mss || true;
+                                                                                        } catch (error) {
+                                                                                            throw error;
+                                                                                        }
+                                                                                    }
                                                                                 }
                                                                             }}
                                                                             render={({ field, fieldState }) => {
                                                                                 return (
                                                                                     <div
                                                                                         key={x.id}
-                                                                                        className="w-full grid grid-cols-1 items-start z-[99]"
+                                                                                        className="w-full  z-[99]"
                                                                                     >
                                                                                         <Zoom>
                                                                                             <div
@@ -535,7 +605,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                                         </span>
                                                                                                     </h3>
                                                                                                     <div className="flex items-center font-oblique flex-wrap">
-                                                                                                        {dataProductSerial.is_enable === "1" ? (
+                                                                                                        {dataProductSerial.is_enable === "1" && (
                                                                                                             <div className="flex gap-0.5">
                                                                                                                 <h6 className="text-[8px]">
                                                                                                                     Serial:
@@ -544,10 +614,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                                                     {x.serial == null || x.serial == "" ? "-" : x?.serial}
                                                                                                                 </h6>
                                                                                                             </div>
-                                                                                                        ) : (
-                                                                                                            ""
                                                                                                         )}
-                                                                                                        {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                                                                        {(dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") && (
                                                                                                             <>
                                                                                                                 <div className="flex gap-0.5">
                                                                                                                     <h6 className="text-[8px]">
@@ -566,8 +634,6 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                                                     </h6>
                                                                                                                 </div>
                                                                                                             </>
-                                                                                                        ) : (
-                                                                                                            ""
                                                                                                         )}
                                                                                                     </div>
                                                                                                 </div>
@@ -581,7 +647,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                                 {...field}
                                                                                                 onChange={(event) =>
                                                                                                     field.onChange({
-                                                                                                        newValue: event.target.value,
+                                                                                                        newValue: event.target.value == '' ? null : event.target.value,
                                                                                                         ...x
                                                                                                     })
                                                                                                 }
@@ -591,6 +657,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                                     if (floatValue == 0) {
                                                                                                         return true;
                                                                                                     }
+                                                                                                    if (floatValue > x.value) {
+                                                                                                        isShow('warning', `Vui lòng nhập số nhỏ hơn hoặc bằng ${formatNumber(x.value)}`);
+                                                                                                        return false
+                                                                                                    }
                                                                                                     if (floatValue < 0) {
                                                                                                         isShow('warning', 'Vui lòng nhập lớn hơn 0');
                                                                                                         return false
@@ -599,7 +669,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                                 }}
                                                                                             />
                                                                                         }
-                                                                                        {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
+                                                                                        {x.show && fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
                                                                                     </div>
                                                                                 )
                                                                             }}
