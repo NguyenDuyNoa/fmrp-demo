@@ -119,7 +119,7 @@ const Navbar = (props) => {
                 navbar && navbar.map((item) => {
                     return (
                         <>
-                            <h1 className="text-sm">{item.title}</h1>
+                            <h1 className="2xl:text-sm text-xs">{item.title}</h1>
                             {item.children ?
                                 item.children.map((child) => {
                                     return (
