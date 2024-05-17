@@ -148,7 +148,7 @@ const Index = (props) => {
                                         {/* header table */}
 
                                         <div className='my-2'>
-                                            <HeaderTable gridCols={12} className={'rounded-none  !bg-slate-100 '}>
+                                            <HeaderTable gridCols={12} className={'!rounded-none  !bg-slate-100 '}>
                                                 <ColumnTable colSpan={2} textAlign={'center'}>
                                                     Mã nhà cung cấp
                                                 </ColumnTable>
