@@ -80,7 +80,7 @@ const Index = (props) => {
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
     //new
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [listData, sListData] = useState([]);
 
@@ -744,7 +744,7 @@ const Index = (props) => {
             </Head>
             <Container className='!h-auto'>
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
+                    {statusExprired ? (
                         <EmptyExprired />
                     ) : (
 

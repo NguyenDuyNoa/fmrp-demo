@@ -19,7 +19,7 @@ import PopupAppTrial from "@/components/UI/popup/PopupAppTrial";
 const Dashboard = () => {
     const dispatch = useDispatch();
     const dataPstWH = useSelector((state) => state.trangthai);
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const _HandleExample = () => {
         dispatch({
@@ -48,7 +48,7 @@ const Dashboard = () => {
                         }}
                     />
                 )}
-                <div className={`${trangthaiExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
+                <div className={`${statusExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
                     <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">Lệnh sản xuất</h3>
                     <button
                         style={{

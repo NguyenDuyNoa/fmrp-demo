@@ -45,7 +45,7 @@ const Index = (props) => {
 
     const isShow = useToast()
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems()
 
@@ -188,7 +188,7 @@ const Index = (props) => {
                 <title>{dataLang?.personnels_deparrtments_title}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">

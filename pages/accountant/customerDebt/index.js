@@ -51,7 +51,7 @@ const Index = (props) => {
     const dataSeting = useSetingServer()
     const [total, sTotal] = useState({});
     const [keySearch, sKeySearch] = useState("");
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
@@ -307,7 +307,7 @@ const Index = (props) => {
                 <title>{dataLang?.customerDebt_title || "customerDebt_title"} </title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
 
                 ) : (

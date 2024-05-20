@@ -10,7 +10,7 @@ import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 const Index = (props) => {
     const dataLang = props.dataLang;
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
     const initialData = {
         data: [
             {
@@ -1684,7 +1684,7 @@ const Index = (props) => {
                 <title>{"Điều độ sản xuất"}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? <EmptyExprired /> : <Header data={data} listStaff={listStaff}></Header>}
+                {statusExprired ? <EmptyExprired /> : <Header data={data} listStaff={listStaff}></Header>}
                 <FilterHeader />
                 <MainTable
                     data={data}

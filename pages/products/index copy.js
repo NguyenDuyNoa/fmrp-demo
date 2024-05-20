@@ -99,7 +99,7 @@ const Index = (props) => {
 
     const dispatch = useDispatch();
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     useEffect(() => {
         router.push({
@@ -445,7 +445,7 @@ const Index = (props) => {
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
+                    {statusExprired ? (
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">

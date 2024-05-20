@@ -34,7 +34,7 @@ const Expirred = () => {
 
     useEffect(() => {
         dispatch({
-            type: "trangthaiExprired",
+            type: "statusExprired",
             // payload: false,
             payload: checkDate,
         });

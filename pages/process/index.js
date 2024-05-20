@@ -16,7 +16,7 @@ import {
 } from "iconsax-react";
 import useStatusExprired from "@/hooks/useStatusExprired";
 const Index = () => {
-    const trangthaiExprired = useStatusExprired()
+    const statusExprired = useStatusExprired()
     return (
         <React.Fragment>
             <Head>
@@ -24,7 +24,7 @@ const Index = () => {
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-10 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between">
                 <div className="space-y-3 overflow-hidden">
-                    {trangthaiExprired ? (
+                    {statusExprired ? (
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">

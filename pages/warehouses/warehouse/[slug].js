@@ -343,7 +343,7 @@ const Index = (props) => {
     const _HandleFresh = () => {
         sOnFetching(true);
     };
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     console.log('data', data);
 
@@ -353,7 +353,7 @@ const Index = (props) => {
                 <title>{title}</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
@@ -626,16 +626,16 @@ const Index = (props) => {
                                     <div className={`2xl:w-[100%] pr-2`}>
                                         <div
                                             className={`${dataProductSerial.is_enable == "1"
-                                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                    ? "grid-cols-12"
+                                                    : dataMaterialExpiry.is_enable == "1"
                                                         ? "grid-cols-12"
-                                                        : dataMaterialExpiry.is_enable == "1"
-                                                            ? "grid-cols-12"
-                                                            : "grid-cols-10"
-                                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                        : "grid-cols-10"
+                                                : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                    ? "grid-cols-11"
+                                                    : dataMaterialExpiry.is_enable == "1"
                                                         ? "grid-cols-11"
-                                                        : dataMaterialExpiry.is_enable == "1"
-                                                            ? "grid-cols-11"
-                                                            : "grid-cols-9"
+                                                        : "grid-cols-9"
                                                 }  grid sticky top-0 bg-white shadow-lg p-2 divide-x  z-10`}
                                         >
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center">
@@ -692,18 +692,18 @@ const Index = (props) => {
                                                 {data?.map((e) => (
                                                     <div
                                                         className={`${dataProductSerial.is_enable == "1"
-                                                                ? dataMaterialExpiry.is_enable !=
-                                                                    dataProductExpiry.is_enable
+                                                            ? dataMaterialExpiry.is_enable !=
+                                                                dataProductExpiry.is_enable
+                                                                ? "grid-cols-12"
+                                                                : dataMaterialExpiry.is_enable == "1"
                                                                     ? "grid-cols-12"
-                                                                    : dataMaterialExpiry.is_enable == "1"
-                                                                        ? "grid-cols-12"
-                                                                        : "grid-cols-10"
-                                                                : dataMaterialExpiry.is_enable !=
-                                                                    dataProductExpiry.is_enable
+                                                                    : "grid-cols-10"
+                                                            : dataMaterialExpiry.is_enable !=
+                                                                dataProductExpiry.is_enable
+                                                                ? "grid-cols-11"
+                                                                : dataMaterialExpiry.is_enable == "1"
                                                                     ? "grid-cols-11"
-                                                                    : dataMaterialExpiry.is_enable == "1"
-                                                                        ? "grid-cols-11"
-                                                                        : "grid-cols-9"
+                                                                    : "grid-cols-9"
                                                             }  grid hover:bg-slate-50`}
                                                     >
                                                         <div
@@ -731,8 +731,8 @@ const Index = (props) => {
                                                             <h6 className=" 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] py-3  w-fit text-left ">
                                                                 <span
                                                                     className={`${e.item_type == "product"
-                                                                            ? "text-lime-500  border-lime-500 "
-                                                                            : " text-orange-500 border-orange-500"
+                                                                        ? "text-lime-500  border-lime-500 "
+                                                                        : " text-orange-500 border-orange-500"
                                                                         } border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px]`}
                                                                 >
                                                                     {e.item_type ? dataLang[e?.item_type] : ""}
@@ -751,35 +751,35 @@ const Index = (props) => {
                                                         </div>
                                                         <div
                                                             className={`border-l border-r grid ${dataProductSerial.is_enable == "1"
-                                                                    ? dataMaterialExpiry.is_enable !=
-                                                                        dataProductExpiry.is_enable
+                                                                ? dataMaterialExpiry.is_enable !=
+                                                                    dataProductExpiry.is_enable
+                                                                    ? "col-span-8"
+                                                                    : dataMaterialExpiry.is_enable == "1"
                                                                         ? "col-span-8"
-                                                                        : dataMaterialExpiry.is_enable == "1"
-                                                                            ? "col-span-8"
-                                                                            : "col-span-6"
-                                                                    : dataMaterialExpiry.is_enable !=
-                                                                        dataProductExpiry.is_enable
+                                                                        : "col-span-6"
+                                                                : dataMaterialExpiry.is_enable !=
+                                                                    dataProductExpiry.is_enable
+                                                                    ? "col-span-7"
+                                                                    : dataMaterialExpiry.is_enable == "1"
                                                                         ? "col-span-7"
-                                                                        : dataMaterialExpiry.is_enable == "1"
-                                                                            ? "col-span-7"
-                                                                            : "col-span-5"
+                                                                        : "col-span-5"
                                                                 }`}
                                                         >
                                                             {e?.detail.map((e) => (
                                                                 <div
                                                                     className={`grid ${dataProductSerial.is_enable == "1"
-                                                                            ? dataMaterialExpiry.is_enable !=
-                                                                                dataProductExpiry.is_enable
+                                                                        ? dataMaterialExpiry.is_enable !=
+                                                                            dataProductExpiry.is_enable
+                                                                            ? "grid-cols-8"
+                                                                            : dataMaterialExpiry.is_enable == "1"
                                                                                 ? "grid-cols-8"
-                                                                                : dataMaterialExpiry.is_enable == "1"
-                                                                                    ? "grid-cols-8"
-                                                                                    : "grid-cols-6"
-                                                                            : dataMaterialExpiry.is_enable !=
-                                                                                dataProductExpiry.is_enable
+                                                                                : "grid-cols-6"
+                                                                        : dataMaterialExpiry.is_enable !=
+                                                                            dataProductExpiry.is_enable
+                                                                            ? "grid-cols-7"
+                                                                            : dataMaterialExpiry.is_enable == "1"
                                                                                 ? "grid-cols-7"
-                                                                                : dataMaterialExpiry.is_enable == "1"
-                                                                                    ? "grid-cols-7"
-                                                                                    : " grid-cols-5"
+                                                                                : " grid-cols-5"
                                                                         }`}
                                                                 >
                                                                     <div className="col-span-1 border-r border-b">

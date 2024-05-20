@@ -48,7 +48,7 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [onFetching, sOnFetching] = useState(false);
 
@@ -482,7 +482,7 @@ const Index = (props) => {
             </Head>
             {/* <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'> */}
             <Container className="!h-auto">
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
 const Index = () => {
-    const trangthaiExprired = useStatusExprired()
+    const statusExprired = useStatusExprired()
     const dataSell = [
         {
             name: "Bắt đầu",
@@ -196,7 +196,7 @@ const Index = () => {
             </Head>
             <div className="3xl:px-10 3xl:pt-16 3xl:pb-3 2xl:pt-[70px] xl:px-10 px-3 pt-16 pb-3 space-y-1 lg:h-screen overflow-auto flex flex-col justify-between">
                 <div className="px-2 py-4">
-                    {trangthaiExprired ? (
+                    {statusExprired ? (
                         <div className="p-3"></div>
                     ) : (
                         <div className="flex space-x-1 3xl:text-[16px] 2xl:text-[14px] xl:text-[15px] text-[12px]">

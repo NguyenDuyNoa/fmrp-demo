@@ -79,7 +79,7 @@ const Form = (props) => {
     const [isSubmitted, sIsSubmitted] = useState(false);
     const [dataErr, sDataErr] = useState(false);
 
-    const trangthaiExprired = useStatusExprired()
+    const statusExprired = useStatusExprired()
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
@@ -724,7 +724,7 @@ const Form = (props) => {
                     errData={errData}
                     setOpen={true}
                 />
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
 

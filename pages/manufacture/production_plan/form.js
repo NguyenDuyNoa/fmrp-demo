@@ -40,7 +40,7 @@ const FormAdd = (props) => {
 
     const queryData = (key) => sData((prve) => ({ ...prve, ...key }));
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { getItem, setItem } = FnlocalStorage();
 
@@ -305,7 +305,7 @@ const FormAdd = (props) => {
                 <title>{"Thêm kế hoạch nguyên vật liệu"}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

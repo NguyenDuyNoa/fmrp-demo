@@ -40,7 +40,7 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { isOpen, isId, handleQueryId } = useToggle();
 
@@ -169,7 +169,7 @@ const Index = (props) => {
                 <title>{dataLang?.suppliers_groups_title}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
 
                 ) : (

@@ -56,7 +56,7 @@ const Index = (props) => {
         valueDate: { startDate: null, endDate: null },
     };
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [listData, sListData] = useState(initsArr);
 
@@ -277,7 +277,7 @@ const Index = (props) => {
                 <title>{dataLang?.internal_plan || "internal_plan"} </title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

@@ -42,7 +42,7 @@ const Index = (props) => {
 
     const [data, sData] = useState([]);
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [dataExcel, sDataExcel] = useState([]);
 
@@ -272,7 +272,7 @@ const Index = (props) => {
                 <title>{dataLang?.debt_suppliers || "debt_suppliers"} </title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

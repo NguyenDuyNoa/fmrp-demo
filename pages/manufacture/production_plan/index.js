@@ -40,7 +40,7 @@ const Index = (props) => {
 
     const router = useRouter();
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
 
     const initialData = {
@@ -414,7 +414,7 @@ const Index = (props) => {
                 <title>{"Kế hoạch sản xuất"}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? <EmptyExprired /> : <Header {...shareProps} />}
+                {statusExprired ? <EmptyExprired /> : <Header {...shareProps} />}
                 <FilterHeader {...shareProps} onChangeValue={onChangeValue} />
 
                 <BodyGantt

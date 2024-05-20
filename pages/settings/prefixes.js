@@ -20,7 +20,7 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const dataLang = props.dataLang;
-    const trangthaiExprired = useStatusExprired()
+    const statusExprired = useStatusExprired()
     const [onFetching, sOnFetching] = useState(false);
     const [onSending, sOnSending] = useState(false);
     const [data, sData] = useState([]);
@@ -110,7 +110,7 @@ const Index = (props) => {
                 <title>Thiết lập tiếp đầu ngữ</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
 

@@ -74,7 +74,7 @@ const Index = (props) => {
 
     const [dataWarehouse, sDataWarehouse] = useState([]);
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
@@ -733,7 +733,7 @@ const Index = (props) => {
                 <title>{id ? dataLang?.production_warehouse_edit : dataLang?.production_warehouse_add}</title>
             </Head>
             <Container className={'!h-auto'}>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />) :
                     (
                         <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

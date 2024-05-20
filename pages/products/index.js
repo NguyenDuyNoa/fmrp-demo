@@ -52,7 +52,7 @@ const Index = (props) => {
 
     const dispatch = useDispatch();
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const dataSeting = useSetingServer()
 
@@ -388,7 +388,7 @@ const Index = (props) => {
                 <title>{dataLang?.header_category_finishedProduct_list}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
 

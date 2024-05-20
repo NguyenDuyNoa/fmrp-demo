@@ -67,7 +67,7 @@ const Index = (props) => {
 
     const dataSeting = useSetingServer()
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [onFetching, sOnFetching] = useState(false);
 
@@ -330,7 +330,7 @@ const Index = (props) => {
                 <title>{dataLang?.header_category_material_list}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

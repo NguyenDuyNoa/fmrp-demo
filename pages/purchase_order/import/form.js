@@ -59,7 +59,7 @@ const Index = (props) => {
 
     const [onFetching, sOnFetching] = useState(false);
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
 
@@ -1165,7 +1165,7 @@ const Index = (props) => {
                 <title>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</title>
             </Head>
             <Container className="!h-auto">
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

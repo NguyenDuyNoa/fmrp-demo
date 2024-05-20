@@ -72,7 +72,7 @@ const Index = (props) => {
 
     const dataSeting = useSetingServer()
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
@@ -475,7 +475,7 @@ const Index = (props) => {
                 {isState.data_export.length > 0 && (
                     <Popup_status className="hidden" data_export={isState.data_export} dataLang={dataLang} />
                 )}
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
 

@@ -55,7 +55,7 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { isOpen, isId, handleQueryId } = useToggle();
 
@@ -199,7 +199,7 @@ const Index = (props) => {
                 </title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

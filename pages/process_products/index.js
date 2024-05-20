@@ -9,7 +9,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";
 
 const Index = () => {
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
     const router = useRouter();
     return (
         <React.Fragment>
@@ -18,7 +18,7 @@ const Index = () => {
             </Head>
             <div className="3xl:px-10 3xl:pt-16 3xl:pb-3 2xl:pt-[70px] xl:px-10 px-3 pt-16 pb-3 space-y-1 lg:h-screen overflow-hidden flex flex-col justify-between">
                 <div className="space-y-2 overflow-hidden px-2 py-4">
-                    {trangthaiExprired ? (
+                    {statusExprired ? (
                         <div className="p-3"></div>
                     ) : (
                         <div className="flex space-x-1 3xl:text-[16px] 2xl:text-[14px] xl:text-[15px] text-[12px]">

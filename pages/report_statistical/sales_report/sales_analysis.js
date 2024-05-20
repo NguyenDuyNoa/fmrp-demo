@@ -29,7 +29,7 @@ const Index = (props) => {
 
     const router = useRouter()
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
     const formatNumber = (number) => {
@@ -62,7 +62,7 @@ const Index = (props) => {
                 <title>Phân tích bán hàng</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : null}
 

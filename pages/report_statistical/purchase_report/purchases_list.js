@@ -28,7 +28,7 @@ const Index = (props) => {
 
     const router = useRouter()
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
     const formatNumber = (number) => {
@@ -61,7 +61,7 @@ const Index = (props) => {
                 <title>Bảng kê mua hàng</title>
             </Head>
             <Container className={'!pb-0'}>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : null}
 
@@ -183,33 +183,33 @@ const Index = (props) => {
                                                 </ColumnTable>
                                             </HeaderTable>
                                             <RowTable gridCols={12} className={'  bg-slate-100'}>
-                                                <RowItemTable colSpan={2} textAlign={'center'}>
+                                                <RowItemTable colSpan={2} className={'!text-[#3276FA]'} textAlign={'center'}>
                                                     NCC-Vải Thịnh Phát
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={'center'}>
+                                                <RowItemTable colSpan={1} className={'!text-[#3276FA]'} textAlign={'center'}>
                                                     Vải Thịnh Phát
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={'right'}>
+                                                <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
                                                     0
                                                 </RowItemTable>
 
                                                 <RowTable gridCols={6} className={'col-span-8 grid grid-cols-6'}>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
                                                         39,528,000
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
                                                         725,000
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'} >
+                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'} >
                                                         0
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
                                                         0
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
                                                         9,055,000
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} className={'!text-red-500 !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
                                                         31,198,000
                                                     </RowItemTable>
                                                 </RowTable>

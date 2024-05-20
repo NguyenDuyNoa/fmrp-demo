@@ -54,7 +54,7 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const router = useRouter();
 
@@ -270,7 +270,7 @@ const Index = (props) => {
                 <title>{dataLang?.header_category_personnel_position || "header_category_personnel_position"}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

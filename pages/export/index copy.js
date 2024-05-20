@@ -35,7 +35,7 @@ const Index = (props) => {
         materials: [],
         products: [],
     };
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const scrollAreaRef = useRef(null);
 
@@ -510,7 +510,7 @@ const Index = (props) => {
                 <title>{"Export dữ liệu"}</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 h-screen overflow-hidden">
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">

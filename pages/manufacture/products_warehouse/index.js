@@ -69,7 +69,7 @@ const Index = (props) => {
 
     const dataSeting = useSetingServer()
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const { isKeyState, isOpen, handleQueryId } = useToggle();
 
@@ -454,7 +454,7 @@ const Index = (props) => {
                         dataLang={dataLang}
                     />
                 )}
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
 

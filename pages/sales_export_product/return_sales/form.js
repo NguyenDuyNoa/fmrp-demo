@@ -88,7 +88,7 @@ const Index = (props) => {
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [fetChingData, sFetchingData] = useState(initsFetching);
 
@@ -887,7 +887,7 @@ const Index = (props) => {
                 </title>
             </Head>
             <Container className="!h-auto">
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
 

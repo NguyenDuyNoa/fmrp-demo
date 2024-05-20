@@ -14,7 +14,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { Container } from "@/components/UI/common/layout";
 const Index = (props) => {
     const dataLang = props.dataLang;
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
     const [isShow, sIsshow] = useState({
         showHidden: false,
         showHistory: 1,
@@ -1219,7 +1219,7 @@ const Index = (props) => {
                 <title>{"Tổng quan sản xuất"}</title>
             </Head>
             <Container className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 lg:pb-10 overflow-hidden h-screen">
-                {trangthaiExprired ? <div className="p-4"></div> : <Header {...propsDetail} />}
+                {statusExprired ? <div className="p-4"></div> : <Header {...propsDetail} />}
                 <Main {...propsDetail} />
                 <ModalDetail {...propsDetail} />
             </Container>

@@ -18,7 +18,7 @@ const Index = (props) => {
 
     const [onFetching, sOnFetching] = useState(false);
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const [onSending, sOnSending] = useState(false);
 
@@ -144,7 +144,7 @@ const Index = (props) => {
                 <title>Thiết lập chung</title>
             </Head>
             <Container>
-                {trangthaiExprired ? (
+                {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">

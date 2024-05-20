@@ -13,7 +13,7 @@ const MainTable = dynamic(() => import("./components/table/mainTable"), { ssr: f
 const Index = (props) => {
     const dataLang = props.dataLang;
 
-    const trangthaiExprired = useStatusExprired();
+    const statusExprired = useStatusExprired();
 
     const propsDefault = { dataLang };
 
@@ -23,7 +23,7 @@ const Index = (props) => {
                 <title>{"Kế hoạch nguyên vật liệu"}</title>
             </Head>
             <Container>
-                {trangthaiExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
+                {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}
                 <MainTable {...propsDefault} />
             </Container>
         </>

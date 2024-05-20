@@ -594,12 +594,14 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Tồn quỹ"
+                            name: "Tồn quỹ",
+                            link: "/report_statistical/fund_balance"
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Tồn kho"
+                            name: "Tồn kho",
+                            link: "/report_statistical/warehouse_report"
                         },
                         {
                             viewOwn: -1,
