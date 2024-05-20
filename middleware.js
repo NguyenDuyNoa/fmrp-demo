@@ -16,7 +16,6 @@ export async function middleware(request, event) {
             },
             signal: event.signal
         }).then(async (res) => {
-            if (!res) return
             const data = await res.json();
             if (data.isSuccess) {
                 return NextResponse.next();
