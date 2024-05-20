@@ -584,7 +584,8 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Công nợ phải thu"
+                            name: "Công nợ phải thu",
+                            link: "/report_statistical/receivables_debt"
                         },
                         {
                             viewOwn: -1,

@@ -68,7 +68,7 @@ const Index = (props) => {
 
                 <div className='h-full'>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <TitleHeader />
+                        <TitleHeader title={'Tồn kho'} />
                         <div className='grid grid-cols-10'>
                             <Navbar />
                             <div className='col-span-8'>

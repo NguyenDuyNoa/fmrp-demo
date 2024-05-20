@@ -215,25 +215,53 @@ const Navbar = (props) => {
             ]
         },
     ]
-
-
+    // Công nợ phải thu
+    const isNavbarReceivables = [
+        {
+            id: uuidv4(),
+            name: "Tổng hợp công nợ phải thu",
+            path: "/report_statistical/receivables_debt/aggregate_debt",
+        },
+        {
+            id: uuidv4(),
+            name: "Chi tiết công nợ phải thu",
+            path: "/report_statistical/receivables_debt/aggregate_debt_detail",
+        },
+        {
+            id: uuidv4(),
+            name: "Tổng hợp công nợ phải thu theo nhân viên",
+            path: "/report_statistical/receivables_debt/employee_debt",
+        },
+        {
+            id: uuidv4(),
+            name: "Bảng đối chiếu công nợ",
+            path: "/report_statistical/receivables_debt/debt_comparison_table",
+        },
+    ]
 
     const [navbar, setNavbar] = useState([])
 
     useEffect(() => {
-        if (router.pathname.startsWith("/report_statistical/sales_report")) {
-            setNavbar(isNavbarSales)
+        const path = router.pathname;
+        switch (true) {
+            case path.startsWith("/report_statistical/sales_report"):
+                setNavbar(isNavbarSales);
+                break;
+            case path.startsWith("/report_statistical/purchase_report"):
+                setNavbar(isNavbarPurchase);
+                break;
+            case path.startsWith("/report_statistical/warehouse_report"):
+                setNavbar(isNavbarWarehouse);
+                break;
+            case path.startsWith("/report_statistical/fund_balance"):
+                setNavbar(isNavbarFundBalance);
+                break;
+            case path.startsWith("/report_statistical/receivables_debt"):
+                setNavbar(isNavbarReceivables);
+                break;
+            default:
+                break;
         }
-        if (router.pathname.startsWith("/report_statistical/purchase_report")) {
-            setNavbar(isNavbarPurchase)
-        }
-        if (router.pathname.startsWith("/report_statistical/warehouse_report")) {
-            setNavbar(isNavbarWarehouse)
-        }
-        if (router.pathname.startsWith("/report_statistical/fund_balance")) {
-            setNavbar(isNavbarFundBalance)
-        }
-
     }, [router.pathname])
 
 
