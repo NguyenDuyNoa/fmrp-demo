@@ -23,6 +23,7 @@ import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericF
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import Loading from "@/components/UI/loading";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Image from "next/image";
 const Popup_NVL = React.memo((props) => {
     const dataOptUnit = useSelector((state) => state.unit_NVL);
 
@@ -1058,7 +1059,7 @@ const Popup_NVL = React.memo((props) => {
                                                             onChange={_HandleChangeFileThumb.bind(this)}
                                                             type="file"
                                                             id={`upload`}
-                                                            accept="image/png, image/jpeg"
+                                                            accept="image/*"
                                                             hidden
                                                         />
                                                         <label
