@@ -20,7 +20,7 @@ import ModalImage from "react-modal-image";
 import { v4 as uuidv4 } from "uuid";
 import { _ServerInstance as Axios } from "/services/axios";
 
-const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest }) => {
+const PopupPurchase = ({ dataLang, icon, title, dataTable, className, fetchDataTable, ...rest }) => {
     const [open, sOpen] = useState(false);
 
     const isShow = useToast();
@@ -155,6 +155,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                     if (data?.isSuccess) {
                         isShow('success', data?.message)
                         _ToggleModal(false)
+                        fetchDataTable()
                         form.reset()
                     } else {
                         isShow('error', data?.message)
