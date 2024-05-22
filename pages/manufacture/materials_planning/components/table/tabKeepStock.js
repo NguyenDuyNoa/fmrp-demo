@@ -25,11 +25,11 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                 <div className="flex  items-center gap-4">
                     <button type="button" onClick={() => setIsTab('dataKeepStock')} className={`${isTab === 'dataKeepStock' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal 3xl:text-sm text-xs w-fit rounded-md  flex gap-1 items-center`}>
                         Giữ kho
-                        <span className="bg-[#0BAA2E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">{dataTable?.listDataRight?.dataKeepStock?.length}</span>
+                        <span className="bg-[#0BAA2E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">{dataTable?.listDataRight?.dataKeepStock?.length ?? 0}</span>
                     </button>
                     <button type="button" onClick={() => setIsTab('dataPurchases')} className={`${isTab === 'dataPurchases' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal 3xl:text-sm text-xs w-fit rounded-md  flex gap-1 items-center`}>
                         YCMH
-                        <span className="bg-[#EE1E1E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">{dataTable?.listDataRight?.dataPurchases?.length}</span>
+                        <span className="bg-[#EE1E1E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">{dataTable?.listDataRight?.dataPurchases?.length ?? 0}</span>
                     </button>
                 </div>
             </div>
