@@ -80,7 +80,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                                             <span className="px-2 text-[#9295A4] font-normal 3xl:text-sm text-xs">
                                                 bởi
                                             </span>
-                                            {e.user}
+                                            <span className="capitalize">{e.user}</span>
                                         </h5>
                                         <TagWarehouse data={e?.warehousemanId} />
                                     </div>
@@ -237,7 +237,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                                             <span className="px-2 text-[#9295A4] font-normal 3xl:text-sm text-xs">
                                                 bởi
                                             </span>
-                                            {e.user}
+                                            <span className="capitalize">{e.user}</span>
                                         </h5>
                                         {/* <div className="bg-[#FEF8EC] rounded-xl w-fit flex items-center gap-2">
                                             <div className="bg-[#FF8F0D] h-2 w-2 rounded-full ml-2" />

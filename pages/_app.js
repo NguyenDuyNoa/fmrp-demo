@@ -1,23 +1,23 @@
 import Head from "next/head";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import React, { useState, useEffect } from "react";
-import { useSelector, Provider, useDispatch } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 
-import store from "/services/redux";
 import Layout from "@/components/layout";
 import { _ServerInstance as Axios } from "/services/axios";
+import store from "/services/redux";
 
-import "../styles/globals.scss";
-import "sweetalert2/src/sweetalert2.scss";
 import "react-datepicker/dist/react-datepicker.css";
+import "sweetalert2/src/sweetalert2.scss";
+import "../styles/globals.scss";
 
-import Swal from "sweetalert2";
-import Popup from "reactjs-popup";
-import { useRouter } from "next/router";
-import { Lexend_Deca } from "@next/font/google";
-import { More as IconMore, Eye as IconEye, EyeSlash as IconEyeSlash } from "iconsax-react";
 import { CookieCore } from "@/utils/lib/cookie";
+import { Lexend_Deca } from "@next/font/google";
+import { Eye as IconEye, EyeSlash as IconEyeSlash, More as IconMore } from "iconsax-react";
+import { useRouter } from "next/router";
+import Popup from "reactjs-popup";
+import Swal from "sweetalert2";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -191,26 +191,23 @@ const LoginPage = React.memo((props) => {
 
     const data = useSelector((state) => state.availableLang);
 
-    const [tab, sTab] = useState(0);
-    const _HandleSelectTab = (e) => sTab(e);
-
     const [typePassword, sTypePassword] = useState(false);
     const _TogglePassword = () => sTypePassword(!typePassword);
 
     const [rememberMe, sRememberMe] = useState(
-        // localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false
-        CookieCore.get("remembermeFMRP") ? CookieCore.get("remembermeFMRP") : false
+        localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false
+        // CookieCore.get("remembermeFMRP") ? CookieCore.get("remembermeFMRP") : false
     );
     const _ToggleRememberMe = () => sRememberMe(!rememberMe);
 
     const [code, sCode] = useState(
-        // localStorage?.getItem("usercodeFMRP") ? localStorage?.getItem("usercodeFMRP") : ""
-        CookieCore.get("usercodeFMRP") ? CookieCore.get("usercodeFMRP") : ""
+        localStorage?.getItem("usercodeFMRP") ? localStorage?.getItem("usercodeFMRP") : ""
+        // CookieCore.get("usercodeFMRP") ? CookieCore.get("usercodeFMRP") : ""
 
     );
     const [name, sName] = useState(
-        // localStorage?.getItem("usernameFMRP") ? localStorage?.getItem("usernameFMRP") : ""
-        CookieCore.get("usernameFMRP") ? CookieCore.get("usernameFMRP") : ""
+        localStorage?.getItem("usernameFMRP") ? localStorage?.getItem("usernameFMRP") : ""
+        // CookieCore.get("usernameFMRP") ? CookieCore.get("usernameFMRP") : ""
     );
     const [password, sPassword] = useState("");
     const [onSending, sOnSending] = useState(false);
@@ -249,9 +246,7 @@ const LoginPage = React.memo((props) => {
     };
 
     const _ServerSending = () => {
-        Axios(
-            "POST",
-            "/api_web/Api_Login/loginMain?csrf_protection=true",
+        Axios("POST", "/api_web/Api_Login/loginMain?csrf_protection=true",
             {
                 data: {
                     company_code: code,
@@ -284,28 +279,28 @@ const LoginPage = React.memo((props) => {
                         showToat("success", message);
 
                         if (rememberMe) {
-                            CookieCore.set('usernameFMRP', name, {
-                                path: "/",
-                                expires: new Date(Date.now() + 86400 * 1000),
-                                sameSite: true,
-                            })
-                            CookieCore.set('usercodeFMRP', code, {
-                                path: "/",
-                                expires: new Date(Date.now() + 86400 * 1000),
-                                sameSite: true,
-                            })
-                            CookieCore.set('remembermeFMRP', rememberMe, {
-                                path: "/",
-                                expires: new Date(Date.now() + 86400 * 1000),
-                                sameSite: true,
-                            })
-                            // localStorage.setItem("usernameFMRP", name);
-                            // localStorage.setItem("usercodeFMRP", code);
-                            // localStorage.setItem("remembermeFMRP", rememberMe);
+                            // CookieCore.set('usernameFMRP', name, {
+                            //     path: "/",
+                            //     expires: new Date(Date.now() + 86400 * 1000),
+                            //     sameSite: true,
+                            // })
+                            // CookieCore.set('usercodeFMRP', code, {
+                            //     path: "/",
+                            //     expires: new Date(Date.now() + 86400 * 1000),
+                            //     sameSite: true,
+                            // })
+                            // CookieCore.set('remembermeFMRP', rememberMe, {
+                            //     path: "/",
+                            //     expires: new Date(Date.now() + 86400 * 1000),
+                            //     sameSite: true,
+                            // })
+                            localStorage.setItem("usernameFMRP", name);
+                            localStorage.setItem("usercodeFMRP", code);
+                            localStorage.setItem("remembermeFMRP", rememberMe);
                         } else {
                             ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) =>
-                                // localStorage.removeItem(key)
-                                CookieCore.remove(key)
+                                localStorage.removeItem(key)
+                                // CookieCore.remove(key)
                             );
                         }
                     } else {
