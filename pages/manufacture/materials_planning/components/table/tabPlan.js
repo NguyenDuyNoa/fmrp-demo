@@ -115,7 +115,7 @@ const TabPlan = ({ dataTable, isFetching }) => {
                                             {formatNumber(e.quantityKeep)}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.lack)}
+                                            {e.lack > 0 ? formatNumber(e.lack) : 0}
                                         </h4>
                                     </div>
                             )}
@@ -241,7 +241,7 @@ const TabPlan = ({ dataTable, isFetching }) => {
                                             {formatNumber(e.quantityKeep)}
                                         </h4>
                                         <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.lack)}
+                                            {e.lack > 0 ? formatNumber(e.lack) : 0}
                                         </h4>
                                     </div>
                             )}
