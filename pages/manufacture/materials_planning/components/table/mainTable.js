@@ -606,9 +606,9 @@ const MainTable = ({ dataLang }) => {
                                                 </div>
                                             </button>
                                             ||
-                                            e.id == 1 && <PopupKeepStock fetchDataTable={fetchDataTable} id={e.id} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
+                                            e.id == 1 && <PopupKeepStock id={e.id} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
                                             ||
-                                            e.id == 2 && <PopupPurchase fetchDataTable={fetchDataTable} id={e.id} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
+                                            e.id == 2 && <PopupPurchase id={e.id} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
                                         }
                                     </Zoom>
                                 ))}

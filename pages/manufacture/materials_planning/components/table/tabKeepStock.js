@@ -11,6 +11,7 @@ import { TickCircle } from "iconsax-react";
 import moment from "moment";
 import Image from "next/image";
 import { useState } from "react";
+import ModalImage from "react-modal-image";
 
 const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) => {
     const dataSeting = useSetingServer();
@@ -125,11 +126,13 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                                                         className={`grid grid-cols-12 items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"} `}
                                                     >
                                                         <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
-                                                            <Image
-                                                                src={i.image}
+                                                            <ModalImage
+                                                                small={i.image}
+                                                                large={i.image}
                                                                 width={36}
                                                                 height={36}
-                                                                className="object-cover rounded"
+                                                                alt={i.image}
+                                                                className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                             />
                                                             <div className="flex flex-col gap-0.5">
                                                                 <h1 className="text-[#0F4F9E] font-semibold 3xl:text-sm text-xs">
@@ -287,11 +290,13 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                                                             } `}
                                                     >
                                                         <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
-                                                            <Image
-                                                                src={i.image}
+                                                            <ModalImage
+                                                                small={e.image}
+                                                                large={e.image}
                                                                 width={36}
                                                                 height={36}
-                                                                className="object-cover rounded"
+                                                                alt={e.image}
+                                                                className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                             />
                                                             <div className="flex flex-col gap-0.5">
                                                                 <h1 className="text-[#0F4F9E] font-semibold 3xl:text-sm text-xs">
