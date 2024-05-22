@@ -11,6 +11,7 @@ import { TickCircle } from "iconsax-react";
 import moment from "moment";
 import Image from "next/image";
 import { useState } from "react";
+import ModalImage from "react-modal-image";
 
 const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) => {
     const dataSeting = useSetingServer();
