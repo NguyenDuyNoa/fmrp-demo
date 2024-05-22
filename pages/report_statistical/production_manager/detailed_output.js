@@ -1,12 +1,12 @@
+// Báo cáo sản lượng chi tiết
 import OnResetData from '@/components/UI/btnResetData/btnReset';
 import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
 import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
 import { EmptyExprired } from '@/components/UI/common/EmptyExprired';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
-import { Container, ContainerTotal } from '@/components/UI/common/layout';
+import { Container } from '@/components/UI/common/layout';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
-import SelectComponent from '@/components/UI/filterComponents/selectComponent';
 import Loading from '@/components/UI/loading';
 import NoData from '@/components/UI/noData/nodata';
 import Pagination from "@/components/UI/pagination";
@@ -19,9 +19,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
-import { TbFileReport } from 'react-icons/tb';
 import Navbar from '../components/navbar';
 import TitleHeader from '../components/titleHeader';
+import SelectComponent from '@/components/UI/filterComponents/selectComponent';
 const Index = (props) => {
     const dataLang = props.dataLang
 
@@ -59,21 +59,21 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Báo cáo hàng trả lại</title>
+                <title>Báo cáo sản lượng chi tiết</title>
             </Head>
-            <Container>
+            <Container className={'!pb-0'}>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : null}
 
                 <div className='h-full'>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <TitleHeader title={'Báo cáo bán hàng'} />
+                        <TitleHeader title={'Quản lý sản xuất'} />
                         <div className='grid grid-cols-10'>
                             <Navbar />
                             <div className='col-span-8'>
                                 <div className="3xl:space-y-3 space-y-2 col-span-8">
-                                    <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
+                                    <div className="bg-slate-100 w-full rounded-t-lg items-start grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                         <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                             <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                                 <div className="grid grid-cols-5 gap-2">
@@ -82,50 +82,50 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: 'Khách hàng',
+                                                                label: 'Lệnh sản xuất',
                                                                 isDisabled: true,
                                                             },
                                                         ]}
-                                                        placeholder={'Khách hàng'}
+                                                        placeholder={'Lệnh sản xuất'}
                                                         isSearchable={true}
                                                         colSpan={1}
                                                     />
-                                                    {/* <div className="w-full relative">
-                                                        <DatePicker
-                                                            id="start"
-                                                            portalId="menu-time"
-                                                            calendarClassName="rasta-stripes"
-                                                            clearButtonClassName="text"
-                                                            // selected={startDate}
-                                                            // onChange={(date) => setStartDate(date)}
-                                                            isClearable
-                                                            placeholderText="Ngày bắt đầu"
-                                                            className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
-                                                        />
-                                                        <ArrowDown2
-                                                            size="11"
-                                                            color="#6b7280"
-                                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                                                        />
-                                                    </div>
-                                                    <div className="w-full relative">
-                                                        <DatePicker
-                                                            id="start"
-                                                            portalId="menu-time"
-                                                            calendarClassName="rasta-stripes"
-                                                            clearButtonClassName="text"
-                                                            // selected={startDate}
-                                                            // onChange={(date) => setStartDate(date)}
-                                                            isClearable
-                                                            placeholderText="Ngày kết thúc"
-                                                            className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
-                                                        />
-                                                        <ArrowDown2
-                                                            size="11"
-                                                            color="#6b7280"
-                                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                                                        />
-                                                    </div> */}
+                                                    {/* <SelectComponent
+                                                        options={[
+                                                            {
+                                                                value: "",
+                                                                label: 'Mặt hàng',
+                                                                isDisabled: true,
+                                                            },
+                                                        ]}
+                                                        placeholder={'Mặt hàng'}
+                                                        isSearchable={true}
+                                                        colSpan={1}
+                                                    /> */}
+                                                    <SelectComponent
+                                                        options={[
+                                                            {
+                                                                value: "",
+                                                                label: 'Nhân viên',
+                                                                isDisabled: true,
+                                                            },
+                                                        ]}
+                                                        placeholder={'Nhân viên'}
+                                                        isSearchable={true}
+                                                        colSpan={1}
+                                                    />
+                                                    <SelectComponent
+                                                        options={[
+                                                            {
+                                                                value: "",
+                                                                label: 'Công đoạn',
+                                                                isDisabled: true,
+                                                            },
+                                                        ]}
+                                                        placeholder={'Công đoạn'}
+                                                        isSearchable={true}
+                                                        colSpan={1}
+                                                    />
                                                     <div className="w-full relative">
                                                         <DatePicker
                                                             id="start"
@@ -137,7 +137,7 @@ const Index = (props) => {
                                                             // onChange={onChange}
                                                             // startDate={startDate}
                                                             // endDate={endDate}
-                                                            selectsRange
+                                                            // selectsRange
                                                             // onChange={(date) => setStartDate(date)}
                                                             isClearable
                                                             placeholderText="Từ ngày đến ngày"
@@ -170,32 +170,37 @@ const Index = (props) => {
                                 <div className="3xl:h-[620px] 2xl:max-h-[550px] 2xl:h-[550px] max-h-[550px] h-[550px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className={`2xl:w-[100%] pr-2`}>
                                         {/* header table */}
-                                        <HeaderTable gridCols={12}>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                Khách hàng
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                Phiếu hàng trả lại
+                                        <HeaderTable gridCols={10}>
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                                STT
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
                                                 Ngày
                                             </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                Mã mặt hàng
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                Tên mặt hàng
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                                Mã sản phẩm
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Số lượng
+                                                Tên sản phẩm
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Giá
+                                                Lệnh SX
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Thành tiền
+                                                Nhân viên
                                             </ColumnTable>
-
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                                Công đoạn
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                                Đơn giá
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                                SL thực nhập
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                                Tổng tiền
+                                            </ColumnTable>
                                         </HeaderTable>
                                         {/* data table */}
                                         {
@@ -204,29 +209,35 @@ const Index = (props) => {
                                             ) : isState?.data && isState?.data?.length > 0 ? (
                                                 <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
                                                     {isState.data?.map((e) => (
-                                                        <RowTable gridCols={12} key={e.id.toString()} >
-                                                            <RowItemTable colSpan={2} textAlign={'center'}>
+                                                        <RowTable gridCols={10} key={e.id.toString()} >
+                                                            <RowItemTable colSpan={1} textAlign={'center'}>
                                                                 {/* {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""} */}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={'center'}>
+                                                            <RowItemTable colSpan={1} textAlign={'center'}>
 
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} textAlign={'right'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={'right'}>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={2} textAlign={'right'}>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
 
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="flex items-center space-x-1">
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1}>
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
+
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
+
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={2} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
                                                         </RowTable>
@@ -238,20 +249,6 @@ const Index = (props) => {
                                         }
                                     </div>
                                 </div>
-                                {isState?.data?.length != 0 &&
-                                    <ContainerTotal className="!grid-cols-12">
-                                        <ColumnTable colSpan={9} textAlign={'center'} className="p-2">
-                                            {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1" />
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-                                    </ContainerTotal>
-                                }
                             </div>
                         </div>
                     </div>
@@ -274,8 +271,6 @@ const Index = (props) => {
             </Container>
         </React.Fragment >
     )
-
-
 }
 
 export default Index

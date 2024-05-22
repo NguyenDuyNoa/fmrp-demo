@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 const Navbar = (props) => {
     const router = useRouter()
@@ -238,7 +238,44 @@ const Navbar = (props) => {
             path: "/report_statistical/receivables_debt/debt_comparison_table",
         },
     ]
-
+    // Quản lý sản xuất
+    const isNavbarProductionManager = [
+        {
+            id: uuidv4(),
+            name: "Báo cáo định mức NVL",
+            path: "/report_statistical/production_manager/quota_materials",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo tiến độ theo đơn hàng",
+            path: "/report_statistical/production_manager/order_progress",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo lệnh sản xuất theo công đoạn",
+            path: "/report_statistical/production_manager/stage_production_order",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo nguyên liệu sử dụng",
+            path: "/report_statistical/production_manager/raw_materials_used",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo thời gian sản xuất theo đơn hàng",
+            path: "/report_statistical/production_manager/time_order_production",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo sản lượng chi tiết",
+            path: "/report_statistical/production_manager/detailed_output",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo nhập kho thành phẩm",
+            path: "/report_statistical/production_manager/import_warehouse_products",
+        },
+    ]
     const [navbar, setNavbar] = useState([])
 
     useEffect(() => {
@@ -259,6 +296,9 @@ const Navbar = (props) => {
             case path.startsWith("/report_statistical/receivables_debt"):
                 setNavbar(isNavbarReceivables);
                 break;
+            case path.startsWith("/report_statistical/production_manager"):
+                setNavbar(isNavbarProductionManager);
+                break;
             default:
                 break;
         }
@@ -266,11 +306,11 @@ const Navbar = (props) => {
 
 
     return (
-        <ul className='col-span-2 3xl:h-[620px] 2xl:max-h-[550px] 2xl:h-[550px] max-h-[550px] h-[550px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+        <ul className='col-span-2 flex flex-col gap-2 3xl:h-[620px] 2xl:max-h-[550px] 2xl:h-[550px] max-h-[550px] h-[550px] rounded-xl w-full list-disc list-inside  bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
             {
                 navbar && navbar.map((item) => {
                     return (
-                        <>
+                        <React.Fragment key={item.id}>
                             <h1 className="2xl:text-sm text-xs uppercase">{item.title}</h1>
                             {item.children ?
                                 item.children.map((child) => {
@@ -290,9 +330,9 @@ const Navbar = (props) => {
                                             </li>
                                             {router.pathname === child.path &&
                                                 <div className="absolute right-0 -top-1">
-                                                    <span class="relative flex h-3 w-3">
-                                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                                                    <span className="relative flex h-3 w-3">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
                                                     </span>
                                                 </div>
                                             }
@@ -315,15 +355,15 @@ const Navbar = (props) => {
                                     </li>
                                     {router.pathname === item.path &&
                                         <div className="absolute right-0 -top-1">
-                                            <span class="relative flex h-3 w-3">
-                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                                            <span className="relative flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
                                             </span>
                                         </div>
                                     }
                                 </Link>
                             }
-                        </>
+                        </React.Fragment>
                     )
                 })
             }

@@ -37,6 +37,8 @@ import { routerDeliveryReceipt } from "routers/sellingGoods";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -1116,12 +1118,10 @@ const Index = (props) => {
                             {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerDeliveryReceipt.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.import_comeback || "import_comeback"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
 
@@ -2417,19 +2417,15 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerDeliveryReceipt.home)}
-                                className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                            >
-                                {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
-                            </button>
-                            <button
+                                dataLang={dataLang}
+                            />
+                            <ButtonSubmit
                                 onClick={_HandleSubmit.bind(this)}
-                                type="submit"
-                                className="button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                            >
-                                {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}
-                            </button>
+                                loading={onSending}
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
                 </div>

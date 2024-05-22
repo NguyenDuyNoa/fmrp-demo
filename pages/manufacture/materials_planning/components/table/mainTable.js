@@ -14,21 +14,22 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import FilterHeader from "../header/filterHeader";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+// const TabItem = dynamic(() => import("./tabItem"), { ssr: false });
+import TabItem from "./tabItem";
 
-const TabItem = dynamic(() => import("./tabItem"), { ssr: false });
+// const TabPlan = dynamic(() => import("./tabPlan"), { ssr: false });
+import TabPlan from "./tabPlan";
 
-const TabPlan = dynamic(() => import("./tabPlan"), { ssr: false });
-
-const TabKeepStock = dynamic(() => import("./tabKeepStock"), { ssr: false });
+// const TabKeepStock = dynamic(() => import("./tabKeepStock"), { ssr: false });
+import TabKeepStock from "./tabKeepStock";
 
 import { CONFIRM_DELETION, TITLE_DELETE_COMMAND } from "@/constants/delete/deleteTable";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import formatNumber from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 
 
@@ -41,7 +42,7 @@ const MainTable = ({ dataLang }) => {
         },
         {
             id: 2,
-            name: "Thêm KH  mua hàng",
+            name: "Thêm yêu cầu mua hàng",
             icon: "/materials_planning/add.png",
         },
         {
@@ -85,6 +86,7 @@ const MainTable = ({ dataLang }) => {
                 productsBom: [],
             },
             dataKeepStock: [],
+            dataPurchase: [],
         },
         next: null
     }
@@ -102,7 +104,7 @@ const MainTable = ({ dataLang }) => {
         resetPage: false
     }
 
-    const { isOpen, isId, handleQueryId } = useToggle();
+    const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
     const [dataTable, sDataTable] = useState(initialState);
 
@@ -175,7 +177,8 @@ const MainTable = ({ dataLang }) => {
                                     productsBom: [],
                                     materialsBom: []
                                 },
-                                dataKeepStock: []
+                                dataKeepStock: [],
+                                dataPurchases: []
                             }
                         })
                     }
@@ -195,6 +198,9 @@ const MainTable = ({ dataLang }) => {
                 if (!err) {
                     const { data, isSuccess } = response?.data
                     if (isSuccess == 1) {
+                        console.log("data", data?.keepWarehouses);
+
+
                         queryState({
                             listDataRight: {
                                 title: data?.productionPlan?.reference_no,
@@ -209,8 +215,8 @@ const MainTable = ({ dataLang }) => {
                                                 id: uddid(),
                                                 image: i?.images ? i?.images : "/no_img.png",
                                                 name: i?.item_name,
-                                                productVariation: i?.product_variation,
-                                                subName: i?.item_code,
+                                                itemVariation: i?.product_variation,
+                                                code: i?.item_code,
                                                 quantity: +i?.quantity,
                                                 unit: i?.unit_name,
                                                 timeline: {
@@ -228,11 +234,12 @@ const MainTable = ({ dataLang }) => {
                                             name: e?.item_name,
                                             image: e?.images ? e?.images : "/no_img.png",
                                             unit: e?.unit_name,
-                                            use: formatNumber(+e?.total_quota),//sl sử dụng
-                                            exist: formatNumber(+e?.quantity_warehouse), //sl tồn
-                                            lack: formatNumber(+e?.quantity_rest), //sl thiếu
+                                            use: e?.total_quota,//sl sử dụng
+                                            exist: e?.quantity_warehouse, //sl tồn
+                                            lack: e?.quantity_rest, //sl thiếu
                                             code: e?.item_code,
-                                            itemVariation: e?.item_variation
+                                            itemVariation: e?.item_variation,
+                                            quantityKeep: e?.quantity_keep //sl đã giữ
                                         }
                                     }),
                                     materialsBom: data?.listBom?.materialsBom?.map(e => {
@@ -241,16 +248,70 @@ const MainTable = ({ dataLang }) => {
                                             name: e?.item_name,
                                             image: e?.images ? e?.images : "/no_img.png",
                                             unit: e?.unit_name,
-                                            use: formatNumber(+e?.total_quota),//sl sử dụng
-                                            exchange: formatNumber(+e?.quota_primary), //sl quy đổi
-                                            exist: formatNumber(+e?.quantity_warehouse), //sl tồn
-                                            lack: formatNumber(+e?.quantity_rest), //sl thiếu
+                                            use: e?.total_quota,//sl sử dụng
+                                            exchange: e?.quota_primary, //sl quy đổi
+                                            exist: e?.quantity_warehouse, //sl tồn
+                                            lack: e?.quantity_rest, //sl thiếu
                                             code: e?.item_code,
-                                            itemVariation: e?.item_variation
+                                            itemVariation: e?.item_variation,
+                                            quantityKeep: e?.quantity_keep //sl đã giữ
                                         }
                                     })
                                 },
-                                dataKeepStock: []
+                                dataKeepStock: data?.keepWarehouses?.map(e => {
+                                    return {
+                                        id: e?.id,
+                                        title: e?.code,
+                                        time: isMoment(e?.date, 'DD/MM/YYYY'),
+                                        user: e?.created_by_name,
+                                        warehousemanId: e?.warehouseman_id,
+                                        warehouseFrom: e?.name_w_from,
+                                        warehouseTo: e?.name_w_to,
+                                        arrListData: e?.items?.map(i => {
+                                            return {
+                                                id: i?.id_transfer,
+                                                image: i?.images ? i?.images : "/no_img.png",
+                                                name: i?.item_name,
+                                                quantity: i?.quantity_net,
+                                                unit: i?.unit_name,
+                                                lot: i?.lot,
+                                                expiration_date: i?.expiration_date,
+                                                serial: i?.serial,
+                                                code: i?.item_code,
+                                                itemVariation: i?.item_variation,
+                                                locationFrom: i?.name_location_from,
+                                                locationTo: i?.name_location_to,
+                                            }
+                                        })
+                                    }
+                                }),
+                                dataPurchases: data?.purchases?.map(e => {
+                                    return {
+                                        id: e?.id,
+                                        title: e?.code,
+                                        time: isMoment(e?.date, 'DD/MM/YYYY'),
+                                        user: e?.created_by_name,
+                                        status: e?.status,
+                                        arrListData: e?.items?.map(i => {
+                                            return {
+                                                id: i?.id_transfer,
+                                                image: i?.images ? i?.images : "/no_img.png",
+                                                name: i?.item_name,
+                                                quantity: i?.quantity_net,
+                                                unit: i?.unit_name,
+                                                lot: i?.lot,
+                                                expiration_date: i?.expiration_date,
+                                                serial: i?.serial,
+                                                code: i?.item_code,
+                                                itemVariation: i?.item_variation,
+                                                processBar: [
+                                                    { id: uddid(), active: i?.quantity_order && i?.quantity_order > 0, title: "Đặt hàng", quantity: i?.quantity_order },
+                                                    { id: uddid(), active: i?.quantity_import && i?.quantity_import > 0, title: "Nhập hàng", quantity: i?.quantity_import },
+                                                ],
+                                            }
+                                        })
+                                    }
+                                }),
                             },
                         })
                     }
@@ -326,7 +387,8 @@ const MainTable = ({ dataLang }) => {
                                 productsBom: [],
                                 materialsBom: []
                             },
-                            dataKeepStock: []
+                            dataKeepStock: [],
+                            dataPurchase: [],
                         }
                     })
                 }
@@ -370,11 +432,11 @@ const MainTable = ({ dataLang }) => {
     }
 
 
-    const handShowItem = (id) => {
+    const handShowItem = (id, type) => {
         queryState({
             listDataRight: {
                 ...dataTable.listDataRight,
-                dataPPItems: dataTable.listDataRight.dataPPItems?.map(e => {
+                [type]: dataTable.listDataRight?.[type]?.map(e => {
                     if (e.id == id) {
                         return {
                             ...e,
@@ -391,21 +453,44 @@ const MainTable = ({ dataLang }) => {
         queryValue({ search: e.target.value, page: 1, resetPage: true })
     }, 500)
 
+    const handDeleteItem = (id, type) => {
+        queryValue({ page: 1, resetPage: true })
+        handleQueryId({ status: true, id: id, idChild: type })
+    }
+
+    const handleConfimDeleteItem = async () => {
+        const type = {
+            dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
+            dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
+        }
+        await Axios("DELETE", type[isIdChild], {},
+            (err, response) => {
+                if (!err) {
+                    let { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        fetchDataTable()
+                        isShow("success", dataLang[message] || message);
+                    } else {
+                        isShow("error", dataLang[message] || message);
+                    }
+                }
+            }
+        );
+        handleQueryId({ status: false });
+    }
+
     const shareProps = {
         dataTable,
         dataLang,
         filterItem: () => { },
         handShowItem,
-        handDeleteItem: () => { },
+        handDeleteItem,
         isFetching,
         isValue,
         queryValue,
         fetDataOrder,
-        fetchDataPlan
+        fetchDataPlan,
     };
-    console.log(dataTable);
-
-
     return (
         <React.Fragment>
             <FilterHeader {...shareProps} />
@@ -427,10 +512,8 @@ const MainTable = ({ dataLang }) => {
                                 />
                             </form>
                         </div>
-                        <ScrollArea
+                        <Customscrollbar
                             className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
-                            speed={1}
-                            smoothScrolling={true}
                         >
                             {dataTable.listDataLeft.map((e, eIndex) => (
                                 <div
@@ -488,7 +571,7 @@ const MainTable = ({ dataLang }) => {
                             {dataTable.next &&
                                 <button type="button" onClick={() => queryValue({ page: isValue.page + 1 })} className="mx-auto text-sm block py-1 bg-blue-50 w-full hover:bg-blue-200 mt-1 transition-all duration-200 ease-linear">Xem thêm</button>
                             }
-                        </ScrollArea>
+                        </Customscrollbar>
                     </div>
                     <div className="w-[75%] border border-[#d8dae5] ">
                         <div className="flex items-center justify-between py-1 px-4 border-b">
@@ -565,7 +648,13 @@ const MainTable = ({ dataLang }) => {
                 title={TITLE_DELETE_COMMAND}
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
-                save={handleConfim}
+                save={() => {
+                    if (isIdChild) {
+                        handleConfimDeleteItem()
+                    } else {
+                        handleConfim()
+                    }
+                }}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>

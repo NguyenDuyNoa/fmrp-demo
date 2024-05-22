@@ -51,7 +51,7 @@ const ModalFilter = ({ isShow, handleIsShowFilter }) => {
                         </button>
                     </div>
                     <div className="flex items-center gap-4 mt-7">
-                        <div class="w-1/2">
+                        <div className="w-1/2">
                             <label htmlFor="start" className="text-sm text-gray-500 font-medium">
                                 Từ ngày
                             </label>
@@ -68,7 +68,7 @@ const ModalFilter = ({ isShow, handleIsShowFilter }) => {
                                 />
                             </div>
                         </div>
-                        <div class="w-1/2">
+                        <div className="w-1/2">
                             <label htmlFor="start" className="text-sm text-gray-500 font-medium">
                                 Đến ngày
                             </label>

@@ -30,6 +30,8 @@ import { routerWarehouseTransfer } from "routers/manufacture";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { SelectCore } from "@/utils/lib/Select";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 /// Hậu viết API
 const Index = (props) => {
     const router = useRouter();
@@ -502,7 +504,7 @@ const Index = (props) => {
     const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", moment(startDate).format("YYYY-MM-DD"));
         formData.append("branch_id", idBranch?.value);
         formData.append("warehouses_id", idExportWarehouse?.value);
         formData.append("warehouses_to", idReceiveWarehouse?.value);
@@ -817,12 +819,10 @@ const Index = (props) => {
                                 : dataLang?.warehouseTransfer_titleAadd || "warehouseTransfer_titleAadd"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerWarehouseTransfer.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.import_comeback || "import_comeback"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
 
@@ -855,13 +855,11 @@ const Index = (props) => {
                                         <DatePicker
                                             blur
                                             fixedHeight
-                                            showTimeSelect
                                             selected={startDate}
                                             onSelect={(date) => sStartDate(date)}
                                             onChange={(e) => handleTimeChange(e)}
-                                            placeholderText="DD/MM/YYYY HH:mm:ss"
-                                            dateFormat="dd/MM/yyyy h:mm:ss aa"
-                                            timeInputLabel={"Time: "}
+                                            placeholderText="DD/MM/YYYY"
+                                            dateFormat="dd/MM/yyyy"
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
@@ -1608,19 +1606,14 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerWarehouseTransfer.home)}
-                                className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                            >
-                                {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
-                            </button>
-                            <button
+                                dataLang={dataLang}
+                            />
+                            <ButtonSubmit
                                 onClick={_HandleSubmit.bind(this)}
-                                type="submit"
-                                className="button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                            >
-                                {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
                 </div>

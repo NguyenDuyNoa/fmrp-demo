@@ -35,6 +35,8 @@ import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import Popup_Product from "./components/popupProduct";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 const Form = (props) => {
     const dataLang = props.dataLang;
     const dispatch = useDispatch();
@@ -1544,20 +1546,9 @@ const Form = (props) => {
                                         }, 0))}
                                 </span>
                             </div>
-                            <div className="space-x-3">
-                                <button
-                                    onClick={() => router.back()}
-                                    className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                                >
-                                    {"Quay lại"}
-                                </button>
-                                <button
-                                    onClick={_HandleSubmit.bind(this)}
-                                    type="submit"
-                                    className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                                >
-                                    {"Lưu"}
-                                </button>
+                            <div className="space-x-2">
+                                <ButtonBack onClick={() => router.back()} dataLang={dataLang} />
+                                <ButtonSubmit loading={onSending} onClick={_HandleSubmit} dataLang={dataLang} />
                             </div>
                         </div>
                     </div>

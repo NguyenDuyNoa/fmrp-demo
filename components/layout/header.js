@@ -607,7 +607,8 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Quản lý sản xuất"
+                            name: "Quản lý sản xuất",
+                            link: "/report_statistical/production_manager"
                         },
                         {
                             viewOwn: -1,

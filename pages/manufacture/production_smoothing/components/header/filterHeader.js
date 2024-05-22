@@ -17,7 +17,7 @@ const FilterHeader = () => {
                     <SelectComponent classNamePrefix={"productionSmoothing"} placeholder={"Công đoạn"} />
                 </div>
                 <div className="col-span-2">
-                    <div class="">
+                    <div className="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
                             Ngày bắt đầu
                         </label>
@@ -42,7 +42,7 @@ const FilterHeader = () => {
                     </div>
                 </div>
                 <div className="col-span-2">
-                    <div class="">
+                    <div className="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
                             Ngày kết thúc
                         </label>
@@ -71,7 +71,7 @@ const FilterHeader = () => {
                     <SelectComponent classNamePrefix={"productionSmoothing"} placeholder={"Nhân viên"} />
                 </div>
                 <div className="col-span-2">
-                    <div class="">
+                    <div className="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
                             Loại thống kê
                         </label>

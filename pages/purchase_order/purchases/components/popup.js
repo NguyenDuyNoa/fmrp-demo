@@ -1,34 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
-import PopupEdit from "/components/UI/popup";
 import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Add as IconAdd,
-    TickCircle,
-    ArrowCircleDown,
-    Image as IconImage,
+    TickCircle
 } from "iconsax-react";
-import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import ModalImage from "react-modal-image";
+import PopupEdit from "/components/UI/popup";
 
-import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-import moment from "moment/moment";
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import NoData from "@/components/UI/noData/nodata";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import NoData from "@/components/UI/noData/nodata";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import Loading from "components/UI/loading";
+import ExpandableContent from "components/UI/more";
+import moment from "moment/moment";
+import { _ServerInstance as Axios } from "/services/axios";
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
@@ -143,9 +131,23 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.purchase_status || "purchase_status"}
                                             </h3>
                                             <h3 className="col-span-1 text-[13px]">
-                                                <TagWarehouse data={{
-                                                    warehouseman_id: data?.status
-                                                }} />
+                                                {data?.status == 0 &&
+                                                    <div className={` font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 w-fit  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]`}>
+                                                        Chưa duyệt
+                                                    </div>
+                                                    ||
+                                                    data?.status != 0 &&
+                                                    <div className={`font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 w-fit  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center`}>
+                                                        <TickCircle
+                                                            className="bg-lime-500 rounded-full animate-pulse "
+                                                            color="white"
+                                                            size={15}
+                                                        />
+                                                        <span>
+                                                            Đã duyệt
+                                                        </span>
+                                                    </div>
+                                                }
                                             </h3>
                                         </div>
                                         {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
@@ -271,7 +273,7 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">
                                                                 <ExpandableContent
                                                                     content={
-                                                                        e?.note
+                                                                        e?.note ?? ''
                                                                     }
                                                                 />
                                                             </h6>

@@ -53,7 +53,7 @@ import useActionRole from "@/hooks/useRole";
 import TabFilter from "@/components/UI/TabFilter";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
@@ -62,6 +62,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -470,7 +471,7 @@ const Index = (props) => {
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.production_warehouse || "production_warehouse"}
                             </h2>
-                            <button
+                            <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
                                         router.push(routerProductionWarehouse.form)
@@ -481,11 +482,8 @@ const Index = (props) => {
                                         isShow("warning", WARNING_STATUS_ROLE)
                                     }
                                 }}
-                                type="button"
-                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.btn_new || "btn_new"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
 
                         <ContainerFilterTab>
@@ -559,7 +557,7 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 colSpan={1}
                                             />
-                                            <DatepickerComponent colSpan={1} value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
+                                            <DateToDateComponent colSpan={1} value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
 
                                         </div>
                                     </div>

@@ -38,7 +38,7 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                         placeholder={"Kế hoạch nội bộ"} />
                 </div>
                 <div className="col-span-2">
-                    <div class="">
+                    <div className="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
                             Ngày bắt đầu
                         </label>
@@ -64,7 +64,7 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                     </div>
                 </div>
                 <div className="col-span-2">
-                    <div class="">
+                    <div className="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
                             Ngày kết thúc
                         </label>

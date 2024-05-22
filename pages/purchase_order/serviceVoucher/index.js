@@ -40,7 +40,7 @@ import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePag
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -482,7 +482,7 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 colSpan={2}
                                             />
-                                            <DatepickerComponent
+                                            <DateToDateComponent
                                                 value={isState.valueDate}
                                                 colSpan={2}
                                                 onChange={(e) => queryState({ valueDate: e })}

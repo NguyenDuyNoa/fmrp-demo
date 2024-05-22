@@ -27,7 +27,7 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
@@ -40,6 +40,7 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { routerInternalPlan } from "routers/manufacture";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 
 const PopupDetail = dynamic(() => import("./components/PopupDetail"), { ssr: false });
 const Index = (props) => {
@@ -295,8 +296,7 @@ const Index = (props) => {
                                 {dataLang?.internal_plan || 'internal_plan'}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                <button
-                                    type="button"
+                                <ButtonAddNew
                                     onClick={() => {
                                         if (role || checkAdd) {
                                             router.push(routerInternalPlan.form)
@@ -304,10 +304,8 @@ const Index = (props) => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }
                                     }}
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                >
-                                    {dataLang?.branch_popup_create_new}
-                                </button>
+                                    dataLang={dataLang}
+                                />
                             </div>
                         </div>
                         <ContainerTable>
@@ -339,7 +337,7 @@ const Index = (props) => {
                                                 noOptionsMessage={() => "Không có dữ liệu"}
                                                 closeMenuOnSelect={true}
                                             />
-                                            <DatepickerComponent
+                                            <DateToDateComponent
                                                 value={idFillter.valueDate}
                                                 onChange={onChangeFilter("valueDate")}
                                                 colSpan={3}

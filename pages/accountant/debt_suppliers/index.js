@@ -23,7 +23,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -331,7 +331,7 @@ const Index = (props) => {
                                                 onChange={onChangeValue("idSupplier")}
                                                 placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                             />
-                                            <DatepickerComponent
+                                            <DateToDateComponent
                                                 value={isValue?.valueDate}
                                                 onChange={onChangeValue("valueDate")}
                                             />

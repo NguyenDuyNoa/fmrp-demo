@@ -27,7 +27,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -422,7 +422,7 @@ const Index = (props) => {
                                                 placeholder={dataLang?.payment_ob || "payment_ob"}
                                                 colSpan={2}
                                             />
-                                            <DatepickerComponent
+                                            <DateToDateComponent
                                                 colSpan={2}
                                                 value={value.valueDate}
                                                 onChange={onChangeValue("valueDate")}

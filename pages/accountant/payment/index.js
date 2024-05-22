@@ -32,7 +32,7 @@ import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 
 import useActionRole from "@/hooks/useRole";
 import { useSetData } from "@/hooks/useSetData";
@@ -460,7 +460,7 @@ const Index = (props) => {
                                                 placeholder={dataLang?.payment_ob || "payment_ob"}
                                                 colSpan={2}
                                             />
-                                            <DatepickerComponent
+                                            <DateToDateComponent
                                                 colSpan={2}
                                                 value={isValue?.valueDate}
                                                 onChange={onChangeValue("valueDate")}

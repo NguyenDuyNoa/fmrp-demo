@@ -33,7 +33,7 @@ const Index = () => {
 
                 <div className="3xl:h-[100%] 2xl:h-[100%] xl:h-[100%] lg:h-[84%] w-[100%] 3xl:px-[55px] 3xl:py-10 2xl:px-12 2xl:py-1 lg:py-2 lg:px-10 relative border-2 border-slate-100 overflow-hidden flex-col flex">
                     <div className="h-full w-full rounded-lg relative z-10 3xl:px-10 2xl:px-6 px-6 xl:space-y-1 lg:space-y-1 flex flex-row">
-                        <div class="basis-full">
+                        <div className="basis-full">
                             <div className="grid grid-cols-12">
                                 <div className="col-span-1 flex flex-col">
                                     <div className="mx-auto max-h-[74px] h-[74px] w-[74px] max-w-[74px] bg-black rounded-full text-white flex items-center justify-center text-sm">

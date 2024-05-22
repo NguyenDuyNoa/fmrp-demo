@@ -105,7 +105,7 @@ const Index = (props) => {
                                                         isSearchable={true}
                                                         colSpan={1}
                                                     />
-                                                    <div className="w-full relative">
+                                                    {/* <div className="w-full relative">
                                                         <DatePicker
                                                             id="start"
                                                             portalId="menu-time"
@@ -133,6 +133,29 @@ const Index = (props) => {
                                                             // onChange={(date) => setStartDate(date)}
                                                             isClearable
                                                             placeholderText="Ngày kết thúc"
+                                                            className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
+                                                        />
+                                                        <ArrowDown2
+                                                            size="11"
+                                                            color="#6b7280"
+                                                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                                                        />
+                                                    </div> */}
+                                                    <div className="w-full relative">
+                                                        <DatePicker
+                                                            id="start"
+                                                            portalId="menu-time"
+                                                            calendarClassName="rasta-stripes"
+                                                            clearButtonClassName="text"
+                                                            // selected={startDate}
+                                                            // selected={startDate}
+                                                            // onChange={onChange}
+                                                            // startDate={startDate}
+                                                            // endDate={endDate}
+                                                            selectsRange
+                                                            // onChange={(date) => setStartDate(date)}
+                                                            isClearable
+                                                            placeholderText="Từ ngày đến ngày"
                                                             className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
                                                         />
                                                         <ArrowDown2

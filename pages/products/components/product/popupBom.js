@@ -500,11 +500,11 @@ const Popup_Bom = React.memo((props) => {
                 if (!err) {
                     const { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
+                        isShow("success", props.dataLang[message] || message);
                         sIsOpen(false);
                         props.onRefresh && props.onRefresh();
                     } else {
-                        isShow("error", props.dataLang[message]);
+                        isShow("error", props.dataLang[message] || message);
                     }
                 }
                 sOnSending(false);

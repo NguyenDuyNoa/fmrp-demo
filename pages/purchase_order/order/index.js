@@ -39,7 +39,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
@@ -535,7 +535,7 @@ const Index = (props) => {
                                                 colSpan={1}
                                             />
                                             <div className="z-20 col-span-1">
-                                                <DatepickerComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
+                                                <DateToDateComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
                                             </div>
                                         </div>
                                     </div>

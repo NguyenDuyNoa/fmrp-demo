@@ -17,7 +17,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 import Loading from "@/components/UI/loading";
 import { Container } from "@/components/UI/common/layout";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import ButtonSubmit from "@/components/UI/buttonSubmit/buttonSubmit";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 
@@ -31,6 +31,7 @@ import { SelectCore } from "@/utils/lib/Select";
 import { routerExportToOther, routerProductionWarehouse } from "@/routers/manufacture";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
+import ButtonBack from "@/components/UI/button/buttonBack";
 
 
 const Index = (props) => {
@@ -827,12 +828,7 @@ const Index = (props) => {
                                 : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <button
-                                onClick={() => router.push(routerProductionWarehouse.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.import_comeback || "import_comeback"}
-                            </button>
+                            <ButtonBack onClick={() => router.push(routerExportToOther.home)} dataLang={dataLang} />
                         </div>
                     </div>
 
@@ -1778,15 +1774,9 @@ const Index = (props) => {
                                 </h3>
                             </div>
                         </div>
-
                         <div className="space-x-2">
-                            <button
-                                onClick={() => router.push(routerExportToOther.home)}
-                                className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                            >
-                                {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
-                            </button>
-                            <ButtonSubmit onSending={onSending} _HandleSubmit={_HandleSubmit} dataLang={dataLang} />
+                            <ButtonBack onClick={() => router.push(routerExportToOther.home)} dataLang={dataLang} />
+                            <ButtonSubmit loading={onSending} onClick={_HandleSubmit} dataLang={dataLang} />
                         </div>
                     </div>
                 </div>

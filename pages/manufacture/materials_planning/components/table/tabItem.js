@@ -7,7 +7,6 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import ModalImage from "react-modal-image";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
@@ -41,7 +40,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching }) => {
                             <>
                                 <div key={e.id} className="grid grid-cols-10 items-center ">
                                     <div
-                                        onClick={() => handShowItem(e.id)}
+                                        onClick={() => handShowItem(e.id, 'dataPPItems')}
                                         className="col-span-10 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"
                                     >
                                         <Image
@@ -78,7 +77,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching }) => {
                                                             {i.name}
                                                         </h1>
                                                         <h1 className="text-[#9295A4] font-normal text-[10px]">
-                                                            {i.subName} - {i.productVariation}
+                                                            {i.code} - {i.itemVariation}
                                                         </h1>
                                                     </div>
                                                 </h4>

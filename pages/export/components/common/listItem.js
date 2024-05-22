@@ -10,7 +10,7 @@ const ListItem = ({ dataColumnNew, type, dataLang, HandlePushItem, isShow, dataE
                             <Zoom>
                                 <button
                                     onClick={() => HandlePushItem(e.value, type, dataEmty, sDataEmty)}
-                                    class="group hover:bg-gray-100 border w-full transition-all duration-200 ease-in-out p-2 rounded-xl inline-flex justify-between gap-2 items-center text-sm font-medium hover:border-gray-200"
+                                    className="group hover:bg-gray-100 border w-full transition-all duration-200 ease-in-out p-2 rounded-xl inline-flex justify-between gap-2 items-center text-sm font-medium hover:border-gray-200"
                                 >
                                     <span className="3xl:text-[14px] xxl:text-[13px] 2xl:text-[11px] xl:text-[10px] text-[11px]">
                                         {dataLang[e.label] || e.label}

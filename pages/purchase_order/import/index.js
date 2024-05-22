@@ -48,7 +48,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
@@ -62,6 +62,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -494,7 +495,7 @@ const Index = (props) => {
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.import_list || "import_list"}
                             </h2>
-                            <button
+                            <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
                                         router.push(routerImport.form)
@@ -505,11 +506,8 @@ const Index = (props) => {
                                         isShow("warning", WARNING_STATUS_ROLE)
                                     }
                                 }}
-                                type="button"
-                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.btn_new || "btn_new"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                         <ContainerFilterTab>
                             {isState.listDs &&
@@ -587,7 +585,7 @@ const Index = (props) => {
                                                 isSearchable={true}
 
                                             />
-                                            <DatepickerComponent
+                                            <DateToDateComponent
                                                 colSpan={1}
                                                 value={isState.valueDate}
                                                 onChange={(e) => queryState({ valueDate: e })}

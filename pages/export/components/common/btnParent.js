@@ -146,7 +146,7 @@ const BtnParent = ({
     return (
         <div className="col-span-12 mt-2 grid-cols-10 grid gap-2.5 justify-center">
             <div className="col-span-2">
-                <div class="w-full relative group">
+                <div className="w-full relative group">
                     <NumericFormat
                         id="page"
                         onChange={(e) => sPageLimit((prevState) => ({ ...prevState, page: e.target.value }))}
@@ -176,7 +176,7 @@ const BtnParent = ({
                 </div>
             </div>
             <div className="col-span-2">
-                <div class="w-full relative group">
+                <div className="w-full relative group">
                     <NumericFormat
                         id="limit"
                         onChange={(e) => sPageLimit((prevState) => ({ ...prevState, limit: e.target.value }))}

@@ -70,7 +70,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
 
     const onSubmit = async (value) => {
         if (value.arrayItem.length == 0) {
-            return shhowToat('error', 'Không có mặt hàng cần giữ kho. VUi lòng thêm mặt hàng')
+            return shhowToat('error', 'Không có mặt hàng cần giữ kho. Vui lòng thêm mặt hàng')
         }
 
         let formData = new FormData();
@@ -104,6 +104,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                     const data = response.data;
                     if (data?.isSuccess) {
                         isShow('success', data?.message)
+                        _ToggleModal(false)
+                        form.reset()
                     } else {
                         isShow('error', data?.message)
                     }
@@ -112,14 +114,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
         );
     }
 
-    useEffect(() => {
-        if (open) {
-            form.reset()
-        }
-    }, [open])
 
     useEffect(() => {
         if (open) {
+            form.setValue('arrayItem', [])
             fetchListItem()
         }
     }, [findValue.type, open])
@@ -166,7 +164,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                             //sl cần
                             quantityNeed: formatNumber(e?.quota_primary),
                             // sl giữ
-                            quantityKept: formatNumber(e?.quantity_keep),
+                            quantityKeepp: formatNumber(e?.quantity_keep),
                             // sl tồn
                             quantityInventory: formatNumber(e?.quantity_warehouse),
                             warehouse: e?.arrW?.map((i) => {
@@ -321,11 +319,11 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                     }}
                                                     fixedHeight
                                                     id={field.name}
-                                                    showTimeSelect
+                                                    // showTimeSelect
                                                     selected={field.value}
-                                                    placeholderText="DD/MM/YYYY HH:mm:ss"
-                                                    dateFormat="dd/MM/yyyy h:mm:ss aa"
-                                                    timeInputLabel={"Time: "}
+                                                    placeholderText="DD/MM/YYYY"
+                                                    dateFormat="dd/MM/yyyy"
+                                                    // timeInputLabel={"Time: "}
                                                     className={`border ${fieldState.error ? 'border-red-500' : 'border-[#d0d5dd]'} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                                 />
                                                 {
@@ -483,7 +481,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                     {e?.quantityNeed == 0 ? "-" : e?.quantityNeed}
                                                 </h6>
                                                 <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
-                                                    {e?.quantityKept == 0 ? "-" : e?.quantityKept}
+                                                    {e?.quantityKeepp == 0 ? "-" : e?.quantityKeepp}
                                                 </h6>
                                                 <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
                                                     {e?.quantityInventory == 0 ? "-" : e?.quantityInventory}
@@ -559,7 +557,6 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                 },
                                                                                 validate: {
                                                                                     fn: (value) => {
-                                                                                        console.log(value);
                                                                                         try {
                                                                                             let mss = ''
                                                                                             if (x.show && value.newValue == null) {

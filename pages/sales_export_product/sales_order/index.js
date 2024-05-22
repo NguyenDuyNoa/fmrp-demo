@@ -43,12 +43,13 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 
 
 const Index = (props) => {
@@ -528,7 +529,7 @@ const Index = (props) => {
                                 {dataLang?.sales_product_list || "sales_product_list"}
                             </h2>
                             <div className={` flex justify-end items-center`}>
-                                <button
+                                <ButtonAddNew
                                     onClick={() => {
                                         if (role) {
                                             router.push(routerSalesOrder.form)
@@ -539,11 +540,8 @@ const Index = (props) => {
                                             isShow("warning", WARNING_STATUS_ROLE)
                                         }
                                     }}
-                                    type="button"
-                                    className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                >
-                                    {dataLang?.btn_new || "btn_new"}
-                                </button>
+                                    dataLang={dataLang}
+                                />
                             </div>
                         </div>
                         <ContainerFilterTab>
@@ -632,7 +630,7 @@ const Index = (props) => {
                                                 />
                                             </div>
                                             <div className="z-20 col-span-1">
-                                                <DatepickerComponent value={valueChange.valueDate} onChange={onChangeFilter("valueDate")} />
+                                                <DateToDateComponent value={valueChange.valueDate} onChange={onChangeFilter("valueDate")} />
                                             </div>
                                         </div>
                                     </div>
@@ -676,8 +674,7 @@ const Index = (props) => {
                                             {dataLang?.sales_product_type_order || "sales_product_type_order"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.sales_product_total_into_money ||
-                                                "sales_product_total_into_money"}
+                                            {dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.sales_product_status || "sales_product_status"}

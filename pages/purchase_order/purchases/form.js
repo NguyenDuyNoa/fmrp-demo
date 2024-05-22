@@ -38,6 +38,8 @@ import { useToggle } from "@/hooks/useToggle";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import { isAllowedNumber } from "@/utils/helpers/common";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 
 const Index = (props) => {
     const router = useRouter();
@@ -500,12 +502,10 @@ const Index = (props) => {
                             {id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}
                         </h2>
                         <div className="flex justify-end items-center">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerPurchases.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.warehouses_detail_back}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
                     <div className=" w-full rounded">
@@ -908,19 +908,15 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerPurchases.home)}
-                                className="button text-[#344054] font-normal 2xl:text-[14px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                            >
-                                {dataLang?.purchase_back || "purchase_back"}
-                            </button>
-                            <button
+                                dataLang={dataLang}
+                            />
+                            <ButtonSubmit
                                 onClick={_HandleSubmit.bind(this)}
-                                type="submit"
-                                className="button text-[#FFFFFF]  font-normal 2xl:text-[14px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                            >
-                                {dataLang?.purchase_save || "purchase_save"}
-                            </button>
+                                dataLang={dataLang}
+                                loading={onSending}
+                            />
                         </div>
                     </div>
                 </div>

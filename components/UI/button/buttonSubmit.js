@@ -1,15 +1,15 @@
 import React from "react";
-const ButtonSubmit = ({ onSending, dataLang, _HandleSubmit }) => {
+const ButtonSubmit = ({ loading, dataLang, onClick, ...rest }) => {
     return (
         <React.Fragment>
-            {!onSending ? (
+            {!loading ? (
                 <button
-                    onClick={_HandleSubmit.bind(this)}
+                    onClick={onClick}
                     type="submit"
-                    className="button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                    {...rest}
+                    className={`${rest?.className} button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]`}
                 >
-                    {dataLang?.purchase_order_purchase_save ||
-                        "purchase_order_purchase_save"}
+                    {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}
                 </button>
             ) : (
                 <button

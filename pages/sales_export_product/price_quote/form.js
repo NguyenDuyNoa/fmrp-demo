@@ -27,6 +27,8 @@ import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyForma
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 
 const Index = (props) => {
     const router = useRouter();
@@ -820,12 +822,10 @@ const Index = (props) => {
                                 : dataLang?.price_quote_add_order || "price_quote_add_order"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerPriceQuote.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.btn_back || "btn_back"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
 
@@ -1464,19 +1464,15 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <button
+                            <ButtonBack
                                 onClick={() => router.push(routerPriceQuote.home)}
-                                className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                            >
-                                {dataLang?.btn_back || "btn_back"}
-                            </button>
-                            <button
+                                dataLang={dataLang}
+                            />
+                            <ButtonSubmit
                                 onClick={_HandleSubmit.bind(this)}
-                                type="submit"
-                                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                            >
-                                {dataLang?.btn_save || "btn_save"}
-                            </button>
+                                dataLang={dataLang}
+                                loading={onSending}
+                            />
                         </div>
                     </div>
                 </div>

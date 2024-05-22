@@ -56,9 +56,10 @@ import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePag
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -481,7 +482,7 @@ const Index = (props) => {
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.returns_list || "returns_list"}
                             </h2>
-                            <button
+                            <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
                                         router.push(routerReturns.form)
@@ -492,11 +493,8 @@ const Index = (props) => {
                                         isShow("warning", WARNING_STATUS_ROLE)
                                     }
                                 }}
-                                type="button"
-                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.btn_new || "btn_new"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                         <ContainerFilterTab>
                             {isState.listDs &&
@@ -576,7 +574,7 @@ const Index = (props) => {
                                                 colSpan={1}
 
                                             />
-                                            <DatepickerComponent
+                                            <DateToDateComponent
                                                 colSpan={1}
                                                 value={isState.valueDate}
                                                 onChange={(e) => queryState({ valueDate: e })}

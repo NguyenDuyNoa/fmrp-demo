@@ -1,4 +1,4 @@
-// bảng đối chiếu công nợ
+// Báo cáo nguyên liệu sử dụng
 import OnResetData from '@/components/UI/btnResetData/btnReset';
 import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
 import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
@@ -19,9 +19,9 @@ import { ArrowDown2, Grid6 } from 'iconsax-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import DatePicker from "react-datepicker";
 import Navbar from '../components/navbar';
 import TitleHeader from '../components/titleHeader';
-import DatePicker from "react-datepicker";
 const Index = (props) => {
     const dataLang = props.dataLang
 
@@ -59,7 +59,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Bảng đối chiếu công nợ</title>
+                <title>Báo cáo nguyên liệu sử dụng</title>
             </Head>
             <Container className={'!pb-0'}>
                 {statusExprired ? (
@@ -68,7 +68,7 @@ const Index = (props) => {
 
                 <div className='h-full'>
                     <div className="space-y-3 h-[96%] overflow-hidden">
-                        <TitleHeader title={'Công nợ phải thu'} />
+                        <TitleHeader title={'Quản lý sản xuất'} />
                         <div className='grid grid-cols-10'>
                             <Navbar />
                             <div className='col-span-8'>
@@ -82,11 +82,11 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: 'Khách hàng',
+                                                                label: 'Nguyên liệu',
                                                                 isDisabled: true,
                                                             },
                                                         ]}
-                                                        placeholder={'Công đoạn'}
+                                                        placeholder={'Nguyên liệu'}
                                                         isSearchable={true}
                                                         colSpan={1}
                                                     />
@@ -108,6 +108,7 @@ const Index = (props) => {
                                                             className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
                                                         />
                                                     </div>
+
                                                     <div className="w-full relative">
                                                         <DatePicker
                                                             id="start"
@@ -170,115 +171,44 @@ const Index = (props) => {
                                 <div className="3xl:h-[620px] 2xl:max-h-[550px] 2xl:h-[550px] max-h-[550px] h-[550px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className={`2xl:w-[100%] pr-2`}>
                                         {/* header table */}
-
-                                        <div className='my-2'>
-                                            <HeaderTable gridCols={12} className={'!rounded-none  !bg-slate-100 '}>
-                                                <ColumnTable colSpan={2} textAlign={'center'}>
-                                                    Mã KH
-                                                </ColumnTable>
-                                                <ColumnTable colSpan={1} textAlign={'center'}>
-                                                    Tên KH
-                                                </ColumnTable>
-                                                <ColumnTable colSpan={1} textAlign={'center'}>
-                                                    Nợ đầu kỳ
-                                                </ColumnTable>
-                                                <ColumnTable colSpan={8} className="grid grid-cols-6  items-center justify-center !px-0">
-                                                    <ColumnTable colSpan={6} textAlign={'center'} className="border-b  py-0.5">
-                                                        Mua trong kì
-                                                    </ColumnTable>
-                                                    <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 border-r">
-                                                        Tiền hàng
-                                                    </ColumnTable>
-                                                    <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 py-0.5 border-r">
-                                                        Thuế GTGT
-                                                    </ColumnTable>
-                                                    <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 py-0.5 border-r">
-                                                        Khoảng giảm trừ
-                                                    </ColumnTable>
-                                                    <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 py-0.5 border-r">
-                                                        Tiền mặt
-                                                    </ColumnTable>
-                                                    <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 py-0.5 border-r">
-                                                        Chuyển khoản
-                                                    </ColumnTable>
-                                                    <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 py-0.5">
-                                                        Nợ cuối kỳ
-                                                    </ColumnTable>
-                                                </ColumnTable>
-                                            </HeaderTable>
-                                            <RowTable gridCols={12} className={'  bg-slate-100'}>
-                                                <RowItemTable colSpan={2} className={'!text-[#3276FA]'} textAlign={'center'}>
-                                                    NCC-Vải Thịnh Phát
-                                                </RowItemTable>
-                                                <RowItemTable colSpan={1} className={'!text-[#3276FA]'} textAlign={'center'}>
-                                                    Vải Thịnh Phát
-                                                </RowItemTable>
-                                                <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
-                                                    0
-                                                </RowItemTable>
-
-                                                <RowTable gridCols={6} className={'col-span-8 grid grid-cols-6'}>
-                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
-                                                        39,528,000
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
-                                                        725,000
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'} >
-                                                        0
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
-                                                        0
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={'!text-[#3276FA] !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
-                                                        9,055,000
-                                                    </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={'!text-red-500 !3xl:text-xl 2xl:text-base text-sm'} textAlign={'right'}>
-                                                        31,198,000
-                                                    </RowItemTable>
-                                                </RowTable>
-                                            </RowTable>
-                                        </div>
-
-                                        <HeaderTable gridCols={14}>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                STT
+                                        <HeaderTable gridCols={13}>
+                                            <ColumnTable colSpan={2} textAlign={'center'}>
+                                                Đơn hàng bán/ Kế hoạch nội bộ
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Số phiếu
+                                                Ghi chú đơn hàng
+                                            </ColumnTable>
+                                            <ColumnTable colSpan={2} textAlign={'center'}>
+                                                Số lệnh SX chi tiết
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
                                                 Ngày
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Loại hàng
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                Tên hàng
+                                                Mã NVL
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Q.Cách
+                                                Tên NVL
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                ĐVT
+                                                Loại
                                             </ColumnTable>
                                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                                SL
+                                                Đơn vị
                                             </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                ĐG
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Tiền hàng
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                CK
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Thuế
-                                            </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
-                                                Tổng tiền
+                                            <ColumnTable colSpan={3} className="grid grid-cols-3  items-center justify-center !px-0">
+                                                <ColumnTable colSpan={3} textAlign={'center'} className="border-b py-0.5">
+                                                    Số lượng
+                                                </ColumnTable>
+                                                <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 border-r">
+                                                    Đầu ra
+                                                </ColumnTable>
+                                                <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 py-0.5 border-r">
+                                                    Nhập lại
+                                                </ColumnTable>
+                                                <ColumnTable colSpan={1} textAlign={'center'} className="pt-1 py-0.5">
+                                                    Đã sử dụng
+                                                </ColumnTable>
                                             </ColumnTable>
                                         </HeaderTable>
                                         {/* data table */}
@@ -289,43 +219,37 @@ const Index = (props) => {
                                                 <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
                                                     {isState.data?.map((e) => (
                                                         <RowTable gridCols={13} key={e.id.toString()} >
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <RowItemTable colSpan={2} textAlign={'center'}>
                                                                 {/* {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""} */}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} textAlign={'center'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'right'}>
-
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'right'}>
-
-                                                            </RowItemTable>
                                                             <RowItemTable colSpan={2} textAlign={'right'}>
+
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
+
+                                                            </RowItemTable>
+                                                            <RowItemTable colSpan={1} textAlign={'right'}>
 
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="flex items-center space-x-1">
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1}>
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="mx-auto">
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="mx-auto">
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="mx-auto">
-
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="mx-auto">
-
-                                                            </RowItemTable>
-                                                            <RowItemTable colSpan={1} className="mx-auto">
+                                                            <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
 
                                                             </RowItemTable>
                                                         </RowTable>
@@ -337,50 +261,6 @@ const Index = (props) => {
                                         }
                                     </div>
                                 </div>
-                                {isState?.data?.length != 0 &&
-                                    <ContainerTotal className="!grid-cols-13">
-                                        <ColumnTable colSpan={10} textAlign={'center'} className="p-2">
-                                            Tổng tiền hàng trong kỳ
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-
-                                        <ColumnTable colSpan={12} textAlign={'center'} className="p-2">
-                                            Khoảng phát sinh
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-
-                                        <ColumnTable colSpan={12} textAlign={'center'} className="p-2">
-                                            Khoảng giảm trừ
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-
-                                        <ColumnTable colSpan={12} textAlign={'center'} className="p-2">
-                                            Tổng cộng
-                                        </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-                                            {formatNumber(isState.total?.total_quantity)}
-                                        </ColumnTable>
-
-                                    </ContainerTotal>
-                                }
                             </div>
                         </div>
                     </div>
@@ -403,8 +283,6 @@ const Index = (props) => {
             </Container>
         </React.Fragment >
     )
-
-
 }
 
 export default Index

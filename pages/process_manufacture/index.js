@@ -34,7 +34,7 @@ const Index = () => {
 
                 <div className="3xl:h-[100%] 2xl:h-[100%] xl:h-[100%] lg:h-[84%] w-[100%] 3xl:px-[55px] 3xl:py-10 2xl:px-12 2xl:py-1 lg:py-2 lg:px-10 relative border-2 border-slate-100 overflow-hidden flex-col flex">
                     <div className="h-full w-full rounded-lg relative z-10 3xl:px-10 2xl:px-6 px-6 xl:space-y-1 lg:space-y-1 flex flex-row">
-                        <div class="basis-full">
+                        <div className="basis-full">
                             <div className="3xl:w-[180px] 2xl:w-[100px] xl:w-[100px] lg:w-[80px] flex justify-center">
                                 <div className=" 3xl:h-[80px] 3xl:w-[80px] 2xl:h-[60px] 2xl:w-[60px] xl:h-[48px] xl:w-[48px] lg:h-[44px] lg:w-[44px] rounded-full flex flex-col justify-center items-center bg-[#3276FA] text-white">
                                     <h5 className="3xl:text-[16px] 2xl:text-[12px] xl:text-[10px] lg:text-[8px] text-center">

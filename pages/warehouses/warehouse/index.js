@@ -707,7 +707,7 @@ const Index = (props) => {
                                                                 {/* {item.is_system == 1 && <span className={`${isState.idWarehouse === item.id ? "text-white" : "text-[#6C9AC4] group-hover:text-white"} lowercase`}>(Kho hệ thống)</span>} */}
                                                             </div>
                                                             {item.is_system == 1 &&
-                                                                <div class="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
+                                                                <div className="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
                                                                     Kho hệ thống
                                                                 </div>
                                                             }
@@ -719,9 +719,9 @@ const Index = (props) => {
                                                 </li>
                                                 {isState.idWarehouse === item.id && item.is_system == 0 &&
                                                     <div className="absolute right-0 -top-1">
-                                                        <span class="relative flex h-3 w-3">
-                                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                                                        <span className="relative flex h-3 w-3">
+                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
                                                         </span>
                                                     </div>
                                                 }

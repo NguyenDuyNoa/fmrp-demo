@@ -50,7 +50,7 @@ const PopupAdd = ({ data, listStaff }) => {
                             id={props.value}
                             className="peer relative h-[18px] w-[18px] cursor-pointer appearance-none rounded-[4px] border border-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
                             checked={props.isSelected}
-                            // onChange={() => props.selectProps.onChange(props.data)}
+                        // onChange={() => props.selectProps.onChange(props.data)}
                         />
                         <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                             <svg
@@ -100,12 +100,12 @@ const PopupAdd = ({ data, listStaff }) => {
             onClickOpen={() => handleOpenPopup(true)}
             open={isOpenPopup}
             onClose={() => handleOpenPopup(false)}
-            // classNameBtn={props?.className}
+        // classNameBtn={props?.className}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
             <div className="space-x-1 3xl:w-[950px]  xxl:w-[650px] 2xl:w-[650px] xl:w-[640px] lg:w-[640px] w-[700px] 3xl:h-auto xxl:h-[480px]  2xl:h-[520px] xl:h-[480px] lg:h-[500px] h-[500px] ">
                 <div className="flex gap-6 items-center my-4">
-                    <div class="w-1/2 z-[999]">
+                    <div className="w-1/2 z-[999]">
                         <label
                             htmlFor="start"
                             className="3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]  text-[#344054] font-normal ml-1"
@@ -134,7 +134,7 @@ const PopupAdd = ({ data, listStaff }) => {
                             />
                         </div>
                     </div>
-                    <div class="w-1/2 ">
+                    <div className="w-1/2 ">
                         <label
                             htmlFor="start"
                             className="3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]  text-[#344054] font-normal ml-1"
@@ -284,10 +284,10 @@ const PopupAdd = ({ data, listStaff }) => {
                                     backgroundColor: isDisabled
                                         ? undefined
                                         : isSelected
-                                        ? "#1760B9"
-                                        : isFocused
-                                        ? "white"
-                                        : undefined,
+                                            ? "#1760B9"
+                                            : isFocused
+                                                ? "white"
+                                                : undefined,
                                     cursor: isDisabled ? "not-allowed" : "default",
                                     color: !isDisabled ? (isSelected ? "white" : "black") : undefined,
                                     fontWeight: "500",

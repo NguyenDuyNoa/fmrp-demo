@@ -1,28 +1,16 @@
-import React, { useEffect, useState } from "react";
-import Head from "next/head";
-import Link from "next/link";
 import moment from "moment/moment";
+import Head from "next/head";
+import React, { useEffect, useState } from "react";
 
 import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Add as IconAdd,
-    TickCircle,
-    ArrowCircleDown,
-    Image as IconImage,
-    Refresh2,
-    Grid6,
+    Grid6
 } from "iconsax-react";
 
 import { useRouter } from "next/router";
 
-import "react-datepicker/dist/react-datepicker.css";
-import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
+import "react-datepicker/dist/react-datepicker.css";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -35,37 +23,38 @@ import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import { routerPurchases } from "routers/buyImportGoods";
 
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import BtnAction from "@/components/UI/BtnAction";
-import { debounce } from "lodash";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
 import TabFilter from "@/components/UI/TabFilter";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import NoData from "@/components/UI/noData/nodata";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import NoData from "@/components/UI/noData/nodata";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { debounce } from "lodash";
+import { useSelector } from "react-redux";
 
 
 const Index = (props) => {
@@ -430,7 +419,7 @@ const Index = (props) => {
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {dataLang?.purchase_title || 'purchase_title'}
                             </h2>
-                            <button
+                            <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
                                         router.push(routerPurchases.form)
@@ -441,11 +430,8 @@ const Index = (props) => {
                                         isShow("warning", WARNING_STATUS_ROLE)
                                     }
                                 }}
-                                type="button"
-                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.btn_new || "btn_new"}
-                            </button>
+                                dataLang={dataLang}
+                            />
                         </div>
                         <ContainerFilterTab>
                             {isState.listDs &&
@@ -528,7 +514,7 @@ const Index = (props) => {
                                                 colSpan={1}
                                             />
                                             <div className="ml-1 col-span-1 z-20">
-                                                <DatepickerComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
+                                                <DateToDateComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
                                             </div>
                                         </div>
                                     </div>
