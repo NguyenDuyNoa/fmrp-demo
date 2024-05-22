@@ -290,12 +290,6 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                                                             } `}
                                                     >
                                                         <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
-                                                            <Image
-                                                                src={i.image}
-                                                                width={36}
-                                                                height={36}
-                                                                className="object-cover rounded"
-                                                            />
                                                             <ModalImage
                                                                 small={i.image}
                                                                 large={i.image}
