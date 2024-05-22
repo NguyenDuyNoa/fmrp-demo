@@ -11,7 +11,6 @@ import { TickCircle } from "iconsax-react";
 import moment from "moment";
 import Image from "next/image";
 import { useState } from "react";
-import ModalImage from "react-modal-image";
 
 const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) => {
     const dataSeting = useSetingServer();
@@ -131,7 +130,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                                                                 large={i.image}
                                                                 width={36}
                                                                 height={36}
-                                                                alt={i.image}
+                                                                alt={i.name}
                                                                 className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                             />
                                                             <div className="flex flex-col gap-0.5">
@@ -290,12 +289,18 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching }) =
                                                             } `}
                                                     >
                                                         <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
-                                                            <ModalImage
-                                                                small={e.image}
-                                                                large={e.image}
+                                                            <Image
+                                                                src={i.image}
                                                                 width={36}
                                                                 height={36}
-                                                                alt={e.image}
+                                                                className="object-cover rounded"
+                                                            />
+                                                            <ModalImage
+                                                                small={i.image}
+                                                                large={i.image}
+                                                                width={36}
+                                                                height={36}
+                                                                alt={i.name}
                                                                 className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                             />
                                                             <div className="flex flex-col gap-0.5">
