@@ -8,7 +8,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ModalImage from "react-modal-image";
 
-const TabPlan = ({ dataTable, isFetching }) => {
+const TabPlan = ({ dataTable, isFetching, dataLang }) => {
     const { dataBom } = dataTable.listDataRight
     console.log("dataBom", dataBom);
     // productsBom bán tp
@@ -18,43 +18,27 @@ const TabPlan = ({ dataTable, isFetching }) => {
         <>
             <div className="flex items-start">
                 <h1 className="w-1/2 text-[#11315B] font-normal 3xl:text-lg text-base">
-                    Danh sách kế hoạch bán thành phẩm
+                    {dataLang?.materials_planning_list_semi || 'materials_planning_list_semi'}
                 </h1>
                 <h1 className="w-1/2 text-[#11315B] font-normal 3xl:text-lg text-base">
-                    Danh sách kế hoạch nguyên vật liệu
+                    {dataLang?.materials_planning_list_material || 'materials_planning_list_material'}
                 </h1>
             </div>
             <div className="flex gap-2">
                 <div className="w-1/2 ">
                     <div className="grid grid-cols-12 items-center py-2 bg-[#FBFCEE] rounded">
-                        <h4 className="col-span-5 px-4 text-[#344054] font-normal text-xs capitalize">Bán TP</h4>
+                        <h4 className="col-span-5 px-4 text-[#344054] font-normal text-xs capitalize">{dataLang?.materials_planning_sell_tp || 'materials_planning_sell_tp'}</h4>
                         <h4 className="col-span-1 px-4 text-center text-[#344054] font-normal text-xs capitalize">
-                            ĐVT
+                            {dataLang?.materials_planning_dvt || 'materials_planning_dvt'}
                         </h4>
                         <h4 className="col-span-2  text-center flex items-center justify-center gap-2 text-[#344054] font-normal text-xs capitalize">
-                            S.dụng
-                            {/* <div className="flex-col flex gap-1 cursor-pointer">
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedrop.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedow.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                            </div> */}
+                            {dataLang?.materials_planning_use || 'materials_planning_use'}
                         </h4>
                         <h4 className="col-span-2  text-center flex items-center justify-center gap-2 text-[#344054] font-normal text-xs capitalize">
-                            Đã giữ
+                            {dataLang?.materials_planning_held || 'materials_planning_held'}
                         </h4>
                         <h4 className="col-span-2  text-center flex items-center justify-center gap-2 text-[#344054] font-normal text-xs capitalize">
-                            Thiếu
+                            {dataLang?.materials_planning_lack || 'materials_planning_lack'}
                             {/* <div className="flex-col flex gap-1 cursor-pointer">
                                 <Image
                                     alt=""
@@ -127,70 +111,22 @@ const TabPlan = ({ dataTable, isFetching }) => {
                 <div className="w-1/2 ">
                     <div className="grid grid-cols-8 items-center py-2 bg-[#F2FBF7] rounded">
                         <h4 className="col-span-3 px-4 text-[#344054] font-normal text-xs capitalize whitespace-nowrap">
-                            Nguyên vật liệu
+                            {dataLang?.materials_planning_materials || 'materials_planning_materials'}
                         </h4>
                         <h4 className="col-span-1 px-4 text-center text-[#344054] font-normal text-xs capitalize">
-                            ĐVT
+                            {dataLang?.materials_planning_dvt || 'materials_planning_dvt'}
                         </h4>
                         <h4 className="col-span-1  text-center flex items-center justify-center gap-2 text-[#344054] font-normal text-xs capitalize">
-                            S.dụng
-                            {/* <div className="flex-col flex gap-1 cursor-pointer">
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedrop.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedow.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                            </div> */}
+                            {dataLang?.materials_planning_use || 'materials_planning_use'}
                         </h4>
                         <h4 className="col-span-1  text-center flex items-center justify-center gap-1 text-[#344054] font-normal text-xs capitalize">
-                            Q.đổi
-                            {/* <div className="flex-col flex gap-1 cursor-pointer">
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedrop.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedow.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                            </div> */}
+                            {dataLang?.materials_planning_change || 'materials_planning_change'}
                         </h4>
                         <h4 className="col-span-1  text-center flex items-center justify-center gap-2 text-[#344054] font-normal text-xs capitalize">
-                            Đã giữ
+                            {dataLang?.materials_planning_held || 'materials_planning_held'}
                         </h4>
                         <h4 className="col-span-1  text-center flex items-center justify-center gap-2 text-[#344054] font-normal text-xs capitalize">
-                            Thiếu
-                            {/* <div className="flex-col flex gap-1 cursor-pointer">
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedrop.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                                <Image
-                                    alt=""
-                                    width={7}
-                                    height={4}
-                                    src={"/productionPlan/Shapedow.png"}
-                                    className={` object-cover hover:scale-110 transition-all ease-linear duration-200`}
-                                />
-                            </div> */}
+                            {dataLang?.materials_planning_lack || 'materials_planning_lack'}
                         </h4>
                     </div>
                     {isFetching ? (

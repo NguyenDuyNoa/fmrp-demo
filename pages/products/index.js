@@ -554,6 +554,9 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.category_titel}
                                         </ColumnTable>
+                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                            {dataLang?.code_finishedProduct || 'dataLang?.code_finishedProduct'}
+                                        </ColumnTable>
                                         <ColumnTable colSpan={2} textAlign={'center'}>
                                             {dataLang?.product}
                                         </ColumnTable>
@@ -563,9 +566,9 @@ const Index = (props) => {
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.category_material_list_variant || "category_material_list_variant"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        {/* <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.stock || "stock"}
-                                        </ColumnTable>
+                                        </ColumnTable> */}
                                         <ColumnTable colSpan={1} textAlign={'center'}>
                                             {dataLang?.bom_finishedProduct}
                                         </ColumnTable>
@@ -610,21 +613,27 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'left'}>
                                                             {e?.category_name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'left'} className="flex flex-col">
-                                                            <h6 className="">
-                                                                {e?.name}
-                                                            </h6>
-                                                            <h6>
-                                                                {dataLang?.code_finishedProduct || "code_finishedProduct"}: <Popup_ThongTin
-                                                                    id={e?.id}
-                                                                    dataProductExpiry={dataProductExpiry}
-                                                                    dataLang={dataLang}
-                                                                >
-                                                                    <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none">
-                                                                        {e?.code}
-                                                                    </button>
-                                                                </Popup_ThongTin>
-                                                            </h6>
+                                                        <RowItemTable colSpan={1} textAlign={'left'}>
+                                                            <Popup_ThongTin
+                                                                id={e?.id}
+                                                                dataProductExpiry={dataProductExpiry}
+                                                                dataLang={dataLang}
+                                                            >
+                                                                <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none">
+                                                                    {e?.code}
+                                                                </button>
+                                                            </Popup_ThongTin>
+                                                        </RowItemTable>
+                                                        <RowItemTable colSpan={2} textAlign={'left'} className="flex flex-col items-start justify-start">
+                                                            <Popup_ThongTin
+                                                                id={e?.id}
+                                                                dataProductExpiry={dataProductExpiry}
+                                                                dataLang={dataLang}
+                                                            >
+                                                                <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none  text-left">
+                                                                    {e?.name}
+                                                                </button>
+                                                            </Popup_ThongTin>
                                                             <h6 className="flex gap-1 items-center">
                                                                 <span
                                                                     className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit w-fit font-[300] break-words leading-relaxed ${(e?.type_products?.id === 0 &&
@@ -643,9 +652,9 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {formatNumber(e?.variation_count)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        {/* <RowItemTable colSpan={1} textAlign={'center'}>
                                                             {formatNumber(e?.stock_quantity)}
-                                                        </RowItemTable>
+                                                        </RowItemTable> */}
                                                         <RowItemTable colSpan={1} className="flex items-center justify-center">
                                                             {Number(e?.variation_count) == 0 ? (
                                                                 Number(e?.ct_versions) != 0 && (

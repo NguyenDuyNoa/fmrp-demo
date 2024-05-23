@@ -1,31 +1,30 @@
 import Image from "next/image";
 
-import dynamic from "next/dynamic";
 
 import Loading from "@/components/UI/loading";
 
 import NoData from "@/components/UI/noData/nodata";
 import ModalImage from "react-modal-image";
 
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
-const TabItem = ({ dataTable, handShowItem, isFetching }) => {
+const TabItem = ({ dataTable, handShowItem, isFetching, dataLang }) => {
     const dataSeting = useSetingServer();
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
         <>
-            <h1 className="text-[#11315B] font-normal 3xl:text-lg text-base">Danh sách sản phẩm (theo đơn hàng)</h1>
+            <h1 className="text-[#11315B] font-normal 3xl:text-lg text-base">{dataLang?.materials_planning_list_products || 'materials_planning_list_products'}</h1>
             <div className="my-4">
                 <div className="grid grid-cols-10 my-4">
-                    <h4 className="col-span-4 px-4 text-[#344054] font-normal text-xs uppercase">Đơn hàng</h4>
+                    <h4 className="col-span-4 px-4 text-[#344054] font-normal text-xs uppercase">{dataLang?.materials_planning_order || 'materials_planning_order'}</h4>
                     <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                        Đơn vị tính
+                        {dataLang?.category_unit || 'category_unit'}
                     </h4>
-                    <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">Số lượng</h4>
+                    <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">{dataLang?.warehouses_detail_quantity || 'warehouses_detail_quantity'}</h4>
                     <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                        TIMELINE SẢN XUẤT
+                        {dataLang?.materials_planning_timeline_production || 'materials_planning_timeline_production'}
                     </h4>
                 </div>
             </div>

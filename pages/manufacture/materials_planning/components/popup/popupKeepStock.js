@@ -14,7 +14,6 @@ import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Add, Trash as IconDelete, ArrowDown2 as IconDown, TickCircle } from "iconsax-react";
 import moment from "moment";
-import Image from "next/image";
 import DatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
 import { BsCalendarEvent } from "react-icons/bs";
@@ -36,18 +35,17 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
         type: [
             {
                 id: uuidv4(),
-                label: "Bán thành phẩm",
+                label: "materials_planning_semi",
                 value: "product",
             },
             {
                 id: uuidv4(),
-                label: "Nguyên vật liệu",
+                label: "materials_planning_materials",
                 value: "material",
             }
         ],
         arrayItem: []
     }
-
     const dataSeting = useSetingServer()
 
     const [isState, sIsState] = useState(initialState);
@@ -70,7 +68,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
 
     const onSubmit = async (value) => {
         if (value.arrayItem.length == 0) {
-            return shhowToat('error', 'Không có mặt hàng cần giữ kho. Vui lòng thêm mặt hàng')
+            return shhowToat('error', dataLang?.materials_planning_no_items || 'materials_planning_no_items')
         }
 
         let formData = new FormData();
@@ -265,20 +263,21 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
     return (
         <>
             <PopupEdit
-                title={'Giữ kho nguyên vật liệu'}
+                title={dataLang?.materials_planning_raw_materials || 'materials_planning_raw_materials'}
                 button={
                     <button
-                        className=" bg-[#F3F4F6] rounded-lg  outline-none focus:outline-none"
+                        className=" bg-blue-100 rounded-lg  outline-none focus:outline-none"
                         onClick={() => {
                             if (+dataTable?.countAll == 0) {
-                                return isShow('error', 'Vui lòng thêm kế hoạch sản xuất')
+                                return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
                             }
                             _ToggleModal(true)
                         }}
                     >
                         <div className="flex items-center gap-2 py-2 px-3 ">
-                            <Image height={16} width={16} src={icon} className="object-cover" />
-                            <h3 className="text-[#141522] font-medium 3xl:text-base text-xs">
+                            {/* <Image height={16} width={16} src={icon} className="object-cover" /> */}
+                            {icon}
+                            <h3 className="text-blue-600 font-medium 3xl:text-base text-xs">
                                 {title}
                             </h3>
                         </div>
@@ -290,10 +289,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
             >
                 <div className="mt-4">
                     <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                    <div className="grid grid-cols-12 gap-4">
+                    <div className="grid grid-cols-10 gap-4">
                         <div className="col-span-4 flex flex-col">
                             <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                                Ngày giữ kho  <span className=" text-red-500">*</span>
+                                {dataLang?.materials_planning_storage_date || 'materials_planning_storage_date'}  <span className=" text-red-500">*</span>
                             </div>
                             <Controller
                                 name="date"
@@ -301,7 +300,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                 rules={{
                                     required: {
                                         value: true,
-                                        message: 'Vui lòng chọn ngày giữ kho'
+                                        message: dataLang?.materials_planning_pease_select_date || 'materials_planning_pease_select_date'
                                     }
                                 }}
                                 render={({ field, fieldState }) => {
@@ -360,7 +359,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                             htmlFor={e.value}
                                                             className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
                                                         >
-                                                            {e.label}
+                                                            {dataLang[e.label] || e.label}
                                                         </label>
                                                     </div >
                                                 )
@@ -370,7 +369,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                 }}
                             />
                         </div>
-                        <div className="col-span-8">
+                        <div className="col-span-6">
                             <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
                                 {dataLang?.sales_product_note || "sales_product_note"}
                             </div>
@@ -397,25 +396,25 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                 {dataLang?.price_quote_item || "price_quote_item"}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
-                                {'Đơn vị mua'}
+                                {dataLang?.materials_planning_purchase_unit || 'materials_planning_purchase_unit'}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
-                                {'SL Cần'}
+                                {dataLang?.materials_planning_qty_need || 'materials_planning_qty_need'}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
-                                {'SL Đã giữ'}
+                                {dataLang?.materials_planning_qty_held || 'materials_planning_qty_held'}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
-                                {"SL tồn kho"}
+                                {dataLang?.materials_planning_qty_inventory || 'materials_planning_qty_inventory'}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={2}>
                                 {dataLang?.salesOrder_warehouse || "salesOrder_warehouse"}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={3}>
-                                {'Vị trí kho'}
+                                {dataLang?.warehouses_localtion_title || 'warehouses_localtion_title'}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
-                                {'Thao tác'}
+                                {dataLang?.inventory_operatione || 'inventory_operatione'}
                             </ColumnTablePopup>
                         </HeaderTablePopup>
                         {isState.onFetching ? (
@@ -493,7 +492,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                         rules={{
                                                             required: {
                                                                 value: findValue.arrayItem.find(x => x?.id == e?.id)?.valueWarehouse ? false : true,
-                                                                message: 'Vui lòng chọn kho'
+                                                                message: dataLang?.materials_planning_pease_select_warehouse || 'materials_planning_pease_select_warehouse'
                                                             },
                                                         }}
                                                         render={({ field, fieldState }) => {
@@ -508,14 +507,14 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                         formatOptionLabel={(option) => (
                                                                             <div className="flex justify-start items-center gap-1 z-[99]">
                                                                                 <h2>{option?.label}</h2>
-                                                                                <h2>{`(Tồn: ${option?.value})`}</h2>
+                                                                                <h2>{`(${dataLang?.materials_planning_exist || 'materials_planning_exist'}: ${option?.value})`}</h2>
                                                                             </div>
                                                                         )}
                                                                         {...field}
                                                                         onChange={(event) => {
                                                                             const check = findValue.arrayItem.some(x => x?.valueWarehouse?.id == event?.id)
                                                                             if (check) {
-                                                                                return isShow("error", "Kho đã được chọn")
+                                                                                return isShow("error", dataLang?.materials_planning_warehouse_has_been_selected || 'materials_planning_warehouse_has_been_selected')
                                                                             }
 
                                                                             fetchListLocationWarehouse(e, event?.id)
@@ -553,17 +552,17 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                             rules={{
                                                                                 required: {
                                                                                     value: x.show,
-                                                                                    message: 'Nhập số lượng'
+                                                                                    message: dataLang?.materials_planning_enter_quantity || 'materials_planning_enter_quantity'
                                                                                 },
                                                                                 validate: {
                                                                                     fn: (value) => {
                                                                                         try {
                                                                                             let mss = ''
                                                                                             if (x.show && value.newValue == null) {
-                                                                                                mss = 'Nhập số lượng'
+                                                                                                mss = dataLang?.materials_planning_enter_quantity || 'materials_planning_enter_quantity'
                                                                                             }
                                                                                             if (x.show && value.newValue == 0) {
-                                                                                                mss = 'Số lượng phải lớn hơn 0'
+                                                                                                mss = dataLang?.materials_planning_must_be_greater || 'materials_planning_must_be_greater'
                                                                                             }
                                                                                             return mss || true;
                                                                                         } catch (error) {
@@ -655,11 +654,11 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                                                                                                         return true;
                                                                                                     }
                                                                                                     if (floatValue > x.value) {
-                                                                                                        isShow('warning', `Vui lòng nhập số nhỏ hơn hoặc bằng ${formatNumber(x.value)}`);
+                                                                                                        isShow('warning', `${dataLang?.materials_planning_llease_enter || 'materials_planning_llease_enter'} ${formatNumber(x.value)}`);
                                                                                                         return false
                                                                                                     }
                                                                                                     if (floatValue < 0) {
-                                                                                                        isShow('warning', 'Vui lòng nhập lớn hơn 0');
+                                                                                                        isShow('warning', dataLang?.materials_planning_please_enter_greater || 'materials_planning_please_enter_greater');
                                                                                                         return false
                                                                                                     }
                                                                                                     return true

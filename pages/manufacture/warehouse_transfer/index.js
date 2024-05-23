@@ -719,9 +719,7 @@ const Index = (props) => {
                                                             {formatMoney(e?.grand_total)}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="mx-auto flex items-center justify-center">
-                                                            {e?.order_id != 0 ? <TagColorOrange name={'Đã giữ kho'} /> : <TagColorSky name={'Chưa giữ kho'} />
-                                                            }
-
+                                                            {(e?.order_id != 0 || e?.plan_id != 0) ? <TagColorOrange name={'Đã giữ kho'} /> : <TagColorSky name={'Chưa giữ kho'} />}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
                                                             {e?.note}

@@ -2,17 +2,17 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 
 const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
-const Header = ({ }) => {
+const Header = ({ dataLang }) => {
     return (
         <>
             <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                <h6 className="text-[#141522]/40">{"Sản xuất"}</h6>
+                <h6 className="text-[#141522]/40">{dataLang?.materials_planning_manufacture || "materials_planning_manufacture"}</h6>
                 <span className="text-[#141522]/40">/</span>
-                <h6>{"Kế hoạch nguyên vật liệu"}</h6>
+                <h6>{dataLang?.materials_planning || 'materials_planning'}</h6>
             </div>
             <div className="flex justify-between items-center">
                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                    Kế hoạch nguyên vật liệu
+                    {dataLang?.materials_planning || 'materials_planning'}
                 </h2>
                 <div>
                     <Zoom>
@@ -27,7 +27,7 @@ const Header = ({ }) => {
                                 className="object-cover"
                             />
                             <h3 className="text-[#141522] font-medium transition-all duration-200 ease-linear text-sm">
-                                Xuất báo cáo
+                                {dataLang?.materials_planning_export_report || 'materials_planning_export_report'}
                             </h3>
                         </button>
                     </Zoom>

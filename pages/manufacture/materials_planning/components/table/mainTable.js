@@ -1,6 +1,4 @@
 import { SearchNormal1 } from "iconsax-react";
-import dynamic from "next/dynamic";
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { v4 as uddid } from "uuid";
 
@@ -23,13 +21,15 @@ import TabPlan from "./tabPlan";
 // const TabKeepStock = dynamic(() => import("./tabKeepStock"), { ssr: false });
 import TabKeepStock from "./tabKeepStock";
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { CONFIRM_DELETION, TITLE_DELETE_COMMAND } from "@/constants/delete/deleteTable";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";
+import { MdAdd } from "react-icons/md";
+import { RiDeleteBin5Line } from "react-icons/ri";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 
 
@@ -37,35 +37,37 @@ const MainTable = ({ dataLang }) => {
     const arrButton = [
         {
             id: 1,
-            name: "Giữ kho",
-            icon: "/materials_planning/add.png",
+            name: dataLang?.salesOrder_keep_stock || 'salesOrder_keep_stock',
+            icon: <MdAdd className="text-base text-blue-600" />,
         },
         {
             id: 2,
-            name: "Thêm yêu cầu mua hàng",
-            icon: "/materials_planning/add.png",
+            name: dataLang?.materials_planning_add_purchase || 'materials_planning_add_purchase',
+            icon: <MdAdd className="text-base text-blue-600" />,
+            // icon: "/materials_planning/add.png",
         },
         {
             id: 3,
-            name: "Xóa",
-            icon: "/materials_planning/delete.png",
+            name: dataLang?.materials_planning_delete || 'materials_planning_delete',
+            icon: <RiDeleteBin5Line className="text-base text-red-600" />,
+            // icon: "/materials_planning/delete.png",
         },
     ];
 
     const listTab = [
         {
             id: uddid(),
-            name: "Mặt hàng",
+            name: dataLang?.materials_planning_items || 'materials_planning_items',
             type: "item",
         },
         {
             id: uddid(),
-            name: "Kế hoạch Bán thành phẩm & Nguyên vật liệu",
+            name: dataLang?.materials_planning_plan || 'materials_planning_plan',
             type: "plan",
         },
         {
             id: uddid(),
-            name: "Giữ kho & Yêu cầu mua hàng",
+            name: dataLang?.materials_planning_keep_stock || 'materials_planning_keep_stock',
             type: "keepStock",
         },
     ];
@@ -122,8 +124,8 @@ const MainTable = ({ dataLang }) => {
                 date_start: isValue.dateStart ? isMoment(isValue.dateStart, 'DD/MM/YYYY') : "",
                 date_end: isValue.dateEnd ? isMoment(isValue.dateEnd, 'DD/MM/YYYY') : "",
                 search: isValue.search == "" ? "" : isValue.search,
-                orders_id: [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map(e => e?.value) : "",
-                "internal_plans_id": [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map(e => e?.value) : ""
+                "orders_id": [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map(e => e) : "",
+                "internal_plans_id": [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map(e => e) : ""
             }
         },
             (err, response) => {
@@ -496,7 +498,7 @@ const MainTable = ({ dataLang }) => {
         <React.Fragment>
             <FilterHeader {...shareProps} />
             <div className="!mt-[14px]">
-                <h1 className="text-[#141522] font-medium text-sm my-2">Tổng số kế hoạch NVL: {dataTable?.countAll}</h1>
+                <h1 className="text-[#141522] font-medium text-sm my-2">{dataLang?.materials_planning_total_nvl || 'materials_planning_total_nvl'}: {dataTable?.countAll}</h1>
                 <div className="flex ">
                     <div className="w-[25%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
@@ -509,7 +511,7 @@ const MainTable = ({ dataLang }) => {
                                     onChange={(e) => onChangeSearch(e)}
                                     className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                     type="text"
-                                    placeholder="Tìm kế hoạch NVL"
+                                    placeholder={dataLang?.materials_planning_find_nvl || 'materials_planning_find_nvl'}
                                 />
                             </form>
                         </div>
@@ -533,13 +535,13 @@ const MainTable = ({ dataLang }) => {
                                         </div>
                                         <div className="flex flex-col items-end 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0 my-0">
                                             <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
-                                                Tạo vào{" "}
+                                                {dataLang?.materials_planning_create_on || 'materials_planning_create_on'}{" "}
                                                 <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
                                                     {e.time}
                                                 </span>
                                             </h3>
                                             <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
-                                                bởi{" "}
+                                                {dataLang?.materials_planning_by || 'materials_planning_by'}{" "}
                                                 <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
                                                     {e.name}
                                                 </span>
@@ -550,7 +552,7 @@ const MainTable = ({ dataLang }) => {
                                         <div className="flex flex-col gap-2">
                                             <div className="flex">
                                                 <h3 className="w-[30%] text-[#52575E] font-normal 3xl:text-sm text-xs">
-                                                    Lập theo
+                                                    {dataLang?.materials_planning_foloww_up || 'materials_planning_foloww_up'}
                                                 </h3>
                                                 <div className="flex flex-col w-[70%]">
                                                     {e.followUp.map((i) => (
@@ -577,9 +579,9 @@ const MainTable = ({ dataLang }) => {
                     <div className="w-[75%] border border-[#d8dae5] ">
                         <div className="flex items-center justify-between py-1 px-4 border-b">
                             <div>
-                                <h1 className="text-[#52575E] font-normal text-xs uppercase">Kế hoạch NVL</h1>
+                                <h1 className="text-[#52575E] font-normal text-xs uppercase">{dataLang?.materials_planning_nvl || 'materials_planning_nvl'}</h1>
                                 <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                    {dataTable.listDataRight?.title ?? "Không có kế hoạch NVL"}
+                                    {dataTable.listDataRight?.title ?? (dataLang?.materials_planning_no_nvl || 'materials_planning_no_nvl')}
                                 </h1>
                             </div>
                             <div className="flex gap-4">
@@ -587,10 +589,10 @@ const MainTable = ({ dataLang }) => {
                                     <Zoom key={e.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 1.08 }} className="w-fit">
                                         {e.id == 3 &&
                                             <button
-                                                className=" bg-[#F3F4F6] rounded-lg  outline-none focus:outline-none"
+                                                className=" bg-red-100 rounded-lg  outline-none focus:outline-none"
                                                 onClick={() => {
                                                     if (+dataTable?.countAll == 0) {
-                                                        return isShow('error', 'Vui lòng thêm kế hoạch sản xuất')
+                                                        return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
                                                     }
                                                     if (e.id == 3) {
                                                         queryValue({ page: 1, resetPage: true })
@@ -599,8 +601,9 @@ const MainTable = ({ dataLang }) => {
                                                 }}
                                             >
                                                 <div className="flex items-center gap-2 py-2 px-3 ">
-                                                    <Image height={16} width={16} src={e.icon} className="object-cover" />
-                                                    <h3 className="text-[#141522] font-medium 3xl:text-base text-xs">
+                                                    {/* <Image height={16} width={16} src={e.icon} className="object-cover text-red-500" /> */}
+                                                    {e.icon}
+                                                    <h3 className="text-red-600 font-medium 3xl:text-base text-xs">
                                                         {e.name}
                                                     </h3>
                                                 </div>

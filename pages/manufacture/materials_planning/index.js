@@ -5,10 +5,12 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 
-const Header = dynamic(() => import("./components/header/header"), { ssr: false });
+// const Header = dynamic(() => import("./components/header/header"), { ssr: false });
+import Header from "./components/header/header";
 
 
-const MainTable = dynamic(() => import("./components/table/mainTable"), { ssr: false });
+// const MainTable = dynamic(() => import("./components/table/mainTable"), { ssr: false });
+import MainTable from "./components/table/mainTable";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -20,7 +22,7 @@ const Index = (props) => {
     return (
         <>
             <Head>
-                <title>{"Kế hoạch nguyên vật liệu"}</title>
+                <title>{dataLang?.materials_planning || 'materials_planning'}</title>
             </Head>
             <Container>
                 {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}

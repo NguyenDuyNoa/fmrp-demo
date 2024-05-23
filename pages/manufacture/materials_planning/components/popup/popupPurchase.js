@@ -11,7 +11,6 @@ import useToast from "@/hooks/useToast";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Trash as IconDelete } from "iconsax-react";
 import moment from "moment";
-import Image from "next/image";
 import DatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
 import { BsCalendarEvent } from "react-icons/bs";
@@ -34,12 +33,12 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
         type: [
             {
                 id: uuidv4(),
-                label: "Bán thành phẩm",
+                label: 'materials_planning_semi',
                 value: "product",
             },
             {
                 id: uuidv4(),
-                label: "Nguyên vật liệu",
+                label: 'materials_planning_materials',
                 value: "material",
             }
         ],
@@ -130,7 +129,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
 
     const onSubmit = async (value) => {
         if (value.arrayItem.length == 0) {
-            return shhowToat('error', 'Không có mặt hàng cần giữ kho. Vui lòng thêm mặt hàng')
+            return shhowToat('error', dataLang?.materials_planning_no_items_purchase || 'materials_planning_no_items_purchase')
         }
         let formData = new FormData();
         formData.append('note', value.note)
@@ -167,20 +166,21 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
     return (
         <>
             <PopupEdit
-                title={'Thêm yêu cầu mua hàng'}
+                title={dataLang?.materials_planning_add_purchase || 'materials_planning_add_purchase'}
                 button={
                     <button
-                        className=" bg-[#F3F4F6] rounded-lg  outline-none focus:outline-none"
+                        className=" bg-blue-100 rounded-lg  outline-none focus:outline-none"
                         onClick={() => {
                             if (+dataTable?.countAll == 0) {
-                                return isShow('error', 'Vui lòng thêm kế hoạch sản xuất')
+                                return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
                             }
                             _ToggleModal(true)
                         }}
                     >
                         <div className="flex items-center gap-2 py-2 px-3 ">
-                            <Image height={16} width={16} src={icon} className="object-cover" />
-                            <h3 className="text-[#141522] font-medium 3xl:text-base text-xs">
+                            {/* <Image height={16} width={16} src={icon} className="object-cover" /> */}
+                            {icon}
+                            <h3 className="text-blue-600 font-medium 3xl:text-base text-xs">
                                 {title}
                             </h3>
                         </div>
@@ -195,7 +195,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-4 flex flex-col">
                             <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                                Ngày mua hàng <span className=" text-red-500">*</span>
+                                {dataLang?.materials_planning_date_purchase || 'materials_planning_date_purchase'} <span className=" text-red-500">*</span>
                             </div>
                             <Controller
                                 name="date"
@@ -203,7 +203,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                                 rules={{
                                     required: {
                                         value: true,
-                                        message: 'Vui lòng chọn ngày mua hàng'
+                                        message: dataLang?.materials_planning_pease_select_purchase || 'materials_planning_pease_select_purchase'
                                     }
                                 }}
                                 render={({ field, fieldState }) => {
@@ -262,7 +262,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                                                             htmlFor={e.value}
                                                             className="ml-2 cursor-pointer 3xl:text-sm text-xs font-medium text-[#52575E]"
                                                         >
-                                                            {e.label}
+                                                            {dataLang[e.label] || e.label}
                                                         </label>
                                                     </div >
                                                 )
@@ -281,7 +281,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                                 rules={{
                                     required: {
                                         value: true,
-                                        message: 'Vui lòng nhập tên phiếu'
+                                        message: dataLang?.materials_planning_enter_ticket || 'materials_planning_enter_ticket'
                                     }
                                 }}
                                 control={form.control}
@@ -328,20 +328,20 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                                 {dataLang?.price_quote_item || "price_quote_item"}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={1}>
-                                {'ĐVT'}
+                                {dataLang?.materials_planning_dvt || 'materials_planning_dvt'}
                             </ColumnTablePopup>
 
                             <ColumnTablePopup colSpan={2}>
-                                {"SL cần mua"}
+                                {dataLang?.materials_planning_qty_need_by || 'materials_planning_qty_need_by'}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={2}>
-                                {"SL đã yêu cầu"}
+                                {dataLang?.materials_planning_qty_requested || 'materials_planning_qty_requested'}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={2}>
-                                {"SL mua"}
+                                {dataLang?.materials_planning_qty_buys || 'materials_planning_qty_buys'}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={1}>
-                                {'Thao tác'}
+                                {dataLang?.inventory_operatione || 'inventory_operatione'}
                             </ColumnTablePopup>
                         </HeaderTablePopup>
                         {isState.onFetching ? (
@@ -407,17 +407,17 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                                                         rules={{
                                                             required: {
                                                                 value: true,
-                                                                message: 'Nhập số lượng'
+                                                                message: dataLang?.materials_planning_enter_quantity || 'materials_planning_enter_quantity'
                                                             },
                                                             validate: {
                                                                 fn: (value) => {
                                                                     try {
                                                                         let mss = ''
                                                                         if (value == null) {
-                                                                            mss = 'Nhập số lượng'
+                                                                            mss = dataLang?.materials_planning_enter_quantity || 'materials_planning_enter_quantity'
                                                                         }
                                                                         if (value == 0) {
-                                                                            mss = 'Số lượng phải lớn hơn 0'
+                                                                            mss = dataLang?.materials_planning_must_be_greater || 'materials_planning_must_be_greater'
                                                                         }
                                                                         return mss || true;
                                                                     } catch (error) {
@@ -472,9 +472,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, ...rest })
                                     </div>
                                 </Customscrollbar>
                             </>
-                        ) : (
-                            <NoData />
-                        )}
+                        ) : <NoData />}
                         <div className="text-right mt-5 space-x-2">
                             <button
                                 type="button"
