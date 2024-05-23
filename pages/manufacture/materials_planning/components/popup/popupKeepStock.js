@@ -21,7 +21,7 @@ import { MdClear } from "react-icons/md";
 import ModalImage from "react-modal-image";
 import { v4 as uuidv4 } from "uuid";
 import { _ServerInstance as Axios } from "/services/axios";
-const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }) => {
+const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValue, fetchDataTable, ...rest }) => {
     const [open, sOpen] = useState(false);
 
     const isShow = useToast();
@@ -102,6 +102,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, ...rest }
                     const data = response.data;
                     if (data?.isSuccess) {
                         isShow('success', data?.message)
+                        queryValue({ page: 1 })
+                        fetchDataTable(1)
                         _ToggleModal(false)
                         form.reset()
                     } else {

@@ -103,7 +103,7 @@ const MainTable = ({ dataLang }) => {
         listPlan: [],
         valueOrder: null,
         valuePlan: null,
-        resetPage: false
+
     }
 
     const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
@@ -118,44 +118,44 @@ const MainTable = ({ dataLang }) => {
 
     const [isFetching, sIsFetChing] = useState(false);
 
-    const fetchDataTable = () => {
-        Axios("POST", `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${isValue.page}&limit=${isValue.limit}`, {
-            params: {
-                date_start: isValue.dateStart ? isMoment(isValue.dateStart, 'DD/MM/YYYY') : "",
-                date_end: isValue.dateEnd ? isMoment(isValue.dateEnd, 'DD/MM/YYYY') : "",
-                search: isValue.search == "" ? "" : isValue.search,
-                "orders_id": [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map(e => e) : "",
-                "internal_plans_id": [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map(e => e) : ""
+    const convertArrData = (arr) => {
+        const newData = arr?.map((e, index) => {
+            return {
+                id: e?.id,
+                title: e?.reference_no,
+                time: isMoment(e?.date, 'DD/MM/YYYY'),
+                name: e?.created_by_full_name,
+                nameBranch: e?.name_branch,
+                productionOrder: [],
+                followUp: e?.listObject?.map(i => {
+                    return {
+                        id: i?.pp_id,
+                        nameFollow: i?.reference_no,
+                        typeFollow: i?.object_type == 1 ? 'Đơn hàng' : "Kế hoạch nội bộ",
+                    }
+                }),
+                note: ""
             }
+        })
+        return newData
+    }
+
+    const params = {
+        date_start: isValue.dateStart ? isMoment(isValue.dateStart, 'DD/MM/YYYY') : "",
+        date_end: isValue.dateEnd ? isMoment(isValue.dateEnd, 'DD/MM/YYYY') : "",
+        search: isValue.search == "" ? "" : isValue.search,
+        "orders_id": [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map(e => e) : "",
+        "internal_plans_id": [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map(e => e) : ""
+    }
+
+    const fetchDataTable = (page) => {
+        Axios("POST", `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${page}&limit=${isValue.limit}`, {
+            params: params
         },
             (err, response) => {
                 if (!err) {
                     const { data } = response?.data
-
-                    const item = data?.productionPlans?.map((e, index) => {
-                        return {
-                            id: e?.id,
-                            title: e?.reference_no,
-                            time: isMoment(e?.date, 'DD/MM/YYYY'),
-                            name: e?.created_by_full_name,
-                            nameBranch: e?.name_branch,
-                            productionOrder: [],
-                            followUp: e?.listObject?.map(i => {
-                                return {
-                                    id: i?.pp_id,
-                                    nameFollow: i?.reference_no,
-                                    typeFollow: i?.object_type == 1 ? 'Đơn hàng' : "Kế hoạch nội bộ",
-                                }
-                            }),
-                            note: ""
-                        }
-                    })
-                    let arrayItem = []
-                    if (isValue.resetPage) {
-                        arrayItem = item
-                    } else {
-                        arrayItem = [...dataTable.listDataLeft, ...item]
-                    }
+                    const arrayItem = convertArrData(data?.productionPlans)
                     queryState({
                         countAll: data?.countAll,
                         listDataLeft: arrayItem.map((e, index) => {
@@ -188,11 +188,59 @@ const MainTable = ({ dataLang }) => {
             }
         );
     }
+
     useEffect(() => {
-        fetchDataTable()
-    }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.page]);
+        fetchDataTable(isValue.page)
+    }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan]);
 
 
+    const fetchDataTableSeeMore = () => {
+        Axios("POST", `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${isValue.page}&limit=${isValue.limit}`, {
+            params: params
+        },
+            (err, response) => {
+                if (!err) {
+                    const { data } = response?.data
+                    const item = convertArrData(data?.productionPlans)
+                    let arrayItem = [...dataTable.listDataLeft, ...item]
+                    queryState({
+                        countAll: data?.countAll,
+                        listDataLeft: arrayItem.map((e, index) => {
+                            return {
+                                ...e,
+                                showParent: index == 0,
+                            }
+                        }),
+                        next: data?.next == 1
+                    });
+                    if (isValue.search == "" && arrayItem[0]?.id) {
+                        fetchDataTableRight(arrayItem[0]?.id)
+                    }
+                    if (data?.productionPlans?.length == 0) {
+                        queryState({
+                            listDataRight: {
+                                ...dataTable.listDataRight,
+                                title: null,
+                                dataPPItems: [],
+                                dataBom: {
+                                    productsBom: [],
+                                    materialsBom: []
+                                },
+                                dataKeepStock: [],
+                                dataPurchases: []
+                            }
+                        })
+                    }
+                }
+            }
+        );
+    }
+
+    useEffect(() => {
+        if (isValue.page != 1) {
+            fetchDataTableSeeMore()
+        }
+    }, [isValue.page]);
 
     const fetchDataTableRight = async (id) => {
         await Axios("GET", `/api_web/api_manufactures/getDetailProductionPlans/${id}?csrf_protection`, {},
@@ -200,9 +248,6 @@ const MainTable = ({ dataLang }) => {
                 if (!err) {
                     const { data, isSuccess } = response?.data
                     if (isSuccess == 1) {
-                        console.log("data", data?.keepWarehouses);
-
-
                         queryState({
                             listDataRight: {
                                 title: data?.productionPlan?.reference_no,
@@ -324,9 +369,7 @@ const MainTable = ({ dataLang }) => {
 
     const fetDataOrder = debounce(async (value) => {
         await Axios("GET", `/api_web/api_internal_plan/searchOrders?csrf_protection=true`, {
-            params: {
-                search: value
-            }
+            params: { search: value }
         },
             (err, response) => {
                 if (!err) {
@@ -347,9 +390,7 @@ const MainTable = ({ dataLang }) => {
 
     const fetchDataPlan = debounce(async (value) => {
         await Axios("GET", `/api_web/api_internal_plan/searchInternalPlans?csrf_protection=true`, {
-            params: {
-                search: value
-            }
+            params: { search: value }
         },
             (err, response) => {
                 if (!err) {
@@ -452,11 +493,11 @@ const MainTable = ({ dataLang }) => {
     }
 
     const onChangeSearch = debounce((e) => {
-        queryValue({ search: e.target.value, page: 1, resetPage: true })
+        queryValue({ search: e.target.value, page: 1 })
     }, 500)
 
     const handDeleteItem = (id, type) => {
-        queryValue({ page: 1, resetPage: true })
+        queryValue({ page: 1 })
         handleQueryId({ status: true, id: id, idChild: type })
     }
 
@@ -470,7 +511,8 @@ const MainTable = ({ dataLang }) => {
                 if (!err) {
                     let { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        fetchDataTable()
+                        fetchDataTable(1)
+                        queryValue({ page: 1 })
                         isShow("success", dataLang[message] || message);
                     } else {
                         isShow("error", dataLang[message] || message);
@@ -572,7 +614,9 @@ const MainTable = ({ dataLang }) => {
                                 </div>
                             ))}
                             {dataTable.next &&
-                                <button type="button" onClick={() => queryValue({ page: isValue.page + 1 })} className="mx-auto text-sm block py-1 bg-blue-50 w-full hover:bg-blue-200 mt-1 transition-all duration-200 ease-linear">Xem thêm</button>
+                                <button type="button" onClick={() => queryValue({ page: isValue.page + 1 })} className="mx-auto text-sm block py-1 bg-blue-50 w-full hover:bg-blue-200 mt-1 transition-all duration-200 ease-linear">
+                                    {dataLang?.materials_planning_see_more || 'materials_planning_see_more'}
+                                </button>
                             }
                         </Customscrollbar>
                     </div>
@@ -595,7 +639,7 @@ const MainTable = ({ dataLang }) => {
                                                         return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
                                                     }
                                                     if (e.id == 3) {
-                                                        queryValue({ page: 1, resetPage: true })
+                                                        queryValue({ page: 1 })
                                                         handleQueryId({ status: true, id: dataTable.listDataRight?.idCommand })
                                                     }
                                                 }}
@@ -609,9 +653,10 @@ const MainTable = ({ dataLang }) => {
                                                 </div>
                                             </button>
                                             ||
-                                            e.id == 1 && <PopupKeepStock id={e.id} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
+
+                                            e.id == 1 && <PopupKeepStock id={e.id} queryValue={queryValue} fetchDataTable={fetchDataTable} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
                                             ||
-                                            e.id == 2 && <PopupPurchase id={e.id} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
+                                            e.id == 2 && <PopupPurchase id={e.id} queryValue={queryValue} fetchDataTable={fetchDataTable} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
                                         }
                                     </Zoom>
                                 ))}
