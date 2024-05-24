@@ -182,7 +182,17 @@ const Popup_Bom = React.memo((props) => {
                             value: e?.id,
                             child: [],
                         }))
-                    sDataVariant(newData);
+                    const converArr = newData?.map(e => {
+                        if (e?.label == "(NONE)") {
+                            return {
+                                ...e,
+                                label: "Mặc định",
+                            }
+                        }
+                        return e
+                    })
+                    console.log(converArr);
+                    sDataVariant(converArr);
                 }
             }
         );
@@ -198,13 +208,18 @@ const Popup_Bom = React.memo((props) => {
     const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x?.value));
 
     const _HandleChangeSelect = (value) => {
+        console.log("value", value);
         const newValue = value?.map(e => {
             const checkValue = currentData.find(x => x?.value == e?.value)
             if (checkValue) {
-                return checkValue
+                return {
+                    ...checkValue,
+                    label: checkValue.label == "NONE" ? "Mặc định" : checkValue.label
+                }
             }
             return e
         })
+        console.log("newValue", newValue);
         sValueVariant(newValue);
     };
 
@@ -241,11 +256,12 @@ const Popup_Bom = React.memo((props) => {
 
     const _HandleApplyVariant = () => {
         const newData = valueVariant?.filter(x => dataSelectedVariant.some(e => e?.value != x?.value));
+        console.log("newData", newData);
+        if (valueVariant.some(x => dataSelectedVariant.some(e => e?.value == x?.value))) {
+            return isShow('error', 'Biến thể đã được chọn vui lòng bỏ chọn');
+        }
         if (newData.length > 0) {
             dataSelectedVariant?.push(...newData);
-        }
-        else if (valueVariant.some(x => dataSelectedVariant.some(e => e?.value == x?.value))) {
-            return isShow('error', 'Biến thể đã được chọn');
         }
         else {
             dataSelectedVariant?.push(...valueVariant);
