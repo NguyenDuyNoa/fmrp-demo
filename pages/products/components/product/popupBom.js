@@ -59,17 +59,27 @@ const Popup_Bom = React.memo((props) => {
 
     const [dataCd, sDataCd] = useState([]);
 
+
+
+    const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
+
     const _HandleSelectTab = (e) => {
         if (e == tab) return
         sTab(e);
+        const checkNull = dataSelectedVariant?.map(e => {
+            return {
+                ...e,
+                child: e?.child.filter(x => x.name != null)
+            }
+        })
+        console.log("dataSelectedVariant", dataSelectedVariant);
+        sDataSelectedVariant(checkNull)
         sLoadingData(true)
         setTimeout(() => {
             sLoadingData(false)
         }, 1000);
         return () => clearTimeout()
     }
-
-    const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
 
     const dataRestVariant = dataVariant?.filter(
         (item1) => !dataSelectedVariant?.some((item2) => item1?.label === item2?.label && item1?.value === item2?.value)
@@ -514,12 +524,18 @@ const Popup_Bom = React.memo((props) => {
             });
         }
         // props.type == "edit" &&
+        const checkTab = dataSelectedVariant.some(x => x.value == tab)
+        if (checkTab) {
+            return
+        }
         if (props.type == "edit") {
+
             sTab(dataSelectedVariant[0]?.value ?? selectedList?.value);
         } else {
             sTab(dataSelectedVariant[0]?.value);
         }
     }, [dataSelectedVariant]);
+
     const _ServerSending = () => {
         let formData = new FormData();
         formData.append("product_id", props?.id);
