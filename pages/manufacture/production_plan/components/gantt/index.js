@@ -347,13 +347,13 @@ const BodyGantt = ({
                                                                     {i.status == "unfulfilled" && "Chưa thực hiện"}
                                                                 </h3>
                                                                 <h3 className="text-[#52575E] pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                                                    {formatNumber(i.quantity)}
+                                                                    {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
                                                                 </h3>
-                                                                <h3 className="text-[#52575E] pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
-                                                                    {formatNumber(i.quantityPlan)}
+                                                                <h3 className="text-blue-600 pl-4 text-center font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2">
+                                                                    {i.quantityPlan > 0 ? formatNumber(i.quantityPlan) : "-"}
                                                                 </h3>
-                                                                <h3 className="text-[#667085] text-center  font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2 ">
-                                                                    {formatNumber(i.quantityRemaining)}
+                                                                <h3 className="text-[#FF8F0D] text-center  font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-2 ">
+                                                                    {i.quantityRemaining > 0 ? formatNumber(i.quantityRemaining) : "-"}
                                                                 </h3>
                                                             </label>
                                                         ))}

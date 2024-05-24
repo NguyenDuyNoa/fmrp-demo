@@ -9,53 +9,7 @@ const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/s
 const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options, dataLang }) => {
     return (
         <>
-            <div className="grid grid-cols-12 items-center gap-2 ">
-                <div className="col-span-2">
-                    <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                        Ngày bắt đầu
-                    </label>
-                    <div className="w-full relative">
-                        <DatePicker
-                            id="start"
-                            calendarClassName="rasta-stripes"
-                            clearButtonClassName="text"
-                            selected={isValue.startDate}
-                            onChange={onChangeValue("startDate")}
-                            dateFormat={"dd/MM/yyyy"}
-                            isClearable
-                            placeholderText="Ngày bắt đầu"
-                            className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
-                        />
-                        <ArrowDown2
-                            size="11"
-                            color="#6b7280"
-                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                        />
-                    </div>
-                </div>
-                <div className="col-span-2">
-                    <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                        Ngày kết thúc
-                    </label>
-                    <div className="w-full relative">
-                        <DatePicker
-                            id="start"
-                            calendarClassName="rasta-stripes"
-                            clearButtonClassName="text"
-                            selected={isValue.endDate}
-                            onChange={onChangeValue("endDate")}
-                            isClearable
-                            dateFormat={"dd/MM/yyyy"}
-                            placeholderText="Ngày kết thúc"
-                            className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
-                        />
-                        <ArrowDown2
-                            size="11"
-                            color="#6b7280"
-                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
-                        />
-                    </div>
-                </div>
+            <div className="grid grid-cols-14 items-center gap-2 ">
                 <div className="col-span-2">
                     <h3 className="text-sm text-[#051B44] font-medium ml-1">Khách hàng</h3>
                     <SelectComponent
@@ -66,6 +20,16 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         classNamePrefix={"productionSmoothing"}
                         placeholder={"Khách hàng"}
                     />
+                </div>
+                <div className="col-span-2">
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'}</h3>
+                    <SelectComponent
+                        isClearable={true}
+                        value={isValue.valueBr}
+                        onChange={onChangeValue("valueBr")}
+                        options={isData.listBr}
+                        classNamePrefix={"productionSmoothing"}
+                        placeholder={dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'} />
                 </div>
                 <div className="col-span-2">
                     <h3 className="text-sm text-[#051B44] font-medium ml-1">Nhóm thành phẩm</h3>
@@ -177,6 +141,52 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         classNamePrefix={"productionSmoothing"}
                         placeholder={"Trạng thái kế hoạch"}
                     />
+                </div>
+                <div className="col-span-2">
+                    <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
+                        Ngày bắt đầu
+                    </label>
+                    <div className="w-full relative">
+                        <DatePicker
+                            id="start"
+                            calendarClassName="rasta-stripes"
+                            clearButtonClassName="text"
+                            selected={isValue.startDate}
+                            onChange={onChangeValue("startDate")}
+                            dateFormat={"dd/MM/yyyy"}
+                            isClearable
+                            placeholderText="Ngày bắt đầu"
+                            className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
+                        />
+                        <ArrowDown2
+                            size="11"
+                            color="#6b7280"
+                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                        />
+                    </div>
+                </div>
+                <div className="col-span-2">
+                    <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
+                        Ngày kết thúc
+                    </label>
+                    <div className="w-full relative">
+                        <DatePicker
+                            id="start"
+                            calendarClassName="rasta-stripes"
+                            clearButtonClassName="text"
+                            selected={isValue.endDate}
+                            onChange={onChangeValue("endDate")}
+                            isClearable
+                            dateFormat={"dd/MM/yyyy"}
+                            placeholderText="Ngày kết thúc"
+                            className="p-2 mb-[5px] placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
+                        />
+                        <ArrowDown2
+                            size="11"
+                            color="#6b7280"
+                            className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"
+                        />
+                    </div>
                 </div>
             </div>
         </>

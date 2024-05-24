@@ -23,11 +23,11 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
             <div className="flex justify-start items-center gap-8">
                 <h1 className=" text-[#11315B] font-normal 3xl:text-lg text-base">{dataLang?.materials_planning_plan_status || 'materials_planning_plan_status'}</h1>
                 <div className="flex  items-center gap-4">
-                    <button type="button" onClick={() => setIsTab('dataKeepStock')} className={`${isTab === 'dataKeepStock' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal 3xl:text-sm text-xs w-fit rounded-md  flex gap-1 items-center`}>
+                    <button type="button" onClick={() => setIsTab('dataKeepStock')} className={`${isTab === 'dataKeepStock' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit rounded-md  flex gap-1 items-center`}>
                         {dataLang?.materials_planning_keep_tock || 'materials_planning_keep_tock'}
                         <span className="bg-[#0BAA2E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">{dataTable?.listDataRight?.dataKeepStock?.length ?? 0}</span>
                     </button>
-                    <button type="button" onClick={() => setIsTab('dataPurchases')} className={`${isTab === 'dataPurchases' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal 3xl:text-sm text-xs w-fit rounded-md  flex gap-1 items-center`}>
+                    <button type="button" onClick={() => setIsTab('dataPurchases')} className={`${isTab === 'dataPurchases' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit rounded-md  flex gap-1 items-center`}>
                         {dataLang?.materials_planning_ycmh || 'materials_planning_ycmh'}
                         <span className="bg-[#EE1E1E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">{dataTable?.listDataRight?.dataPurchases?.length ?? 0}</span>
                     </button>
@@ -36,7 +36,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
             {isFetching ? (
                 <Loading className="h-80" color="#0f4f9e" />
             ) : dataTable?.listDataRight?.[isTab]?.length > 0 ? (
-                <Customscrollbar className="3xl:h-[52.5vh] xxl:h-[34.5vh] 2xl:h-[42.5vh] xl:h-[36vh] lg:h-[37.5vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
+                <Customscrollbar className="3xl:h-[52.5vh] xxl:h-[34.5vh] 2xl:h-[40vh] xl:h-[36vh] lg:h-[37.5vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
                 >
                     {dataTable?.listDataRight?.[isTab]?.map(
                         (e) =>
@@ -55,7 +55,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                 >
                                                     <h3
                                                         onClick={() => handShowItem(e.id, isTab)}
-                                                        className={`cursor-pointer text-[#3276FA] font-normal 3xl:text-sm text-xs border-b border-[#3276FA] w-fit`}
+                                                        className={`cursor-pointer text-[#3276FA] font-normal xl:text-sm text-xs border-b border-[#3276FA] w-fit`}
                                                     >
                                                         {e.showChild ? (dataLang?.materials_planning_hide || 'materials_planning_hide') : (dataLang?.materials_planning_show_more || 'materials_planning_show_more')}
                                                     </h3>
@@ -67,7 +67,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                 >
                                                     <h3
                                                         onClick={() => handDeleteItem(e.id, isTab)}
-                                                        className="cursor-pointer text-[#EE1E1E] font-normal 3xl:text-sm text-xs border-b border-[#EE1E1E] w-fit"
+                                                        className="cursor-pointer text-[#EE1E1E] font-normal xl:text-sm text-xs border-b border-[#EE1E1E] w-fit"
                                                     >
                                                         {dataLang?.materials_planning_delete || 'materials_planning_delete'}
                                                     </h3>
@@ -76,9 +76,9 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-5 my-2">
-                                            <h5 className="text-[#3A3E4C] font-normal 3xl:text-sm text-xs">
+                                            <h5 className="text-[#3A3E4C] font-normal xl:text-sm text-xs">
                                                 {e.time}
-                                                <span className="px-2 text-[#9295A4] font-normal 3xl:text-sm text-xs">
+                                                <span className="px-2 text-[#9295A4] font-normal xl:text-sm text-xs">
                                                     {dataLang?.materials_planning_by || 'materials_planning_by'}
                                                 </span>
                                                 <span className="capitalize">{e.user}</span>
@@ -105,14 +105,14 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                         </div>
                                         {isTab === 'dataKeepStock' &&
                                             <div className="flex items-center gap-5 my-2">
-                                                <h5 className="text-[#3A3E4C] font-normal 3xl:text-sm text-xs">
-                                                    <span className="pr-2 text-[#9295A4] font-normal 3xl:text-sm text-xs">
+                                                <h5 className="text-[#3A3E4C] font-normal xl:text-sm text-xs">
+                                                    <span className="pr-2 text-[#9295A4] font-normal xl:text-sm text-xs">
                                                         {dataLang?.warehouseTransfer_transferWarehouse || 'warehouseTransfer_transferWarehouse'}:
                                                     </span>
                                                     {e.warehouseFrom}
                                                 </h5>
-                                                <h5 className="text-[#3A3E4C] font-normal 3xl:text-sm text-xs">
-                                                    <span className="pr-2 text-[#9295A4] font-normal 3xl:text-sm text-xs">
+                                                <h5 className="text-[#3A3E4C] font-normal xl:text-sm text-xs">
+                                                    <span className="pr-2 text-[#9295A4] font-normal xl:text-sm text-xs">
                                                         {dataLang?.warehouseTransfer_receivingWarehouse || 'warehouseTransfer_receivingWarehouse'}:
                                                     </span>
                                                     {e.warehouseTo}
@@ -160,10 +160,10 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                 className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                             />
                                                             <div className="flex flex-col gap-0.5">
-                                                                <h1 className="text-[#0F4F9E] font-semibold 3xl:text-sm text-xs">
+                                                                <h1 className="text-[#0F4F9E] font-semibold xl:text-sm text-xs">
                                                                     {i.name}
                                                                 </h1>
-                                                                <h1 className="text-[#9295A4] font-normal text-[10px]">
+                                                                <h1 className="text-[#9295A4] font-normal text-[11px]">
                                                                     {i.code} - {i.itemVariation}
                                                                 </h1>
                                                                 <div className="flex items-center font-oblique flex-wrap">
@@ -200,18 +200,18 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                 </div>
                                                             </div>
                                                         </h4>
-                                                        <h4 className="col-span-2 text-center text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                        <h4 className="col-span-2 text-center text-[#52575E] font-normal xl:text-sm text-xs">
                                                             {i.unit}
                                                         </h4>
-                                                        <h4 className="col-span-2 text-center text-[#141522] font-semibold 3xl:text-base text-xs">
-                                                            {formatNumber(i.quantity)}
+                                                        <h4 className="col-span-2 text-center text-[#141522] font-semibold xl:text-sm text-xs">
+                                                            {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
                                                         </h4>
                                                         {isTab === 'dataKeepStock' && (
                                                             <>
-                                                                <h4 className="col-span-2 text-center text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                                <h4 className="col-span-2 text-center text-[#52575E] font-normal xl:text-sm text-xs">
                                                                     {i.locationFrom}
                                                                 </h4>
-                                                                <h4 className="col-span-2 text-center text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                                <h4 className="col-span-2 text-center text-[#52575E] font-normal xl:text-sm text-xs">
                                                                     {i.locationTo}
                                                                 </h4>
                                                             </>
@@ -237,8 +237,8 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                             </p>
                                                                             <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`}>
                                                                                 SL:
-                                                                                <span className="text-[#0BAA2E] font-semibold text-[10px] px-1">
-                                                                                    {formatNumber(j.quantity)}
+                                                                                <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
+                                                                                    {j.quantity > 0 ? formatNumber(j.quantity) : "-"}
                                                                                 </span>
                                                                             </p>
                                                                         </div>

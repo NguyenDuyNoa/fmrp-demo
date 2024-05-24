@@ -72,21 +72,21 @@ const TabItem = ({ dataTable, handShowItem, isFetching, dataLang }) => {
                                                         className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                                     />
                                                     <div className="flex flex-col gap-0.5">
-                                                        <h1 className="text-[#000000] font-semibold 3xl:text-sm text-xs">
+                                                        <h1 className="text-[#000000] font-semibold xl:text-sm text-xs">
                                                             {i.name}
                                                         </h1>
-                                                        <h1 className="text-[#9295A4] font-normal text-[10px]">
+                                                        <h1 className="text-[#9295A4] font-normal text-[11px]">
                                                             {i.code} - {i.itemVariation}
                                                         </h1>
                                                     </div>
                                                 </h4>
-                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
+                                                <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
                                                     {i.unit}
                                                 </h4>
-                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                    {formatNumber(i.quantity)}
+                                                <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
+                                                    {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
                                                 </h4>
-                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
+                                                <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-[11px] uppercase">
                                                     {i.timeline.start} - {i.timeline.end}
                                                 </h4>
                                             </div>
@@ -94,9 +94,7 @@ const TabItem = ({ dataTable, handShowItem, isFetching, dataLang }) => {
                                 </div>
                             </>
                         ))
-                    ) : (
-                        <NoData />
-                    )}
+                    ) : <NoData />}
                 </Customscrollbar>
             )}
         </>

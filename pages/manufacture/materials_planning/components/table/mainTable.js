@@ -103,6 +103,8 @@ const MainTable = ({ dataLang }) => {
         listPlan: [],
         valueOrder: null,
         valuePlan: null,
+        listBr: [],
+        valueBr: null,
 
     }
 
@@ -409,9 +411,23 @@ const MainTable = ({ dataLang }) => {
             })
     }, 500);
 
+
+    const fetchDataBranch = debounce(async (value) => {
+        await Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {
+            // params: { search: value }
+        },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response?.data;
+                    queryValue({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
+                }
+            })
+    }, 500);
+
     useEffect(() => {
         fetDataOrder()
         fetchDataPlan()
+        fetchDataBranch()
     }, []);
 
     const handleShow = (id) => {

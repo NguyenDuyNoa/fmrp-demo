@@ -80,11 +80,11 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                                                 className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                             />
                                             <div className="flex flex-col">
-                                                <h1 className="3xl:text-sm text-xs">{e.name}</h1>
-                                                <h1 className="text-[#9295A4] font-normal text-[10px]">
+                                                <h1 className="xl:text-sm text-xs">{e.name}</h1>
+                                                <h1 className="text-[#9295A4] font-normal text-[11px]">
                                                     {e.code} - {e.itemVariation}
                                                 </h1>
-                                                <h1 className="text-red-500 font-normal text-[10px]">
+                                                <h1 className="text-red-500 font-normal text-[11px]">
                                                     {e.exist > 0 ? `Tồn: ${formatNumber(e.exist)}` : 'Hết kho'}
                                                 </h1>
                                             </div>
@@ -93,13 +93,13 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                                             {e.unit}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.use)}
+                                            {e.use > 0 ? formatNumber(e.use) : "-"}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.quantityKeep)}
+                                            {e.quantityKeep > 0 ? formatNumber(e.quantityKeep) : "-"}
                                         </h4>
                                         <h4 className="col-span-2 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.lack > 0 ? formatNumber(e.lack) : 0}
+                                            {e.lack > 0 ? formatNumber(e.lack) : "-"}
                                         </h4>
                                     </div>
                             )}
@@ -152,32 +152,32 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                                                 className="object-cover rounded-md min-w-[36px] min-h-[36px] w-[36px] h-[36px] max-w-[36px] max-h-[36px]"
                                             />
                                             <div className="flex flex-col">
-                                                <h1 className="3xl:text-sm text-xs">{e.name}</h1>
-                                                <h1 className="text-[#9295A4] font-normal text-[10px]">
+                                                <h1 className="xl:text-sm text-xs">{e.name}</h1>
+                                                <h1 className="text-[#9295A4] font-normal text-[11px]">
                                                     {e.code} - {e.itemVariation}
                                                 </h1>
-                                                <h1 className="text-red-500 font-normal text-[10px]">
+                                                <h1 className="text-red-500 font-normal text-[11px]">
                                                     {e.exist > 0 ? `Tồn: ${formatNumber(e.exist)}` : 'Hết kho'}
                                                 </h1>
                                             </div>
                                         </h4>
-                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
+                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal xl:text-sm text-xs">
                                             {e.unit}
                                         </h4>
-                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.use)}
+                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal xl:text-sm text-xs">
+                                            {e.use > 0 ? formatNumber(e.use) : "-"}
                                         </h4>
-                                        {/* <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
+                                        {/* <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal xl:text-sm text-xs">
                                             {formatNumber(e.exist)}
                                         </h4> */}
-                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.exchange)}
+                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal xl:text-sm text-xs">
+                                            {e.exchange > 0 ? formatNumber(e.exchange) : "-"}
                                         </h4>
-                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {formatNumber(e.quantityKeep)}
+                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal xl:text-sm text-xs">
+                                            {e.quantityKeep > 0 ? formatNumber(e.quantityKeep) : "-"}
                                         </h4>
-                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal text-xs">
-                                            {e.lack > 0 ? formatNumber(e.lack) : 0}
+                                        <h4 className="col-span-1 px-4 text-center text-[#52575E] font-normal xl:text-sm text-xs">
+                                            {e.lack > 0 ? formatNumber(e.lack) : "-"}
                                         </h4>
                                     </div>
                             )}

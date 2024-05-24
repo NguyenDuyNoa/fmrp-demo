@@ -31,9 +31,11 @@ import useActionRole from "@/hooks/useRole";
 
 const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 
-const Header = dynamic(() => import("./components/header"), { ssr: false });
+// const Header = dynamic(() => import("./components/header"), { ssr: false });
+import Header from "./components/header";
 
-const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
+// const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
+import FilterHeader from "./components/fillter/filterHeader";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -49,6 +51,7 @@ const Index = (props) => {
         client: [],
         productGroup: [],
         product: [],
+        listBr: [],
         planStatus: [
             { id: uuid(), value: "outDate", label: "Đã quá hạn" },
             { id: uuid(), value: "processing", label: "Đang thực hiện" },
@@ -63,6 +66,7 @@ const Index = (props) => {
         idClient: null,
         idProductGroup: null,
         idProduct: null,
+        valueBr: null,
         planStatus: null,
     };
 
@@ -207,6 +211,14 @@ const Index = (props) => {
                 }
             }
         );
+        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {
+        },
+            (err, response) => {
+                if (!err) {
+                    let { result } = response?.data;
+                    updateData({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
+                }
+            })
     };
 
     const _HandleSeachApi = debounce((inputValue) => {

@@ -452,6 +452,7 @@ const BtnAction = React.memo((props) => {
                                             code={props?.code}
                                             onRefresh={props.onRefresh}
                                             type={props?.typeOpen}
+                                            bom={props?.bom}
                                             className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                                         />
                                         <Popup_ThanhPham

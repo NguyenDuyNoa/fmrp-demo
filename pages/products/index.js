@@ -636,8 +636,8 @@ const Index = (props) => {
                                                             </Popup_ThongTin>
                                                             <h6 className="flex gap-1 items-center">
                                                                 <span
-                                                                    className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit w-fit font-[300] break-words leading-relaxed ${(e?.type_products?.id === 0 &&
-                                                                        "text-lime-500 border-lime-500") ||
+                                                                    className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed 2xl:text-[10px] text-[9px]
+                                                                     ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") ||
                                                                         (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") ||
                                                                         (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")
                                                                         }`}
@@ -656,19 +656,23 @@ const Index = (props) => {
                                                             {formatNumber(e?.stock_quantity)}
                                                         </RowItemTable> */}
                                                         <RowItemTable colSpan={1} className="flex items-center justify-center">
-                                                            {Number(e?.variation_count) == 0 ? (
-                                                                Number(e?.ct_versions) != 0 && (
-                                                                    <IconTick className="text-green-500" />
-                                                                )
-                                                            ) : Number(e?.variation_count) > Number(e?.ct_versions) ? (
-                                                                Number(e?.ct_versions) == 0 ? (
-                                                                    ""
-                                                                ) : (
-                                                                    formatNumber(e?.ct_versions)
-                                                                )
-                                                            ) : (
-                                                                <IconTick className="text-green-500" />
-                                                            )}
+                                                            {
+                                                                Number(e?.variation_count) == 0 ?
+                                                                    (
+                                                                        Number(e?.ct_versions) != 0 && <IconTick className="text-green-500" />
+                                                                    )
+                                                                    :
+                                                                    (
+                                                                        Number(e?.variation_count) > Number(e?.ct_versions) ?
+                                                                            (
+                                                                                Number(e?.ct_versions) == 0 ? "" : formatNumber(e?.ct_versions)
+                                                                            )
+                                                                            :
+                                                                            (
+                                                                                <IconTick className="text-green-500" />
+                                                                            )
+                                                                    )
+                                                            }
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex items-center justify-center">
                                                             {Number(e?.ct_versions_stage) == 0 ? (
@@ -695,7 +699,25 @@ const Index = (props) => {
                                                                 id={e.id}
                                                                 name={e.name}
                                                                 code={e.code}
-                                                                bom={Number(e?.ct_versions)}
+                                                                bom={
+                                                                    Number(e?.variation_count) == 0 ?
+                                                                        (
+                                                                            Number(e?.ct_versions) != 0 && true
+                                                                        )
+                                                                        :
+                                                                        (
+                                                                            Number(e?.variation_count) > Number(e?.ct_versions) ?
+                                                                                (
+                                                                                    Number(e?.ct_versions) == 0 ? false : true
+                                                                                )
+                                                                                :
+                                                                                (
+                                                                                    true
+                                                                                )
+                                                                        )
+
+                                                                }
+                                                                // bom={Number(e?.ct_versions)}
                                                                 stage={Number(e?.ct_versions_stage)}
                                                                 type="products"
                                                                 typeOpen="add"

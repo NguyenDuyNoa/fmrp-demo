@@ -148,7 +148,7 @@ const Popup_ThongTin = React.memo((props) => {
             name: props.dataLang?.stage_finishedProduct || "stage_finishedProduct",
         }
     ]
-
+    console.log("selectedListBom", selectedListBom);
     return (
         <PopupEdit
             title={"Chi tiết thành phẩm"}
@@ -214,7 +214,16 @@ const Popup_ThongTin = React.memo((props) => {
                                                 {props.dataLang?.type_finishedProduct}:
                                             </h5>
                                             <h6 className="w-[55%] text-right">
-                                                {props.dataLang[list?.type_products?.name]}
+                                                {/* {props.dataLang[list?.type_products?.name]} */}
+                                                <span
+                                                    className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
+                                                                     ${(list?.type_products?.id === 0 && "text-lime-500 border-lime-500") ||
+                                                        (list?.type_products?.id === 1 && "text-orange-500 border-orange-500") ||
+                                                        (list?.type_products?.id === 2 && "text-sky-500 border-sky-500")
+                                                        }`}
+                                                >
+                                                    {props.dataLang[list?.type_products?.name] || list?.type_products?.name}
+                                                </span>
                                             </h6>
                                         </div>
                                         <div className="flex justify-between">
@@ -467,7 +476,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                                 <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
                                                                     {formatNumber(e?.loss)}%
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs col-span-3">
+                                                                <h6 className="px-2 xl:text-base text-xs col-span-3 text-center">
                                                                     {e?.stage_name}
                                                                 </h6>
                                                             </div>
@@ -481,7 +490,9 @@ const Popup_ThongTin = React.memo((props) => {
                                                         name={list?.name}
                                                         code={list?.code}
                                                         type="edit"
-                                                        className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
+                                                        onRefresh={props.onRefresh}
+                                                        onRefreshBom={_ServerFetchingBom}
+                                                    // className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
                                                     />
                                                 </div>
                                             </div>

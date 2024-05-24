@@ -1,12 +1,7 @@
-import dynamic from "next/dynamic";
-
-import vi from "date-fns/locale/vi";
 
 import DatePicker from "react-datepicker";
-
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { ArrowDown2 } from "iconsax-react";
-
-const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), { ssr: false });
 
 const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPlan }) => {
     const renderMonthContent = (month, shortMonth, longMonth) => {
@@ -15,14 +10,15 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
     };
     return (
         <>
-            <div className="grid grid-cols-8 items-center gap-10 ">
+            <div className="grid grid-cols-10 items-center gap-10 ">
+
                 <div className="col-span-2">
                     <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.materials_planning_order_number || 'materials_planning_order_number'}</h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.valueOrder}
                         onInputChange={(e) => fetDataOrder(e)}
-                        onChange={(e) => queryValue({ valueOrder: e, page: 1, resetPage: true })}
+                        onChange={(e) => queryValue({ valueOrder: e, page: 1 })}
                         options={isValue.listOrders}
                         classNamePrefix={"productionSmoothing"} placeholder={dataLang?.materials_planning_order_number || 'materials_planning_order_number'} />
                 </div>
@@ -32,10 +28,20 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                         isClearable={true}
                         value={isValue.valuePlan}
                         onInputChange={(e) => fetchDataPlan(e)}
-                        onChange={(e) => queryValue({ valuePlan: e, page: 1, resetPage: true })}
+                        onChange={(e) => queryValue({ valuePlan: e, page: 1 })}
                         options={isValue.listPlan}
                         classNamePrefix={"productionSmoothing"}
                         placeholder={dataLang?.internal_plan || 'internal_plan'} />
+                </div>
+                <div className="col-span-2">
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'}</h3>
+                    <SelectComponent
+                        isClearable={true}
+                        value={isValue.valueBr}
+                        onChange={(e) => queryValue({ valueBr: e, page: 1 })}
+                        options={isValue.listBr}
+                        classNamePrefix={"productionSmoothing"}
+                        placeholder={dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'} />
                 </div>
                 <div className="col-span-2">
                     <div className="">
@@ -48,7 +54,7 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                                 calendarClassName="rasta-stripes"
                                 clearButtonClassName="text -translate-x-1/2"
                                 selected={isValue?.dateStart}
-                                onChange={(date) => queryValue({ dateStart: date, page: 1, resetPage: true })}
+                                onChange={(date) => queryValue({ dateStart: date, page: 1 })}
                                 value={isValue?.dateStart}
                                 isClearable
                                 dateFormat="dd/MM/yyyy"
@@ -72,7 +78,7 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                             <DatePicker
                                 selected={isValue?.dateEnd}
                                 dateFormat="dd/MM/yyyy"
-                                onChange={(date) => queryValue({ dateEnd: date, page: 1, resetPage: true })}
+                                onChange={(date) => queryValue({ dateEnd: date, page: 1 })}
                                 value={isValue?.dateEnd}
                                 isClearable
                                 placeholderText={dataLang?.materials_planning_end_day || 'materials_planning_end_day'}

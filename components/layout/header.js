@@ -397,13 +397,13 @@ const Header = () => {
                         },
                     ],
                 },
-                {
-                    title: "Cảnh báo tồn kho",
-                    img: "/icon/header/kho/canhbao.png",
-                    link: "#",
-                    viewOwn: -1,
-                    view: -1,
-                },
+                // {
+                //     title: "Cảnh báo tồn kho",
+                //     img: "/icon/header/kho/canhbao.png",
+                //     link: "#",
+                //     viewOwn: -1,
+                //     view: -1,
+                // },
                 {
                     title: "Lịch sản xuất",
                     img: "/icon/header/kho/lich.png",

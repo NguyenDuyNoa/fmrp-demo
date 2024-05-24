@@ -205,6 +205,16 @@ const FormAdd = (props) => {
         setItem("arrData", JSON.stringify(newData));
     };
 
+    useEffect(() => {
+        const newData = data.dataProduction.map((e) => {
+            return {
+                ...e,
+                date: isValue.dateRange
+            }
+        });
+        queryData({ dataProduction: newData });
+    }, [isValue.dateRange])
+
     const handSavePlan = async () => {
         const { hasMissingBom, hasMissingStage, hasMissingQuantityDate } = data.dataProduction.reduce(
             (acc, item) => {
