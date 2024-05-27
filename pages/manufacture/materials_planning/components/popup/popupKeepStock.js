@@ -211,7 +211,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                             label: i?.name_location,
                                             value: formatNumber(i?.quantity_warehouse),
                                             qty: formatNumber(i?.quantity_warehouse),
-                                            show: false,
+                                            show: true,
                                         }
                                     })
                                 }

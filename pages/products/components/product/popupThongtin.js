@@ -158,7 +158,7 @@ const Popup_ThongTin = React.memo((props) => {
             onClose={_ToggleModal.bind(this, false)}
             nested
         >
-            <div className="py-4 w-[900px] space-y-5">
+            <div className="py-4 xl:w-[1000px] w-[900px] space-y-5">
                 <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     {dataTab.map((item) => (
                         <button
@@ -428,7 +428,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                     ))}
                                                 </div>
                                                 <HeaderTablePopup gridCols={13}    >
-                                                    <ColumnTablePopup colSpan={2}>
+                                                    <ColumnTablePopup colSpan={3}>
                                                         {props.dataLang?.warehouses_detail_type || "warehouses_detail_type"}
                                                     </ColumnTablePopup>
                                                     <ColumnTablePopup colSpan={2}>
@@ -444,7 +444,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                         %
                                                         {props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
                                                     </ColumnTablePopup>
-                                                    <ColumnTablePopup colSpan={3}>
+                                                    <ColumnTablePopup colSpan={2}>
                                                         {props.dataLang?.stage_usage_finishedProduct}
                                                     </ColumnTablePopup>
                                                 </HeaderTablePopup>
@@ -456,10 +456,23 @@ const Popup_ThongTin = React.memo((props) => {
                                                                 key={e?.id ? e?.id.toString() : ""}
                                                                 className={`grid grid-cols-13 px-2 py-2.5 hover:bg-slate-50 items-center`}
                                                             >
-                                                                <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
+                                                                {/* <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
                                                                     {e?.str_type_item}
+                                                                </h6> */}
+                                                                <h6 className="flex gap-1 items-center col-span-3">
+                                                                    <span
+                                                                        className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
+                                                                     ${(e?.item_type_current === "products" && "text-lime-500 border-lime-500") ||
+                                                                            (e?.item_type_current == "semi_products" && "text-orange-500 border-orange-500") ||
+                                                                            (e?.item_type_current == "out_side" && "text-sky-500 border-sky-500") ||
+                                                                            (e?.item_type_current == "material" && "text-purple-500 border-purple-500") ||
+                                                                            (e?.item_type_current == "semi_products_outside" && "text-green-500 border-green-500")
+                                                                            }`}
+                                                                    >
+                                                                        {e?.str_type_item ?? ""}
+                                                                    </span>
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs col-span-2">
+                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs col-span-2">
                                                                     <div className="grid grid-cols-1">
                                                                         <h5>{e?.item_name}</h5>
                                                                         <h5 className="text-xs italic">
@@ -467,16 +480,16 @@ const Popup_ThongTin = React.memo((props) => {
                                                                         </h5>
                                                                     </div>
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs col-span-2 text-center">
+                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs col-span-2 text-center">
                                                                     {e?.unit_name}
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
+                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs  col-span-2 text-center">
                                                                     {formatNumber(e?.quota)}
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
+                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs  col-span-2 text-center">
                                                                     {formatNumber(e?.loss)}%
                                                                 </h6>
-                                                                <h6 className="px-2 xl:text-base text-xs col-span-3 text-center">
+                                                                <h6 className="px-2 2xl:text-base xl:text-sm text-xs col-span-2 text-center">
                                                                     {e?.stage_name}
                                                                 </h6>
                                                             </div>

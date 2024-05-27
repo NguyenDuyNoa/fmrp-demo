@@ -147,7 +147,8 @@ const MainTable = ({ dataLang }) => {
         date_end: isValue.dateEnd ? isMoment(isValue.dateEnd, 'DD/MM/YYYY') : "",
         search: isValue.search == "" ? "" : isValue.search,
         "orders_id": [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map(e => e) : "",
-        "internal_plans_id": [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map(e => e) : ""
+        "internal_plans_id": [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map(e => e) : "",
+        'branch_id': isValue.valueBr?.value || "",
     }
 
     const fetchDataTable = (page) => {
@@ -193,7 +194,7 @@ const MainTable = ({ dataLang }) => {
 
     useEffect(() => {
         fetchDataTable(isValue.page)
-    }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan]);
+    }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.valueBr]);
 
 
     const fetchDataTableSeeMore = () => {

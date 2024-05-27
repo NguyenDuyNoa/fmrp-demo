@@ -420,19 +420,19 @@ const Index = (props) => {
                                                             {e.plan_name}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="mx-auto">
-                                                            {e.status == "1" && (
+                                                            {/* {e.status == "1" && (
                                                                 <BtnStatusApproved
                                                                     onClick={() =>
                                                                         handleQueryId({
                                                                             id: e?.id,
                                                                             status: true,
-                                                                            idChild: "0",
+                                                                            idChild:e.status == "1"? "0": "1",
                                                                         })
                                                                     }
-                                                                    type="1"
+                                                                    type={e.status == "1" ? "1" : "0"}
                                                                 />
                                                             )}
-                                                            {e.status == "0" && (
+                                                            {(e.status == null || e.status == "0") && (
                                                                 <BtnStatusApproved
                                                                     onClick={() =>
                                                                         handleQueryId({
@@ -443,7 +443,17 @@ const Index = (props) => {
                                                                     }
                                                                     type="0"
                                                                 />
-                                                            )}
+                                                            )} */}
+                                                            <BtnStatusApproved
+                                                                onClick={() =>
+                                                                    handleQueryId({
+                                                                        id: e?.id,
+                                                                        status: true,
+                                                                        idChild: e.status == "1" ? "0" : "1",
+                                                                    })
+                                                                }
+                                                                type={e.status == "1" ? "1" : "0"}
+                                                            />
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'left'} className="flex items-center space-x-1">
                                                             <CustomAvatar profileImage={e?.created_by_profile_image} fullName={e?.created_by_full_name} />

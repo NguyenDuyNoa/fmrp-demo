@@ -59,8 +59,6 @@ const Popup_Bom = React.memo((props) => {
 
     const [dataCd, sDataCd] = useState([]);
 
-
-
     const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
 
     const _HandleSelectTab = (e) => {
@@ -72,7 +70,6 @@ const Popup_Bom = React.memo((props) => {
                 child: e?.child.filter(x => x.name != null)
             }
         })
-        console.log("dataSelectedVariant", dataSelectedVariant);
         sDataSelectedVariant(checkNull)
         sLoadingData(true)
         setTimeout(() => {
@@ -97,8 +94,6 @@ const Popup_Bom = React.memo((props) => {
         sDataSelectedVariant([])
         sSelectedList({})
     }, [isOpen]);
-    console.log("dataSelectedVariant", dataSelectedVariant);
-    console.log("tab", tab);
 
     const _ServerFetching = () => {
         Axios("GET", `/api_web/Api_product/getDesignBOM?csrf_protection=true`,
@@ -182,7 +177,7 @@ const Popup_Bom = React.memo((props) => {
                             value: e?.id,
                             child: [],
                         }))
-                    const converArr = newData?.map(e => {
+                    const convertArr = newData?.map(e => {
                         if (e?.label == "(NONE)") {
                             return {
                                 ...e,
@@ -191,8 +186,7 @@ const Popup_Bom = React.memo((props) => {
                         }
                         return e
                     })
-                    console.log(converArr);
-                    sDataVariant(converArr);
+                    sDataVariant(convertArr);
                 }
             }
         );
@@ -208,7 +202,6 @@ const Popup_Bom = React.memo((props) => {
     const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x?.value));
 
     const _HandleChangeSelect = (value) => {
-        console.log("value", value);
         const newValue = value?.map(e => {
             const checkValue = currentData.find(x => x?.value == e?.value)
             if (checkValue) {
@@ -219,7 +212,6 @@ const Popup_Bom = React.memo((props) => {
             }
             return e
         })
-        console.log("newValue", newValue);
         sValueVariant(newValue);
     };
 
@@ -241,7 +233,6 @@ const Popup_Bom = React.memo((props) => {
                     label: ("NONE")
                 }
                 dataSelectedVariant.push({ ...newData })
-                console.log("newData?.value", newData?.value);
                 sTab(newData?.value)
                 _HandleAddNew(newData?.value)
             }
@@ -256,7 +247,6 @@ const Popup_Bom = React.memo((props) => {
 
     const _HandleApplyVariant = () => {
         const newData = valueVariant?.filter(x => dataSelectedVariant.some(e => e?.value != x?.value));
-        console.log("newData", newData);
         if (valueVariant.some(x => dataSelectedVariant.some(e => e?.value == x?.value))) {
             return isShow('error', 'Biến thể đã được chọn vui lòng bỏ chọn');
         }
@@ -270,31 +260,41 @@ const Popup_Bom = React.memo((props) => {
     };
 
     const _HandleAddNew = (id) => {
-        const index = dataSelectedVariant.findIndex((obj) => obj?.value == id);
-        const newData = [...dataSelectedVariant];
-        if (newData[index]) {
-            newData[index] = {
-                ...newData[index],
-                child: [
-                    ...newData[index]?.child,
-                    {
-                        id: Date.now(),
-                        type: null,
-                        name: null,
-                        dataName: [],
-                        unit: null,
-                        dataUnit: [],
-                        norm: 0,
-                        loss: 0,
-                        stage: null,
-                    },
-                ],
-            };
+        let itemFound = false;
+        const newData = dataSelectedVariant.map((item) => {
+            if (item?.value === id) {
+                itemFound = true;
+                const childArray = Array.isArray(item.child) ? item.child : [];
+                return {
+                    ...item,
+                    child: [
+                        ...childArray,
+                        {
+                            id: Date.now(),
+                            type: null,
+                            name: null,
+                            dataName: [],
+                            unit: null,
+                            dataUnit: [],
+                            norm: 0,
+                            loss: 0,
+                            stage: null,
+                        },
+                    ],
+                };
+            }
+            return item;
+        });
+
+        if (itemFound) {
+            console.log("newData", newData);
             sDataSelectedVariant(newData);
         } else {
             isShow('error', 'Vui lòng chọn biến thể');
         }
     };
+
+
 
     const _HandleDeleteItemBOM = (parentId, id) => {
         const index = dataSelectedVariant.findIndex((obj) => obj?.value === parentId);

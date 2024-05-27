@@ -109,6 +109,7 @@ const Index = (props) => {
                     date_end: isValue.endDate ? isMoment(isValue.endDate, "DD/MM/YYYY") : "",
                     customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
                     category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
+                    branch_id: isValue.valueBr?.value ? isValue.valueBr?.value : "",
                     product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
                 },
             },
