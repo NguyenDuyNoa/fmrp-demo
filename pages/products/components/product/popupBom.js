@@ -262,7 +262,7 @@ const Popup_Bom = React.memo((props) => {
     const _HandleAddNew = (id) => {
         let itemFound = false;
         const newData = dataSelectedVariant.map((item) => {
-            if (item?.value === id) {
+            if (item?.value == id) {
                 itemFound = true;
                 const childArray = Array.isArray(item.child) ? item.child : [];
                 return {
@@ -287,7 +287,6 @@ const Popup_Bom = React.memo((props) => {
         });
 
         if (itemFound) {
-            console.log("newData", newData);
             sDataSelectedVariant(newData);
         } else {
             isShow('error', 'Vui lòng chọn biến thể');
