@@ -422,7 +422,7 @@ const MainTable = ({ dataLang }) => {
         <React.Fragment>
             <FilterHeader {...shareProps} />
             <div className="!mt-[14px]">
-                <h1 className="text-[#141522] font-medium text-sm my-2">{'Tổng số LSX tổng'}: {isState?.countAll}</h1>
+                <h1 className="text-[#141522] font-medium text-sm my-2">{'Tổng số LSX'}: {isState?.countAll}</h1>
                 <div className="flex ">
                     <div className="w-[20%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">

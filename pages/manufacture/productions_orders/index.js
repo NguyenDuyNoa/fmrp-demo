@@ -18,7 +18,7 @@ const Index = (props) => {
     return (
         <>
             <Head>
-                <title>{'Lệnh sản xuất tổng'}</title>
+                <title>{'Lệnh sản xuất'}</title>
             </Head>
             <Container className={'relative'}>
                 {statusExprired ? <EmptyExprired /> : <Header {...propsDefault} />}

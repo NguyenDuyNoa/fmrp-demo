@@ -571,15 +571,15 @@ const Header = () => {
                 {
                     viewOwn: -1,
                     view: -1,
-                    title: "Lệnh sản xuất tổng",
+                    title: "Lệnh sản xuất",
                     link: "/manufacture/productions_orders"
                 },
-                {
-                    viewOwn: -1,
-                    view: -1,
-                    title: "Lệnh sản xuất chi tiết",
-                    link: "#",
-                },
+                // {
+                //     viewOwn: -1,
+                //     view: -1,
+                //     title: "Lệnh sản xuất chi tiết",
+                //     link: "#",
+                // },
 
                 {
                     title: "Lịch sản xuất",
