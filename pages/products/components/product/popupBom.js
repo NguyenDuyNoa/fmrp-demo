@@ -348,6 +348,8 @@ const Popup_Bom = React.memo((props) => {
         );
     }, 500)
 
+    console.log(selectedList);
+
     const _HandleChangeItemBOM = (parentId, childId, type, value) => {
         const newData = dataSelectedVariant.map((parent) => {
             if (parent?.value === parentId) {
@@ -552,6 +554,7 @@ const Popup_Bom = React.memo((props) => {
     }, [dataSelectedVariant]);
 
     const _ServerSending = () => {
+        console.log("okkk");
         let formData = new FormData();
         formData.append("product_id", props?.id);
         dataSelectedVariant.forEach((item, i) => {
@@ -583,14 +586,10 @@ const Popup_Bom = React.memo((props) => {
                     }
                     isShow("error", props.dataLang[message] || message);
                 }
-                sOnSending(false);
             }
         );
+        sOnSending(false);
     };
-
-    useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
@@ -598,11 +597,17 @@ const Popup_Bom = React.memo((props) => {
         if (checkValue) {
             checkValue && sErrValue(true);
             isShow("error", props.dataLang?.required_field_null);
-            return
+        } else {
+            sErrValue(false);
+            sOnSending(true);
         }
-        sErrValue(false);
-        sOnSending(true);
     };
+
+
+    useEffect(() => {
+        onSending && _ServerSending();
+    }, [onSending]);
+
     return (
         <PopupEdit
             title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name
@@ -1035,7 +1040,7 @@ const Popup_Bom = React.memo((props) => {
                         </button>
                         <button
                             type="submit"
-                            onClick={(e) => _HandleSubmit(e)}
+                            onClick={_HandleSubmit.bind(this)}
                             className="button text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
                         >
                             {props.dataLang?.branch_popup_save}
