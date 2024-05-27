@@ -159,6 +159,7 @@ const MainTable = ({ dataLang }) => {
                 if (!err) {
                     const { data } = response?.data
                     const arrayItem = convertArrData(data?.productionPlans)
+                    console.log("arrayItem", arrayItem);
                     queryState({
                         countAll: data?.countAll,
                         listDataLeft: arrayItem.map((e, index) => {
@@ -250,6 +251,7 @@ const MainTable = ({ dataLang }) => {
             (err, response) => {
                 if (!err) {
                     const { data, isSuccess } = response?.data
+                    console.log("data?.productionPlan", data);
                     if (isSuccess == 1) {
                         queryState({
                             listDataRight: {
@@ -559,7 +561,7 @@ const MainTable = ({ dataLang }) => {
             <div className="!mt-[14px]">
                 <h1 className="text-[#141522] font-medium text-sm my-2">{dataLang?.materials_planning_total_nvl || 'materials_planning_total_nvl'}: {dataTable?.countAll}</h1>
                 <div className="flex ">
-                    <div className="w-[25%] border-r-0 border-[#d8dae5] border">
+                    <div className="w-[20%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
                             <form className="flex items-center relative  w-full">
                                 <SearchNormal1
@@ -590,9 +592,15 @@ const MainTable = ({ dataLang }) => {
                                             <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
                                                 {e.title}
                                             </h1>
+                                            <h3 className="text-[#667085] font-normal text-[11px]">
+                                                {dataLang?.materials_planning_create_on || 'materials_planning_create_on'}{" "}
+                                                <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
+                                                    {e.time}
+                                                </span>
+                                            </h3>
                                             <TagBranch className='w-fit'>{e?.nameBranch}</TagBranch>
                                         </div>
-                                        <div className="flex flex-col items-end 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0 my-0">
+                                        {/* <div className="flex flex-col items-end 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0 my-0">
                                             <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
                                                 {dataLang?.materials_planning_create_on || 'materials_planning_create_on'}{" "}
                                                 <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
@@ -605,23 +613,23 @@ const MainTable = ({ dataLang }) => {
                                                     {e.name}
                                                 </span>
                                             </h3>
-                                        </div>
+                                        </div> */}
                                     </div>
                                     {e.showParent && (
-                                        <div className="flex flex-col gap-2">
-                                            <div className="flex">
-                                                <h3 className="w-[30%] text-[#52575E] font-normal 3xl:text-sm text-xs">
-                                                    {dataLang?.materials_planning_foloww_up || 'materials_planning_foloww_up'}
+                                        <div className="flex flex-col gap-2 mt-1">
+                                            <div className="flex items-center gap-1">
+                                                <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                    {dataLang?.materials_planning_foloww_up || 'materials_planning_foloww_up'}:
                                                 </h3>
-                                                <div className="flex flex-col w-[70%]">
+                                                <div className="flex items-center gap-1">
                                                     {e.followUp.map((i) => (
                                                         <React.Fragment key={i.id}>
                                                             <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
                                                                 {i.nameFollow}
                                                             </h2>
-                                                            <h2 className="text-[#9295A4] font-normal 3xl:text-sm text-xs">
+                                                            {/* <h2 className="text-[#9295A4] font-normal 3xl:text-sm text-xs">
                                                                 {i.typeFollow}
-                                                            </h2>
+                                                            </h2> */}
                                                         </React.Fragment>
                                                     ))}
                                                 </div>
@@ -637,7 +645,7 @@ const MainTable = ({ dataLang }) => {
                             }
                         </Customscrollbar>
                     </div>
-                    <div className="w-[75%] border border-[#d8dae5] ">
+                    <div className="w-[80%] border border-[#d8dae5] ">
                         <div className="flex items-center justify-between py-1 px-4 border-b">
                             <div>
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">{dataLang?.materials_planning_nvl || 'materials_planning_nvl'}</h1>

@@ -227,7 +227,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                         >
                                                                             <div className="flex items-center">
                                                                                 {index === 0 && <div className={`${j.active ? "bg-[#00C170]" : "bg-gray-500"} w-[10px] h-[10px] rounded-full`} />}
-                                                                                <div className={`${j.active ? "bg-[#00C170]" : "bg-gray-500"} 3xl:w-[167px] xxl:w-[110px] 2xl:w-[127px] xl:w-[100px] lg:w-[65px] w-[110px] h-[2px]`} />
+                                                                                <div className={`${j.active ? "bg-[#00C170]" : "bg-gray-500"}  h-[2px]`} />
                                                                                 {index === i.processBar.length - 1 && <div className={`${j.active ? "bg-[#00C170]" : "bg-gray-500"} w-[10px] h-[10px] rounded-full`} />}
                                                                             </div>
                                                                         </motion.div>

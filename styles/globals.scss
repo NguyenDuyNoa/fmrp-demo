@@ -26,6 +26,14 @@ body::-webkit-scrollbar-thumb {
 body::-webkit-scrollbar-thumb:hover {
     background: #93c5fd;
 }
+
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 //Popup
 .popup-edit-overlay {
     .popup-content {
