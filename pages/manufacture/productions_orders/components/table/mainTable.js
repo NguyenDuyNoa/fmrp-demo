@@ -543,7 +543,7 @@ const MainTable = ({ dataLang }) => {
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">{'Lệnh sản xuất'}</h1>
                                 <div className="flex items-center gap-2">
                                     <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                        {isState.listDataRight?.title ?? (dataLang?.materials_planning_no_nvl || 'materials_planning_no_nvl')}
+                                        {isState.listDataRight?.title ?? 'Không có lệnh sản xuất'}
                                     </h1>
                                     {isState.listDataRight?.title &&
                                         <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded-2xl font-medium">
@@ -558,6 +558,9 @@ const MainTable = ({ dataLang }) => {
                                 onClick={() => {
                                     if (+isState?.countAll == 0) {
                                         return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
+                                    }
+                                    if (!isState.listDataRight?.title) {
+                                        return isShow('error', 'Vui lòng chọn lệnh sản xuất')
                                     }
                                     queryState({ page: 1 })
                                     handleQueryId({ status: true, id: isState.listDataRight?.idCommand })
