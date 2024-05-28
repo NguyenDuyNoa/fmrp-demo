@@ -17,11 +17,14 @@ import TabItem from "./tabItem";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { CONFIRM_DELETION, TITLE_DELETE_COMMAND, TITLE_DELETE_PRODUCTIONS_ORDER } from "@/constants/delete/deleteTable";
+import { CONFIRM_DELETION, TITLE_DELETE_PRODUCTIONS_ORDER } from "@/constants/delete/deleteTable";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import ModalFilter from "../modal/modalFilter";
+import moment from "moment";
+import useSetingServer from "@/hooks/useConfigNumber";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 
 
@@ -78,6 +81,10 @@ const MainTable = ({ dataLang }) => {
 
     const [isFetching, sIsFetChing] = useState(false);
 
+    const dataSeting = useSetingServer();
+
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
     const convertArrData = (arr) => {
         const newData = arr?.map((e, index) => {
             return {
@@ -94,6 +101,12 @@ const MainTable = ({ dataLang }) => {
                         typeFollow: i?.object_type == 1 ? 'Đơn hàng' : "Kế hoạch nội bộ",
                     }
                 }),
+                processBar: [
+                    { id: uddid(), active: true, date: new Date(), title: "Đã điều độ", quantity: 100 },
+                    { id: uddid(), active: true, date: new Date(), title: "Đã điều độ", quantity: 150 },
+                    { id: uddid(), active: true, date: new Date(), title: "Đã điều độ", quantity: 200 },
+                    { id: uddid(), active: false, date: new Date(), title: "Đã điều độ", quantity: 0 },
+                ],
                 note: ""
             }
         })
@@ -117,7 +130,6 @@ const MainTable = ({ dataLang }) => {
                 if (!err) {
                     const { data } = response?.data
                     const arrayItem = convertArrData(data?.productionPlans)
-                    console.log("arrayItem", arrayItem);
                     queryState({
                         countAll: data?.countAll,
                         listDataLeft: arrayItem.map((e, index) => {
@@ -221,7 +233,7 @@ const MainTable = ({ dataLang }) => {
                                                     { id: uddid(), active: true, date: new Date(), title: "Nhập hàng", quantity: 200 },
                                                     { id: uddid(), active: false, date: new Date(), title: "Đóng gói", quantity: 0 },
                                                     { id: uddid(), active: false, date: new Date(), title: "Sản xuất", quantity: 0 },
-                                                    { id: uddid(), active: false, date: new Date(), title: "Hoàn Thành", quantity: 0 },
+                                                    { id: uddid(), active: false, date: new Date(), title: "Hoàn thành", quantity: 0 },
                                                 ],
                                                 semiProduct: {
                                                     name: 'Bán thành phẩm 1',
@@ -424,7 +436,7 @@ const MainTable = ({ dataLang }) => {
             <div className="!mt-[14px]">
                 <h1 className="text-[#141522] font-medium text-sm my-2">{'Tổng số LSX'}: {isState?.countAll}</h1>
                 <div className="flex ">
-                    <div className="w-[20%] border-r-0 border-[#d8dae5] border">
+                    <div className="w-[25%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
                             <form className="flex items-center relative  w-full">
                                 <SearchNormal1
@@ -465,7 +477,7 @@ const MainTable = ({ dataLang }) => {
                                         <TagBranch className='w-fit h-fit'>{e?.nameBranch}</TagBranch>
                                     </div>
                                     {e.showParent && (
-                                        <div className="flex flex-col gap-2 mt-1">
+                                        <div className="flex flex-col gap-2 mt-1 w-full">
                                             <div className="flex items-center gap-1">
                                                 <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
                                                     {dataLang?.materials_planning_foloww_up || 'materials_planning_foloww_up'}:
@@ -480,6 +492,37 @@ const MainTable = ({ dataLang }) => {
                                                     ))}
                                                 </div>
                                             </div>
+                                            <div className="w-full flex items-center">
+                                                {e.processBar.map((j, JIndex) => {
+                                                    return (
+                                                        <div key={j.id} className="flex flex-col w-full items-start">
+                                                            <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px]`}>
+                                                                {moment(j.date).format('DD/MM/YYYY')}
+                                                            </p>
+
+                                                            <li className={`${JIndex == e.processBar.length - 1 ? 'flex w-full relative text-gray-900 '
+                                                                :
+                                                                `flex w-full relative text-gray-900  after:content-[''] after:w-full after:h-0.5 ${j.active ? 'after:bg-[#00C170]' : 'after:bg-gray-500'}   after:inline-block after:absolute after:top-1 after:left-[25px]`}`}
+                                                            >
+                                                                <div className="block whitespace-nowrap z-10">
+                                                                    <span className={`w-[10px] h-[10px]  border-2  ${j.active ? 'bg-[#00C170] border-[#00C170]' : 'bg-gray-500 border-gray-500'} rounded-full flex justify-center items-center mx-auto mb-1 text-sm`}></span>
+                                                                    <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[11px] text-[10px]`}>
+                                                                        {j.title}
+                                                                    </p>
+
+                                                                    <p className={` ${j.quantity > 0 ? "opacity-100" : "opacity-0"} text-[#0BAA2E] font-normal text-[10px]`}>
+                                                                        SL:
+                                                                        <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">
+                                                                            {j.quantity > 0 ? formatNumber(j.quantity) : "-"}
+                                                                        </span>
+                                                                    </p>
+                                                                </div>
+                                                            </li >
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+
                                         </div>
                                     )}
                                 </div>
@@ -491,7 +534,7 @@ const MainTable = ({ dataLang }) => {
                             }
                         </Customscrollbar>
                     </div>
-                    <div className="w-[80%] border border-[#d8dae5] ">
+                    <div className="w-[75%] border border-[#d8dae5] ">
                         <div className="flex items-center justify-between py-1 px-4 border-b">
                             <div className="">
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">{'Lệnh sản xuất'}</h1>

@@ -9,13 +9,14 @@ const ModalFilter = ({ isState, queryState }) => {
     const [initialX, setInitialX] = useState(null);
     const [initialWidth, setInitialWidth] = useState(null);
     const minWidth = 500; // Đặt giá trị chiều rộng tối thiểu
+    const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
 
     useEffect(() => {
         const handleResize = (event) => {
             if (isResizing) {
                 const newWidth = initialWidth + (initialX - event.clientX);
-                // Đảm bảo rằng chiều rộng không thể nhỏ hơn giá trị tối thiểu
-                setWidth(Math.max(newWidth, minWidth));
+                // Đảm bảo rằng chiều rộng không thể nhỏ hơn giá trị tối thiểu và lớn hơn giá trị tối đa
+                setWidth(Math.min(Math.max(newWidth, minWidth), maxWidth));
             }
         };
 
@@ -33,7 +34,7 @@ const ModalFilter = ({ isState, queryState }) => {
             document.removeEventListener("mousemove", handleResize);
             document.removeEventListener("mouseup", stopResize);
         };
-    }, [isResizing, initialWidth, initialX, minWidth]);
+    }, [isResizing, initialWidth, initialX, minWidth, maxWidth]);
 
     const startResize = (event) => {
         setIsResizing(true);
@@ -47,7 +48,8 @@ const ModalFilter = ({ isState, queryState }) => {
             style={{
                 width: width,
                 height: `calc(100vh - ${68}px)`,
-                transform: isState.openModal ? "translateX(0%)" : "translateX(100%)", // Thêm transform translatex
+                transform: isState.openModal ? "translateX(0%)" : "translateX(100%)",
+                maxWidth: '100vw',
             }}
             className={`bg-[#FFFFFF] absolute top-[9.2%] right-0 shadow-md z-[999] transition-all duration-150 ease-linear`}
         >
@@ -55,13 +57,13 @@ const ModalFilter = ({ isState, queryState }) => {
                 <div className="border-b border-gray-300 flex justify-between py-4">
                     <div className="flex items-center gap-2">
                         <FaAngleDoubleRight className="text-gray-600 text-sm cursor-pointer" onClick={() => setWidth(900)} />
-                        <FaUpRightAndDownLeftFromCenter className="text-gray-600 text-sm cursor-pointer rotate-90" onClick={() => setWidth(`100vw`)} />
+                        <FaUpRightAndDownLeftFromCenter className="text-gray-600 text-sm cursor-pointer rotate-90" onClick={() => setWidth(window.innerWidth)} />
                         <h1 className="text-[#0284c7]">Chi tiết lệnh sản xuất</h1>
                     </div>
                     <button
                         onClick={() => {
                             queryState({ openModal: !isState.openModal });
-                            setWidth(900)
+                            setWidth(900);
                         }}
                         type="button"
                         className="w-[20px] h-[20px] hover:animate-spin transition-all duration-300 ease-linear"
