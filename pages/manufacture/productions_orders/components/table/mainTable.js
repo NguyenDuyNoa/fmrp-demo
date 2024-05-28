@@ -332,7 +332,9 @@ const MainTable = ({ dataLang }) => {
                     ...e,
                     showParent: showParent
                 }
-            })
+            }),
+            openModal: false,
+            dataModal: {}
         });
         fetchingData()
     }
