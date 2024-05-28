@@ -545,9 +545,12 @@ const MainTable = ({ dataLang }) => {
                                     <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
                                         {isState.listDataRight?.title ?? (dataLang?.materials_planning_no_nvl || 'materials_planning_no_nvl')}
                                     </h1>
-                                    <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded-2xl font-medium">
-                                        <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
-                                        Chưa sản xuất</span>
+                                    {isState.listDataRight?.title &&
+                                        <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded-2xl font-medium">
+                                            <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
+                                            Chưa sản xuất
+                                        </span>
+                                    }
                                 </div>
                             </div>
                             <button
