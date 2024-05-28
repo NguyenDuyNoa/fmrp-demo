@@ -102,10 +102,10 @@ const MainTable = ({ dataLang }) => {
                     }
                 }),
                 processBar: [
-                    { id: uddid(), active: true, date: new Date(), title: "Đã điều độ", quantity: 100 },
-                    { id: uddid(), active: true, date: new Date(), title: "Đã điều độ", quantity: 150 },
-                    { id: uddid(), active: true, date: new Date(), title: "Đã điều độ", quantity: 200 },
-                    { id: uddid(), active: false, date: new Date(), title: "Đã điều độ", quantity: 0 },
+                    { id: uddid(), active: true, date: new Date(), title: 'Bồi', status: "Đã điều độ", quantity: 100 },
+                    { id: uddid(), active: true, date: new Date(), title: 'Bế', status: "Đã điều độ", quantity: 150 },
+                    { id: uddid(), active: true, date: new Date(), title: 'Dán TP', status: "Đã điều độ", quantity: 200 },
+                    { id: uddid(), active: false, date: new Date(), title: 'Đóng gói', status: "Đã điều độ", quantity: 0 },
                 ],
                 note: ""
             }
@@ -496,8 +496,9 @@ const MainTable = ({ dataLang }) => {
                                                 {e.processBar.map((j, JIndex) => {
                                                     return (
                                                         <div key={j.id} className="flex flex-col w-full items-start">
-                                                            <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px]`}>
-                                                                {moment(j.date).format('DD/MM/YYYY')}
+                                                            <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
+                                                                <span>{j.status}</span>
+                                                                <span>({moment(j.date).format('DD/MM/YYYY')})</span>
                                                             </p>
 
                                                             <li className={`${JIndex == e.processBar.length - 1 ? 'flex w-full relative text-gray-900 '
