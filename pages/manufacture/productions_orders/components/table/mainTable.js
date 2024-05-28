@@ -229,11 +229,11 @@ const MainTable = ({ dataLang }) => {
                                                 quantity: +i?.quantity,
                                                 unit: i?.unit_name,
                                                 processBar: [
-                                                    { id: uddid(), active: true, date: new Date(), title: "Đặt hàng", quantity: 200 },
-                                                    { id: uddid(), active: true, date: new Date(), title: "Nhập hàng", quantity: 200 },
-                                                    { id: uddid(), active: false, date: new Date(), title: "Đóng gói", quantity: 0 },
-                                                    { id: uddid(), active: false, date: new Date(), title: "Sản xuất", quantity: 0 },
-                                                    { id: uddid(), active: false, date: new Date(), title: "Hoàn thành", quantity: 0 },
+                                                    { id: uddid(), active: true, date: new Date(), title: "Đặt hàng", status: "Đã điều độ", quantity: 200 },
+                                                    { id: uddid(), active: true, date: new Date(), title: "Nhập hàng", status: "Đã điều độ", quantity: 200 },
+                                                    { id: uddid(), active: false, date: new Date(), title: "Đóng gói", status: "Đã điều độ", quantity: 0 },
+                                                    { id: uddid(), active: false, date: new Date(), title: "Sản xuất", status: "Đã điều độ", quantity: 0 },
+                                                    { id: uddid(), active: false, date: new Date(), title: "Hoàn thành", status: "Đã điều độ", quantity: 0 },
                                                 ],
                                                 semiProduct: {
                                                     name: 'Bán thành phẩm 1',

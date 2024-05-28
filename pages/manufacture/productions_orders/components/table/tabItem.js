@@ -87,14 +87,19 @@ const TabItem = ({ isState, handShowItem, isFetching, dataLang, handleShowModel 
                                             <h4 className="col-span-2 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">
                                                 {i.quantity > 0 ? formatNumber(i.quantity) : "-"}
                                             </h4>
-                                            <h4 className="col-span-5 flex items-center text-center text-[#344054] font-normal xl:text-sm text-[11px]">
+                                            <h4 className="col-span-5 flex items-center">
                                                 {i.processBar.map((j, JIndex) => {
                                                     return (
                                                         <div key={j.id} className="flex flex-col w-full items-start">
 
-                                                            <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px]`}>
-                                                                {moment(j.date).format('DD/MM/YYYY')}
-                                                                {/* {moment(j.date).format('DD/MM/YYYY, HH:mm:ss')} */}
+                                                            {/* <div className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
+                                                                {moment(j.date).format('DD/MM/YYYY, HH:mm:ss')}
+                                                                <span>{j.status}</span>
+                                                                <span>({moment(j.date).format('DD/MM/YYYY')})</span>
+                                                            </div> */}
+                                                            <p className={`${j.active ? "text-[#0BAA2E]" : "text-gray-500"} font-normal 3xl:text-[10px] text-[9px] flex flex-col`}>
+                                                                <span>{j.status}</span>
+                                                                <span>({moment(j.date).format('DD/MM/YYYY')})</span>
                                                             </p>
 
                                                             <li className={`${JIndex == i.processBar.length - 1 ? 'flex w-full relative text-gray-900 '
