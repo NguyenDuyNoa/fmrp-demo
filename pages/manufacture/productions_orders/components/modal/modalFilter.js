@@ -62,7 +62,7 @@ const ModalFilter = ({ isState, queryState }) => {
                     </div>
                     <button
                         onClick={() => {
-                            queryState({ openModal: !isState.openModal });
+                            queryState({ openModal: !isState.openModal, dataModal: {} });
                             setWidth(900);
                         }}
                         type="button"
