@@ -101,12 +101,12 @@ const MainTable = ({ dataLang }) => {
                         typeFollow: i?.object_type == 1 ? 'Đơn hàng' : "Kế hoạch nội bộ",
                     }
                 }),
-                processBar: [
-                    { id: uddid(), active: true, date: new Date(), title: 'Bồi', status: "Đã điều độ", quantity: 100 },
-                    { id: uddid(), active: true, date: new Date(), title: 'Bế', status: "Đã điều độ", quantity: 150 },
-                    { id: uddid(), active: true, date: new Date(), title: 'Dán TP', status: "Đã điều độ", quantity: 200 },
-                    { id: uddid(), active: false, date: new Date(), title: 'Đóng gói', status: "Đã điều độ", quantity: 0 },
-                ],
+                // processBar: [
+                //     { id: uddid(), active: true, date: new Date(), title: 'Bồi', status: "Đã điều độ", quantity: 100 },
+                //     { id: uddid(), active: true, date: new Date(), title: 'Bế', status: "Đã điều độ", quantity: 150 },
+                //     { id: uddid(), active: true, date: new Date(), title: 'Dán TP', status: "Đã điều độ", quantity: 200 },
+                //     { id: uddid(), active: false, date: new Date(), title: 'Đóng gói', status: "Đã điều độ", quantity: 0 },
+                // ],
                 note: ""
             }
         })
@@ -495,7 +495,13 @@ const MainTable = ({ dataLang }) => {
                                                     ))}
                                                 </div>
                                             </div>
-                                            <div className="w-full flex items-center">
+                                            {isState.listDataRight?.title &&
+                                                <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded font-medium w-fit">
+                                                    <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
+                                                    {dataLang?.productions_orders_produced || 'productions_orders_produced'}
+                                                </span>
+                                            }
+                                            {/* <div className="w-full flex items-center">
                                                 {e.processBar.map((j, JIndex) => {
                                                     return (
                                                         <div key={j.id} className="flex flex-col w-full items-start">
@@ -525,8 +531,7 @@ const MainTable = ({ dataLang }) => {
                                                         </div>
                                                     )
                                                 })}
-                                            </div>
-
+                                            </div> */}
                                         </div>
                                     )}
                                 </div>
@@ -546,12 +551,6 @@ const MainTable = ({ dataLang }) => {
                                     <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
                                         {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || 'productions_orders_no_orders')}
                                     </h1>
-                                    {isState.listDataRight?.title &&
-                                        <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded-2xl font-medium">
-                                            <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
-                                            {dataLang?.productions_orders_produced || 'productions_orders_produced'}
-                                        </span>
-                                    }
                                 </div>
                             </div>
                             <button

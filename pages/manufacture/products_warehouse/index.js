@@ -102,7 +102,6 @@ const Index = (props) => {
 
     const [checkedWare, sCheckedWare] = useState({});
 
-
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkAdd, checkExport } = useActionRole(auth, "productsWarehouse")
