@@ -9,6 +9,7 @@
             "@/configs/*": ["configs/*"],
             "@/routers/*": ["routers/*"],
             "@/utils/*": ["utils/*"],
+            "@/utils/lib*": ["utils/lib*"],
             "@/services/*": ["services/*"]
         }
     }

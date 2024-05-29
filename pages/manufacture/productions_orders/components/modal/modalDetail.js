@@ -2,17 +2,14 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { ContainerFilterTab } from "@/components/UI/common/layout";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import moment from "moment";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { memo, useEffect, useState } from "react";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { FaUpRightAndDownLeftFromCenter } from "react-icons/fa6";
 import { RxDragHandleDots1 } from "react-icons/rx";
-import ModalImage from "react-modal-image";
-import { v4 as uddid } from "uuid";
-import TabInFormation from "./tabInFormation";
 import TabExportSituation from "./tabExportSituation";
+import TabInFormation from "./tabInFormation";
 
 const dataTotal = [
     {
