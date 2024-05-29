@@ -13,8 +13,8 @@ import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
 import useActionRole from '@/hooks/useRole';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { html2canvasCore } from '@/utils/lib/Html2canvas';
-import { saveAsCore } from '@/utils/lib/SaveAs';
+import { html2canvas } from 'html2canvas';
+import { saveAs } from 'file-saver';
 import { Grid6 } from 'iconsax-react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -416,9 +416,9 @@ const ChartColumn = memo(({ dataChart }) => {
     // Hàm xử lý khi người dùng nhấn nút "Export" vào PNG
     const handleExportPNG = () => {
         if (!chartRef) return;
-        html2canvasCore(chartRef).then((canvas) => {
+        html2canvas(chartRef).then((canvas) => {
             canvas.toBlob((blob) => {
-                saveAsCore(blob, 'chart.png');
+                saveAs(blob, 'chart.png');
             });
         });
     };
