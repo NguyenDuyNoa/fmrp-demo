@@ -76,9 +76,19 @@ const TabItem = ({ isState, handShowItem, isFetching, dataLang, handleShowModel 
                                                     <h1 className="text-[#9295A4] font-normal text-[11px]">
                                                         {i.code} - {i.itemVariation}
                                                     </h1>
-                                                    <span className="border border-gray-400 px-2 py-1 rounded-xl text-[#9295A4] text-[11px]">
-                                                        {i.semiProduct.name} - SL: {i.semiProduct.quantity > 0 ? formatNumber(i.semiProduct.quantity) : '-'} - {moment(i.semiProduct.date).format('DD/MM/YYYY')}
-                                                    </span>
+                                                    <div className="border border-gray-400 px-2 py-1 rounded-xl flex items-center gap-1">
+                                                        <ModalImage
+                                                            small={i.semiProduct.image}
+                                                            large={i.semiProduct.image}
+                                                            width={18}
+                                                            height={18}
+                                                            alt={i.semiProduct.name}
+                                                            className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
+                                                        />
+                                                        <span className="text-[#9295A4] text-[11px]">
+                                                            {i.semiProduct.name} - SL: {i.semiProduct.quantity > 0 ? formatNumber(i.semiProduct.quantity) : '-'} - {moment(i.semiProduct.date).format('DD/MM/YYYY')}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </h4>
                                             <h4 className="col-span-1 text-center text-[#344054] font-normal xl:text-sm text-xs uppercase">

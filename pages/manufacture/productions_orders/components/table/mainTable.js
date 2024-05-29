@@ -21,7 +21,7 @@ import { CONFIRM_DELETION, TITLE_DELETE_PRODUCTIONS_ORDER } from "@/constants/de
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import ModalFilter from "../modal/modalFilter";
+import ModalDetail from "../modal/modalDetail";
 import moment from "moment";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -33,12 +33,12 @@ const MainTable = ({ dataLang }) => {
     const listTab = [
         {
             id: uddid(),
-            name: "Thành phẩm",
+            name: dataLang?.import_finished_product || 'import_finished_product',
             type: "products",
         },
         {
             id: uddid(),
-            name: 'Bán thành phẩm',
+            name: dataLang?.materials_planning_semi || 'materials_planning_semi',
             type: "semiProduct",
         },
     ];
@@ -238,7 +238,8 @@ const MainTable = ({ dataLang }) => {
                                                 semiProduct: {
                                                     name: 'Bán thành phẩm 1',
                                                     quantity: 200,
-                                                    date: new Date()
+                                                    date: new Date(),
+                                                    image: "/no_img.png",
                                                 }
                                             }
                                         })
@@ -436,7 +437,7 @@ const MainTable = ({ dataLang }) => {
         <React.Fragment>
             <FilterHeader {...shareProps} />
             <div className="!mt-[14px]">
-                <h1 className="text-[#141522] font-medium text-sm my-2">{'Tổng số LSX'}: {isState?.countAll}</h1>
+                <h1 className="text-[#141522] font-medium text-sm my-2">{dataLang?.productions_orders_total || 'productions_orders_total'}: {isState?.countAll}</h1>
                 <div className="flex ">
                     <div className="w-[25%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
@@ -449,7 +450,7 @@ const MainTable = ({ dataLang }) => {
                                     onChange={(e) => onChangeSearch(e)}
                                     className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                     type="text"
-                                    placeholder={'Tìm lệnh sản xuất'}
+                                    placeholder={dataLang?.productions_orders_find || 'productions_orders_find'}
                                 />
                             </form>
                         </div>
@@ -540,15 +541,15 @@ const MainTable = ({ dataLang }) => {
                     <div className="w-[75%] border border-[#d8dae5] ">
                         <div className="flex items-center justify-between py-1 px-4 border-b">
                             <div className="">
-                                <h1 className="text-[#52575E] font-normal text-xs uppercase">{'Lệnh sản xuất'}</h1>
+                                <h1 className="text-[#52575E] font-normal text-xs uppercase">{dataLang?.productions_orders || 'productions_orders'}</h1>
                                 <div className="flex items-center gap-2">
                                     <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                        {isState.listDataRight?.title ?? 'Không có lệnh sản xuất'}
+                                        {isState.listDataRight?.title ?? (dataLang?.productions_orders_no_orders || 'productions_orders_no_orders')}
                                     </h1>
                                     {isState.listDataRight?.title &&
                                         <span className="text-[#FF8F0D] bg-[#FEF8EC] text-xs pl-2 pr-4 py-2 rounded-2xl font-medium">
                                             <span className="bg-[#FF8F0D] h-2 w-2 rounded-full inline-block mr-2" />
-                                            Chưa sản xuất
+                                            {dataLang?.productions_orders_produced || 'productions_orders_produced'}
                                         </span>
                                     }
                                 </div>
@@ -560,7 +561,7 @@ const MainTable = ({ dataLang }) => {
                                         return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
                                     }
                                     if (!isState.listDataRight?.title) {
-                                        return isShow('error', 'Vui lòng chọn lệnh sản xuất')
+                                        return isShow('error', dataLang?.productions_orders_please_select || 'productions_orders_please_select')
                                     }
                                     queryState({ page: 1 })
                                     handleQueryId({ status: true, id: isState.listDataRight?.idCommand })
@@ -569,7 +570,7 @@ const MainTable = ({ dataLang }) => {
                                 <div className="flex items-center gap-2 py-2 px-3 ">
                                     <RiDeleteBin5Line className="text-base text-red-600" />
                                     <h3 className="text-red-600 font-medium 3xl:text-base text-xs">
-                                        Xóa
+                                        {dataLang?.materials_planning_delete || 'materials_planning_delete'}
                                     </h3>
                                 </div>
                             </button>
@@ -600,7 +601,7 @@ const MainTable = ({ dataLang }) => {
                         </div>
                     </div>
                 </div>
-                <ModalFilter {...shareProps} />
+                <ModalDetail {...shareProps} />
             </div>
             <PopupConfim
                 dataLang={dataLang}
