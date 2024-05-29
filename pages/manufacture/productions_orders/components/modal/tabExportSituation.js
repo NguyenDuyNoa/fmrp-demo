@@ -194,7 +194,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, "")
+    // const { checkAdd, checkExport } = useActionRole(auth, "")
 
     const dataSeting = useSetingServer();
 
