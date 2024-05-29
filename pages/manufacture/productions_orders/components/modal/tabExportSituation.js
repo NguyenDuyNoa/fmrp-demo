@@ -219,7 +219,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
         <div className='h-full'>
             <div className='flex justify-between items-center'>
                 <div className='flex items-center gap-1'>
-                    <h1 className="3xl:text-xl text-base my-1 w-1/2">{listTab[isStateModal.isTab - 1]?.name}</h1>
+                    <h1 className="3xl:text-basse text-sm my-1 w-1/3">{listTab[isStateModal.isTab - 1]?.name}</h1>
                     <div className="flex justify-start items-center gap-4">
                         <button type="button" onClick={() => setIsTab('chart')} className={`${isTab === 'chart' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
                             Biểu đồ thống kê
@@ -231,7 +231,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                 </div>
                 {
                     isTab == 'table' &&
-                    <div className="flex justify-end items-center gap-2">
+                    <div className="flex justify-end items-center gap-1">
                         <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={() => { }} classInput={'border'} />
                         <OnResetData sOnFetching={(e) => queryStatesetExportSituation({ onFetching: e })} />
                         {/* {(role == true || checkExport) ?
