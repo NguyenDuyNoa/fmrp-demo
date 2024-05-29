@@ -211,7 +211,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             </div>
                             <div className="my-2  col-span-3 flex items-center gap-1">
                                 <h3 className="text-[13px] ">
-                                    Kế hoạch nguyên vật liệu:
+                                    Kế hoạch NVL:
                                 </h3>
                                 <h3 className=" text-[13px] font-medium">
                                     KHSX-28112302
@@ -219,10 +219,10 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             </div>
                             <div className="my-2 flex items-center gap-1">
                                 <h3 className="text-[13px]">
-                                    Số lệnh sản xuất chi tiết:
+                                    Số LSX chi tiết:
                                 </h3>
                                 <h3 className=" text-[13px] font-medium">
-                                    lsxct-28112302
+                                    Lsxct-28112302
                                 </h3>
                             </div>
                         </div>
@@ -256,10 +256,10 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                     <div className={`grid grid-cols-3 ${width >= 1100 ? 'col-span-7' : 'col-span-12'}  gap-5`}>
                         {dataTotal.map((e, i) => (
                             <div className={`w-full p-4 rounded-md space-y-1.5`} style={{ backgroundColor: `${e.bgColor}` }} key={i}>
-                                <h4 className="text-[#3A3E4C] font-normal text-base">{e.title}</h4>
+                                <h4 className={`text-[#3A3E4C] font-normal ${width >= 1100 ? 'text-base' : 'text-xs'}`}>{e.title}</h4>
                                 <div className="flex justify-between items-end">
                                     <h6
-                                        className="2xl:text-lg text-base font-medium text-white px-3 py-1 flex flex-col justify-center items-center rounded-md"
+                                        className={`text-base font-medium text-white px-3 py-1 flex flex-col justify-center items-center rounded-md`}
                                         style={{ backgroundColor: `${e.bgSmall}` }}
                                     >
                                         {e.number}
