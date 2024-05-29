@@ -28,7 +28,7 @@ import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { routerProductsWarehouse } from "@/routers/manufacture";
-import { SelectCore } from "@/utils/lib/Select";
+import { SelectCore } from "@/utils/lib/select";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 

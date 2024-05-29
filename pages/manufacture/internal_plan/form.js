@@ -24,7 +24,7 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 
 
-import { SelectCore } from "@/utils/lib/Select";
+import { SelectCore } from "@/utils/lib/select";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 

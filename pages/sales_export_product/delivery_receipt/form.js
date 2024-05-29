@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { PopupParent } from "@/utils/lib/Popup";
+import { PopupParent } from "@/utils/lib/popup";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";

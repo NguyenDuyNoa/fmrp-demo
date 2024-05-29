@@ -31,7 +31,7 @@ import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { isAllowedNumber } from "@/utils/helpers/common";
-import { SelectCore } from "@/utils/lib/Select";
+import { SelectCore } from "@/utils/lib/select";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 const Index = (props) => {

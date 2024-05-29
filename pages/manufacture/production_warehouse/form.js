@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import { debounce } from "lodash";
-import { SelectCore } from "@/utils/lib/Select";
+import { SelectCore } from "@/utils/lib/select";
 import moment from "moment/moment";
 import { v4 as uuidv4 } from "uuid";
 import { MdClear } from "react-icons/md";

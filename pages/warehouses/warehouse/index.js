@@ -37,7 +37,7 @@ import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePag
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 
-import { PopupParent } from "@/utils/lib/Popup";
+import { PopupParent } from "@/utils/lib/popup";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 

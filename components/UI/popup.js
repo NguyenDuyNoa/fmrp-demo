@@ -1,5 +1,5 @@
 import React from "react";
-import { PopupParent } from "@/utils/lib/Popup";
+import { PopupParent } from "@/utils/lib/popup";
 
 import { Add as IconClose } from "iconsax-react";
 import { Lexend_Deca } from "@next/font/google";

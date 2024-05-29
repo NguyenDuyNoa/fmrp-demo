@@ -1,5 +1,5 @@
 import useSetingServer from "@/hooks/useConfigNumber";
-import { NumericFormatCore } from '@/utils/lib/NumericFormat'
+import { NumericFormatCore } from '@/utils/lib/numericFormat'
 const InPutNumericFormat = ({ className,
     value, onValueChange, isAllowed,
     allowNegative, isNumericString, readOnly,

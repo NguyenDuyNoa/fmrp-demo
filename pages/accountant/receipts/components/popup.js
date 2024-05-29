@@ -34,8 +34,8 @@ import {
 } from "Api/apiReceipts/api";
 import { debounce } from "lodash";
 import useSetingServer from "@/hooks/useConfigNumber";
-import { SelectCore } from "@/utils/lib/Select";
-import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
+import { SelectCore } from "@/utils/lib/select";
+import { CreatableSelectCore } from "@/utils/lib/creatableSelect";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { BiEdit } from "react-icons/bi";

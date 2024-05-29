@@ -29,7 +29,7 @@ import { routerWarehouseTransfer } from "routers/manufacture";
 
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { SelectCore } from "@/utils/lib/Select";
+import { SelectCore } from "@/utils/lib/select";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 /// Hậu viết API

@@ -1,4 +1,4 @@
-import { SelectCore } from "@/utils/lib/Select";
+import { SelectCore } from "@/utils/lib/select";
 import configSelectFillter from "@/configs/configSelectFillter";
 
 const SelectComponent = ({

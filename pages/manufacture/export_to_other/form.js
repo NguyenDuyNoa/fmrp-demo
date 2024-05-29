@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
+import { CreatableSelectCore } from "@/utils/lib/creatableSelect";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -27,7 +27,7 @@ import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { SelectCore } from "@/utils/lib/Select";
+import { SelectCore } from "@/utils/lib/select";
 import { routerExportToOther, routerProductionWarehouse } from "@/routers/manufacture";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
