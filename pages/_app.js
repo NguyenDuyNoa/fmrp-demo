@@ -12,7 +12,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "sweetalert2/src/sweetalert2.scss";
 import "../styles/globals.scss";
 
-import { CookieCore } from "@/utils/lib/cookie";
+import { CookieCore } from "@/utils/lib/Cookie";
 import { Lexend_Deca } from "@next/font/google";
 import { Eye as IconEye, EyeSlash as IconEyeSlash, More as IconMore } from "iconsax-react";
 import { useRouter } from "next/router";

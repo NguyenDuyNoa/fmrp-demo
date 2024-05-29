@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { CookieCore } from './utils/lib/cookie';
+import { CookieCore } from './utils/lib/Cookie';
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request, event) {

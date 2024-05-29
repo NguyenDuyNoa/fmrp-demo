@@ -32,7 +32,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { PopupParent } from "@/utils/lib/popup";
+import { PopupParent } from "@/utils/lib/Popup";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 const Index = (props) => {

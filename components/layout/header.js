@@ -14,7 +14,7 @@ import "react-tippy/dist/tippy.css";
 import Expirred from "components/UI/expired";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
-import { CookieCore } from "@/utils/lib/cookie";
+import { CookieCore } from "@/utils/lib/Cookie";
 const Header = () => {
     const router = useRouter();
 

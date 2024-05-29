@@ -23,11 +23,11 @@ import { debounce } from "lodash";
 import useToast from "@/hooks/useToast";
 import useSetingServer from "@/hooks/useConfigNumber";
 
-import { CreatableSelectCore } from "@/utils/lib/creatableSelect";
+import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 
-import { SelectCore } from "@/utils/lib/select";
+import { SelectCore } from "@/utils/lib/Select";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 const Popup_Product = React.memo((props) => {
     const dataPstWH = useSelector((state) => state.vitrikho_kiemke);

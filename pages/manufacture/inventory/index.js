@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { PopupParent } from "@/utils/lib/popup";
+import { PopupParent } from "@/utils/lib/Popup";
 import { debounce } from "lodash";
 import moment from "moment/moment";
 import { useRouter } from "next/router";

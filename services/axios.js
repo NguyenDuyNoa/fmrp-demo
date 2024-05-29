@@ -1,6 +1,6 @@
 import axios from "axios";
 import useToast from "@/hooks/useToast";
-import { CookieCore } from "@/utils/lib/cookie";
+import { CookieCore } from "@/utils/lib/Cookie";
 import Cookies from "js-cookie";
 axios.defaults.baseURL = `${process.env.NEXT_PUBLIC_URL_API}`;
 

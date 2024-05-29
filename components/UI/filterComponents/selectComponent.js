@@ -1,5 +1,5 @@
-import { SelectCore } from "@/utils/lib/select";
 import configSelectFillter from "@/configs/configSelectFillter";
+import { SelectCore } from "@/utils/lib/Select";
 
 const SelectComponent = ({
     options,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PopupParent } from "@/utils/lib/popup";
+import { PopupParent } from "@/utils/lib/Popup";
 import { _ServerInstance as Axios } from "/services/axios";
 import moment from "moment";
 import ModalImage from "react-modal-image";
