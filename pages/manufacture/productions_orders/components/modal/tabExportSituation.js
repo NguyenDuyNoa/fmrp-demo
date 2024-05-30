@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux';
 import { v4 as uddid } from 'uuid';
 import * as XLSX from 'xlsx';
 const Column = dynamic(() => import("@ant-design/plots").then(({ Column }) => Column), { ssr: false });
+
 const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => {
     const [isTab, setIsTab] = useState('chart')
 
@@ -184,6 +185,7 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
             },
         ]
     }
+
 
     const router = useRouter()
 
@@ -525,5 +527,7 @@ const ChartColumn = memo(({ dataChart }) => {
         </div>
     )
 })
+
+
 
 export default TabExportSituation

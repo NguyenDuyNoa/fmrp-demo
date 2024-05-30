@@ -14,6 +14,7 @@ const Index = React.memo(
       paginate(event.selected + 1);
     };
 
+
     return (
       <ReactPaginate
         nextLabel={<ArrowRight size="22" color="blue" />}
@@ -34,6 +35,7 @@ const Index = React.memo(
         containerClassName="pagination"
         activeClassName="active"
         renderOnZeroPageCount={null}
+        forcePage={currentPage - 1}
       />
     );
   }

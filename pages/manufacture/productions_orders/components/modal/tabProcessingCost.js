@@ -44,7 +44,6 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
                 // chi phí gia công
                 processingCost: 10000
             },
-
         ]
     }
 
@@ -81,6 +80,7 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
         }, 2000)
     }, [isTab])
 
+
     return (
         <div className='h-full'>
             <div className='flex justify-between items-center'>
@@ -90,8 +90,11 @@ const TabProcessingCost = memo(({ isStateModal, width, dataLang, listTab }) => {
                         <select
                             id="select-2"
                             value={isTab}
-                            onChange={(value) => { setIsTab(value.target.value) }}
-                            className="p-2 block w-full border-teal-500 border outline-none rounded-lg text-xs focus:border-teal-500 focus:ring-teal-500 disabled:opacity-50 disabled:pointer-events-none  text-neutral-500">
+                            onChange={(value) => {
+                                paginate(1)
+                                setIsTab(value.target.value)
+                            }}
+                            className="px-2 py-1 block w-full border-teal-500 border outline-none rounded-lg text-xs focus:border-teal-500 focus:ring-teal-500 disabled:opacity-50 disabled:pointer-events-none  text-neutral-500">
                             <option value={1} className='text-sm'>Chi phí NVL xuất sản xuất tại xưởng</option>
                             <option value={2} className='text-sm'>Chi phí NVL xuất gia công ngoài</option>
                             <option value={3} className='text-sm'>Chi phí gia công</option>
