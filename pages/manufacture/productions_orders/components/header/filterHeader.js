@@ -2,8 +2,9 @@
 import DatePicker from "react-datepicker";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { ArrowDown2 } from "iconsax-react";
+import { memo } from "react";
 
-const FilterHeader = ({ dataLang, isState, queryState, }) => {
+const FilterHeader = memo(({ dataLang, isState, queryState, }) => {
     return (
         <>
             <div className="grid grid-cols-12 items-center gap-2">
@@ -81,5 +82,5 @@ const FilterHeader = ({ dataLang, isState, queryState, }) => {
             </div >
         </>
     );
-};
+})
 export default FilterHeader;

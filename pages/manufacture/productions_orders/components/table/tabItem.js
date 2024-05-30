@@ -9,8 +9,9 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import moment from "moment";
 import ModalImage from "react-modal-image";
+import { memo } from "react";
 
-const TabItem = ({ isState, handShowItem, isFetching, dataLang, handleShowModel }) => {
+const TabItem = memo(({ isState, handShowItem, isFetching, dataLang, handleShowModel }) => {
     const dataSeting = useSetingServer();
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
@@ -143,5 +144,5 @@ const TabItem = ({ isState, handShowItem, isFetching, dataLang, handleShowModel 
             )}
         </>
     );
-};
+})
 export default TabItem;

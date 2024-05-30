@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 import ModalImage from 'react-modal-image';
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import moment from 'moment';
 import { v4 as uddid } from 'uuid';
-const TabInFormation = ({ handleShowProcess, isStateModal, width, dataLang, listTab }) => {
+const TabInFormation = memo(({ handleShowProcess, isStateModal, width, dataLang, listTab }) => {
     const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
@@ -354,6 +354,6 @@ const TabInFormation = ({ handleShowProcess, isStateModal, width, dataLang, list
             </div>
         </div>
     )
-}
+})
 
 export default TabInFormation

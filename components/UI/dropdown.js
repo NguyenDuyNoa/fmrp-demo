@@ -238,7 +238,7 @@ export const DropdownThongBao = (props) => {
             <Popup
                 trigger={
                     <button
-                        className={`text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] 
+                        className={`flex items-center justify-center text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] 
               `}
                     >
                         {props.children}

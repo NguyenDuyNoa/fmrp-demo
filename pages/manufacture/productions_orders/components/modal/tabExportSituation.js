@@ -11,10 +11,9 @@ import NoData from '@/components/UI/noData/nodata';
 import Pagination from "@/components/UI/pagination";
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
-import useActionRole from '@/hooks/useRole';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { html2canvas } from 'html2canvas';
-import { saveAs } from 'file-saver';
+import saveAs from 'file-saver';
+import html2canvas from 'html2canvas';
 import { Grid6 } from 'iconsax-react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -213,7 +212,11 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     useEffect(() => {
         sTotalItems(10)
-    }, [])
+        queryStatesetExportSituation({ onFetching: true })
+        setTimeout(() => {
+            queryStatesetExportSituation({ onFetching: false })
+        }, 2000)
+    }, [isTab])
 
     return (
         <div className='h-full'>
@@ -264,7 +267,10 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                 }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
                 {isTab === 'table' &&
                     <div>
-                        <HeaderTable gridCols={10} display={'grid'}>
+                        <HeaderTable gridCols={11} display={'grid'}>
+                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                STT
+                            </ColumnTable>
                             <ColumnTable colSpan={3} textAlign={'center'}>
                                 Tên NVL
                             </ColumnTable>
@@ -292,8 +298,11 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                         ) : isExportSituation.dataTable?.length > 0 ? (
                             <>
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                    {isExportSituation.dataTable?.map((e) => (
-                                        <RowTable gridCols={10} key={e.id.toString()} >
+                                    {isExportSituation.dataTable?.map((e, index) => (
+                                        <RowTable gridCols={11} key={e.id.toString()} >
+                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                {index + 1}
+                                            </RowItemTable>
                                             <RowItemTable colSpan={3} textAlign={'left'} className={'flex items-center gap-2'}>
                                                 <ModalImage
                                                     small={e.image}
@@ -346,7 +355,9 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                 }
                 {isTab === 'chart' &&
                     <div className='h-full'>
-                        <ChartColumn dataChart={isExportSituation.dataChart} />
+                        {
+                            isExportSituation.onFetching ? <Loading className="h-full" color="#0f4f9e" /> : <ChartColumn dataChart={isExportSituation.dataChart} />
+                        }
                     </div>
                 }
             </div>

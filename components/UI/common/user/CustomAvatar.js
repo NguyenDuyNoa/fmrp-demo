@@ -10,6 +10,7 @@ const CustomAvatar = ({ profileImage, fullName, data }) => {
                     small={profileImage ? profileImage : "/user-placeholder.jpg"}
                     large={profileImage ? profileImage : "/user-placeholder.jpg"}
                     className="h-6 w-6 min-h-6 min-w-6 rounded-full object-cover "
+                    alt={fullName ?? ""}
                 >
                     <div className="">
                         <ImageErrors

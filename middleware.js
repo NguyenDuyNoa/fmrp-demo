@@ -6,8 +6,27 @@ export async function middleware(request, event) {
     const { pathname, origin } = request.nextUrl;
     const token = request.cookies.get("tokenFMRP") ?? ""
     const databaseappFMRP = request.cookies.get("databaseappFMRP") ?? ""
-    event.waitUntil(
-        fetch(`${process.env.NEXT_PUBLIC_URL_API}/api_web/Api_Authentication/authentication?csrf_protection=true`, {
+    // event.waitUntil(
+    //     fetch(`${process.env.NEXT_PUBLIC_URL_API}/api_web/Api_Authentication/authentication?csrf_protection=true`, {
+    //         method: "GET",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             "Authorization": `Bearer ${token?.value}`,
+    //             "x-api-key": databaseappFMRP?.value
+    //         },
+    //         signal: event.signal
+    //     }).then(async (res) => {
+    //         const data = await res.json();
+    //         if (data.isSuccess) {
+    //             return NextResponse.next();
+    //         } else {
+    //             CookieCore.remove("tokenFMRP");
+    //             CookieCore.remove("databaseappFMRP");
+    //         }
+    //     })
+    // )
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api_web/Api_Authentication/authentication?csrf_protection=true`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -15,16 +34,21 @@ export async function middleware(request, event) {
                 "x-api-key": databaseappFMRP?.value
             },
             signal: event.signal
-        }).then(async (res) => {
-            const data = await res.json();
-            if (data.isSuccess) {
-                return NextResponse.next();
-            } else {
-                CookieCore.remove("tokenFMRP");
-                CookieCore.remove("databaseappFMRP");
-            }
-        })
-    )
+        });
+
+        const data = await response.json();
+        console.log("data", data);
+        if (data.isSuccess) {
+            return NextResponse.next();
+        } else {
+            CookieCore.remove("tokenFMRP");
+            CookieCore.remove("databaseappFMRP");
+        }
+    } catch (error) {
+        console.error("error", error);
+    }
+
+
     if (pathname.startsWith("/")) {
         if ((!token || token == "" || token?.value == "") || (!databaseappFMRP || databaseappFMRP == "" || databaseappFMRP?.value == "")) {
             return NextResponse.next();

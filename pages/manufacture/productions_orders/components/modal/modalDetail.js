@@ -10,6 +10,10 @@ import { FaUpRightAndDownLeftFromCenter } from "react-icons/fa6";
 import { RxDragHandleDots1 } from "react-icons/rx";
 import TabExportSituation from "./tabExportSituation";
 import TabInFormation from "./tabInFormation";
+import TabExportHistory from "./tabExportHistory";
+import TabWarehouseHistory from "./tabWarehouseHistory";
+import TabRecallMaterials from "./tabRecallMaterials";
+import TabProcessingCost from "./tabProcessingCost";
 
 const dataTotal = [
     {
@@ -60,13 +64,13 @@ const listTab = [
         name: 'Thu hồi NVL',
         count: 2
     },
+    // {
+    //     id: 6,
+    //     name: 'Phiếu công việc',
+    //     count: 3
+    // },
     {
         id: 6,
-        name: 'Phiếu công việc',
-        count: 3
-    },
-    {
-        id: 7,
         name: 'Chi phí NVL - Gia công',
         count: 0
     }
@@ -153,6 +157,15 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
     }, [isState.openModal])
 
     const shareProps = { queryStateModal, dataLang, handleShowProcess, isStateModal, width, listTab }
+
+    const components = {
+        1: <TabInFormation {...shareProps} />,
+        2: <TabExportSituation {...shareProps} />,
+        3: <TabExportHistory {...shareProps} />,
+        4: <TabWarehouseHistory {...shareProps} />,
+        5: <TabRecallMaterials {...shareProps} />,
+        6: <TabProcessingCost {...shareProps} />,
+    }
 
     return (
         <div
@@ -287,8 +300,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                     </ContainerFilterTab>
                 </div>
                 <div className="my-2 w-full">
-                    {isStateModal.isTab == 1 && <TabInFormation {...shareProps} />}
-                    {isStateModal.isTab == 2 && <TabExportSituation {...shareProps} />}
+                    {components[isStateModal.isTab]}
                 </div>
             </div>
             <div className="absolute bg-transparent top-0 left-0 -translate-x-1/4  h-full cursor-col-resize"

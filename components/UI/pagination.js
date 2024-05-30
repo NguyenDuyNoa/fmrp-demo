@@ -15,7 +15,6 @@ const Index = React.memo(
     };
 
     return (
-
       <ReactPaginate
         nextLabel={<ArrowRight size="22" color="blue" />}
         onPageChange={handlePageClick}
@@ -35,7 +34,6 @@ const Index = React.memo(
         containerClassName="pagination"
         activeClassName="active"
         renderOnZeroPageCount={null}
-
       />
     );
   }
