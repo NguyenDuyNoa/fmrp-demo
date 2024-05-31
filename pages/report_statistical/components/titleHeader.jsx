@@ -1,4 +1,4 @@
-const { TbFileReport } = require("react-icons/tb")
+import { TbFileReport } from "react-icons/tb"
 
 const TitleHeader = (props) => {
     return <div className="flex items-center mt-1 mr-2 gap-2">

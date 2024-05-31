@@ -275,6 +275,21 @@ const Navbar = (props) => {
             name: "Báo cáo nhập kho thành phẩm",
             path: "/report_statistical/production_manager/import_warehouse_products",
         },
+        {
+            id: uuidv4(),
+            name: "Báo cáo thời gian sản xuất theo sản phẩm",
+            path: "/report_statistical/production_manager/time_by_product",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo sản xuất tổng hợp",
+            path: "/report_statistical/production_manager/synthetic_production",
+        },
+        {
+            id: uuidv4(),
+            name: "Báo cáo thời gian sản xuất theo loại sản phẩm",
+            path: "/report_statistical/production_manager/time_type_product",
+        },
     ]
     const [navbar, setNavbar] = useState([])
 
