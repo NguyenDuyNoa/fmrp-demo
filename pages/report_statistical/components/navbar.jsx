@@ -290,13 +290,6 @@ const Navbar = (props) => {
         },
     ];
 
-    const isNavbarProfit = [
-        {
-            id: uuidv4(),
-            name: "Báo cáo lợi nhuận",
-            path: "/report_statistical/profit_report/profit",
-        },
-    ];
     const [navbar, setNavbar] = useState([]);
 
     useEffect(() => {
@@ -319,9 +312,6 @@ const Navbar = (props) => {
                 break;
             case path.startsWith("/report_statistical/production_manager"):
                 setNavbar(isNavbarProductionManager);
-                break;
-            case path.startsWith("/report_statistical/profit_report"):
-                setNavbar(isNavbarProfit);
                 break;
             default:
                 break;

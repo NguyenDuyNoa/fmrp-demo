@@ -788,7 +788,7 @@ const Header = () => {
                             viewOwn: -1,
                             view: -1,
                             name: "Báo cáo lợi nhuận",
-                            link: "/report_statistical/profit_report/profit",
+                            link: "/report_statistical/profit_report",
                         },
                     ],
                 },
