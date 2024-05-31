@@ -31,24 +31,22 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
 
-
-
 const MainTable = ({ dataLang }) => {
     const arrButton = [
         {
             id: 1,
-            name: dataLang?.salesOrder_keep_stock || 'salesOrder_keep_stock',
+            name: dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock",
             icon: <MdAdd className="text-base text-blue-600" />,
         },
         {
             id: 2,
-            name: dataLang?.materials_planning_add_purchase || 'materials_planning_add_purchase',
+            name: dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase",
             icon: <MdAdd className="text-base text-blue-600" />,
             // icon: "/materials_planning/add.png",
         },
         {
             id: 3,
-            name: dataLang?.materials_planning_delete || 'materials_planning_delete',
+            name: dataLang?.materials_planning_delete || "materials_planning_delete",
             icon: <RiDeleteBin5Line className="text-base text-red-600" />,
             // icon: "/materials_planning/delete.png",
         },
@@ -57,27 +55,27 @@ const MainTable = ({ dataLang }) => {
     const listTab = [
         {
             id: uddid(),
-            name: dataLang?.materials_planning_items || 'materials_planning_items',
+            name: dataLang?.materials_planning_items || "materials_planning_items",
             type: "item",
         },
         {
             id: uddid(),
-            name: dataLang?.materials_planning_plan || 'materials_planning_plan',
+            name: dataLang?.materials_planning_plan || "materials_planning_plan",
             type: "plan",
         },
         {
             id: uddid(),
-            name: dataLang?.materials_planning_keep_stock || 'materials_planning_keep_stock',
+            name: dataLang?.materials_planning_keep_stock || "materials_planning_keep_stock",
             type: "keepStock",
         },
     ];
 
     const isShow = useToast();
 
-    const { isMoment } = formatMoment()
+    const { isMoment } = formatMoment();
 
     const initialState = {
-        isTab: 'item',
+        isTab: "item",
         countAll: 0,
         listDataLeft: [],
         listDataRight: {
@@ -90,8 +88,8 @@ const MainTable = ({ dataLang }) => {
             dataKeepStock: [],
             dataPurchase: [],
         },
-        next: null
-    }
+        next: null,
+    };
 
     const initialValue = {
         page: 1,
@@ -105,8 +103,7 @@ const MainTable = ({ dataLang }) => {
         valuePlan: null,
         listBr: [],
         valueBr: null,
-
-    }
+    };
 
     const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
@@ -125,40 +122,43 @@ const MainTable = ({ dataLang }) => {
             return {
                 id: e?.id,
                 title: e?.reference_no,
-                time: isMoment(e?.date, 'DD/MM/YYYY'),
+                time: isMoment(e?.date, "DD/MM/YYYY"),
                 name: e?.created_by_full_name,
                 nameBranch: e?.name_branch,
                 productionOrder: [],
-                followUp: e?.listObject?.map(i => {
+                followUp: e?.listObject?.map((i) => {
                     return {
                         id: i?.pp_id,
                         nameFollow: i?.reference_no,
-                        typeFollow: i?.object_type == 1 ? 'Đơn hàng' : "Kế hoạch nội bộ",
-                    }
+                        typeFollow: i?.object_type == 1 ? "Đơn hàng" : "Kế hoạch nội bộ",
+                    };
                 }),
-                note: ""
-            }
-        })
-        return newData
-    }
+                note: "",
+            };
+        });
+        return newData;
+    };
 
     const params = {
-        date_start: isValue.dateStart ? isMoment(isValue.dateStart, 'DD/MM/YYYY') : "",
-        date_end: isValue.dateEnd ? isMoment(isValue.dateEnd, 'DD/MM/YYYY') : "",
+        date_start: isValue.dateStart ? isMoment(isValue.dateStart, "DD/MM/YYYY") : "",
+        date_end: isValue.dateEnd ? isMoment(isValue.dateEnd, "DD/MM/YYYY") : "",
         search: isValue.search == "" ? "" : isValue.search,
-        "orders_id": [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map(e => e) : "",
-        "internal_plans_id": [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map(e => e) : "",
-        'branch_id': isValue.valueBr?.value || "",
-    }
+        orders_id: [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map((e) => e) : "",
+        internal_plans_id: [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map((e) => e) : "",
+        branch_id: isValue.valueBr?.value || "",
+    };
 
     const fetchDataTable = (page) => {
-        Axios("POST", `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${page}&limit=${isValue.limit}`, {
-            params: params
-        },
+        Axios(
+            "POST",
+            `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${page}&limit=${isValue.limit}`,
+            {
+                params: params,
+            },
             (err, response) => {
                 if (!err) {
-                    const { data } = response?.data
-                    const arrayItem = convertArrData(data?.productionPlans)
+                    const { data } = response?.data;
+                    const arrayItem = convertArrData(data?.productionPlans);
                     console.log("arrayItem", arrayItem);
                     queryState({
                         countAll: data?.countAll,
@@ -166,12 +166,12 @@ const MainTable = ({ dataLang }) => {
                             return {
                                 ...e,
                                 showParent: index == 0,
-                            }
+                            };
                         }),
-                        next: data?.next == 1
+                        next: data?.next == 1,
                     });
                     if (isValue.search == "" && arrayItem[0]?.id) {
-                        fetchDataTableRight(arrayItem[0]?.id)
+                        fetchDataTableRight(arrayItem[0]?.id);
                     }
                     if (data?.productionPlans?.length == 0) {
                         queryState({
@@ -181,44 +181,46 @@ const MainTable = ({ dataLang }) => {
                                 dataPPItems: [],
                                 dataBom: {
                                     productsBom: [],
-                                    materialsBom: []
+                                    materialsBom: [],
                                 },
                                 dataKeepStock: [],
-                                dataPurchases: []
-                            }
-                        })
+                                dataPurchases: [],
+                            },
+                        });
                     }
                 }
             }
         );
-    }
+    };
 
     useEffect(() => {
-        fetchDataTable(isValue.page)
+        fetchDataTable(isValue.page);
     }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.valueBr]);
 
-
     const fetchDataTableSeeMore = () => {
-        Axios("POST", `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${isValue.page}&limit=${isValue.limit}`, {
-            params: params
-        },
+        Axios(
+            "POST",
+            `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${isValue.page}&limit=${isValue.limit}`,
+            {
+                params: params,
+            },
             (err, response) => {
                 if (!err) {
-                    const { data } = response?.data
-                    const item = convertArrData(data?.productionPlans)
-                    let arrayItem = [...dataTable.listDataLeft, ...item]
+                    const { data } = response?.data;
+                    const item = convertArrData(data?.productionPlans);
+                    let arrayItem = [...dataTable.listDataLeft, ...item];
                     queryState({
                         countAll: data?.countAll,
                         listDataLeft: arrayItem.map((e, index) => {
                             return {
                                 ...e,
                                 showParent: index == 0,
-                            }
+                            };
                         }),
-                        next: data?.next == 1
+                        next: data?.next == 1,
                     });
                     if (isValue.search == "" && arrayItem[0]?.id) {
-                        fetchDataTableRight(arrayItem[0]?.id)
+                        fetchDataTableRight(arrayItem[0]?.id);
                     }
                     if (data?.productionPlans?.length == 0) {
                         queryState({
@@ -228,41 +230,44 @@ const MainTable = ({ dataLang }) => {
                                 dataPPItems: [],
                                 dataBom: {
                                     productsBom: [],
-                                    materialsBom: []
+                                    materialsBom: [],
                                 },
                                 dataKeepStock: [],
-                                dataPurchases: []
-                            }
-                        })
+                                dataPurchases: [],
+                            },
+                        });
                     }
                 }
             }
         );
-    }
+    };
 
     useEffect(() => {
         if (isValue.page != 1) {
-            fetchDataTableSeeMore()
+            fetchDataTableSeeMore();
         }
     }, [isValue.page]);
 
     const fetchDataTableRight = async (id) => {
-        await Axios("GET", `/api_web/api_manufactures/getDetailProductionPlans/${id}?csrf_protection`, {},
+        await Axios(
+            "GET",
+            `/api_web/api_manufactures/getDetailProductionPlans/${id}?csrf_protection`,
+            {},
             (err, response) => {
                 if (!err) {
-                    const { data, isSuccess } = response?.data
+                    const { data, isSuccess } = response?.data;
                     console.log("data?.productionPlan", data);
                     if (isSuccess == 1) {
                         queryState({
                             listDataRight: {
                                 title: data?.productionPlan?.reference_no,
                                 idCommand: data?.productionPlan?.id,
-                                dataPPItems: data?.listPPItems?.map(e => {
+                                dataPPItems: data?.listPPItems?.map((e) => {
                                     return {
                                         id: e?.object_id,
                                         title: e?.reference_no,
                                         showChild: true,
-                                        arrListData: e?.items?.map(i => {
+                                        arrListData: e?.items?.map((i) => {
                                             return {
                                                 id: uddid(),
                                                 image: i?.images ? i?.images : "/no_img.png",
@@ -272,54 +277,54 @@ const MainTable = ({ dataLang }) => {
                                                 quantity: +i?.quantity,
                                                 unit: i?.unit_name,
                                                 timeline: {
-                                                    start: isMoment(i?.timeline_start, 'DD/MM/YYYY'),
-                                                    end: isMoment(i?.timeline_end, 'DD/MM/YYYY')
-                                                }
-                                            }
-                                        })
-                                    }
+                                                    start: isMoment(i?.timeline_start, "DD/MM/YYYY"),
+                                                    end: isMoment(i?.timeline_end, "DD/MM/YYYY"),
+                                                },
+                                            };
+                                        }),
+                                    };
                                 }),
                                 dataBom: {
-                                    productsBom: data?.listBom?.productsBom?.map(e => {
+                                    productsBom: data?.listBom?.productsBom?.map((e) => {
                                         return {
                                             id: e?.item_id,
                                             name: e?.item_name,
                                             image: e?.images ? e?.images : "/no_img.png",
                                             unit: e?.unit_name,
-                                            use: e?.total_quota,//sl sử dụng
+                                            use: e?.total_quota, //sl sử dụng
                                             exist: e?.quantity_warehouse, //sl tồn
                                             lack: e?.quantity_rest, //sl thiếu
                                             code: e?.item_code,
                                             itemVariation: e?.item_variation,
-                                            quantityKeep: e?.quantity_keep //sl đã giữ
-                                        }
+                                            quantityKeep: e?.quantity_keep, //sl đã giữ
+                                        };
                                     }),
-                                    materialsBom: data?.listBom?.materialsBom?.map(e => {
+                                    materialsBom: data?.listBom?.materialsBom?.map((e) => {
                                         return {
                                             id: e?.item_id,
                                             name: e?.item_name,
                                             image: e?.images ? e?.images : "/no_img.png",
                                             unit: e?.unit_name,
-                                            use: e?.total_quota,//sl sử dụng
+                                            use: e?.total_quota, //sl sử dụng
                                             exchange: e?.quota_primary, //sl quy đổi
                                             exist: e?.quantity_warehouse, //sl tồn
                                             lack: e?.quantity_rest, //sl thiếu
                                             code: e?.item_code,
                                             itemVariation: e?.item_variation,
-                                            quantityKeep: e?.quantity_keep //sl đã giữ
-                                        }
-                                    })
+                                            quantityKeep: e?.quantity_keep, //sl đã giữ
+                                        };
+                                    }),
                                 },
-                                dataKeepStock: data?.keepWarehouses?.map(e => {
+                                dataKeepStock: data?.keepWarehouses?.map((e) => {
                                     return {
                                         id: e?.id,
                                         title: e?.code,
-                                        time: isMoment(e?.date, 'DD/MM/YYYY'),
+                                        time: isMoment(e?.date, "DD/MM/YYYY"),
                                         user: e?.created_by_name,
                                         warehousemanId: e?.warehouseman_id,
                                         warehouseFrom: e?.name_w_from,
                                         warehouseTo: e?.name_w_to,
-                                        arrListData: e?.items?.map(i => {
+                                        arrListData: e?.items?.map((i) => {
                                             return {
                                                 id: i?.id_transfer,
                                                 image: i?.images ? i?.images : "/no_img.png",
@@ -333,18 +338,18 @@ const MainTable = ({ dataLang }) => {
                                                 itemVariation: i?.item_variation,
                                                 locationFrom: i?.name_location_from,
                                                 locationTo: i?.name_location_to,
-                                            }
-                                        })
-                                    }
+                                            };
+                                        }),
+                                    };
                                 }),
-                                dataPurchases: data?.purchases?.map(e => {
+                                dataPurchases: data?.purchases?.map((e) => {
                                     return {
                                         id: e?.id,
                                         title: e?.code,
-                                        time: isMoment(e?.date, 'DD/MM/YYYY'),
+                                        time: isMoment(e?.date, "DD/MM/YYYY"),
                                         user: e?.created_by_name,
                                         status: e?.status,
-                                        arrListData: e?.items?.map(i => {
+                                        arrListData: e?.items?.map((i) => {
                                             return {
                                                 id: i?.id_transfer,
                                                 image: i?.images ? i?.images : "/no_img.png",
@@ -357,15 +362,27 @@ const MainTable = ({ dataLang }) => {
                                                 code: i?.item_code,
                                                 itemVariation: i?.item_variation,
                                                 processBar: [
-                                                    { id: uddid(), active: i?.quantity_order && i?.quantity_order > 0, title: "Đặt hàng", quantity: i?.quantity_order },
-                                                    { id: uddid(), active: i?.quantity_import && i?.quantity_import > 0, title: "Nhập hàng", quantity: i?.quantity_import },
+                                                    {
+                                                        id: uddid(),
+                                                        active:
+                                                            i?.quantity_order && i?.quantity_order > 0 ? true : false,
+                                                        title: "Đặt hàng",
+                                                        quantity: i?.quantity_order,
+                                                    },
+                                                    {
+                                                        id: uddid(),
+                                                        active:
+                                                            i?.quantity_import && i?.quantity_import > 0 ? true : false,
+                                                        title: "Nhập hàng",
+                                                        quantity: i?.quantity_import,
+                                                    },
                                                 ],
-                                            }
-                                        })
-                                    }
+                                            };
+                                        }),
+                                    };
                                 }),
                             },
-                        })
+                        });
                     }
                 }
             }
@@ -373,64 +390,75 @@ const MainTable = ({ dataLang }) => {
     };
 
     const fetDataOrder = debounce(async (value) => {
-        await Axios("GET", `/api_web/api_internal_plan/searchOrders?csrf_protection=true`, {
-            params: { search: value }
-        },
+        await Axios(
+            "GET",
+            `/api_web/api_internal_plan/searchOrders?csrf_protection=true`,
+            {
+                params: { search: value },
+            },
             (err, response) => {
                 if (!err) {
-                    const { data } = response?.data
+                    const { data } = response?.data;
                     if (data?.items) {
                         queryValue({
-                            listOrders: data?.items?.map(e => {
+                            listOrders: data?.items?.map((e) => {
                                 return {
                                     value: e?.id,
-                                    label: e?.reference_no
-                                }
-                            })
-                        })
+                                    label: e?.reference_no,
+                                };
+                            }),
+                        });
                     }
                 }
-            })
-    }, 500)
-
-    const fetchDataPlan = debounce(async (value) => {
-        await Axios("GET", `/api_web/api_internal_plan/searchInternalPlans?csrf_protection=true`, {
-            params: { search: value }
-        },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response?.data
-                    if (data?.items) {
-                        queryValue({
-                            listPlan: data?.items?.map(e => {
-                                return {
-                                    value: e?.id,
-                                    label: e?.reference_no
-                                }
-                            })
-                        })
-                    }
-                }
-            })
+            }
+        );
     }, 500);
 
+    const fetchDataPlan = debounce(async (value) => {
+        await Axios(
+            "GET",
+            `/api_web/api_internal_plan/searchInternalPlans?csrf_protection=true`,
+            {
+                params: { search: value },
+            },
+            (err, response) => {
+                if (!err) {
+                    const { data } = response?.data;
+                    if (data?.items) {
+                        queryValue({
+                            listPlan: data?.items?.map((e) => {
+                                return {
+                                    value: e?.id,
+                                    label: e?.reference_no,
+                                };
+                            }),
+                        });
+                    }
+                }
+            }
+        );
+    }, 500);
 
     const fetchDataBranch = debounce(async (value) => {
-        await Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {
-            // params: { search: value }
-        },
+        await Axios(
+            "GET",
+            `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
+            {
+                // params: { search: value }
+            },
             (err, response) => {
                 if (!err) {
                     let { result } = response?.data;
                     queryValue({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
                 }
-            })
+            }
+        );
     }, 500);
 
     useEffect(() => {
-        fetDataOrder()
-        fetchDataPlan()
-        fetchDataBranch()
+        fetDataOrder();
+        fetchDataPlan();
+        fetchDataBranch();
     }, []);
 
     const handleShow = (id) => {
@@ -438,7 +466,7 @@ const MainTable = ({ dataLang }) => {
             listDataLeft: dataTable.listDataLeft.map((e) => {
                 const showParent = e.id == id ? !e.showParent : false;
                 if (showParent) {
-                    fetchDataTableRight(id)
+                    fetchDataTableRight(id);
                 } else {
                     queryState({
                         listDataRight: {
@@ -447,25 +475,24 @@ const MainTable = ({ dataLang }) => {
                             dataPPItems: [],
                             dataBom: {
                                 productsBom: [],
-                                materialsBom: []
+                                materialsBom: [],
                             },
                             dataKeepStock: [],
                             dataPurchase: [],
-                        }
-                    })
+                        },
+                    });
                 }
                 return {
                     ...e,
-                    showParent: showParent
-                }
-            })
+                    showParent: showParent,
+                };
+            }),
         });
-        fetchingData()
-    }
-
+        fetchingData();
+    };
 
     const handleActiveTab = (e) => {
-        queryState({ isTab: e })
+        queryState({ isTab: e });
         fetchingData();
     };
 
@@ -477,75 +504,75 @@ const MainTable = ({ dataLang }) => {
     };
 
     const handleConfim = async () => {
-        await Axios("DELETE", `/api_web/api_manufactures/deleteProductionPlans/${isId}?csrf_protection=true`, {},
+        await Axios(
+            "DELETE",
+            `/api_web/api_manufactures/deleteProductionPlans/${isId}?csrf_protection=true`,
+            {},
             (err, response) => {
                 if (!err) {
-                    const { isSuccess, message } = response?.data
+                    const { isSuccess, message } = response?.data;
                     if (isSuccess == 1) {
-                        fetchDataTable()
+                        fetchDataTable();
                         isShow("success", `${dataLang[message] || message}`);
-                        return
+                        return;
                     }
                     isShow("error", `${dataLang[message] || message}`);
                 }
             }
         );
         handleQueryId({ status: false });
-    }
-
+    };
 
     const handShowItem = (id, type) => {
         queryState({
             listDataRight: {
                 ...dataTable.listDataRight,
-                [type]: dataTable.listDataRight?.[type]?.map(e => {
+                [type]: dataTable.listDataRight?.[type]?.map((e) => {
                     if (e.id == id) {
                         return {
                             ...e,
-                            showChild: !e.showChild
-                        }
+                            showChild: !e.showChild,
+                        };
                     }
-                    return e
+                    return e;
                 }),
             },
-        })
-    }
+        });
+    };
 
     const onChangeSearch = debounce((e) => {
-        queryValue({ search: e.target.value, page: 1 })
-    }, 500)
+        queryValue({ search: e.target.value, page: 1 });
+    }, 500);
 
     const handDeleteItem = (id, type) => {
-        queryValue({ page: 1 })
-        handleQueryId({ status: true, id: id, idChild: type })
-    }
+        queryValue({ page: 1 });
+        handleQueryId({ status: true, id: id, idChild: type });
+    };
 
     const handleConfimDeleteItem = async () => {
         const type = {
             dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
             dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
-        }
-        await Axios("DELETE", type[isIdChild], {},
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        fetchDataTable(1)
-                        queryValue({ page: 1 })
-                        isShow("success", dataLang[message] || message);
-                    } else {
-                        isShow("error", dataLang[message] || message);
-                    }
+        };
+        await Axios("DELETE", type[isIdChild], {}, (err, response) => {
+            if (!err) {
+                let { isSuccess, message } = response.data;
+                if (isSuccess) {
+                    fetchDataTable(1);
+                    queryValue({ page: 1 });
+                    isShow("success", dataLang[message] || message);
+                } else {
+                    isShow("error", dataLang[message] || message);
                 }
             }
-        );
+        });
         handleQueryId({ status: false });
-    }
+    };
 
     const shareProps = {
         dataTable,
         dataLang,
-        filterItem: () => { },
+        filterItem: () => {},
         handShowItem,
         handDeleteItem,
         isFetching,
@@ -553,13 +580,15 @@ const MainTable = ({ dataLang }) => {
         queryValue,
         fetDataOrder,
         fetchDataPlan,
-        fetchDataTable
+        fetchDataTable,
     };
     return (
         <React.Fragment>
             <FilterHeader {...shareProps} />
             <div className="!mt-[14px]">
-                <h1 className="text-[#141522] font-medium text-sm my-2">{dataLang?.materials_planning_total_nvl || 'materials_planning_total_nvl'}: {dataTable?.countAll}</h1>
+                <h1 className="text-[#141522] font-medium text-sm my-2">
+                    {dataLang?.materials_planning_total_nvl || "materials_planning_total_nvl"}: {dataTable?.countAll}
+                </h1>
                 <div className="flex ">
                     <div className="w-[20%] border-r-0 border-[#d8dae5] border">
                         <div className="border-b py-2 px-1 flex items-center justify-center bg-[#D0D5DD]/20 ">
@@ -572,20 +601,20 @@ const MainTable = ({ dataLang }) => {
                                     onChange={(e) => onChangeSearch(e)}
                                     className="relative border border-[#d8dae5] bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded-md 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                     type="text"
-                                    placeholder={dataLang?.materials_planning_find_nvl || 'materials_planning_find_nvl'}
+                                    placeholder={dataLang?.materials_planning_find_nvl || "materials_planning_find_nvl"}
                                 />
                             </form>
                         </div>
-                        <Customscrollbar
-                            className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
-                        >
+                        <Customscrollbar className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
                             {dataTable.listDataLeft.map((e, eIndex) => (
                                 <div
                                     key={e.id}
                                     onClick={() => handleShow(e.id)}
-                                    className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"
-                                        } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
-                                        } `}
+                                    className={`py-2 pl-2 pr-3 ${
+                                        e.showParent && "bg-[#F0F7FF]"
+                                    } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${
+                                        dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
+                                    } `}
                                 >
                                     <div className="flex justify-between">
                                         <div className="flex flex-col gap-1">
@@ -593,12 +622,13 @@ const MainTable = ({ dataLang }) => {
                                                 {e.title}
                                             </h1>
                                             <h3 className="text-[#667085] font-normal text-[11px]">
-                                                {dataLang?.materials_planning_create_on || 'materials_planning_create_on'}{" "}
+                                                {dataLang?.materials_planning_create_on ||
+                                                    "materials_planning_create_on"}{" "}
                                                 <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
                                                     {e.time}
                                                 </span>
                                             </h3>
-                                            <TagBranch className='w-fit'>{e?.nameBranch}</TagBranch>
+                                            <TagBranch className="w-fit">{e?.nameBranch}</TagBranch>
                                         </div>
                                         {/* <div className="flex flex-col items-end 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0 my-0">
                                             <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
@@ -619,7 +649,9 @@ const MainTable = ({ dataLang }) => {
                                         <div className="flex flex-col gap-2 mt-1">
                                             <div className="flex items-center gap-1">
                                                 <h3 className=" text-[#52575E] font-normal 3xl:text-sm text-xs">
-                                                    {dataLang?.materials_planning_foloww_up || 'materials_planning_foloww_up'}:
+                                                    {dataLang?.materials_planning_foloww_up ||
+                                                        "materials_planning_foloww_up"}
+                                                    :
                                                 </h3>
                                                 <div className="flex items-center gap-1">
                                                     {e.followUp.map((i) => (
@@ -638,34 +670,53 @@ const MainTable = ({ dataLang }) => {
                                     )}
                                 </div>
                             ))}
-                            {dataTable.next &&
-                                <button type="button" onClick={() => queryValue({ page: isValue.page + 1 })} className="mx-auto text-sm block py-1 bg-blue-50 w-full hover:bg-blue-200 mt-1 transition-all duration-200 ease-linear">
-                                    {dataLang?.materials_planning_see_more || 'materials_planning_see_more'}
+                            {dataTable.next && (
+                                <button
+                                    type="button"
+                                    onClick={() => queryValue({ page: isValue.page + 1 })}
+                                    className="mx-auto text-sm block py-1 bg-blue-50 w-full hover:bg-blue-200 mt-1 transition-all duration-200 ease-linear"
+                                >
+                                    {dataLang?.materials_planning_see_more || "materials_planning_see_more"}
                                 </button>
-                            }
+                            )}
                         </Customscrollbar>
                     </div>
                     <div className="w-[80%] border border-[#d8dae5] ">
                         <div className="flex items-center justify-between py-1 px-4 border-b">
                             <div>
-                                <h1 className="text-[#52575E] font-normal text-xs uppercase">{dataLang?.materials_planning_nvl || 'materials_planning_nvl'}</h1>
+                                <h1 className="text-[#52575E] font-normal text-xs uppercase">
+                                    {dataLang?.materials_planning_nvl || "materials_planning_nvl"}
+                                </h1>
                                 <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
-                                    {dataTable.listDataRight?.title ?? (dataLang?.materials_planning_no_nvl || 'materials_planning_no_nvl')}
+                                    {dataTable.listDataRight?.title ??
+                                        (dataLang?.materials_planning_no_nvl || "materials_planning_no_nvl")}
                                 </h1>
                             </div>
                             <div className="flex gap-4">
                                 {arrButton.map((e) => (
-                                    <Zoom key={e.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 1.08 }} className="w-fit">
-                                        {e.id == 3 &&
+                                    <Zoom
+                                        key={e.id}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 1.08 }}
+                                        className="w-fit"
+                                    >
+                                        {(e.id == 3 && (
                                             <button
                                                 className=" bg-red-100 rounded-lg  outline-none focus:outline-none"
                                                 onClick={() => {
                                                     if (+dataTable?.countAll == 0) {
-                                                        return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
+                                                        return isShow(
+                                                            "error",
+                                                            dataLang?.materials_planning_please_add ||
+                                                                "materials_planning_please_add"
+                                                        );
                                                     }
                                                     if (e.id == 3) {
-                                                        queryValue({ page: 1 })
-                                                        handleQueryId({ status: true, id: dataTable.listDataRight?.idCommand })
+                                                        queryValue({ page: 1 });
+                                                        handleQueryId({
+                                                            status: true,
+                                                            id: dataTable.listDataRight?.idCommand,
+                                                        });
                                                     }
                                                 }}
                                             >
@@ -677,12 +728,29 @@ const MainTable = ({ dataLang }) => {
                                                     </h3>
                                                 </div>
                                             </button>
-                                            ||
-
-                                            e.id == 1 && <PopupKeepStock id={e.id} queryValue={queryValue} fetchDataTable={fetchDataTable} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
-                                            ||
-                                            e.id == 2 && <PopupPurchase id={e.id} queryValue={queryValue} fetchDataTable={fetchDataTable} dataLang={dataLang} title={e.name} dataTable={dataTable} icon={e.icon} />
-                                        }
+                                        )) ||
+                                            (e.id == 1 && (
+                                                <PopupKeepStock
+                                                    id={e.id}
+                                                    queryValue={queryValue}
+                                                    fetchDataTable={fetchDataTable}
+                                                    dataLang={dataLang}
+                                                    title={e.name}
+                                                    dataTable={dataTable}
+                                                    icon={e.icon}
+                                                />
+                                            )) ||
+                                            (e.id == 2 && (
+                                                <PopupPurchase
+                                                    id={e.id}
+                                                    queryValue={queryValue}
+                                                    fetchDataTable={fetchDataTable}
+                                                    dataLang={dataLang}
+                                                    title={e.name}
+                                                    dataTable={dataTable}
+                                                    icon={e.icon}
+                                                />
+                                            ))}
                                     </Zoom>
                                 ))}
                             </div>
@@ -694,12 +762,14 @@ const MainTable = ({ dataLang }) => {
                                         <button
                                             key={e.id}
                                             onClick={() => handleActiveTab(e.type)}
-                                            className={`hover:bg-[#F7FBFF] ${dataTable.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
-                                                } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                            className={`hover:bg-[#F7FBFF] ${
+                                                dataTable.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
+                                            } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
                                         >
                                             <h3
-                                                className={`py-[10px] px-2  font-normal ${dataTable.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
-                                                    } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
+                                                className={`py-[10px] px-2  font-normal ${
+                                                    dataTable.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
+                                                } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
                                             >
                                                 {e.name}
                                             </h3>
@@ -724,9 +794,9 @@ const MainTable = ({ dataLang }) => {
                 isOpen={isOpen}
                 save={() => {
                     if (isIdChild) {
-                        handleConfimDeleteItem()
+                        handleConfimDeleteItem();
                     } else {
-                        handleConfim()
+                        handleConfim();
                     }
                 }}
                 cancel={() => handleQueryId({ status: false })}
