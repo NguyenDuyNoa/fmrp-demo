@@ -70,14 +70,14 @@ const Index = (props) => {
     const tabPage = router.query?.tab;
     const hiRef = useRef(null);
     const scrollAreaRef = useRef(null);
-    const statusExprired = useStatusExprired()
+    const statusExprired = useStatusExprired();
 
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
 
-    const isShow = useToast()
+    const isShow = useToast();
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -146,18 +146,18 @@ const Index = (props) => {
         extra: false,
     });
 
-
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit } = useActionRole(auth,
-        router.query?.tab == 1 && "client_customers" ||
-        router.query?.tab == 2 && "suppliers" ||
-        router.query?.tab == 3 && "materials" ||
-        router.query?.tab == 4 && "products" ||
-        router.query?.tab == 5 && "products" ||
-        router.query?.tab == 6 && "products"
+    const { checkAdd, checkEdit } = useActionRole(
+        auth,
+        (router.query?.tab == 1 && "client_customers") ||
+            (router.query?.tab == 2 && "suppliers") ||
+            (router.query?.tab == 3 && "materials") ||
+            (router.query?.tab == 4 && "products") ||
+            (router.query?.tab == 5 && "products") ||
+            (router.query?.tab == 6 && "products")
         // ... thêm các type
-    )
+    );
     const _ServerFetching = () => {
         sOnLoading(true);
 
@@ -800,11 +800,12 @@ const Index = (props) => {
                 else if (!ObError?.name) {
                     Toast.fire({
                         icon: "error",
-                        title: `${(tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
+                        title: `${
+                            (tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
                             (tabPage == 2 && !ObError?.name && dataLang?.import_ERR_add_nameDataSuplier) ||
                             (tabPage == 3 && !ObError?.name && dataLang?.import_ERR_add_nameMterial) ||
                             (tabPage == 4 && !ObError?.name && dataLang?.import_ERR_add_nameProduct)
-                            }`,
+                        }`,
                     });
                 }
                 //bắt buộc phải có cột chi nhánh
@@ -840,7 +841,7 @@ const Index = (props) => {
                 } else {
                     Toast.fire({
                         icon: "error",
-                        title: `${dataLang?.required_field_null}`,
+                        title: `${dataLang?.required_field_null || "required_field_null"}`,
                     });
                 }
             } else {
@@ -852,7 +853,7 @@ const Index = (props) => {
                 fileImport == null && sErrFileImport(true);
                 Toast.fire({
                     icon: "error",
-                    title: `${dataLang?.required_field_null}`,
+                    title: `${dataLang?.required_field_null || "required_field_null"}`,
                 });
             } else {
                 sErrFileImport(false);
@@ -1012,74 +1013,78 @@ const Index = (props) => {
                 dataChunks.push(chunk);
             }
         } else if (tabPage == 2) {
-            const dataClientContact = dataImport?.filter((item) => item).map((item, index) => {
-                const result = {};
-                for (const listDataItem of mergedListData) {
-                    const { column, dataFields, columnContact, dataFieldsContact } = listDataItem;
-                    const columnValue = column?.value;
-                    const dataFieldsValue = dataFields?.value;
-                    const columnContactValue = columnContact?.value;
-                    const dataFieldsContactValue = dataFieldsContact?.value;
+            const dataClientContact = dataImport
+                ?.filter((item) => item)
+                .map((item, index) => {
+                    const result = {};
+                    for (const listDataItem of mergedListData) {
+                        const { column, dataFields, columnContact, dataFieldsContact } = listDataItem;
+                        const columnValue = column?.value;
+                        const dataFieldsValue = dataFields?.value;
+                        const columnContactValue = columnContact?.value;
+                        const dataFieldsContactValue = dataFieldsContact?.value;
 
-                    if (columnValue && item[columnValue]) {
-                        result[dataFieldsValue] = item[columnValue];
+                        if (columnValue && item[columnValue]) {
+                            result[dataFieldsValue] = item[columnValue];
+                        }
+
+                        if (columnContactValue && item[columnContactValue]) {
+                            result[dataFieldsContactValue] = item[columnContactValue];
+                        }
+                        if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
+                            const fieldKey = dataFieldsValue;
+                            const fieldValue = item[dataFields.label];
+                            result[fieldKey] = fieldValue;
+                        }
+
+                        if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
+                            const fieldKey = dataFieldsContactValue;
+                            const fieldValue = item[dataFieldsContact.label];
+                            result[fieldKey] = fieldValue;
+                        }
+                    }
+                    if (Object.keys(result).length > 0) {
+                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
+                        return result;
                     }
 
-                    if (columnContactValue && item[columnContactValue]) {
-                        result[dataFieldsContactValue] = item[columnContactValue];
-                    }
-                    if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
-                        const fieldKey = dataFieldsValue;
-                        const fieldValue = item[dataFields.label];
-                        result[fieldKey] = fieldValue;
-                    }
-
-                    if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
-                        const fieldKey = dataFieldsContactValue;
-                        const fieldValue = item[dataFieldsContact.label];
-                        result[fieldKey] = fieldValue;
-                    }
-                }
-                if (Object.keys(result).length > 0) {
-                    result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
-                    return result;
-                }
-
-                return null;
-            })
+                    return null;
+                })
                 .filter((item) => item !== null);
             for (let i = 0; i < dataClientContact.length; i += chunkSize) {
                 const chunk = dataClientContact.slice(i, i + chunkSize);
                 dataChunks.push(chunk);
             }
         } else {
-            const data = dataImport?.filter((item) => item).map((item) => {
-                const result = {};
+            const data = dataImport
+                ?.filter((item) => item)
+                .map((item) => {
+                    const result = {};
 
-                for (const listDataItem of listData) {
-                    const columnValue = listDataItem.column?.value;
-                    const dataFieldsValue = listDataItem.dataFields?.value;
-                    if (columnValue && item[columnValue]) {
-                        result[dataFieldsValue] = item[columnValue];
+                    for (const listDataItem of listData) {
+                        const columnValue = listDataItem.column?.value;
+                        const dataFieldsValue = listDataItem.dataFields?.value;
+                        if (columnValue && item[columnValue]) {
+                            result[dataFieldsValue] = item[columnValue];
+                        }
+                        if (
+                            listDataItem?.dataFields &&
+                            listDataItem?.dataFields.label &&
+                            listDataItem?.dataFields?.value &&
+                            item[listDataItem?.dataFields?.label]
+                        ) {
+                            const fieldKey = listDataItem?.dataFields?.value;
+                            const fieldValue = item[listDataItem?.dataFields?.label];
+                            result[fieldKey] = fieldValue;
+                        }
                     }
-                    if (
-                        listDataItem?.dataFields &&
-                        listDataItem?.dataFields.label &&
-                        listDataItem?.dataFields?.value &&
-                        item[listDataItem?.dataFields?.label]
-                    ) {
-                        const fieldKey = listDataItem?.dataFields?.value;
-                        const fieldValue = item[listDataItem?.dataFields?.label];
-                        result[fieldKey] = fieldValue;
+                    if (Object.keys(result).length > 0) {
+                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
+                        return result;
                     }
-                }
-                if (Object.keys(result).length > 0) {
-                    result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
-                    return result;
-                }
 
-                return null;
-            })
+                    return null;
+                })
                 .filter((item) => item !== null);
             for (let i = 0; i < data.length; i += chunkSize) {
                 const chunk = data.slice(i, i + chunkSize);
@@ -1136,7 +1141,9 @@ const Index = (props) => {
             );
         } else {
             for (const data of dataChunks) {
-                Axios("POST", `${apiUrl}`,
+                Axios(
+                    "POST",
+                    `${apiUrl}`,
                     {
                         data: {
                             data,
@@ -1206,7 +1213,9 @@ const Index = (props) => {
             });
         }
         formData.append(`tab`, tabPage);
-        Axios("POST", `${"/api_web/Api_import_data/add_tempate_import?csrf_protection=true"}`,
+        Axios(
+            "POST",
+            `${"/api_web/Api_import_data/add_tempate_import?csrf_protection=true"}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -1247,14 +1256,12 @@ const Index = (props) => {
                 <title>{dataLang?.import_data || "import_data"}</title>
             </Head>
 
-            <Container className={'!h-auto'}>
+            <Container className={"!h-auto"}>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.import_data || "import_data"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.import_data || "import_data"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.import_category || "import_category"}</h6>
                     </div>
@@ -1263,7 +1270,7 @@ const Index = (props) => {
                 <ContainerBody>
                     <div className="space-y-3 h-[96%] overflow-hidden">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                            {dataLang?.import_catalog || 'import_catalog'}
+                            {dataLang?.import_catalog || "import_catalog"}
                         </h2>
 
                         <div className="grid grid-cols-12 items-center justify-center mx-auto space-x-3">
@@ -1321,9 +1328,7 @@ const Index = (props) => {
                                                 onChange={_HandleChange.bind(this, "sampleImport")}
                                                 value={sampleImport}
                                                 LoadingIndicator
-                                                noOptionsMessage={() =>
-                                                    dataLang?.import_no_data || "import_no_data"
-                                                }
+                                                noOptionsMessage={() => dataLang?.import_no_data || "import_no_data"}
                                                 maxMenuHeight="200px"
                                                 isClearable={true}
                                                 menuPortalTarget={document.body}
@@ -1372,9 +1377,7 @@ const Index = (props) => {
                                         </h5>
                                         <Select
                                             closeMenuOnSelect={true}
-                                            placeholder={
-                                                dataLang?.import_condition_column || "import_condition_column"
-                                            }
+                                            placeholder={dataLang?.import_condition_column || "import_condition_column"}
                                             isLoading={onLoading}
                                             options={dataConditionColumn}
                                             isSearchable={true}
@@ -1406,13 +1409,13 @@ const Index = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${errValueCheck ? "border-red-500" : "border-transparent"
-                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                            className={`${
+                                                errValueCheck ? "border-red-500" : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                         />
                                         {errValueCheck && (
                                             <label className="text-sm text-red-500">
-                                                {dataLang?.import_ERR_condition_column ||
-                                                    "import_ERR_condition_column"}
+                                                {dataLang?.import_ERR_condition_column || "import_ERR_condition_column"}
                                             </label>
                                         )}
                                     </>
@@ -1426,19 +1429,18 @@ const Index = (props) => {
                             <div className="col-span-4 ">
                                 <div className="grid-cols-12 grid items-center gap-1">
                                     <div className={`${!showDeleteButton ? "col-span-12" : "col-span-11"}`}>
-                                        <label
-                                            for="importFile"
-                                            className="block text-sm font-medium mb-2 "
-                                        >
+                                        <label for="importFile" className="block text-sm font-medium mb-2 ">
                                             {dataLang?.import_file || "import_file"}{" "}
                                             <span className="text-red-500">*</span>
                                         </label>
                                         <label
                                             for="importFile"
-                                            className={`${(errFileImport && dataImport.length == 0) ||
+                                            className={`${
+                                                (errFileImport && dataImport.length == 0) ||
                                                 (errFileImport && fileImport == null)
-                                                ? "border-red-500" : "border-gray-200"
-                                                } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
+                                                    ? "border-red-500"
+                                                    : "border-gray-200"
+                                            } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
                                         >
                                             <input
                                                 accept=".xlsx, .xls"
@@ -1520,8 +1522,9 @@ const Index = (props) => {
                                 )}
                                 {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
                                     <div
-                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
-                                            }`}
+                                        className={`flex items-center justify-center  gap-2 pt-5 ${
+                                            save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                        }`}
                                     >
                                         <Stepper
                                             stepper={stepper}
@@ -1534,8 +1537,9 @@ const Index = (props) => {
                                 )}
                                 {(tabPage == 1 || tabPage == 2) && (
                                     <div
-                                        className={`flex items-center justify-center  gap-2 pt-5 ${save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
-                                            }`}
+                                        className={`flex items-center justify-center  gap-2 pt-5 ${
+                                            save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                        }`}
                                     >
                                         <Stepper
                                             stepper={stepper}
@@ -1550,8 +1554,9 @@ const Index = (props) => {
                             <div className="col-span-2"></div>
                             <div className="col-span-2"></div>
                             <div
-                                className={`${listData?.length > 2 ? "mt-3" : ""} ${onLoadingListData ? "col-span-8" : "col-span-6"
-                                    }`}
+                                className={`${listData?.length > 2 ? "mt-3" : ""} ${
+                                    onLoadingListData ? "col-span-8" : "col-span-6"
+                                }`}
                             >
                                 {onLoadingListData ? (
                                     <Loading className="h-2" color="#0f4f9e" />
@@ -1563,8 +1568,7 @@ const Index = (props) => {
                                                     <div className="col-span-6">
                                                         {index == 0 && (
                                                             <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                                {dataLang?.import_data_fields ||
-                                                                    "import_data_fields"}{" "}
+                                                                {dataLang?.import_data_fields || "import_data_fields"}{" "}
                                                                 <span className="text-red-500">*</span>
                                                             </h5>
                                                         )}
@@ -1609,17 +1613,17 @@ const Index = (props) => {
                                                                     position: "absolute",
                                                                 }),
                                                             }}
-                                                            className={`${errFiles && e.dataFields == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                            className={`${
+                                                                errFiles && e.dataFields == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                         />
                                                     </div>
                                                     <div className="col-span-6">
                                                         {index == 0 && (
                                                             <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                                {dataLang?.import_data_column ||
-                                                                    "import_data_column"}
+                                                                {dataLang?.import_data_column || "import_data_column"}
                                                                 <span className="text-red-500">*</span>
                                                             </h5>
                                                         )}
@@ -1630,11 +1634,7 @@ const Index = (props) => {
                                                             }
                                                             options={dataColumn}
                                                             isSearchable={true}
-                                                            onChange={_HandleChangeChild.bind(
-                                                                this,
-                                                                e?.id,
-                                                                "column"
-                                                            )}
+                                                            onChange={_HandleChangeChild.bind(this, e?.id, "column")}
                                                             value={e?.column}
                                                             LoadingIndicator
                                                             noOptionsMessage={() =>
@@ -1664,10 +1664,11 @@ const Index = (props) => {
                                                                     position: "absolute",
                                                                 }),
                                                             }}
-                                                            className={`${errColumn && e?.column == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                            className={`${
+                                                                errColumn && e?.column == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                         />
                                                     </div>
                                                     <div className="col-span-1 mx-auto">
@@ -1682,12 +1683,11 @@ const Index = (props) => {
                                                     </h5>
                                                 )}
                                                 {e?.dataFields?.value == "group_id" ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "category_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "unit_id") ||
-                                                    ((tabPage == 3 || tabPage == 4) &&
-                                                        e?.dataFields?.value == "unit_convert_id") ? (
+                                                ((tabPage == 3 || tabPage == 4) &&
+                                                    e?.dataFields?.value == "category_id") ||
+                                                ((tabPage == 3 || tabPage == 4) && e?.dataFields?.value == "unit_id") ||
+                                                ((tabPage == 3 || tabPage == 4) &&
+                                                    e?.dataFields?.value == "unit_convert_id") ? (
                                                     <div className="flex items-center space-x-2 rounded p-2 ">
                                                         <TiTick color="green" />
                                                         <label
@@ -1701,9 +1701,7 @@ const Index = (props) => {
                                                     ""
                                                 )}
                                                 {e?.dataFields?.value == "type_products" && (
-                                                    <div
-                                                        className={` shadow-2xl rounded-xl  bg-slate-700 relative`}
-                                                    >
+                                                    <div className={` shadow-2xl rounded-xl  bg-slate-700 relative`}>
                                                         <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
                                                             <Notification
                                                                 size="22"
@@ -1887,21 +1885,21 @@ const Index = (props) => {
                                 <button
                                     onClick={(e) => {
                                         if (role || checkAdd || checkEdit) {
-                                            _HandleSubmit(e)
-                                            return
-                                        }
-                                        else {
-                                            return isShow("warning", WARNING_STATUS_ROLE)
+                                            _HandleSubmit(e);
+                                            return;
+                                        } else {
+                                            return isShow("warning", WARNING_STATUS_ROLE);
                                         }
                                     }}
                                     type="button"
                                     className="xl:text-sm text-xs p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
                                 >
                                     <div
-                                        className={`${multipleProgress
-                                            ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
-                                            : ""
-                                            }`}
+                                        className={`${
+                                            multipleProgress
+                                                ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
+                                                : ""
+                                        }`}
                                     ></div>
                                     <span>{"Import"}</span>
                                 </button>
