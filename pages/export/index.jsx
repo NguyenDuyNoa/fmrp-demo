@@ -20,7 +20,6 @@ import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 
-
 const Index = (props) => {
     const initsArr = {
         clients: [],
@@ -66,7 +65,6 @@ const Index = (props) => {
     const [sampleImport, sSampleImport] = useState(null);
 
     const [onFetchTemple, sOnFetchTemple] = useState(false);
-
 
     const dataTab = [
         {
@@ -262,7 +260,7 @@ const Index = (props) => {
                 [type]: prev[type].filter((e) => value !== e.value),
             }));
         } else {
-            // Thêm dữ liệu vào trường dữ liệu xuất
+            // Thêm dữ liệu xuất vào trường dữ liệu
             const updatedDataAffter = dataEmty[type].filter((item) => item.value !== value);
             sDataEmty((prev) => ({ ...prev, [type]: updatedDataAffter }));
             sDataColumnNew((prev) => ({ ...prev, [type]: [obDataAffter, ...prev[type]] }));
@@ -310,7 +308,9 @@ const Index = (props) => {
                 }
             });
         }
-        Axios("POST", `${apiUrl}`,
+        Axios(
+            "POST",
+            `${apiUrl}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -502,7 +502,9 @@ const Index = (props) => {
             });
         }
         formData.append(`tab`, tabPage);
-        Axios("POST", `${"/api_web/Api_export_data/add_tempate_export?csrf_protection=true"}`,
+        Axios(
+            "POST",
+            `${"/api_web/Api_export_data/add_tempate_export?csrf_protection=true"}`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -544,9 +546,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            Export dữ liệu
-                        </h6>
+                        <h6 className="text-[#141522]/40">Export dữ liệu</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.import_category || "import_category"}</h6>
                     </div>

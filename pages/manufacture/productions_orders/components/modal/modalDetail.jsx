@@ -135,28 +135,14 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         queryStateModal({ isTab: e })
     };
 
-    const handleShowProcess = (id) => {
-        console.log("id", id);
-        const newData = isStateModal.dataInformation.arrayProducts.map(e => {
-            if (e.id == id) {
-                e.show = !e.show
-            }
-            return e
-        })
-        queryStateModal({
-            dataInformation: {
-                ...isStateModal.dataInformation,
-                arrayProducts: newData
-            }
-        })
-    }
+    
 
 
     useEffect(() => {
         queryStateModal({ ...initialState })
     }, [isState.openModal])
 
-    const shareProps = { queryStateModal, dataLang, handleShowProcess, isStateModal, width, listTab }
+    const shareProps = { queryStateModal, dataLang, isStateModal, width, listTab }
 
     const components = {
         1: <TabInFormation {...shareProps} />,

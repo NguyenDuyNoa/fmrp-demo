@@ -1,4 +1,4 @@
-// Báo cáo thời gian sản xuất theo loại sản phẩm
+// Báo cáo lợi nhuận
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
@@ -59,7 +59,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Báo cáo thời gian sản xuất theo loại sản phẩm</title>
+                <title>Báo cáo lợi nhuận</title>
             </Head>
             <Container className={"!pb-0"}>
                 {statusExprired ? <EmptyExprired /> : null}
@@ -81,6 +81,18 @@ const Index = (props) => {
                                                         placeholder={dataLang?.branch_search}
                                                         onChange={() => {}}
                                                     />
+                                                    <SelectComponent
+                                                        options={[
+                                                            {
+                                                                value: "",
+                                                                label: "Chi nhánh",
+                                                                isDisabled: true,
+                                                            },
+                                                        ]}
+                                                        placeholder={"Chi nhánh"}
+                                                        isSearchable={true}
+                                                        colSpan={1}
+                                                    />
                                                     <div className="w-full relative">
                                                         <DatePicker
                                                             id="start"
@@ -95,7 +107,7 @@ const Index = (props) => {
                                                             selectsRange
                                                             // onChange={(date) => setStartDate(date)}
                                                             isClearable
-                                                            placeholderText="Ngày bắt đầu"
+                                                            placeholderText="Tháng"
                                                             className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
                                                         />
                                                         <ArrowDown2
@@ -118,7 +130,7 @@ const Index = (props) => {
                                                             selectsRange
                                                             // onChange={(date) => setStartDate(date)}
                                                             isClearable
-                                                            placeholderText="Ngày kết thúc"
+                                                            placeholderText="Năm"
                                                             className="p-2  placeholder:text-[#cbd5e1]  2xl:text-base text-xs w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-2  rounded-md"
                                                         />
                                                         <ArrowDown2

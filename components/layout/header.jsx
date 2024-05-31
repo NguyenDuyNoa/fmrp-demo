@@ -18,7 +18,7 @@ import { CookieCore } from "@/utils/lib/cookie";
 const Header = () => {
     const router = useRouter();
 
-    const isShow = useToast()
+    const isShow = useToast();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
@@ -54,7 +54,7 @@ const Header = () => {
                             viewOwn: auth?.client_group?.is_view_own,
                             view: auth?.client_group?.is_view,
                             name: "Nhóm khách hàng",
-                            link: "/clients/groups"
+                            link: "/clients/groups",
                         },
                     ],
                 },
@@ -71,7 +71,7 @@ const Header = () => {
                             viewOwn: auth?.suppliers?.is_view_own,
                             view: auth?.suppliers?.is_view,
                             name: "Danh sách NCC",
-                            link: "/suppliers/supplier"
+                            link: "/suppliers/supplier",
                         },
                         {
                             // viewOwn: auth?.contacts_suppliers?.is_view_own,
@@ -113,7 +113,7 @@ const Header = () => {
                             viewOwn: auth?.materials?.is_view_own,
                             view: auth?.materials?.is_view,
                             name: "Danh sách nguyên vật liệu",
-                            link: "/items"
+                            link: "/items",
                         },
                     ],
                 },
@@ -125,13 +125,13 @@ const Header = () => {
                             viewOwn: auth?.category_products?.is_view_own,
                             view: auth?.category_products?.is_view,
                             name: "Nhóm thành phẩm",
-                            link: "/products/category"
+                            link: "/products/category",
                         },
                         {
                             viewOwn: auth?.products?.is_view_own,
                             view: auth?.products?.is_view,
                             name: "Danh sách thành phẩm",
-                            link: "/products"
+                            link: "/products",
                         },
                     ],
                 },
@@ -154,13 +154,13 @@ const Header = () => {
                             viewOwn: auth?.department?.is_view_own,
                             view: auth?.department?.is_view,
                             name: "Phòng ban",
-                            link: "/personnel/departments"
+                            link: "/personnel/departments",
                         },
                         {
                             viewOwn: auth?.position?.is_view_own,
                             view: auth?.position?.is_view,
                             name: "Chức vụ",
-                            link: "/personnel/roles"
+                            link: "/personnel/roles",
                         },
                     ],
                 },
@@ -234,7 +234,7 @@ const Header = () => {
                             viewOwn: auth?.purchase_order?.is_view_own,
                             view: auth?.purchase_order?.is_view,
                             name: "Đơn đặt hàng",
-                            link: "/purchase_order/order"
+                            link: "/purchase_order/order",
                         },
                         {
                             viewOwn: auth?.services?.is_view_own,
@@ -257,13 +257,13 @@ const Header = () => {
                             viewOwn: auth?.import?.is_view_own,
                             view: auth?.import?.is_view,
                             name: "Nhập hàng",
-                            link: "/purchase_order/import"
+                            link: "/purchase_order/import",
                         },
                         {
                             viewOwn: auth?.return_suppliers?.is_view_own,
                             view: auth?.return_suppliers?.is_view,
                             name: "Trả hàng",
-                            link: "/purchase_order/returns"
+                            link: "/purchase_order/returns",
                         },
                     ],
                 },
@@ -487,13 +487,13 @@ const Header = () => {
                             viewOwn: auth?.warehouse?.is_view_own,
                             view: auth?.warehouse?.is_view,
                             name: "Kho hàng",
-                            link: "/warehouses/warehouse"
+                            link: "/warehouses/warehouse",
                         },
                         {
                             viewOwn: auth?.warehouse_location?.is_view_own,
                             view: auth?.warehouse_location?.is_view,
                             name: "Vị trí kho",
-                            link: "/warehouses/location"
+                            link: "/warehouses/location",
                         },
                     ],
                 },
@@ -566,13 +566,13 @@ const Header = () => {
                     viewOwn: -1,
                     view: -1,
                     title: "Tổng quan sản xuất",
-                    link: "/manufacture/production_overview"
+                    link: "/manufacture/production_overview",
                 },
                 {
                     viewOwn: -1,
                     view: -1,
                     title: "Lệnh sản xuất",
-                    link: "/manufacture/productions_orders"
+                    link: "/manufacture/productions_orders",
                 },
                 // {
                 //     viewOwn: -1,
@@ -587,7 +587,6 @@ const Header = () => {
                     viewOwn: -1,
                     view: -1,
                 },
-
             ],
         },
         {
@@ -598,15 +597,15 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Xuất gia công"
+                            name: "Xuất gia công",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Nhập gia công"
-                        }
+                            name: "Nhập gia công",
+                        },
                     ],
-                }
+                },
             ],
         },
         {
@@ -651,36 +650,48 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Yêu cầu khiếu nại"
+                            name: "Yêu cầu khiếu nại",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Lịch"
+                            name: "Lịch",
                         },
                         {
-                            viewOwn: (auth?.customers?.is_view_own == "1" ||
+                            viewOwn:
+                                auth?.customers?.is_view_own == "1" ||
                                 auth?.suppliers?.is_view_own == "1" ||
                                 auth?.materials?.is_view_own == "1" ||
-                                auth?.products?.is_view_own == "1") ? "1" : "0",
-                            view: (auth?.customers?.is_view == "1" ||
+                                auth?.products?.is_view_own == "1"
+                                    ? "1"
+                                    : "0",
+                            view:
+                                auth?.customers?.is_view == "1" ||
                                 auth?.suppliers?.is_view == "1" ||
                                 auth?.materials?.is_view == "1" ||
-                                auth?.products?.is_view == "1") ? "1" : "0",
+                                auth?.products?.is_view == "1"
+                                    ? "1"
+                                    : "0",
                             name: "Import dữ liệu",
-                            link: "/import"
+                            link: "/import",
                         },
                         {
-                            viewOwn: (auth?.customers?.is_view_own == "1" ||
+                            viewOwn:
+                                auth?.customers?.is_view_own == "1" ||
                                 auth?.suppliers?.is_view_own == "1" ||
                                 auth?.materials?.is_view_own == "1" ||
-                                auth?.products?.is_view_own == "1") ? "1" : "0",
-                            view: (auth?.customers?.is_view == "1" ||
+                                auth?.products?.is_view_own == "1"
+                                    ? "1"
+                                    : "0",
+                            view:
+                                auth?.customers?.is_view == "1" ||
                                 auth?.suppliers?.is_view == "1" ||
                                 auth?.materials?.is_view == "1" ||
-                                auth?.products?.is_view == "1") ? "1" : "0",
+                                auth?.products?.is_view == "1"
+                                    ? "1"
+                                    : "0",
                             name: "Export dữ liệu",
-                            link: "/export"
+                            link: "/export",
                         },
                     ],
                 },
@@ -696,22 +707,22 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Danh sách công việc"
+                            name: "Danh sách công việc",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Danh sách kanban"
+                            name: "Danh sách kanban",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Lịch công việc"
+                            name: "Lịch công việc",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Sơ đồ gant"
+                            name: "Sơ đồ gant",
                         },
                     ],
                 },
@@ -736,47 +747,48 @@ const Header = () => {
                             viewOwn: -1,
                             view: -1,
                             name: "Báo cáo bán hàng",
-                            link: "/report_statistical/sales_report"
+                            link: "/report_statistical/sales_report/quote",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
                             name: "Báo cáo mua hàng",
-                            link: "/report_statistical/purchase_report"
+                            link: "/report_statistical/purchase_report/purchases",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
                             name: "Công nợ phải thu",
-                            link: "/report_statistical/receivables_debt"
+                            link: "/report_statistical/receivables_debt/aggregate_debt",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Công nợ phải trả"
+                            name: "Công nợ phải trả",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
                             name: "Tồn quỹ",
-                            link: "/report_statistical/fund_balance"
+                            link: "/report_statistical/fund_balance/autumn_diary",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
                             name: "Tồn kho",
-                            link: "/report_statistical/warehouse_report"
+                            link: "/report_statistical/warehouse_report/card",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
                             name: "Quản lý sản xuất",
-                            link: "/report_statistical/production_manager"
+                            link: "/report_statistical/production_manager/quota_materials",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Báo cáo lợi nhuận"
+                            name: "Báo cáo lợi nhuận",
+                            link: "/report_statistical/profit_report/profit",
                         },
                     ],
                 },
@@ -792,22 +804,22 @@ const Header = () => {
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Tạo khách hàng"
+                            name: "Tạo khách hàng",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Tạo nhà cung cấp"
+                            name: "Tạo nhà cung cấp",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Tạo yêu cầu mua hàng"
+                            name: "Tạo yêu cầu mua hàng",
                         },
                         {
                             viewOwn: -1,
                             view: -1,
-                            name: "Tạo đơn mua hàng"
+                            name: "Tạo đơn mua hàng",
                         },
                     ],
                 },
@@ -1102,13 +1114,13 @@ const Header = () => {
                             viewOwn: auth?.other_payslips_coupon?.is_view_own,
                             view: auth?.other_payslips_coupon?.is_view,
                             name: "Phiếu thu",
-                            link: "/accountant/receipts"
+                            link: "/accountant/receipts",
                         },
                         {
                             viewOwn: auth?.customer_debt?.is_view_own,
                             view: auth?.customer_debt?.is_view,
                             name: "Công nợ khách hàng",
-                            link: "/accountant/customerDebt"
+                            link: "/accountant/customerDebt",
                         },
                     ],
                 },
@@ -1125,7 +1137,7 @@ const Header = () => {
                             viewOwn: auth?.other_payslips?.is_view_own,
                             view: auth?.other_payslips?.is_view,
                             name: "Phiếu chi",
-                            link: "/accountant/payment"
+                            link: "/accountant/payment",
                         },
                         {
                             viewOwn: auth?.supplier_debt?.is_view_own,
@@ -1341,9 +1353,9 @@ const Header = () => {
                                         position={dropdown.position}
                                         className={dropdown.className}
                                         style={dataPstWH}
-                                    // onClick={() =>
-                                    //   dispatch({ type: "trangthai", payload: true })
-                                    // }
+                                        // onClick={() =>
+                                        //   dispatch({ type: "trangthai", payload: true })
+                                        // }
                                     >
                                         {dropdown.title}
                                     </Dropdown>
@@ -1433,11 +1445,11 @@ const Header = () => {
                                 if (role) {
                                     router.push("/settings");
                                 } else {
-                                    isShow('warning', WARNING_STATUS_ROLE_ADMIN)
+                                    isShow("warning", WARNING_STATUS_ROLE_ADMIN);
                                 }
                             }}
                             className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition"
-                        // className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                            // className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
                         >
                             <Image
                                 alt=""
@@ -1475,7 +1487,7 @@ const Header = () => {
                             href="#"
                             title="Thông báo"
                             className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition relative  "
-                        // className="3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
+                            // className="3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
                         >
                             <DropdownThongBao
                                 data={ListThongBao}
@@ -1549,8 +1561,6 @@ const DropdownAvatar = React.memo(() => {
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
-
-
 
     const _HandleLogout = () => {
         sOnSending(true);
