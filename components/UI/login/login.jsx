@@ -54,7 +54,11 @@ const LoginPage = React.memo((props) => {
         sendOtp: true,
         checkOtp: false,
         countOtp: 0,
+        name: "",
+        code: "",
     };
+
+    const valueForm = watch();
 
     const [isState, sIsState] = useState(initialState);
 
@@ -63,6 +67,10 @@ const LoginPage = React.memo((props) => {
     const showToat = (type, mssg) => {
         return Toast.fire({ icon: `${type}`, title: `${mssg}` });
     };
+
+    useEffect(() => {
+        queryState({ sendOtp: true });
+    }, [valueForm.phone]);
 
     const setupRecapcha = () => {
         try {
@@ -265,10 +273,8 @@ const LoginPage = React.memo((props) => {
                         const { isSuccess, message, code, email } = response?.data;
                         if (isSuccess) {
                             showToat("success", message);
-                            setTimeout(() => {
-                                queryState({ name: email, code: code });
-                                router.push("/");
-                            }, 1000);
+                            queryState({ name: email, code: code });
+                            router.push("/");
                         } else {
                             showToat("error", message);
                             queryState({ loadingRegester: false });
