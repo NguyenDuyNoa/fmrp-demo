@@ -56,6 +56,7 @@ const LoginPage = React.memo((props) => {
         countOtp: 0,
         name: "",
         code: "",
+        checkValidateOtp: false,
     };
 
     const valueForm = watch();
@@ -93,7 +94,7 @@ const LoginPage = React.memo((props) => {
     }, []);
 
     const handleSendOtp = async (phone) => {
-        queryState({ countOtp: 30, checkOtp: true, sendOtp: false });
+        queryState({ countOtp: 30, checkOtp: true, sendOtp: false, checkValidateOtp: true });
         const appVerifier = window.recaptchaVerifier;
         // const formattedPhoneNumber = `+${phone.replace(/\D/g, "")}`;
         const formatPhoneNumber = (phoneNumber) => {
@@ -824,7 +825,7 @@ const LoginPage = React.memo((props) => {
                                                 name="otp"
                                                 {...register("otp", {
                                                     required: {
-                                                        value: isState.checkOtp && isState.countOtp > 0,
+                                                        value: isState.checkValidateOtp,
                                                         message: "Vui lòng nhập mã xác thực",
                                                     },
                                                     minLength: {
@@ -874,7 +875,10 @@ const LoginPage = React.memo((props) => {
                                         <div className="flex gap-5">
                                             {isState.checkOtp && isState.countOtp == 0 && (
                                                 <button
-                                                    onClick={handleSubmit((data) => onSubmit(data, "sendOtp"))}
+                                                    onClick={() => {
+                                                        queryState({ checkValidateOtp: false });
+                                                        handleSubmit((data) => onSubmit(data, "sendOtp"))();
+                                                    }}
                                                     type="button"
                                                     className={` w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                                 >
@@ -883,16 +887,18 @@ const LoginPage = React.memo((props) => {
                                             )}
                                             <button
                                                 type="button"
-                                                onClick={handleSubmit((data) =>
-                                                    onSubmit(
-                                                        data,
-                                                        isState?.sendOtp
-                                                            ? "sendOtp"
-                                                            : isState.checkOtp
-                                                            ? "checkOtp"
-                                                            : "register"
-                                                    )
-                                                )}
+                                                onClick={() => {
+                                                    handleSubmit((data) =>
+                                                        onSubmit(
+                                                            data,
+                                                            isState?.sendOtp
+                                                                ? "sendOtp"
+                                                                : isState.checkOtp
+                                                                ? "checkOtp"
+                                                                : "register"
+                                                        )
+                                                    )();
+                                                }}
                                                 disabled={
                                                     isState.sendOtp && isState.countOtp > 0
                                                         ? true
