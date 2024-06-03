@@ -816,9 +816,9 @@ const LoginPage = React.memo((props) => {
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-5">
-                                            <button className="w-full bg-[#E2F0FE] text-[#1760B9] rounded 3xl:text-base text-sm px-2">
+                                            <div className="w-full flex justify-center items-center bg-[#E2F0FE] text-[#1760B9] rounded 3xl:text-base text-sm px-2">
                                                 Nhập mã xác thực qua SMS
-                                            </button>
+                                            </div>
                                             <input
                                                 type="number"
                                                 placeholder="Nhập mã xác thực"
