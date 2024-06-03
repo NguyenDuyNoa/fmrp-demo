@@ -703,11 +703,11 @@ const LoginPage = React.memo((props) => {
                                                         },
                                                         minLength: {
                                                             value: 10,
-                                                            message: "Tối thiểu 10 số",
+                                                            message: "Số điện thoại tối thiểu 10 số",
                                                         },
                                                         maxLength: {
                                                             value: 11,
-                                                            message: "Tối đa 10 số",
+                                                            message: "Số điện thoại tối đa 10 số",
                                                         },
                                                         pattern: {
                                                             value: /^(0|\+84)(\d{9})$/,
