@@ -3,8 +3,15 @@ import { useRouter } from "next/router";
 import ModalImage from "react-modal-image";
 import React, { useState, useEffect } from "react";
 
-
-import { Edit as IconEdit, Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch, Add as IconAdd, Grid6, Edit, } from "iconsax-react";
+import {
+    Edit as IconEdit,
+    Grid6 as IconExcel,
+    Trash as IconDelete,
+    SearchNormal1 as IconSearch,
+    Add as IconAdd,
+    Grid6,
+    Edit,
+} from "iconsax-react";
 
 import moment from "moment";
 import { debounce } from "lodash";
@@ -13,13 +20,11 @@ import { _ServerInstance as Axios } from "@/services/axios";
 
 import Popup_kho from "./components/popup";
 
-
 import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-
 
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
@@ -40,6 +45,9 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import { PopupParent } from "@/utils/lib/Popup";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import apiComons from "@/Api/apiComon/apiComon";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -48,13 +56,13 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport, checkEdit } = useActionRole(auth, "warehouse")
+    const { checkAdd, checkExport, checkEdit } = useActionRole(auth, "warehouse");
 
     const [data_ex, sData_ex] = useState([]);
 
@@ -77,209 +85,155 @@ const Index = (props) => {
         idVariantMain: null,
         idVariantSub: null,
         isLoading: false,
-    }
-
-    const [isState, setIsState] = useState(initialState)
-
-    const queryKeyIsState = (key) => setIsState((prev) => ({ ...prev, ...key }))
-
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-    const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting)
-    }
-
-    const fetchListBranchWarehouse = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    queryKeyIsState({
-                        listBranchWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })) || [],
-                    })
-                }
-            }
-        );
     };
 
-    const fetchFilterLocationWarehouse = () => {
-        Axios(
-            "GET",
-            `/api_web/api_warehouse/location/?csrf_protection=true&filter[warehouse_id]=${isState.idWarehouse}`,
-            {},
-            (err, response) => {
+    const [isState, setIsState] = useState(initialState);
 
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryKeyIsState({
-                        listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })),
-                    })
-                }
-            }
-        );
+    const queryKeyIsState = (key) => setIsState((prev) => ({ ...prev, ...key }));
+
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
+
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
+    };
+
+    const fetchListBranchWarehouse = async () => {
+        const { result } = await apiComons.apiBranchCombobox();
+        queryKeyIsState({ listBranchWarehouse: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
+    };
+
+    const fetchFilterLocationWarehouse = async () => {
+        const { rResult } = await apiWarehouse.apiLocationWarehouse(isState.idWarehouse);
+        queryKeyIsState({ listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })) });
     };
 
     // fetch list biến thể
-    const fetchFilterVariationWarehouse = () => {
-        Axios("GET", `/api_web/Api_variation/variation?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data ?? {};
-                const options = rResult?.flatMap(({ option }) => option) ?? [];
-                queryKeyIsState({
-                    listVariant: options?.map(({ id, name }) => ({
-                        label: name,
-                        value: id,
-                    })),
-                })
-            }
+    const fetchFilterVariationWarehouse = async () => {
+        const { rResult } = await apiWarehouse.apiVariation();
+        const options = rResult?.flatMap(({ option }) => option) ?? [];
+        queryKeyIsState({
+            listVariant: options?.map(({ id, name }) => ({
+                label: name,
+                value: id,
+            })),
         });
     };
 
     const handleOpenSelect = (type) => {
-        if (type === 'branch' && isState?.listBranchWarehouse?.length === 0) {
-            fetchListBranchWarehouse()
-        } else if (type === 'locationWarehouse' && isState?.listLocationWarehouse?.length === 0 && isState.idWarehouse) {
+        if (type === "branch" && isState?.listBranchWarehouse?.length === 0) {
+            fetchListBranchWarehouse();
+        } else if (
+            type === "locationWarehouse" &&
+            isState?.listLocationWarehouse?.length === 0 &&
+            isState.idWarehouse
+        ) {
             // fetch list vị trí kho theo từng kho
-            fetchFilterLocationWarehouse()
-        } else if (type === 'mainVariation' && isState?.listVariant?.length === 0) {
-            fetchFilterVariationWarehouse()
-        } else if (type === 'subVariation') {
-
+            fetchFilterLocationWarehouse();
+        } else if (type === "mainVariation" && isState?.listVariant?.length === 0) {
+            fetchFilterVariationWarehouse();
+        } else if (type === "subVariation") {
         }
-    }
+    };
 
     // fetch danh sách kho
-    const fetchDataListWarehouse = () => {
-        Axios("GET", `/api_web/api_warehouse/warehouse/?csrf_protection=true`,
-            {
-                params: {
-                    limit: undefined,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
-                },
-            },
-            (err, response) => {
-                queryKeyIsState({
-                    isLoading: true
-                })
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    if (rResult.length > 0) {
-                        queryKeyIsState({ idWarehouse: rResult[0].id })
-                    } else {
-                        queryKeyIsState({ idWarehouse: null, dataWarehouseDetail: [] })
-                    }
-                    queryKeyIsState({ dataWarehouse: rResult, })
-                    sTotalItems(output);
-                    sData_ex(rResult);
-                    setTimeout(() => {
-                        queryKeyIsState({ isLoading: false })
-                    }, 500);
-                } else {
-                    setTimeout(() => {
-                        queryKeyIsState({ isLoading: false })
-                    }, 500);
-                }
-            }
-        );
-    }
+    const fetchDataListWarehouse = async () => {
+        const param = {
+            limit: undefined,
+            page: router.query?.page || 1,
+            "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
+        };
+        queryKeyIsState({ isLoading: true });
+        const { rResult, output } = await apiWarehouse.apiListWarehouse({ param: param });
+        if (rResult.length > 0) {
+            queryKeyIsState({ idWarehouse: rResult[0].id });
+        } else {
+            queryKeyIsState({ idWarehouse: null, dataWarehouseDetail: [] });
+        }
+        queryKeyIsState({ dataWarehouse: rResult });
+        sTotalItems(output);
+        sData_ex(rResult);
+        setTimeout(() => {
+            queryKeyIsState({ isLoading: false });
+        }, 500);
+    };
 
     useEffect(() => {
-        fetchDataListWarehouse()
-    }, [isState.idBranch])
+        fetchDataListWarehouse();
+    }, [isState.idBranch]);
 
     useEffect(() => {
         if (isState.idWarehouse) {
-            fetchFilterLocationWarehouse()
+            fetchFilterLocationWarehouse();
         }
-    }, [isState.idWarehouse])
+    }, [isState.idWarehouse]);
 
     // fetch data ẩn hiện cột trong table
-    const fetchDataOnOffCol = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const data = response.data;
-                queryKeyIsState({
-                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
-                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
-                    dataProductSerial: data.find((x) => x.code == "product_serial"),
-                })
-            }
+    const fetchDataOnOffCol = async () => {
+        const fature = await apiDashboard.apiFeature();
+        queryKeyIsState({
+            dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
+            dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
+            dataProductSerial: fature.find((x) => x.code == "product_serial"),
         });
-    }
+    };
 
     // fetch data chi tiết của kho
     const fetchDataWarehouseDetail = async () => {
-        Axios("GET", `/api_web/api_warehouse/warehouse_detail/${isState.idWarehouse}?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearchItem,
-                    limit: isState.limitItemWarehouseDetail,
-                    page: router.query?.page || 1,
-                    "filter[location_id]": isState.idLocationWarehouse?.value ? isState.idLocationWarehouse?.value : null,
-                    "filter[variation_option_id_1]": isState.idVariantMain?.value ? isState.idVariantMain?.value : null,
-                    "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
-                },
-            },
-            (err, response) => {
-                queryKeyIsState({
-                    isLoading: true
-                })
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    queryKeyIsState({
-                        dataWarehouseDetail: rResult,
-                        dataWarehouseExcel: rResult,
-                        totalItemWarehouseDetail: output,
-                    })
-                    setTimeout(() => {
-                        queryKeyIsState({
-                            isLoading: false
-                        })
-                    }, 500);
-                } else {
-                    setTimeout(() => {
-                        queryKeyIsState({
-                            isLoading: false
-                        })
-                    }, 500);
-                }
-            }
-        );
-    }
+        const params = {
+            search: isState.keySearchItem,
+            limit: isState.limitItemWarehouseDetail,
+            page: router.query?.page || 1,
+            "filter[location_id]": isState.idLocationWarehouse?.value ? isState.idLocationWarehouse?.value : null,
+            "filter[variation_option_id_1]": isState.idVariantMain?.value ? isState.idVariantMain?.value : null,
+            "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
+        };
+        queryKeyIsState({ isLoading: true });
+        const { rResult, output } = await apiWarehouse.apiWarehouseDetail(isState.idWarehouse, { params: params });
+        queryKeyIsState({
+            dataWarehouseDetail: rResult,
+            dataWarehouseExcel: rResult,
+            totalItemWarehouseDetail: output,
+        });
+        setTimeout(() => {
+            queryKeyIsState({
+                isLoading: false,
+            });
+        }, 500);
+    };
 
     useEffect(() => {
         if (isState.idWarehouse) {
-            fetchDataWarehouseDetail()
-            fetchDataOnOffCol()
+            fetchDataWarehouseDetail();
+            fetchDataOnOffCol();
         }
-    }, [isState.limitItemWarehouseDetail, isState.idWarehouse, isState.idLocationWarehouse, isState.idVariantSub, isState.idVariantMain, isState.keySearchItem, router.query?.page])
+    }, [
+        isState.limitItemWarehouseDetail,
+        isState.idWarehouse,
+        isState.idLocationWarehouse,
+        isState.idVariantSub,
+        isState.idVariantMain,
+        isState.keySearchItem,
+        router.query?.page,
+    ]);
 
     const onChangeFilter = (type, value) => {
         if (type == "branch") {
             // fetch list chi nhánh kho
             queryKeyIsState({
                 idBranch: value,
-            })
+            });
         } else if (type == "location") {
             queryKeyIsState({
                 idLocationWarehouse: value,
-            })
+            });
         } else if (type == "MainVariation") {
             queryKeyIsState({
                 idVariantMain: value,
-            })
+            });
         } else if (type == "SubVariation") {
             queryKeyIsState({
                 idVariantSub: value,
-            })
+            });
         }
         router.push({
             pathname: router.route,
@@ -295,7 +249,7 @@ const Index = (props) => {
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        queryKeyIsState({ keySearchItem: value })
+        queryKeyIsState({ keySearchItem: value });
         router.replace(router.route);
     }, 500);
 
@@ -380,13 +334,15 @@ const Index = (props) => {
     //         ]),
     //     },
     // ];
-    const newResult = isState.dataWarehouseExcel?.map((item) => {
-        const detail = item.detail || [];
-        return detail.map((detailItem) => ({
-            ...item,
-            detail: detailItem,
-        }));
-    }).flat();
+    const newResult = isState.dataWarehouseExcel
+        ?.map((item) => {
+            const detail = item.detail || [];
+            return detail.map((detailItem) => ({
+                ...item,
+                detail: detailItem,
+            }));
+        })
+        .flat();
 
     const multiDataSet = [
         {
@@ -503,13 +459,31 @@ const Index = (props) => {
                     value: `${e?.detail.option_name_2 ? e?.detail.option_name_2 : ""}`,
                 },
                 {
-                    value: `${isState?.dataProductSerial.is_enable === "1" ? (e?.detail.serial != null ? e?.detail.serial : "") : ""}`,
+                    value: `${
+                        isState?.dataProductSerial.is_enable === "1"
+                            ? e?.detail.serial != null
+                                ? e?.detail.serial
+                                : ""
+                            : ""
+                    }`,
                 },
                 {
-                    value: `${isState?.dataMaterialExpiry.is_enable === "1" ? (e?.detail.lot != null ? e?.detail.lot : "") : ""}`,
+                    value: `${
+                        isState?.dataMaterialExpiry.is_enable === "1"
+                            ? e?.detail.lot != null
+                                ? e?.detail.lot
+                                : ""
+                            : ""
+                    }`,
                 },
                 {
-                    value: `${isState?.dataMaterialExpiry.is_enable === "1" ? e?.detail.expiration_date != null ? e?.detail.expiration_date : "" : ""}`,
+                    value: `${
+                        isState?.dataMaterialExpiry.is_enable === "1"
+                            ? e?.detail.expiration_date != null
+                                ? e?.detail.expiration_date
+                                : ""
+                            : ""
+                    }`,
                 },
                 {
                     value: `${e?.detail.quantity != null ? e?.detail.quantity : ""}`,
@@ -522,31 +496,29 @@ const Index = (props) => {
     ];
 
     const handleClickChooseWarehouse = (item) => {
-        queryKeyIsState({ idWarehouse: item.id })
+        queryKeyIsState({ idWarehouse: item.id });
         router.push({
             pathname: router.route,
             query: { page: 1 },
         });
-    }
+    };
 
     const handleRefresh = () => {
-        fetchDataWarehouseDetail()
-        fetchDataOnOffCol()
+        fetchDataWarehouseDetail();
+        fetchDataOnOffCol();
     };
 
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.Warehouse_title || 'Warehouse_title'}</title>
+                <title>{dataLang?.Warehouse_title || "Warehouse_title"}</title>
             </Head>
             <Container>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.Warehouse_title || "Warehouse_title"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.Warehouse_title || "Warehouse_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.Warehouse_title || "Warehouse_title"}</h6>
                     </div>
@@ -556,46 +528,54 @@ const Index = (props) => {
                     <div className="space-y-3 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.Warehouse_title || 'Warehouse_title'}
+                                {dataLang?.Warehouse_title || "Warehouse_title"}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_kho
                                         onRefresh={fetchDataListWarehouse.bind(this)}
                                         onRefreshGroup={fetchDataWarehouseDetail.bind(this)}
                                         dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <div className="3xl:space-y-3 space-y-2">
                             <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                 <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                     <div className="grid grid-cols-5 gap-2">
-                                        <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={_HandleOnChangeKeySearch.bind(this)} />
+                                        <SearchComponent
+                                            colSpan={1}
+                                            dataLang={dataLang}
+                                            placeholder={dataLang?.branch_search}
+                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                        />
                                         <SelectComponent
                                             options={[
                                                 {
                                                     value: "",
-                                                    label: dataLang?.price_quote_branch || 'price_quote_branch',
+                                                    label: dataLang?.price_quote_branch || "price_quote_branch",
                                                     isDisabled: true,
                                                 },
                                                 ...isState.listBranchWarehouse,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect('branch')}
+                                            onMenuOpen={() => handleOpenSelect("branch")}
                                             onChange={onChangeFilter.bind(this, "branch")}
                                             value={isState.idBranch}
                                             isMulti
                                             isClearable={true}
-                                            placeholder={dataLang?.price_quote_branch || 'price_quote_branch'}
+                                            placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
                                             isSearchable={true}
                                             components={{ MultiValue }}
                                             colSpan={1}
@@ -605,17 +585,21 @@ const Index = (props) => {
                                             options={[
                                                 {
                                                     value: "",
-                                                    label: dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare",
+                                                    label:
+                                                        dataLang?.warehouses_detail_filterWare ||
+                                                        "warehouses_detail_filterWare",
                                                     isDisabled: true,
                                                 },
                                                 ...isState.listLocationWarehouse,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect('locationWarehouse')}
+                                            onMenuOpen={() => handleOpenSelect("locationWarehouse")}
                                             onChange={onChangeFilter.bind(this, "location")}
                                             value={isState.idLocationWarehouse}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            placeholder={dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare"}
+                                            placeholder={
+                                                dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare"
+                                            }
                                             className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
                                             isSearchable={true}
                                             colSpan={1}
@@ -624,17 +608,21 @@ const Index = (props) => {
                                             options={[
                                                 {
                                                     value: "",
-                                                    label: dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain",
+                                                    label:
+                                                        dataLang?.warehouses_detail_filterMain ||
+                                                        "warehouses_detail_filterMain",
                                                     isDisabled: true,
                                                 },
                                                 ...isState.listVariant,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect('mainVariation')}
+                                            onMenuOpen={() => handleOpenSelect("mainVariation")}
                                             onChange={onChangeFilter.bind(this, "MainVariation")}
                                             value={isState.idVariantMain}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            placeholder={dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain"}
+                                            placeholder={
+                                                dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain"
+                                            }
                                             className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
                                             isSearchable={true}
                                             colSpan={1}
@@ -644,17 +632,21 @@ const Index = (props) => {
                                             options={[
                                                 {
                                                     value: "",
-                                                    label: dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub",
+                                                    label:
+                                                        dataLang?.warehouses_detail_filterSub ||
+                                                        "warehouses_detail_filterSub",
                                                     isDisabled: true,
                                                 },
                                                 ...isState.listVariant,
                                             ]}
-                                            onMenuOpen={() => handleOpenSelect('subVariation')}
+                                            onMenuOpen={() => handleOpenSelect("subVariation")}
                                             onChange={onChangeFilter.bind(this, "SubVariation")}
                                             value={isState.idVariantSub}
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            placeholder={dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub"}
+                                            placeholder={
+                                                dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub"
+                                            }
                                             className="rounded-md bg-white 3xl:text-base xxl:text-sm text-xs z-20"
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
@@ -666,75 +658,84 @@ const Index = (props) => {
                                 <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                     <div className="flex justify-end gap-2 space-x-2 items-center">
                                         <OnResetData sOnFetching={() => handleRefresh()} />
-                                        {(role == true || checkExport) ?
+                                        {role == true || checkExport ? (
                                             <div className={``}>
                                                 {data_ex?.length > 0 && (
-                                                    <ExcelFileComponent dataLang={dataLang}
+                                                    <ExcelFileComponent
+                                                        dataLang={dataLang}
                                                         filename="Danh sách kho"
                                                         title="Dsk"
                                                         multiDataSet={multiDataSet}
-                                                    />)}
+                                                    />
+                                                )}
                                             </div>
-                                            :
-                                            <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                        ) : (
+                                            <button
+                                                onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                            >
                                                 <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                 <span>{dataLang?.client_list_exportexcel}</span>
                                             </button>
-                                        }
+                                        )}
                                         <div>
                                             <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
-                        <div className='grid grid-cols-10'>
-                            <ul className='col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
-                                {
-                                    isState.dataWarehouse && isState.dataWarehouse.map((item, index) => (
+                        <div className="grid grid-cols-10">
+                            <ul className="col-span-2 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] rounded-xl w-full list-disc list-inside flex flex-col gap-2 bg-[#F7FAFE] 3xl:px-6 3xl:py-4 py-3 px-2 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                {isState.dataWarehouse &&
+                                    isState.dataWarehouse.map((item, index) => (
                                         <PopupParent
-                                            trigger={<div key={item.id} className="grid grid-cols-12 relative">
-                                                <li
-                                                    className={`group col-span-12 ${isState.idWarehouse === item.id ? "bg-[#3276FA] text-white" : ""} font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
-                                                    onClick={() => handleClickChooseWarehouse(item)}
-                                                >
-                                                    <div className='flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2'>
-                                                        <div className='w-[6px] h-[6px] rounded-full bg-[#6C9AC4]' />
-                                                        <div className="flex flex-col items-start w-full">
-                                                            <div className='w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs '>
-                                                                {item.name}
-                                                                {/* {item.is_system == 1 && <span className={`${isState.idWarehouse === item.id ? "text-white" : "text-[#6C9AC4] group-hover:text-white"} lowercase`}>(Kho hệ thống)</span>} */}
-                                                            </div>
-                                                            {item.is_system == 1 &&
-                                                                <div className="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
-                                                                    Kho hệ thống
+                                            trigger={
+                                                <div key={item.id} className="grid grid-cols-12 relative">
+                                                    <li
+                                                        className={`group col-span-12 ${
+                                                            isState.idWarehouse === item.id
+                                                                ? "bg-[#3276FA] text-white"
+                                                                : ""
+                                                        } font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
+                                                        onClick={() => handleClickChooseWarehouse(item)}
+                                                    >
+                                                        <div className="flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2">
+                                                            <div className="w-[6px] h-[6px] rounded-full bg-[#6C9AC4]" />
+                                                            <div className="flex flex-col items-start w-full">
+                                                                <div className="w-[95%] max-w-[95%] 3xl:text-base xl:text-sm text-xs ">
+                                                                    {item.name}
+                                                                    {/* {item.is_system == 1 && <span className={`${isState.idWarehouse === item.id ? "text-white" : "text-[#6C9AC4] group-hover:text-white"} lowercase`}>(Kho hệ thống)</span>} */}
                                                                 </div>
-                                                            }
+                                                                {item.is_system == 1 && (
+                                                                    <div className="items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#F9ECC9]/35  bg-orange-100 text-[#FF9900] 3xl:text-sm text-xs font-medium cursor-default">
+                                                                        Kho hệ thống
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className='xl:w-[10%] xl:max-w-[10%] w-[15%] max-w-[15%] bg-[#E1ECFC]/80 p-1 3xl:text-base xl:text-xs text-xs text-center rounded-md text-black'>
-                                                        {item.totalItems}
-                                                    </div>
-                                                </li>
-                                                {isState.idWarehouse === item.id && item.is_system == 0 &&
-                                                    <div className="absolute right-0 -top-1">
-                                                        <span className="relative flex h-3 w-3">
-                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
-                                                        </span>
-                                                    </div>
-                                                }
-                                            </div>}
+                                                        <div className="xl:w-[10%] xl:max-w-[10%] w-[15%] max-w-[15%] bg-[#E1ECFC]/80 p-1 3xl:text-base xl:text-xs text-xs text-center rounded-md text-black">
+                                                            {item.totalItems}
+                                                        </div>
+                                                    </li>
+                                                    {isState.idWarehouse === item.id && item.is_system == 0 && (
+                                                        <div className="absolute right-0 -top-1">
+                                                            <span className="relative flex h-3 w-3">
+                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            }
                                             closeOnDocumentClick={false}
                                             position="right top"
-                                            on={['hover']}
+                                            on={["hover"]}
                                             arrow={false}
                                         >
-                                            {isState.idWarehouse === item.id && item.is_system == 0 &&
+                                            {isState.idWarehouse === item.id && item.is_system == 0 && (
                                                 <div className="ml-2 flex items-center gap-2  rounded-md bg-gray-200 3xl:py-3 py-2 px-4">
-                                                    {role == true || checkEdit ?
-
+                                                    {role == true || checkEdit ? (
                                                         <Popup_kho
                                                             dataLang={dataLang}
                                                             id={item?.id}
@@ -744,11 +745,13 @@ const Index = (props) => {
                                                             note={item?.note}
                                                             branch={item?.branch}
                                                             onRefresh={fetchDataListWarehouse.bind(this)}
-
                                                         />
-                                                        :
-                                                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                                                    }
+                                                    ) : (
+                                                        <IconEdit
+                                                            className="cursor-pointer"
+                                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                        />
+                                                    )}
                                                     <BtnAction
                                                         onRefresh={fetchDataListWarehouse.bind(this)}
                                                         onRefreshGroup={fetchDataWarehouseDetail.bind(this)}
@@ -757,10 +760,9 @@ const Index = (props) => {
                                                         type="warehouse"
                                                     />
                                                 </div>
-                                            }
+                                            )}
                                         </PopupParent>
-                                    ))
-                                }
+                                    ))}
                             </ul>
                             <div className="col-span-8 3xl:max-h-[620px] 3xl:h-[620px] 2xl:max-h-[440px] 2xl:h-[440px] max-h-[440px] h-[440px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <div className={`2xl:w-[100%] pr-2`}>
@@ -768,203 +770,300 @@ const Index = (props) => {
                                     <HeaderTable
                                         gridCols={
                                             isState.dataProductSerial.is_enable == "1"
-                                                ? (isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable)
+                                                ? isState.dataMaterialExpiry.is_enable !=
+                                                  isState.dataProductExpiry.is_enable
                                                     ? 10
                                                     : isState.dataMaterialExpiry.is_enable == "1"
-                                                        ? 10 : 8
-                                                : isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
-                                                    ? 9 : isState.dataMaterialExpiry.is_enable == "1"
-                                                        ? 9 : 7
-
+                                                    ? 10
+                                                    : 8
+                                                : isState.dataMaterialExpiry.is_enable !=
+                                                  isState.dataProductExpiry.is_enable
+                                                ? 9
+                                                : isState.dataMaterialExpiry.is_enable == "1"
+                                                ? 9
+                                                : 7
                                         }
                                     >
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_product || "warehouses_detail_product"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}
                                         </ColumnTable>
                                         {isState.dataProductSerial.is_enable === "1" && (
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                            <ColumnTable colSpan={1} textAlign={"center"}>
                                                 {"Serial"}
                                             </ColumnTable>
                                         )}
-                                        {isState.dataMaterialExpiry.is_enable === "1" || isState.dataProductExpiry.is_enable === "1" ? (
+                                        {isState.dataMaterialExpiry.is_enable === "1" ||
+                                        isState.dataProductExpiry.is_enable === "1" ? (
                                             <>
-                                                <ColumnTable colSpan={1} textAlign={'center'}>
+                                                <ColumnTable colSpan={1} textAlign={"center"}>
                                                     {"Lot"}
                                                 </ColumnTable>
-                                                <ColumnTable colSpan={1} textAlign={'center'}>
+                                                <ColumnTable colSpan={1} textAlign={"center"}>
                                                     {dataLang?.warehouses_detail_date || "warehouses_detail_date"}
                                                 </ColumnTable>
                                             </>
                                         ) : (
                                             ""
                                         )}
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.warehouses_detail_value || "warehouses_detail_value"}
                                         </ColumnTable>
                                     </HeaderTable>
                                     {/* data table */}
-                                    {
-                                        isState.isLoading ? (
-                                            <Loading className="3xl:max-h-[560px] 3xl:h-[560px] 2xl:max-h-[400px] 2xl:h-[400px] max-h-[400px] h-[400px]" color="#0f4f9e" />
-                                        ) : isState?.dataWarehouseDetail && isState?.dataWarehouseDetail?.length > 0 ? (
-                                            <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
-                                                {isState?.dataWarehouseDetail && isState?.dataWarehouseDetail?.map((e) => (
+                                    {isState.isLoading ? (
+                                        <Loading
+                                            className="3xl:max-h-[560px] 3xl:h-[560px] 2xl:max-h-[400px] 2xl:h-[400px] max-h-[400px] h-[400px]"
+                                            color="#0f4f9e"
+                                        />
+                                    ) : isState?.dataWarehouseDetail && isState?.dataWarehouseDetail?.length > 0 ? (
+                                        <div className=" min:h-[400px] h-[100%] w-full max:h-[600px]  ">
+                                            {isState?.dataWarehouseDetail &&
+                                                isState?.dataWarehouseDetail?.map((e) => (
                                                     <div
-                                                        className={`${isState?.dataProductSerial.is_enable == "1"
-                                                            ? isState?.dataMaterialExpiry.is_enable != isState?.dataProductExpiry.is_enable
-                                                                ? "grid-cols-10"
-                                                                : isState?.dataMaterialExpiry.is_enable == "1" ? "grid-cols-10" : "grid-cols-8"
-                                                            : isState?.dataMaterialExpiry.is_enable != isState?.dataProductExpiry.is_enable
+                                                        className={`${
+                                                            isState?.dataProductSerial.is_enable == "1"
+                                                                ? isState?.dataMaterialExpiry.is_enable !=
+                                                                  isState?.dataProductExpiry.is_enable
+                                                                    ? "grid-cols-10"
+                                                                    : isState?.dataMaterialExpiry.is_enable == "1"
+                                                                    ? "grid-cols-10"
+                                                                    : "grid-cols-8"
+                                                                : isState?.dataMaterialExpiry.is_enable !=
+                                                                  isState?.dataProductExpiry.is_enable
                                                                 ? "grid-cols-9"
-                                                                : isState?.dataMaterialExpiry.is_enable == "1" ? "grid-cols-9" : "grid-cols-7"
-                                                            }  grid hover:bg-slate-50 px-2`}
+                                                                : isState?.dataMaterialExpiry.is_enable == "1"
+                                                                ? "grid-cols-9"
+                                                                : "grid-cols-7"
+                                                        }  grid hover:bg-slate-50 px-2`}
                                                     >
-                                                        <RowItemTable colSpan={2} className={`flex justify-center items-center border-b py-2`}>
+                                                        <RowItemTable
+                                                            colSpan={2}
+                                                            className={`flex justify-center items-center border-b py-2`}
+                                                        >
                                                             <h6 className="xl:text-base text-xs w-full  ">
                                                                 {e?.image == null ? (
-                                                                    <div className='flex 3xl:gap-3 gap-2 px-2 w-full'>
-                                                                        <div className='3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center'>
+                                                                    <div className="flex 3xl:gap-3 gap-2 px-2 w-full">
+                                                                        <div className="3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center">
                                                                             <ModalImage
                                                                                 small="/no_image.png"
                                                                                 large="/no_image.png"
                                                                                 className="xxl:w-[70px] xxl:min-w-[70px] xxl:h-[70px] xl:w-[50px] xl:min-w-[50px] xl:h-[50px] w-[40px] min-w-[40px] h-[40px] rounded object-contain"
                                                                             />
                                                                         </div>
-                                                                        <div className='3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1'>
+                                                                        <div className="3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1">
                                                                             <h6 className="3xl:text-base xl:text-sm lg:text-xs text-xs font-semibold text-zinc-600 w-full text-left">
-                                                                                {e.item_name == null ? "-" : e.item_name}
+                                                                                {e.item_name == null
+                                                                                    ? "-"
+                                                                                    : e.item_name}
                                                                             </h6>
 
                                                                             <h6 className="3xl:text-sm xl:text-xs lg:text-xs text-xs font-medium text-zinc-500 w-full text-left">
-                                                                                {e.item_code == null ? "-" : e.item_code}
+                                                                                {e.item_code == null
+                                                                                    ? "-"
+                                                                                    : e.item_code}
                                                                             </h6>
 
                                                                             <h6 className="w-fit text-left ">
                                                                                 <span
-                                                                                    className={`${e.item_type == "product"
-                                                                                        ? "text-lime-500  border-lime-500 "
-                                                                                        : " text-orange-500 border-orange-500"
-                                                                                        } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
+                                                                                    className={`${
+                                                                                        e.item_type == "product"
+                                                                                            ? "text-lime-500  border-lime-500 "
+                                                                                            : " text-orange-500 border-orange-500"
+                                                                                    } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
                                                                                 >
-                                                                                    {e.item_type ? dataLang[e?.item_type] : ""}
+                                                                                    {e.item_type
+                                                                                        ? dataLang[e?.item_type]
+                                                                                        : ""}
                                                                                 </span>
                                                                             </h6>
                                                                         </div>
                                                                     </div>
                                                                 ) : (
-                                                                    <div className='flex 3xl:gap-3 gap-2 px-2 w-full'>
-                                                                        <div className='3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center'>
+                                                                    <div className="flex 3xl:gap-3 gap-2 px-2 w-full">
+                                                                        <div className="3xl:w-[25%] 3xl:max-w-[25%] xl:w-[35%] xl:max-w-[35%] w-[30%] max-w-[30%] flex items-center">
                                                                             <ModalImage
                                                                                 small={e?.image}
                                                                                 large={e?.image}
                                                                                 className="xxl:w-[70px] xxl:min-w-[70px] xxl:h-[70px] xl:w-[50px] xl:min-w-[50px] xl:h-[50px] w-[40px] min-w-[40px] h-[40px] rounded-lg object-cover"
                                                                             />
                                                                         </div>
-                                                                        <div className='3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1'>
+                                                                        <div className="3xl:w-[75%] 3xl:max-w-[75%] xl:w-[65%] xl:max-w-[65%] w-[70%] max-w-[70%] flex flex-col 3xl:gap-2 gap-1">
                                                                             <h6 className="3xl:text-base xl:text-sm lg:text-xs text-xs font-semibold text-zinc-600 w-full text-left ">
-                                                                                {e.item_name == null ? "-" : e.item_name}
+                                                                                {e.item_name == null
+                                                                                    ? "-"
+                                                                                    : e.item_name}
                                                                             </h6>
 
                                                                             <h6 className="3xl:text-sm xl:text-xs lg:text-xs text-xs font-medium text-zinc-500 w-full text-left">
-                                                                                {e.item_code == null ? "-" : e.item_code}
+                                                                                {e.item_code == null
+                                                                                    ? "-"
+                                                                                    : e.item_code}
                                                                             </h6>
 
                                                                             <h6 className="w-fit text-left ">
                                                                                 <span
-                                                                                    className={`${e.item_type == "product" ? "text-lime-500  border-lime-500" : " text-orange-500 border-orange-500"
-                                                                                        } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
+                                                                                    className={`${
+                                                                                        e.item_type == "product"
+                                                                                            ? "text-lime-500  border-lime-500"
+                                                                                            : " text-orange-500 border-orange-500"
+                                                                                    } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
                                                                                 >
-                                                                                    {e.item_type ? dataLang[e?.item_type] : ""}
+                                                                                    {e.item_type
+                                                                                        ? dataLang[e?.item_type]
+                                                                                        : ""}
                                                                                 </span>
                                                                             </h6>
-
                                                                         </div>
                                                                     </div>
                                                                 )}
                                                             </h6>
                                                         </RowItemTable>
 
-                                                        <div className={` grid ${isState.dataProductSerial.is_enable == "1"
-                                                            ? isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
-                                                                ? "col-span-8" : isState.dataMaterialExpiry.is_enable == "1" ? "col-span-8" : "col-span-6"
-                                                            : isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
-                                                                ? "col-span-7" : isState.dataMaterialExpiry.is_enable == "1" ? "col-span-7" : "col-span-5"
+                                                        <div
+                                                            className={` grid ${
+                                                                isState.dataProductSerial.is_enable == "1"
+                                                                    ? isState.dataMaterialExpiry.is_enable !=
+                                                                      isState.dataProductExpiry.is_enable
+                                                                        ? "col-span-8"
+                                                                        : isState.dataMaterialExpiry.is_enable == "1"
+                                                                        ? "col-span-8"
+                                                                        : "col-span-6"
+                                                                    : isState.dataMaterialExpiry.is_enable !=
+                                                                      isState.dataProductExpiry.is_enable
+                                                                    ? "col-span-7"
+                                                                    : isState.dataMaterialExpiry.is_enable == "1"
+                                                                    ? "col-span-7"
+                                                                    : "col-span-5"
                                                             }`}
                                                         >
                                                             {e?.detail.map((item) => (
                                                                 <div
-                                                                    className={`grid ${isState.dataProductSerial.is_enable == "1"
-                                                                        ? isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
-                                                                            ? "grid-cols-8"
-                                                                            : isState.dataMaterialExpiry.is_enable == "1" ? "grid-cols-8" : "grid-cols-6"
-                                                                        : isState.dataMaterialExpiry.is_enable != isState.dataProductExpiry.is_enable
+                                                                    className={`grid ${
+                                                                        isState.dataProductSerial.is_enable == "1"
+                                                                            ? isState.dataMaterialExpiry.is_enable !=
+                                                                              isState.dataProductExpiry.is_enable
+                                                                                ? "grid-cols-8"
+                                                                                : isState.dataMaterialExpiry
+                                                                                      .is_enable == "1"
+                                                                                ? "grid-cols-8"
+                                                                                : "grid-cols-6"
+                                                                            : isState.dataMaterialExpiry.is_enable !=
+                                                                              isState.dataProductExpiry.is_enable
                                                                             ? "grid-cols-7"
-                                                                            : isState.dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : " grid-cols-5"
-                                                                        }`}
+                                                                            : isState.dataMaterialExpiry.is_enable ==
+                                                                              "1"
+                                                                            ? "grid-cols-7"
+                                                                            : " grid-cols-5"
+                                                                    }`}
                                                                 >
                                                                     <RowItemTable colSpan={1} className="border-b py-3">
-                                                                        {item.location_name == null ? "-" : item.location_name}
+                                                                        {item.location_name == null
+                                                                            ? "-"
+                                                                            : item.location_name}
                                                                     </RowItemTable>
-                                                                    <RowItemTable colSpan={1} className="border-b py-3" textAlign={'center'}>
-                                                                        {item.option_name_1 == null ? "-" : item.option_name_1}
+                                                                    <RowItemTable
+                                                                        colSpan={1}
+                                                                        className="border-b py-3"
+                                                                        textAlign={"center"}
+                                                                    >
+                                                                        {item.option_name_1 == null
+                                                                            ? "-"
+                                                                            : item.option_name_1}
                                                                     </RowItemTable>
-                                                                    <RowItemTable colSpan={1} className="border-b py-3" textAlign={'center'}>
-                                                                        {item.option_name_2 == null ? "-" : item.option_name_2}
+                                                                    <RowItemTable
+                                                                        colSpan={1}
+                                                                        className="border-b py-3"
+                                                                        textAlign={"center"}
+                                                                    >
+                                                                        {item.option_name_2 == null
+                                                                            ? "-"
+                                                                            : item.option_name_2}
                                                                     </RowItemTable>
                                                                     {isState.dataProductSerial.is_enable === "1" ? (
-                                                                        <RowItemTable colSpan={1} className="border-b py-3" textAlign={'center'}>
-                                                                            {item.serial == null || item.serial == "" ? "-" : item.serial}
+                                                                        <RowItemTable
+                                                                            colSpan={1}
+                                                                            className="border-b py-3"
+                                                                            textAlign={"center"}
+                                                                        >
+                                                                            {item.serial == null || item.serial == ""
+                                                                                ? "-"
+                                                                                : item.serial}
                                                                         </RowItemTable>
                                                                     ) : (
                                                                         ""
                                                                     )}
-                                                                    {isState.dataMaterialExpiry.is_enable === "1" || isState.dataProductExpiry.is_enable === "1" ? (
+                                                                    {isState.dataMaterialExpiry.is_enable === "1" ||
+                                                                    isState.dataProductExpiry.is_enable === "1" ? (
                                                                         <>
-                                                                            <RowItemTable colSpan={1} className="border-b py-3" textAlign={'center'}>
-                                                                                {item.lot == null || item.lot == "" ? "-" : item.lot}
+                                                                            <RowItemTable
+                                                                                colSpan={1}
+                                                                                className="border-b py-3"
+                                                                                textAlign={"center"}
+                                                                            >
+                                                                                {item.lot == null || item.lot == ""
+                                                                                    ? "-"
+                                                                                    : item.lot}
                                                                             </RowItemTable>
-                                                                            <RowItemTable colSpan={1} className="border-b py-3" textAlign={'center'}>
-                                                                                {item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                            <RowItemTable
+                                                                                colSpan={1}
+                                                                                className="border-b py-3"
+                                                                                textAlign={"center"}
+                                                                            >
+                                                                                {item.expiration_date
+                                                                                    ? moment(
+                                                                                          item.expiration_date
+                                                                                      ).format("DD/MM/YYYY")
+                                                                                    : "-"}
                                                                             </RowItemTable>
                                                                         </>
                                                                     ) : (
                                                                         ""
                                                                     )}
-                                                                    <RowItemTable textAlign={'right'} colSpan={1} className="border-b py-3 ">
-                                                                        {item.quantity ? formatNumber(+item?.quantity) : "-"}
+                                                                    <RowItemTable
+                                                                        textAlign={"right"}
+                                                                        colSpan={1}
+                                                                        className="border-b py-3 "
+                                                                    >
+                                                                        {item.quantity
+                                                                            ? formatNumber(+item?.quantity)
+                                                                            : "-"}
                                                                     </RowItemTable>
-                                                                    <RowItemTable textAlign={'right'} colSpan={1} className="border-b py-3">
-                                                                        {item.amount ? formatNumber(+item?.amount) : "-"}
+                                                                    <RowItemTable
+                                                                        textAlign={"right"}
+                                                                        colSpan={1}
+                                                                        className="border-b py-3"
+                                                                    >
+                                                                        {item.amount
+                                                                            ? formatNumber(+item?.amount)
+                                                                            : "-"}
                                                                     </RowItemTable>
                                                                 </div>
                                                             ))}
                                                         </div>
-
                                                     </div>
                                                 ))}
-                                            </div>
-                                        ) : (
-                                            <NoData />
-                                        )
-                                    }
+                                        </div>
+                                    ) : (
+                                        <NoData />
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
                     {isState?.dataWarehouse?.length != 0 && (
-                        <ContainerPagination className={'justify-end'}>
+                        <ContainerPagination className={"justify-end"}>
                             {/* <h6 className='3xl:text-base text-sm'>
                                 {dataLang?.display} {isState?.totalItemWarehouseDetail?.iTotalDisplayRecords} {dataLang?.among}{" "}
                                 {isState?.totalItemWarehouseDetail?.iTotalRecords} {dataLang?.ingredient}
@@ -978,7 +1077,7 @@ const Index = (props) => {
                                 totalPosts={Number(isState?.totalItemWarehouseDetail?.iTotalDisplayRecords)}
                                 paginate={paginate}
                                 currentPage={router.query?.page || 1}
-                                className='3xl:text-base text-sm'
+                                className="3xl:text-base text-sm"
                             />
                         </ContainerPagination>
                     )}
@@ -987,6 +1086,5 @@ const Index = (props) => {
         </React.Fragment>
     );
 };
-
 
 export default Index;

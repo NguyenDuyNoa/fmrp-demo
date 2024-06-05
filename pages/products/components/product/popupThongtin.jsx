@@ -148,7 +148,6 @@ const Popup_ThongTin = React.memo((props) => {
             name: props.dataLang?.stage_finishedProduct || "stage_finishedProduct",
         }
     ]
-    console.log("selectedListBom", selectedListBom);
     return (
         <PopupEdit
             title={"Chi tiết thành phẩm"}

@@ -420,7 +420,6 @@ const Index = (props) => {
     ];
 
     const handleSaveStatus = () => {
-        console.log("isKeyState", isKeyState);
         if (isKeyState?.type === "browser") {
             const checked = isKeyState.value.target.checked;
             const warehousemanId = isKeyState.value.target.value;

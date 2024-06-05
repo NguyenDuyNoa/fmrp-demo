@@ -1249,8 +1249,6 @@ const Popup_ThanhPham = React.memo((props) => {
 
     const _HandleApplyVariant = () => {
         if (optSelectedVariantMain?.length > 0) {
-            console.log("dataTotalVariant", dataTotalVariant);
-            console.log("optSelectedVariantSub", optSelectedVariantSub);
             sDataTotalVariant([...dataTotalVariant,
             ...(optSelectedVariantMain?.length > 0
                 ? optSelectedVariantMain?.map((item1, index) => {
@@ -1298,7 +1296,6 @@ const Popup_ThanhPham = React.memo((props) => {
         }
     };
     //////
-    console.log("ress", dataTotalVariant);
 
     const [errGroup, sErrGroup] = useState(false);
 
@@ -1496,7 +1493,6 @@ const Popup_ThanhPham = React.memo((props) => {
         formData.append("note", note);
         branch.forEach((e) => formData.append("branch_id[]", e.value));
         formData.append("images", thumbFile);
-        console.log("dataTotalVariant", dataTotalVariant);
         for (let i = 0; i < dataTotalVariant.length; i++) {
             var item = dataTotalVariant[i];
 
@@ -3516,7 +3512,6 @@ const Popup_Bom = React.memo((props) => {
     const [tab, sTab] = useState(null);
 
     const [selectedList, sSelectedList] = useState(null);
-    console.log("selectedList", selectedList);
     const [dataTypeCd, sDataTypeCd] = useState([]);
     const [dataCd, sDataCd] = useState([]);
 
@@ -3686,7 +3681,6 @@ const Popup_Bom = React.memo((props) => {
 
     const _HandleAddNew = (id) => {
         const index = dataSelectedVariant.findIndex((obj) => obj?.value === id);
-        console.log("index", index);
         const newData = [...dataSelectedVariant];
         newData[index] = {
             ...newData[index],
@@ -3719,10 +3713,7 @@ const Popup_Bom = React.memo((props) => {
     };
 
     const _HandleSeachApi = (value, inputValue, type, id) => {
-        console.log("type", type);
-        console.log("inputValue", inputValue);
-        console.log("value", value);
-        console.log("id", id);
+
         setTimeout(() => {
             type != "" &&
                 Axios(
@@ -3742,7 +3733,6 @@ const Popup_Bom = React.memo((props) => {
                                 value: item.id,
                                 product_variation: item?.product_variation,
                             }));
-                            console.log("dataSelectedVariant", dataSelectedVariant);
                             const newDb = dataSelectedVariant.map((e) => ({
                                 ...e,
                                 child: e.child.map((ce, ceIndex) => ({

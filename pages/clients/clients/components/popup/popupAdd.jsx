@@ -33,13 +33,12 @@ import { useSelector } from "react-redux";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
-
 const Popup_dskh = (props) => {
     const scrollAreaRef = useRef(null);
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit } = useActionRole(auth, props?.nameModel)
+    const { checkAdd, checkEdit } = useActionRole(auth, props?.nameModel);
 
     const { isOpen, isId, handleQueryId, isIdChild } = useToggle();
 
@@ -82,7 +81,7 @@ const Popup_dskh = (props) => {
         valueChar: [],
         listChar: [],
         errInputName: false,
-    }
+    };
 
     const [isState, sIsState] = useState(initalState);
 
@@ -90,23 +89,21 @@ const Popup_dskh = (props) => {
 
     const [tab, sTab] = useState(0);
 
-    const _HandleSelectTab = (e) => sTab(e)
-
+    const _HandleSelectTab = (e) => sTab(e);
 
     useEffect(() => {
         queryState({
             dataBr: props?.listBr || [],
-            dataCity: props?.listSelectCt?.map((e) => ({ label: e?.name, value: e?.provinceid }))
-        })
-        isState.open && props?.id && queryState({ onFetching: true })
-    }, [isState.open])
+            dataCity: props?.listSelectCt?.map((e) => ({ label: e?.name, value: e?.provinceid })),
+        });
+        isState.open && props?.id && queryState({ onFetching: true });
+    }, [isState.open]);
 
     useEffect(() => {
         if (isState?.onFetching) {
-            _ServerFetching_detailUser()
+            _ServerFetching_detailUser();
         }
-    }, [isState?.onFetching])
-    console.log("checkEdit", isIdChild);
+    }, [isState?.onFetching]);
     const _ServerFetching_detailUser = async () => {
         await Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
@@ -127,31 +124,34 @@ const Popup_dskh = (props) => {
                     note: db?.note,
                     debt_limit: db?.debt_limit,
                     debt_limit_day: db?.debt_limit_day,
-                    valueDitrict: db?.district.districtid ? {
-                        label: db?.district.name,
-                        value: db?.district.districtid,
-                    } : null,
+                    valueDitrict: db?.district.districtid
+                        ? {
+                              label: db?.district.name,
+                              value: db?.district.districtid,
+                          }
+                        : null,
                     valueCt: {
                         value: db?.city.provinceid,
-                        label: db?.city.name
+                        label: db?.city.name,
                     },
                     valueWa: {
                         label: db?.ward.name,
-                        value: db?.ward.wardid
+                        value: db?.ward.wardid,
                     },
-                    option: db?.contact?.map(e => {
-                        return {
-                            idFe: uuidv4(),
-                            idBe: e?.id,
-                            full_name: e?.full_name,
-                            email: e?.email,
-                            position: e?.position,
-                            birthday: e?.birthday,
-                            address: e?.address,
-                            phone_number: e?.phone_number,
-                            // disble: role == true || checkEdit == true
-                        }
-                    }) || [],
+                    option:
+                        db?.contact?.map((e) => {
+                            return {
+                                idFe: uuidv4(),
+                                idBe: e?.id,
+                                full_name: e?.full_name,
+                                email: e?.email,
+                                position: e?.position,
+                                birthday: e?.birthday,
+                                address: e?.address,
+                                phone_number: e?.phone_number,
+                                // disble: role == true || checkEdit == true
+                            };
+                        }) || [],
                     optionDelivery: db?.clients_address_delivery?.map((e) => ({
                         idFe: e?.id,
                         nameDelivery: e?.fullname,
@@ -159,9 +159,8 @@ const Popup_dskh = (props) => {
                         addressDelivery: e?.address,
                         actionDelivery: e?.is_primary == "1" ? true : false,
                         idBe: e?.id,
-                    }))
-
-                })
+                    })),
+                });
             }
             queryState({ onFetching: false });
         });
@@ -184,7 +183,7 @@ const Popup_dskh = (props) => {
                         listChar: db?.map((e) => ({
                             label: e.name,
                             value: e.staffid,
-                        }))
+                        })),
                     });
                 }
                 queryState({ onFetchingChar: false });
@@ -194,12 +193,11 @@ const Popup_dskh = (props) => {
 
     useEffect(() => {
         isState.valueBr?.length > 0 && queryState({ onFetchingChar: true, onFetchingGr: true });
-    }, [isState.valueBr])
+    }, [isState.valueBr]);
 
     useEffect(() => {
-        isState.onFetchingChar && _ServerFetching_Char()
-    }, [isState.onFetchingChar])
-
+        isState.onFetchingChar && _ServerFetching_Char();
+    }, [isState.onFetchingChar]);
 
     const _ServerFetching_Gr = async () => {
         await Axios(
@@ -217,7 +215,7 @@ const Popup_dskh = (props) => {
                         dataGroup: rResult?.map((e) => ({
                             label: e.name,
                             value: e.id,
-                        }))
+                        })),
                     });
                 }
                 queryState({ onFetchingGr: false });
@@ -226,16 +224,16 @@ const Popup_dskh = (props) => {
     };
 
     useEffect(() => {
-        isState.onFetchingGr && _ServerFetching_Gr()
-    }, [isState.onFetchingGr])
+        isState.onFetchingGr && _ServerFetching_Gr();
+    }, [isState.onFetchingGr]);
 
     useEffect(() => {
         isState.valueCt && queryState({ onFetchingDis: true });
-    }, [isState.valueCt])
+    }, [isState.valueCt]);
 
     useEffect(() => {
         isState.onFetchingDis && _ServerFetching_distric();
-    }, [isState.onFetchingDis])
+    }, [isState.onFetchingDis]);
 
     const _ServerFetching_distric = async () => {
         await Axios(
@@ -253,46 +251,48 @@ const Popup_dskh = (props) => {
                         dataDitrict: rResult?.map((e) => ({
                             label: e.name,
                             value: e.districtid,
-                        }))
-                    })
+                        })),
+                    });
                 }
                 queryState({ onFetchingDis: false });
             }
         );
     };
     useEffect(() => {
-        isState.valueBr?.length == 0 && queryState({
-            dataGroup: [],
-            valueGr: [],
-            listChar: [],
-            valueChar: []
-        });
-    }, [isState.valueBr])
-
+        isState.valueBr?.length == 0 &&
+            queryState({
+                dataGroup: [],
+                valueGr: [],
+                listChar: [],
+                valueChar: [],
+            });
+    }, [isState.valueBr]);
 
     useEffect(() => {
         isState.valueDitrict && queryState({ onFetchingWar: true });
-    }, [isState.valueDitrict])
+    }, [isState.valueDitrict]);
 
     useEffect(() => {
         isState.onFetchingWar && _ServerFetching_war();
-    }, [isState.onFetchingWar])
+    }, [isState.onFetchingWar]);
 
     useEffect(() => {
-        isState.valueDitrict == null && queryState({
-            valueWar: null,
-            dataWar: []
-        })
-    }, [isState.valueDitrict])
+        isState.valueDitrict == null &&
+            queryState({
+                valueWar: null,
+                dataWar: [],
+            });
+    }, [isState.valueDitrict]);
 
     useEffect(() => {
-        isState.valueCt == null && queryState({
-            valueWar: null,
-            dataWar: [],
-            valueDitrict: null,
-            dataDitrict: []
-        })
-    }, [isState.valueCt])
+        isState.valueCt == null &&
+            queryState({
+                valueWar: null,
+                dataWar: [],
+                valueDitrict: null,
+                dataDitrict: [],
+            });
+    }, [isState.valueCt]);
 
     const _ServerFetching_war = async () => {
         await Axios(
@@ -306,13 +306,12 @@ const Popup_dskh = (props) => {
             (err, response) => {
                 if (!err) {
                     const { rResult } = response.data;
-                    console.log("rResult", rResult);
                     queryState({
                         dataWar: rResult?.map((e) => ({
                             label: e.name,
                             value: e.wardid,
-                        }))
-                    })
+                        })),
+                    });
                 }
                 queryState({ onFetchingWar: false });
             }
@@ -363,7 +362,13 @@ const Popup_dskh = (props) => {
             data.append(`items[${index}][address]`, e?.addressDelivery ? e?.addressDelivery : "");
             data.append(`items[${index}][is_primary]`, e?.actionDelivery ? 1 : 0);
         });
-        await Axios("POST", `${id ? `/api_web/api_client/client/${id}?csrf_protection=true` : "/api_web/api_client/client?csrf_protection=true"}`,
+        await Axios(
+            "POST",
+            `${
+                id
+                    ? `/api_web/api_client/client/${id}?csrf_protection=true`
+                    : "/api_web/api_client/client?csrf_protection=true"
+            }`,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -373,12 +378,20 @@ const Popup_dskh = (props) => {
                     const { isSuccess, message, branch_name } = response.data;
                     if (isSuccess) {
                         // isShow("success", typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message);
-                        isShow("success", typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message);
+                        isShow(
+                            "success",
+                            typeof props?.dataLang[message] !== "undefined" ? props?.dataLang[message] : message
+                        );
                         props.onRefresh && props.onRefresh();
-                        queryState({ open: false })
+                        queryState({ open: false });
                     } else {
                         // isShow("error", typeof props?.dataLang[message] !== "undefined" ? props.dataLang[message] : message);
-                        isShow("error", typeof props?.dataLang[message] !== "undefined" ? props.dataLang[message] + " " + branch_name : message);
+                        isShow(
+                            "error",
+                            typeof props?.dataLang[message] !== "undefined"
+                                ? props.dataLang[message] + " " + branch_name
+                                : message
+                        );
                     }
                 }
                 queryState({ onSending: false });
@@ -386,24 +399,23 @@ const Popup_dskh = (props) => {
         );
     };
 
-
     //onchang option form
     const onChangOptions = (id, type, value) => {
         var index = isState.option.findIndex((x) => x.idFe === id);
         if (type == "full_name") {
-            isState.option[index].full_name = value
+            isState.option[index].full_name = value;
         } else if (type == "email") {
-            isState.option[index].email = value
+            isState.option[index].email = value;
         } else if (type == "position") {
-            isState.option[index].position = value
+            isState.option[index].position = value;
         } else if (type == "birthday") {
-            isState.option[index].birthday = value
+            isState.option[index].birthday = value;
         } else if (type == "address") {
-            isState.option[index].address = value
+            isState.option[index].address = value;
         } else if (type == "phone_number") {
-            isState.option[index].phone_number = value
+            isState.option[index].phone_number = value;
         }
-        queryState({ option: [...isState.option] })
+        queryState({ option: [...isState.option] });
     };
 
     const onChangOptionsDelivery = (id, type, value) => {
@@ -424,17 +436,20 @@ const Popup_dskh = (props) => {
     // add option form
     const _HandleAddNew = () => {
         queryState({
-            option: [...isState.option, {
-                idFe: uuidv4(),
-                idBe: "",
-                full_name: "",
-                email: "",
-                position: "",
-                birthday: "",
-                address: "",
-                phone_number: ""
-            }]
-        })
+            option: [
+                ...isState.option,
+                {
+                    idFe: uuidv4(),
+                    idBe: "",
+                    full_name: "",
+                    email: "",
+                    position: "",
+                    birthday: "",
+                    address: "",
+                    phone_number: "",
+                },
+            ],
+        });
     };
 
     const _HandleAddNewDelivery = () => {
@@ -445,11 +460,10 @@ const Popup_dskh = (props) => {
             phoneDelivery: null,
             addressDelivery: null,
             actionDelivery: false,
-
         };
         queryState({
-            optionDelivery: [...isState.optionDelivery, newData]
-        })
+            optionDelivery: [...isState.optionDelivery, newData],
+        });
     };
 
     const _HandleDelete = async () => {
@@ -469,7 +483,11 @@ const Popup_dskh = (props) => {
     // save form
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (isState.name == "" || isState.valueBr?.length == 0 || isState.option.some(x => x.full_name == "" || x.phone_number == "")) {
+        if (
+            isState.name == "" ||
+            isState.valueBr?.length == 0 ||
+            isState.option.some((x) => x.full_name == "" || x.phone_number == "")
+        ) {
             isState.name == "" && queryState({ errInputName: true });
             isState.valueBr?.length == 0 && queryState({ errInputBr: true });
             isShow("error", props.dataLang?.required_field_null);
@@ -498,22 +516,25 @@ const Popup_dskh = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                            }  px-4 py-2 outline-none font-semibold`}
+                        className={`${
+                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_general}
                     </button>
                     <button
                         onClick={() => _HandleSelectTab(1)}
-                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                            }  px-4 py-2 outline-none font-semibold`}
+                        className={`${
+                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_contact}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 2)}
-                        className={`${tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                            }  px-4 py-2 outline-none font-semibold`}
+                        className={`${
+                            tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_devivelyInfo}
                     </button>
@@ -521,17 +542,13 @@ const Popup_dskh = (props) => {
                 <div className="mt-4">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         {tab === 0 && (
-                            <Customscrollbar
-                                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]"
-                            >
+                            <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]">
                                 <Form dataLang={props.dataLang} isState={isState} queryState={queryState} />
                             </Customscrollbar>
                         )}
                         {tab === 1 && (
                             <div>
-                                <Customscrollbar
-                                    className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]"
-                                >
+                                <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px]">
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.option.map((e) => (
                                             <FormContactInfo
@@ -554,8 +571,7 @@ const Popup_dskh = (props) => {
                         )}
                         {tab === 2 && (
                             <div>
-                                <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto"
-                                >
+                                <Customscrollbar className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-y-auto">
                                     <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                                         {isState.optionDelivery.map((e) => (
                                             <FormContactDelivery

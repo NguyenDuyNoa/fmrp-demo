@@ -69,11 +69,11 @@ const Popup_dspc = (props) => {
         return { menuPortalTarget };
     };
 
-    const isShow = useToast()
+    const isShow = useToast();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit } = useActionRole(auth, 'payment');
+    const { checkAdd, checkEdit } = useActionRole(auth, "payment");
 
     const [open, sOpen] = useState(false);
 
@@ -199,25 +199,25 @@ const Popup_dspc = (props) => {
                         db?.objects === "other"
                             ? { label: db?.object_text, value: db?.object_text }
                             : {
-                                label: dataLang[db?.object_text] || db?.object_text,
-                                value: db?.objects_id,
-                            }
+                                  label: dataLang[db?.object_text] || db?.object_text,
+                                  value: db?.objects_id,
+                              }
                     );
                     sTypeOfDocument(
                         db?.type_vouchers
                             ? {
-                                label: dataLang[db?.type_vouchers],
-                                value: db?.type_vouchers,
-                            }
+                                  label: dataLang[db?.type_vouchers],
+                                  value: db?.type_vouchers,
+                              }
                             : null
                     );
                     sListTypeOfDocument(
                         db?.type_vouchers
                             ? db?.voucher?.map((e) => ({
-                                label: e?.code,
-                                value: e?.id,
-                                money: e?.money,
-                            }))
+                                  label: e?.code,
+                                  value: e?.id,
+                                  money: e?.money,
+                              }))
                             : []
                     );
                     sOption(
@@ -442,7 +442,7 @@ const Popup_dspc = (props) => {
                 }
             }
         );
-    }, 500)
+    }, 500);
 
     //Loại chi phí
     const _ServerFetching_ListCost = () => {
@@ -626,7 +626,6 @@ const Popup_dspc = (props) => {
         const hasNullLabel = option.some((item) => item.chiphi === "");
         const hasNullSotien = option.some((item) => item.sotien === "" || item.sotien === null);
         const totalSotienErr = option.reduce((total, item) => total + item.sotien, 0);
-        console.log("price", price);
         if (
             branch == null ||
             object == null ||
@@ -654,9 +653,10 @@ const Popup_dspc = (props) => {
             }));
             ToatstNotifi(
                 "error",
-                `${totalSotienErr < price
-                    ? props?.dataLang.payment_err_alerTotalThan || "payment_err_alerTotalThan"
-                    : props.dataLang?.required_field_null || "required_field_null"
+                `${
+                    totalSotienErr < price
+                        ? props?.dataLang.payment_err_alerTotalThan || "payment_err_alerTotalThan"
+                        : props.dataLang?.required_field_null || "required_field_null"
                 }`
             );
         } else {
@@ -821,9 +821,10 @@ const Popup_dspc = (props) => {
         });
         Axios(
             "POST",
-            `${id
-                ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
-                : "/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true"
+            `${
+                id
+                    ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
+                    : "/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -866,16 +867,19 @@ const Popup_dspc = (props) => {
                         : `${props.dataLang?.payment_add || "payment_add"}`
                 }
                 button={
-                    props?.id ?
+                    props?.id ? (
                         <div
                             onClick={() => {
                                 if (role || checkEdit) {
-                                    sOpen(true)
+                                    sOpen(true);
                                 } else {
-                                    isShow("warning", WARNING_STATUS_ROLE)
+                                    isShow("warning", WARNING_STATUS_ROLE);
                                 }
                             }}
-                            className={"group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}>
+                            className={
+                                "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"
+                            }
+                        >
                             <BiEdit
                                 size={20}
                                 className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
@@ -883,19 +887,20 @@ const Popup_dspc = (props) => {
                             <p className="group-hover:text-sky-500">
                                 {props.dataLang?.payment_editVotes || "payment_editVotes"}
                             </p>
-
                         </div>
-
-                        : <div
+                    ) : (
+                        <div
                             onClick={() => {
                                 if (role || checkAdd) {
-                                    sOpen(true)
+                                    sOpen(true);
                                 } else {
-                                    isShow("warning", WARNING_STATUS_ROLE)
+                                    isShow("warning", WARNING_STATUS_ROLE);
                                 }
                             }}
-                        >{props.dataLang?.branch_popup_create_new || 'branch_popup_create_new'}</div>
-
+                        >
+                            {props.dataLang?.branch_popup_create_new || "branch_popup_create_new"}
+                        </div>
+                    )
                 }
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
@@ -991,8 +996,9 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${error.errBranch ? "border-red-500" : "border-transparent"
-                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${
+                                                error.errBranch ? "border-red-500" : "border-transparent"
+                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errBranch && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1038,8 +1044,9 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${error.errMethod ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${
+                                                error.errMethod ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errMethod && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1085,8 +1092,9 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${error.errObject ? "border-red-500" : "border-transparent"
-                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            className={`${
+                                                error.errObject ? "border-red-500" : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errObject && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1107,8 +1115,9 @@ const Popup_dspc = (props) => {
                                                 isClearable={true}
                                                 value={listObject}
                                                 classNamePrefix="Select"
-                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
-                                                    } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${
+                                                    error.errListObject ? "border-red-500" : "border-transparent"
+                                                } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                 isSearchable={true}
                                                 noOptionsMessage={() => `Chưa có gợi ý`}
                                                 formatCreateLabel={(value) => `Tạo "${value}"`}
@@ -1185,8 +1194,9 @@ const Popup_dspc = (props) => {
                                                         position: "absolute",
                                                     }),
                                                 }}
-                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${
+                                                    error.errListObject ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                         )}
                                         {error.errListObject && (
@@ -1277,12 +1287,13 @@ const Popup_dspc = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${error.errListTypeDoc &&
+                                            className={`${
+                                                error.errListTypeDoc &&
                                                 typeOfDocument != null &&
                                                 listTypeOfDocument?.length == 0
-                                                ? "border-red-500"
-                                                : "border-transparent"
-                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                                    ? "border-red-500"
+                                                    : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
                                             typeOfDocument != null &&
@@ -1309,8 +1320,9 @@ const Popup_dspc = (props) => {
                                                 </h1>
                                             </div>
                                             <Customscrollbar
-                                                className={`${data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
-                                                    } cursor-pointer`}
+                                                className={`${
+                                                    data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
+                                                } cursor-pointer`}
                                             >
                                                 {data.dataTable.map((e) => {
                                                     return (
@@ -1364,12 +1376,13 @@ const Popup_dspc = (props) => {
                                                         if (floatValue > totalMoney) {
                                                             Toast.fire({
                                                                 icon: "error",
-                                                                title: `${props.dataLang?.payment_errPlease ||
+                                                                title: `${
+                                                                    props.dataLang?.payment_errPlease ||
                                                                     "payment_errPlease"
-                                                                    } ${totalMoney.toLocaleString("en")}`,
+                                                                } ${totalMoney.toLocaleString("en")}`,
                                                             });
                                                         }
-                                                        return false
+                                                        return false;
                                                     } else {
                                                         return true;
                                                     }
@@ -1377,10 +1390,11 @@ const Popup_dspc = (props) => {
                                                     return true;
                                                 }
                                             }}
-                                            className={`${error.errPrice && price == null
-                                                ? "border-red-500"
-                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
-                                                } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
+                                            className={`${
+                                                error.errPrice && price == null
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                            } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
                                         />
                                         {error.errPrice && (
                                             <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1424,9 +1438,7 @@ const Popup_dspc = (props) => {
                                             {props.dataLang?.payment_operation || "payment_operation"}
                                         </h4>
                                     </div>
-                                    <Customscrollbar
-                                        className="min-h-[100px] max-h-[100px]"
-                                    >
+                                    <Customscrollbar className="min-h-[100px] max-h-[100px]">
                                         {sortedArr.map((e, index) => (
                                             <div className="grid grid-cols-12 items-center gap-1 py-1 " key={e?.id}>
                                                 <div className="col-span-6  my-auto ">
@@ -1467,10 +1479,11 @@ const Popup_dspc = (props) => {
                                                                 position: "absolute",
                                                             }),
                                                         }}
-                                                        className={`${error.errCosts && e?.chiphi === ""
-                                                            ? "border-red-500"
-                                                            : "border-transparent"
-                                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
+                                                        className={`${
+                                                            error.errCosts && e?.chiphi === ""
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                                     />
                                                 </div>
                                                 <div className="col-span-4 text-center flex items-center justify-center">
@@ -1494,9 +1507,10 @@ const Popup_dspc = (props) => {
                                                                 if (floatValue > price) {
                                                                     Toast.fire({
                                                                         icon: "error",
-                                                                        title: `${props.dataLang?.payment_errPlease ||
+                                                                        title: `${
+                                                                            props.dataLang?.payment_errPlease ||
                                                                             "payment_errPlease"
-                                                                            } ${price.toLocaleString("en")}`,
+                                                                        } ${price.toLocaleString("en")}`,
                                                                     });
                                                                 }
                                                                 return false;
@@ -1504,10 +1518,11 @@ const Popup_dspc = (props) => {
                                                                 return true;
                                                             }
                                                         }}
-                                                        className={`${error.errSotien && (e?.sotien === "" || e?.sotien === null)
-                                                            ? "border-b-red-500"
-                                                            : " border-gray-200"
-                                                            } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
+                                                        className={`${
+                                                            error.errSotien && (e?.sotien === "" || e?.sotien === null)
+                                                                ? "border-b-red-500"
+                                                                : " border-gray-200"
+                                                        } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                                     />
                                                 </div>
                                                 <div className="col-span-2 flex items-center justify-center">

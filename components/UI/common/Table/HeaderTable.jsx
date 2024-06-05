@@ -1,5 +1,4 @@
 export const HeaderTable = ({ ref, children, className, gridCols, display }) => {
-    console.log("ref", ref);
     return (
         <div
             ref={ref}

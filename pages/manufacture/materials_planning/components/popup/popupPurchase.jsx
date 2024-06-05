@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
@@ -17,7 +18,6 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import ModalImage from "react-modal-image";
 import { v4 as uuidv4 } from "uuid";
-import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue, fetchDataTable, ...rest }) => {
     const [open, sOpen] = useState(false);
@@ -26,47 +26,45 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
 
     const _ToggleModal = (e) => sOpen(e);
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const initialState = {
         onFetching: false,
         type: [
             {
                 id: uuidv4(),
-                label: 'materials_planning_semi',
+                label: "materials_planning_semi",
                 value: "product",
             },
             {
                 id: uuidv4(),
-                label: 'materials_planning_materials',
+                label: "materials_planning_materials",
                 value: "material",
-            }
+            },
         ],
-        arrayItem: []
-    }
-
+        arrayItem: [],
+    };
 
     const [isState, sIsState] = useState(initialState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
-
     const form = useForm({
         defaultValues: {
             date: new Date(),
-            note: '',
-            type: 'material',
-            purchaseName: 'Yêu cầu mua hàng (PR)',
-            arrayItem: []
-        }
+            note: "",
+            type: "material",
+            purchaseName: "Yêu cầu mua hàng (PR)",
+            arrayItem: [],
+        },
     });
 
     /// lắng nghe thay đổi
-    const findValue = form.watch()
+    const findValue = form.watch();
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
-    }
+    };
 
     const removeItem = (id) => {
         const updatedData = form.getValues("arrayItem").filter((item) => item.id !== id);
@@ -76,114 +74,101 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
     const fetchListItem = async () => {
         queryState({ onFetching: true });
         await new Promise((resolve) => setTimeout(resolve, 500));
-        let formData = new FormData()
+        let formData = new FormData();
         // type: 1 nvl, 2 BTP
         // type_object: 2 YCMH
-        formData.append('type', findValue.type == "material" ? 1 : 2)
-        formData.append('type_object', 2)
-        formData.append('pPlan_id', dataTable.listDataRight.idCommand)
-        Axios("POST", `/api_web/api_manufactures/keepItemsWarehouses`, {
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" },
-        },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message, data } = response?.data
-                    const newData = data?.items?.map((e) => {
-                        return {
-                            id: uuidv4(),
-                            idParent: e?.id,
-                            item: {
-                                item_id: e?.item_id,
-                                item_code: e?.item_code,
-                                name: e?.item_name,
-                                type: e?.type_item,
-                                image: e?.images,
-                                variation: e?.item_variation,
-
-                            },
-                            unit: e?.unit_name_parent,
-                            // sl giữ
-                            quantityKeepp: formatNumber(e?.quantity_keep),
-                            // sl còn lại
-                            quantityRest: formatNumber(e?.quantity_rest),
-                            // sl đã mua
-                            quantityPurchased: e?.quantity_purchase,
-                            quantity: formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0 ? formatNumber(e?.quantity_rest - e?.quantity_purchase) : null,
-                            itemVariationOptionValueId: e?.item_variation_option_value_id
-                        }
-                    })
-                    form.setValue("arrayItem", newData);
-                    queryState({ onFetching: false });
-                }
-            }
-        );
-    }
+        formData.append("type", findValue.type == "material" ? 1 : 2);
+        formData.append("type_object", 2);
+        formData.append("pPlan_id", dataTable.listDataRight.idCommand);
+        const { isSuccess, message, data } = await apiMaterialsPlanning.apiKeepItemsWarehouses(formData);
+        const newData = data?.items?.map((e) => {
+            return {
+                id: uuidv4(),
+                idParent: e?.id,
+                item: {
+                    item_id: e?.item_id,
+                    item_code: e?.item_code,
+                    name: e?.item_name,
+                    type: e?.type_item,
+                    image: e?.images,
+                    variation: e?.item_variation,
+                },
+                unit: e?.unit_name_parent,
+                // sl giữ
+                quantityKeepp: formatNumber(e?.quantity_keep),
+                // sl còn lại
+                quantityRest: formatNumber(e?.quantity_rest),
+                // sl đã mua
+                quantityPurchased: e?.quantity_purchase,
+                quantity:
+                    formatNumber(e?.quantity_rest - e?.quantity_purchase) > 0
+                        ? formatNumber(e?.quantity_rest - e?.quantity_purchase)
+                        : null,
+                itemVariationOptionValueId: e?.item_variation_option_value_id,
+            };
+        });
+        form.setValue("arrayItem", newData);
+        queryState({ onFetching: false });
+    };
 
     useEffect(() => {
         if (open) {
-            form.setValue('arrayItem', [])
-            fetchListItem()
+            form.setValue("arrayItem", []);
+            fetchListItem();
         }
-    }, [findValue.type, open])
+    }, [findValue.type, open]);
 
     const onSubmit = async (value) => {
         if (value.arrayItem.length == 0) {
-            return shhowToat('error', dataLang?.materials_planning_no_items_purchase || 'materials_planning_no_items_purchase')
+            return shhowToat(
+                "error",
+                dataLang?.materials_planning_no_items_purchase || "materials_planning_no_items_purchase"
+            );
         }
         let formData = new FormData();
-        formData.append('note', value.note)
-        formData.append('name', value.purchaseName)
-        formData.append('type', value.type == "material" ? 1 : 2)
-        formData.append('plan_id', dataTable?.listDataRight?.idCommand)
-        formData.append('date', moment(value.date).format('DD/MM/YYYY HH:mm:ss'))
+        formData.append("note", value.note);
+        formData.append("name", value.purchaseName);
+        formData.append("type", value.type == "material" ? 1 : 2);
+        formData.append("plan_id", dataTable?.listDataRight?.idCommand);
+        formData.append("date", moment(value.date).format("DD/MM/YYYY HH:mm:ss"));
         value.arrayItem.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
             formData.append(`items[${index}][quantity]`, e?.quantity);
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
             formData.append(`items[${index}][item_variation_option_value_id]`, e?.itemVariationOptionValueId);
-        })
-        Axios("POST", "/api_web/api_manufactures/handlingPurchaseProductionPlan",
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const data = response.data;
-                    if (data?.isSuccess) {
-                        isShow('success', data?.message)
-                        queryValue({ page: 1 })
-                        fetchDataTable(1)
-                        _ToggleModal(false)
-                        form.reset()
-                    } else {
-                        isShow('error', data?.message)
-                    }
-                }
-            }
-        );
-    }
+        });
+        const data = await apiMaterialsPlanning.apiHandlingPurchaseProductionPlan(formData);
+        if (data?.isSuccess) {
+            isShow("success", data?.message);
+            queryValue({ page: 1 });
+            fetchDataTable(1);
+            _ToggleModal(false);
+            form.reset();
+        } else {
+            isShow("error", data?.message);
+        }
+    };
     return (
         <>
             <PopupEdit
-                title={dataLang?.materials_planning_add_purchase || 'materials_planning_add_purchase'}
+                title={dataLang?.materials_planning_add_purchase || "materials_planning_add_purchase"}
                 button={
                     <button
                         className=" bg-blue-100 rounded-lg  outline-none focus:outline-none"
                         onClick={() => {
                             if (+dataTable?.countAll == 0) {
-                                return isShow('error', dataLang?.materials_planning_please_add || 'materials_planning_please_add')
+                                return isShow(
+                                    "error",
+                                    dataLang?.materials_planning_please_add || "materials_planning_please_add"
+                                );
                             }
-                            _ToggleModal(true)
+                            _ToggleModal(true);
                         }}
                     >
                         <div className="flex items-center gap-2 py-2 px-3 ">
                             {/* <Image height={16} width={16} src={icon} className="object-cover" /> */}
                             {icon}
-                            <h3 className="text-blue-600 font-medium 3xl:text-base text-xs">
-                                {title}
-                            </h3>
+                            <h3 className="text-blue-600 font-medium 3xl:text-base text-xs">{title}</h3>
                         </div>
                     </button>
                 }
@@ -196,7 +181,8 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-4 flex flex-col">
                             <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                                {dataLang?.materials_planning_date_purchase || 'materials_planning_date_purchase'} <span className=" text-red-500">*</span>
+                                {dataLang?.materials_planning_date_purchase || "materials_planning_date_purchase"}{" "}
+                                <span className=" text-red-500">*</span>
                             </div>
                             <Controller
                                 name="date"
@@ -204,8 +190,10 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                 rules={{
                                     required: {
                                         value: true,
-                                        message: dataLang?.materials_planning_pease_select_purchase || 'materials_planning_pease_select_purchase'
-                                    }
+                                        message:
+                                            dataLang?.materials_planning_pease_select_purchase ||
+                                            "materials_planning_pease_select_purchase",
+                                    },
                                 }}
                                 render={({ field, fieldState }) => {
                                     return (
@@ -216,7 +204,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                     ref={(ref) => {
                                                         if (ref !== null) {
                                                             field.ref({
-                                                                focus: ref.setFocus
+                                                                focus: ref.setFocus,
                                                             });
                                                         }
                                                     }}
@@ -227,19 +215,25 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                     placeholderText="DD/MM/YYYY HH:mm:ss"
                                                     dateFormat="dd/MM/yyyy h:mm:ss aa"
                                                     timeInputLabel={"Time: "}
-                                                    className={`border ${fieldState.error ? 'border-red-500' : 'border-[#d0d5dd]'} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                                    className={`border ${
+                                                        fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
+                                                    } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                                 />
-                                                {
-                                                    field.value && <MdClear
+                                                {field.value && (
+                                                    <MdClear
                                                         className="absolute right-10 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                        onClick={() => form.setValue('date', null)}
+                                                        onClick={() => form.setValue("date", null)}
                                                     />
-                                                }
+                                                )}
                                                 <BsCalendarEvent className="absolute right-5 top-1/2 -translate-y-1/2 text-[#CCCCCC] scale-110 cursor-pointer" />
-                                            </div >
-                                            {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
+                                            </div>
+                                            {fieldState.error && (
+                                                <span className="text-[12px]  text-red-500">
+                                                    {fieldState.error.message}{" "}
+                                                </span>
+                                            )}
                                         </>
-                                    )
+                                    );
                                 }}
                             />
                             <Controller
@@ -265,11 +259,11 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                         >
                                                             {dataLang[e.label] || e.label}
                                                         </label>
-                                                    </div >
-                                                )
+                                                    </div>
+                                                );
                                             })}
                                         </div>
-                                    )
+                                    );
                                 }}
                             />
                         </div>
@@ -282,8 +276,10 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                 rules={{
                                     required: {
                                         value: true,
-                                        message: dataLang?.materials_planning_enter_ticket || 'materials_planning_enter_ticket'
-                                    }
+                                        message:
+                                            dataLang?.materials_planning_enter_ticket ||
+                                            "materials_planning_enter_ticket",
+                                    },
                                 }}
                                 control={form.control}
                                 render={({ field, fieldState }) => {
@@ -294,11 +290,19 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                 name="fname"
                                                 type="text"
                                                 placeholder={dataLang?.purchase_name || "purchase_name"}
-                                                className={`${fieldState.error ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                                            {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
+                                                className={`${
+                                                    fieldState.error
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                            />
+                                            {fieldState.error && (
+                                                <span className="text-[12px]  text-red-500">
+                                                    {fieldState.error.message}{" "}
+                                                </span>
+                                            )}
                                         </>
-                                    )
+                                    );
                                 }}
                             />
                         </div>
@@ -318,47 +322,44 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                             type="text"
                                             className="focus:border-[#92BFF7] border-[#d0d5dd] resize-none placeholder:text-slate-300 w-full min-h-[100px] max-h-[100px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                                         />
-                                    )
+                                    );
                                 }}
                             />
                         </div>
-                    </div >
+                    </div>
                     <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
                         <HeaderTablePopup gridCols={12}>
                             <ColumnTablePopup colSpan={4}>
                                 {dataLang?.price_quote_item || "price_quote_item"}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={1}>
-                                {dataLang?.materials_planning_dvt || 'materials_planning_dvt'}
+                                {dataLang?.materials_planning_dvt || "materials_planning_dvt"}
                             </ColumnTablePopup>
 
                             <ColumnTablePopup colSpan={2}>
-                                {dataLang?.materials_planning_qty_need_by || 'materials_planning_qty_need_by'}
+                                {dataLang?.materials_planning_qty_need_by || "materials_planning_qty_need_by"}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={2}>
-                                {dataLang?.materials_planning_qty_requested || 'materials_planning_qty_requested'}
+                                {dataLang?.materials_planning_qty_requested || "materials_planning_qty_requested"}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={2}>
-                                {dataLang?.materials_planning_qty_buys || 'materials_planning_qty_buys'}
+                                {dataLang?.materials_planning_qty_buys || "materials_planning_qty_buys"}
                             </ColumnTablePopup>
                             <ColumnTablePopup colSpan={1}>
-                                {dataLang?.inventory_operatione || 'inventory_operatione'}
+                                {dataLang?.inventory_operatione || "inventory_operatione"}
                             </ColumnTablePopup>
                         </HeaderTablePopup>
                         {isState.onFetching ? (
                             <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                         ) : findValue.arrayItem && findValue.arrayItem?.length > 0 ? (
                             <>
-                                <Customscrollbar
-                                    className="min-h-[300px] max-h-[300px] overflow-hidden"
-                                >
+                                <Customscrollbar className="min-h-[300px] max-h-[300px] overflow-hidden">
                                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                         {findValue.arrayItem?.map((e, index) => (
                                             <div
                                                 className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
                                                 key={e?.id?.toString()}
                                             >
-
                                                 <h6 className="text-[13px] flex items-center font-medium py-1 col-span-4 text-left">
                                                     <div className={`flex items-center gap-2`}>
                                                         <div>
@@ -408,33 +409,45 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                         rules={{
                                                             required: {
                                                                 value: true,
-                                                                message: dataLang?.materials_planning_enter_quantity || 'materials_planning_enter_quantity'
+                                                                message:
+                                                                    dataLang?.materials_planning_enter_quantity ||
+                                                                    "materials_planning_enter_quantity",
                                                             },
                                                             validate: {
                                                                 fn: (value) => {
                                                                     try {
-                                                                        let mss = ''
+                                                                        let mss = "";
                                                                         if (value == null) {
-                                                                            mss = dataLang?.materials_planning_enter_quantity || 'materials_planning_enter_quantity'
+                                                                            mss =
+                                                                                dataLang?.materials_planning_enter_quantity ||
+                                                                                "materials_planning_enter_quantity";
                                                                         }
                                                                         if (value == 0) {
-                                                                            mss = dataLang?.materials_planning_must_be_greater || 'materials_planning_must_be_greater'
+                                                                            mss =
+                                                                                dataLang?.materials_planning_must_be_greater ||
+                                                                                "materials_planning_must_be_greater";
                                                                         }
                                                                         return mss || true;
                                                                     } catch (error) {
                                                                         throw error;
                                                                     }
-                                                                }
-                                                            }
+                                                                },
+                                                            },
                                                         }}
                                                         render={({ field, fieldState }) => {
                                                             return (
                                                                 <duv className="flex flex-col justify-center items-center">
                                                                     <InPutNumericFormat
-                                                                        className={`${fieldState.error && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                                        className={`${
+                                                                            fieldState.error && "border-red-500"
+                                                                        } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                                         {...field}
                                                                         onChange={(event) =>
-                                                                            field.onChange(event.target.value == '' ? null : +event.target.value)
+                                                                            field.onChange(
+                                                                                event.target.value == ""
+                                                                                    ? null
+                                                                                    : +event.target.value
+                                                                            )
                                                                         }
                                                                         isAllowed={(values) => {
                                                                             // const { floatValue, value } = values;
@@ -449,12 +462,16 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                                             //     isShow('warning', 'Vui lòng nhập lớn hơn 0');
                                                                             //     return false
                                                                             // }
-                                                                            return true
+                                                                            return true;
                                                                         }}
                                                                     />
-                                                                    {fieldState.error && <span className="text-[12px]  text-red-500">{fieldState.error.message} </span>}
+                                                                    {fieldState.error && (
+                                                                        <span className="text-[12px]  text-red-500">
+                                                                            {fieldState.error.message}{" "}
+                                                                        </span>
+                                                                    )}
                                                                 </duv>
-                                                            )
+                                                            );
                                                         }}
                                                     />
                                                 </h6>
@@ -473,7 +490,9 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                     </div>
                                 </Customscrollbar>
                             </>
-                        ) : <NoData />}
+                        ) : (
+                            <NoData />
+                        )}
                         <div className="text-right mt-5 space-x-2">
                             <button
                                 type="button"
@@ -497,4 +516,4 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
     );
 };
 
-export default PopupPurchase
+export default PopupPurchase;

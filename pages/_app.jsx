@@ -13,6 +13,7 @@ import "../styles/globals.scss";
 import LoginPage from "@/components/UI/login/login";
 import { Lexend_Deca } from "@next/font/google";
 import Swal from "sweetalert2";
+import apiDashboard from "Api/apiDashboard/apiDashboard";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -53,48 +54,28 @@ function MainPage({ Component, pageProps }) {
 
     useEffect(() => {
         const showLang = localStorage.getItem("LanguagesFMRP");
-
         dispatch({ type: "lang/update", payload: showLang ? showLang : "vi" });
     }, []);
 
-    // kiểm tra khi chuyển tab trình duyệt nếu đăng xuất thì tất cả tab đăng xuất
-    // if (typeof document !== 'undefined') {
-    //     document.addEventListener('visibilitychange', () => {
-    //         if (document.visibilityState === 'hidden') {
-    //             console.log('Tab không được nhìn thấy');
-    //         } else {
-    //             sOnChecking(true);
-    //         }
-    //     });
-    // }
-
     const _ServerLang = async () => {
-        await Axios("GET", `/api_web/Api_Lang/language/${langDefault}`, {}, (err, response) => {
-            if (!err) {
-                sData(response.data);
-                sChangeLang(false);
-            }
-        });
+        const res = await apiDashboard.apiLang(langDefault);
+        if (res) {
+            sData(res);
+            sChangeLang(false);
+        }
     };
 
     const FetchSetingServer = async () => {
-        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { settings } = response?.data;
-                dispatch({ type: "setings/server", payload: settings });
-            }
-        });
-        await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const data = response?.data;
-                const newData = {
-                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
-                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
-                    dataProductSerial: data.find((x) => x.code == "product_serial"),
-                };
-                dispatch({ type: "setings/feature", payload: newData });
-            }
-        });
+        const res = await apiDashboard.apiSettings();
+        dispatch({ type: "setings/server", payload: res?.settings });
+
+        const fature = await apiDashboard.apiFeature();
+        const newData = {
+            dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
+            dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
+            dataProductSerial: fature.find((x) => x.code == "product_serial"),
+        };
+        dispatch({ type: "setings/feature", payload: newData });
         sOnSeting(false);
     };
 
@@ -119,20 +100,14 @@ function MainPage({ Component, pageProps }) {
 
     const [onChecking, sOnChecking] = useState(false);
 
-    const ServerFetching = () => {
-        Axios("GET", "/api_web/Api_Authentication/authentication?csrf_protection=true", {}, (err, response) => {
-            if (err) {
-                dispatch({ type: "auth/update", payload: false });
-            } else {
-                const { isSuccess, info } = response?.data;
-                if (isSuccess) {
-                    dispatch({ type: "auth/update", payload: info });
-                } else {
-                    dispatch({ type: "auth/update", payload: false });
-                }
-            }
-            sOnChecking(false);
-        });
+    const ServerFetching = async () => {
+        const { isSuccess, info } = await apiDashboard.apiAuthentication();
+        if (isSuccess) {
+            dispatch({ type: "auth/update", payload: info });
+        } else {
+            dispatch({ type: "auth/update", payload: false });
+        }
+        sOnChecking(false);
     };
 
     useEffect(() => {

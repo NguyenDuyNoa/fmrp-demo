@@ -1,27 +1,28 @@
-import Head from "next/head";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
 import { routerPproductionPlan } from "@/routers/manufacture";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const InFo = dynamic(() => import("./components/form/info"), { ssr: false });
 const Table = dynamic(() => import("./components/form/table"), { ssr: false });
-import { _ServerInstance as Axios } from "/services/axios";
-import { formatMoment } from "@/utils/helpers/formatMoment";
 const FormAdd = (props) => {
     const router = useRouter();
 
@@ -82,54 +83,37 @@ const FormAdd = (props) => {
         handleSendItem();
     }, []);
 
-
-
-    const fetcDataBranch = () => {
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true `, {}, (err, response) => {
-            if (!err) {
-                const { isSuccess, result } = response?.data;
-                if (isSuccess) {
-                    queryData({ dataBrand: result?.map((e) => ({ value: e?.id, label: e?.name })) });
-                }
-            }
-        });
+    const fetcDataBranch = async () => {
+        const { isSuccess, result } = await apiComons.apiBranchCombobox();
+        if (isSuccess) {
+            queryData({ dataBrand: result?.map((e) => ({ value: e?.id, label: e?.name })) });
+        }
     };
 
-    const handleSendItem = () => {
+    const handleSendItem = async () => {
         let form = new FormData();
         dataLocals.forEach((e) => {
             form.append(tab == "plan" ? "dataBusinessitemId[]" : "dataOrderItemId[]", e?.id);
         });
-
-        Axios("POST", `/api_web/api_manufactures/getDataHandlingManufacture?csrf_protection=true`,
-            {
-                data: form,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data, isSuccess } = response.data;
-                    data.items?.length < 1 && backPage();
-                    queryData({
-                        dataProduction: data?.items.map((e) => {
-                            return {
-                                ...e,
-                                bom: e?.is_bom,
-                                stage: e?.is_stage,
-                                idParent: e?.order_id,
-                                unitName: e?.unit_name,
-                                nameOrder: e?.reference_no,
-                                quantityRemaining: +e?.quantity_rest,
-                                quantityWarehouse: +e?.quantity_warehouse,
-                                productVariation: e?.product_variation,
-                                date: { startDate: null, endDate: null },
-                                deliveryDate: isMoment(e?.delivery_date, "DD/MM/YYYY"),
-                            };
-                        }),
-                    });
-                }
-            }
-        );
+        const { data, isSuccess } = await apiProductionPlan.apiHandlingManufacture(form);
+        data.items?.length < 1 && backPage();
+        queryData({
+            dataProduction: data?.items.map((e) => {
+                return {
+                    ...e,
+                    bom: e?.is_bom,
+                    stage: e?.is_stage,
+                    idParent: e?.order_id,
+                    unitName: e?.unit_name,
+                    nameOrder: e?.reference_no,
+                    quantityRemaining: +e?.quantity_rest,
+                    quantityWarehouse: +e?.quantity_warehouse,
+                    productVariation: e?.product_variation,
+                    date: { startDate: null, endDate: null },
+                    deliveryDate: isMoment(e?.delivery_date, "DD/MM/YYYY"),
+                };
+            }),
+        });
     };
 
     ///Xóa từng button dấu X
@@ -189,7 +173,6 @@ const FormAdd = (props) => {
     ///Khi data thay đổi nếu < 1 thì trở về trang trước
     useEffect(() => {
         dataLocals?.length < 1 && backPage();
-
     }, [data.dataProduction]);
 
     const handChangeTable = (idParent, id, value, type) => {
@@ -209,11 +192,11 @@ const FormAdd = (props) => {
         const newData = data.dataProduction.map((e) => {
             return {
                 ...e,
-                date: isValue.dateRange
-            }
+                date: isValue.dateRange,
+            };
         });
         queryData({ dataProduction: newData });
-    }, [isValue.dateRange])
+    }, [isValue.dateRange]);
 
     const handSavePlan = async () => {
         const { hasMissingBom, hasMissingStage, hasMissingQuantityDate } = data.dataProduction.reduce(
@@ -224,15 +207,17 @@ const FormAdd = (props) => {
                 if (!item.stage == "1") {
                     acc.hasMissingStage = true;
                 }
-                if (!item.quantityRemaining || item.quantityRemaining == 0 || (!item.date.startDate && !item.date.endDate)) {
+                if (
+                    !item.quantityRemaining ||
+                    item.quantityRemaining == 0 ||
+                    (!item.date.startDate && !item.date.endDate)
+                ) {
                     acc.hasMissingQuantityDate = true;
                 }
                 return acc;
             },
             { hasMissingBom: false, hasMissingStage: false, hasMissingQuantityDate: false }
         );
-
-
 
         if (
             hasMissingQuantityDate ||
@@ -254,46 +239,44 @@ const FormAdd = (props) => {
         }
 
         let formData = new FormData();
-        formData.append("reference_no", "")
-        formData.append("date", isValue.date ? isMoment(isValue.date, "DD/MM/YYYY") : "")
-        formData.append("branch_id", isValue.idBrach?.value ? isValue.idBrach?.value : "")
-        formData.append("option_id", tab == "plan" ? 2 : 1)
-        formData.append("timeline", `${isMoment(isValue?.dateRange?.startDate, "DD/MM/YYYY")}-${isMoment(isValue?.dateRange?.endDate, "DD/MM/YYYY")}`)
-        data.dataProduction.forEach((e, index) => {
-            formData.append(`items[${index}][quantity]`, e?.quantityRemaining ? e?.quantityRemaining : "")
-
-            formData.append(`items[${index}][timeline]`, e?.date ? `${isMoment(e?.date.startDate, "DD/MM/YYYY")}-${isMoment(e?.date.endDate, "DD/MM/YYYY")}` : "")
-
-            formData.append(`items[${index}][delivery_date]`, e?.deliveryDate ? e?.deliveryDate : "")
-
-            formData.append(`items[${index}][item_variation_id]`, e?.item_variation_id ? e?.item_variation_id : "")
-
-            formData.append(`items[${index}][item_id]`, e?.item_id ? e?.item_id : "")
-
-            formData.append(`items[${index}][object_type]`, e?.object_type ? e?.object_type : "")
-
-            formData.append(`items[${index}][object_id]`, e?.objec_id ? e?.objec_id : "")
-
-            formData.append(`items[${index}][object_item_id]`, e?.object_item_id ? e?.object_item_id : "")
-        })
-        await Axios("POST", `/api_web/api_manufactures/handlingProductionPlans?csrf_protection=true`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess == 1) {
-                        showToat("success", message);
-                        router.push(routerPproductionPlan.home)
-                    } else {
-                        showToat("error", message);
-                    }
-
-                }
-            }
+        formData.append("reference_no", "");
+        formData.append("date", isValue.date ? isMoment(isValue.date, "DD/MM/YYYY") : "");
+        formData.append("branch_id", isValue.idBrach?.value ? isValue.idBrach?.value : "");
+        formData.append("option_id", tab == "plan" ? 2 : 1);
+        formData.append(
+            "timeline",
+            `${isMoment(isValue?.dateRange?.startDate, "DD/MM/YYYY")}-${isMoment(
+                isValue?.dateRange?.endDate,
+                "DD/MM/YYYY"
+            )}`
         );
+        data.dataProduction.forEach((e, index) => {
+            formData.append(`items[${index}][quantity]`, e?.quantityRemaining ? e?.quantityRemaining : "");
+
+            formData.append(
+                `items[${index}][timeline]`,
+                e?.date ? `${isMoment(e?.date.startDate, "DD/MM/YYYY")}-${isMoment(e?.date.endDate, "DD/MM/YYYY")}` : ""
+            );
+
+            formData.append(`items[${index}][delivery_date]`, e?.deliveryDate ? e?.deliveryDate : "");
+
+            formData.append(`items[${index}][item_variation_id]`, e?.item_variation_id ? e?.item_variation_id : "");
+
+            formData.append(`items[${index}][item_id]`, e?.item_id ? e?.item_id : "");
+
+            formData.append(`items[${index}][object_type]`, e?.object_type ? e?.object_type : "");
+
+            formData.append(`items[${index}][object_id]`, e?.objec_id ? e?.objec_id : "");
+
+            formData.append(`items[${index}][object_item_id]`, e?.object_item_id ? e?.object_item_id : "");
+        });
+        const { isSuccess, message } = await apiProductionPlan.apiHandlingProductionPlans(formData);
+        if (isSuccess == 1) {
+            showToat("success", message);
+            router.push(routerPproductionPlan.home);
+        } else {
+            showToat("error", message);
+        }
 
         // showToat("success", "Thêm kế hoạch NVL thành công");
     };
@@ -331,7 +314,7 @@ const FormAdd = (props) => {
                         </h2>
                         <div className="flex items-center gap-2">
                             <button
-                                onClick={() => router.push('/manufacture/production_plan?tab=order')}
+                                onClick={() => router.push("/manufacture/production_plan?tab=order")}
                                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
@@ -355,7 +338,7 @@ const FormAdd = (props) => {
                 subtitle={CONFIRM_DELETION}
                 isOpen={isOpen}
                 save={handleConfim}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 cancel={() => handleQueryId({ status: false })}
             />
         </>

@@ -1,33 +1,30 @@
-import Head from "next/head";
 import { debounce } from "lodash";
-import { v4 as uuid } from "uuid";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useMemo, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { v4 as uuid } from "uuid";
 
-import { _ServerInstance as Axios } from "/services/axios";
-
+import { useChangeValue } from "@/hooks/useChangeValue";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
+import { useSetData } from "@/hooks/useSetData";
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useTab from "@/hooks/useTab";
 import { useToggle } from "@/hooks/useToggle";
-import { useSetData } from "@/hooks/useSetData";
-import usePagination from "@/hooks/usePagination";
-import { useChangeValue } from "@/hooks/useChangeValue";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
-
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
+import { useSelector } from "react-redux";
 
 const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 
@@ -35,6 +32,8 @@ const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 import Header from "./components/header";
 
 // const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
 import FilterHeader from "./components/fillter/filterHeader";
 
 const Index = (props) => {
@@ -43,7 +42,6 @@ const Index = (props) => {
     const router = useRouter();
 
     const statusExprired = useStatusExprired();
-
 
     const initialData = {
         timeLine: [],
@@ -94,154 +92,114 @@ const Index = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'production_plans_fmrp');
-
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "production_plans_fmrp");
 
     const [data, sData] = useState([]);
-    const _ServerFetching = () => {
-        Axios("GET", `${router.query?.tab == "plan" ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true" : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true"}`,
-            {
-                params: {
-                    page: router.query?.page || 1,
-                    limit: limit,
-                    sort: isSort,
-                    date_start: isValue.startDate ? isMoment(isValue.startDate, "DD/MM/YYYY") : "",
-                    date_end: isValue.endDate ? isMoment(isValue.endDate, "DD/MM/YYYY") : "",
-                    customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
-                    category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
-                    branch_id: isValue.valueBr?.value ? isValue.valueBr?.value : "",
-                    product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { data, message } = response?.data;
-                    updateData({
-                        listOrder: data?.rResult?.map((i) => {
-                            return {
-                                id: i.id,
-                                nameOrder: i.nameOrder,
-                                status: i.status,
-                                process: i.process,
-                                processDefault: i.processDefault,
-                                listProducts: i.listProducts.map((s) => {
-                                    const check = arrIdChecked.includes(s.id);
-                                    return {
-                                        id: s.id,
-                                        name: s.name,
-                                        images: s.images,
-                                        desription: s.desription,
-                                        status: s.status,
-                                        quantity: +s.quantity,
-                                        quantityRemaining: +s.quantity_rest,
-                                        quantityPlan: +s.quantity_plan,
-                                        actions: s.actions,
-                                        processArr: s?.processArr?.items.map(j => {
-                                            return {
-                                                id: uuid(),
-                                                date: isMoment(j?.date, 'DD/MM/YYYY'),
-                                                active: j?.active,
-                                                outDate: j?.outDate
-                                            }
-                                        }),
-                                        unitName: s.unit_name,
-                                        checked: check,
-                                        productVariation: s.product_variation,
-                                    };
-                                }),
-                            };
-                        }),
-                        timeLine: data?.listDate?.map((e) => {
-                            return {
-                                id: uuid(),
-                                title: e?.title,
-                                month: isMoment(e?.month_year, 'MM'),
-                                days: e?.days?.map(i => {
-                                    return {
-                                        id: uuid(),
-                                        day: `${i?.day_name} ${isMoment(i?.date, 'DD')}`,
-                                        date: isMoment(i?.date, 'DD/MM/YYYY')
-                                    }
-                                })
-                            }
-                        }),
-                    });
-
-                    updateTotalItems({
-                        iTotalDisplayRecords: data?.output?.iTotalDisplayRecords,
-                        iTotalRecords: data?.output?.iTotalRecords,
-                    });
-                }
-                sIsFetching(false);
-            }
-        );
+    const _ServerFetching = async () => {
+        const url =
+            router.query?.tab == "plan"
+                ? "/api_web/api_manufactures/getByInternalPlan?csrf_protection=true"
+                : "/api_web/api_manufactures/getProductionPlan?csrf_protection=true";
+        const params = {
+            page: router.query?.page || 1,
+            limit: limit,
+            sort: isSort,
+            date_start: isValue.startDate ? isMoment(isValue.startDate, "DD/MM/YYYY") : "",
+            date_end: isValue.endDate ? isMoment(isValue.endDate, "DD/MM/YYYY") : "",
+            customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
+            category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
+            branch_id: isValue.valueBr?.value ? isValue.valueBr?.value : "",
+            product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
+        };
+        const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: params });
+        updateData({
+            listOrder: data?.rResult?.map((i) => {
+                return {
+                    id: i.id,
+                    nameOrder: i.nameOrder,
+                    status: i.status,
+                    process: i.process,
+                    processDefault: i.processDefault,
+                    listProducts: i.listProducts.map((s) => {
+                        const check = arrIdChecked.includes(s.id);
+                        return {
+                            id: s.id,
+                            name: s.name,
+                            images: s.images,
+                            desription: s.desription,
+                            status: s.status,
+                            quantity: +s.quantity,
+                            quantityRemaining: +s.quantity_rest,
+                            quantityPlan: +s.quantity_plan,
+                            actions: s.actions,
+                            processArr: s?.processArr?.items.map((j) => {
+                                return {
+                                    id: uuid(),
+                                    date: isMoment(j?.date, "DD/MM/YYYY"),
+                                    active: j?.active,
+                                    outDate: j?.outDate,
+                                };
+                            }),
+                            unitName: s.unit_name,
+                            checked: check,
+                            productVariation: s.product_variation,
+                        };
+                    }),
+                };
+            }),
+            timeLine: data?.listDate?.map((e) => {
+                return {
+                    id: uuid(),
+                    title: e?.title,
+                    month: isMoment(e?.month_year, "MM"),
+                    days: e?.days?.map((i) => {
+                        return {
+                            id: uuid(),
+                            day: `${i?.day_name} ${isMoment(i?.date, "DD")}`,
+                            date: isMoment(i?.date, "DD/MM/YYYY"),
+                        };
+                    }),
+                };
+            }),
+        });
+        updateTotalItems({
+            iTotalDisplayRecords: data?.output?.iTotalDisplayRecords,
+            iTotalRecords: data?.output?.iTotalRecords,
+        });
+        sIsFetching(false);
     };
-    const _ServerFetching_filter = () => {
-        Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response?.data;
-                updateData({ client: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
-            }
+    const _ServerFetching_filter = async () => {
+        const { rResult: client } = await apiProductionPlan.apiClientOption();
+        const { rResult: productGroup } = await apiProductionPlan.apiCategoryOption();
+        const { result: listBr } = await apiComons.apiBranchCombobox();
+        const { data } = await apiProductionPlan.apiSearchProductsVariant({
+            params: { "filter[branch_id]": 0 },
         });
-
-        Axios("GET", "api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response?.data;
-                updateData({
-                    productGroup: rResult.map((e) => ({
-                        label: `${e.name + " " + "(" + e.code + ")"}`,
-                        value: e.id,
-                        level: e.level,
-                        code: e.code,
-                        parent_id: e.parent_id,
-                    })),
-                });
-            }
+        updateData({
+            client: client?.map(({ name, id }) => ({ label: name, value: id })),
+            productGroup: productGroup.map((e) => ({
+                label: `${e.name + " " + "(" + e.code + ")"}`,
+                value: e.id,
+                level: e.level,
+                code: e.code,
+                parent_id: e.parent_id,
+            })),
+            listBr: listBr?.map((e) => ({ label: e?.name, value: e?.id })) || [],
+            product: data?.result,
         });
-
-        Axios("POST", "/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true&term",
-            {
-                params: {
-                    "filter[branch_id]": 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    updateData({ product: result });
-                }
-            }
-        );
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {
-        },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response?.data;
-                    updateData({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
-                }
-            })
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
-        Axios("POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id]": 0,
-                },
-                data: {
-                    term: inputValue,
-                },
+    const _HandleSeachApi = debounce(async (inputValue) => {
+        const { data } = await apiProductionPlan.apiSearchProductsVariant({
+            params: {
+                "filter[branch_id]": 0,
             },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-
-                    updateData({ product: result });
-                }
-            }
-        );
-    }, 500)
-
+            data: {
+                term: inputValue,
+            },
+        });
+        updateData({ product: data?.result });
+    }, 500);
 
     const options = isData?.product?.map((e) => ({
         label: `${e.name}
@@ -274,7 +232,6 @@ const Index = (props) => {
     };
 
     const updateProcessDefault = (order, timeLine) => {
-
         const processDefaultUpdate = sortArrayByDay(order.processDefault, timeLine);
 
         return processDefaultUpdate;
@@ -442,10 +399,7 @@ const Index = (props) => {
 
                 {data?.length > 0 && (
                     <ContainerPagination className="flex space-x-5 items-center">
-                        <TitlePagination
-                            dataLang={dataLang}
-                            totalItems={totalItems?.iTotalDisplayRecords}
-                        />
+                        <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                         <Pagination
                             postsPerPage={limit}
                             totalPosts={Number(totalItems?.iTotalDisplayRecords)}

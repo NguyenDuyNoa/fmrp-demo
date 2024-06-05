@@ -1324,7 +1324,6 @@ const Index = (props) => {
                                                     ) : (
                                                         e?.child?.map((ce, index) => (
                                                             <React.Fragment key={ce?.id?.toString()}>
-                                                                {console.log("ce?.location", ce?.location)}
                                                                 <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
                                                                     <SelectCore
                                                                         options={ce?.dataWarehouse}

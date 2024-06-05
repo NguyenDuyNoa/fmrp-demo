@@ -854,7 +854,6 @@ const Index = (props) => {
         sListData([...newData]);
     };
 
-    console.log(listData);
 
     const FunCheckQuantity = (parentId, childId) => {
         const e = listData.find((item) => item?.id == parentId);
@@ -862,9 +861,7 @@ const Index = (props) => {
         const ce = e.child.find((child) => child?.id == childId);
         if (!ce) return;
         const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
-        console.log("checkChild", checkChild);
-        console.log("ce.amount", ce.amount);
-        console.log("qtyHouse", qtyHouse);
+
         if (checkChild > qtyHouse) {
             isShow("error", `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`);
             ce.amount = "";

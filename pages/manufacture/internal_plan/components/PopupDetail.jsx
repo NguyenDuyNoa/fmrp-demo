@@ -1,29 +1,20 @@
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import ModalImage from "react-modal-image";
-import React, { useState, useEffect } from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-} from "iconsax-react";
-import PopupEdit from "@/components/UI/popup";
+import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
-import ImageErrors from "@/components/UI/imageErrors";
-import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
-import formatNumberConfig from "@/utils/helpers/formatnumber";
+import PopupEdit from "@/components/UI/popup";
 import useSetingServer from "@/hooks/useConfigNumber";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import { TagColorLime, TagColorRed } from "@/components/UI/common/Tag/TagStatus";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
+import moment from "moment/moment";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const PopupDetail = (props) => {
     const [data, sData] = useState();
 
@@ -43,17 +34,10 @@ const PopupDetail = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const _ServerFetching_detailOrder = () => {
-        Axios("GET", `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let { data } = response?.data;
-                    sData(data);
-                }
-                sOnFetching(false);
-            }
-        );
+    const _ServerFetching_detailOrder = async () => {
+        const { data } = await apiInternalPlan.apiDetailInternalPlan(props?.id);
+        sData(data);
+        sOnFetching(false);
     };
 
     useEffect(() => {
@@ -83,15 +67,21 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.internalPlans?.date != null ? moment(data?.internalPlans?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.internalPlans?.date != null
+                                                    ? moment(data?.internalPlans?.date).format("DD/MM/YYYY")
+                                                    : ""}
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2 items-center">
                                             <h3 className=" text-[13px] font-medium">
-                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator ||
+                                                    "production_warehouse_creator"}
                                             </h3>
                                             <div className="font-medium grid grid-cols-2">
-                                                <CustomAvatar profileImage={data?.internalPlans?.created_by_profile_image} fullName={data?.internalPlans?.created_by_full_name} />
+                                                <CustomAvatar
+                                                    profileImage={data?.internalPlans?.created_by_profile_image}
+                                                    fullName={data?.internalPlans?.created_by_full_name}
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -131,7 +121,6 @@ const PopupDetail = (props) => {
                                                     <TagColorLime name={"Đã Duyệt"} />
                                                 )}
                                                 {data?.internalPlans.status == "0" && (
-
                                                     <TagColorRed name={"Chưa Duyệt"} />
                                                 )}
                                             </h3>
@@ -140,20 +129,16 @@ const PopupDetail = (props) => {
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
-                                            <TagBranch className="w-fit">
-                                                {data?.internalPlans?.name_branch}
-                                            </TagBranch>
+                                            <TagBranch className="w-fit">{data?.internalPlans?.name_branch}</TagBranch>
                                         </div>
                                     </div>
                                 </div>
                                 <div className=" w-[100%]">
-                                    <HeaderTablePopup gridCols={12}  >
+                                    <HeaderTablePopup gridCols={12}>
                                         <ColumnTablePopup colSpan={4}>
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
                                         </ColumnTablePopup>
-                                        <ColumnTablePopup colSpan={2}>
-                                            {"ĐVT"}
-                                        </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={2}>{"ĐVT"}</ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.import_from_quantity || "import_from_quantity"}
                                         </ColumnTablePopup>

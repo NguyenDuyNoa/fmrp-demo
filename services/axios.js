@@ -32,7 +32,7 @@ axios.interceptors.request.use(
 );
 
 
-const _ServerInstance = (method, url, dataObject, callback) => {
+const _ServerInstance = (method, url, dataObject = {}, callback) => {
     const showToat = useToast()
     var token = null;
     try {
@@ -50,51 +50,62 @@ const _ServerInstance = (method, url, dataObject, callback) => {
         databaseApp = null;
     }
 
-    axios({
+    const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "x-api-key": databaseApp,
+        ...dataObject.headers
+    };
+    // Check if dataObject contains FormData
+    if (dataObject instanceof FormData) {
+        headers["Content-Type"] = "multipart/form-data";
+    } else if (dataObject.headers?.["Content-Type"]) {
+        headers["Content-Type"] = dataObject.headers["Content-Type"] ? dataObject.headers["Content-Type"] : 'application/json';
+    }
+
+    // const controller = new AbortController();
+
+    return axios({
         method: method,
         url: url,
         withCredentials: false,
-        include: true,
-        ...dataObject,
-        headers: {
-            "Content-Type": dataObject.headers?.["Content-Type"] ? dataObject.headers?.["Content-Type"]
-                : "application/json",
-            Authorization: `Bearer ${token}`,
-            "x-api-key": databaseApp,
-            // "Access-Control-Allow-Headers": "Origin, X-Api-Key, X-Requested-With, Content-Type, Accept, Authorization"
-        },
+        ...(dataObject && dataObject instanceof FormData ? { data: dataObject } : dataObject),
+        headers,
         retries: 3,
-        // timeout: 8000,
+        // signal: controller.signal
     })
-        .then(async function (response) {
-            callback && callback(null, response);
-        })
-        .catch(function (error) {
-            if (error.response && error.response?.status == 500) {
-                // store.dispatch({type: "auth/update", payload: null})
-                // showToat("error", 'Đã xảy ra lỗi vui lòng làm mới trang')
-                console.log("error.response 500", error.response);
-                // window.location.href = '/error/405';
+        .then(async (response) => {
+            if (callback) {
+                callback(null, response);
             }
-            else if (error.response && error.response?.status == 403) {
-                console.log("error.response 403", error.response?.data);
-                showToat("error", error.response?.data?.message)
+
+            return await response;
+        })
+        .catch((error) => {
+            if (callback) {
+                callback(error, null);
+            }
+            if (error.response && error.response.status === 500) {
+                console.log("error.response 500", error.response);
+                // store.dispatch({type: "auth/update", payload: null});
+                // showToat("error", 'Đã xảy ra lỗi vui lòng làm mới trang');
+                // window.location.href = '/error/405';
+            } else if (error.response && error.response.status === 403) {
+                console.log("error.response 403", error.response.data);
+                showToat("error", error.response.data?.message);
                 setTimeout(() => {
                     window.location.href = '/error/403';
-                }, 1500)
-                // window.location.href = '/error/403';
-                // store.dispatch({type: "auth/update", payload: null})
-            }
-            else if (error.response && error.response?.status == 404) {
-                console.log("error.response 404", error.response?.data);
-                showToat("error", error.response?.data?.message)
+                }, 1500);
+                // store.dispatch({type: "auth/update", payload: null});
+            } else if (error.response && error.response.status === 404) {
+                console.log("error.response 404", error.response.data);
+                showToat("error", error.response.data?.message);
                 window.location.href = '/error/404';
-                // store.dispatch({type: "auth/update", payload: null})
+                // store.dispatch({type: "auth/update", payload: null});
             }
-            else {
-                callback && callback(error, null);
-            }
+            throw error;
         });
+
 };
 
 export { _ServerInstance, axios };

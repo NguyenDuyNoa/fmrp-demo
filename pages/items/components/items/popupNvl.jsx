@@ -216,7 +216,6 @@ const Popup_NVL = React.memo((props) => {
             //     processedData.push(idMap[id]);
             // }
             // sDataTotalVariant(processedData.reverse());
-            console.log("newData", newData);
             const newdb = [...dataTotalVariant, ...newData]
 
             // Mảng chứa dữ liệu sau khi xử lý
@@ -241,15 +240,11 @@ const Popup_NVL = React.memo((props) => {
                 }
             });
 
-            console.log("newdb", newdb);
             // Lấy các giá trị từ idMap và đưa vào mảng processedData
             for (const id in idMap) {
                 processedData.push(idMap[id]);
             }
-            console.log("Object.values(idMap)", Object.values(idMap));
-
-
-            console.log("processedData", processedData);
+       
             sDataTotalVariant(processedData.reverse());
             // sDataTotalVariant([
             //     ...(optSelectedVariantMain?.length > 0
@@ -421,7 +416,6 @@ const Popup_NVL = React.memo((props) => {
             },
             (err, response) => {
                 if (!err) {
-                    console.log("response", response);
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
                         isShow("success", props.dataLang[message] || message);
@@ -450,7 +444,6 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         onSending && _ServerSending();
-        console.log("sub mit");
     }, [onSending]);
 
     const _HandleSubmit = (e) => {

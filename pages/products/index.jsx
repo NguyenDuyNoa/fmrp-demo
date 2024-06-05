@@ -381,7 +381,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    console.log(role == true || checkAdd);
     return (
         <React.Fragment>
             <Head>

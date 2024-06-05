@@ -37,7 +37,7 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
@@ -75,7 +75,7 @@ const Index = (props) => {
 
     const [dataItems, sDataItems] = useState([]);
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
     //new
 
     const statusExprired = useStatusExprired();
@@ -142,7 +142,9 @@ const Index = (props) => {
     }));
 
     const _ServerFetchingDetailPage = () => {
-        Axios("GET", `/api_web/Api_product_receipt/getProductReceiptDetail/${id}?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_product_receipt/getProductReceiptDetail/${id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
@@ -161,8 +163,9 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                    }</span>`,
+                                label: `${e.item?.name} <span style={{display: none}}>${
+                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
                                 value: e.item?.id,
                             },
                             child: e?.child.map((ce) => ({
@@ -172,12 +175,14 @@ const Index = (props) => {
                                     (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
                                     (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                                 location:
-                                    ce?.warehouse_location?.location_name || ce?.warehouse_location?.id || ce?.warehouse_location?.warehouse_name
+                                    ce?.warehouse_location?.location_name ||
+                                    ce?.warehouse_location?.id ||
+                                    ce?.warehouse_location?.warehouse_name
                                         ? {
-                                            label: ce?.warehouse_location?.location_name || null,
-                                            value: ce?.warehouse_location?.id || null,
-                                            warehouse_name: ce?.warehouse_location?.warehouse_name || null,
-                                        }
+                                              label: ce?.warehouse_location?.location_name || null,
+                                              value: ce?.warehouse_location?.id || null,
+                                              warehouse_name: ce?.warehouse_location?.warehouse_name || null,
+                                          }
                                         : null,
                                 serial: ce?.serial == null ? "" : ce?.serial,
                                 lot: ce?.lot == null ? "" : ce?.lot,
@@ -205,8 +210,16 @@ const Index = (props) => {
     }, [onFetchingDetail]);
 
     useEffect(() => {
-        id && JSON.stringify(dataMaterialExpiry) !== "{}" && JSON.stringify(dataProductExpiry) !== "{}" && JSON.stringify(dataProductSerial) !== "{}" && sOnFetchingDetail(true);
-    }, [JSON.stringify(dataMaterialExpiry) !== "{}" && JSON.stringify(dataProductExpiry) !== "{}" && JSON.stringify(dataProductSerial) !== "{}",]);
+        id &&
+            JSON.stringify(dataMaterialExpiry) !== "{}" &&
+            JSON.stringify(dataProductExpiry) !== "{}" &&
+            JSON.stringify(dataProductSerial) !== "{}" &&
+            sOnFetchingDetail(true);
+    }, [
+        JSON.stringify(dataMaterialExpiry) !== "{}" &&
+            JSON.stringify(dataProductExpiry) !== "{}" &&
+            JSON.stringify(dataProductSerial) !== "{}",
+    ]);
 
     const _ServerFetching_ItemsAll = () => {
         Axios(
@@ -227,7 +240,9 @@ const Index = (props) => {
         sOnFetchingItemsAll(false);
     };
     const _ServerFetching_ExportWarehouse = async () => {
-        await Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
+        await Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -249,7 +264,9 @@ const Index = (props) => {
         sOnFetchingExportWarehouse(false);
     };
     const _ServerFetching_Location = async () => {
-        await Axios("GET", "/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true",
+        await Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -275,7 +292,9 @@ const Index = (props) => {
         if (idBranch == null || idImportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios("POST", `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+            Axios(
+                "POST",
+                `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
                 {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -293,8 +312,7 @@ const Index = (props) => {
                 }
             );
         }
-    }, 500)
-
+    }, 500);
 
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
@@ -326,7 +344,7 @@ const Index = (props) => {
                 }
             } else {
                 sIdBranch(value);
-                sIdImportWarehouse(null)
+                sIdImportWarehouse(null);
             }
         } else if (type == "idImportWarehouse" && idImportWarehouse != value) {
             if (listData?.length > 0) {
@@ -355,13 +373,27 @@ const Index = (props) => {
 
         const hasNullKho = hasNullOrCondition(listData, (item, childItem) => childItem.location === null);
 
-        const hasNullSerial = hasNullOrCondition(listData, (item, childItem) => item?.matHang.e?.text_type === "products" && (childItem.serial === "" || childItem.serial == null));
+        const hasNullSerial = hasNullOrCondition(
+            listData,
+            (item, childItem) =>
+                item?.matHang.e?.text_type === "products" && (childItem.serial === "" || childItem.serial == null)
+        );
 
-        const hasNullLot = hasNullOrCondition(listData, (item, childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null));
+        const hasNullLot = hasNullOrCondition(
+            listData,
+            (item, childItem) => !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null)
+        );
 
-        const hasNullDate = hasNullOrCondition(listData, (item, childItem) => !childItem.disabledDate && childItem.date === null);
+        const hasNullDate = hasNullOrCondition(
+            listData,
+            (item, childItem) => !childItem.disabledDate && childItem.date === null
+        );
 
-        const hasNullQty = hasNullOrCondition(listData, (item, childItem) => childItem.importQuantity === null || childItem.importQuantity === "" || childItem.importQuantity == 0);
+        const hasNullQty = hasNullOrCondition(
+            listData,
+            (item, childItem) =>
+                childItem.importQuantity === null || childItem.importQuantity === "" || childItem.importQuantity == 0
+        );
 
         const isEmpty = listData?.length === 0;
 
@@ -454,15 +486,33 @@ const Index = (props) => {
             formData.append(`items[${index}][item]`, item?.matHang?.value);
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
-                formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
-                formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
-                formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss"));
-                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
+                formData.append(
+                    `items[${index}][child][${childIndex}][serial]`,
+                    childItem?.serial === null ? "" : childItem?.serial
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][lot]`,
+                    childItem?.lot === null ? "" : childItem?.lot
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][expiration_date]`,
+                    childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss")
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
+                    childItem?.location?.value || 0
+                );
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.importQuantity);
             });
         });
-        Axios("POST", `${id ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true` : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`}`,
+        Axios(
+            "POST",
+            `${
+                id
+                    ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true`
+                    : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`
+            }`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -614,8 +664,7 @@ const Index = (props) => {
                     } else {
                         updatedChild.location = value;
                     }
-                }
-                else if (type === "serial") {
+                } else if (type === "serial") {
                     const newTypeValue = value?.target.value;
                     // Kiểm tra xem giá trị mới đã tồn tại trong cả phần tử cha và các phần tử con
                     const existsInParent = newData[parentIndex].child.some((ce) => ce[type] === newTypeValue);
@@ -667,8 +716,12 @@ const Index = (props) => {
                                 idChildBackEnd: null,
                                 id: uuidv4(),
                                 disabledDate:
-                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
-                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
+                                    (value?.e?.text_type === "products" &&
+                                        dataProductExpiry?.is_enable === "1" &&
+                                        false) ||
+                                    (value?.e?.text_type === "products" &&
+                                        dataProductExpiry?.is_enable === "0" &&
+                                        true),
                                 unit: value?.e?.unit_name,
                                 importQuantity: null,
                                 numberOfConversions: null,
@@ -695,22 +748,28 @@ const Index = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit" : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
+                    {id
+                        ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
+                        : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
                 </title>
             </Head>
-            <Container className={'!h-auto'}>
+            <Container className={"!h-auto"}>
                 {statusExprired ? (
-                    <EmptyExprired />) :
-                    (
-                        <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.production_warehouse || "production_warehouse"}
-                            </h6>
-                            <span className="text-[#141522]/40">/</span>
-                            <h6> {id ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
-                                : dataLang?.productsWarehouse_add || "productsWarehouse_add"}</h6>
-                        </div>
-                    )}
+                    <EmptyExprired />
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.production_warehouse || "production_warehouse"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>
+                            {" "}
+                            {id
+                                ? dataLang?.productsWarehouse_edit || "productsWarehouse_edit"
+                                : dataLang?.productsWarehouse_add || "productsWarehouse_add"}
+                        </h6>
+                    </div>
+                )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
                     <div className="flex justify-between items-center">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
@@ -726,7 +785,8 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione ||
+                                    "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
@@ -762,8 +822,9 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -791,8 +852,9 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errBranch ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -852,8 +914,9 @@ const Index = (props) => {
                                             dataLang?.productsWarehouse_warehouseImport ||
                                             "productsWarehouse_warehouseImport"
                                         }
-                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errExportWarehouse ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -973,12 +1036,13 @@ const Index = (props) => {
                                         : "grid-cols-9"
                                 } */}
                             <div
-                                className={`${dataProductSerial.is_enable == "1"
-                                    ? "grid-cols-6"
-                                    : dataProductExpiry.is_enable == "1"
+                                className={`${
+                                    dataProductSerial.is_enable == "1"
+                                        ? "grid-cols-6"
+                                        : dataProductExpiry.is_enable == "1"
                                         ? "grid-cols-7"
                                         : "grid-cols-5"
-                                    } grid `}
+                                } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
                                     {dataLang?.productsWarehouse_warehouseLocaImport ||
@@ -1109,12 +1173,13 @@ const Index = (props) => {
 
                         <div className="col-span-10">
                             <div
-                                className={`${dataProductSerial.is_enable == "1"
-                                    ? "grid-cols-6"
-                                    : dataProductExpiry.is_enable == "1"
+                                className={`${
+                                    dataProductSerial.is_enable == "1"
+                                        ? "grid-cols-6"
+                                        : dataProductExpiry.is_enable == "1"
                                         ? "grid-cols-7"
                                         : "grid-cols-5"
-                                    } grid  divide-x border-t border-b border-r border-l`}
+                                } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
                                     {" "}
@@ -1327,16 +1392,16 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-10  items-center">
                                                 <div
-                                                    className={`${dataProductSerial.is_enable == "1"
-                                                        ? "grid-cols-6"
-                                                        : dataProductExpiry.is_enable == "1"
+                                                    className={`${
+                                                        dataProductSerial.is_enable == "1"
+                                                            ? "grid-cols-6"
+                                                            : dataProductExpiry.is_enable == "1"
                                                             ? "grid-cols-7"
                                                             : "grid-cols-5"
-                                                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
+                                                    }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
                                                 >
                                                     {e?.child?.map((ce) => (
                                                         <React.Fragment key={ce?.id?.toString()}>
-                                                            {console.log(ce?.location)}
                                                             <div className="flex justify-center border-t border-l  h-full p-1 flex-col items-center ">
                                                                 <SelectCore
                                                                     options={dataLocation}
@@ -1350,15 +1415,16 @@ const Index = (props) => {
                                                                         ce?.id,
                                                                         "location"
                                                                     )}
-                                                                    className={`${errWarehouse && ce?.location == null
-                                                                        ? "border-red-500 border"
-                                                                        : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    className={`${
+                                                                        errWarehouse && ce?.location == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                    }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
                                                                             : dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                                            "productsWarehouse_warehouseLocaImport"
+                                                                              "productsWarehouse_warehouseLocaImport"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata || "returns_nodata"
@@ -1423,14 +1489,15 @@ const Index = (props) => {
                                                                             disabled={
                                                                                 e?.matHang?.e?.text_type != "products"
                                                                             }
-                                                                            className={`border ${e?.matHang?.e?.text_type != "products"
-                                                                                ? "bg-gray-50"
-                                                                                : errSerial &&
-                                                                                    (ce?.serial == "" ||
-                                                                                        ce?.serial == null)
+                                                                            className={`border ${
+                                                                                e?.matHang?.e?.text_type != "products"
+                                                                                    ? "bg-gray-50"
+                                                                                    : errSerial &&
+                                                                                      (ce?.serial == "" ||
+                                                                                          ce?.serial == null)
                                                                                     ? "border-red-500"
                                                                                     : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                             onChange={_HandleChangeChild.bind(
                                                                                 this,
                                                                                 e?.id,
@@ -1453,14 +1520,15 @@ const Index = (props) => {
                                                                                 <input
                                                                                     value={ce?.lot}
                                                                                     disabled={ce?.disabledDate}
-                                                                                    className={`border ${ce?.disabledDate
-                                                                                        ? "bg-gray-50"
-                                                                                        : errLot &&
-                                                                                            (ce?.lot == "" ||
-                                                                                                ce?.lot == null)
+                                                                                    className={`border ${
+                                                                                        ce?.disabledDate
+                                                                                            ? "bg-gray-50"
+                                                                                            : errLot &&
+                                                                                              (ce?.lot == "" ||
+                                                                                                  ce?.lot == null)
                                                                                             ? "border-red-500"
                                                                                             : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                     onChange={_HandleChangeChild.bind(
                                                                                         this,
                                                                                         e?.id,
@@ -1493,13 +1561,14 @@ const Index = (props) => {
                                                                                                 dataLang?.price_quote_system_default ||
                                                                                                 "price_quote_system_default"
                                                                                             }
-                                                                                            className={`border ${ce?.disabledDate
-                                                                                                ? "bg-gray-50"
-                                                                                                : errDateList &&
-                                                                                                    ce?.date == null
+                                                                                            className={`border ${
+                                                                                                ce?.disabledDate
+                                                                                                    ? "bg-gray-50"
+                                                                                                    : errDateList &&
+                                                                                                      ce?.date == null
                                                                                                     ? "border-red-500"
                                                                                                     : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                         />
                                                                                         {effectiveDate && (
                                                                                             <>
@@ -1543,14 +1612,20 @@ const Index = (props) => {
                                                                 </button>
 
                                                                 <InPutNumericFormat
-                                                                    className={`${errQty &&
+                                                                    className={`${
+                                                                        errQty &&
                                                                         (ce?.importQuantity == null ||
                                                                             ce?.importQuantity == "" ||
                                                                             ce?.importQuantity == 0)
-                                                                        ? "border-red-500 border-b"
-                                                                        : ""
+                                                                            ? "border-red-500 border-b"
+                                                                            : ""
+                                                                    }
+                                                                        ${
+                                                                            (ce?.importQuantity == null ||
+                                                                                ce?.importQuantity == "" ||
+                                                                                ce?.importQuantity == 0) &&
+                                                                            "border-red-500 border-b"
                                                                         }
-                                                                        ${(ce?.importQuantity == null || ce?.importQuantity == "" || ce?.importQuantity == 0) && "border-red-500 border-b"}
                                                                         placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
@@ -1666,15 +1741,8 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <ButtonBack
-                                onClick={() => router.push(routerProductsWarehouse.home)}
-                                dataLang={dataLang}
-                            />
-                            <ButtonSubmit
-                                onClick={_HandleSubmit.bind(this)}
-                                loading={onSending}
-                                dataLang={dataLang}
-                            />
+                            <ButtonBack onClick={() => router.push(routerProductsWarehouse.home)} dataLang={dataLang} />
+                            <ButtonSubmit onClick={_HandleSubmit.bind(this)} loading={onSending} dataLang={dataLang} />
                         </div>
                     </div>
                 </div>
@@ -1686,12 +1754,11 @@ const Index = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>
     );
 };
-
 
 export default Index;

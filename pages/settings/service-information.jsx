@@ -18,7 +18,6 @@ const Index = (props) => {
     const statusExprired = useStatusExprired()
 
     const auth = useSelector((state) => state?.auth);
-    console.log("auth", auth);
 
     const initialPackage = {
         title: "Dùng thử",

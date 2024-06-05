@@ -334,7 +334,7 @@ const TabInFormation = memo(({ isStateModal, width, dataLang, listTab }) => {
                     {isInfomation.dataInformation.arrayProducts.map((e) => {
                         const shownElements = isInfomation.dataInformation.arrayProducts.filter((e) => e.show);
                         return (
-                            <div className="min-w-fit max-w-fit w-fit">
+                            <div key={e.id} className="min-w-fit max-w-fit w-fit">
                                 <div className="bg-white sticky top-0 z-10 ">
                                     <div
                                         onClick={() => handleShowProcess(e.id)}
@@ -349,7 +349,7 @@ const TabInFormation = memo(({ isStateModal, width, dataLang, listTab }) => {
                                 <div className="w-full pt-3">
                                     {e.show && (
                                         <ol
-                                            class={`flex flex-col border-r ${
+                                            className={`flex flex-col border-r ${
                                                 shownElements.length > 0 &&
                                                 shownElements[shownElements.length - 1] === e
                                                     ? "border-r-0"
@@ -391,7 +391,7 @@ const TabInFormation = memo(({ isStateModal, width, dataLang, listTab }) => {
                                                                 <div className="flex flex-col gap-2">
                                                                     {j.arraySemi.map((s) => {
                                                                         return (
-                                                                            <div className="">
+                                                                            <div key={s?.id} className="">
                                                                                 <div className="border border-gray-400 px-2 py-1 rounded-xl flex items-center gap-1">
                                                                                     <ModalImage
                                                                                         small={s.image}

@@ -732,7 +732,6 @@ const Index = (props) => {
                 if (typeOrder === "1" && quote !== null) {
                     const newData = value
                         ?.map((e, index) => {
-                            console.log("e2", e);
                             return {
                                 id: uuidv4(),
                                 item: {
@@ -777,7 +776,6 @@ const Index = (props) => {
 
     const handleAddParent = (value) => {
         const checkData = option?.some((e) => e?.item?.value === value?.value);
-        console.log("value", value);
         if (!checkData) {
             if (typeOrder === "0") {
                 const newData = {
@@ -1116,7 +1114,6 @@ const Index = (props) => {
         formData.append("staff_id", staff?.value ? staff?.value : "");
         formData.append("note", note ? note : "");
         formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
-        console.log("newDataOption", newDataOption);
         newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
             formData.append(`items[${index}][id]`, item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : "");

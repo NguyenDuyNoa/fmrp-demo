@@ -1,17 +1,11 @@
+import { Edit as IconEdit } from "iconsax-react";
+import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
-import React, { useState, useRef, useEffect } from "react";
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-} from "iconsax-react";
 
-import { _ServerInstance as Axios } from "/services/axios";
+import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import PopupEdit from "@/components/UI/popup";
 import useToast from "@/hooks/useToast";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 
 const Popup_Vitrikho = (props) => {
     const [open, sOpen] = useState(false);
@@ -48,14 +42,17 @@ const Popup_Vitrikho = (props) => {
         sErrInputCode(false);
         sErrInputName(false);
         sName(props.name ? props.name : "");
-        sCode(props.code ? props.code : "")
+        sCode(props.code ? props.code : "");
         sListkho(props.isState.listWarehouse || []);
-        sValuekho(props.id ? {
-            label: props.warehouse_name,
-            value: props.warehouse_id,
-        } : null);
+        sValuekho(
+            props.id
+                ? {
+                      label: props.warehouse_name,
+                      value: props.warehouse_id,
+                  }
+                : null
+        );
     }, [open]);
-
 
     const _HandleChangeInput = (type, value) => {
         if (type == "name") {
@@ -66,38 +63,30 @@ const Popup_Vitrikho = (props) => {
             sCode(value.target?.value);
         }
     };
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         const id = props.id;
         let data = new FormData();
         data.append("name", name ? name : "");
         data.append("code", code ? code : "");
         data.append("warehouse_id", valuekho?.value ? valuekho?.value : "");
-        Axios("POST", `${props.id ? `/api_web/api_warehouse/location/${id}?csrf_protection=true` : "/api_web/api_warehouse/location/?csrf_protection=true"
-            }`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${props.dataLang[message]}`);
-                        props.onRefresh && props.onRefresh();
-                        sOpen(false);
-                        sErrInputCode(false);
-                        sErrInputName(false);
-                        sErrInputKho(false);
-                        sName("");
-                        sCode("");
-                        sValuekho(null);
-                    } else {
-                        isShow("error", `${props.dataLang[message]}`);
-                    }
-                }
-                sOnSending(false);
-            }
-        );
+        const url = props.id
+            ? `/api_web/api_warehouse/location/${id}?csrf_protection=true`
+            : "/api_web/api_warehouse/location/?csrf_protection=true";
+        const { isSuccess, message } = await apiLocationWarehouse.apiHandingLocation(url, data);
+        if (isSuccess) {
+            isShow("success", `${props.dataLang[message]}`);
+            props.onRefresh && props.onRefresh();
+            sOpen(false);
+            sErrInputCode(false);
+            sErrInputName(false);
+            sErrInputKho(false);
+            sName("");
+            sCode("");
+            sValuekho(null);
+        } else {
+            isShow("error", `${props.dataLang[message]}`);
+        }
+        sOnSending(false);
     };
 
     //da up date
@@ -150,9 +139,7 @@ const Popup_Vitrikho = (props) => {
             >
                 <div className="mt-4">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
-                        <Customscrollbar
-                            className="h-[280px]"
-                        >
+                        <Customscrollbar className="h-[280px]">
                             <div className="w-[30vw] ">
                                 <div className="flex flex-wrap justify-between ">
                                     <div className="w-full">
@@ -167,10 +154,11 @@ const Popup_Vitrikho = (props) => {
                                                 placeholder={props.dataLang?.warehouses_localtion_code}
                                                 name="fname"
                                                 type="text"
-                                                className={`${errInputCode
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${
+                                                    errInputCode
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -189,10 +177,11 @@ const Popup_Vitrikho = (props) => {
                                                 placeholder={props.dataLang?.warehouses_localtion_NAME}
                                                 name="fname"
                                                 type="text"
-                                                className={`${errInputName
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                className={`${
+                                                    errInputName
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -236,8 +225,9 @@ const Popup_Vitrikho = (props) => {
                                                         },
                                                     }),
                                                 }}
-                                                className={`${errInputKho ? "border-red-500" : "border-transparent"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${
+                                                    errInputKho ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             />
                                             {errInputKho && (
                                                 <label className="mb-2  text-[14px] text-red-500">
@@ -271,4 +261,4 @@ const Popup_Vitrikho = (props) => {
         </>
     );
 };
-export default Popup_Vitrikho
+export default Popup_Vitrikho;

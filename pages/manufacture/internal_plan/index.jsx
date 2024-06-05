@@ -41,6 +41,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { routerInternalPlan } from "routers/manufacture";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
+import apiComons from "@/Api/apiComon/apiComon";
 
 const PopupDetail = dynamic(() => import("./components/PopupDetail"), { ssr: false });
 const Index = (props) => {
@@ -75,11 +77,9 @@ const Index = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'internal_plan');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "internal_plan");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
-
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     useEffect(() => {
         router.push({
@@ -88,41 +88,35 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_internal_plan/getInternalPlan?csrf_protection=true`,
-            {
-                params: {
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    branch_id: idFillter.idBranch != null ? idFillter.idBranch.value : null,
-                    start_date: idFillter?.valueDate?.startDate != null ? moment(idFillter?.valueDate?.startDate).format("DD/MM/YYYY") : null,
-                    end_date: idFillter?.valueDate?.endDate != null ? moment(idFillter?.valueDate?.endDate).format("DD/MM/YYYY") : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data?.data;
-                    sListData((e) => ({
-                        ...e,
-                        data: rResult,
-                        dataExcel: rResult,
-                    }));
-                    sTotalItems(output);
-                    sOnFetching(false);
-                }
-            }
-        );
+    const _ServerFetching = async () => {
+        const params = {
+            search: keySearch,
+            limit: limit,
+            page: router.query?.page || 1,
+            branch_id: idFillter.idBranch != null ? idFillter.idBranch.value : null,
+            start_date:
+                idFillter?.valueDate?.startDate != null
+                    ? moment(idFillter?.valueDate?.startDate).format("DD/MM/YYYY")
+                    : null,
+            end_date:
+                idFillter?.valueDate?.endDate != null
+                    ? moment(idFillter?.valueDate?.endDate).format("DD/MM/YYYY")
+                    : null,
+        };
+        const { data } = await apiInternalPlan.apiListInternalPlan({ params: params });
+        sListData((e) => ({
+            ...e,
+            data: data?.rResult,
+            dataExcel: data?.rResult,
+        }));
+        sTotalItems(data?.output);
+        sOnFetching(false);
     };
 
     // filter
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sListData((e) => ({ ...e, listBr: rResult.map((e) => ({ label: e.name, value: e.id })) }));
-            }
-        });
+    const _ServerFetching_filter = async () => {
+        const { result } = await apiComons.apiBranchCombobox();
+        sListData((e) => ({ ...e, listBr: result.map((e) => ({ label: e.name, value: e.id })) }));
         sOnFetching_filter(false);
     };
 
@@ -140,7 +134,7 @@ const Index = (props) => {
     }, []);
 
     useEffect(() => {
-        sOnFetching(true)
+        sOnFetching(true);
     }, [limit, idFillter.idBranch, idFillter.valueDate.endDate, idFillter.valueDate.startDate]);
 
     const onChangeFilter = (type) => (event) => sIdFillter((e) => ({ ...e, [type]: event }));
@@ -166,28 +160,21 @@ const Index = (props) => {
             });
             sOnFetching(true);
         });
-    }, 500)
+    }, 500);
 
     const toggleStatus = () => {
         handlePostStatus(isId, status);
     };
 
-    const handlePostStatus = (id, newStatus) => {
-        Axios("GET", `/api_web/api_internal_plan/agree?id=${id}&status=${newStatus}&csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess == 1) {
-                        isShow("success", `${dataLang[message] || message}`);
-                        handleQueryId({ status: false });
-                        _ServerFetching();
-                        return;
-                    }
-                    isShow("error", `${dataLang[message] || message}`);
-                }
-            }
-        );
+    const handlePostStatus = async (id, newStatus) => {
+        const { isSuccess, message } = await apiInternalPlan.apiPostStatus(id, newStatus);
+        if (isSuccess == 1) {
+            isShow("success", `${dataLang[message] || message}`);
+            handleQueryId({ status: false });
+            _ServerFetching();
+            return;
+        }
+        isShow("error", `${dataLang[message] || message}`);
     };
 
     // excel
@@ -282,9 +269,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.internal_planEnd || "internal_planEnd"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.internal_plan || "internal_plan"}</h6>
                     </div>
@@ -293,13 +278,13 @@ const Index = (props) => {
                     <div className="space-y-3 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.internal_plan || 'internal_plan'}
+                                {dataLang?.internal_plan || "internal_plan"}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
                                 <ButtonAddNew
                                     onClick={() => {
                                         if (role || checkAdd) {
-                                            router.push(routerInternalPlan.form)
+                                            router.push(routerInternalPlan.form);
                                         } else {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }
@@ -347,7 +332,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={sOnFetching} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {listData.dataExcel?.length > 0 && (
                                                         <ExcelFileComponent
@@ -358,12 +343,15 @@ const Index = (props) => {
                                                         />
                                                     )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
                                             </div>
@@ -374,28 +362,28 @@ const Index = (props) => {
                             <Customscrollbar className="min:h-[200px] 3xl:h-[90%] 2xl:h-[87%] xl:h-[78%] lg:h-[90%] max:h-[400px]">
                                 <div className="w-full">
                                     <HeaderTable gridCols={9}>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.internal_plan_name || "internal_plan_name"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.internal_plan_status || "internal_plan_status"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.internal_plan_creators || "internal_plan_creators"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.import_branch || "import_branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.recall_noteChild || "recall_noteChild"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.import_action || "import_action"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -406,17 +394,20 @@ const Index = (props) => {
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[900px]">
                                                 {listData?.data?.map((e, index) => (
                                                     <RowTable key={e.id.toString()} gridCols={9}>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {e?.date != null
+                                                                ? moment(e?.date).format("DD/MM/YYYY")
+                                                                : ""}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <PopupDetail
                                                                 dataLang={dataLang}
-                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer " name={e?.reference_no}
+                                                                className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                                name={e?.reference_no}
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'left'}>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.plan_name}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="mx-auto">
@@ -455,15 +446,24 @@ const Index = (props) => {
                                                                 type={e.status == "1" ? "1" : "0"}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'} className="flex items-center space-x-1">
-                                                            <CustomAvatar profileImage={e?.created_by_profile_image} fullName={e?.created_by_full_name} />
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            textAlign={"left"}
+                                                            className="flex items-center space-x-1"
+                                                        >
+                                                            <CustomAvatar
+                                                                profileImage={e?.created_by_profile_image}
+                                                                fullName={e?.created_by_full_name}
+                                                            />
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="mx-auto">
-                                                            <TagBranch className="w-fit">
-                                                                {e?.name_branch}
-                                                            </TagBranch>
+                                                            <TagBranch className="w-fit">{e?.name_branch}</TagBranch>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            textAlign={"left"}
+                                                            className="truncate"
+                                                        >
                                                             {e.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex justify-center">
@@ -489,10 +489,7 @@ const Index = (props) => {
                     </div>
                     {listData.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}

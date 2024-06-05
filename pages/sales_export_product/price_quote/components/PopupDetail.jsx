@@ -14,7 +14,6 @@ import {
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment/moment";
 
-
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -26,7 +25,7 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 const PopupDetail = (props) => {
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const [open, sOpen] = useState(false);
 
@@ -41,7 +40,7 @@ const PopupDetail = (props) => {
     }, [open]);
 
     const formatNumber = (num) => {
-        return formatNumberConfig(+num, dataSeting)
+        return formatNumberConfig(+num, dataSeting);
     };
 
     const formatMoney = (num) => {
@@ -52,7 +51,6 @@ const PopupDetail = (props) => {
         Axios("GET", `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if (response && response?.data) {
                 var db = response?.data;
-                console.log(db);
                 sData(db);
             }
             sOnFetching(false);
@@ -157,9 +155,7 @@ const PopupDetail = (props) => {
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.price_quote_branch || "price_quote_branch"}
                                             </h3>
-                                            <TagBranch className="w-fit mr-2">
-                                                {data?.branch_name}
-                                            </TagBranch>
+                                            <TagBranch className="w-fit mr-2">{data?.branch_name}</TagBranch>
                                         </div>
                                     </div>
                                 </div>
@@ -203,9 +199,7 @@ const PopupDetail = (props) => {
                                         <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>
-                                            <Customscrollbar
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                            >
+                                            <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden">
                                                 <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                                     {data?.items?.map((e) => (
                                                         <div

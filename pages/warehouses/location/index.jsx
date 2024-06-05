@@ -44,6 +44,8 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import BtnAction from "@/components/UI/BtnAction";
 import Popup_Vitrikho from "./components/popup";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
 const Location = (props) => {
     const dataLang = props.dataLang;
 
@@ -62,7 +64,7 @@ const Location = (props) => {
         listWarehouse: [],
         onSending: null,
         onFetchingWarehouse: false,
-    }
+    };
 
     const [isState, sIsState] = useState(initialState);
 
@@ -70,11 +72,9 @@ const Location = (props) => {
 
     const { isOpen, isId, isKeyState, handleQueryId } = useToggle();
 
-
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
     //thay type
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'warehouse_location');
-
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "warehouse_location");
 
     const [limit, sLimit] = useState(15);
 
@@ -84,64 +84,42 @@ const Location = (props) => {
 
     const [active, sActive] = useState(null);
 
-    const _HandleFresh = () => { }
+    const _HandleFresh = () => {};
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_warehouse/location/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[warehouse_id]": isState.valueWarehouse ? isState.valueWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult, output } = response.data;
-                    sTotalItems(output);
-                    queryState({ data: rResult, data_ex: rResult });
-                }
-                setTimeout(() => {
-                    queryState({ onFetching: false })
-                }, 1000);
-            }
-        );
+    const _ServerFetching = async () => {
+        const params = {
+            search: isState.keySearch,
+            limit: limit,
+            page: router.query?.page || 1,
+            "filter[warehouse_id]": isState.valueWarehouse ? isState.valueWarehouse?.value : null,
+        };
+        const { rResult, output } = await apiLocationWarehouse.apiLocationWarehouse({ params: params });
+        sTotalItems(output);
+        queryState({ data: rResult, data_ex: rResult, onFetching: false });
     };
-    const _ServerFetching_kho = () => {
-        Axios("GET", `/api_web/api_warehouse/warehouse/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    "filter[is_system]": 2,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    queryState({ listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })) });
-                }
-                queryState({ onFetchingWarehouse: false });
-            }
-        );
+    const _ServerFetching_kho = async () => {
+        const params = {
+            limit: 0,
+            "filter[is_system]": 2,
+        };
+        const { rResult } = await apiLocationWarehouse.apiListWarehouse({ params: params });
+        queryState({
+            listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })),
+            onFetchingWarehouse: false,
+        });
     };
-
-
 
     useEffect(() => {
-        (isState.onFetching && _ServerFetching())
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        (isState.onFetchingWarehouse && _ServerFetching_kho());
+        isState.onFetchingWarehouse && _ServerFetching_kho();
     }, [isState.onFetchingWarehouse]);
 
     useEffect(() => {
-        queryState({ onFetchingWarehouse: true })
+        queryState({ onFetchingWarehouse: true });
     }, []);
-
 
     useEffect(() => {
         queryState({ onFetching: true });
@@ -165,39 +143,30 @@ const Location = (props) => {
 
     const _ServerSending = async () => {
         let id = active;
-        let data = new FormData();
-        data.append("status", status);
-        await Axios("POST", `${id && `/api_web/api_warehouse/locationStatus/${id}?csrf_protection=true`}`,
-            {
-                data: {
-                    status: status,
-                },
-                headers: { "Content-Type": "multipart/form-data" },
+        if (!id) return;
+        const { isSuccess, message } = await apiLocationWarehouse.apiHandingStatus(id, {
+            data: {
+                status: status,
             },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
-                    } else {
-                        isShow("error", `${dataLang[message]}`);
-                    }
-                }
-                _ServerFetching(true);
-                queryState({ onSending: false });
-            }
-        );
+        });
+        if (isSuccess) {
+            isShow("success", `${dataLang[message] || message}`);
+        } else {
+            isShow("error", `${dataLang[message] || message}`);
+        }
+        _ServerFetching(true);
+        queryState({ onSending: false });
     };
     useEffect(() => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
 
     useEffect(() => {
-        queryState({ onSending: true })
+        queryState({ onSending: true });
     }, [status]);
 
     useEffect(() => {
-        queryState({ onSending: true })
+        queryState({ onSending: true });
     }, [active]);
 
     const paginate = (pageNumber) => {
@@ -216,7 +185,7 @@ const Location = (props) => {
             },
         });
         queryState({ onFetching: true });
-    }, 500)
+    }, 500);
     //excel
     const multiDataSet = [
         {
@@ -286,7 +255,7 @@ const Location = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.warehouses_localtion_title || 'warehouses_localtion_title'}</title>
+                <title>{dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}</title>
             </Head>
             <Container>
                 {statusExprired ? (
@@ -305,25 +274,28 @@ const Location = (props) => {
                     <div className="space-y-3 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.warehouses_localtion_title || 'warehouses_localtion_title'}
+                                {dataLang?.warehouses_localtion_title || "warehouses_localtion_title"}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_Vitrikho
                                         // listKho={listKho}
                                         isState={isState}
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <ContainerTable>
@@ -359,7 +331,7 @@ const Location = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
                                                         <ExcelFileComponent
@@ -368,14 +340,18 @@ const Location = (props) => {
                                                             dataSet={multiDataSet}
                                                             data={multiDataSet}
                                                             dataLang={dataLang}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -386,23 +362,23 @@ const Location = (props) => {
                             <Customscrollbar className="min:h-[500px] 2xl:h-[88%] xl:h-[73%] h-[100%] max:h-[800px]">
                                 {/* <Customscrollbar className="min:h-[500px] 2xl:h-[85%] xl:h-[69%] h-[100%] max:h-[800px]"> */}
                                 <div className="w-full">
-                                    <HeaderTable display={'grid'} gridCols={12}>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                    <HeaderTable display={"grid"} gridCols={12}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.warehouses_localtion_ware}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.warehouses_localtion_code}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.warehouses_localtion_NAME}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.warehouses_localtion_status}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.warehouses_localtion_date}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.branch_popup_properties}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -412,18 +388,17 @@ const Location = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={12} key={e?.id?.toString()}
-                                                    >
-                                                        <RowItemTable colSpan={2} textAlign={'left'}>
+                                                    <RowTable gridCols={12} key={e?.id?.toString()}>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.warehouse_name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'left'}>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.code}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'left'}>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'center'}>
+                                                        <RowItemTable colSpan={2} textAlign={"center"}>
                                                             <label
                                                                 htmlFor={e.id}
                                                                 className="relative inline-flex items-center cursor-pointer"
@@ -435,7 +410,10 @@ const Location = (props) => {
                                                                     id={e.id}
                                                                     checked={e.status == "0" ? false : true}
                                                                     onChange={() =>
-                                                                        handleQueryId({ initialKey: e.id, status: true })
+                                                                        handleQueryId({
+                                                                            initialKey: e.id,
+                                                                            status: true,
+                                                                        })
                                                                     }
                                                                 />
 
@@ -443,13 +421,17 @@ const Location = (props) => {
                                                             </label>
                                                         </RowItemTable>
                                                         {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.email}</h6>                 */}
-                                                        <RowItemTable colSpan={2} textAlign={'left'}>
-                                                            {e?.date_create != null ? moment(e.date_create).format("DD/MM/YYYY, h:mm:ss") : ""}
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
+                                                            {e?.date_create != null
+                                                                ? moment(e.date_create).format("DD/MM/YYYY, h:mm:ss")
+                                                                : ""}
                                                         </RowItemTable>
 
-                                                        <RowItemTable colSpan={2} className="space-x-2 text-center flex items-center justify-center">
-
-                                                            {role == true || checkEdit ?
+                                                        <RowItemTable
+                                                            colSpan={2}
+                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                        >
+                                                            {role == true || checkEdit ? (
                                                                 <Popup_Vitrikho
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     warehouse_name={e.warehouse_name}
@@ -461,12 +443,17 @@ const Location = (props) => {
                                                                     code={e.code}
                                                                     id={e?.id}
                                                                 />
-                                                                :
-                                                                <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                                                            }
+                                                            ) : (
+                                                                <IconEdit
+                                                                    className="cursor-pointer"
+                                                                    onClick={() =>
+                                                                        isShow("warning", WARNING_STATUS_ROLE)
+                                                                    }
+                                                                />
+                                                            )}
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => { }}
+                                                                onRefreshGroup={() => {}}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="warehouse_location"
@@ -485,10 +472,7 @@ const Location = (props) => {
                     </div>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItem?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
@@ -512,6 +496,5 @@ const Location = (props) => {
         </React.Fragment>
     );
 };
-
 
 export default Location;

@@ -15,6 +15,8 @@ import Popup from "reactjs-popup";
 import Swal from "sweetalert2";
 
 import firebase from "@/utils/lib/Firebase";
+import apiDashboard from "Api/apiDashboard/apiDashboard";
+import apiLogin from "Api/apiLogin/apiLogin";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -149,23 +151,16 @@ const LoginPage = React.memo((props) => {
     }, []);
 
     const FetchSetingServer = async () => {
-        await Axios("GET", `/api_web/api_setting/getSettings?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { settings } = response?.data;
-                dispatch({ type: "setings/server", payload: settings });
-            }
-        });
-        await Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const data = response?.data;
-                const newData = {
-                    dataMaterialExpiry: data.find((x) => x.code == "material_expiry"),
-                    dataProductExpiry: data.find((x) => x.code == "product_expiry"),
-                    dataProductSerial: data.find((x) => x.code == "product_serial"),
-                };
-                dispatch({ type: "setings/feature", payload: newData });
-            }
-        });
+        const res = await apiDashboard.apiSettings();
+        dispatch({ type: "setings/server", payload: res?.settings });
+
+        const fature = await apiDashboard.apiFeature();
+        const newData = {
+            dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
+            dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
+            dataProductSerial: fature.find((x) => x.code == "product_serial"),
+        };
+        dispatch({ type: "setings/feature", payload: newData });
     };
 
     ///Đăng ký
@@ -175,15 +170,11 @@ const LoginPage = React.memo((props) => {
         !e && queryState({ onFechingRegister: true });
     };
 
-    const _ServerFetching_Majior = () => {
-        Axios("GET", "/api_web/Api_Login/get_list_data?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                const result = response?.data;
-                queryState({ listMajor: result?.career, listPosition: result?.role_user });
-            }
-        });
-        queryState({ onFechingRegister: false });
+    const _ServerFetching_Majior = async () => {
+        const res = await apiLogin.apiMajior();
+        queryState({ listMajor: res?.career, listPosition: res?.role_user, onFechingRegister: false });
     };
+
     useEffect(() => {
         isState.onFechingRegister && _ServerFetching_Majior();
     }, [isState.onFechingRegister]);
@@ -197,51 +188,38 @@ const LoginPage = React.memo((props) => {
     };
     const onSubmit = async (data, type) => {
         if (type == "login") {
-            Axios(
-                "POST",
-                "/api_web/Api_Login/loginMain?csrf_protection=true",
-                {
-                    data: {
-                        company_code: data.code,
-                        user_name: data.name,
-                        password: data.password,
-                    },
+            const res = await apiLogin.apiLoginMain({
+                data: {
+                    company_code: data.code,
+                    user_name: data.name,
+                    password: data.password,
                 },
-                (err, response) => {
-                    if (response !== null) {
-                        const { isSuccess, message, token, database_app } = response?.data;
-                        if (isSuccess) {
-                            FetchSetingServer();
-                            dispatch({ type: "auth/update", payload: response.data?.data });
-                            CookieCore.set("tokenFMRP", token, {
-                                path: "/",
-                                expires: new Date(Date.now() + 86400 * 1000),
-                                sameSite: true,
-                            });
-                            CookieCore.set("databaseappFMRP", database_app, {
-                                path: "/",
-                                expires: new Date(Date.now() + 86400 * 1000),
-                                sameSite: true,
-                            });
-                            showToat("success", message);
-                            if (isState.rememberMe) {
-                                localStorage.setItem("usernameFMRP", data.name);
-                                localStorage.setItem("usercodeFMRP", data.code);
-                                localStorage.setItem("remembermeFMRP", isState.rememberMe);
-                            } else {
-                                ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach(
-                                    (key) => localStorage.removeItem(key)
-                                    // CookieCore.remove(key)
-                                );
-                            }
-                        } else {
-                            showToat("error", `${message || "Đăng nhập thất bại"}`);
-                        }
-                    } else {
-                        console.log("Lỗi");
-                    }
+            });
+            const { isSuccess, message, token, database_app } = res;
+            if (isSuccess) {
+                FetchSetingServer();
+                dispatch({ type: "auth/update", payload: res.data?.data });
+                CookieCore.set("tokenFMRP", token, {
+                    path: "/",
+                    expires: new Date(Date.now() + 86400 * 1000),
+                    sameSite: true,
+                });
+                CookieCore.set("databaseappFMRP", database_app, {
+                    path: "/",
+                    expires: new Date(Date.now() + 86400 * 1000),
+                    sameSite: true,
+                });
+                showToat("success", message);
+                if (isState.rememberMe) {
+                    localStorage.setItem("usernameFMRP", data.name);
+                    localStorage.setItem("usercodeFMRP", data.code);
+                    localStorage.setItem("remembermeFMRP", isState.rememberMe);
+                } else {
+                    ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) => localStorage.removeItem(key));
                 }
-            );
+            } else {
+                showToat("error", `${message || "Đăng nhập thất bại"}`);
+            }
         }
         if (type == "sendOtp") {
             await handleSendOtp(data?.phone);
@@ -261,32 +239,17 @@ const LoginPage = React.memo((props) => {
             dataSubmit.append("password", data?.password);
             dataSubmit.append("role_user", data?.location);
             dataSubmit.append("otp", 111111);
-
-            await Axios(
-                "POST",
-                `/api_web/Api_Login/SignUpMain?csrf_protection=true`,
-                {
-                    data: dataSubmit,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    if (!err) {
-                        const { isSuccess, message, code, email } = response?.data;
-                        if (isSuccess) {
-                            showToat("success", message);
-                            queryState({ name: email, code: code });
-                            router.push("/");
-                        } else {
-                            showToat("error", message);
-                            queryState({ loadingRegester: false });
-                        }
-                    }
-                }
-            );
+            const { isSuccess, message, code, email } = await apiLogin.apiRegister(dataSubmit);
+            if (isSuccess) {
+                showToat("success", message);
+                queryState({ name: email, code: code });
+                router.push("/");
+            } else {
+                showToat("error", message);
+                queryState({ loadingRegester: false });
+            }
         }
     };
-
-    console.log("isState.countOtp", isState);
 
     return (
         <>
@@ -840,7 +803,6 @@ const LoginPage = React.memo((props) => {
                                                 className="w-full border border-[#D0D5DD] 3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none focus:border-[#3276FA] rounded placeholder:text-[13px]"
                                             />
 
-                                            {console.log("errors", errors)}
                                             {errors.otp && (
                                                 <span className="text-red-500 text-[13px]">{errors.otp.message}</span>
                                             )}

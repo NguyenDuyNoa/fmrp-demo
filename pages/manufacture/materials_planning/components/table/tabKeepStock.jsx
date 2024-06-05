@@ -17,7 +17,6 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
     const [isTab, setIsTab] = useState("dataKeepStock");
-    console.log("dataTable?.listDataRight", dataTable?.listDataRight);
     return (
         <>
             <div className="flex justify-start items-center gap-8">

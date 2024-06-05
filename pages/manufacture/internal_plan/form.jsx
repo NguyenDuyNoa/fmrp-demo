@@ -23,7 +23,6 @@ import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 
-
 import { SelectCore } from "@/utils/lib/Select";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
@@ -33,6 +32,8 @@ import { routerInternalPlan } from "@/routers/manufacture";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 const Index = (props) => {
     const initsFetching = {
         onFetching: false,
@@ -69,7 +70,7 @@ const Index = (props) => {
 
     const dataLang = props?.dataLang;
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
@@ -88,7 +89,7 @@ const Index = (props) => {
     const [listData, sListData] = useState([]);
 
     const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting)
+        return formatNumberConfig(+number, dataSeting);
     };
 
     const resetAllStates = () => {
@@ -100,23 +101,15 @@ const Index = (props) => {
         router.query && resetAllStates();
     }, [router.query]);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sFetchingData((e) => ({ ...e, onLoading: true }));
+        const { result } = await apiComons.apiBranchCombobox();
+        sDataSelect((e) => ({
+            ...e,
+            dataBranch: result?.map(({ name, id }) => ({ label: name, value: id })),
+        }));
 
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
-
-                sDataSelect((e) => ({
-                    ...e,
-                    dataBranch: result?.map(({ name, id }) => ({ label: name, value: id })),
-                }));
-
-                sFetchingData((e) => ({ ...e, onLoading: false }));
-            }
-        });
-
-        sFetchingData((e) => ({ ...e, onFetching: false }));
+        sFetchingData((e) => ({ ...e, onLoading: false }));
     };
 
     useEffect(() => {
@@ -131,87 +124,65 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios(
-            "GET",
-            `/api_web/api_internal_plan/detailInternalPlan/${id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let { data } = response?.data;
-                    sListData(
-                        data?.internalPlansItems.map((e) => {
-                            return {
-                                id: e?.id,
-                                idParenBackend: e?.id,
-                                matHang: {
-                                    e: e,
-                                    label: `${e?.item_name} <span style={{display: none}}>${e?.code + e?.product_variation + e?.text_type + e?.unit_name}</span>`,
-                                    value: e?.item_id,
-                                },
-                                unit: e?.unit_name,
-                                quantity: Number(e?.quantity),
-                                note: e?.note_item,
-                                date: moment(e?.date_needed).toDate(),
-                            };
-                        })
-                    );
-                    sIdChange({
-                        code: data?.internalPlans?.reference_no,
-                        date: moment(data?.internalPlans?.date).toDate(),
-                        idBranch: {
-                            label: data?.internalPlans?.name_branch,
-                            value: data?.internalPlans?.branch_id,
-                        },
-                        namePlan: data?.internalPlans.plan_name,
-                        note: data?.internalPlans?.note,
-                    });
-                }
-                sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
-            }
+    const _ServerFetchingDetailPage = async () => {
+        const { data } = await apiInternalPlan.apiDetailInternalPlan(id);
+        sListData(
+            data?.internalPlansItems.map((e) => {
+                return {
+                    id: e?.id,
+                    idParenBackend: e?.id,
+                    matHang: {
+                        e: e,
+                        label: `${e?.item_name} <span style={{display: none}}>${
+                            e?.code + e?.product_variation + e?.text_type + e?.unit_name
+                        }</span>`,
+                        value: e?.item_id,
+                    },
+                    unit: e?.unit_name,
+                    quantity: Number(e?.quantity),
+                    note: e?.note_item,
+                    date: moment(e?.date_needed).toDate(),
+                };
+            })
         );
+        sIdChange({
+            code: data?.internalPlans?.reference_no,
+            date: moment(data?.internalPlans?.date).toDate(),
+            idBranch: {
+                label: data?.internalPlans?.name_branch,
+                value: data?.internalPlans?.branch_id,
+            },
+            namePlan: data?.internalPlans.plan_name,
+            note: data?.internalPlans?.note,
+        });
+        sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
     };
 
     useEffect(() => {
         fetChingData.onFetchingDetail && _ServerFetchingDetailPage();
     }, [fetChingData.onFetchingDetail]);
 
-    const _ServerFetching_ItemsAll = () => {
-        Axios("POST", "/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true&term",
-            {
-                params: {
-                    "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
-                },
+    const _ServerFetching_ItemsAll = async () => {
+        const { data } = await apiComons.apiSearchProductsVariant({
+            params: {
+                "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    sDataSelect((e) => ({ ...e, dataItems: result }));
-                }
-            }
-        );
+        });
+        sDataSelect((e) => ({ ...e, dataItems: data?.result }));
         sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
     };
 
-
-    const _HandleSeachApi = debounce((inputValue) => {
-        Axios("POST", `/api_web/api_internal_plan/searchProductsVariant?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
-                },
-                data: {
-                    term: inputValue,
-                },
+    const _HandleSeachApi = debounce(async (inputValue) => {
+        const { data } = await apiComons.apiSearchProductsVariant({
+            params: {
+                "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    sDataSelect((e) => ({ ...e, dataItems: result }));
-                }
-            }
-        );
-    }, 500)
+            data: {
+                term: inputValue,
+            },
+        });
+        sDataSelect((e) => ({ ...e, dataItems: data?.result }));
+    }, 500);
 
     const handleSaveStatus = () => {
         isKeyState?.sDataSelect((e) => ({ ...e, dataItems: [] }));
@@ -318,8 +289,6 @@ const Index = (props) => {
     useEffect(() => {
         fetChingData.onFetchingItemsAll && _ServerFetching_ItemsAll();
     }, [fetChingData.onFetchingItemsAll]);
-
-
 
     const _DataValueItem = (value) => {
         return {
@@ -492,34 +461,24 @@ const Index = (props) => {
 
             formData.append(`items[${index}][note_item]`, item?.note ? item?.note : "");
         });
-        await Axios(
-            "POST",
-            `${id
-                ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
-                : "/api_web/api_internal_plan/handling?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response?.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message] || message}`);
 
-                        resetAllStates();
+        const url = id
+            ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
+            : "/api_web/api_internal_plan/handling?csrf_protection=true";
 
-                        sListData([]);
+        const { isSuccess, message } = await apiInternalPlan.apiHandlingInternalPlan(url, formData);
+        if (isSuccess) {
+            isShow("success", `${dataLang[message] || message}`);
 
-                        router.push(routerInternalPlan.home);
-                    } else {
-                        isShow("error", `${dataLang[message] || message}`);
-                    }
-                }
-                sFetchingData((e) => ({ ...e, onSending: false }));
-            }
-        );
+            resetAllStates();
+
+            sListData([]);
+
+            router.push(routerInternalPlan.home);
+        } else {
+            isShow("error", `${dataLang[message] || data?.message}`);
+        }
+        sFetchingData((e) => ({ ...e, onSending: false }));
     };
 
     useEffect(() => {
@@ -535,14 +494,12 @@ const Index = (props) => {
                         : dataLang?.internal_plan_add || "internal_plan_add"}
                 </title>
             </Head>
-            <Container className={'!h-auto'}>
+            <Container className={"!h-auto"}>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.internal_planEnd || "internal_planEnd"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>
                             {id
@@ -552,7 +509,6 @@ const Index = (props) => {
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
-
                     <div className="flex justify-between items-center">
                         <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                             {id
@@ -636,8 +592,9 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${errors.errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errors.errBranch ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -689,8 +646,9 @@ const Index = (props) => {
                                         name="fname"
                                         type="text"
                                         placeholder={dataLang?.internal_plan_name || "internal_plan_name"}
-                                        className={`focus:border-[#92BFF7] ${errors.errPlan ? "border-red-500 " : "border-[#d0d5dd]"
-                                            }   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
+                                        className={`focus:border-[#92BFF7] ${
+                                            errors.errPlan ? "border-red-500 " : "border-[#d0d5dd]"
+                                        }   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                     {errors.errPlan && (
                                         <label className="text-sm text-red-500">
@@ -897,18 +855,21 @@ const Index = (props) => {
                                                                 "quantity"
                                                             )}
                                                             value={e.quantity || null}
-                                                            className={`${errors.errQuantity &&
+                                                            className={`${
+                                                                errors.errQuantity &&
                                                                 (e.quantity == null ||
                                                                     e.quantity == "" ||
                                                                     e.quantity == 0)
-                                                                ? "border-b border-red-500"
-                                                                : "border-b border-gray-200"
-                                                                }
-                                                                ${e.quantity == null ||
+                                                                    ? "border-b border-red-500"
+                                                                    : "border-b border-gray-200"
+                                                            }
+                                                                ${
+                                                                    e.quantity == null ||
                                                                     e.quantity == "" ||
                                                                     e.quantity == 0
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"}
+                                                                        ? "border-b border-red-500"
+                                                                        : "border-b border-gray-200"
+                                                                }
                                                                 appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                             isAllowed={isAllowedNumber}
                                                         />
@@ -932,10 +893,11 @@ const Index = (props) => {
                                                             isClearable
                                                             value={e.date}
                                                             placeholderText="Chọn ngày"
-                                                            className={`outline-none ${errors.errDate && (e.date == null || e.date == "")
-                                                                ? "border-b border-red-500"
-                                                                : "border-b border-gray-200"
-                                                                } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
+                                                            className={`outline-none ${
+                                                                errors.errDate && (e.date == null || e.date == "")
+                                                                    ? "border-b border-red-500"
+                                                                    : "border-b border-gray-200"
+                                                            } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
                                                         />
                                                     </div>
                                                 </div>
@@ -1020,7 +982,11 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <ButtonBack onClick={() => router.push(routerInternalPlan.home)} dataLang={dataLang} />
-                            <ButtonSubmit loading={fetChingData.onSending} onClick={_HandleSubmit} dataLang={dataLang} />
+                            <ButtonSubmit
+                                loading={fetChingData.onSending}
+                                onClick={_HandleSubmit}
+                                dataLang={dataLang}
+                            />
                         </div>
                     </div>
                 </div>
@@ -1031,13 +997,12 @@ const Index = (props) => {
                 title={TITLE_DELETE_ITEMS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 save={handleSaveStatus}
                 cancel={handleCancleStatus}
             />
         </React.Fragment>
     );
 };
-
 
 export default Index;

@@ -1662,7 +1662,6 @@ const Popup_chitietThere = (props) => {
                                                         speed={1}
                                                         smoothScrolling={true}
                                                     >
-                                                        {console.log(data)}
                                                         <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                                             {data?.item?.map((e) => (
                                                                 <div

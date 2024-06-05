@@ -8,11 +8,7 @@ import PopupEdit from "@/components/UI/popup";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
-import {
-    AttachCircle,
-    Add as IconAdd,
-    Trash as IconDelete
-} from "iconsax-react";
+import { AttachCircle, Add as IconAdd, Trash as IconDelete } from "iconsax-react";
 import { debounce } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -30,7 +26,7 @@ const Popup_Bom = React.memo((props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit } = useActionRole(auth, 'products');
+    const { checkAdd, checkEdit } = useActionRole(auth, "products");
 
     const [onFetching, sOnFetching] = useState(false);
 
@@ -41,9 +37,9 @@ const Popup_Bom = React.memo((props) => {
     const _ToggleModal = (e) => {
         sIsOpen(e);
         if (!e) {
-            sTab(null)
+            sTab(null);
         }
-    }
+    };
 
     const [onSending, sOnSending] = useState(false);
 
@@ -62,21 +58,21 @@ const Popup_Bom = React.memo((props) => {
     const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
 
     const _HandleSelectTab = (e) => {
-        if (e == tab) return
+        if (e == tab) return;
         sTab(e);
-        const checkNull = dataSelectedVariant?.map(e => {
+        const checkNull = dataSelectedVariant?.map((e) => {
             return {
                 ...e,
-                child: e?.child.filter(x => x.name != null)
-            }
-        })
-        sDataSelectedVariant(checkNull)
-        sLoadingData(true)
+                child: e?.child.filter((x) => x.name != null),
+            };
+        });
+        sDataSelectedVariant(checkNull);
+        sLoadingData(true);
         setTimeout(() => {
-            sLoadingData(false)
+            sLoadingData(false);
         }, 1000);
-        return () => clearTimeout()
-    }
+        return () => clearTimeout();
+    };
 
     const dataRestVariant = dataVariant?.filter(
         (item1) => !dataSelectedVariant?.some((item2) => item1?.label === item2?.label && item1?.value === item2?.value)
@@ -85,18 +81,19 @@ const Popup_Bom = React.memo((props) => {
 
     const [errValue, sErrValue] = useState(false);
 
-
     useEffect(() => {
         isOpen && props.type == "edit" && sOnFetching(true);
         isOpen && props?.id && sOnFetchingCd(true);
         isOpen && sLoadingData(false);
         isOpen && sErrValue(false);
-        sDataSelectedVariant([])
-        sSelectedList({})
+        sDataSelectedVariant([]);
+        sSelectedList({});
     }, [isOpen]);
 
     const _ServerFetching = () => {
-        Axios("GET", `/api_web/Api_product/getDesignBOM?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_product/getDesignBOM?csrf_protection=true`,
             {
                 params: {
                     id: props.id,
@@ -117,7 +114,7 @@ const Popup_Bom = React.memo((props) => {
                             name: {
                                 label: ce?.item_name,
                                 value: ce?.item_id,
-                                product_variation: ce?.variation_name
+                                product_variation: ce?.variation_name,
                             },
                             unit: {
                                 label: ce?.unit_name,
@@ -130,12 +127,12 @@ const Popup_Bom = React.memo((props) => {
                                 value: ce?.stage_id,
                             },
                         })),
-                    }))
+                    }));
                     sDataSelectedVariant(newData);
                     sCurrentData(newData);
                 }
-                setTimeout(() => sOnFetching(false), 1000)
-                return () => clearTimeout()
+                setTimeout(() => sOnFetching(false), 1000);
+                return () => clearTimeout();
             }
         );
     };
@@ -166,26 +163,26 @@ const Popup_Bom = React.memo((props) => {
                     const { rResult } = response.data;
                     const newData = rResult[0]?.product_variation?.includes("NONE")
                         ? [
-                            {
-                                label: "Mặc định",
-                                value: rResult[0]?.id,
-                                child: [],
-                            },
-                        ]
+                              {
+                                  label: "Mặc định",
+                                  value: rResult[0]?.id,
+                                  child: [],
+                              },
+                          ]
                         : rResult.map((e) => ({
-                            label: e?.product_variation,
-                            value: e?.id,
-                            child: [],
-                        }))
-                    const convertArr = newData?.map(e => {
+                              label: e?.product_variation,
+                              value: e?.id,
+                              child: [],
+                          }));
+                    const convertArr = newData?.map((e) => {
                         if (e?.label == "(NONE)") {
                             return {
                                 ...e,
                                 label: "Mặc định",
-                            }
+                            };
                         }
-                        return e
-                    })
+                        return e;
+                    });
                     sDataVariant(convertArr);
                 }
             }
@@ -202,58 +199,59 @@ const Popup_Bom = React.memo((props) => {
     const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x?.value));
 
     const _HandleChangeSelect = (value) => {
-        const newValue = value?.map(e => {
-            const checkValue = currentData.find(x => x?.value == e?.value)
+        const newValue = value?.map((e) => {
+            const checkValue = currentData.find((x) => x?.value == e?.value);
             if (checkValue) {
                 return {
                     ...checkValue,
-                    label: checkValue.label == "NONE" ? "Mặc định" : checkValue.label
-                }
+                    label: checkValue.label == "NONE" ? "Mặc định" : checkValue.label,
+                };
             }
-            return e
-        })
+            return e;
+        });
         sValueVariant(newValue);
     };
 
     useEffect(() => {
         if (isOpen && dataSelectedVariant?.length == 0 && dataVariant?.length > 0) {
-            const newValue = dataVariant?.map(e => {
-                const checkValue = currentData.find(x => x?.value == e?.value)
-                if (checkValue?.value == e?.value) {
-                    return checkValue
-                }
-                return e
-            }).filter(x => x?.label == '(NONE)')
+            const newValue = dataVariant
+                ?.map((e) => {
+                    const checkValue = currentData.find((x) => x?.value == e?.value);
+                    if (checkValue?.value == e?.value) {
+                        return checkValue;
+                    }
+                    return e;
+                })
+                .filter((x) => x?.label == "(NONE)");
             if (props.type == "edit") {
-                dataSelectedVariant.push({ ...newValue[0] })
-                _HandleAddNew(newValue[0]?.value)
+                dataSelectedVariant.push({ ...newValue[0] });
+                _HandleAddNew(newValue[0]?.value);
             } else {
                 const newData = {
                     ...dataVariant[0],
-                    label: ("NONE")
-                }
-                dataSelectedVariant.push({ ...newData })
-                sTab(newData?.value)
-                _HandleAddNew(newData?.value)
+                    label: "NONE",
+                };
+                dataSelectedVariant.push({ ...newData });
+                sTab(newData?.value);
+                _HandleAddNew(newData?.value);
             }
         }
-    }, [dataSelectedVariant, isOpen, dataVariant])
+    }, [dataSelectedVariant, isOpen, dataVariant]);
 
     useEffect(() => {
         if (selectedList?.child?.length == 0) {
-            _HandleAddNew(tab)
+            _HandleAddNew(tab);
         }
-    }, [selectedList, isOpen])
+    }, [selectedList, isOpen]);
 
     const _HandleApplyVariant = () => {
-        const newData = valueVariant?.filter(x => dataSelectedVariant.some(e => e?.value != x?.value));
-        if (valueVariant.some(x => dataSelectedVariant.some(e => e?.value == x?.value))) {
-            return isShow('error', 'Biến thể đã được chọn vui lòng bỏ chọn');
+        const newData = valueVariant?.filter((x) => dataSelectedVariant.some((e) => e?.value != x?.value));
+        if (valueVariant.some((x) => dataSelectedVariant.some((e) => e?.value == x?.value))) {
+            return isShow("error", "Biến thể đã được chọn vui lòng bỏ chọn");
         }
         if (newData.length > 0) {
             dataSelectedVariant?.push(...newData);
-        }
-        else {
+        } else {
             dataSelectedVariant?.push(...valueVariant);
         }
         sValueVariant([]);
@@ -289,11 +287,9 @@ const Popup_Bom = React.memo((props) => {
         if (itemFound) {
             sDataSelectedVariant(newData);
         } else {
-            isShow('error', 'Vui lòng chọn biến thể');
+            isShow("error", "Vui lòng chọn biến thể");
         }
     };
-
-
 
     const _HandleDeleteItemBOM = (parentId, id) => {
         const index = dataSelectedVariant.findIndex((obj) => obj?.value === parentId);
@@ -301,13 +297,15 @@ const Popup_Bom = React.memo((props) => {
         const newChild = newData[index].child.filter((item) => item.id !== id);
         newData[index] = { ...newData[index], child: newChild };
         if (selectedList?.child?.length == 1) {
-            return isShow('error', 'Phải có ít nhất 1 thành phần BOM');
+            return isShow("error", "Phải có ít nhất 1 thành phần BOM");
         }
         sDataSelectedVariant(newData);
     };
 
     const _HandleSeachApi = debounce((value, Idparent, type, id, name) => {
-        Axios("POST", `/api_web/api_product/searchItemsVariants?csrf_protection=true`,
+        Axios(
+            "POST",
+            `/api_web/api_product/searchItemsVariants?csrf_protection=true`,
             {
                 data: {
                     term: value,
@@ -334,21 +332,18 @@ const Popup_Bom = React.memo((props) => {
                                                 dataName: getdata,
                                             };
                                         }
-                                        return x
+                                        return x;
                                     }),
-                                }
+                                };
                             }
-                            return e
+                            return e;
                         });
                         sDataSelectedVariant([...newDb]);
                     }
-
                 }
             }
         );
-    }, 500)
-
-    console.log(selectedList);
+    }, 500);
 
     const _HandleChangeItemBOM = (parentId, childId, type, value) => {
         const newData = dataSelectedVariant.map((parent) => {
@@ -359,7 +354,6 @@ const Popup_Bom = React.memo((props) => {
                             ...child,
                             [type]: type === "norm" || type === "loss" ? Number(value.value) : value,
                         };
-
                     }
                     return child;
                 });
@@ -377,7 +371,9 @@ const Popup_Bom = React.memo((props) => {
                 const child = found.child.find((child) => child?.id === childId);
                 if (child) {
                     const type = child.type?.value;
-                    Axios("POST", "/api_web/api_product/searchItemsVariants?csrf_protection=true",
+                    Axios(
+                        "POST",
+                        "/api_web/api_product/searchItemsVariants?csrf_protection=true",
                         {
                             data: {
                                 type: type,
@@ -399,10 +395,10 @@ const Popup_Bom = React.memo((props) => {
                                                     stage: null,
                                                     dataName: data?.items
                                                         ? data?.items.map((e) => ({
-                                                            label: e.name,
-                                                            value: e.id,
-                                                            product_variation: e?.product_variation,
-                                                        }))
+                                                              label: e.name,
+                                                              value: e.id,
+                                                              product_variation: e?.product_variation,
+                                                          }))
                                                         : [],
                                                 };
                                             }
@@ -448,9 +444,9 @@ const Popup_Bom = React.memo((props) => {
                                                     unit: null,
                                                     dataUnit: data?.units
                                                         ? data?.units.map((e) => ({
-                                                            label: e.unit,
-                                                            value: e.unitid,
-                                                        }))
+                                                              label: e.unit,
+                                                              value: e.unitid,
+                                                          }))
                                                         : [],
                                                 };
                                             }
@@ -470,37 +466,37 @@ const Popup_Bom = React.memo((props) => {
     };
 
     const _HandleDeleteBOM = (id) => {
-        const newData = dataSelectedVariant.filter((item) => item?.value !== id)
+        const newData = dataSelectedVariant.filter((item) => item?.value !== id);
         if (newData?.length == 0) {
-            return isShow('error', 'Thiết kế BOM phải có ít nhất 1 biến thể')
+            return isShow("error", "Thiết kế BOM phải có ít nhất 1 biến thể");
         }
         setTimeout(() => {
-            sLoadingData(false)
-            sTab(newData[newData?.length - 1]?.value)
-        }, 100)
+            sLoadingData(false);
+            sTab(newData[newData?.length - 1]?.value);
+        }, 100);
         sDataSelectedVariant(newData);
-        return () => clearTimeout()
+        return () => clearTimeout();
     };
 
     useEffect(() => {
         if (isOpen && (tab || dataSelectedVariant)) {
-            const newData = dataSelectedVariant?.find((item) => item?.value == tab)
+            const newData = dataSelectedVariant?.find((item) => item?.value == tab);
             sSelectedList(newData);
-
         }
     }, [tab, dataSelectedVariant, isOpen]);
 
     const checkEqual = (prevValue, nextValue) => {
         return prevValue && nextValue && JSON.stringify(prevValue) == JSON.stringify(nextValue);
-    }
-
+    };
 
     useEffect(() => {
         if (checkEqual(currentData, dataSelectedVariant)) {
             dataSelectedVariant.forEach((e) => {
                 e?.child.forEach((ce) => {
                     if (ce.name != null) {
-                        Axios("POST", "/api_web/api_product/searchItemsVariants?csrf_protection=true",
+                        Axios(
+                            "POST",
+                            "/api_web/api_product/searchItemsVariants?csrf_protection=true",
                             {
                                 data: {
                                     type: ce.type.value,
@@ -519,7 +515,9 @@ const Popup_Bom = React.memo((props) => {
                         );
                     }
                     if (ce.unit != null) {
-                        Axios("POST", "/api_web/api_product/rowItem?csrf_protection=true",
+                        Axios(
+                            "POST",
+                            "/api_web/api_product/rowItem?csrf_protection=true",
                             {
                                 data: {
                                     item_id: ce?.name?.value,
@@ -541,12 +539,11 @@ const Popup_Bom = React.memo((props) => {
             });
         }
         // props.type == "edit" &&
-        const checkTab = dataSelectedVariant.some(x => x.value == tab)
+        const checkTab = dataSelectedVariant.some((x) => x.value == tab);
         if (checkTab) {
-            return
+            return;
         }
         if (props.type == "edit") {
-
             sTab(dataSelectedVariant[0]?.value ?? selectedList?.value);
         } else {
             sTab(dataSelectedVariant[0]?.value);
@@ -554,7 +551,6 @@ const Popup_Bom = React.memo((props) => {
     }, [dataSelectedVariant]);
 
     const _ServerSending = () => {
-        console.log("okkk");
         let formData = new FormData();
         formData.append("product_id", props?.id);
         dataSelectedVariant.forEach((item, i) => {
@@ -569,7 +565,9 @@ const Popup_Bom = React.memo((props) => {
             });
         });
 
-        Axios("POST", "/api_web/api_product/designBOM?csrf_protection=true",
+        Axios(
+            "POST",
+            "/api_web/api_product/designBOM?csrf_protection=true",
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -582,7 +580,7 @@ const Popup_Bom = React.memo((props) => {
                         props.onRefresh && props.onRefresh();
                         props.onRefreshBom && props.onRefreshBom();
                         sIsOpen(false);
-                        return
+                        return;
                     }
                     isShow("error", props.dataLang[message] || message);
                 }
@@ -593,7 +591,9 @@ const Popup_Bom = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const checkValue = dataSelectedVariant.some((item) => item.child.some((itemChild) => !itemChild.type || !itemChild.name || !itemChild.stage));
+        const checkValue = dataSelectedVariant.some((item) =>
+            item.child.some((itemChild) => !itemChild.type || !itemChild.name || !itemChild.stage)
+        );
         if (checkValue) {
             checkValue && sErrValue(true);
             isShow("error", props.dataLang?.required_field_null);
@@ -603,37 +603,40 @@ const Popup_Bom = React.memo((props) => {
         }
     };
 
-
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
 
     return (
         <PopupEdit
-            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name
-                })`}
-
+            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${
+                props.name
+            })`}
             button={
                 <div
                     onClick={() => {
                         if (props.bom) {
-                            isShow("error", props.dataLang?.bom_had || 'bom_had')
-                            return
-                        }
-                        else if ((role || checkEdit || checkAdd) && !props.bom) {
-                            sIsOpen(true)
+                            isShow("error", props.dataLang?.bom_had || "bom_had");
+                            return;
+                        } else if ((role || checkEdit || checkAdd) && !props.bom) {
+                            sIsOpen(true);
                         } else {
-                            isShow("warning", WARNING_STATUS_ROLE)
+                            isShow("warning", WARNING_STATUS_ROLE);
                         }
                     }}
-                    className={props.type == 'add' ?
-                        "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full "
-                        :
-                        'text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition'}
+                    className={
+                        props.type == "add"
+                            ? "group outline-none transition-all ease-in-out flex items-center justify-start gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full "
+                            : "text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition"
+                    }
                 >
-                    {props.type == "add" && <AttachCircle size={20} className="group-hover:text-green-500 group-hover:scale-110" />}
-                    <button type="button" className="group-hover:text-green-500" >
-                        {props.type == "add" ? `${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"}` : `${props.dataLang?.edit_bom || "edit_bom"}`}
+                    {props.type == "add" && (
+                        <AttachCircle size={20} className="group-hover:text-green-500 group-hover:scale-110" />
+                    )}
+                    <button type="button" className="group-hover:text-green-500">
+                        {props.type == "add"
+                            ? `${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"}`
+                            : `${props.dataLang?.edit_bom || "edit_bom"}`}
                     </button>
                 </div>
             }
@@ -646,8 +649,7 @@ const Popup_Bom = React.memo((props) => {
                     <div className="flex justify-between items-end pb-2">
                         <div className="w-2/3">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                {props.dataLang?.category_material_list_variant}{" "}
-                                <span className="text-red-500">*</span>
+                                {props.dataLang?.category_material_list_variant} <span className="text-red-500">*</span>
                             </label>
                             <Select
                                 closeMenuOnSelect={false}
@@ -702,10 +704,11 @@ const Popup_Bom = React.memo((props) => {
                                     <button
                                         key={e?.value}
                                         onClick={_HandleSelectTab.bind(this, e?.value)}
-                                        className={`${tab == e?.value
-                                            ? "text-[#0F4F9E] bg-[#0F4F9E10]"
-                                            : "hover:text-[#0F4F9E] bg-slate-50/50"
-                                            } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center whitespace-nowrap`}
+                                        className={`${
+                                            tab == e?.value
+                                                ? "text-[#0F4F9E] bg-[#0F4F9E10]"
+                                                : "hover:text-[#0F4F9E] bg-slate-50/50"
+                                        } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center whitespace-nowrap`}
                                     >
                                         <span>{e?.label?.includes("NONE") ? "Mặc định" : e?.label}</span>
                                     </button>
@@ -722,30 +725,24 @@ const Popup_Bom = React.memo((props) => {
                     )}
                     <div className="space-y-1 -pt-5">
                         <HeaderTablePopup gridCols={14}>
-                            <ColumnTablePopup colSpan={5}>
-                                {props.dataLang?.bom_name_finishedProduct}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={2}>
-                                {props.dataLang?.unit}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={2} textAlign={'left'}>
+                            <ColumnTablePopup colSpan={5}>{props.dataLang?.bom_name_finishedProduct}</ColumnTablePopup>
+                            <ColumnTablePopup colSpan={2}>{props.dataLang?.unit}</ColumnTablePopup>
+                            <ColumnTablePopup colSpan={2} textAlign={"left"}>
                                 {props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}
                             </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={2} textAlign={'left'}>
+                            <ColumnTablePopup colSpan={2} textAlign={"left"}>
                                 %{props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
                             </ColumnTablePopup>
-                            <ColumnTablePopup colSpan={2} textAlign={'left'}>
+                            <ColumnTablePopup colSpan={2} textAlign={"left"}>
                                 {props.dataLang?.stage_usage_finishedProduct || "stage_usage_finishedProduct"}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
                                 {props.dataLang?.branch_popup_properties || "branch_popup_properties"}
                             </ColumnTablePopup>
                         </HeaderTablePopup>
-                        <Customscrollbar
-                            className="max-h-[250px]"
-                        >
+                        <Customscrollbar className="max-h-[250px]">
                             <div className="divide-y divide-slate-100 min:h-[170px]  max:h-[170px]">
-                                {(onFetching || loadingData) ? (
+                                {onFetching || loadingData ? (
                                     <Loading className="h-40" color="#0f4f9e" />
                                 ) : (
                                     <>
@@ -772,10 +769,11 @@ const Popup_Bom = React.memo((props) => {
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         classNamePrefix="Select"
-                                                        className={`${errValue && e.type == null
-                                                            ? "border-red-500"
-                                                            : "border-transparent"
-                                                            } 
+                                                        className={`${
+                                                            errValue && e.type == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                        } 
                                                         [&>div>div_div]:!whitespace-nowrap placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
@@ -813,7 +811,15 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "name"
                                                         )}
-                                                        onInputChange={(x) => _HandleSeachApi(x, selectedList?.value, e?.type, e.id, e.name)}
+                                                        onInputChange={(x) =>
+                                                            _HandleSeachApi(
+                                                                x,
+                                                                selectedList?.value,
+                                                                e?.type,
+                                                                e.id,
+                                                                e.name
+                                                            )
+                                                        }
                                                         formatOptionLabel={(option) => (
                                                             <div className="">
                                                                 <div className="flex gap-1">
@@ -839,10 +845,11 @@ const Popup_Bom = React.memo((props) => {
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         classNamePrefix="Select "
-                                                        className={`${errValue && e.name == null
-                                                            ? "border-red-500"
-                                                            : "border-transparent"
-                                                            } Select__custom white placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                        className={`${
+                                                            errValue && e.name == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                        } Select__custom white placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
                                                             colors: {
@@ -884,10 +891,11 @@ const Popup_Bom = React.memo((props) => {
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         classNamePrefix="Select"
-                                                        className={`${errValue && e.unit == null
-                                                            ? "border-red-500"
-                                                            : "border-transparent"
-                                                            } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                        className={`${
+                                                            errValue && e.unit == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                        } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
                                                             colors: {
@@ -936,9 +944,9 @@ const Popup_Bom = React.memo((props) => {
                                                             const { floatValue } = values;
                                                             if (floatValue > 100) {
                                                                 isShow("error", "Vui lòng nhập nhỏ hơn hoặc bằng 100%");
-                                                                return false
+                                                                return false;
                                                             }
-                                                            return true
+                                                            return true;
                                                         }}
                                                         value={e?.loss}
                                                         onValueChange={_HandleChangeItemBOM.bind(
@@ -947,9 +955,10 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "loss"
                                                         )}
-                                                        placeholder={`%${props.dataLang?.loss_finishedProduct ||
+                                                        placeholder={`%${
+                                                            props.dataLang?.loss_finishedProduct ||
                                                             "loss_finishedProduct"
-                                                            }`}
+                                                        }`}
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                     />
                                                 </div>
@@ -970,18 +979,20 @@ const Popup_Bom = React.memo((props) => {
                                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
-                                                        className={`${errValue && e.stage == null
-                                                            ? "border-red-500"
-                                                            : "border-transparent"
-                                                            } [&>div>div_div]:!whitespace-nowrap placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `} theme={(theme) => ({
-                                                                ...theme,
-                                                                colors: {
-                                                                    ...theme.colors,
-                                                                    primary25: "#EBF5FF",
-                                                                    primary50: "#92BFF7",
-                                                                    primary: "#0F4F9E",
-                                                                },
-                                                            })}
+                                                        className={`${
+                                                            errValue && e.stage == null
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
+                                                        } [&>div>div_div]:!whitespace-nowrap placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                        theme={(theme) => ({
+                                                            ...theme,
+                                                            colors: {
+                                                                ...theme.colors,
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
+                                                            },
+                                                        })}
                                                         styles={{
                                                             placeholder: (base) => ({
                                                                 ...base,
@@ -1051,4 +1062,4 @@ const Popup_Bom = React.memo((props) => {
         </PopupEdit>
     );
 });
-export default Popup_Bom
+export default Popup_Bom;

@@ -10,7 +10,8 @@
             "@/routers/*": ["routers/*"],
             "@/utils/*": ["utils/*"],
             "@/utils/lib*": ["utils/lib*"],
-            "@/services/*": ["services/*"]
+            "@/services/*": ["services/*"],
+            "@/Api/*": ["Api/*"]
         }
     }
 }

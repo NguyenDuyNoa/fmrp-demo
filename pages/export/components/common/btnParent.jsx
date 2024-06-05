@@ -31,21 +31,20 @@ const BtnParent = ({
     sIsShow,
     sMultipleProgress,
 }) => {
-
-    const isShowToat = useToast()
+    const isShowToat = useToast();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkExport } = useActionRole(auth,
-        tabPage == 1 && "client_customers" ||
-        tabPage == 2 && "suppliers" ||
-        tabPage == 3 && "materials" ||
-        tabPage == 4 && "products" ||
-        tabPage == 5 && "products" ||
-        tabPage == 6 && "products"
+    const { checkExport } = useActionRole(
+        auth,
+        (tabPage == 1 && "client_customers") ||
+            (tabPage == 2 && "suppliers") ||
+            (tabPage == 3 && "materials") ||
+            (tabPage == 4 && "products") ||
+            (tabPage == 5 && "products") ||
+            (tabPage == 6 && "products")
         // ... thêm các type
     );
-
 
     useEffect(() => {
         if (isShow) {
@@ -134,15 +133,15 @@ const BtnParent = ({
 
         XLSX.writeFile(
             wb,
-            `${"Export dữ liệu"}${(tabPage == 1 && "danh mục khách hàng") ||
-            (tabPage == 2 && "danh mục nhà cung cấp") ||
-            (tabPage == 3 && "danh mục nguyên vật liệu") ||
-            (tabPage == 4 && "danh mục thành phẩm")
+            `${"Export dữ liệu"}${
+                (tabPage == 1 && "danh mục khách hàng") ||
+                (tabPage == 2 && "danh mục nhà cung cấp") ||
+                (tabPage == 3 && "danh mục nguyên vật liệu") ||
+                (tabPage == 4 && "danh mục thành phẩm")
             }.xlsx`
         );
     };
 
-    console.log("pageLimit.limit", pageLimit.limit);
     return (
         <div className="col-span-12 mt-2 grid-cols-10 grid gap-2.5 justify-center">
             <div className="col-span-2">
@@ -312,9 +311,9 @@ const BtnParent = ({
                 <button
                     onClick={(e) => {
                         if (role || checkExport) {
-                            _HandleSubmit(e)
+                            _HandleSubmit(e);
                         } else {
-                            isShowToat('warning', WARNING_STATUS_ROLE)
+                            isShowToat("warning", WARNING_STATUS_ROLE);
                         }
                     }}
                     type="button"

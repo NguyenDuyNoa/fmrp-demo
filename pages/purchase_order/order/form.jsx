@@ -73,7 +73,7 @@ const Index = (props) => {
 
     const [onSending, sOnSending] = useState(false);
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const [option, sOption] = useState([
         {
@@ -179,7 +179,9 @@ const Index = (props) => {
                         id: e.purchases_order_item_id,
                         mathang: {
                             e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
+                            label: `${e.item?.name} <span style={{display: none}}>${
+                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
                             value: e.item?.id,
                         },
                         soluong: Number(e?.quantity),
@@ -189,7 +191,8 @@ const Index = (props) => {
                         donvitinh: e.item?.unit_name,
                         dongiasauck: Number(e?.price_after_discount),
                         note: e?.note,
-                        thanhtien: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
+                        thanhtien:
+                            Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity),
                     }))
                 );
 
@@ -399,7 +402,6 @@ const Index = (props) => {
             sEffectiveDateNew(null);
         }
         if (type === "delivery_dateNew") {
-            console.log("hihihi");
             sDelivery_dateNew(new Date());
         }
     };
@@ -481,7 +483,9 @@ const Index = (props) => {
     };
 
     const _ServerFetching_Supplier = () => {
-        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true",
+        Axios(
+            "GET",
+            "/api_web/api_supplier/supplier/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch.value : null,
@@ -497,7 +501,9 @@ const Index = (props) => {
         sOnFetchingSupplier(false);
     };
     const _ServerFetching_Staff = () => {
-        Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true",
+        Axios(
+            "GET",
+            "/api_web/Api_staff/staffOption?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch.value : null,
@@ -542,7 +548,9 @@ const Index = (props) => {
     }, [idSupplier]);
 
     const _ServerFetching_Purcher = () => {
-        Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true",
+        Axios(
+            "GET",
+            "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch != null ? idBranch?.value : -1,
@@ -564,7 +572,9 @@ const Index = (props) => {
     };
 
     const _ServerFetching_Items = () => {
-        Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
+        Axios(
+            "GET",
+            "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
             {
                 params: {
                     branch_id: idBranch != null ? +idBranch?.value : "",
@@ -590,10 +600,12 @@ const Index = (props) => {
     }, [idPurchases]);
 
     const _ServerFetching_ItemsAll = () => {
-        if (loai == '0') {
-            let form = new FormData()
-            form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "")
-            Axios("POST", `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
+        if (loai == "0") {
+            let form = new FormData();
+            form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "");
+            Axios(
+                "POST",
+                `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
                 {
                     data: form,
                     headers: { "Content-Type": "multipart/form-data" },
@@ -606,7 +618,9 @@ const Index = (props) => {
                 }
             );
         } else {
-            Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
+            Axios(
+                "GET",
+                "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true",
                 {
                     params: {
                         branch_id: idBranch != null ? +idBranch?.value : "",
@@ -647,7 +661,7 @@ const Index = (props) => {
     useEffect(() => {
         const check = () => {
             sOnFetchingItemsAll(true);
-        }
+        };
 
         if (loai == "1") {
             idBranch != null && check();
@@ -659,12 +673,11 @@ const Index = (props) => {
         }
     }, [idBranch]);
 
-
     useEffect(() => {
         if (loai == "1") {
             sOnFetchingPurcher(true);
         }
-    }, [loai])
+    }, [loai]);
 
     useEffect(() => {
         idBranch == null && sIdPurchases([]);
@@ -674,7 +687,6 @@ const Index = (props) => {
         idPurchases?.length > 0 && sOnFetchingItems(true);
         idPurchases?.length == 0 && sDataItems([]);
     }, [idPurchases]);
-
 
     const dataOption = sortedArr?.map((e) => {
         return {
@@ -690,12 +702,13 @@ const Index = (props) => {
         };
     });
 
-
     const newDataOption = dataOption?.filter((e) => e?.item !== undefined);
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const check = newDataOption.some((e) => e?.price == 0 || e?.price == "" || e?.quantity == 0 || e?.quantity == "");
+        const check = newDataOption.some(
+            (e) => e?.price == 0 || e?.price == "" || e?.quantity == 0 || e?.quantity == ""
+        );
         if (loai == "0") {
             if (idSupplier == null || idStaff == null || idBranch == null || check) {
                 idSupplier == null && sErrSupplier(true);
@@ -737,30 +750,31 @@ const Index = (props) => {
     }, [idPurchases?.length > 0]);
 
     const _HandleSeachApi = debounce((inputValue) => {
-        if (loai === "0" && idBranch != null)
-        // Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`,
-        //     // Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
-        //     {
-        //         data: {
-        //             branch_id: idBranch != null ? +idBranch?.value : "",
-        //             term: inputValue,
-        //         },
-        //         params: {
-        //             purchase_order_id: id,
-        //         },
-        //     },
-        //     (err, response) => {
-        //         if (!err) {
-        //             var { result } = response?.data.data;
-        //             sDataItems(result);
-        //         }
-        //     }
-        // );
-        {
-            let form = new FormData()
-            form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "")
-            form.append(`term`, inputValue)
-            Axios("POST", `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
+        if (loai === "0" && idBranch != null) {
+            // Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`,
+            //     // Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,
+            //     {
+            //         data: {
+            //             branch_id: idBranch != null ? +idBranch?.value : "",
+            //             term: inputValue,
+            //         },
+            //         params: {
+            //             purchase_order_id: id,
+            //         },
+            //     },
+            //     (err, response) => {
+            //         if (!err) {
+            //             var { result } = response?.data.data;
+            //             sDataItems(result);
+            //         }
+            //     }
+            // );
+            let form = new FormData();
+            form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : "");
+            form.append(`term`, inputValue);
+            Axios(
+                "POST",
+                `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
                 {
                     data: form,
                     headers: { "Content-Type": "multipart/form-data" },
@@ -772,12 +786,10 @@ const Index = (props) => {
                     }
                 }
             );
-        }
-
-        else {
+        } else {
             return;
         }
-    }, 500)
+    }, 500);
 
     const hiddenOptions = idPurchases?.length > 3 ? idPurchases?.slice(0, 3) : [];
 
@@ -789,7 +801,7 @@ const Index = (props) => {
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
-    }
+    };
 
     const _HandleChangeInputOption = (id, type, index3, value) => {
         var index = option.findIndex((x) => x.id === id);
@@ -985,8 +997,6 @@ const Index = (props) => {
         setTongTienState(tongTien);
     }, [option]);
 
-
-
     const _ServerSending = () => {
         let formData = new FormData();
         formData.append("code", code);
@@ -1019,7 +1029,12 @@ const Index = (props) => {
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
         });
-        Axios("POST", `${id ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true` : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
+        Axios(
+            "POST",
+            `${
+                id
+                    ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`
+                    : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -1070,8 +1085,6 @@ const Index = (props) => {
         onSending && _ServerSending();
     }, [onSending]);
 
-
-
     return (
         <React.Fragment>
             <Head>
@@ -1086,9 +1099,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.purchase_order || "purchase_order"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.purchase_order || "purchase_order"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.purchase_order_information || "purchase_order_information"}</h6>
                     </div>
@@ -1099,17 +1110,15 @@ const Index = (props) => {
                             {dataLang?.purchase_order_information || "purchase_order_information"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <ButtonBack
-                                onClick={() => router.push(routerOrder.home)}
-                                dataLang={dataLang}
-                            />
+                            <ButtonBack onClick={() => router.push(routerOrder.home)} dataLang={dataLang} />
                         </div>
                     </div>
 
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione ||
+                                    "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-12 gap-3 items-center mt-2">
                                 <div className="col-span-3">
@@ -1141,8 +1150,9 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errBranch ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         style={{
@@ -1192,8 +1202,9 @@ const Index = (props) => {
                                         placeholder={dataLang?.purchase_order_supplier || "purchase_order_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errSupplier ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}
@@ -1250,8 +1261,9 @@ const Index = (props) => {
                                         placeholder={dataLang?.purchase_order_staff || "purchase_order_staff"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errStaff ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errStaff ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1315,8 +1327,9 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -1418,8 +1431,9 @@ const Index = (props) => {
                                             }
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${errPurchase ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                            className={`${
+                                                errPurchase ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -1565,26 +1579,32 @@ const Index = (props) => {
                                                                         <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                             {option.e?.product_variation}
                                                                         </h5>
-
                                                                     </div>
-                                                                    <h5 className={`${loai == "1" ? "" : 'flex items-center gap-1'} text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
+                                                                    <h5
+                                                                        className={`${
+                                                                            loai == "1" ? "" : "flex items-center gap-1"
+                                                                        } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                                    >
                                                                         {dataLang[option.e?.text_type]}{" "}
                                                                         {loai == "1" ? "-" : ""}{" "}
                                                                         {loai == "1" ? option.e?.purchases_code : ""}{" "}
-                                                                        {loai != "1" &&
+                                                                        {loai != "1" && (
                                                                             <>
                                                                                 <h5>-</h5>
                                                                                 <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                    {dataLang?.purchase_survive || "purchase_survive"}
+                                                                                    {dataLang?.purchase_survive ||
+                                                                                        "purchase_survive"}
                                                                                     :
                                                                                 </h5>
                                                                                 <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                    {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                                    {option.e?.qty_warehouse
+                                                                                        ? option.e?.qty_warehouse
+                                                                                        : "0"}
                                                                                 </h5>
                                                                             </>
-                                                                        }
+                                                                        )}
                                                                     </h5>
-                                                                    {loai == "1" &&
+                                                                    {loai == "1" && (
                                                                         <div className="flex text-gray-400 items-center gap-2">
                                                                             <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                                 Số lượng:
@@ -1594,15 +1614,17 @@ const Index = (props) => {
                                                                             </h5>
                                                                             {"-"}
                                                                             <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {dataLang?.purchase_survive || "purchase_survive"}
+                                                                                {dataLang?.purchase_survive ||
+                                                                                    "purchase_survive"}
                                                                                 :
                                                                             </h5>
                                                                             <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                                {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                                                                                {option.e?.qty_warehouse
+                                                                                    ? option.e?.qty_warehouse
+                                                                                    : "0"}
                                                                             </h5>
                                                                         </div>
-
-                                                                    }
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1672,8 +1694,12 @@ const Index = (props) => {
                                                         isAllowed={isAllowedNumber}
                                                         className={`
                                                         ${index === 0 ? "cursor-default" : "cursor-text"} 
-                                                        ${e?.soluong == 0 && 'border-red-500' || e?.soluong == "" && 'border-red-500'} 
-                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`} />
+                                                        ${
+                                                            (e?.soluong == 0 && "border-red-500") ||
+                                                            (e?.soluong == "" && "border-red-500")
+                                                        } 
+                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                    />
                                                     <button
                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                                         onClick={() => handleIncrease(e.id)}
@@ -1694,7 +1720,10 @@ const Index = (props) => {
                                                     )}
                                                     readOnly={index === 0 ? readOnlyFirst : false}
                                                     className={`${index === 0 ? "cursor-default" : "cursor-text"}
-                                                ${e?.dongia == 0 && 'border-red-500' || e?.dongia == "" && 'border-red-500'} 
+                                                ${
+                                                    (e?.dongia == 0 && "border-red-500") ||
+                                                    (e?.dongia == "" && "border-red-500")
+                                                } 
                                                 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                             </div>
@@ -1724,12 +1753,12 @@ const Index = (props) => {
                                                     value={
                                                         e?.thue
                                                             ? {
-                                                                label: taxOptions.find(
-                                                                    (item) => item.value === e?.thue?.value
-                                                                )?.label,
-                                                                value: e?.thue?.value,
-                                                                tax_rate: e?.thue?.tax_rate,
-                                                            }
+                                                                  label: taxOptions.find(
+                                                                      (item) => item.value === e?.thue?.value
+                                                                  )?.label,
+                                                                  value: e?.thue?.value,
+                                                                  tax_rate: e?.thue?.tax_rate,
+                                                              }
                                                             : null
                                                     }
                                                     placeholder={"% Thuế"}
@@ -1953,15 +1982,8 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <ButtonBack
-                                onClick={() => router.push(routerOrder.home)}
-                                dataLang={dataLang}
-                            />
-                            <ButtonSubmit
-                                onClick={_HandleSubmit.bind(this)}
-                                dataLang={dataLang}
-                                loading={onSending}
-                            />
+                            <ButtonBack onClick={() => router.push(routerOrder.home)} dataLang={dataLang} />
+                            <ButtonSubmit onClick={_HandleSubmit.bind(this)} dataLang={dataLang} loading={onSending} />
                         </div>
                     </div>
                 </div>
@@ -1973,7 +1995,7 @@ const Index = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>

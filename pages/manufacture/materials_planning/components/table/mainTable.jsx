@@ -30,6 +30,8 @@ import { MdAdd } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
+import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
+import apiComons from "@/Api/apiComon/apiComon";
 
 const MainTable = ({ dataLang }) => {
     const arrButton = [
@@ -111,11 +113,17 @@ const MainTable = ({ dataLang }) => {
 
     const [isValue, sIsValue] = useState(initialValue);
 
+    const [isMounted, sIsMounted] = useState(false);
+
     const queryState = (key) => sDataTable((prve) => ({ ...prve, ...key }));
 
     const queryValue = (key) => sIsValue((prve) => ({ ...prve, ...key }));
 
     const [isFetching, sIsFetChing] = useState(false);
+
+    useEffect(() => {
+        sIsMounted(true);
+    }, []);
 
     const convertArrData = (arr) => {
         const newData = arr?.map((e, index) => {
@@ -148,98 +156,85 @@ const MainTable = ({ dataLang }) => {
         branch_id: isValue.valueBr?.value || "",
     };
 
-    const fetchDataTable = (page) => {
-        Axios(
-            "POST",
-            `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${page}&limit=${isValue.limit}`,
-            {
-                params: params,
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response?.data;
-                    const arrayItem = convertArrData(data?.productionPlans);
-                    console.log("arrayItem", arrayItem);
-                    queryState({
-                        countAll: data?.countAll,
-                        listDataLeft: arrayItem.map((e, index) => {
-                            return {
-                                ...e,
-                                showParent: index == 0,
-                            };
-                        }),
-                        next: data?.next == 1,
-                    });
-                    if (isValue.search == "" && arrayItem[0]?.id) {
-                        fetchDataTableRight(arrayItem[0]?.id);
-                    }
-                    if (data?.productionPlans?.length == 0) {
-                        queryState({
-                            listDataRight: {
-                                ...dataTable.listDataRight,
-                                title: null,
-                                dataPPItems: [],
-                                dataBom: {
-                                    productsBom: [],
-                                    materialsBom: [],
-                                },
-                                dataKeepStock: [],
-                                dataPurchases: [],
-                            },
-                        });
-                    }
-                }
-            }
-        );
+    const fetchDataTable = async (page) => {
+        const { data } = await apiMaterialsPlanning.apiProductionPlans(page, isValue.limit, { params: params });
+        const arrayItem = convertArrData(data?.productionPlans);
+        queryState({
+            countAll: data?.countAll,
+            listDataLeft: arrayItem.map((e, index) => {
+                return {
+                    ...e,
+                    showParent: index == 0,
+                };
+            }),
+            next: data?.next == 1,
+        });
+        if (isValue.search == "" && arrayItem[0]?.id) {
+            fetchDataTableRight(arrayItem[0]?.id);
+        }
+        if (data?.productionPlans?.length == 0) {
+            queryState({
+                listDataRight: {
+                    ...dataTable.listDataRight,
+                    title: null,
+                    dataPPItems: [],
+                    dataBom: {
+                        productsBom: [],
+                        materialsBom: [],
+                    },
+                    dataKeepStock: [],
+                    dataPurchases: [],
+                },
+            });
+        }
     };
 
     useEffect(() => {
-        fetchDataTable(isValue.page);
-    }, [isValue.search, isValue.dateStart, isValue.dateEnd, isValue.valueOrder, isValue.valuePlan, isValue.valueBr]);
+        if (isMounted) {
+            fetchDataTable(isValue.page);
+        }
+    }, [
+        isValue.search,
+        isValue.dateStart,
+        isValue.dateEnd,
+        isValue.valueOrder,
+        isValue.valuePlan,
+        isValue.valueBr,
+        isMounted,
+    ]);
 
-    const fetchDataTableSeeMore = () => {
-        Axios(
-            "POST",
-            `/api_web/api_manufactures/getProductionPlans?csrf_protection=true&page=${isValue.page}&limit=${isValue.limit}`,
-            {
-                params: params,
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response?.data;
-                    const item = convertArrData(data?.productionPlans);
-                    let arrayItem = [...dataTable.listDataLeft, ...item];
-                    queryState({
-                        countAll: data?.countAll,
-                        listDataLeft: arrayItem.map((e, index) => {
-                            return {
-                                ...e,
-                                showParent: index == 0,
-                            };
-                        }),
-                        next: data?.next == 1,
-                    });
-                    if (isValue.search == "" && arrayItem[0]?.id) {
-                        fetchDataTableRight(arrayItem[0]?.id);
-                    }
-                    if (data?.productionPlans?.length == 0) {
-                        queryState({
-                            listDataRight: {
-                                ...dataTable.listDataRight,
-                                title: null,
-                                dataPPItems: [],
-                                dataBom: {
-                                    productsBom: [],
-                                    materialsBom: [],
-                                },
-                                dataKeepStock: [],
-                                dataPurchases: [],
-                            },
-                        });
-                    }
-                }
-            }
-        );
+    const fetchDataTableSeeMore = async () => {
+        const { data } = await apiMaterialsPlanning.apiProductionPlans(isValue.page, isValue.limit, { params: params });
+        const item = convertArrData(data?.productionPlans);
+        let arrayItem = [...dataTable.listDataLeft, ...item];
+        queryState({
+            countAll: data?.countAll,
+            listDataLeft: arrayItem.map((e, index) => {
+                return {
+                    ...e,
+                    showParent: index == 0,
+                };
+            }),
+            next: data?.next == 1,
+        });
+        if (isValue.search == "" && arrayItem[0]?.id) {
+            fetchDataTableRight(arrayItem[0]?.id);
+        }
+        if (data?.productionPlans?.length == 0) {
+            queryState({
+                listDataRight: {
+                    ...dataTable.listDataRight,
+                    title: null,
+                    dataPPItems: [],
+                    dataBom: {
+                        productsBom: [],
+                        materialsBom: [],
+                    },
+                    dataKeepStock: [],
+                    dataPurchases: [],
+                },
+            });
+        }
     };
 
     useEffect(() => {
@@ -249,217 +244,174 @@ const MainTable = ({ dataLang }) => {
     }, [isValue.page]);
 
     const fetchDataTableRight = async (id) => {
-        await Axios(
-            "GET",
-            `/api_web/api_manufactures/getDetailProductionPlans/${id}?csrf_protection`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    const { data, isSuccess } = response?.data;
-                    console.log("data?.productionPlan", data);
-                    if (isSuccess == 1) {
-                        queryState({
-                            listDataRight: {
-                                title: data?.productionPlan?.reference_no,
-                                idCommand: data?.productionPlan?.id,
-                                dataPPItems: data?.listPPItems?.map((e) => {
-                                    return {
-                                        id: e?.object_id,
-                                        title: e?.reference_no,
-                                        showChild: true,
-                                        arrListData: e?.items?.map((i) => {
-                                            return {
-                                                id: uddid(),
-                                                image: i?.images ? i?.images : "/no_img.png",
-                                                name: i?.item_name,
-                                                itemVariation: i?.product_variation,
-                                                code: i?.item_code,
-                                                quantity: +i?.quantity,
-                                                unit: i?.unit_name,
-                                                timeline: {
-                                                    start: isMoment(i?.timeline_start, "DD/MM/YYYY"),
-                                                    end: isMoment(i?.timeline_end, "DD/MM/YYYY"),
-                                                },
-                                            };
-                                        }),
-                                    };
-                                }),
-                                dataBom: {
-                                    productsBom: data?.listBom?.productsBom?.map((e) => {
-                                        return {
-                                            id: e?.item_id,
-                                            name: e?.item_name,
-                                            image: e?.images ? e?.images : "/no_img.png",
-                                            unit: e?.unit_name,
-                                            use: e?.total_quota, //sl sử dụng
-                                            exist: e?.quantity_warehouse, //sl tồn
-                                            lack: e?.quantity_rest, //sl thiếu
-                                            code: e?.item_code,
-                                            itemVariation: e?.item_variation,
-                                            quantityKeep: e?.quantity_keep, //sl đã giữ
-                                        };
-                                    }),
-                                    materialsBom: data?.listBom?.materialsBom?.map((e) => {
-                                        return {
-                                            id: e?.item_id,
-                                            name: e?.item_name,
-                                            image: e?.images ? e?.images : "/no_img.png",
-                                            unit: e?.unit_name,
-                                            use: e?.total_quota, //sl sử dụng
-                                            exchange: e?.quota_primary, //sl quy đổi
-                                            exist: e?.quantity_warehouse, //sl tồn
-                                            lack: e?.quantity_rest, //sl thiếu
-                                            code: e?.item_code,
-                                            itemVariation: e?.item_variation,
-                                            quantityKeep: e?.quantity_keep, //sl đã giữ
-                                        };
-                                    }),
-                                },
-                                dataKeepStock: data?.keepWarehouses?.map((e) => {
-                                    return {
-                                        id: e?.id,
-                                        title: e?.code,
-                                        time: isMoment(e?.date, "DD/MM/YYYY"),
-                                        user: e?.created_by_name,
-                                        warehousemanId: e?.warehouseman_id,
-                                        warehouseFrom: e?.name_w_from,
-                                        warehouseTo: e?.name_w_to,
-                                        arrListData: e?.items?.map((i) => {
-                                            return {
-                                                id: i?.id_transfer,
-                                                image: i?.images ? i?.images : "/no_img.png",
-                                                name: i?.item_name,
-                                                quantity: i?.quantity_net,
-                                                unit: i?.unit_name,
-                                                lot: i?.lot,
-                                                expiration_date: i?.expiration_date,
-                                                serial: i?.serial,
-                                                code: i?.item_code,
-                                                itemVariation: i?.item_variation,
-                                                locationFrom: i?.name_location_from,
-                                                locationTo: i?.name_location_to,
-                                            };
-                                        }),
-                                    };
-                                }),
-                                dataPurchases: data?.purchases?.map((e) => {
-                                    return {
-                                        id: e?.id,
-                                        title: e?.code,
-                                        time: isMoment(e?.date, "DD/MM/YYYY"),
-                                        user: e?.created_by_name,
-                                        status: e?.status,
-                                        arrListData: e?.items?.map((i) => {
-                                            return {
-                                                id: i?.id_transfer,
-                                                image: i?.images ? i?.images : "/no_img.png",
-                                                name: i?.item_name,
-                                                quantity: i?.quantity_net,
-                                                unit: i?.unit_name,
-                                                lot: i?.lot,
-                                                expiration_date: i?.expiration_date,
-                                                serial: i?.serial,
-                                                code: i?.item_code,
-                                                itemVariation: i?.item_variation,
-                                                processBar: [
-                                                    {
-                                                        id: uddid(),
-                                                        active:
-                                                            i?.quantity_order && i?.quantity_order > 0 ? true : false,
-                                                        title: "Đặt hàng",
-                                                        quantity: i?.quantity_order,
-                                                    },
-                                                    {
-                                                        id: uddid(),
-                                                        active:
-                                                            i?.quantity_import && i?.quantity_import > 0 ? true : false,
-                                                        title: "Nhập hàng",
-                                                        quantity: i?.quantity_import,
-                                                    },
-                                                ],
-                                            };
-                                        }),
-                                    };
-                                }),
-                            },
-                        });
-                    }
-                }
-            }
-        );
+        const { data, isSuccess } = await apiMaterialsPlanning.apiDetailProductionPlans(id);
+        if (isSuccess == 1) {
+            queryState({
+                listDataRight: {
+                    title: data?.productionPlan?.reference_no,
+                    idCommand: data?.productionPlan?.id,
+                    dataPPItems: data?.listPPItems?.map((e) => {
+                        return {
+                            id: e?.object_id,
+                            title: e?.reference_no,
+                            showChild: true,
+                            arrListData: e?.items?.map((i) => {
+                                return {
+                                    id: uddid(),
+                                    image: i?.images ? i?.images : "/no_img.png",
+                                    name: i?.item_name,
+                                    itemVariation: i?.product_variation,
+                                    code: i?.item_code,
+                                    quantity: +i?.quantity,
+                                    unit: i?.unit_name,
+                                    timeline: {
+                                        start: isMoment(i?.timeline_start, "DD/MM/YYYY"),
+                                        end: isMoment(i?.timeline_end, "DD/MM/YYYY"),
+                                    },
+                                };
+                            }),
+                        };
+                    }),
+                    dataBom: {
+                        productsBom: data?.listBom?.productsBom?.map((e) => {
+                            return {
+                                id: e?.item_id,
+                                name: e?.item_name,
+                                image: e?.images ? e?.images : "/no_img.png",
+                                unit: e?.unit_name,
+                                use: e?.total_quota, //sl sử dụng
+                                exist: e?.quantity_warehouse, //sl tồn
+                                lack: e?.quantity_rest, //sl thiếu
+                                code: e?.item_code,
+                                itemVariation: e?.item_variation,
+                                quantityKeep: e?.quantity_keep, //sl đã giữ
+                            };
+                        }),
+                        materialsBom: data?.listBom?.materialsBom?.map((e) => {
+                            return {
+                                id: e?.item_id,
+                                name: e?.item_name,
+                                image: e?.images ? e?.images : "/no_img.png",
+                                unit: e?.unit_name,
+                                use: e?.total_quota, //sl sử dụng
+                                exchange: e?.quota_primary, //sl quy đổi
+                                exist: e?.quantity_warehouse, //sl tồn
+                                lack: e?.quantity_rest, //sl thiếu
+                                code: e?.item_code,
+                                itemVariation: e?.item_variation,
+                                quantityKeep: e?.quantity_keep, //sl đã giữ
+                            };
+                        }),
+                    },
+                    dataKeepStock: data?.keepWarehouses?.map((e) => {
+                        return {
+                            id: e?.id,
+                            title: e?.code,
+                            time: isMoment(e?.date, "DD/MM/YYYY"),
+                            user: e?.created_by_name,
+                            warehousemanId: e?.warehouseman_id,
+                            warehouseFrom: e?.name_w_from,
+                            warehouseTo: e?.name_w_to,
+                            arrListData: e?.items?.map((i) => {
+                                return {
+                                    id: i?.id_transfer,
+                                    image: i?.images ? i?.images : "/no_img.png",
+                                    name: i?.item_name,
+                                    quantity: i?.quantity_net,
+                                    unit: i?.unit_name,
+                                    lot: i?.lot,
+                                    expiration_date: i?.expiration_date,
+                                    serial: i?.serial,
+                                    code: i?.item_code,
+                                    itemVariation: i?.item_variation,
+                                    locationFrom: i?.name_location_from,
+                                    locationTo: i?.name_location_to,
+                                };
+                            }),
+                        };
+                    }),
+                    dataPurchases: data?.purchases?.map((e) => {
+                        return {
+                            id: e?.id,
+                            title: e?.code,
+                            time: isMoment(e?.date, "DD/MM/YYYY"),
+                            user: e?.created_by_name,
+                            status: e?.status,
+                            arrListData: e?.items?.map((i) => {
+                                return {
+                                    id: i?.id_transfer,
+                                    image: i?.images ? i?.images : "/no_img.png",
+                                    name: i?.item_name,
+                                    quantity: i?.quantity_net,
+                                    unit: i?.unit_name,
+                                    lot: i?.lot,
+                                    expiration_date: i?.expiration_date,
+                                    serial: i?.serial,
+                                    code: i?.item_code,
+                                    itemVariation: i?.item_variation,
+                                    processBar: [
+                                        {
+                                            id: uddid(),
+                                            active: i?.quantity_order && i?.quantity_order > 0 ? true : false,
+                                            title: "Đặt hàng",
+                                            quantity: i?.quantity_order,
+                                        },
+                                        {
+                                            id: uddid(),
+                                            active: i?.quantity_import && i?.quantity_import > 0 ? true : false,
+                                            title: "Nhập hàng",
+                                            quantity: i?.quantity_import,
+                                        },
+                                    ],
+                                };
+                            }),
+                        };
+                    }),
+                },
+            });
+        }
     };
 
     const fetDataOrder = debounce(async (value) => {
-        await Axios(
-            "GET",
-            `/api_web/api_internal_plan/searchOrders?csrf_protection=true`,
-            {
-                params: { search: value },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response?.data;
-                    if (data?.items) {
-                        queryValue({
-                            listOrders: data?.items?.map((e) => {
-                                return {
-                                    value: e?.id,
-                                    label: e?.reference_no,
-                                };
-                            }),
-                        });
-                    }
-                }
-            }
-        );
+        const { data } = await apiMaterialsPlanning.apiSearchOrders({ params: { search: value } });
+        if (data?.items) {
+            queryValue({
+                listOrders: data?.items?.map((e) => {
+                    return {
+                        value: e?.id,
+                        label: e?.reference_no,
+                    };
+                }),
+            });
+        }
     }, 500);
 
     const fetchDataPlan = debounce(async (value) => {
-        await Axios(
-            "GET",
-            `/api_web/api_internal_plan/searchInternalPlans?csrf_protection=true`,
-            {
-                params: { search: value },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { data } = response?.data;
-                    if (data?.items) {
-                        queryValue({
-                            listPlan: data?.items?.map((e) => {
-                                return {
-                                    value: e?.id,
-                                    label: e?.reference_no,
-                                };
-                            }),
-                        });
-                    }
-                }
-            }
-        );
+        const { data } = await apiMaterialsPlanning.apiSearchInternalPlans({ params: { search: value } });
+        if (data?.items) {
+            queryValue({
+                listPlan: data?.items?.map((e) => {
+                    return {
+                        value: e?.id,
+                        label: e?.reference_no,
+                    };
+                }),
+            });
+        }
     }, 500);
 
     const fetchDataBranch = debounce(async (value) => {
-        await Axios(
-            "GET",
-            `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
-            {
-                // params: { search: value }
-            },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response?.data;
-                    queryValue({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
-                }
-            }
-        );
+        const { result } = await apiComons.apiBranchCombobox();
+        queryValue({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
     }, 500);
 
     useEffect(() => {
-        fetDataOrder();
-        fetchDataPlan();
-        fetchDataBranch();
-    }, []);
+        if (isMounted) {
+            fetDataOrder();
+            fetchDataPlan();
+            fetchDataBranch();
+        }
+    }, [isMounted]);
 
     const handleShow = (id) => {
         queryState({
@@ -504,22 +456,13 @@ const MainTable = ({ dataLang }) => {
     };
 
     const handleConfim = async () => {
-        await Axios(
-            "DELETE",
-            `/api_web/api_manufactures/deleteProductionPlans/${isId}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message } = response?.data;
-                    if (isSuccess == 1) {
-                        fetchDataTable();
-                        isShow("success", `${dataLang[message] || message}`);
-                        return;
-                    }
-                    isShow("error", `${dataLang[message] || message}`);
-                }
-            }
-        );
+        const { isSuccess, message } = await apiMaterialsPlanning.apiDeleteProductionPlans(isId);
+        if (isSuccess == 1) {
+            fetchDataTable();
+            isShow("success", `${dataLang[message] || message}`);
+        } else {
+            isShow("error", `${dataLang[message] || message}`);
+        }
         handleQueryId({ status: false });
     };
 
@@ -554,18 +497,14 @@ const MainTable = ({ dataLang }) => {
             dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
             dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
         };
-        await Axios("DELETE", type[isIdChild], {}, (err, response) => {
-            if (!err) {
-                let { isSuccess, message } = response.data;
-                if (isSuccess) {
-                    fetchDataTable(1);
-                    queryValue({ page: 1 });
-                    isShow("success", dataLang[message] || message);
-                } else {
-                    isShow("error", dataLang[message] || message);
-                }
-            }
-        });
+        const { isSuccess, message } = await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild]);
+        if (isSuccess) {
+            fetchDataTable(1);
+            queryValue({ page: 1 });
+            isShow("success", dataLang[message] || message);
+        } else {
+            isShow("error", dataLang[message] || message);
+        }
         handleQueryId({ status: false });
     };
 
@@ -582,6 +521,9 @@ const MainTable = ({ dataLang }) => {
         fetchDataPlan,
         fetchDataTable,
     };
+
+    if (!isMounted) return null;
+
     return (
         <React.Fragment>
             <FilterHeader {...shareProps} />

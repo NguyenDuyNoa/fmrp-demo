@@ -447,7 +447,6 @@ const Popup_ThanhPham = React.memo((props) => {
         formData.append("note", note);
         branch.forEach((e) => formData.append("branch_id[]", e.value));
         formData.append("images", thumbFile);
-        console.log("dataTotalVariant", dataTotalVariant);
         for (let i = 0; i < dataTotalVariant?.length; i++) {
             var item = dataTotalVariant[i];
 
@@ -605,9 +604,7 @@ const Popup_ThanhPham = React.memo((props) => {
                         onClick={() => {
                             if (role || checkEdit) {
                                 sIsOpen(true)
-                                console.log("e,1");
                             } else {
-                                console.log("e,2");
                                 isShow("warning", WARNING_STATUS_ROLE)
                             }
                         }}

@@ -53,7 +53,6 @@ const Popup_chitietThere = (props) => {
         return formatMoneyConfig(+number, dataSeting);
     }
 
-    console.log(props?.type);
     const _ServerFetching_detailThere = () => {
         Axios(
             "GET",

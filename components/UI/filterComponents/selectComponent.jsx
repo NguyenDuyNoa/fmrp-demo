@@ -22,7 +22,8 @@ const SelectComponent = ({
     noOptionsMessage,
     menuShouldBlockScroll,
     classParent,
-    onMenuOpen
+    onMenuOpen,
+    maxShowMuti,
 }) => {
     return (
         <div className={`${classParent ? classParent : "ml-1"}`} style={{ gridColumn: `span ${colSpan || 1}` }}>
@@ -38,6 +39,7 @@ const SelectComponent = ({
                 className={className ? className : configSelectFillter.className}
                 isMulti={isMulti ? isMulti : false}
                 components={components}
+                maxShowMuti={maxShowMuti}
                 noOptionsMessage={noOptionsMessage ? noOptionsMessage : configSelectFillter.noOptionsMessage}
                 closeMenuOnSelect={closeMenuOnSelect}
                 formatOptionLabel={formatOptionLabel}

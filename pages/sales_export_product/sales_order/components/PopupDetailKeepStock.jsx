@@ -29,7 +29,6 @@ import useFeature from "@/hooks/useConfigFeature";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
-
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
 
 const Popup_DetailKeepStock = (props) => {
@@ -76,7 +75,7 @@ const Popup_DetailKeepStock = (props) => {
 
     const { isValue, sIsValue, onChangeValue } = useChangeValue(initialValues);
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const _ToggleModal = (e) => sOpen(e);
 
@@ -89,9 +88,9 @@ const Popup_DetailKeepStock = (props) => {
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
-    }
+    };
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     const handleFetching = () => {
         Axios(
@@ -123,7 +122,6 @@ const Popup_DetailKeepStock = (props) => {
             }
         );
     };
-
 
     const _ServerFetching_filter = () => {
         Axios("GET", "/api_web/Api_transfer/TransferCombobox/?csrf_protection=true", {}, (err, response) => {
@@ -192,7 +190,6 @@ const Popup_DetailKeepStock = (props) => {
         };
         sData({ ...newDb });
     };
-    console.log(data);
 
     useEffect(() => {
         isFetching.onFetching && handleFetching();
@@ -363,7 +360,7 @@ const Popup_DetailKeepStock = (props) => {
                             </div>
                         </div>
                         <div className=" w-[100%]">
-                            <HeaderTablePopup gridCols={10} className={'!rounded-none'}>
+                            <HeaderTablePopup gridCols={10} className={"!rounded-none"}>
                                 <ColumnTablePopup>
                                     {dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
                                 </ColumnTablePopup>
@@ -374,17 +371,17 @@ const Popup_DetailKeepStock = (props) => {
                                     {dataLang?.salesOrder_code_orders || "salesOrder_code_orders"}
                                 </ColumnTablePopup>
                                 <ColumnTablePopup colSpan={2}>
-                                    {dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
+                                    {dataLang?.warehouseTransfer_transferWarehouse ||
+                                        "warehouseTransfer_transferWarehouse"}
                                 </ColumnTablePopup>
                                 <ColumnTablePopup colSpan={2}>
-                                    {dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
+                                    {dataLang?.warehouseTransfer_receivingWarehouse ||
+                                        "warehouseTransfer_receivingWarehouse"}
                                 </ColumnTablePopup>
                                 <ColumnTablePopup>
                                     {dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}
                                 </ColumnTablePopup>
-                                <ColumnTablePopup>
-                                    {dataLang?.inventory_note || "inventory_note"}
-                                </ColumnTablePopup>
+                                <ColumnTablePopup>{dataLang?.inventory_note || "inventory_note"}</ColumnTablePopup>
                                 <ColumnTablePopup>
                                     {dataLang?.salesOrder_action || "salesOrder_action"}
                                 </ColumnTablePopup>
@@ -393,9 +390,7 @@ const Popup_DetailKeepStock = (props) => {
                                 <Loading className="max-h-28" color="#0f4f9e" />
                             ) : dataClone?.transfer?.length > 0 ? (
                                 <>
-                                    <Customscrollbar
-                                        className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
-                                    >
+                                    <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden">
                                         <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
                                             {dataClone?.transfer?.map((e) => {
                                                 return (
@@ -410,10 +405,11 @@ const Popup_DetailKeepStock = (props) => {
                                                                     size="22"
                                                                     color="red"
                                                                     variant="Bold"
-                                                                    className={`${e.isShow
-                                                                        ? "rotate-90 transition-all duration-200 ease-linear"
-                                                                        : ""
-                                                                        } cursor-pointer`}
+                                                                    className={`${
+                                                                        e.isShow
+                                                                            ? "rotate-90 transition-all duration-200 ease-linear"
+                                                                            : ""
+                                                                    } cursor-pointer`}
                                                                 />
                                                                 {isMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                                             </h6>
@@ -430,15 +426,17 @@ const Popup_DetailKeepStock = (props) => {
                                                                 {e?.warehouses_to_name}
                                                             </h6>
                                                             <h6
-                                                                className={`text-[12px] ${e?.warehouseman_id == "0"
-                                                                    ? "bg-blue-200 text-blue-700 px-1.5"
-                                                                    : " bg-green-200 text-green-700 px-3"
-                                                                    } py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
+                                                                className={`text-[12px] ${
+                                                                    e?.warehouseman_id == "0"
+                                                                        ? "bg-blue-200 text-blue-700 px-1.5"
+                                                                        : " bg-green-200 text-green-700 px-3"
+                                                                } py-1 col-span-1 font-medium text-center break-words w-fit  mx-auto rounded-2xl`}
                                                             >
-                                                                {`${e?.warehouseman_id == "0"
-                                                                    ? "Chưa duyệt kho"
-                                                                    : "Đã duyệt kho"
-                                                                    }`}
+                                                                {`${
+                                                                    e?.warehouseman_id == "0"
+                                                                        ? "Chưa duyệt kho"
+                                                                        : "Đã duyệt kho"
+                                                                }`}
                                                             </h6>
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
                                                                 {e?.note}
@@ -487,16 +485,15 @@ const Popup_DetailKeepStock = (props) => {
                                                                         </h6>
                                                                     </div>
 
-                                                                    <Customscrollbar
-                                                                        className="min-h-[90px] mx-5  max-h-[170px] col-span-10 2xl:max-h-[250px] overflow-hidden"
-                                                                    >
+                                                                    <Customscrollbar className="min-h-[90px] mx-5  max-h-[170px] col-span-10 2xl:max-h-[250px] overflow-hidden">
                                                                         <div className="max-h-[300px] col-span-10 grid grid-cols-10 items-center ">
                                                                             {e?.items?.map((e, index) => (
                                                                                 <div
-                                                                                    className={`col-span-10 ${index == 0
-                                                                                        ? "border-t-0"
-                                                                                        : "border-t"
-                                                                                        }  overflow-hidden grid grid-cols-9  hover:bg-slate-50 items-center`}
+                                                                                    className={`col-span-10 ${
+                                                                                        index == 0
+                                                                                            ? "border-t-0"
+                                                                                            : "border-t"
+                                                                                    }  overflow-hidden grid grid-cols-9  hover:bg-slate-50 items-center`}
                                                                                     key={e.id}
                                                                                 >
                                                                                     <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">
@@ -506,7 +503,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                         <div className="flex items-center gap-2">
                                                                                             <div>
                                                                                                 {e?.item?.images !=
-                                                                                                    null ? (
+                                                                                                null ? (
                                                                                                     <ModalImage
                                                                                                         small={
                                                                                                             e?.item
@@ -541,7 +538,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                 </h6>
                                                                                                 <div className="flex items-center font-oblique flex-wrap">
                                                                                                     {dataProductSerial.is_enable ===
-                                                                                                        "1" ? (
+                                                                                                    "1" ? (
                                                                                                         <div className="flex gap-0.5">
                                                                                                             <h6 className="text-[12px]">
                                                                                                                 Serial:
@@ -550,13 +547,13 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                                 {e?.item
                                                                                                                     ?.serial ==
                                                                                                                     null ||
-                                                                                                                    e?.item
-                                                                                                                        ?.serial ==
+                                                                                                                e?.item
+                                                                                                                    ?.serial ==
                                                                                                                     ""
                                                                                                                     ? "-"
                                                                                                                     : e
-                                                                                                                        ?.item
-                                                                                                                        ?.serial}
+                                                                                                                          ?.item
+                                                                                                                          ?.serial}
                                                                                                             </h6>
                                                                                                         </div>
                                                                                                     ) : (
@@ -564,7 +561,7 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                     )}
                                                                                                     {dataMaterialExpiry.is_enable ===
                                                                                                         "1" ||
-                                                                                                        dataProductExpiry.is_enable ===
+                                                                                                    dataProductExpiry.is_enable ===
                                                                                                         "1" ? (
                                                                                                         <>
                                                                                                             <div className="flex gap-0.5">
@@ -576,14 +573,14 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                                         ?.item
                                                                                                                         ?.lot ==
                                                                                                                         null ||
-                                                                                                                        e
-                                                                                                                            ?.item
-                                                                                                                            ?.lot ==
+                                                                                                                    e
+                                                                                                                        ?.item
+                                                                                                                        ?.lot ==
                                                                                                                         ""
                                                                                                                         ? "-"
                                                                                                                         : e
-                                                                                                                            ?.item
-                                                                                                                            ?.lot}
+                                                                                                                              ?.item
+                                                                                                                              ?.lot}
                                                                                                                 </h6>
                                                                                                             </div>
                                                                                                             <div className="flex gap-0.5">
@@ -595,11 +592,11 @@ const Popup_DetailKeepStock = (props) => {
                                                                                                                         ?.item
                                                                                                                         ?.expiration_date
                                                                                                                         ? isMoment(
-                                                                                                                            e
-                                                                                                                                ?.item
-                                                                                                                                ?.expiration_date,
-                                                                                                                            "DD/MM/YYYY"
-                                                                                                                        )
+                                                                                                                              e
+                                                                                                                                  ?.item
+                                                                                                                                  ?.expiration_date,
+                                                                                                                              "DD/MM/YYYY"
+                                                                                                                          )
                                                                                                                         : "-"}
                                                                                                                 </h6>
                                                                                                             </div>

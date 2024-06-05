@@ -750,7 +750,6 @@ const Index = (props) => {
             </div>
         );
     };
-    console.log("listData", listData);
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const checkChildItem = (childItem, property) => {

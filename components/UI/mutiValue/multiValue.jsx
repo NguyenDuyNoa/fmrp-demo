@@ -1,7 +1,7 @@
 import MoreSelectedBadge from "./moreSelectedBadge";
 import { components } from "react-select";
 const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
+    const maxToShow = props?.selectProps?.maxShowMuti || 2;
     const overflow = getValue()
         .slice(maxToShow)
         .map((x) => x.label);
@@ -12,4 +12,4 @@ const MultiValue = ({ index, getValue, ...props }) => {
         <MoreSelectedBadge items={overflow} />
     ) : null;
 };
-export default MultiValue
+export default MultiValue;
