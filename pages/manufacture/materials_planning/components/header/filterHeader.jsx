@@ -1,4 +1,3 @@
-
 import DatePicker from "react-datepicker";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { ArrowDown2 } from "iconsax-react";
@@ -11,42 +10,55 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
     return (
         <>
             <div className="grid grid-cols-10 items-center gap-10 ">
-
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.materials_planning_order_number || 'materials_planning_order_number'}</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">
+                        {dataLang?.materials_planning_order_number || "materials_planning_order_number"}
+                    </h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.valueOrder}
-                        onInputChange={(e) => fetDataOrder(e)}
+                        onInputChange={(e) => {
+                            fetDataOrder(e);
+                        }}
                         onChange={(e) => queryValue({ valueOrder: e, page: 1 })}
                         options={isValue.listOrders}
-                        classNamePrefix={"productionSmoothing"} placeholder={dataLang?.materials_planning_order_number || 'materials_planning_order_number'} />
+                        classNamePrefix={"productionSmoothing"}
+                        placeholder={dataLang?.materials_planning_order_number || "materials_planning_order_number"}
+                    />
                 </div>
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.internal_plan || 'internal_plan'}</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">
+                        {dataLang?.internal_plan || "internal_plan"}
+                    </h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.valuePlan}
-                        onInputChange={(e) => fetchDataPlan(e)}
+                        onInputChange={(e) => {
+                            fetchDataPlan(e);
+                        }}
                         onChange={(e) => queryValue({ valuePlan: e, page: 1 })}
                         options={isValue.listPlan}
                         classNamePrefix={"productionSmoothing"}
-                        placeholder={dataLang?.internal_plan || 'internal_plan'} />
+                        placeholder={dataLang?.internal_plan || "internal_plan"}
+                    />
                 </div>
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'}</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">
+                        {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                    </h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.valueBr}
                         onChange={(e) => queryValue({ valueBr: e, page: 1 })}
                         options={isValue.listBr}
                         classNamePrefix={"productionSmoothing"}
-                        placeholder={dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'} />
+                        placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                    />
                 </div>
                 <div className="col-span-2">
                     <div className="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                            {dataLang?.materials_planning_start_day || 'materials_planning_start_day'}
+                            {dataLang?.materials_planning_start_day || "materials_planning_start_day"}
                         </label>
                         <div className="w-full relative">
                             <DatePicker
@@ -58,7 +70,9 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                                 value={isValue?.dateStart}
                                 isClearable
                                 dateFormat="dd/MM/yyyy"
-                                placeholderText={dataLang?.materials_planning_start_day || 'materials_planning_start_day'}
+                                placeholderText={
+                                    dataLang?.materials_planning_start_day || "materials_planning_start_day"
+                                }
                                 className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
                             />
                             <ArrowDown2
@@ -72,7 +86,7 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                 <div className="col-span-2">
                     <div className="">
                         <label htmlFor="start" className="text-sm text-[#051B44] font-medium ml-1">
-                            {dataLang?.materials_planning_end_day || 'materials_planning_end_day'}
+                            {dataLang?.materials_planning_end_day || "materials_planning_end_day"}
                         </label>
                         <div className="w-full relative ">
                             <DatePicker
@@ -81,9 +95,8 @@ const FilterHeader = ({ dataLang, isValue, queryValue, fetDataOrder, fetchDataPl
                                 onChange={(date) => queryValue({ dateEnd: date, page: 1 })}
                                 value={isValue?.dateEnd}
                                 isClearable
-                                placeholderText={dataLang?.materials_planning_end_day || 'materials_planning_end_day'}
+                                placeholderText={dataLang?.materials_planning_end_day || "materials_planning_end_day"}
                                 clearButtonClassName="text -translate-x-1/2"
-
                                 className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280]  text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
                             />
                             <ArrowDown2

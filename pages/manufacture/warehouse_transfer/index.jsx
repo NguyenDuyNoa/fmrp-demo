@@ -57,6 +57,8 @@ import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
+import apiComons from "@/Api/apiComon/apiComon";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -126,114 +128,65 @@ const Index = (props) => {
         queryState({ onFetching_filter: true });
     }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/Api_transfer/transfer/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                    "filter[warehouses_id]":
-                        isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
-                    "filter[warehouses_to]":
-                        isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data;
-                    sTotalItems(output);
-                    sTotal(rTotal);
-                    queryState({ data: rResult, dataExcel: rResult });
-                }
-                queryState({ onFetching: false });
-            }
-        );
+        const params = {
+            search: isState.keySearch,
+            limit: limit,
+            page: router.query?.page || 1,
+            "filter[status_bar]": tabPage ?? null,
+            "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+            "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+            "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+            "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+            "filter[warehouses_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
+            "filter[warehouses_to]": isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
+        };
+        const { rResult, output, rTotal } = await apiWarehouseTransfer.apiListTransfer({ params: params });
+        sTotalItems(output);
+        sTotal(rTotal);
+        queryState({ data: rResult, dataExcel: rResult, onFetching: false });
     };
 
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_transfer/TransferFilterBar/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                    "filter[warehouses_id]":
-                        isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
-                    "filter[warehouses_to]":
-                        isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    queryState({ listDs: data || [] });
-                }
-                queryState({ onFetchingGroup: false });
-            }
-        );
+    const _ServerFetching_group = async () => {
+        const params = {
+            limit: 0,
+            search: isState.keySearch,
+            "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+            "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+            "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+            "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+            "filter[warehouses_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
+            "filter[warehouses_to]": isState.idReceivingWarehouse != null ? isState.idReceivingWarehouse?.value : null,
+        };
+        const db = await apiWarehouseTransfer.apiTransferFilterBar({ params: params });
+        queryState({ listDs: db || [], onFetchingGroup: false });
     };
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
-            }
+    const _ServerFetching_filter = async () => {
+        const { result: listBr } = await apiComons.apiBranchCombobox();
+        const { result: listCode } = await apiWarehouseTransfer.apiTransferCombobox("GET");
+        const data = await apiWarehouseTransfer.apiWarehouseComboboxFindBranch();
+        const db = data?.map((e) => ({
+            label: e?.warehouse_name,
+            value: e?.id,
+        }));
+        queryState({
+            listCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [],
+            listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
+            dataWarehouse: db || [],
+            dataReceivingWarehouse: db || [],
+            onFetching_filter: false,
         });
-        Axios("GET", "/api_web/Api_transfer/TransferCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
-                queryState({ listCode: result?.map((e) => ({ label: e.code, value: e.id })) || [] });
-            }
-        });
-        Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseComboboxFindBranch/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    let data = response?.data;
-                    const db = data?.map((e) => ({
-                        label: e?.warehouse_name,
-                        value: e?.id,
-                    }));
-                    queryState({ dataWarehouse: db || [], dataReceivingWarehouse: db || [] });
-                }
-            }
-        );
-        queryState({ onFetching_filter: false });
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_transfer/TransferCombobox/?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
-                },
+    const _HandleSeachApi = debounce(async (inputValue) => {
+        const { result: listCode } = await apiWarehouseTransfer.apiTransferCombobox("POST", {
+            data: {
+                term: inputValue,
             },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response?.data;
-                    queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) || [] });
-                }
-            }
-        );
+        });
+        queryState({ lisCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [] });
     }, 500);
 
     useEffect(() => {

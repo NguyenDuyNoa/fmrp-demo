@@ -267,6 +267,7 @@ const MainTable = ({ dataLang }) => {
                                 itemVariation: i?.product_variation,
                                 code: i?.item_code,
                                 quantity: +i?.quantity,
+
                                 unit: i?.unit_name,
                                 processBar: i?.list_stages?.map((j) => {
                                     return {

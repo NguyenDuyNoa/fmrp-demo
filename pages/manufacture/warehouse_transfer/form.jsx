@@ -1,37 +1,36 @@
-import Head from "next/head";
 import { debounce } from "lodash";
-import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
 import moment from "moment/moment";
-import { v4 as uuidv4 } from "uuid";
-import { MdClear } from "react-icons/md";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import { v4 as uuidv4 } from "uuid";
 
-import { _ServerInstance as Axios } from "/services/axios";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 
-import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
-
-
-import Loading from "@/components/UI/loading";
-import { Container } from "@/components/UI/common/layout";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
 import { routerWarehouseTransfer } from "routers/manufacture";
 
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { SelectCore } from "@/utils/lib/Select";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
 /// Hậu viết API
 const Index = (props) => {
     const router = useRouter();
@@ -41,7 +40,7 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const [onFetching, sOnFetching] = useState(false);
 
@@ -53,7 +52,7 @@ const Index = (props) => {
 
     const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] = useState(false);
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     const [onFetchingReceivingLocation, sOnFetchingReceivingLocation] = useState(false);
 
@@ -120,28 +119,19 @@ const Index = (props) => {
 
     const statusExprired = useStatusExprired();
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sOnLoading(true);
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-                sOnLoading(false);
-            }
-        });
-        Axios("GET", "/api_web/Api_warehouse/warehouseCombobox_not_system/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sDataReceiveWarehouse(
-                        data?.map((e) => ({
-                            label: e?.warehouse_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
+
+        const { result } = await apiComons.apiBranchCombobox();
+        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+        sOnLoading(false);
+
+        const data = await apiWarehouseTransfer.apiWarehouseComboboxNotSystem();
+        sDataReceiveWarehouse(
+            data?.map((e) => ({
+                label: e?.warehouse_name,
+                value: e?.id,
+            }))
         );
         sOnFetching(false);
     };
@@ -162,81 +152,77 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios("GET", `/api_web/Api_transfer/getTransferDetail/${id}?csrf_protection=true`, {},
-            (err, response) => {
-                if (!err) {
-                    let rResult = response.data;
-                    sIdBranch({
-                        label: rResult?.branch_name_id,
-                        value: rResult?.branch_id,
-                    });
-                    sIdExportWarehouse({
-                        label: rResult?.warehouses_id_name,
-                        value: rResult?.warehouses_id,
-                    });
-                    sIdReceiveWarehouse({
-                        label: rResult?.warehouses_to_name,
-                        value: rResult?.warehouses_to,
-                    });
-                    sCode(rResult?.code);
-                    sStartDate(moment(rResult?.date).toDate());
-                    sNote(rResult?.note);
-                    sListData(
-                        rResult?.items.map((e) => ({
-                            id: e?.item?.id,
-                            idParenBackend: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
-                                value: e.item?.id,
-                            },
-                            child: e?.child.map((ce) => ({
-                                idChildBackEnd: Number(ce?.id),
-                                id: Number(ce?.id),
-                                disabledDate:
-                                    (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                                    (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                                    (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                    (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                                location:
-                                    ce?.warehouse_location?.location_name ||
-                                        ce?.warehouse_location?.id ||
-                                        ce?.warehouse_location?.warehouse_name ||
-                                        ce?.warehouse_location?.quantity
-                                        ? {
-                                            label: ce?.warehouse_location?.location_name,
-                                            value: ce?.warehouse_location?.id,
-                                            warehouse_name: ce?.warehouse_location?.warehouse_name,
-                                            qty: +ce?.warehouse_location?.quantity,
-                                        }
-                                        : null,
-                                receivingLocation:
-                                    ce?.warehouse_location_to?.location_name || ce?.warehouse_location_to?.location_id
-                                        ? {
-                                            label: ce?.warehouse_location_to?.location_name,
-                                            value: ce?.warehouse_location_to?.id,
-                                        }
-                                        : null,
-                                serial: ce?.serial == null ? "" : ce?.serial,
-                                lot: ce?.lot == null ? "" : ce?.lot,
-                                date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                                unit: e?.item?.unit_name,
-                                dataWarehouse: e?.item?.warehouse.map((ye) => ({
-                                    label: ye?.location_name,
-                                    value: ye?.id,
-                                    warehouse_name: ye?.warehouse_name,
-                                    qty: +ye?.quantity,
-                                })),
-                                exportQuantity: +ce?.quantity,
-                                note: ce?.note,
-                            })),
-                        }))
-                    );
-                }
-                sOnFetchingDetail(false);
-            }
+    const _ServerFetchingDetailPage = async () => {
+        const rResult = await apiWarehouseTransfer.apiDetailTransfer(id);
+        sIdBranch({
+            label: rResult?.branch_name_id,
+            value: rResult?.branch_id,
+        });
+        sIdExportWarehouse({
+            label: rResult?.warehouses_id_name,
+            value: rResult?.warehouses_id,
+        });
+        sIdReceiveWarehouse({
+            label: rResult?.warehouses_to_name,
+            value: rResult?.warehouses_to,
+        });
+        sCode(rResult?.code);
+        sStartDate(moment(rResult?.date).toDate());
+        sNote(rResult?.note);
+        sListData(
+            rResult?.items.map((e) => ({
+                id: e?.item?.id,
+                idParenBackend: e?.item?.id,
+                matHang: {
+                    e: e?.item,
+                    label: `${e.item?.name} <span style={{display: none}}>${
+                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                    }</span>`,
+                    value: e.item?.id,
+                },
+                child: e?.child.map((ce) => ({
+                    idChildBackEnd: Number(ce?.id),
+                    id: Number(ce?.id),
+                    disabledDate:
+                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                    location:
+                        ce?.warehouse_location?.location_name ||
+                        ce?.warehouse_location?.id ||
+                        ce?.warehouse_location?.warehouse_name ||
+                        ce?.warehouse_location?.quantity
+                            ? {
+                                  label: ce?.warehouse_location?.location_name,
+                                  value: ce?.warehouse_location?.id,
+                                  warehouse_name: ce?.warehouse_location?.warehouse_name,
+                                  qty: +ce?.warehouse_location?.quantity,
+                              }
+                            : null,
+                    receivingLocation:
+                        ce?.warehouse_location_to?.location_name || ce?.warehouse_location_to?.location_id
+                            ? {
+                                  label: ce?.warehouse_location_to?.location_name,
+                                  value: ce?.warehouse_location_to?.id,
+                              }
+                            : null,
+                    serial: ce?.serial == null ? "" : ce?.serial,
+                    lot: ce?.lot == null ? "" : ce?.lot,
+                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                    unit: e?.item?.unit_name,
+                    dataWarehouse: e?.item?.warehouse.map((ye) => ({
+                        label: ye?.location_name,
+                        value: ye?.id,
+                        warehouse_name: ye?.warehouse_name,
+                        qty: +ye?.quantity,
+                    })),
+                    exportQuantity: +ce?.quantity,
+                    note: ce?.note,
+                })),
+            }))
         );
+        sOnFetchingDetail(false);
     };
 
     useEffect(() => {
@@ -252,94 +238,63 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-        JSON.stringify(dataProductExpiry) !== "{}" &&
-        JSON.stringify(dataProductSerial) !== "{}",
+            JSON.stringify(dataProductExpiry) !== "{}" &&
+            JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
-        await Axios("GET", "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    sDataItems(result);
-                }
-            }
-        );
+        const params = {
+            "filter[branch_id]": idBranch ? idBranch?.value : null,
+            "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+        };
+        const { data } = await apiWarehouseTransfer.apiGetSemiItems("GET", { params: params });
+        sDataItems(data?.result);
         sOnFetchingItemsAll(false);
     };
     const _ServerFetching_ExportWarehouse = async () => {
-        await Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sDataWarehouse(
-                        data?.map((e) => ({
-                            label: e?.warehouse_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
+        const params = {
+            "filter[branch_id]": idBranch ? idBranch?.value : null,
+            "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+        };
+        const data = await apiWarehouseTransfer.apiWarehouseCombobox({ params: params });
+        sDataWarehouse(
+            data?.map((e) => ({
+                label: e?.warehouse_name,
+                value: e?.id,
+            }))
         );
         sOnFetchingExportWarehouse(false);
     };
     const _ServerFetching_ReceivingLocation = async () => {
-        await Axios("GET", `/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true`,
-            {
-                params: {
-                    "filter[warehouse_id]": idReceiveWarehouse ? idReceiveWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sDataReceivingLocation(
-                        data?.map((e) => ({
-                            label: e?.location_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
+        const params = {
+            "filter[warehouse_id]": idReceiveWarehouse ? idReceiveWarehouse?.value : null,
+        };
+        const data = await apiWarehouseTransfer.apiwarehouseLocationCombobox({ params: params });
+        sDataReceivingLocation(
+            data?.map((e) => ({
+                label: e?.location_name,
+                value: e?.id,
+            }))
         );
         sOnFetchingReceivingLocation(false);
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
+    const _HandleSeachApi = debounce(async (inputValue) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios("POST", `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
-
-                    data: {
-                        term: inputValue,
-                    },
+            const { data } = await apiWarehouseTransfer.apiGetSemiItems("POST", {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
                 },
-                (err, response) => {
-                    if (!err) {
-                        let { result } = response.data.data;
-                        sDataItems(result);
-                    }
-                }
-            );
+
+                data: {
+                    term: inputValue,
+                },
+            });
+            sDataItems(data?.result);
         }
-    }, 500)
+    }, 500);
 
     const resetValue = () => {
         if (isKeyState?.type === "branch") {
@@ -425,7 +380,11 @@ const Index = (props) => {
 
         const hasNullLocation = hasNullValue(listData, (childItem) => childItem.receivingLocation === null);
 
-        const hasNullQty = hasNullValue(listData, (childItem) => childItem.exportQuantity === null || childItem.exportQuantity === "" || childItem.exportQuantity == 0);
+        const hasNullQty = hasNullValue(
+            listData,
+            (childItem) =>
+                childItem.exportQuantity === null || childItem.exportQuantity === "" || childItem.exportQuantity == 0
+        );
 
         const isEmpty = listData?.length == 0 ? true : false;
 
@@ -499,10 +458,10 @@ const Index = (props) => {
     }, [idReceiveWarehouse]);
 
     const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting)
+        return formatNumberConfig(+number, dataSeting);
     };
-    const _ServerSending = () => {
-        var formData = new FormData();
+    const _ServerSending = async () => {
+        let formData = new FormData();
         formData.append("code", code);
         formData.append("date", moment(startDate).format("YYYY-MM-DD"));
         formData.append("branch_id", idBranch?.value);
@@ -515,40 +474,39 @@ const Index = (props) => {
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
-                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
-                formData.append(`items[${index}][child][${childIndex}][location_warehouses_to]`, childItem?.receivingLocation?.value || 0);
+                formData.append(
+                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
+                    childItem?.location?.value || 0
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][location_warehouses_to]`,
+                    childItem?.receivingLocation?.value || 0
+                );
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.exportQuantity);
             });
         });
-        Axios("POST", `${id ? `/api_web/Api_transfer/transfer/${id}?csrf_protection=true` : `/api_web/Api_transfer/transfer/?csrf_protection=true`}`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message, item } = response.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang[message]);
-                        sCode("");
-                        sStartDate(new Date());
-                        sIdBranch(null);
-                        sIdExportWarehouse(null);
-                        sIdReceiveWarehouse(null);
-                        sNote("");
-                        sErrBranch(false);
-                        sErrExportWarehouse(false);
-                        sErrReceiveWarehouse(false);
-                        sErrDate(false);
-                        sListData([]);
-                        router.push(routerWarehouseTransfer.home);
-                    } else {
-                        handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
-                    }
-                }
-                sOnSending(false);
-            }
-        );
+        const url = id
+            ? `/api_web/Api_transfer/transfer/${id}?csrf_protection=true`
+            : `/api_web/Api_transfer/transfer/?csrf_protection=true`;
+        const { isSuccess, message, item } = apiWarehouseTransfer.apiHandingTransfer(url, formData);
+        if (isSuccess) {
+            isShow("success", dataLang[message]);
+            sCode("");
+            sStartDate(new Date());
+            sIdBranch(null);
+            sIdExportWarehouse(null);
+            sIdReceiveWarehouse(null);
+            sNote("");
+            sErrBranch(false);
+            sErrExportWarehouse(false);
+            sErrReceiveWarehouse(false);
+            sErrDate(false);
+            sListData([]);
+            router.push(routerWarehouseTransfer.home);
+        } else {
+            handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -757,10 +715,18 @@ const Index = (props) => {
                                 idChildBackEnd: null,
                                 id: uuidv4(),
                                 disabledDate:
-                                    (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
-                                    (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
-                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
-                                    (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
+                                    (value?.e?.text_type === "material" &&
+                                        dataMaterialExpiry?.is_enable === "1" &&
+                                        false) ||
+                                    (value?.e?.text_type === "material" &&
+                                        dataMaterialExpiry?.is_enable === "0" &&
+                                        true) ||
+                                    (value?.e?.text_type === "products" &&
+                                        dataProductExpiry?.is_enable === "1" &&
+                                        false) ||
+                                    (value?.e?.text_type === "products" &&
+                                        dataProductExpiry?.is_enable === "0" &&
+                                        true),
                                 unit: value?.e?.unit_name,
                                 receivingLocation: null,
                                 location: null,
@@ -807,8 +773,12 @@ const Index = (props) => {
                             {dataLang?.warehouseTransfer_title || "warehouseTransfer_title"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6> {id ? dataLang?.warehouseTransfer_titleEdit || "warehouseTransfer_titleEdit"
-                            : dataLang?.warehouseTransfer_titleAadd || "warehouseTransfer_titleAadd"}</h6>
+                        <h6>
+                            {" "}
+                            {id
+                                ? dataLang?.warehouseTransfer_titleEdit || "warehouseTransfer_titleEdit"
+                                : dataLang?.warehouseTransfer_titleAadd || "warehouseTransfer_titleAadd"}
+                        </h6>
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
@@ -819,17 +789,15 @@ const Index = (props) => {
                                 : dataLang?.warehouseTransfer_titleAadd || "warehouseTransfer_titleAadd"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <ButtonBack
-                                onClick={() => router.push(routerWarehouseTransfer.home)}
-                                dataLang={dataLang}
-                            />
+                            <ButtonBack onClick={() => router.push(routerWarehouseTransfer.home)} dataLang={dataLang} />
                         </div>
                     </div>
 
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2">
-                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione ||
+                                    "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
@@ -863,8 +831,9 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -892,8 +861,9 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errBranch ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -950,10 +920,12 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={
-                                            dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"
+                                            dataLang?.warehouseTransfer_transferWarehouse ||
+                                            "warehouseTransfer_transferWarehouse"
                                         }
-                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errExportWarehouse ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1008,10 +980,12 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={
-                                            dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"
+                                            dataLang?.warehouseTransfer_receivingWarehouse ||
+                                            "warehouseTransfer_receivingWarehouse"
                                         }
-                                        className={`${errReceiveWarehouse ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errReceiveWarehouse ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1065,10 +1039,12 @@ const Index = (props) => {
                         <div className="col-span-9">
                             <div className="grid grid-cols-8">
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {dataLang?.warehouseTransfer_rransferPosition || "warehouseTransfer_rransferPosition"}
+                                    {dataLang?.warehouseTransfer_rransferPosition ||
+                                        "warehouseTransfer_rransferPosition"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
+                                    {dataLang?.warehouseTransfer_receivingLocation ||
+                                        "warehouseTransfer_receivingLocation"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
@@ -1137,7 +1113,8 @@ const Index = (props) => {
                                                             Serial: {option.e?.serial ? option.e?.serial : "-"}
                                                         </div>
                                                     )}
-                                                    {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                    {dataMaterialExpiry.is_enable === "1" ||
+                                                    dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
@@ -1146,8 +1123,8 @@ const Index = (props) => {
                                                                 Date:{" "}
                                                                 {option.e?.expiration_date
                                                                     ? moment(option.e?.expiration_date).format(
-                                                                        "DD/MM/YYYY"
-                                                                    )
+                                                                          "DD/MM/YYYY"
+                                                                      )
                                                                     : "-"}
                                                             </div>
                                                         </>
@@ -1202,7 +1179,10 @@ const Index = (props) => {
                                     {" "}
                                     <SelectCore
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={dataLang?.warehouseTransfer_rransferPosition || "warehouseTransfer_rransferPosition"}
+                                        placeholder={
+                                            dataLang?.warehouseTransfer_rransferPosition ||
+                                            "warehouseTransfer_rransferPosition"
+                                        }
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -1210,7 +1190,10 @@ const Index = (props) => {
                                 <div className="col-span-2">
                                     <SelectCore
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
+                                        placeholder={
+                                            dataLang?.warehouseTransfer_receivingLocation ||
+                                            "warehouseTransfer_receivingLocation"
+                                        }
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -1301,18 +1284,28 @@ const Index = (props) => {
                                                                             {dataProductSerial.is_enable === "1" && (
                                                                                 <div className="text-[11px] text-[#667085] font-[500]">
                                                                                     Serial:{" "}
-                                                                                    {option.e?.serial ? option.e?.serial : "-"}
+                                                                                    {option.e?.serial
+                                                                                        ? option.e?.serial
+                                                                                        : "-"}
                                                                                 </div>
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" ||
+                                                                            dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
-                                                                                        {option.e?.lot ? option.e?.lot : "-"}
+                                                                                        {option.e?.lot
+                                                                                            ? option.e?.lot
+                                                                                            : "-"}
                                                                                     </div>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Date:{" "}
-                                                                                        {option.e?.expiration_date ? moment(option.e?.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                        {option.e?.expiration_date
+                                                                                            ? moment(
+                                                                                                  option.e
+                                                                                                      ?.expiration_date
+                                                                                              ).format("DD/MM/YYYY")
+                                                                                            : "-"}
                                                                                     </div>
                                                                                 </>
                                                                             ) : (
@@ -1370,7 +1363,9 @@ const Index = (props) => {
                                                         <Add className="" />
                                                     </button>
                                                 </div>
-                                                {e?.child?.filter((e) => e?.location == null && e?.receivingLocation == null)?.length >= 2 && (
+                                                {e?.child?.filter(
+                                                    (e) => e?.location == null && e?.receivingLocation == null
+                                                )?.length >= 2 && (
                                                     <button
                                                         onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
                                                         className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
@@ -1378,7 +1373,13 @@ const Index = (props) => {
                                                         <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                                         <span className="relative text-xs">
                                                             Xóa{" "}
-                                                            {e?.child?.filter((e) => e?.location == null && e?.receivingLocation == null)?.length}{" "}
+                                                            {
+                                                                e?.child?.filter(
+                                                                    (e) =>
+                                                                        e?.location == null &&
+                                                                        e?.receivingLocation == null
+                                                                )?.length
+                                                            }{" "}
                                                             hàng chưa chọn vị trí
                                                         </span>
                                                     </button>
@@ -1395,15 +1396,30 @@ const Index = (props) => {
                                                                     <SelectCore
                                                                         options={ce?.dataWarehouse}
                                                                         value={ce?.location}
-                                                                        isLoading={ce?.location != null ? false : onLoadingChild}
-                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "location")}
-                                                                        className={`${errWarehouse && ce?.location == null
-                                                                            ? "border-red-500 border"
-                                                                            : ""
-                                                                            } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                        placeholder={onLoadingChild ? "" : dataLang?.warehouseTransfer_rransferPosition || "warehouseTransfer_rransferPosition"
+                                                                        isLoading={
+                                                                            ce?.location != null
+                                                                                ? false
+                                                                                : onLoadingChild
                                                                         }
-                                                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "location"
+                                                                        )}
+                                                                        className={`${
+                                                                            errWarehouse && ce?.location == null
+                                                                                ? "border-red-500 border"
+                                                                                : ""
+                                                                        } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        placeholder={
+                                                                            onLoadingChild
+                                                                                ? ""
+                                                                                : dataLang?.warehouseTransfer_rransferPosition ||
+                                                                                  "warehouseTransfer_rransferPosition"
+                                                                        }
+                                                                        noOptionsMessage={() =>
+                                                                            dataLang?.returns_nodata || "returns_nodata"
                                                                         }
                                                                         menuPortalTarget={document.body}
                                                                         formatOptionLabel={(option) => (
@@ -1416,12 +1432,14 @@ const Index = (props) => {
                                                                                 <div className="flex gap-1">
                                                                                     {option?.qty && (
                                                                                         <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                            {dataLang?.returns_survive || "returns_survive"}
+                                                                                            {dataLang?.returns_survive ||
+                                                                                                "returns_survive"}
                                                                                             :
                                                                                         </h2>
                                                                                     )}
                                                                                     <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
-                                                                                        {option?.qty && formatNumber(option?.qty)}
+                                                                                        {option?.qty &&
+                                                                                            formatNumber(option?.qty)}
                                                                                     </h2>
                                                                                 </div>
                                                                             </div>
@@ -1447,13 +1465,31 @@ const Index = (props) => {
                                                                     <SelectCore
                                                                         options={dataReceivingLocation}
                                                                         value={ce?.receivingLocation}
-                                                                        isLoading={ce?.receivingLocation != null ? false : onLoadingChild}
-                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "receivingLocation")}
-                                                                        className={`${errReceivingLocation && ce?.receivingLocation == null ? "border-red-500 border" : ""
-                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                        placeholder={onLoadingChild ? "" : dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"
+                                                                        isLoading={
+                                                                            ce?.receivingLocation != null
+                                                                                ? false
+                                                                                : onLoadingChild
                                                                         }
-                                                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "receivingLocation"
+                                                                        )}
+                                                                        className={`${
+                                                                            errReceivingLocation &&
+                                                                            ce?.receivingLocation == null
+                                                                                ? "border-red-500 border"
+                                                                                : ""
+                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        placeholder={
+                                                                            onLoadingChild
+                                                                                ? ""
+                                                                                : dataLang?.warehouseTransfer_receivingLocation ||
+                                                                                  "warehouseTransfer_receivingLocation"
+                                                                        }
+                                                                        noOptionsMessage={() =>
+                                                                            dataLang?.returns_nodata || "returns_nodata"
                                                                         }
                                                                         menuPortalTarget={document.body}
                                                                         formatOptionLabel={(option) => (
@@ -1489,7 +1525,12 @@ const Index = (props) => {
                                                                 <div className="flex items-center justify-center  h-full p-0.5">
                                                                     <button
                                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                        onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}
+                                                                        onClick={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "decrease"
+                                                                        )}
                                                                     >
                                                                         <Minus
                                                                             className="2xl:scale-100 xl:scale-100 scale-50"
@@ -1498,18 +1539,41 @@ const Index = (props) => {
                                                                     </button>
 
                                                                     <InPutNumericFormat
-                                                                        placeholder={(ce?.location == null || ce?.unit == null) && "Chọn vị trí trước"}
-                                                                        disabled={ce?.location == null || ce?.unit == null}
-                                                                        className={`${errQty && (ce?.exportQuantity == null || ce?.exportQuantity == "" || ce?.exportQuantity == 0) ? "border-red-500 border-b" : ""}
-                                                                            ${(ce?.exportQuantity == null || ce?.exportQuantity == "" || ce?.exportQuantity == 0) && "border-red-500 border-b"}
+                                                                        placeholder={
+                                                                            (ce?.location == null ||
+                                                                                ce?.unit == null) &&
+                                                                            "Chọn vị trí trước"
+                                                                        }
+                                                                        disabled={
+                                                                            ce?.location == null || ce?.unit == null
+                                                                        }
+                                                                        className={`${
+                                                                            errQty &&
+                                                                            (ce?.exportQuantity == null ||
+                                                                                ce?.exportQuantity == "" ||
+                                                                                ce?.exportQuantity == 0)
+                                                                                ? "border-red-500 border-b"
+                                                                                : ""
+                                                                        }
+                                                                            ${
+                                                                                (ce?.exportQuantity == null ||
+                                                                                    ce?.exportQuantity == "" ||
+                                                                                    ce?.exportQuantity == 0) &&
+                                                                                "border-red-500 border-b"
+                                                                            }
                                                                             placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 disabled:bg-transparent font-normal w-full focus:outline-none border-b border-gray-200 `}
-                                                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "exportQuantity")}
+                                                                        onValueChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "exportQuantity"
+                                                                        )}
                                                                         value={ce?.exportQuantity}
                                                                         isAllowed={(values) => {
                                                                             const { floatValue } = values;
                                                                             if (floatValue > +ce?.location?.qty) {
                                                                                 handleQuantityError(+ce?.location?.qty);
-                                                                                return false
+                                                                                return false;
                                                                             }
                                                                             if (floatValue == 0) {
                                                                                 return true;
@@ -1521,7 +1585,12 @@ const Index = (props) => {
 
                                                                     <button
                                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                        onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}
+                                                                        onClick={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "increase"
+                                                                        )}
                                                                     >
                                                                         <Add
                                                                             className="2xl:scale-100 xl:scale-100 scale-50"
@@ -1532,7 +1601,12 @@ const Index = (props) => {
                                                                 <div className="col-span-1 flex items-center justify-center  h-full ">
                                                                     <input
                                                                         value={ce?.note}
-                                                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "note"
+                                                                        )}
                                                                         placeholder="Ghi chú"
                                                                         type="text"
                                                                         className="  placeholder:text-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal px-1.5 outline-none"
@@ -1541,7 +1615,11 @@ const Index = (props) => {
                                                                 <div className=" h-full p-0.5 flex flex-col items-center justify-center">
                                                                     <button
                                                                         title="Xóa"
-                                                                        onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                                                        onClick={_HandleDeleteChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id
+                                                                        )}
                                                                         className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
                                                                     >
                                                                         <IconDelete />
@@ -1595,7 +1673,10 @@ const Index = (props) => {
                                     {formatNumber(
                                         listData?.reduce((total, item) => {
                                             item?.child?.forEach((childItem) => {
-                                                if (childItem.exportQuantity !== undefined && childItem.exportQuantity !== null) {
+                                                if (
+                                                    childItem.exportQuantity !== undefined &&
+                                                    childItem.exportQuantity !== null
+                                                ) {
                                                     total += childItem.exportQuantity;
                                                 }
                                             });
@@ -1606,14 +1687,8 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <ButtonBack
-                                onClick={() => router.push(routerWarehouseTransfer.home)}
-                                dataLang={dataLang}
-                            />
-                            <ButtonSubmit
-                                onClick={_HandleSubmit.bind(this)}
-                                dataLang={dataLang}
-                            />
+                            <ButtonBack onClick={() => router.push(routerWarehouseTransfer.home)} dataLang={dataLang} />
+                            <ButtonSubmit onClick={_HandleSubmit.bind(this)} dataLang={dataLang} />
                         </div>
                     </div>
                 </div>
@@ -1627,12 +1702,11 @@ const Index = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>
     );
 };
-
 
 export default Index;

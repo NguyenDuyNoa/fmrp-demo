@@ -23,7 +23,9 @@ const FilterHeader = memo(
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueProductionOrders}
-                            onInputChange={(e) => fetchComboboxProductionOrders(e)}
+                            onInputChange={(e) => {
+                                fetchComboboxProductionOrders(e);
+                            }}
                             onChange={(e) => handleFilter("valueProductionOrders", e)}
                             options={isState.comboboxProductionOrders}
                             classNamePrefix={"productionSmoothing"}
@@ -61,7 +63,9 @@ const FilterHeader = memo(
                             onChange={(e) => handleFilter("valueProducts", e)}
                             classNamePrefix={"productionSmoothing"}
                             placeholder={"Mặt hàng"}
-                            onInputChange={(e) => fetchDataItems(e)}
+                            onInputChange={(e) => {
+                                fetchDataItems(e);
+                            }}
                             isMulti={true}
                             components={{ MultiValue }}
                             maxShowMuti={1}
@@ -137,7 +141,9 @@ const FilterHeader = memo(
                             isClearable={true}
                             value={isState.valueOrders}
                             options={isState.listOrders}
-                            onInputChange={(e) => fetDataOrder(e)}
+                            onInputChange={(e) => {
+                                fetDataOrder(e);
+                            }}
                             onChange={(e) => handleFilter("valueOrders", e)}
                             classNamePrefix={"productionSmoothing"}
                             placeholder={"Đơn hàng bán"}
@@ -149,7 +155,9 @@ const FilterHeader = memo(
                             isClearable={true}
                             value={isState.valuePlan}
                             options={isState.listPlan}
-                            onInputChange={(e) => fetchDataPlan(e)}
+                            onInputChange={(e) => {
+                                fetchDataPlan(e);
+                            }}
                             onChange={(e) => handleFilter("valuePlan", e)}
                             classNamePrefix={"productionSmoothing"}
                             placeholder={"Kế hoạch nội bộ"}

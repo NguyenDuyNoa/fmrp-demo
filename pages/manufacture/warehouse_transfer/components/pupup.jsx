@@ -1,24 +1,23 @@
 import moment from "moment/moment";
-import ModalImage from "react-modal-image";
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 
-import { _ServerInstance as Axios } from "/services/axios";
-
-import PopupEdit from "@/components/UI/popup";
-import Loading from "@/components/UI/loading";
-import NoData from "@/components/UI/noData/nodata";
-import ExpandableContent from "@/components/UI/more";
-import useSetingServer from "@/hooks/useConfigNumber";
-import ImageErrors from "@/components/UI/imageErrors";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
+import ExpandableContent from "@/components/UI/more";
+import NoData from "@/components/UI/noData/nodata";
+import PopupEdit from "@/components/UI/popup";
+import useSetingServer from "@/hooks/useConfigNumber";
 
-import useFeature from "@/hooks/useConfigFeature";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import useFeature from "@/hooks/useConfigFeature";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -27,36 +26,31 @@ const Popup_chitiet = (props) => {
 
     const [data, sData] = useState();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const [onFetching, sOnFetching] = useState(false);
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
 
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
 
     const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting)
+        return formatNumberConfig(+number, dataSeting);
     };
 
-    const _ServerFetching_detailOrder = () => {
-        Axios("GET", `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sData(data);
-            }
-            sOnFetching(false);
-        });
+    const _ServerFetching_detailOrder = async () => {
+        const data = await apiWarehouseTransfer.apiDetailTransfer(props?.id);
+        sData(data);
+        sOnFetching(false);
     };
 
     useEffect(() => {
         setTimeout(() => {
-            (onFetching && _ServerFetching_detailOrder())
+            onFetching && _ServerFetching_detailOrder();
         }, 400);
     }, [open]);
-
 
     return (
         <>
@@ -94,7 +88,8 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator ||
+                                                    "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
                                                 <div className="relative">
@@ -119,7 +114,8 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
+                                                {props?.dataLang?.production_warehouse_LSX ||
+                                                    "production_warehouse_LSX"}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -132,7 +128,8 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang?.warehouseTransfer_transferWarehouse || "warehouseTransfer_transferWarehouse"}
+                                                {props.dataLang?.warehouseTransfer_transferWarehouse ||
+                                                    "warehouseTransfer_transferWarehouse"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 <LinkWarehouse
@@ -146,7 +143,8 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3 ">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
+                                                {props?.dataLang?.production_warehouse_Total_value ||
+                                                    "production_warehouse_Total_value"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {formatNumber(data?.grand_total)}
@@ -156,13 +154,12 @@ const Popup_chitiet = (props) => {
                                             <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
-                                            <TagBranch className='w-fit'>
-                                                {data?.branch_name_id}
-                                            </TagBranch>
+                                            <TagBranch className="w-fit">{data?.branch_name_id}</TagBranch>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"}
+                                                {props.dataLang?.warehouseTransfer_receivingWarehouse ||
+                                                    "warehouseTransfer_receivingWarehouse"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 <LinkWarehouse
@@ -181,19 +178,21 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
-                                            {props.dataLang?.warehouseTransfer_rransferPosition || "warehouseTransfer_rransferPosition"}
+                                            {props.dataLang?.warehouseTransfer_rransferPosition ||
+                                                "warehouseTransfer_rransferPosition"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
-                                            {props.dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
+                                            {props.dataLang?.warehouseTransfer_receivingLocation ||
+                                                "warehouseTransfer_receivingLocation"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={1}>
-                                            {props.dataLang?.production_warehouse_inventory || "production_warehouse_inventory"}
+                                            {props.dataLang?.production_warehouse_inventory ||
+                                                "production_warehouse_inventory"}
                                         </ColumnTablePopup>
+                                        <ColumnTablePopup colSpan={1}>{"ĐVT"}</ColumnTablePopup>
                                         <ColumnTablePopup colSpan={1}>
-                                            {"ĐVT"}
-                                        </ColumnTablePopup>
-                                        <ColumnTablePopup colSpan={1}>
-                                            {props.dataLang?.production_warehouse_export_sl || "production_warehouse_export_sl"}
+                                            {props.dataLang?.production_warehouse_export_sl ||
+                                                "production_warehouse_export_sl"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.import_from_note || "import_from_note"}
@@ -203,7 +202,7 @@ const Popup_chitiet = (props) => {
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>
-                                            <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]" >
+                                            <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]">
                                                 <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
                                                         <div
@@ -246,20 +245,27 @@ const Popup_chitiet = (props) => {
                                                                                         Serial:
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e?.item?.serial == null || e?.item?.serial == "" ? "-" : e?.item?.serial}
+                                                                                        {e?.item?.serial == null ||
+                                                                                        e?.item?.serial == ""
+                                                                                            ? "-"
+                                                                                            : e?.item?.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" ||
+                                                                            dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
                                                                                             Lot:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
+                                                                                            {e?.item?.lot == null ||
+                                                                                            e?.item?.lot == ""
+                                                                                                ? "-"
+                                                                                                : e?.item?.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className="flex gap-0.5">
@@ -267,7 +273,12 @@ const Popup_chitiet = (props) => {
                                                                                             Date:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e?.item?.expiration_date ? moment(e?.item?.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                            {e?.item?.expiration_date
+                                                                                                ? moment(
+                                                                                                      e?.item
+                                                                                                          ?.expiration_date
+                                                                                                  ).format("DD/MM/YYYY")
+                                                                                                : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>
@@ -310,7 +321,9 @@ const Popup_chitiet = (props) => {
                                                 </div>
                                             </Customscrollbar>
                                         </>
-                                    ) : <NoData />}
+                                    ) : (
+                                        <NoData />
+                                    )}
                                 </div>
                                 <h2 className="font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                                     {props.dataLang?.purchase_total || "purchase_total"}
@@ -329,7 +342,8 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-2 space-y-1 text-right">
                                         <div className="font-medium text-left text-[13px]">
                                             <h3>
-                                                {props?.dataLang?.production_warehouse_totalItem || "production_warehouse_totalItem"}
+                                                {props?.dataLang?.production_warehouse_totalItem ||
+                                                    "production_warehouse_totalItem"}
                                             </h3>
                                         </div>
                                         <div className="font-medium text-left text-[13px]">
@@ -339,7 +353,8 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="font-medium text-left text-[13px]">
                                             <h3>
-                                                {props?.dataLang?.production_warehouse_Totalinventory || "production_warehouse_Totalinventory"}
+                                                {props?.dataLang?.production_warehouse_Totalinventory ||
+                                                    "production_warehouse_Totalinventory"}
                                             </h3>
                                         </div>
                                     </div>

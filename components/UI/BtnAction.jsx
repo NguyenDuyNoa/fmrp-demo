@@ -1,15 +1,15 @@
-import Popup from "reactjs-popup";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import Popup from "reactjs-popup";
 
 import { _ServerInstance as Axios } from "services/axios";
 
-import { BiEdit } from "react-icons/bi";
-import { ArrowDown2, AttachCircle, Box1, BoxSearch, I3Square, Trash } from "iconsax-react";
+import { ArrowDown2, Box1, BoxSearch, Trash } from "iconsax-react";
 import pdfMake from "pdfmake/build/pdfmake";
-import { VscFilePdf } from "react-icons/vsc";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { VscFilePdf } from "react-icons/vsc";
 
 import FilePDF from "./FilePDF";
 
@@ -25,17 +25,17 @@ import {
     routerWarehouseTransfer,
 } from "@/routers/manufacture";
 
-import PopupConfim from "./popupConfim/popupConfim";
-import Popup_KeepStock from "@/pages/sales_export_product/sales_order/components/PopupKeepStock";
 import Popup_DetailKeepStock from "@/pages/sales_export_product/sales_order/components/PopupDetailKeepStock";
+import Popup_KeepStock from "@/pages/sales_export_product/sales_order/components/PopupKeepStock";
+import PopupConfim from "./popupConfim/popupConfim";
 
 ///Đơn đặt hàng PO
-import Popup_TableValidateEdit from "@/pages/purchase_order/order/components/validateEdit";
 import Popup_TableValidateDelete from "@/pages/purchase_order/order/components/validateDelete";
+import Popup_TableValidateEdit from "@/pages/purchase_order/order/components/validateEdit";
 
+import { useSetData } from "@/hooks/useSetData";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import { useSetData } from "@/hooks/useSetData";
 
 import PopupEdit from "@/components/UI/popup";
 
@@ -45,14 +45,14 @@ import Popup_dspc from "@/pages/accountant/payment/components/popup";
 import Popup_dspt from "@/pages/accountant/receipts/components/popup";
 
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
-import { useSelector } from "react-redux";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
-import Popup_GiaiDoan from "@/pages/products/components/product/popupGiaiDoan";
 import Popup_Bom from "@/pages/products/components/product/popupBom";
+import Popup_GiaiDoan from "@/pages/products/components/product/popupGiaiDoan";
 import Popup_ThanhPham from "@/pages/products/components/product/popupThanhPham";
+import { useSelector } from "react-redux";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -83,8 +83,8 @@ const BtnAction = React.memo((props) => {
         Axios("DELETE", url, {}, (err, response) => {
             if (!err) {
                 if (response && response.data) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
+                    let { isSuccess, message, ...res } = response.data;
+                    if (isSuccess || (props.type == "category_errors" && res?.result == 1)) {
                         isShow("success", props.dataLang[message] || message);
 
                         props.onRefresh && props.onRefresh();
@@ -121,6 +121,7 @@ const BtnAction = React.memo((props) => {
         //Báo giá
 
         const initialApiDelete = {
+            category_errors: `api_web/Api_category_error/deleteCategoryError/${props.id}?csrf_protection=true`,
             settings_variant: `/api_web/Api_variation/variation/${props.id}?csrf_protection=true`,
             units: `/api_web/Api_unit/unit/${props.id}?csrf_protection=true`,
             stages: `/api_web/api_product/stage/${props.id}?csrf_protection=true`,
@@ -367,6 +368,7 @@ const BtnAction = React.memo((props) => {
                 "stages",
                 "costs",
                 "settings_variant",
+                "category_errors",
             ].includes(props?.type) ? (
                 <button
                     type="button"

@@ -619,19 +619,13 @@ const Header = () => {
                 },
                 {
                     title: "Danh mục lỗi",
-                    link: "#",
-                    viewOwn: -1,
-                    view: -1,
-                },
-                {
-                    title: "Điều độ sản xuất",
-                    link: "#",
+                    link: "/manufacture/category_errors",
                     viewOwn: -1,
                     view: -1,
                 },
                 {
                     title: "Chi tiết lỗi",
-                    link: "#",
+                    link: "/manufacture/category_detail_errors",
                     viewOwn: -1,
                     view: -1,
                 },
