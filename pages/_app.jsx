@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
 
 import Layout from "@/components/layout";
-import { _ServerInstance as Axios } from "/services/axios";
 import store from "/services/redux";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,20 +11,11 @@ import "../styles/globals.scss";
 
 import LoginPage from "@/components/UI/login/login";
 import { Lexend_Deca } from "@next/font/google";
-import Swal from "sweetalert2";
 import apiDashboard from "Api/apiDashboard/apiDashboard";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
-});
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
 });
 
 const Default = (props) => {

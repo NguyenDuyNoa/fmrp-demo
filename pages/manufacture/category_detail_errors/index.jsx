@@ -383,7 +383,7 @@ const Index = (props) => {
                                                                 onRefreshGroup={() => {}}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
-                                                                type="client_group"
+                                                                type="category_detail_errors"
                                                             />
                                                         </RowItemTable>
                                                     </RowTable>

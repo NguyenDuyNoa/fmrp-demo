@@ -84,7 +84,9 @@ const BtnAction = React.memo((props) => {
             if (!err) {
                 if (response && response.data) {
                     let { isSuccess, message, ...res } = response.data;
-                    if (isSuccess || (props.type == "category_errors" && res?.result == 1)) {
+                    const modelOther = ["category_errors", "category_detail_errors"];
+
+                    if (isSuccess || (modelOther.includes(props.type) && res?.result == 1)) {
                         isShow("success", props.dataLang[message] || message);
 
                         props.onRefresh && props.onRefresh();
@@ -121,6 +123,7 @@ const BtnAction = React.memo((props) => {
         //Báo giá
 
         const initialApiDelete = {
+            category_detail_errors: `api_web/Api_category_error/deleteDetailError/${props.id}?csrf_protection=true`,
             category_errors: `api_web/Api_category_error/deleteCategoryError/${props.id}?csrf_protection=true`,
             settings_variant: `/api_web/Api_variation/variation/${props.id}?csrf_protection=true`,
             units: `/api_web/Api_unit/unit/${props.id}?csrf_protection=true`,
@@ -369,6 +372,7 @@ const BtnAction = React.memo((props) => {
                 "costs",
                 "settings_variant",
                 "category_errors",
+                "category_detail_errors",
             ].includes(props?.type) ? (
                 <button
                     type="button"
