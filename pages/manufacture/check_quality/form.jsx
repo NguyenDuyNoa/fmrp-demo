@@ -740,7 +740,7 @@ const Index = (props) => {
                                 <input
                                     placeholder={"Chi tiết lỗi"}
                                     disabled
-                                    className=" disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-[11px] "
+                                    className=" disabled:bg-gray-50 text-center col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-[11px] "
                                 />
                                 <button
                                     title={dataLang?.returns_delete || "returns_delete"}
@@ -997,8 +997,9 @@ const Index = (props) => {
                                                         name="Nhập chi tiết lỗi"
                                                         data={isStateQlty.listData}
                                                         id={e?.id}
+                                                        quantityError={e.quantityError}
                                                         queryStateQlty={queryStateQlty}
-                                                        className="px-4 py-1.5 rounded-xl bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 hover:scale-105 text-xs font-medium text-[9px] text-center text-white  transition-all ease-linear cursor-pointer "
+                                                        className="px-4 py-1.5 rounded-2xl bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 hover:scale-105 text-xs font-medium text-[9px] text-center text-white  transition-all ease-linear cursor-pointer "
                                                     />
                                                 </div>
                                                 <div className="col-span-1  h-full flex items-center justify-center">

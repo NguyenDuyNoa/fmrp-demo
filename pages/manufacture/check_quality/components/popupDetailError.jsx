@@ -9,7 +9,7 @@ import useToast from "@/hooks/useToast";
 import { SelectCore, componentsCore } from "@/utils/lib/Select";
 import { Trash as IconDelete } from "iconsax-react";
 import { v4 as uuid } from "uuid";
-const PopupDetailError = ({ data, id, queryStateQlty, ...props }) => {
+const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props }) => {
     const isShow = useToast();
 
     const initilaState = {
@@ -81,12 +81,17 @@ const PopupDetailError = ({ data, id, queryStateQlty, ...props }) => {
     useEffect(() => {
         addItemToParent(isState.dataDetailError);
     }, [isFinite.dataDetailError]);
-
     return (
         <PopupEdit
             title={"Thêm chi tiết lỗi"}
             button={props?.name}
-            onClickOpen={() => queryState({ open: true })}
+            onClickOpen={() => {
+                if (+quantityError > 0) {
+                    queryState({ open: true });
+                } else {
+                    isShow("error", "Vui lòng nhập số lượng lỗi");
+                }
+            }}
             open={isState.open}
             onClose={() => queryState({ open: false })}
             classNameBtn={`${props?.className}`}
