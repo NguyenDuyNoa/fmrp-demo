@@ -4,6 +4,7 @@ import PopupEdit from "/components/UI/popup";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import useToast from "@/hooks/useToast";
 import { SelectCore, componentsCore } from "@/utils/lib/Select";
+import NoData from "@/components/UI/noData/nodata";
 const PopupDetailError = (props) => {
     const isShow = useToast();
 
@@ -58,7 +59,7 @@ const PopupDetailError = (props) => {
                 <div className="overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
                     <GeneralInformation {...props} />
                 </div>
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-2 gap-5 mb-3">
                     <div className="">
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
                             Danh mục lỗi
@@ -174,21 +175,14 @@ const PopupDetailError = (props) => {
                     </div>
                 </div>
                 <div className="w-full">
-                    <HeaderTablePopup gridCols={12}>
-                        <ColumnTablePopup colSpan={4}>
-                            {props.dataLang?.import_detail_items || "import_detail_items"}
-                        </ColumnTablePopup>
-                        <ColumnTablePopup colSpan={2}>{"ĐVT"}</ColumnTablePopup>
-                        <ColumnTablePopup colSpan={2}>
-                            {props.dataLang?.import_from_quantity || "import_from_quantity"}
-                        </ColumnTablePopup>
-                        <ColumnTablePopup colSpan={2}>
-                            {props.dataLang?.internal_plan_date || "internal_plan_date"}
-                        </ColumnTablePopup>
-                        <ColumnTablePopup colSpan={2}>
-                            {props.dataLang?.import_from_note || "import_from_note"}
-                        </ColumnTablePopup>
+                    <HeaderTablePopup gridCols={10}>
+                        <ColumnTablePopup colSpan={2}>{"Mã chi tiết lỗi"}</ColumnTablePopup>
+                        <ColumnTablePopup colSpan={2}>{"Tên chi tiết lỗi"}</ColumnTablePopup>
+                        <ColumnTablePopup colSpan={2}>{"Ghi chú"}</ColumnTablePopup>
+                        <ColumnTablePopup colSpan={2}>{"Chi nhánh"}</ColumnTablePopup>
+                        <ColumnTablePopup colSpan={2}>{"Tác vụ"}</ColumnTablePopup>
                     </HeaderTablePopup>
+                    <NoData />
                 </div>
             </div>
         </PopupEdit>
