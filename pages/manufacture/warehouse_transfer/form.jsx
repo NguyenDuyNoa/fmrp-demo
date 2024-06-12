@@ -1064,7 +1064,9 @@ const Index = (props) => {
                     <div className="grid grid-cols-12 items-center gap-1 my-1 py-2">
                         <div className="col-span-3">
                             <SelectCore
-                                onInputChange={_HandleSeachApi.bind(this)}
+                               onInputChange={(event) =>{
+                                _HandleSeachApi(event)
+                            }}
                                 options={options}
                                 value={null}
                                 onChange={_HandleAddParent.bind(this)}
@@ -1242,7 +1244,9 @@ const Index = (props) => {
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
-                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        onInputChange={(event) =>{
+                                                            _HandleSeachApi(event)
+                                                        }}
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}
                                                         formatOptionLabel={(option) => (

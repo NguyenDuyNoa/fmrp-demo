@@ -693,7 +693,9 @@ const Index = (props) => {
                             <SelectCore
                                 options={options}
                                 value={null}
-                                onInputChange={_HandleSeachApi.bind(this)}
+                                onInputChange={(event) => {
+                                    _HandleSeachApi(event);
+                                }}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                 placeholder={dataLang?.returns_items || "returns_items"}
@@ -784,7 +786,9 @@ const Index = (props) => {
                                                     <SelectCore
                                                         options={options}
                                                         value={e?.matHang}
-                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        onInputChange={(event) => {
+                                                            _HandleSeachApi(event);
+                                                        }}
                                                         className=""
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}

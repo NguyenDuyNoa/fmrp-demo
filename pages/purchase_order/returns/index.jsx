@@ -539,7 +539,9 @@ const Index = (props) => {
 
                                             />
                                             <SelectComponent
-                                                onInputChange={_HandleSeachApi.bind(this)}
+                                                  onInputChange={(event) =>{
+                                                    _HandleSeachApi(event)
+                                                }}
                                                 options={[
                                                     {
                                                         value: "",

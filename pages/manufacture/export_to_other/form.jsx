@@ -33,7 +33,6 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
 import ButtonBack from "@/components/UI/button/buttonBack";
 
-
 const Index = (props) => {
     const router = useRouter();
 
@@ -41,7 +40,7 @@ const Index = (props) => {
 
     const scrollAreaRef = useRef(null);
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
@@ -84,7 +83,7 @@ const Index = (props) => {
 
     const [dataItems, sDataItems] = useState([]);
 
-    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
+    const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature();
     //new
 
     const statusExprired = useStatusExprired();
@@ -157,7 +156,6 @@ const Index = (props) => {
         sOnFetching(false);
     };
 
-
     const options = dataItems?.map((e) => ({
         label: `${e.name}
                 <span style={{display: none}}>${e.code}</span>
@@ -195,13 +193,13 @@ const Index = (props) => {
                     sListObject(
                         rResult?.object === "other"
                             ? {
-                                label: rResult?.object_text,
-                                value: rResult?.object_text,
-                            }
+                                  label: rResult?.object_text,
+                                  value: rResult?.object_text,
+                              }
                             : {
-                                label: dataLang[rResult?.object_text] || rResult?.object_text,
-                                value: rResult?.object_id,
-                            }
+                                  label: dataLang[rResult?.object_text] || rResult?.object_text,
+                                  value: rResult?.object_id,
+                              }
                     );
                     sListData(
                         rResult?.items.map((e) => ({
@@ -209,28 +207,32 @@ const Index = (props) => {
                             idParenBackend: e?.item?.id,
                             matHang: {
                                 e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
+                                label: `${e.item?.name} <span style={{display: none}}>${
+                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
                                 value: e.item?.id,
                             },
                             child: e?.child.map((ce) => ({
                                 idChildBackEnd: Number(ce?.id),
                                 id: Number(ce?.id),
                                 disabledDate:
-                                    (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                                    (e.item?.text_type == "material" &&
+                                        dataMaterialExpiry?.is_enable == "1" &&
+                                        false) ||
                                     (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
                                     (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
                                     (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                                 location:
                                     ce?.warehouse_location?.location_name ||
-                                        ce?.warehouse_location?.id ||
-                                        ce?.warehouse_location?.warehouse_name ||
-                                        ce?.warehouse_location?.quantity
+                                    ce?.warehouse_location?.id ||
+                                    ce?.warehouse_location?.warehouse_name ||
+                                    ce?.warehouse_location?.quantity
                                         ? {
-                                            label: ce?.warehouse_location?.location_name,
-                                            value: ce?.warehouse_location?.id,
-                                            warehouse_name: ce?.warehouse_location?.warehouse_name,
-                                            qty: ce?.warehouse_location?.quantity,
-                                        }
+                                              label: ce?.warehouse_location?.location_name,
+                                              value: ce?.warehouse_location?.id,
+                                              warehouse_name: ce?.warehouse_location?.warehouse_name,
+                                              qty: ce?.warehouse_location?.quantity,
+                                          }
                                         : null,
                                 dataWarehouse: e?.item?.warehouseList.map((ye) => ({
                                     label: ye?.location_name,
@@ -272,8 +274,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-        JSON.stringify(dataProductExpiry) !== "{}" &&
-        JSON.stringify(dataProductSerial) !== "{}",
+            JSON.stringify(dataProductExpiry) !== "{}" &&
+            JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = () => {
@@ -324,7 +326,9 @@ const Index = (props) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios("POST", `/api_web/Api_export_other/itemCombobox/?csrf_protection=true`,
+            Axios(
+                "POST",
+                `/api_web/Api_export_other/itemCombobox/?csrf_protection=true`,
                 {
                     params: {
                         "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -342,10 +346,12 @@ const Index = (props) => {
                 }
             );
         }
-    }, 500)
+    }, 500);
 
     const _ServerFetching_LisObject = async () => {
-        await Axios("GET", "/api_web/Api_export_other/objectList/?csrf_protection=true",
+        await Axios(
+            "GET",
+            "/api_web/Api_export_other/objectList/?csrf_protection=true",
             {
                 params: {
                     type: object?.value,
@@ -568,7 +574,9 @@ const Index = (props) => {
                         const qtyExport = Number(value?.value);
                         updatedChild.toOtherQuantity = qtyExport;
                     } else if (type === "location") {
-                        const checkKho = newData[parentIndex].child.map((house) => house).some((i) => i?.location?.value === value?.value);
+                        const checkKho = newData[parentIndex].child
+                            .map((house) => house)
+                            .some((i) => i?.location?.value === value?.value);
                         if (checkKho) {
                             handleCheckError("Vị trí kho đã được chọn");
                         } else {
@@ -578,7 +586,8 @@ const Index = (props) => {
                         if (updatedChild.location == null) {
                             handleCheckError("Vui lòng chọn vị trí trước");
                         } else if (
-                            updatedChild.toOtherQuantity == updatedChild.location?.qty || (id && updatedChild.toOtherQuantity >= updatedChild.location?.qty)
+                            updatedChild.toOtherQuantity == updatedChild.location?.qty ||
+                            (id && updatedChild.toOtherQuantity >= updatedChild.location?.qty)
                         ) {
                             handleQuantityError(updatedChild?.location?.qty);
                         } else {
@@ -613,8 +622,12 @@ const Index = (props) => {
                                     id: uuidv4(),
                                     location: null,
                                     disabledDate:
-                                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
-                                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true),
+                                        (value?.e?.text_type === "material" &&
+                                            dataMaterialExpiry?.is_enable === "1" &&
+                                            false) ||
+                                        (value?.e?.text_type === "material" &&
+                                            dataMaterialExpiry?.is_enable === "0" &&
+                                            true),
                                     dataWarehouse: value?.e?.warehouseList.map((e) => ({
                                         label: e?.location_name,
                                         value: e?.id,
@@ -643,10 +656,15 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const hasNullOrCondition = (data, conditionFn) => data.some((item) => item.child?.some((childItem) => conditionFn(item, childItem)));
+        const hasNullOrCondition = (data, conditionFn) =>
+            data.some((item) => item.child?.some((childItem) => conditionFn(item, childItem)));
 
         const hasNullKho = hasNullOrCondition(listData, (item, childItem) => childItem.location === null);
-        const hasNullQty = hasNullOrCondition(listData, (item, childItem) => childItem.toOtherQuantity === null || childItem.toOtherQuantity === "" || childItem.toOtherQuantity == 0);
+        const hasNullQty = hasNullOrCondition(
+            listData,
+            (item, childItem) =>
+                childItem.toOtherQuantity === null || childItem.toOtherQuantity === "" || childItem.toOtherQuantity == 0
+        );
 
         const isEmpty = listData?.length === 0;
 
@@ -714,7 +732,6 @@ const Index = (props) => {
         idBranch != null && sOnFetchingWarehouse(true);
     }, [idBranch]);
 
-
     const _ServerSending = () => {
         var formData = new FormData();
 
@@ -744,14 +761,23 @@ const Index = (props) => {
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
 
-                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.location?.value || 0);
+                formData.append(
+                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
+                    childItem?.location?.value || 0
+                );
 
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
 
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.toOtherQuantity);
             });
         });
-        Axios("POST", `${id ? `/api_web/Api_export_other/exportOther/${id}?csrf_protection=true` : `/api_web/Api_export_other/exportOther/?csrf_protection=true`}`,
+        Axios(
+            "POST",
+            `${
+                id
+                    ? `/api_web/Api_export_other/exportOther/${id}?csrf_protection=true`
+                    : `/api_web/Api_export_other/exportOther/?csrf_protection=true`
+            }`,
             {
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -807,7 +833,7 @@ const Index = (props) => {
                         : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd"}
                 </title>
             </Head>
-            <Container className={'!h-auto'}>
+            <Container className={"!h-auto"}>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
@@ -816,8 +842,12 @@ const Index = (props) => {
                             {dataLang?.exportToOthe_exporttoOther || "exportToOthe_exporttoOther"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6> {id ? dataLang?.exportToOthe_exporttoOtherEdit || "exportToOthe_exporttoOtherEdit"
-                            : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd"}</h6>
+                        <h6>
+                            {" "}
+                            {id
+                                ? dataLang?.exportToOthe_exporttoOtherEdit || "exportToOthe_exporttoOtherEdit"
+                                : dataLang?.exportToOthe_exporttoOtherAdd || "exportToOthe_exporttoOtherAdd"}
+                        </h6>
                     </div>
                 )}
                 <div className="h-[97%] space-y-3 overflow-hidden">
@@ -835,7 +865,8 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2 ">
-                                {dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
+                                {dataLang?.purchase_order_detail_general_informatione ||
+                                    "purchase_order_detail_general_informatione"}
                             </h2>
                             <div className="grid grid-cols-10  gap-3 items-center mt-2 	">
                                 <div className="col-span-2">
@@ -871,8 +902,9 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -900,8 +932,9 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errBranch ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -957,8 +990,9 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.exportToOthe_warehouse || "exportToOthe_warehouse"}
-                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errExportWarehouse ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1088,8 +1122,9 @@ const Index = (props) => {
                                                 position: "absolute",
                                             }),
                                         }}
-                                        className={`${errObject ? "border-red-500" : "border-transparent"
-                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                        className={`${
+                                            errObject ? "border-red-500" : "border-transparent"
+                                        }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                     />
                                     {errObject && (
                                         <label className="mb-2 text-sm  text-red-500">
@@ -1110,8 +1145,9 @@ const Index = (props) => {
                                             isClearable={true}
                                             value={listObject}
                                             classNamePrefix="Select"
-                                            className={`${errListObject ? "border-red-500" : "border-transparent"
-                                                } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            className={`${
+                                                errListObject ? "border-red-500" : "border-transparent"
+                                            } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                             isSearchable={true}
                                             noOptionsMessage={() => `Chưa có gợi ý`}
                                             formatCreateLabel={(value) => `Tạo "${value}"`}
@@ -1188,8 +1224,9 @@ const Index = (props) => {
                                                     position: "absolute",
                                                 }),
                                             }}
-                                            className={`${errListObject ? "border-red-500" : "border-transparent"
-                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            className={`${
+                                                errListObject ? "border-red-500" : "border-transparent"
+                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                     )}
                                     {errListObject && (
@@ -1214,9 +1251,7 @@ const Index = (props) => {
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
                         <div className="col-span-9">
-                            <div
-                                className={`grid-cols-5  grid `}
-                            >
+                            <div className={`grid-cols-5  grid `}>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
                                     {dataLang?.exportToOthe_location || "exportToOthe_location"}
                                 </h4>
@@ -1240,7 +1275,9 @@ const Index = (props) => {
                             <SelectCore
                                 options={options}
                                 value={null}
-                                onInputChange={_HandleSeachApi.bind(this)}
+                                onInputChange={(event) => {
+                                    _HandleSeachApi(event);
+                                }}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                 placeholder={dataLang?.returns_items || "returns_items"}
@@ -1289,7 +1326,7 @@ const Index = (props) => {
                                                             </div>
                                                         )}
                                                         {dataMaterialExpiry.is_enable === "1" ||
-                                                            dataProductExpiry.is_enable === "1" ? (
+                                                        dataProductExpiry.is_enable === "1" ? (
                                                             <>
                                                                 <div className="text-[11px] text-[#667085] font-[500]">
                                                                     Lot: {option.e?.lot ? option.e?.lot : "-"}
@@ -1298,8 +1335,8 @@ const Index = (props) => {
                                                                     Date:{" "}
                                                                     {option.e?.expiration_date
                                                                         ? moment(option.e?.expiration_date).format(
-                                                                            "DD/MM/YYYY"
-                                                                        )
+                                                                              "DD/MM/YYYY"
+                                                                          )
                                                                         : "-"}
                                                                 </div>
                                                             </>
@@ -1402,7 +1439,10 @@ const Index = (props) => {
                                             <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-5 mt-5">
                                                     <SelectCore
-                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        // onInputChange={_HandleSeachApi.bind(this)}
+                                                        onInputChange={(event) => {
+                                                            _HandleSeachApi(event);
+                                                        }}
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
@@ -1451,7 +1491,7 @@ const Index = (props) => {
                                                                                 </div>
                                                                             )}
                                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                                                dataProductExpiry.is_enable === "1" ? (
+                                                                            dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
@@ -1463,9 +1503,9 @@ const Index = (props) => {
                                                                                         Date:{" "}
                                                                                         {option.e?.expiration_date
                                                                                             ? moment(
-                                                                                                option.e
-                                                                                                    ?.expiration_date
-                                                                                            ).format("DD/MM/YYYY")
+                                                                                                  option.e
+                                                                                                      ?.expiration_date
+                                                                                              ).format("DD/MM/YYYY")
                                                                                             : "-"}
                                                                                     </div>
                                                                                 </>
@@ -1558,15 +1598,16 @@ const Index = (props) => {
                                                                         ce?.id,
                                                                         "location"
                                                                     )}
-                                                                    className={`${errWarehouse && ce?.location == null
-                                                                        ? "border-red-500 border"
-                                                                        : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    className={`${
+                                                                        errWarehouse && ce?.location == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                    }  my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
                                                                             : dataLang?.exportToOthe_location ||
-                                                                            "exportToOthe_location"
+                                                                              "exportToOthe_location"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata || "returns_nodata"
@@ -1637,16 +1678,24 @@ const Index = (props) => {
                                                                 </button>
 
                                                                 <InPutNumericFormat
-                                                                    placeholder={ce?.location == null && "Chọn vị trí trước"}
+                                                                    placeholder={
+                                                                        ce?.location == null && "Chọn vị trí trước"
+                                                                    }
                                                                     disabled={ce?.location == null}
-                                                                    className={`${errQty &&
-                                                                        (ce?.toOtherQuantity == null || ce?.toOtherQuantity == "" || ce?.toOtherQuantity == 0)
-                                                                        ? "border-red-500 border-b"
-                                                                        : ""
-                                                                        }
-                                                                        ${(ce?.toOtherQuantity == null || ce?.toOtherQuantity == "" || ce?.toOtherQuantity == 0)
+                                                                    className={`${
+                                                                        errQty &&
+                                                                        (ce?.toOtherQuantity == null ||
+                                                                            ce?.toOtherQuantity == "" ||
+                                                                            ce?.toOtherQuantity == 0)
                                                                             ? "border-red-500 border-b"
                                                                             : ""
+                                                                    }
+                                                                        ${
+                                                                            ce?.toOtherQuantity == null ||
+                                                                            ce?.toOtherQuantity == "" ||
+                                                                            ce?.toOtherQuantity == 0
+                                                                                ? "border-red-500 border-b"
+                                                                                : ""
                                                                         }
                                                                         placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
                                                                     onValueChange={_HandleChangeChild.bind(
@@ -1788,12 +1837,11 @@ const Index = (props) => {
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
                 save={resetValue}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 cancel={() => handleQueryId({ status: false })}
             />
         </React.Fragment>
     );
 };
-
 
 export default Index;

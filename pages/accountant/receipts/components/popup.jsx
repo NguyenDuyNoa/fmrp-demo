@@ -782,7 +782,9 @@ const Popup_dspt = (props) => {
                                             options={data.dataListTypeofDoc}
                                             closeMenuOnSelect={false}
                                             hideSelectedOptions={false}
-                                            onInputChange={_HandleSeachApi.bind(this)}
+                                            onInputChange={(event) => {
+                                                _HandleSeachApi(event);
+                                            }}
                                             onChange={_HandleChangeInput.bind(this, "listTypeOfDocument")}
                                             value={listValue.listTypeOfDocument}
                                             components={{ MenuList, MultiValue }}

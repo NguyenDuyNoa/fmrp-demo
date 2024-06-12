@@ -1055,7 +1055,9 @@ const Index = (props) => {
                             <SelectCore
                                 options={options}
                                 value={null}
-                                onInputChange={_HandleSeachApi.bind(this)}
+                                onInputChange={(event) =>{
+                                    _HandleSeachApi(event)
+                                }}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                 placeholder={dataLang?.returns_items || "returns_items"}
@@ -1224,7 +1226,9 @@ const Index = (props) => {
                                             <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-1 mt-5">
                                                     <SelectCore
-                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                       onInputChange={(event) =>{
+                                                        _HandleSeachApi(event)
+                                                    }}
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""

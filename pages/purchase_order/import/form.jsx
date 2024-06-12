@@ -1367,7 +1367,9 @@ const Index = (props) => {
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
-                                        onInputChange={_HandleSeachApi.bind(this)}
+                                        onInputChange={(event) =>{
+                                            _HandleSeachApi(event)
+                                        }}
                                         options={dataThe_order}
                                         onChange={_HandleChangeInput.bind(this, "theorder")}
                                         value={idTheOrder}

@@ -22,14 +22,17 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                     />
                 </div>
                 <div className="col-span-2">
-                    <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'}</h3>
+                    <h3 className="text-sm text-[#051B44] font-medium ml-1">
+                        {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                    </h3>
                     <SelectComponent
                         isClearable={true}
                         value={isValue.valueBr}
                         onChange={onChangeValue("valueBr")}
                         options={isData.listBr}
                         classNamePrefix={"productionSmoothing"}
-                        placeholder={dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'} />
+                        placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                    />
                 </div>
                 <div className="col-span-2">
                     <h3 className="text-sm text-[#051B44] font-medium ml-1">Nhóm thành phẩm</h3>
@@ -59,7 +62,9 @@ const FilterHeader = ({ onChangeValue, _HandleSeachApi, isValue, isData, options
                         isClearable={true}
                         value={isValue.idProduct}
                         onChange={onChangeValue("idProduct")}
-                        onInputChange={_HandleSeachApi.bind(this)}
+                        onInputChange={(event) => {
+                            _HandleSeachApi(event);
+                        }}
                         components={{ MultiValue }}
                         isMulti={true}
                         options={[{ label: "Thành phẩm", value: "", isDisabled: true }, ...options]}

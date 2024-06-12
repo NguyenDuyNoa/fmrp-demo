@@ -695,7 +695,9 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-4  z-[100] my-auto">
                                                 <Select
-                                                    onInputChange={_HandleSeachApi.bind(this)}
+                                                      onInputChange={(event) =>{
+                                                        _HandleSeachApi(event)
+                                                    }}
                                                     dangerouslySetInnerHTML={{
                                                         __html: option.label,
                                                     }}

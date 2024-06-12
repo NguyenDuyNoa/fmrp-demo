@@ -527,7 +527,9 @@ const Index = (props) => {
                                                 colSpan={1}
                                             />
                                             <SelectComponent
-                                                onInputChange={_HandleSeachApi.bind(this)}
+                                              onInputChange={(event) =>{
+                                                _HandleSeachApi(event)
+                                            }}
                                                 options={[
                                                     {
                                                         value: "",

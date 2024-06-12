@@ -811,7 +811,7 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "name"
                                                         )}
-                                                        onInputChange={(x) =>
+                                                        onInputChange={(x) => {
                                                             _HandleSeachApi(
                                                                 x,
                                                                 selectedList?.value,
@@ -819,6 +819,8 @@ const Popup_Bom = React.memo((props) => {
                                                                 e.id,
                                                                 e.name
                                                             )
+                                                        }
+                                                           
                                                         }
                                                         formatOptionLabel={(option) => (
                                                             <div className="">

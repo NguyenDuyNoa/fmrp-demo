@@ -158,6 +158,7 @@ const Index = (props) => {
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
+        console.log(inputValue);
         const { data } = await apiComons.apiSearchProductsVariant({
             params: {
                 "filter[branch_id]": isStateQlty.idBranch !== null ? +isStateQlty.idBranch.value : null,
@@ -170,7 +171,6 @@ const Index = (props) => {
     }, 500);
 
     const handleSaveStatus = () => {
-        console.log("isKeyState", isKeyState);
         queryStateQlty({
             dataItems: [],
             listData: [],
@@ -252,12 +252,6 @@ const Index = (props) => {
                     case "quantityError":
                         e.quantityError = Number(value?.value);
                         break;
-                    case "date":
-                        e.date = value;
-                        break;
-                    case "note":
-                        e.note = value?.target.value;
-                        break;
                     default:
                 }
             }
@@ -327,26 +321,29 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
 
-        const checkNullQuantity = (property) =>
-            isStateQlty.listData.some((e) => e[property] === "" || e[property] === null || e[property] === 0);
+        const checkNullQuantity = (property) => isStateQlty.listData.some((e) => !e[property] || e[property] === 0);
 
         const hasNullQuantityQc = checkNullQuantity("quantity");
+
         const hasNullQuantityReached = checkNullQuantity("quantityReached");
+
         const hasNullQuantityError = checkNullQuantity("quantityError");
 
         const hasNullDate = isStateQlty.listData.some((e) => e.date == null || e.date == "");
 
         const isEmpty = isStateQlty.listData?.length == 0;
 
-        if (
-            !isStateQlty.idBranch ||
-            !isStateQlty.idDetailedProduction ||
-            hasNullQuantityQc ||
-            hasNullQuantityReached ||
-            hasNullQuantityError ||
-            isEmpty ||
-            hasNullDate
-        ) {
+        const checkConditions = [
+            !isStateQlty.idBranch,
+            !isStateQlty.idDetailedProduction,
+            hasNullQuantityQc,
+            hasNullQuantityReached,
+            hasNullQuantityError,
+            isEmpty,
+            hasNullDate,
+        ].some((condition) => condition);
+
+        if (checkConditions) {
             queryStateQlty({
                 errBranch: !isStateQlty.idBranch,
                 errQuantityQc: hasNullQuantityQc,
@@ -367,51 +364,37 @@ const Index = (props) => {
         }
     };
     const _ServerSending = async () => {
-        let formData = new FormData();
-        formData.append("reference_no", isStateQlty.code ? isStateQlty.code : "");
-
-        formData.append(
-            "date",
-            moment(isStateQlty.date).format("YYYY-MM-DD HH:mm:ss")
-                ? moment(isStateQlty.date).format("YYYY-MM-DD HH:mm:ss")
-                : ""
-        );
-
-        formData.append("branch_id", isStateQlty.idBranch?.value ? isStateQlty.idBranch?.value : "");
-
-        formData.append("plan_name", isStateQlty.namePlan ? isStateQlty.namePlan : "");
-
-        formData.append("note", isStateQlty.note ? isStateQlty.note : "");
-
-        listData.forEach((item, index) => {
-            formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
-
-            formData.append(`items[${index}][item_id]`, item?.matHang?.value);
-
-            formData.append(`items[${index}][quantity]`, item?.quantity ? item?.quantity : "");
-
-            formData.append(`items[${index}][date_needed]`, item?.date ? moment(item?.date).format("DD/MM/YYYY") : "");
-
-            formData.append(`items[${index}][note_item]`, item?.note ? item?.note : "");
-        });
-
-        const url = id
-            ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
-            : "/api_web/api_internal_plan/handling?csrf_protection=true";
-
-        const { isSuccess, message } = await apiInternalPlan.apiHandlingInternalPlan(url, formData);
-        if (isSuccess) {
-            isShow("success", `${dataLang[message] || message}`);
-
-            resetAllStates();
-
-            sListData([]);
-
-            router.push(routerInternalPlan.home);
-        } else {
-            isShow("error", `${dataLang[message] || data?.message}`);
-        }
-        sFetchingData((e) => ({ ...e, onSending: false }));
+        // let formData = new FormData();
+        // formData.append("reference_no", isStateQlty.code ? isStateQlty.code : "");
+        // formData.append(
+        //     "date",
+        //     moment(isStateQlty.date).format("YYYY-MM-DD HH:mm:ss")
+        //         ? moment(isStateQlty.date).format("YYYY-MM-DD HH:mm:ss")
+        //         : ""
+        // );
+        // formData.append("branch_id", isStateQlty.idBranch?.value ? isStateQlty.idBranch?.value : "");
+        // formData.append("plan_name", isStateQlty.namePlan ? isStateQlty.namePlan : "");
+        // formData.append("note", isStateQlty.note ? isStateQlty.note : "");
+        // listData.forEach((item, index) => {
+        //     formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
+        //     formData.append(`items[${index}][item_id]`, item?.matHang?.value);
+        //     formData.append(`items[${index}][quantity]`, item?.quantity ? item?.quantity : "");
+        //     formData.append(`items[${index}][date_needed]`, item?.date ? moment(item?.date).format("DD/MM/YYYY") : "");
+        //     formData.append(`items[${index}][note_item]`, item?.note ? item?.note : "");
+        // });
+        // const url = id
+        //     ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
+        //     : "/api_web/api_internal_plan/handling?csrf_protection=true";
+        // const { isSuccess, message } = await apiInternalPlan.apiHandlingInternalPlan(url, formData);
+        // if (isSuccess) {
+        //     isShow("success", `${dataLang[message] || message}`);
+        //     resetAllStates();
+        //     sListData([]);
+        //     router.push(routerInternalPlan.home);
+        // } else {
+        //     isShow("error", `${dataLang[message] || data?.message}`);
+        // }
+        // sFetchingData((e) => ({ ...e, onSending: false }));
     };
 
     useEffect(() => {
@@ -668,7 +651,9 @@ const Index = (props) => {
                             <SelectCore
                                 options={options}
                                 value={null}
-                                onInputChange={_HandleSeachApi.bind(this)}
+                                onInputChange={(e) => {
+                                    _HandleSeachApi(e);
+                                }}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                 placeholder={dataLang?.returns_items || "returns_items"}
@@ -777,7 +762,9 @@ const Index = (props) => {
                                                     <SelectCore
                                                         options={options}
                                                         value={e?.matHang}
-                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        onInputChange={(event) => {
+                                                            _HandleSeachApi(event);
+                                                        }}
                                                         className=""
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}

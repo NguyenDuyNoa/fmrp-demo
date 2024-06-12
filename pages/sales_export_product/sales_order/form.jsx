@@ -35,7 +35,7 @@ import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 const Index = (props) => {
     const router = useRouter();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const id = router.query?.id;
 
@@ -157,7 +157,7 @@ const Index = (props) => {
                         label: `${e.item?.item_name} <span style={{display: none}}>${
                             // e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
                             e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                        }</span>`,
                         value: e.item?.id,
                     },
                     quantity: +e?.quantity,
@@ -176,9 +176,9 @@ const Index = (props) => {
                 setContactPerson(
                     rResult?.contact_name !== null && rResult?.contact_name !== "0"
                         ? {
-                            label: rResult?.contact_name,
-                            value: rResult?.contact_id,
-                        }
+                              label: rResult?.contact_name,
+                              value: rResult?.contact_id,
+                          }
                         : null
                 );
                 setBranch({
@@ -242,12 +242,12 @@ const Index = (props) => {
             {
                 params: {
                     search: "",
-                    "branch_id": branch !== null ? [branch?.value]?.map((e) => e) : null,
+                    branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { data } = response.data
+                    var { data } = response.data;
                     setDataCustomer(data?.clients?.map((e) => ({ label: e.name, value: e.id })));
                 }
             }
@@ -261,7 +261,7 @@ const Index = (props) => {
             `/api_web/api_client/searchContact?csrf_protection=true`,
             {
                 params: {
-                    "client_id": customer != null ? customer.value : null,
+                    client_id: customer != null ? customer.value : null,
                 },
             },
             (err, response) => {
@@ -285,7 +285,7 @@ const Index = (props) => {
             `/api_web/api_client/getStaffBranch?csrf_protection=true`,
             {
                 params: {
-                    "branch_id": branch != null ? [+branch?.value]?.map((e) => e) : null,
+                    branch_id: branch != null ? [+branch?.value]?.map((e) => e) : null,
                 },
             },
             (err, response) => {
@@ -331,27 +331,32 @@ const Index = (props) => {
 
     // fetch items
     const handleFetchingItemsAll = () => {
-        let form = new FormData()
+        let form = new FormData();
         if (branch != null) {
-            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
         }
-        Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {
-            data: form,
-            headers: { "Content-Type": "multipart/form-data" },
-        }, (err, response) => {
-            if (!err) {
-                const { result } = response.data.data;
-                setDataItems(result);
+        Axios(
+            "POST",
+            "/api_web/Api_product/searchItemsVariant/?csrf_protection=true",
+            {
+                data: form,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    const { result } = response.data.data;
+                    setDataItems(result);
+                }
             }
-        });
+        );
         setOnFetchingItemsAll(false);
     };
 
     const handleFetchingItem = async () => {
-        let form = new FormData()
+        let form = new FormData();
         // form.append("branch_id", branch != null ? [+branch?.value]?.map((e) => e) : null)
         if (branch != null) {
-            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
         }
         if (typeOrder === "1") {
             if (quote && quote.value !== null) {
@@ -406,7 +411,6 @@ const Index = (props) => {
             setOnFetchingItem(false);
         }
     };
-
 
     const options = dataItems?.map((e) => {
         return {
@@ -499,12 +503,12 @@ const Index = (props) => {
 
     useEffect(() => {
         branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true));
-        branch !== null && setOnFetchingItemsAll(true)
+        branch !== null && setOnFetchingItemsAll(true);
         branch == null && setItemsAll([]);
     }, [branch]);
 
     useEffect(() => {
-        customer !== null && setOnFetchingContactPerson(true)
+        customer !== null && setOnFetchingContactPerson(true);
     }, [customer]);
 
     useEffect(() => {
@@ -542,12 +546,12 @@ const Index = (props) => {
 
     // search api
     const _HandleSeachApi = debounce((inputValue) => {
-        if (branch == null) return
-        let form = new FormData()
+        if (branch == null) return;
+        let form = new FormData();
         if (branch != null) {
-            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
+            [+branch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e));
         }
-        form.append("term", inputValue)
+        form.append("term", inputValue);
         if (typeOrder === "1" && quote && +quote.value) {
             Axios(
                 "POST",
@@ -584,7 +588,7 @@ const Index = (props) => {
                 }
             );
         }
-    }, 500)
+    }, 500);
 
     // format number
     const formatNumber = (number) => {
@@ -596,7 +600,7 @@ const Index = (props) => {
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
-    }
+    };
 
     const resetValue = () => {
         if (status == "customer") {
@@ -625,7 +629,7 @@ const Index = (props) => {
             setTypeOrder(isId);
             setHidden(isId === "1");
             setQuote(isId === "0" ? null : quote);
-            isId == 1 && setOnFetchingQuote(true)
+            isId == 1 && setOnFetchingQuote(true);
             setOnFetchingItem(isId === "0" && true);
             setOnFetchingItemsAll(isId === "1" && true);
 
@@ -701,32 +705,31 @@ const Index = (props) => {
                 setOption([]);
             } else if (value?.length > 0) {
                 if (typeOrder === "0") {
-                    const newData = value
-                        ?.map((e, index) => {
-                            const check = option?.find((x) => x?.item?.e?.id == e?.e?.id);
-                            if (check) {
-                                return check
-                            }
-                            return {
-                                id: uuidv4(),
-                                item: {
-                                    e: e?.e,
-                                    label: e?.label,
-                                    value: e?.value,
-                                },
-                                unit: e?.e?.unit_name,
-                                quantity: 1,
-                                sortIndex: index,
-                                price: 1,
-                                discount: 0,
-                                price_after_discount: 1,
-                                tax: 0,
-                                price_after_tax: 1,
-                                total_amount: 1,
-                                note: "",
-                                delivery_date: null,
-                            };
-                        })
+                    const newData = value?.map((e, index) => {
+                        const check = option?.find((x) => x?.item?.e?.id == e?.e?.id);
+                        if (check) {
+                            return check;
+                        }
+                        return {
+                            id: uuidv4(),
+                            item: {
+                                e: e?.e,
+                                label: e?.label,
+                                value: e?.value,
+                            },
+                            unit: e?.e?.unit_name,
+                            quantity: 1,
+                            sortIndex: index,
+                            price: 1,
+                            discount: 0,
+                            price_after_discount: 1,
+                            tax: 0,
+                            price_after_tax: 1,
+                            total_amount: 1,
+                            note: "",
+                            delivery_date: null,
+                        };
+                    });
                     setOption([...newData]);
                 }
                 if (typeOrder === "1" && quote !== null) {
@@ -1116,13 +1119,19 @@ const Index = (props) => {
         formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
         newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
-            formData.append(`items[${index}][id]`, item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : "");
+            formData.append(
+                `items[${index}][id]`,
+                item?.price_quote_order_item_id != undefined ? item?.price_quote_order_item_id : ""
+            );
             formData.append(`items[${index}][quantity]`, item?.quantity.toString());
             formData.append(`items[${index}][price]`, item?.price);
             formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-            formData.append(`items[${index}][delivery_date]`, item?.delivery_date != undefined ? moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss") : "");
+            formData.append(
+                `items[${index}][delivery_date]`,
+                item?.delivery_date != undefined ? moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss") : ""
+            );
         });
 
         if (
@@ -1134,16 +1143,17 @@ const Index = (props) => {
         ) {
             await Axios(
                 "POST",
-                `${id
-                    ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`
-                    : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"
+                `${
+                    id
+                        ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`
+                        : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"
                 }`,
                 {
                     data: formData,
                     headers: { "Content-Type": "multipart/form-data" },
                 },
                 (err, response) => {
-                    const { isSuccess, message } = response?.data
+                    const { isSuccess, message } = response?.data;
                     if (isSuccess) {
                         isShow("success", `${dataLang[message]}` || message);
                         setCodeProduct("");
@@ -1163,8 +1173,7 @@ const Index = (props) => {
                         setErrQuote(false);
                         setOption([]);
                         router.push(routerSalesOrder.home);
-                    }
-                    else {
+                    } else {
                         isShow("error", `${dataLang[message]}` || message);
                     }
                     setOnSending(false);
@@ -1469,25 +1478,26 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.sales_product_list || "sales_product_list"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.sales_product_list || "sales_product_list"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6> {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                            : dataLang?.sales_product_add_order || "sales_product_add_order"}</h6>
+                        <h6>
+                            {" "}
+                            {id
+                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                        </h6>
                     </div>
                 )}
                 <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
                     <div className="flex justify-between items-center ">
-                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">                            {id
-                            ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
-                            : dataLang?.sales_product_add_order || "sales_product_add_order"}
+                        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                            {" "}
+                            {id
+                                ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                                : dataLang?.sales_product_add_order || "sales_product_add_order"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <ButtonBack
-                                onClick={() => router.push(routerSalesOrder.home)}
-                                dataLang={dataLang}
-                            />
+                            <ButtonBack onClick={() => router.push(routerSalesOrder.home)} dataLang={dataLang} />
                         </div>
                     </div>
 
@@ -1524,8 +1534,9 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.select_branch || "select_branch"}
-                                        className={`${errBranch ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                        className={`${
+                                            errBranch ? "border border-red-500 rounded-md" : ""
+                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         styles={{
@@ -1558,8 +1569,9 @@ const Index = (props) => {
                                         placeholder={dataLang?.select_customer || "select_customer"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errCustomer ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${
+                                            errCustomer ? "border border-red-500 rounded-md" : ""
+                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1637,8 +1649,9 @@ const Index = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                            className={`border ${
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                         />
                                         {startDate && (
                                             <>
@@ -1672,8 +1685,9 @@ const Index = (props) => {
                                         }
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${errStaff ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${
+                                            errStaff ? "border border-red-500 rounded-md" : ""
+                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1760,8 +1774,9 @@ const Index = (props) => {
                                             }
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${errQuote && quote === null ? "border border-red-500 rounded-md" : ""
-                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            className={`${
+                                                errQuote && quote === null ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -1803,7 +1818,9 @@ const Index = (props) => {
                                 {dataLang?.import_click_items || "import_click_items"}{" "}
                             </label>
                             <SelectComponent
-                                onInputChange={_HandleSeachApi.bind(this)}
+                                onInputChange={(event) => {
+                                    _HandleSeachApi(event);
+                                }}
                                 options={typeOrder === "1" && quote === null ? [] : allItems}
                                 // closeMenuOnSelect={false}
                                 onChange={(value) => handleOnChangeInput("itemAll", value)}
@@ -1955,7 +1972,9 @@ const Index = (props) => {
                                 <div className="grid grid-cols-12">
                                     <div className="col-span-2 ">
                                         <SelectComponent
-                                            onInputChange={_HandleSeachApi.bind(this)}
+                                            onInputChange={(event) => {
+                                                _HandleSeachApi(event);
+                                            }}
                                             dangerouslySetInnerHTML={{
                                                 __html: option.label,
                                             }}
@@ -2035,7 +2054,8 @@ const Index = (props) => {
                                                 thousandSeparator=","
                                                 allowNegative={false}
                                                 readOnly={true}
-                                                isNumericString={true} />
+                                                isNumericString={true}
+                                            />
                                         </div>
                                         <div className="col-span-1 text-right flex items-center justify-end">
                                             <h3
@@ -2122,7 +2142,9 @@ const Index = (props) => {
                                     <div className="grid grid-cols-12 gap-1 py-1 items-center" key={e?.id}>
                                         <div className="col-span-2 ">
                                             <SelectComponent
-                                                onInputChange={_HandleSeachApi.bind(this)}
+                                                onInputChange={(event) => {
+                                                    _HandleSeachApi(event);
+                                                }}
                                                 dangerouslySetInnerHTML={{
                                                     __html: option.label,
                                                 }}
@@ -2176,7 +2198,9 @@ const Index = (props) => {
                                                 </button>
                                                 <InPutNumericFormat
                                                     value={e?.quantity}
-                                                    onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
+                                                    onValueChange={(value) =>
+                                                        handleOnChangeInputOption(e?.id, "quantity", value)
+                                                    }
                                                     isAllowed={({ floatValue }) => {
                                                         if (floatValue == 0) {
                                                             return true;
@@ -2185,7 +2209,10 @@ const Index = (props) => {
                                                         }
                                                     }}
                                                     allowNegative={false}
-                                                    className={`${e?.quantity == 0 && 'border-red-500' || e?.quantity == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                    className={`${
+                                                        (e?.quantity == 0 && "border-red-500") ||
+                                                        (e?.quantity == "" && "border-red-500")
+                                                    } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                                 <button
                                                     onClick={() => handleIncrease(e.id)}
@@ -2198,10 +2225,15 @@ const Index = (props) => {
                                         <div className="col-span-1 text-center flex items-center justify-center">
                                             <InPutMoneyFormat
                                                 value={e?.price}
-                                                onValueChange={(value) => handleOnChangeInputOption(e?.id, "price", value)}
+                                                onValueChange={(value) =>
+                                                    handleOnChangeInputOption(e?.id, "price", value)
+                                                }
                                                 isAllowed={isAllowedNumber}
                                                 allowNegative={false}
-                                                className={`${e?.price == 0 && 'border-red-500' || e?.price == "" && 'border-red-500'} cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                className={`${
+                                                    (e?.price == 0 && "border-red-500") ||
+                                                    (e?.price == "" && "border-red-500")
+                                                } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
@@ -2229,12 +2261,12 @@ const Index = (props) => {
                                                 value={
                                                     e?.tax
                                                         ? {
-                                                            label: taxOptions.find(
-                                                                (item) => item.value === e?.tax?.value
-                                                            )?.label,
-                                                            value: e?.tax?.value,
-                                                            tax_rate: e?.tax?.tax_rate,
-                                                        }
+                                                              label: taxOptions.find(
+                                                                  (item) => item.value === e?.tax?.value
+                                                              )?.label,
+                                                              value: e?.tax?.value,
+                                                              tax_rate: e?.tax?.tax_rate,
+                                                          }
                                                         : null
                                                 }
                                                 placeholder={"% Thuế"}
@@ -2283,10 +2315,11 @@ const Index = (props) => {
                                                     onChange={(date) =>
                                                         handleOnChangeInputOption(e?.id, "delivery_date", date)
                                                     }
-                                                    className={`${errDeliveryDate && e?.delivery_date === null
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                        } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
+                                                    className={`${
+                                                        errDeliveryDate && e?.delivery_date === null
+                                                            ? "border-red-500"
+                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
                                                 />
                                                 {e?.delivery_date && (
                                                     <>
@@ -2344,7 +2377,6 @@ const Index = (props) => {
                                     className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] text-center py-1 px-2 bg-transparent font-normal xl:w-20 w-24 focus:outline-none border-b-2 border-gray-300"
                                     isAllowed={isAllowedDiscount}
                                 />
-
                             </div>
                         </div>
                         <div className="col-span-3 flex items-center gap-2">
@@ -2476,10 +2508,7 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <ButtonBack
-                                onClick={() => router.push(routerSalesOrder.home)}
-                                dataLang={dataLang}
-                            />
+                            <ButtonBack onClick={() => router.push(routerSalesOrder.home)} dataLang={dataLang} />
                             <ButtonSubmit
                                 onClick={handleSubmitValidate.bind(this)}
                                 dataLang={dataLang}
@@ -2491,7 +2520,7 @@ const Index = (props) => {
             </Container>
             <PopupConfim
                 dataLang={dataLang}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 type="warning"
                 title={TITLE_DELETE_ITEMS}
                 subtitle={CONFIRMATION_OF_CHANGES}
@@ -2499,7 +2528,7 @@ const Index = (props) => {
                 save={resetValue}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment >
+        </React.Fragment>
     );
 };
 

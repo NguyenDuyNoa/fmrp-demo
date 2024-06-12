@@ -1089,7 +1089,9 @@ const Index = (props) => {
                                         <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
                                             <div className="col-span-3 z-10 my-auto ">
                                                 <SelectComponent
-                                                    onInputChange={_HandleSeachApi.bind(this)}
+                                                  onInputChange={(event) =>{
+                                                    _HandleSeachApi(event)
+                                                }}
                                                     dangerouslySetInnerHTML={{
                                                         __html: option.label,
                                                     }}

@@ -1,24 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import useToast from "@/hooks/useToast";
 import { SelectCore, componentsCore } from "@/utils/lib/Select";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import NoData from "@/components/UI/noData/nodata";
-const PopupDetailError = (props) => {
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { v4 as uuid } from "uuid";
+const PopupDetailError = ({ data, id, queryStateQlty, ...props }) => {
     const isShow = useToast();
-
-    const dataLang = props?.dataLang;
 
     const initilaState = {
         open: false,
+        dataDetailError: [
+            {
+                id: uuid(),
+                code: "QVĐ01",
+                name: "Quần vải đen 1",
+                note: "Quần vải đen bị lỗi ống quần",
+                name_branch: "Chi nhánh",
+            },
+            {
+                id: uuid(),
+                code: "QVĐ01",
+                name: "Quần vải đen 2",
+                note: "Quần vải đen bị lỗi ống quần",
+                name_branch: "Chi nhánh",
+            },
+        ],
     };
 
     const [isState, sIsState] = useState(initilaState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
-
-    console.log("props", props);
 
     const MenuList = (props) => {
         return (
@@ -43,6 +59,29 @@ const PopupDetailError = (props) => {
             </componentsCore.MenuList>
         );
     };
+
+    const handeLeDelete = (id) => {
+        const newData = isState.dataDetailError.filter((item) => item.id !== id);
+        queryState({ dataDetailError: newData });
+    };
+
+    const addItemToParent = (arr) => {
+        const arrData = data.map((e) => {
+            if (e.id == id) {
+                return {
+                    ...e,
+                    dataDetailError: arr,
+                };
+            }
+            return e;
+        });
+        queryStateQlty({ listData: arrData });
+        console.log("arrData", arrData);
+    };
+
+    useEffect(() => {
+        addItemToParent(isState.dataDetailError);
+    }, [isFinite.dataDetailError]);
 
     return (
         <PopupEdit
@@ -175,14 +214,50 @@ const PopupDetailError = (props) => {
                     </div>
                 </div>
                 <div className="w-full">
-                    <HeaderTablePopup gridCols={10}>
+                    <HeaderTablePopup gridCols={9}>
                         <ColumnTablePopup colSpan={2}>{"Mã chi tiết lỗi"}</ColumnTablePopup>
                         <ColumnTablePopup colSpan={2}>{"Tên chi tiết lỗi"}</ColumnTablePopup>
                         <ColumnTablePopup colSpan={2}>{"Ghi chú"}</ColumnTablePopup>
                         <ColumnTablePopup colSpan={2}>{"Chi nhánh"}</ColumnTablePopup>
-                        <ColumnTablePopup colSpan={2}>{"Tác vụ"}</ColumnTablePopup>
+                        <ColumnTablePopup colSpan={1}>{"Tác vụ"}</ColumnTablePopup>
                     </HeaderTablePopup>
-                    <NoData />
+                    <Customscrollbar className="min-h-[250px] max-h-[250px] 2xl:max-h-[250px] overflow-hidden">
+                        <div className="divide-y divide-slate-200 min:h-[250px]  max:h-[250px]">
+                            {isState.dataDetailError?.length > 0 ? (
+                                isState.dataDetailError?.map((e, index) => (
+                                    <div
+                                        className={`grid grid-cols-9 hover:bg-slate-50 items-center`}
+                                        key={e.id?.toString()}
+                                    >
+                                        <h6 className="text-[13px]  px-2 py-2 col-span-2 text-center ">{e.code}</h6>
+                                        <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ">
+                                            {e.name}
+                                        </h6>
+                                        <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
+                                            {e.note}
+                                        </h6>
+                                        <h6 className="text-[13px]   py-2 col-span-2 font-medium flex justify-center items-center ">
+                                            <TagBranch className="w-fit">{e.name_branch}</TagBranch>
+                                        </h6>
+
+                                        <h6 className="text-[13px]   py-2 col-span-1 font-medium mx-auto">
+                                            <div className="">
+                                                <button
+                                                    title="Xóa"
+                                                    onClick={() => handeLeDelete(e.id)}
+                                                    className=" text-red-500 flex p-1 justify-center items-center hover:scale-110 bg-red-50  rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                >
+                                                    <IconDelete size={24} />
+                                                </button>
+                                            </div>
+                                        </h6>
+                                    </div>
+                                ))
+                            ) : (
+                                <NoData />
+                            )}
+                        </div>
+                    </Customscrollbar>
                 </div>
             </div>
         </PopupEdit>

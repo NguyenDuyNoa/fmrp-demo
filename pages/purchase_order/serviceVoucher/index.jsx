@@ -466,7 +466,9 @@ const Index = (props) => {
                                                 isClearable={true}
                                             />
                                             <SelectComponent
-                                                onInputChange={_HandleSeachApi.bind(this)}
+                                                  onInputChange={(event) =>{
+                                                    _HandleSeachApi(event)
+                                                }}
                                                 options={[
                                                     {
                                                         value: "",
