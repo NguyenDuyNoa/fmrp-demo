@@ -45,7 +45,7 @@ const Index = (props) => {
         load: false,
         errBranch: false,
         errQuantityQc: false,
-        errQuantityReached: false,
+        // errQuantityReached: false,
         errQuantityError: false,
         errPlan: false,
         errDate: false,
@@ -333,7 +333,7 @@ const Index = (props) => {
 
         const hasNullQuantityQc = checkNullQuantity("quantity");
 
-        const hasNullQuantityReached = checkNullQuantity("quantityReached");
+        // const hasNullQuantityReached = checkNullQuantity("quantityReached");
 
         const hasNullQuantityError = checkNullQuantity("quantityError");
 
@@ -345,7 +345,7 @@ const Index = (props) => {
             !isStateQlty.idBranch,
             !isStateQlty.idDetailedProduction,
             hasNullQuantityQc,
-            hasNullQuantityReached,
+            // hasNullQuantityReached,
             hasNullQuantityError,
             isEmpty,
             hasNullDate,
@@ -356,7 +356,7 @@ const Index = (props) => {
                 errBranch: !isStateQlty.idBranch,
                 errQuantityQc: hasNullQuantityQc,
                 errQuantityError: hasNullQuantityError,
-                errQuantityReached: hasNullQuantityReached,
+                // errQuantityReached: hasNullQuantityReached,
                 errDetailedProduction: !isStateQlty.errDetailedProduction,
                 errDate: hasNullDate,
             });
@@ -877,12 +877,12 @@ const Index = (props) => {
                                                     <div className="flex items-center justify-center h-full p-0.5">
                                                         <button
                                                             disabled={
-                                                                e.quantityReached === 1 ||
+                                                                // e.quantityReached === 1 ||
                                                                 e.quantityReached === "" ||
                                                                 e.quantityReached === null ||
                                                                 e.quantityReached === 0
                                                             }
-                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                            className=" text-gray-400  hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
                                                             onClick={() => {
                                                                 _HandleChangeChild(e?.id, "quantityReached", {
                                                                     value: e.quantityReached - 1,
@@ -899,22 +899,7 @@ const Index = (props) => {
                                                                 _HandleChangeChild(e?.id, "quantityReached", event)
                                                             }
                                                             value={e.quantityReached || null}
-                                                            className={`${
-                                                                isStateQlty.errQuantityReached &&
-                                                                (e.quantityReached == null ||
-                                                                    e.quantityReached == "" ||
-                                                                    e.quantityReached == 0)
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
-                                                            }
-                                                                ${
-                                                                    e.quantityReached == null ||
-                                                                    e.quantityReached == "" ||
-                                                                    e.quantityReached == 0
-                                                                        ? "border-b border-red-500"
-                                                                        : "border-b border-gray-200"
-                                                                }
-                                                                appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                            className={`appearance-none border-b border-gray-200 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                             isAllowed={isAllowedNumber}
                                                         />
                                                         <button
