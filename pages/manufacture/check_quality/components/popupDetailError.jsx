@@ -101,7 +101,7 @@ const PopupDetailError = ({ data, id, queryStateQlty, ...props }) => {
                     <div className="">
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
                             Danh mục lỗi
-                            <span className="text-red-500">*</span>
+                            <span className="text-red-500 pl-1">*</span>
                         </label>
                         <SelectCore
                             options={[]}
@@ -157,7 +157,7 @@ const PopupDetailError = ({ data, id, queryStateQlty, ...props }) => {
                     <div className="">
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
                             Chi tiết lỗi
-                            <span className="text-red-500">*</span>
+                            <span className="text-red-500  pl-1">*</span>
                         </label>
                         <SelectCore
                             options={[]}

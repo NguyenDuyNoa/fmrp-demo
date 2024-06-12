@@ -143,7 +143,7 @@ const Index = (props) => {
     const _ServerFetching_ItemsAll = async () => {
         const { data } = await apiComons.apiSearchProductsVariant({
             params: {
-                "filter[branch_id]": isStateQlty.idBranch !== null ? +isStateQlty.idBranch.value : null,
+                "filter[branch_id]": isStateQlty.idBranch != null ? +isStateQlty.idBranch.value : null,
             },
         });
         queryStateQlty({
@@ -233,7 +233,7 @@ const Index = (props) => {
     };
 
     const _HandleAddParent = (value) => {
-        const checkData = isStateQlty.listData?.some((e) => e?.matHang?.value === value?.value);
+        const checkData = isStateQlty.listData?.some((e) => e?.matHang?.value == value?.value);
         if (!checkData) {
             const { parent } = _DataValueItem(value);
             queryStateQlty({ listData: [parent, ...isStateQlty.listData] });
@@ -243,7 +243,7 @@ const Index = (props) => {
     };
 
     const _HandleDeleteParent = (parentId) => {
-        const newData = isStateQlty.listData.filter((e) => e?.id !== parentId);
+        const newData = isStateQlty.listData.filter((e) => e?.id != parentId);
         queryStateQlty({ listData: [...newData] });
     };
 
@@ -268,7 +268,7 @@ const Index = (props) => {
         queryStateQlty({ listData: [...newData] });
     };
     const _HandleChangeValue = (parentId, value) => {
-        const checkData = isStateQlty.listData?.some((e) => e?.matHang?.value === value?.value);
+        const checkData = isStateQlty.listData?.some((e) => e?.matHang?.value == value?.value);
         if (!checkData) {
             const newData = isStateQlty.listData?.map((e) => {
                 if (e?.id === parentId) {
@@ -329,7 +329,7 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
 
-        const checkNullQuantity = (property) => isStateQlty.listData.some((e) => !e[property] || e[property] === 0);
+        const checkNullQuantity = (property) => isStateQlty.listData.some((e) => !e[property] || e[property] == 0);
 
         const hasNullQuantityQc = checkNullQuantity("quantity");
 
@@ -430,12 +430,7 @@ const Index = (props) => {
                             {id ? dataLang?.internal_plan_edit || "internal_plan_edit" : "Tạo kiểm tra chất lượng"}
                         </h2>
                         <div className="flex justify-end items-center mr-2">
-                            <button
-                                onClick={() => router.push(routerQc.home)}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.import_comeback || "import_comeback"}
-                            </button>
+                            <ButtonBack onClick={() => router.push(routerQc.home)} dataLang={dataLang} />
                         </div>
                     </div>
 
@@ -1003,7 +998,7 @@ const Index = (props) => {
                                                         data={isStateQlty.listData}
                                                         id={e?.id}
                                                         queryStateQlty={queryStateQlty}
-                                                        className="3xl:text-base px-4 py-1 rounded-xl bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 hover:scale-105 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-center text-white  transition-all ease-linear cursor-pointer "
+                                                        className="px-4 py-1.5 rounded-xl bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 hover:scale-105 text-xs font-medium text-[9px] text-center text-white  transition-all ease-linear cursor-pointer "
                                                     />
                                                 </div>
                                                 <div className="col-span-1  h-full flex items-center justify-center">
