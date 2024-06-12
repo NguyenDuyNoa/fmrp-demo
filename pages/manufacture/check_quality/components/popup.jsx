@@ -3,6 +3,7 @@ import PopupEdit from "/components/UI/popup";
 
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import useToast from "@/hooks/useToast";
+import NoData from "@/components/UI/noData/nodata";
 const PopupCheckQuality = (props) => {
     const isShow = useToast();
     const initilaState = {
@@ -148,67 +149,50 @@ const PopupCheckQuality = (props) => {
                         ) : (
                             <NoData />
                         )} */}
+                        <NoData />
                     </div>
-                    {/* <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
+                    <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                         {props.dataLang?.purchase_total || "purchase_total"}
                     </h2>
+
                     <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between">
                         <div className="col-span-7 font-medium grid grid-cols-7 text-left">
                             <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] ">
                                 {props.dataLang?.price_quote_note || "price_quote_note"}
                             </h3>
                             <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] col-span-5 font-normal rounded-lg">
-                                {data?.note}
+                                {/* {data?.note} */}
                             </h3>
                         </div>
                         <div className="col-span-2 space-y-2">
                             <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                <h3>{props.dataLang?.price_quote_total || "price_quote_total"}</h3>
+                                <h3>{"Tổng số lượng QC"}</h3>
                             </div>
                             <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                <h3>{props.dataLang?.price_quote_total_discount || "price_quote_discount"}</h3>
+                                <h3>{"Tổng số lượng đạt"}</h3>
                             </div>
                             <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                <h3>
-                                    {props.dataLang?.price_quote_total_money_after_discount ||
-                                        "price_quote_money_after_discount"}
-                                </h3>
-                            </div>
-                            <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                <h3>{props.dataLang?.price_quote_tax_money || "price_quote_tax_money"}</h3>
-                            </div>
-                            <div className="font-normal text-left 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                <h3>{props.dataLang?.price_quote_into_money || "price_quote_into_money"}</h3>
+                                <h3>{"Tổng số lượng lỗi"}</h3>
                             </div>
                         </div>
                         <div className="col-span-3 space-y-2">
                             <div className="font-normal mr-2.5">
                                 <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                    {formatMoney(data?.total_price)}
+                                    {/* {formatMoney(data?.total_price)} */}0
                                 </h3>
                             </div>
                             <div className="font-normal mr-2.5">
                                 <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                    {formatMoney(data?.total_discount)}
+                                    0
                                 </h3>
                             </div>
                             <div className="font-normal mr-2.5">
                                 <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                    {formatMoney(data?.total_price_after_discount)}
-                                </h3>
-                            </div>
-                            <div className="font-normal mr-2.5">
-                                <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                    {formatMoney(data?.total_tax_price)}
-                                </h3>
-                            </div>
-                            <div className="font-normal mr-2.5">
-                                <h3 className="text-right text-blue-600 3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px]">
-                                    {formatMoney(data?.total_amount)}
+                                    0
                                 </h3>
                             </div>
                         </div>
-                    </div> */}
+                    </div>
                 </div>
             </div>
         </PopupEdit>
