@@ -84,6 +84,7 @@ const BtnAction = React.memo((props) => {
             if (!err) {
                 if (response && response.data) {
                     let { isSuccess, message, ...res } = response.data;
+                    // này là do không đồng bộ cấu trúc api của be nên phải if thêp type
                     const modelOther = ["category_errors", "category_detail_errors"];
 
                     if (isSuccess || (modelOther.includes(props.type) && res?.result == 1)) {
@@ -110,7 +111,11 @@ const BtnAction = React.memo((props) => {
                             ((props.onRefreshGroup && props.onRefreshGroup()) ||
                                 (props.onRefreshGr && props.onRefreshGr()));
                     } else {
-                        isShow("error", props.dataLang[message] || message);
+                        if (modelOther.includes(props.type)) {
+                            isShow("error", props.dataLang[message.error] || message.error);
+                        } else {
+                            isShow("error", props.dataLang[message] || message);
+                        }
                     }
                 } else {
                     isShow("error", `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`);

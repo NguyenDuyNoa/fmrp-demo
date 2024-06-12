@@ -416,24 +416,26 @@ const MainTable = ({ dataLang }) => {
     const handleShow = (id) => {
         queryState({
             listDataLeft: dataTable.listDataLeft.map((e) => {
-                const showParent = e.id == id ? !e.showParent : false;
-                if (showParent) {
-                    fetchDataTableRight(id);
-                } else {
-                    queryState({
-                        listDataRight: {
-                            ...dataTable.listDataRight,
-                            title: null,
-                            dataPPItems: [],
-                            dataBom: {
-                                productsBom: [],
-                                materialsBom: [],
-                            },
-                            dataKeepStock: [],
-                            dataPurchase: [],
-                        },
-                    });
-                }
+                // const showParent = e.id == id ? !e.showParent : false;
+                const showParent = e.id == id;
+                // if (showParent) {
+                //     fetchDataTableRight(id);
+                // } else {
+                //     queryState({
+                //         listDataRight: {
+                //             ...dataTable.listDataRight,
+                //             title: null,
+                //             dataPPItems: [],
+                //             dataBom: {
+                //                 productsBom: [],
+                //                 materialsBom: [],
+                //             },
+                //             dataKeepStock: [],
+                //             dataPurchase: [],
+                //         },
+                //     });
+                // }
+                showParent && fetchDataTableRight(id);
                 return {
                     ...e,
                     showParent: showParent,

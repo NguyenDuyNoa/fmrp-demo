@@ -366,21 +366,24 @@ const MainTable = ({ dataLang }) => {
     }, [isMouted]);
 
     const handleShow = (id) => {
+        console.log(id, isState.isTab);
         queryState({
             listDataLeft: isState.listDataLeft.map((e) => {
-                const showParent = e.id == id ? !e.showParent : false;
-                if (showParent) {
-                    fetchisStateRight(id);
-                } else {
-                    queryState({
-                        listDataRight: {
-                            ...isState.listDataRight,
-                            title: null,
-                            dataPPItems: [],
-                            dataSemiItems: [],
-                        },
-                    });
-                }
+                const showParent = e.id == id;
+                // const showParent = e.id == id ? !e.showParent : false;
+                // if (showParent) {
+                //     fetchisStateRight(id);
+                // } else {
+                //     queryState({
+                //         listDataRight: {
+                //             ...isState.listDataRight,
+                //             title: null,
+                //             dataPPItems: [],
+                //             dataSemiItems: [],
+                //         },
+                //     });
+                // }
+                showParent && fetchisStateRight(id);
                 return {
                     ...e,
                     showParent: showParent,

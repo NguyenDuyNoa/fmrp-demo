@@ -7,10 +7,7 @@ const Index = (props) => {
         <>
             <div>
                 <Header />
-
-                <div className=" overflow-hidden">
-                    {props.children}
-                </div>
+                <div className="overflow-hidden">{props.children}</div>
             </div>
             <PopupAppTrial />
             <PopupAppRenewal />

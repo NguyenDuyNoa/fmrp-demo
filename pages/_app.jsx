@@ -17,7 +17,6 @@ const deca = Lexend_Deca({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
 });
-
 const Default = (props) => {
     return (
         <React.Fragment>

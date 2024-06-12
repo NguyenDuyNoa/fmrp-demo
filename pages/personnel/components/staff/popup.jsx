@@ -23,7 +23,6 @@ import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 
-
 const Popup_dsnd = (props) => {
     const isShow = useToast();
 
@@ -63,9 +62,9 @@ const Popup_dsnd = (props) => {
         manage: [],
         valueManage: [],
         valueSearch: "",
-    }
+    };
 
-    const [isState, setIsState] = useState(initialData)
+    const [isState, setIsState] = useState(initialData);
 
     const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
@@ -89,44 +88,50 @@ const Popup_dsnd = (props) => {
         queryState({ thumb: isState.thumb });
     }, [isState.thumb]);
 
-
     const fetchDataPower = () => {
-        Axios("GET", props?.id ? `/api_web/api_staff/getPermissionsStaff/${props?.id}?csrf_protection=true` :
-            `/api_web/api_staff/getPermissionsStaff?csrf_protection=true`, {
-            params: {
-                position_id: isState?.positionId != isState?.idPos?.value ? isState?.idPos?.value : 0
-            }
-        }, (err, response) => {
-            if (!err) {
-                const { data, isSuccess, message } = response?.data;
-                if (isSuccess == 1) {
-                    const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
-                        key,
-                        ...value,
-                        child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
-                            key: childKey,
-                            ...childValue,
-                            permissions: Object.entries(childValue?.permissions)?.map(([permissionsKey, permissionsValue]) => ({
-                                key: permissionsKey,
-                                ...permissionsValue,
-                            }))
-                        }))
-                    }));
-                    queryState({ room: permissionsArray });
+        Axios(
+            "GET",
+            props?.id
+                ? `/api_web/api_staff/getPermissionsStaff/${props?.id}?csrf_protection=true`
+                : `/api_web/api_staff/getPermissionsStaff?csrf_protection=true`,
+            {
+                params: {
+                    position_id: isState?.positionId != isState?.idPos?.value ? isState?.idPos?.value : 0,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    const { data, isSuccess, message } = response?.data;
+                    if (isSuccess == 1) {
+                        const permissionsArray = Object.entries(data.permissions)?.map(([key, value]) => ({
+                            key,
+                            ...value,
+                            child: Object.entries(value?.child)?.map(([childKey, childValue]) => ({
+                                key: childKey,
+                                ...childValue,
+                                permissions: Object.entries(childValue?.permissions)?.map(
+                                    ([permissionsKey, permissionsValue]) => ({
+                                        key: permissionsKey,
+                                        ...permissionsValue,
+                                    })
+                                ),
+                            })),
+                        }));
+                        queryState({ room: permissionsArray });
+                    }
+                } else {
+                    {
+                        console.log("err", err);
+                    }
                 }
-            } else {
-                {
-                    console.log("err", err);
-                }
             }
-        });
-    }
+        );
+    };
 
     useEffect(() => {
-        isState.open && fetchDataPower()
+        isState.open && fetchDataPower();
         isState.idPos == null && queryState({ manage: [], valueManage: [] });
-    }, [isState.idPos])
-
+    }, [isState.idPos]);
 
     const _ServerFetching_detailUser = () => {
         Axios("GET", `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`, {}, (err, response) => {
@@ -140,7 +145,7 @@ const Popup_dsnd = (props) => {
                     admin: db?.admin,
                     valueBr: db?.branch?.map((e) => ({
                         label: e.name,
-                        value: Number(e.id),
+                        value: e.id,
                     })),
                     valueManage: db?.manage?.map((x) => ({
                         label: x.full_name,
@@ -148,8 +153,8 @@ const Popup_dsnd = (props) => {
                     })),
                     positionId: db?.position_id,
                     thumb: db?.profile_image,
-                    idPos: db?.position_id == "0" ? null : { value: db?.position_id, label: db?.position_name }
-                })
+                    idPos: db?.position_id == "0" ? null : { value: db?.position_id, label: db?.position_name },
+                });
             }
             queryState({ onFetching: false });
         });
@@ -162,9 +167,10 @@ const Popup_dsnd = (props) => {
                 dataOption: props?.isState?.dataOption || [],
             });
             props?.id && _ServerFetching_detailUser();
-            fetchDataPower()
+            fetchDataPower();
         }
     }, [isState.open]);
+    console.log(props?.isState?.dataBranch);
 
     const handleChange = (parent, child = null, permissions = null) => {
         const newData = isState.room?.map((e) => {
@@ -177,12 +183,12 @@ const Popup_dsnd = (props) => {
                             permissions: x?.permissions?.map((y) => {
                                 return {
                                     ...y,
-                                    is_check: parent.is_check == 0 ? 1 : 0
+                                    is_check: parent.is_check == 0 ? 1 : 0,
                                 };
-                            })
+                            }),
                         };
                     }),
-                    is_check: parent.is_check == 0 ? 1 : 0
+                    is_check: parent.is_check == 0 ? 1 : 0,
                 };
             } else if (child != null && e?.key == parent && e?.is_check == 1) {
                 return {
@@ -195,15 +201,15 @@ const Popup_dsnd = (props) => {
                                     if (y?.key == permissions?.key) {
                                         return {
                                             ...y,
-                                            is_check: y.is_check === 0 ? 1 : 0
+                                            is_check: y.is_check === 0 ? 1 : 0,
                                         };
                                     }
                                     return y;
-                                })
+                                }),
                             };
                         }
                         return x;
-                    })
+                    }),
                 };
             }
             return e;
@@ -214,38 +220,38 @@ const Popup_dsnd = (props) => {
     //post db
     const transformData = (data) => {
         const transformedData = {};
-        data.forEach(item => {
+        data.forEach((item) => {
             const { key, is_check, name, child } = item;
             const transformedChild = {};
 
             if (child) {
-                child.forEach(childItem => {
+                child.forEach((childItem) => {
                     const { key: childKey, name: childName, permissions } = childItem;
                     const transformedPermissions = {};
                     if (permissions) {
-                        permissions.forEach(permission => {
+                        permissions.forEach((permission) => {
                             transformedPermissions[permission.key] = {
                                 name: permission.name,
-                                is_check: permission.is_check
+                                is_check: permission.is_check,
                             };
                         });
                     }
 
                     transformedChild[childKey] = {
                         name: childName,
-                        permissions: transformedPermissions
+                        permissions: transformedPermissions,
                     };
                 });
             }
             transformedData[key] = {
                 is_check,
                 name,
-                child: transformedChild
+                child: transformedChild,
             };
         });
 
         return transformedData;
-    }
+    };
 
     const _ServerSending = () => {
         let id = props?.id;
@@ -263,11 +269,15 @@ const Popup_dsnd = (props) => {
         form.append("profile_image", isState.thumbFile || "");
         form.append("position_id", isState.idPos?.value || "");
         form.append("is_delete_image ", isState.isDeleteThumb || "");
-        const utf8Bytes = JSON.stringify(transformedResult)
+        const utf8Bytes = JSON.stringify(transformedResult);
         form.append("permissions", utf8Bytes);
         Axios(
             "POST",
-            `${id ? `/api_web/api_staff/staff/${id}?csrf_protection=true` : "/api_web/api_staff/staff/?csrf_protection=true"}`,
+            `${
+                id
+                    ? `/api_web/api_staff/staff/${id}?csrf_protection=true`
+                    : "/api_web/api_staff/staff/?csrf_protection=true"
+            }`,
             {
                 data: form,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -292,8 +302,6 @@ const Popup_dsnd = (props) => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
 
-
-
     const _ServerFetching__Manage = () => {
         Axios(
             "GET",
@@ -307,8 +315,8 @@ const Popup_dsnd = (props) => {
                             manage: data?.map((e) => ({
                                 label: e.full_name,
                                 value: Number(e.id),
-                            }))
-                        })
+                            })),
+                        });
                     } else if (props?.id) {
                         queryState({
                             manage: data
@@ -316,9 +324,8 @@ const Popup_dsnd = (props) => {
                                     label: e.full_name,
                                     value: Number(e.id),
                                 }))
-                                ?.filter((e) => isState.valueManage.some((x) => e.value !== x.value))
-                        })
-
+                                ?.filter((e) => isState.valueManage.some((x) => e.value !== x.value)),
+                        });
                     }
                 }
                 queryState({ onFetching_Manage: false });
@@ -329,7 +336,7 @@ const Popup_dsnd = (props) => {
     // save form
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (isState.name == "" || isState.valueBr?.length == 0 || !props?.id && isState.password == "") {
+        if (isState.name == "" || isState.valueBr?.length == 0 || (!props?.id && isState.password == "")) {
             isState.name == "" && queryState({ errInput: true });
             isState.valueBr?.length == 0 && queryState({ errInputBr: true });
             !props?.id && isState.password == "" && queryState({ errInputPas: true });
@@ -351,7 +358,7 @@ const Popup_dsnd = (props) => {
     }, [isState.password != ""]);
 
     useEffect(() => {
-        isState.open && queryState({ onFetching_Manage: true })
+        isState.open && queryState({ onFetching_Manage: true });
     }, [isState.idPos]);
 
     useEffect(() => {
@@ -359,25 +366,25 @@ const Popup_dsnd = (props) => {
     }, [isState.onFetching_Manage]);
 
     useEffect(() => {
-        const filteredData = isState.room.filter(item => item.name.toLowerCase().includes(isState.valueSearch.toLowerCase()));
+        const filteredData = isState.room.filter((item) =>
+            item.name.toLowerCase().includes(isState.valueSearch.toLowerCase())
+        );
         const newdb = isState.room.map((item) => {
             const itemChecked = filteredData.find((x) => item.key == x.key);
             if (itemChecked) {
                 return {
                     ...item,
                     ...itemChecked,
-                    hidden: false
-                }
+                    hidden: false,
+                };
             }
             return {
                 ...item,
-                hidden: true
-            }
-
-        })
+                hidden: true,
+            };
+        });
         queryState({ room: newdb });
-
-    }, [isState.valueSearch])
+    }, [isState.valueSearch]);
 
     return (
         <>
@@ -396,21 +403,23 @@ const Popup_dsnd = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={() => queryState({ tab: 0 })}
-                        className={`${isState.tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                            }  px-4 py-2 outline-none font-semibold`}
+                        className={`${
+                            isState.tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_info}
                     </button>
                     <button
                         onClick={() => {
                             if (role) {
-                                queryState({ tab: 1 })
+                                queryState({ tab: 1 });
                             } else {
-                                isShow('warning', WARNING_STATUS_ROLE_ADMIN)
+                                isShow("warning", WARNING_STATUS_ROLE_ADMIN);
                             }
                         }}
-                        className={`${isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                            }  px-4 py-2 outline-none font-semibold`}
+                        className={`${
+                            isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                        }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_power}
                     </button>
@@ -418,8 +427,7 @@ const Popup_dsnd = (props) => {
                 <div className="mt-4 w-[600px] ">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         {isState.tab == 0 && (
-                            <Customscrollbar className="h-[480px] overflow-hidden"
-                            >
+                            <Customscrollbar className="h-[480px] overflow-hidden">
                                 <div className="">
                                     <div className="flex justify-between gap-5">
                                         <div className="w-1/2">
@@ -445,10 +453,11 @@ const Popup_dsnd = (props) => {
                                                     onChange={(e) => queryState({ name: e.target.value })}
                                                     placeholder={props.dataLang?.personnels_staff_popup_name}
                                                     type="text"
-                                                    className={`${isState.errInput
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                    className={`${
+                                                        isState.errInput
+                                                            ? "border-red-500"
+                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                                 />
 
                                                 {isState.errInput && (
@@ -497,8 +506,9 @@ const Popup_dsnd = (props) => {
                                                             position: "absolute",
                                                         }),
                                                     }}
-                                                    className={`${isState.errInputBr ? "border-red-500" : "border-transparent"
-                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                    className={`${
+                                                        isState.errInputBr ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 />
 
                                                 {isState.errInputBr && (
@@ -543,12 +553,16 @@ const Popup_dsnd = (props) => {
                                                         className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
                                                         id="checkbox-6"
                                                         value={isState.admin}
-                                                        checked={isState.admin === "0" ? false : isState.admin === "1" && true}
+                                                        checked={
+                                                            isState.admin === "0"
+                                                                ? false
+                                                                : isState.admin === "1" && true
+                                                        }
                                                         onChange={(e) => {
                                                             if (role) {
-                                                                queryState({ admin: e.target?.checked ? "1" : "0" })
+                                                                queryState({ admin: e.target?.checked ? "1" : "0" });
                                                             } else {
-                                                                isShow('warning', WARNING_STATUS_ROLE_ADMIN)
+                                                                isShow("warning", WARNING_STATUS_ROLE_ADMIN);
                                                             }
                                                         }}
                                                     />
@@ -587,14 +601,17 @@ const Popup_dsnd = (props) => {
                                                         value={isState.password}
                                                         id="userpwd"
                                                         onChange={(e) => queryState({ password: e?.target?.value })}
-                                                        className={`${isState.errInputPas
-                                                            ? "border-red-500"
-                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal py-2 pl-3 pr-12  border outline-none `}
+                                                        className={`${
+                                                            isState.errInputPas
+                                                                ? "border-red-500"
+                                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal py-2 pl-3 pr-12  border outline-none `}
                                                     />
                                                     <button
                                                         type="button"
-                                                        onClick={() => queryState({ typePassword: !isState.typePassword })}
+                                                        onClick={() =>
+                                                            queryState({ typePassword: !isState.typePassword })
+                                                        }
                                                         className="absolute right-3 top-[50%]"
                                                     >
                                                         {isState.typePassword ? <IconEyeSlash /> : <IconEye />}
@@ -766,17 +783,26 @@ const Popup_dsnd = (props) => {
                                 <div className="w-full">
                                     <label>Tìm kiếm</label>
                                     <div className="relative flex items-center">
-                                        <SearchNormal1 size={20} className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]" />
+                                        <SearchNormal1
+                                            size={20}
+                                            className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                                        />
                                         <input
                                             onChange={(e) => queryState({ valueSearch: e?.target?.value })}
                                             dataLang={props.dataLang}
                                             value={isState.valueSearch}
-                                            className={"border py-1.5 rounded border-gray-300 2xl:text-left 2xl:pl-10 xl:!text-left xl:pl-16 relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-base text-xs  text-center 2xl:w-full xl:w-full w-[100%]"} />
-                                        {
-                                            isState.valueSearch != "" && <MdClear size={32} onClick={() => queryState({ valueSearch: "" })} className="absolute cursor-pointer hover:bg-gray-300 p-2 right-5 bottom-0.5 rounded-full transition-all duration-200 ease-linear" />
-                                        }
+                                            className={
+                                                "border py-1.5 rounded border-gray-300 2xl:text-left 2xl:pl-10 xl:!text-left xl:pl-16 relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] 2xl:text-base text-xs  text-center 2xl:w-full xl:w-full w-[100%]"
+                                            }
+                                        />
+                                        {isState.valueSearch != "" && (
+                                            <MdClear
+                                                size={32}
+                                                onClick={() => queryState({ valueSearch: "" })}
+                                                className="absolute cursor-pointer hover:bg-gray-300 p-2 right-5 bottom-0.5 rounded-full transition-all duration-200 ease-linear"
+                                            />
+                                        )}
                                     </div>
-
                                 </div>
                                 <div className="w-full">
                                     <div className="space-y-2 max-h-[380px] h-auto overflow-y-auo scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -828,26 +854,56 @@ const Popup_dsnd = (props) => {
                                                             <div className="">
                                                                 {e?.child?.map((i, index) => {
                                                                     return (
-                                                                        <div key={i?.key} className={`${e?.child?.length - 1 == index && "border-b"} ml-10 border-t border-x`}>
-                                                                            <div className="border-b p-2 text-sm">{i?.name}</div>
+                                                                        <div
+                                                                            key={i?.key}
+                                                                            className={`${
+                                                                                e?.child?.length - 1 == index &&
+                                                                                "border-b"
+                                                                            } ml-10 border-t border-x`}
+                                                                        >
+                                                                            <div className="border-b p-2 text-sm">
+                                                                                {i?.name}
+                                                                            </div>
                                                                             <div className="grid grid-cols-3 gap-1 ">
                                                                                 {i?.permissions?.map((s) => {
                                                                                     return (
-                                                                                        <div key={s?.key} className="flex w-full items-center">
+                                                                                        <div
+                                                                                            key={s?.key}
+                                                                                            className="flex w-full items-center"
+                                                                                        >
                                                                                             <div className="inline-flex items-center">
                                                                                                 <label
                                                                                                     className="relative flex cursor-pointer items-center rounded-full p-3"
-                                                                                                    htmlFor={s?.key + "" + i?.key}
+                                                                                                    htmlFor={
+                                                                                                        s?.key +
+                                                                                                        "" +
+                                                                                                        i?.key
+                                                                                                    }
                                                                                                     data-ripple-dark="true"
                                                                                                 >
                                                                                                     <input
                                                                                                         type="checkbox"
                                                                                                         className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                                                                                        id={s?.key + "" + i?.key}
+                                                                                                        id={
+                                                                                                            s?.key +
+                                                                                                            "" +
+                                                                                                            i?.key
+                                                                                                        }
                                                                                                         value={s?.name}
-                                                                                                        checked={s?.is_check == 1 ? true : false}
-                                                                                                        onChange={(value) => {
-                                                                                                            handleChange(e?.key, i?.key, s)
+                                                                                                        checked={
+                                                                                                            s?.is_check ==
+                                                                                                            1
+                                                                                                                ? true
+                                                                                                                : false
+                                                                                                        }
+                                                                                                        onChange={(
+                                                                                                            value
+                                                                                                        ) => {
+                                                                                                            handleChange(
+                                                                                                                e?.key,
+                                                                                                                i?.key,
+                                                                                                                s
+                                                                                                            );
                                                                                                         }}
                                                                                                     />
                                                                                                     <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
@@ -869,17 +925,19 @@ const Popup_dsnd = (props) => {
                                                                                                 </label>
                                                                                             </div>
                                                                                             <label
-                                                                                                htmlFor={s?.key + "" + i?.key}
+                                                                                                htmlFor={
+                                                                                                    s?.key + "" + i?.key
+                                                                                                }
                                                                                                 className="text-[#344054] font-medium text-sm cursor-pointer"
                                                                                             >
                                                                                                 {s?.name}
                                                                                             </label>
                                                                                         </div>
-                                                                                    )
+                                                                                    );
                                                                                 })}
                                                                             </div>
                                                                         </div>
-                                                                    )
+                                                                    );
                                                                 })}
                                                             </div>
                                                         )}
@@ -894,7 +952,7 @@ const Popup_dsnd = (props) => {
                         <div className="text-right mt-5 space-x-2">
                             <button
                                 type="button"
-                                onClick={() => queryState({ open: false, })}
+                                onClick={() => queryState({ open: false })}
                                 className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {props.dataLang?.branch_popup_exit}

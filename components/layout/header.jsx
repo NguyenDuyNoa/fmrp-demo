@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { useSelector, useDispatch } from "react-redux";
-import { Router, useRouter } from "next/router";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Dropdown, DropdownThongBao } from "../UI/dropdown";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Popup from "reactjs-popup";
-import { ArrowUp, ArrowDown2 as IconDown } from "iconsax-react";
-import { Tooltip } from "react-tippy";
-import "react-tippy/dist/tippy.css";
-import Expirred from "components/UI/expired";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
 import { CookieCore } from "@/utils/lib/cookie";
+import Expirred from "components/UI/expired";
+import { ArrowUp, ArrowDown2 as IconDown } from "iconsax-react";
+import { Tooltip } from "react-tippy";
+import "react-tippy/dist/tippy.css";
+import Popup from "reactjs-popup";
 const Header = () => {
     const router = useRouter();
 
@@ -613,9 +613,9 @@ const Header = () => {
             sub: [
                 {
                     title: "Kiểm tra chất lượng",
-                    link: "#",
                     viewOwn: -1,
                     view: -1,
+                    link: "/manufacture/check_quality",
                 },
                 {
                     title: "Danh mục lỗi",
