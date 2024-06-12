@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import NoData from "@/components/UI/noData/nodata";
 import useToast from "@/hooks/useToast";
 import { SelectCore, componentsCore } from "@/utils/lib/Select";
-import { Add, Trash as IconDelete, Minus } from "iconsax-react";
-import NoData from "@/components/UI/noData/nodata";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Trash as IconDelete } from "iconsax-react";
 import { v4 as uuid } from "uuid";
 const PopupDetailError = ({ data, id, queryStateQlty, ...props }) => {
     const isShow = useToast();
@@ -76,7 +76,6 @@ const PopupDetailError = ({ data, id, queryStateQlty, ...props }) => {
             return e;
         });
         queryStateQlty({ listData: arrData });
-        console.log("arrData", arrData);
     };
 
     useEffect(() => {

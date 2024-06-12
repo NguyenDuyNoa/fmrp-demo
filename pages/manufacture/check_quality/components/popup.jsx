@@ -1,14 +1,8 @@
-import { Edit as IconEdit } from "iconsax-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
-import apiComons from "@/Api/apiComon/apiComon";
-import apiCategoryErrors from "@/Api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import useToast from "@/hooks/useToast";
-import { Controller, useForm } from "react-hook-form";
-import { GeneralInformation } from "@/components/UI/common/TablePopup";
-import NoData from "@/components/UI/noData/nodata";
 const PopupCheckQuality = (props) => {
     const isShow = useToast();
     const initilaState = {
@@ -21,7 +15,7 @@ const PopupCheckQuality = (props) => {
 
     return (
         <PopupEdit
-            title={"Xem phiếu QC"}
+            title={"Chi tiết kiểm tra chất lượng"}
             button={props?.name}
             onClickOpen={() => queryState({ open: true })}
             open={isState.open}
@@ -33,87 +27,61 @@ const PopupCheckQuality = (props) => {
             <div className="3xl:w-[1200px] 2xl:w-[1100px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
                 <div className="overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
                     <GeneralInformation {...props} />
-                    {/* <div className="grid grid-cols-12 min-h-[100px]">
+                    <div className="grid grid-cols-12 min-h-[100px]">
                         <div className="col-span-4">
                             <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
                                 <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 whitespace-nowrap ">
-                                    {props.dataLang?.price_quote_date || "price_quote_date"} :
+                                    {"Ngày"} :
                                 </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal items-start col-span-4 ml-3">
-                                </h3>
+                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal items-start col-span-4 ml-3"></h3>
                             </div>
                             <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
                                 <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                    {props.dataLang?.price_quote_effective_date || "price_quote_effective_date"} :
+                                    {"Số phiếu QC"} :
                                 </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-normal col-span-2 ml-3">
-                                </h3>
-                            </div>
-                            <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
-                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                    {props.dataLang?.price_quote_code || "price_quote_code"} :
-                                </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-normal col-span-2 ml-3">
-                                </h3>
+                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-normal col-span-2 ml-3"></h3>
                             </div>
                         </div>
 
                         <div className="col-span-4 ">
                             <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
                                 <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                    {props.dataLang?.price_quote_order_status || "price_quote_order_status"} :
+                                    {"Số LSX chi tiết"} :
+                                </h3>
+                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-normal col-span-2 ml-3"></h3>
+                            </div>
+                            <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
+                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
+                                    {"Người tạo"} :
                                 </h3>
                                 <h3 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] font-normal col-span-4"></h3>
                             </div>
+                        </div>
+                        <div className="col-span-4 ">
                             <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
                                 <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                    {props.dataLang?.price_quote_customer || "price_quote_customer"} :
+                                    {"Chi nhánh"} :
                                 </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal col-span-4 whitespace-nowrap"></h3>
-                            </div>
-                            <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
-                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                    {props.dataLang?.price_quote_contact_person || "price_quote_contact_person"} :
-                                </h3>
-                                <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal col-span-4"></h3>
+                                <h3 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[11px] text-[10px] font-normal col-span-4"></h3>
                             </div>
                         </div>
-                    </div> */}
-                    {/* <div className="pr-2 w-full">
-                        <HeaderTablePopup gridCols={12} display="grid">
+                    </div>
+                    <div className="pr-2 w-full">
+                        <HeaderTablePopup gridCols={7} display="grid">
                             <ColumnTablePopup>
                                 {props.dataLang?.price_quote_image || "price_quote_image"}
                             </ColumnTablePopup>
-                            <ColumnTablePopup>
-                                {props.dataLang?.price_quote_item || "price_quote_item"}
-                            </ColumnTablePopup>
                             <ColumnTablePopup colSpan={2}>
-                                {props.dataLang?.price_quote_variant || "price_quote_variant"}
+                                {props.dataLang?.price_quote_item || "price_quote_item"}
                             </ColumnTablePopup>
                             <ColumnTablePopup>
                                 {props.dataLang?.price_quote_from_unit || "price_quote_from_unit"}
                             </ColumnTablePopup>
-                            <ColumnTablePopup>
-                                {props.dataLang?.price_quote_quantity || "price_quote_quantity"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup>
-                                {props.dataLang?.price_quote_unit_price || "price_quote_unit_price"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup>
-                                {props.dataLang?.price_quote_person || "price_quote_person"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup>
-                                {props.dataLang?.price_quote_after_discount || "price_quote_after_discount"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup>{props.dataLang?.price_quote_tax || "price_quote_tax"}</ColumnTablePopup>
-                            <ColumnTablePopup>
-                                {props.dataLang?.price_quote_into_money || "price_quote_into_money"}
-                            </ColumnTablePopup>
-                            <ColumnTablePopup>
-                                {props.dataLang?.price_quote_note_item || "price_quote_note_item"}
-                            </ColumnTablePopup>
+                            <ColumnTablePopup>{"Số lượng QC"}</ColumnTablePopup>
+                            <ColumnTablePopup>{"Số lượng đạt"}</ColumnTablePopup>
+                            <ColumnTablePopup>{"Số lượng lỗi"}</ColumnTablePopup>
                         </HeaderTablePopup>
-                        {loading ? (
+                        {/* {loading ? (
                             <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
                         ) : data?.items?.length > 0 ? (
                             <>
@@ -179,9 +147,9 @@ const PopupCheckQuality = (props) => {
                             </>
                         ) : (
                             <NoData />
-                        )}
+                        )} */}
                     </div>
-                    <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
+                    {/* <h2 className="font-normal p-2 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px] border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]">
                         {props.dataLang?.purchase_total || "purchase_total"}
                     </h2>
                     <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between">

@@ -51,6 +51,12 @@ const routerInventory = {
     form: `${url}/inventory/form`,
 };
 
+//qc
+const routerQc = {
+    home: `${url}/check_quality`,
+    form: `${url}/check_quality/form`,
+}
+
 export {
     routerPproductionPlan,
     routerInternalPlan,
@@ -59,5 +65,6 @@ export {
     routerProductsWarehouse,
     routerRecall,
     routerExportToOther,
-    routerInventory
+    routerInventory,
+    routerQc
 };

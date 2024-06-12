@@ -7,16 +7,16 @@ import Pagination from "/components/UI/pagination";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiCategoryErrors from "@/Api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
-import BtnAction from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import NoData from "@/components/UI/noData/nodata";
@@ -25,13 +25,11 @@ import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
+import { routerQc } from "@/routers/manufacture";
 import { Grid6 } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
-import PopupCategoryErrors from "./components/popup";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import PopupCheckQuality from "./components/popup";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 
 const Index = (props) => {
     const router = useRouter();
@@ -193,7 +191,7 @@ const Index = (props) => {
                                     // else {
                                     //     isShow("warning", WARNING_STATUS_ROLE)
                                     // }
-                                    router.push("/manufacture/check_quality/form");
+                                    router.push(routerQc.form);
                                 }}
                                 dataLang={dataLang}
                             />
@@ -260,7 +258,7 @@ const Index = (props) => {
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
                                                             filename="Kiểm tra chất lượng"
-                                                            title="DML"
+                                                            title="KTTCL"
                                                             dataLang={dataLang}
                                                         />
                                                     )}

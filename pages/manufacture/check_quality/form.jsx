@@ -25,7 +25,7 @@ import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 
-import { routerInternalPlan } from "@/routers/manufacture";
+import { routerQc } from "@/routers/manufacture";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
@@ -104,14 +104,6 @@ const Index = (props) => {
         isStateQlty.onFetching && _ServerFetching();
     }, [isStateQlty.onFetching]);
 
-    const options = isStateQlty.dataItems?.map((e) => ({
-        label: `${e.name}
-            <spa style={{display: none}}>${e.code}</spa
-            <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-        value: e.id,
-        e,
-    }));
-
     const _ServerFetchingDetailPage = async () => {
         const { data } = await apiInternalPlan.apiDetailInternalPlan(id);
         queryStateQlty({
@@ -154,11 +146,19 @@ const Index = (props) => {
                 "filter[branch_id]": isStateQlty.idBranch !== null ? +isStateQlty.idBranch.value : null,
             },
         });
-        queryStateQlty({ dataItems: data?.result, onFetchingItemsAll: false });
+        queryStateQlty({
+            dataItems: data?.result.map((e) => ({
+                label: `${e.name}
+                <spa style={{display: none}}>${e.code}</spa
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                value: e.id,
+                e,
+            })),
+            onFetchingItemsAll: false,
+        });
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        console.log(inputValue);
         const { data } = await apiComons.apiSearchProductsVariant({
             params: {
                 "filter[branch_id]": isStateQlty.idBranch !== null ? +isStateQlty.idBranch.value : null,
@@ -167,7 +167,15 @@ const Index = (props) => {
                 term: inputValue,
             },
         });
-        queryStateQlty({ dataItems: data?.result });
+        queryStateQlty({
+            dataItems: data?.result.map((e) => ({
+                label: `${e.name}
+                <spa style={{display: none}}>${e.code}</spa
+                <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                value: e.id,
+                e,
+            })),
+        });
     }, 500);
 
     const handleSaveStatus = () => {
@@ -262,7 +270,7 @@ const Index = (props) => {
     const _HandleChangeValue = (parentId, value) => {
         const checkData = isStateQlty.listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
-            const newData = listData?.map((e) => {
+            const newData = isStateQlty.listData?.map((e) => {
                 if (e?.id === parentId) {
                     const { parent } = _DataValueItem(value);
                     return parent;
@@ -423,7 +431,7 @@ const Index = (props) => {
                         </h2>
                         <div className="flex justify-end items-center mr-2">
                             <button
-                                onClick={() => router.push("/manufacture/check_quality")}
+                                onClick={() => router.push(routerQc.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
@@ -555,7 +563,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {"Số lệnh sản xuất chi tiết"} <span className="text-red-500">*</span>
+                                        {"Số LSX chi tiết"} <span className="text-red-500">*</span>
                                     </label>
                                     <SelectCore
                                         options={isStateQlty.dataDetailedProduction}
@@ -569,7 +577,7 @@ const Index = (props) => {
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={"Số lệnh sản xuất chi tiết"}
+                                        placeholder={"Số LSX chi tiết"}
                                         className={`${
                                             isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -649,7 +657,7 @@ const Index = (props) => {
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
                         <div className="col-span-3">
                             <SelectCore
-                                options={options}
+                                options={isStateQlty.dataItems}
                                 value={null}
                                 onInputChange={(e) => {
                                     _HandleSeachApi(e);
@@ -760,7 +768,7 @@ const Index = (props) => {
                                             <div className="col-span-3 h-full ">
                                                 <div className="relative">
                                                     <SelectCore
-                                                        options={options}
+                                                        options={isStateQlty.dataItems}
                                                         value={e?.matHang}
                                                         onInputChange={(event) => {
                                                             _HandleSeachApi(event);
@@ -1040,7 +1048,35 @@ const Index = (props) => {
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal ">
-                                <h3>{dataLang?.internal_plan_total || "internal_plan_total"}</h3>
+                                <h3>{"Tổng số lượng QC"}</h3>
+                            </div>
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {formatNumber(
+                                        isStateQlty.listData?.reduce((accumulator, item) => {
+                                            return accumulator + item.quantity;
+                                        }, 0)
+                                    )}
+                                </h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between ">
+                            <div className="font-normal ">
+                                <h3>{"Tổng số lượng đạt"}</h3>
+                            </div>
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {formatNumber(
+                                        isStateQlty.listData?.reduce((accumulator, item) => {
+                                            return accumulator + item.quantity;
+                                        }, 0)
+                                    )}
+                                </h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between ">
+                            <div className="font-normal ">
+                                <h3>{"Tổng số lượng lỗi"}</h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
@@ -1053,7 +1089,7 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <ButtonBack onClick={() => router.push(routerInternalPlan.home)} dataLang={dataLang} />
+                            <ButtonBack onClick={() => router.push(routerQc.home)} dataLang={dataLang} />
                             <ButtonSubmit loading={isStateQlty.onSending} onClick={_HandleSubmit} dataLang={dataLang} />
                         </div>
                     </div>
