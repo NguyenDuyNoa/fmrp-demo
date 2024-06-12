@@ -89,7 +89,7 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
                 if (+quantityError > 0) {
                     queryState({ open: true });
                 } else {
-                    isShow("error", "Vui lòng nhập số lượng lỗi");
+                    isShow("error", "Vui lòng nhập số lượng lỗi lớn hơn 0");
                 }
             }}
             open={isState.open}
