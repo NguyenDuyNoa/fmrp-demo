@@ -240,7 +240,7 @@ const Header = () => {
                             viewOwn: auth?.services?.is_view_own,
                             view: auth?.services?.is_view,
                             name: "Phiếu dịch vụ",
-                            link: "/purchase_order/servicevoucher",
+                            link: "/purchase_order/servicev_voucher",
                         },
                     ],
                 },

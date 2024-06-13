@@ -23,7 +23,7 @@ const useActionRole = (auth, type) => {
         'purchases': "purchases",
         "purchase_order": "order",
         "position": "personnel_roles",
-        "services": "servicevoucher",
+        "services": "servicev_voucher",
         "import": "import",
         "return_suppliers": 'returns',
         "warehouse": "warehouse",

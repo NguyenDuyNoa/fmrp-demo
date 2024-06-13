@@ -225,7 +225,7 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Phiếu dịch vụ",
-                            link: "/purchase_order/serviceVoucher",
+                            link: "/purchase_order/servicev_voucher",
                         },
                     ],
                 },

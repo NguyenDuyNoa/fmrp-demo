@@ -39,7 +39,7 @@ import { useToggle } from "@/hooks/useToggle";
 
 import PopupEdit from "@/components/UI/popup";
 
-import Popup_servie from "@/pages/purchase_order/servicevoucher/components/popup";
+import Popup_servie from "@/pages/purchase_order/servicev_voucher/components/popup";
 
 import Popup_dspc from "@/pages/accountant/payment/components/popup";
 import Popup_dspt from "@/pages/accountant/receipts/components/popup";
@@ -95,7 +95,7 @@ const BtnAction = React.memo((props) => {
                         const checkType = [
                             "returnSales",
                             "purchases",
-                            "servicevoucher",
+                            "servicev_voucher",
                             "returns",
                             "warehouseTransfer",
                             "production_warehouse",
@@ -159,7 +159,7 @@ const BtnAction = React.memo((props) => {
             internal_plan: `/api_web/api_internal_plan/deleteInternalPlan/${props.id}?csrf_protection=true`,
             purchases: `/api_web/Api_purchases/purchases/${props.id}?csrf_protection=true`,
             order: `/api_web/Api_purchase_order/purchase_order/${props.id}?csrf_protection=true`,
-            servicevoucher: `/api_web/Api_service/service/${props.id}?csrf_protection=true`,
+            servicev_voucher: `/api_web/Api_service/service/${props.id}?csrf_protection=true`,
             import: `/api_web/Api_import/import/${props.id}?csrf_protection=true`,
             returns: `/api_web/Api_return_supplier/returnSupplier/${props.id}?csrf_protection=true`,
             warehouseTransfer: `/api_web/Api_transfer/transfer/${props.id}?csrf_protection=true`,
@@ -316,11 +316,11 @@ const BtnAction = React.memo((props) => {
             "returns",
             "deliveryReceipt",
             "returnSales",
-            "servicevoucher",
+            "servicev_voucher",
         ];
 
         if (!!props?.id && checkType.includes(props.type)) {
-            if (!!props?.type === "servicevoucher" && !!props?.status_pay != "not_spent") {
+            if (!!props?.type === "servicev_voucher" && !!props?.status_pay != "not_spent") {
                 isShow("error", `${"Phiếu dịch vụ đã chi. Không thể sửa"}`);
             }
 
@@ -422,7 +422,7 @@ const BtnAction = React.memo((props) => {
                                     className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
                                 />
                             )}
-                            {props.type == "servicevoucher" && (
+                            {props.type == "servicev_voucher" && (
                                 <div className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full">
                                     <BiEdit
                                         size={20}
@@ -523,7 +523,7 @@ const BtnAction = React.memo((props) => {
                                     {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
                                 </Popup_dspc>
                             )}
-                            {!["order", "products", "servicevoucher", "receipts", "payment"].includes(props.type) && (
+                            {!["order", "products", "servicev_voucher", "receipts", "payment"].includes(props.type) && (
                                 <button
                                     onClick={() => {
                                         if (role) {

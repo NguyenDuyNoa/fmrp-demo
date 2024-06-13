@@ -102,7 +102,7 @@ const FilePDF = ({
             internal_plan: `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
             purchases: `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
             order: `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
-            serviceVoucher: `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
+            servicev_voucher: `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
             import: `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
             returns: `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
             warehouseTransfer: `/api_web/Api_transfer/transfer/${props?.id}?csrf_protection=true`,
@@ -141,7 +141,7 @@ const FilePDF = ({
                 internal_plan: docDefinitionInternalPlan,
                 purchases: docDefinitionPurchases,
                 order: docDefinitionOrder,
-                serviceVoucher: docDefinitionServiceVoucher,
+                servicev_voucher: docDefinitionServiceVoucher,
                 import: docDefinitionImportFull,
                 returns: docDefinitionReturnFull,
                 warehouseTransfer: docDefinitionWarehouseTransfer,
@@ -3190,7 +3190,7 @@ const FilePDF = ({
                 table: {
                     widths: "100%",
                     headerRows: 0,
-                    widths: props?.type == "serviceVoucher" && [
+                    widths: props?.type == "servicev_voucher" && [
                         "auto",
                         "auto",
                         "auto",
@@ -3237,7 +3237,7 @@ const FilePDF = ({
                         ],
 
                         // Data rows
-                        ...(data && props?.type == "serviceVoucher" && data?.item.length > 0
+                        ...(data && props?.type == "servicev_voucher" && data?.item.length > 0
                             ? data?.item.map((item, index) => {
                                 return [
                                     {
@@ -7814,7 +7814,7 @@ const FilePDF = ({
         "purchases",
         "internal_plan",
         "order",
-        "serviceVoucher",
+        "servicev_voucher",
         "warehouseTransfer",
         "production_warehouse",
         "productsWarehouse",
