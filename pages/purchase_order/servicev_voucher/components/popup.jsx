@@ -56,7 +56,7 @@ const Popup_servie = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "servicevoucher");
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "servicev_voucher");
 
     const _HandleOpenModal = (e) => {
         if (id) {
