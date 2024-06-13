@@ -132,7 +132,7 @@ const Index = (props) => {
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
-        router.replace("/clients/statusClient");
+        router.replace("/clients/status_client");
         queryState({ onFetching: true });
     }, 500);
 

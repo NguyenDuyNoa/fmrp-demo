@@ -40,7 +40,7 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Trạng thái khách hàng",
-                            link: "/clients/statusClient",
+                            link: "/clients/status_client",
                         },
                         {
                             hidden: 0,
@@ -905,7 +905,7 @@ const Header = () => {
                             hidden: 0,
                             disble: 0,
                             name: "Công nợ khách hàng",
-                            link: "/accountant/customerDebt"
+                            link: "/accountant/customer_debt"
                         },
                     ],
                 },

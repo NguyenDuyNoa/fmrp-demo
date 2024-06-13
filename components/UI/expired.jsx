@@ -29,7 +29,7 @@ const Expirred = () => {
     }, [data]);
 
     const _HandleExtend = () => {
-        router.push("/settings/service-information");
+        router.push("/settings/service_information");
     };
 
     useEffect(() => {
@@ -45,9 +45,10 @@ const Expirred = () => {
                 <div className="rounded relative">
                     <div className="flex justify-between items-center bg-gray-100 p-1">
                         <div className="flex items-center gap-1">
-                            {+date?.dateLimit > 0 ?
+                            {+date?.dateLimit > 0 ? (
                                 <h2 className="font-medium 3xl:text-[14px] 2xl:text-[14px] xl:text-[12px] text-[13px] px-2">
-                                    Phiên bản {data?.trial == "1" ? 'dùng thử' : "có phí"} dành cho <span className="capitalize">{data?.code_company}</span> từ ngày
+                                    Phiên bản {data?.trial == "1" ? "dùng thử" : "có phí"} dành cho{" "}
+                                    <span className="capitalize">{data?.code_company}</span> từ ngày
                                     <span className="mx-1">
                                         {date?.dateStart} đến ngày {date?.dateEnd}
                                     </span>
@@ -56,14 +57,16 @@ const Expirred = () => {
                                         {date?.dateLimit}
                                     </span>
                                     ngày. Một số tính năng của bạn sẽ bị đóng.
-                                </h2> :
+                                </h2>
+                            ) : (
                                 <h2 className="font-medium 3xl:text-[14px] 2xl:text-[14px] xl:text-[12px] text-[13px] px-2">
-                                    Phiên bản {data?.trial == "1" ? 'dùng thử' : "có phí"} dành cho <span className="capitalize">{data?.code_company}</span> từ ngày
+                                    Phiên bản {data?.trial == "1" ? "dùng thử" : "có phí"} dành cho{" "}
+                                    <span className="capitalize">{data?.code_company}</span> từ ngày
                                     <span className="mx-1">
                                         {date?.dateStart} đến ngày {date?.dateEnd} đã hết hạn.
                                     </span>
                                 </h2>
-                            }
+                            )}
                             <NotificationBing size="20" color="red" className="animate-bounce" />
                         </div>
                         <div>

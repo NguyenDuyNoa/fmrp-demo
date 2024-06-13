@@ -140,7 +140,7 @@ const Index = (props) => {
             <Head>
                 <title>Cài đặt</title>
             </Head>
-            <Container className={'!h-auto'}>
+            <Container className={"!h-auto"}>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
@@ -417,7 +417,7 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting url="/settings" isActive="/settings/information">
                     {props.dataLang?.list_btn_seting_information}
                 </Btn_Setting>
-                <Btn_Setting url="/settings/service-information" isActive="/settings/service-information">
+                <Btn_Setting url="/settings/service_information" isActive="/settings/service_information">
                     {props.dataLang?.list_btn_seting_services}
                 </Btn_Setting>
                 <Btn_Setting url="/settings/branch" isActive="/settings/branch">
@@ -450,14 +450,16 @@ const Btn_Setting = React.memo((props) => {
     return (
         <Link href={props.url ? props.url : "#"} alt={props.children}>
             <button
-                className={`${router.asPath.includes(props.isActive)
-                    ? "text-white bg-[#11315B]"
-                    : "text-[#11315B] hover:bg-[#11315B]/5"
-                    } flex items-center space-x-2 rounded w-full text-left font-[400] py-2 px-3 my-1`}
+                className={`${
+                    router.asPath.includes(props.isActive)
+                        ? "text-white bg-[#11315B]"
+                        : "text-[#11315B] hover:bg-[#11315B]/5"
+                } flex items-center space-x-2 rounded w-full text-left font-[400] py-2 px-3 my-1`}
             >
                 <div
-                    className={`${router.asPath.includes(props.isActive) ? "bg-white" : "bg-[#11315B]"
-                        } w-1.5 h-1.5 rounded `}
+                    className={`${
+                        router.asPath.includes(props.isActive) ? "bg-white" : "bg-[#11315B]"
+                    } w-1.5 h-1.5 rounded `}
                 />
                 <span>{props.children}</span>
             </button>

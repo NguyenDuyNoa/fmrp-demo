@@ -48,7 +48,7 @@ const Header = () => {
                             viewOwn: auth?.client_status?.is_view_own,
                             view: auth?.client_status?.is_view,
                             name: "Trạng thái khách hàng",
-                            link: "/clients/statusClient",
+                            link: "/clients/status_client",
                         },
                         {
                             viewOwn: auth?.client_group?.is_view_own,
@@ -1114,7 +1114,7 @@ const Header = () => {
                             viewOwn: auth?.customer_debt?.is_view_own,
                             view: auth?.customer_debt?.is_view,
                             name: "Công nợ khách hàng",
-                            link: "/accountant/customerDebt",
+                            link: "/accountant/customer_debt",
                         },
                     ],
                 },
