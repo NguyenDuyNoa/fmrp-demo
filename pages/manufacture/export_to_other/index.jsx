@@ -1,54 +1,35 @@
-import Head from "next/head";
 import { debounce } from "lodash";
 import moment from "moment/moment";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
 
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Grid6,
-} from "iconsax-react";
+import { Grid6 } from "iconsax-react";
 
-import { _ServerInstance as Axios } from "/services/axios";
-
-import Popup_chitiet from "./components/pupup";
-import Popup_status from "../components/popupStatus";
 import LinkWarehouse from "../components/linkWarehouse";
+import Popup_status from "../components/popupStatus";
+import Popup_chitiet from "./components/pupup";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
-import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 
-import Loading from "@/components/UI/loading";
-import TabFilter from "@/components/UI/TabFilter";
 import BtnAction from "@/components/UI/BtnAction";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import {
     Container,
@@ -57,12 +38,24 @@ import {
     ContainerTable,
     ContainerTotal,
 } from "@/components/UI/common/layout";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import { routerExportToOther } from "@/routers/manufacture";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { routerExportToOther } from "@/routers/manufacture";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -129,113 +122,76 @@ const Index = (props) => {
         queryState({ onFetching_filter: true });
     }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/Api_export_other/exportOther/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                    "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
-                    "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
-                },
+
+        const { rResult, output, rTotal } = await apiExportToOther.apiListExportOther({
+            params: {
+                search: isState.keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[status_bar]": tabPage ?? null,
+                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+                "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
+                "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data;
-                    sTotalItems(output);
-                    sTotal(rTotal);
-                    queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
-                }
-                queryState({ onFetching: false });
-            }
-        );
+        });
+
+        sTotalItems(output);
+
+        sTotal(rTotal);
+
+        queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
     };
 
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_export_other/filterBar/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isStatevalueDate?.endDate : null,
-                    "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
-                    "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
-                },
+    const _ServerFetching_group = async () => {
+        const data = await apiExportToOther.apiListGroupExportOther({
+            params: {
+                limit: 0,
+                search: isState.keySearch,
+                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                "filter[end_date]": isState.valueDate?.endDate != null ? isStatevalueDate?.endDate : null,
+                "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
+                "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    queryState({ listDs: data || [] });
-                }
-                queryState({ onFetchingGroup: false });
-            }
-        );
+        });
+        queryState({ listDs: data || [], onFetchingGroup: false });
     };
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
-            }
+    const _ServerFetching_filter = async () => {
+        const { result: listBr } = await apiComons.apiBranchCombobox();
+
+        const { result: listCode } = await apiExportToOther.apiExportOtherCombobox();
+
+        const data = await apiExportToOther.apiWarehouseCombobox();
+
+        const dataObject = await apiExportToOther.apiListObject();
+
+        queryState({
+            listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
+            listCode:
+                listCode?.map((e) => ({
+                    label: e?.code,
+                    value: e.id,
+                })) || [],
+            dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [],
+            listObject: dataObject?.map((e) => ({ label: dataLang[e?.name], value: e?.id })) || [],
+            onFetching_filter: false,
         });
-        Axios("GET", "/api_web/Api_export_other/exportOtherCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
-                queryState({
-                    listCode:
-                        result?.map((e) => ({
-                            label: e?.code,
-                            value: e.id,
-                        })) || [],
-                });
-            }
-        });
-        Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response?.data;
-                queryState({ dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [] });
-            }
-        });
-        Axios("GET", "/api_web/Api_export_other/object/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response?.data;
-                queryState({ listObject: data?.map((e) => ({ label: dataLang[e?.name], value: e?.id })) || [] });
-            }
-        });
-        queryState({ onFetching_filter: false });
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_export_other/exportOtherCombobox/?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
-                },
+    const _HandleSeachApi = debounce(async (inputValue) => {
+        const { isSuccess, result } = await apiExportToOther.apiAjaxWarehouseCombobox({
+            data: {
+                term: inputValue,
             },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, result } = response?.data;
-                    queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
-                }
-            }
-        );
+        });
+        queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
     }, 500);
 
     useEffect(() => {
@@ -422,37 +378,25 @@ const Index = (props) => {
             },
         });
     };
-    const _ServerSending = () => {
-        var data = new FormData();
+    const _ServerSending = async () => {
+        let data = new FormData();
 
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
 
         data.append("id", checkedWare?.id);
-        Axios(
-            "POST",
-            `/api_web/Api_export_other/confirmWarehouse?csrf_protection=true `,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message, data_export } = response?.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang[message] || message);
-                        setTimeout(() => {
-                            queryState({ onFetching: true });
-                        }, 300);
-                    } else {
-                        isShow("error", dataLang[message] || message);
-                    }
-                    if (data_export?.length > 0) {
-                        queryState({ data_export: data_export });
-                    }
-                }
-                queryState({ onSending: false });
-            }
-        );
+
+        const { isSuccess, message, data_export } = await apiExportToOther.apiHandingStatus(data);
+        if (isSuccess) {
+            isShow("success", dataLang[message] || message);
+            await _ServerFetching();
+            await _ServerFetching_group();
+        } else {
+            isShow("error", dataLang[message] || message);
+        }
+        if (data_export?.length > 0) {
+            queryState({ data_export: data_export });
+        }
+        queryState({ onSending: false });
     };
 
     useEffect(() => {

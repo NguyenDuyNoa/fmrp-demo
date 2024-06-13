@@ -32,6 +32,8 @@ import { routerExportToOther, routerProductionWarehouse } from "@/routers/manufa
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
 import ButtonBack from "@/components/UI/button/buttonBack";
+import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
+import apiComons from "@/Api/apiComon/apiComon";
 
 const Index = (props) => {
     const router = useRouter();
@@ -134,25 +136,19 @@ const Index = (props) => {
 
     const _ServerFetching = async () => {
         sOnLoading(true);
-        await Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-                sOnLoading(false);
-            }
-        });
-        await Axios("GET", "/api_web/Api_export_other/object/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataObjects(
-                    data?.map((e) => ({
-                        label: dataLang[e?.name],
-                        value: e?.id,
-                    }))
-                );
-                sOnLoading(false);
-            }
-        });
+        const { result } = await apiComons.apiBranchCombobox();
+        const data = await apiExportToOther.apiWarehouseCombobox();
+
+        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+
+        sDataObjects(
+            data?.map((e) => ({
+                label: dataLang[e?.name],
+                value: e?.id,
+            }))
+        );
+        sOnLoading(false);
+
         sOnFetching(false);
     };
 
@@ -168,93 +164,82 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_export_other/getExportOtherDetail/${id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let rResult = response.data;
-                    sIdBranch({
-                        label: rResult?.branch_name,
-                        value: rResult?.branch_id,
-                    });
-                    sIdExportWarehouse({
-                        label: rResult?.warehouse_name,
-                        value: rResult?.warehouse_id,
-                    });
+    const _ServerFetchingDetailPage = async () => {
+        const rResult = await apiExportToOther.apiDetaiPageExportToOther(id);
+        sIdBranch({
+            label: rResult?.branch_name,
+            value: rResult?.branch_id,
+        });
+        sIdExportWarehouse({
+            label: rResult?.warehouse_name,
+            value: rResult?.warehouse_id,
+        });
 
-                    sCode(rResult?.code);
-                    sObject({
-                        label: dataLang[rResult?.object] || rResult?.object,
-                        value: rResult?.object,
-                    });
-                    sListObject(
-                        rResult?.object === "other"
-                            ? {
-                                  label: rResult?.object_text,
-                                  value: rResult?.object_text,
-                              }
-                            : {
-                                  label: dataLang[rResult?.object_text] || rResult?.object_text,
-                                  value: rResult?.object_id,
-                              }
-                    );
-                    sListData(
-                        rResult?.items.map((e) => ({
-                            id: e?.item?.id,
-                            idParenBackend: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
-                                value: e.item?.id,
-                            },
-                            child: e?.child.map((ce) => ({
-                                idChildBackEnd: Number(ce?.id),
-                                id: Number(ce?.id),
-                                disabledDate:
-                                    (e.item?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "1" &&
-                                        false) ||
-                                    (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                                    (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                    (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                                location:
-                                    ce?.warehouse_location?.location_name ||
-                                    ce?.warehouse_location?.id ||
-                                    ce?.warehouse_location?.warehouse_name ||
-                                    ce?.warehouse_location?.quantity
-                                        ? {
-                                              label: ce?.warehouse_location?.location_name,
-                                              value: ce?.warehouse_location?.id,
-                                              warehouse_name: ce?.warehouse_location?.warehouse_name,
-                                              qty: ce?.warehouse_location?.quantity,
-                                          }
-                                        : null,
-                                dataWarehouse: e?.item?.warehouseList.map((ye) => ({
-                                    label: ye?.location_name,
-                                    value: ye?.id,
-                                    warehouse_name: ye?.warehouse_name,
-                                    qty: +ye?.quantity,
-                                })),
-                                serial: ce?.serial == null ? "" : ce?.serial,
-                                lot: ce?.lot == null ? "" : ce?.lot,
-                                date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                                unit: e.item?.unit_name,
-                                toOtherQuantity: +ce?.quantity,
-                                note: ce?.note,
-                            })),
-                        }))
-                    );
-                    sStartDate(moment(rResult?.date).toDate());
-                    sNote(rResult?.note);
-                }
-                sOnFetchingDetail(false);
-            }
+        sCode(rResult?.code);
+        sObject({
+            label: dataLang[rResult?.object] || rResult?.object,
+            value: rResult?.object,
+        });
+        sListObject(
+            rResult?.object === "other"
+                ? {
+                      label: rResult?.object_text,
+                      value: rResult?.object_text,
+                  }
+                : {
+                      label: dataLang[rResult?.object_text] || rResult?.object_text,
+                      value: rResult?.object_id,
+                  }
         );
+        sListData(
+            rResult?.items.map((e) => ({
+                id: e?.item?.id,
+                idParenBackend: e?.item?.id,
+                matHang: {
+                    e: e?.item,
+                    label: `${e.item?.name} <span style={{display: none}}>${
+                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                    }</span>`,
+                    value: e.item?.id,
+                },
+                child: e?.child.map((ce) => ({
+                    idChildBackEnd: Number(ce?.id),
+                    id: Number(ce?.id),
+                    disabledDate:
+                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                    location:
+                        ce?.warehouse_location?.location_name ||
+                        ce?.warehouse_location?.id ||
+                        ce?.warehouse_location?.warehouse_name ||
+                        ce?.warehouse_location?.quantity
+                            ? {
+                                  label: ce?.warehouse_location?.location_name,
+                                  value: ce?.warehouse_location?.id,
+                                  warehouse_name: ce?.warehouse_location?.warehouse_name,
+                                  qty: ce?.warehouse_location?.quantity,
+                              }
+                            : null,
+                    dataWarehouse: e?.item?.warehouseList.map((ye) => ({
+                        label: ye?.location_name,
+                        value: ye?.id,
+                        warehouse_name: ye?.warehouse_name,
+                        qty: +ye?.quantity,
+                    })),
+                    serial: ce?.serial == null ? "" : ce?.serial,
+                    lot: ce?.lot == null ? "" : ce?.lot,
+                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                    unit: e.item?.unit_name,
+                    toOtherQuantity: +ce?.quantity,
+                    note: ce?.note,
+                })),
+            }))
+        );
+        sStartDate(moment(rResult?.date).toDate());
+        sNote(rResult?.note);
+        sOnFetchingDetail(false);
     };
 
     useEffect(() => {
@@ -278,97 +263,61 @@ const Index = (props) => {
             JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
-    const _ServerFetching_ItemsAll = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_export_other/itemCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                },
+    const _ServerFetching_ItemsAll = async () => {
+        const { result } = await apiExportToOther.apiItemComboboxExportToOther({
+            params: {
+                "filter[branch_id]": idBranch ? idBranch?.value : null,
+                "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    sDataItems(result);
-                }
-            }
-        );
+        });
+        sDataItems(result);
         sOnFetchingItemsAll(false);
     };
 
-    const _ServerFetching_Warehouse = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id]": idBranch?.value,
-                },
+    const _ServerFetching_Warehouse = async () => {
+        const result = await apiExportToOther.apiWarehouseComboboxExportToOther({
+            params: {
+                "filter[branch_id]": idBranch?.value,
             },
-            (err, response) => {
-                if (!err) {
-                    let result = response.data;
-                    sDataWarehouse(
-                        result?.map((e) => ({
-                            label: e?.warehouse_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
+        });
+        sDataWarehouse(
+            result?.map((e) => ({
+                label: e?.warehouse_name,
+                value: e?.id,
+            }))
         );
         sOnFetchingWarehouse(false);
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
+    const _HandleSeachApi = debounce(async (inputValue) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_export_other/itemCombobox/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                        "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                    },
-                    data: {
-                        term: inputValue,
-                    },
+            const { result } = await apiExportToOther.apiAjaxItemComboboxExportToOther({
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
                 },
-                (err, response) => {
-                    if (!err) {
-                        let { result } = response.data.data;
-                        sDataItems(result);
-                    }
-                }
-            );
+                data: {
+                    term: inputValue,
+                },
+            });
+            sDataItems(result);
         }
     }, 500);
 
     const _ServerFetching_LisObject = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_export_other/objectList/?csrf_protection=true",
-            {
-                params: {
-                    type: object?.value,
-                    "filter[branch_id]": idBranch?.value,
-                },
+        const { rResult } = await apiExportToOther.apiObjectListComboboxExportToOther({
+            params: {
+                type: object?.value,
+                "filter[branch_id]": idBranch?.value,
             },
-            (err, response) => {
-                if (!err) {
-                    const { rResult } = response.data;
-                    sDataListObject(
-                        rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        }))
-                    );
-                }
-            }
+        });
+        sDataListObject(
+            rResult?.map((e) => ({
+                label: e.name,
+                value: e.id,
+            }))
         );
         sOnFetchingLisObject(false);
     };
@@ -732,7 +681,7 @@ const Index = (props) => {
         idBranch != null && sOnFetchingWarehouse(true);
     }, [idBranch]);
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         var formData = new FormData();
 
         formData.append("code", code);
@@ -771,45 +720,29 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.toOtherQuantity);
             });
         });
-        Axios(
-            "POST",
-            `${
-                id
-                    ? `/api_web/Api_export_other/exportOther/${id}?csrf_protection=true`
-                    : `/api_web/Api_export_other/exportOther/?csrf_protection=true`
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message]}` || message);
-                        sCode("");
-                        sStartDate(new Date());
-                        sIdBranch(null);
-                        sIdExportWarehouse(null);
-                        sObject(null);
-                        sListObject(null);
-                        sNote("");
-                        sErrBranch(false);
-                        sErrListObject(false);
-                        sErrObject(false);
-                        sErrWarehouse(false);
-                        sErrDate(false);
-                        sErrExportWarehouse(false);
-                        //new
-                        sListData([]);
-                        router.push(routerExportToOther.home);
-                    } else {
-                        handleCheckError(dataLang[message] || message);
-                    }
-                }
-                sOnSending(false);
-            }
-        );
+        const { isSuccess, message } = await apiExportToOther.apiHandingExportToOther(id ? id : undefined, formData);
+        if (isSuccess) {
+            isShow("success", `${dataLang[message]}` || message);
+            sCode("");
+            sStartDate(new Date());
+            sIdBranch(null);
+            sIdExportWarehouse(null);
+            sObject(null);
+            sListObject(null);
+            sNote("");
+            sErrBranch(false);
+            sErrListObject(false);
+            sErrObject(false);
+            sErrWarehouse(false);
+            sErrDate(false);
+            sErrExportWarehouse(false);
+            //new
+            sListData([]);
+            router.push(routerExportToOther.home);
+        } else {
+            handleCheckError(dataLang[message] || message);
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {

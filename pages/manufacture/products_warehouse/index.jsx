@@ -359,6 +359,7 @@ const Index = (props) => {
             isShow("success", `${dataLang[message] || message}`);
 
             await _ServerFetching();
+            await _ServerFetching_group();
         } else {
             isShow("error", `${dataLang[message] || message}`);
         }
