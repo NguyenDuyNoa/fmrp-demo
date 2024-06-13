@@ -77,7 +77,7 @@ const Index = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "serviceVoucher");
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "servicevoucher");
 
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
@@ -630,7 +630,7 @@ const Index = (props) => {
                                                                 onRefreshGroup={_ServerFetching_group.bind(this)}
                                                                 dataLang={dataLang}
                                                                 status_pay={e?.status_pay}
-                                                                type="serviceVoucher"
+                                                                type="servicevoucher"
                                                                 id={e?.id}
                                                                 className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                             />

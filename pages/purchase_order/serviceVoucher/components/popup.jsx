@@ -52,11 +52,11 @@ const Popup_servie = (props) => {
 
     const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'serviceVoucher');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "servicevoucher");
 
     const _HandleOpenModal = (e) => {
         if (id) {
@@ -74,8 +74,6 @@ const Popup_servie = (props) => {
             sOpen(true);
         }
     };
-
-
 
     const _HandleCloseModal = () => sOpen(false);
 
@@ -343,7 +341,9 @@ const Popup_servie = (props) => {
         e.preventDefault();
 
         const hasNullLabel = option.some((item) => item.dichvu === "");
-        const check = option.some((item) => item.soluong == 0 || item.soluong == "" || item.dongia == 0 || item.dongia == "");
+        const check = option.some(
+            (item) => item.soluong == 0 || item.soluong == "" || item.dongia == 0 || item.dongia == ""
+        );
         if (date == null || valueSupplier == null || valueBr == null || hasNullLabel || check) {
             date == null && sErrDate(true);
             valueBr == null && sErrBranch(true);
@@ -509,11 +509,11 @@ const Popup_servie = (props) => {
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
-    }
+    };
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
-    }
+    };
 
     const tinhTongTien = (option) => {
         const tongTien = option?.reduce(
@@ -578,9 +578,10 @@ const Popup_servie = (props) => {
         });
         Axios(
             "POST",
-            `${id
-                ? `/api_web/Api_service/service/${id}?csrf_protection=true`
-                : "/api_web/Api_service/service/?csrf_protection=true"
+            `${
+                id
+                    ? `/api_web/Api_service/service/${id}?csrf_protection=true`
+                    : "/api_web/Api_service/service/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -712,7 +713,6 @@ const Popup_servie = (props) => {
                                         maxMenuHeight="200px"
                                         isClearable={true}
                                         menuPortalTarget={document.body}
-
                                         theme={(theme) => ({
                                             ...theme,
                                             colors: {
@@ -733,8 +733,9 @@ const Popup_servie = (props) => {
                                                 position: "absolute",
                                             }),
                                         }}
-                                        className={`${errBranch ? "border-red-500" : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
+                                        className={`${
+                                            errBranch ? "border-red-500" : "border-transparent"
+                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                     />
                                     {errBranch && (
                                         <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -759,7 +760,6 @@ const Popup_servie = (props) => {
                                         maxMenuHeight="200px"
                                         isClearable={true}
                                         menuPortalTarget={document.body}
-
                                         theme={(theme) => ({
                                             ...theme,
                                             colors: {
@@ -780,8 +780,9 @@ const Popup_servie = (props) => {
                                                 position: "absolute",
                                             }),
                                         }}
-                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] mb-2 rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${
+                                            errSupplier ? "border-red-500" : "border-transparent"
+                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] mb-2 rounded text-[#52575E] font-normal outline-none border `}
                                     />
                                     {errSupplier && (
                                         <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -831,9 +832,7 @@ const Popup_servie = (props) => {
                                 {dataLang?.serviceVoucher_operation || "serviceVoucher_operation"}
                             </h4>
                         </div>
-                        <Customscrollbar
-                            className="min-h-[140px] xl:min-h-[140px] 2xl:min-h-[180px] max-h-[140px] xl:max-h-[140px] 2xl:max-h-[180px]"
-                        >
+                        <Customscrollbar className="min-h-[140px] xl:min-h-[140px] 2xl:min-h-[180px] max-h-[140px] xl:max-h-[140px] 2xl:max-h-[180px]">
                             {sortedArr.map((e, index) => (
                                 <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
                                     <div className="col-span-2  my-auto ">
@@ -843,8 +842,9 @@ const Popup_servie = (props) => {
                                             name="optionEmail"
                                             placeholder="Dịch vụ"
                                             type="text"
-                                            className={`${errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"
-                                                } placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
+                                            className={`${
+                                                errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"
+                                            } placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
                                         />
                                     </div>
                                     <div className="col-span-2 flex items-center justify-center">
@@ -857,9 +857,10 @@ const Popup_servie = (props) => {
                                                 <Minus className="scale-70" size="16" />
                                             </button>
                                             <InPutNumericFormat
-                                                className={`${e?.soluong == 0 && "border-red-500" ||
-                                                    e?.soluong == '' && "border-red-500"
-                                                    } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                className={`${
+                                                    (e?.soluong == 0 && "border-red-500") ||
+                                                    (e?.soluong == "" && "border-red-500")
+                                                } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong", e)}
                                                 value={e?.soluong}
                                                 isAllowed={isAllowedNumber}
@@ -878,7 +879,10 @@ const Popup_servie = (props) => {
                                             value={e?.dongia}
                                             onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia", index)}
                                             className={`
-                                            ${e?.dongia == 0 && 'border-red-500' || e?.dongia == "" && 'border-red-500'}
+                                            ${
+                                                (e?.dongia == 0 && "border-red-500") ||
+                                                (e?.dongia == "" && "border-red-500")
+                                            }
                                             appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200`}
                                         />
                                     </div>
@@ -921,7 +925,6 @@ const Popup_servie = (props) => {
                                                     <h2 className="2xl:text-[12px] xl:text-[13px] text-[12px]">{`(${option?.tax_rate})`}</h2>
                                                 </div>
                                             )}
-
                                             theme={(theme) => ({
                                                 ...theme,
                                                 colors: {
@@ -984,7 +987,6 @@ const Popup_servie = (props) => {
                                         value={chietkhautong}
                                         onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
                                         className=" text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
-
                                     />
                                 </div>
                             </div>
@@ -1012,7 +1014,6 @@ const Popup_servie = (props) => {
                                             <h2 className="2xl:text-[12px] xl:text-[13px] text-[12px]">{`(${option?.tax_rate})`}</h2>
                                         </div>
                                     )}
-
                                     theme={(theme) => ({
                                         ...theme,
                                         colors: {
