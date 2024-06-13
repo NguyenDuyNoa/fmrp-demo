@@ -491,7 +491,7 @@ body::-webkit-scrollbar-thumb:hover {
     color: #808e9b;
 }
 
-.page-item.active {
+.page-item.active a {
     color: white;
     background-color: #0f4f9e;
     padding: 6px 12px;
@@ -499,17 +499,17 @@ body::-webkit-scrollbar-thumb:hover {
     border-radius: 8px;
     font-weight: 600;
 }
-.page-item {
+.page-item a {
     background-color: #e2e8f0;
-    padding: 8px;
     color: black;
     padding: 6px 12px;
     font-size: 13px;
     border-radius: 8px;
     font-weight: 600;
     transition: all 0.2s ease-in-out;
+    display: block;
 }
-.page-item:hover {
+.page-item a:hover {
     background-color: #e3e3e3;
 }
 

@@ -1,52 +1,39 @@
-import Head from "next/head";
+import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
-import Select from "react-select";
-import dynamic from "next/dynamic";
 import moment from "moment/moment";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useRef, useEffect } from "react";
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Refresh2,
-    Grid6,
-} from "iconsax-react";
+import React, { useEffect, useState } from "react";
 
-import { _ServerInstance as Axios } from "/services/axios";
-
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-import NoData from "@/components/UI/noData/nodata";
+import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import BtnAction from "@/components/UI/BtnAction";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
-import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import BtnAction from "@/components/UI/BtnAction";
-import Popup_Vitrikho from "./components/popup";
-import apiComons from "@/Api/apiComon/apiComon";
-import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import NoData from "@/components/UI/noData/nodata";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import { useSelector } from "react-redux";
+import Popup_Vitrikho from "./components/popup";
 const Location = (props) => {
     const dataLang = props.dataLang;
 

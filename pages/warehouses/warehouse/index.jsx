@@ -1,54 +1,45 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-import React, { useState, useEffect } from "react";
 
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Grid6,
-    Edit,
-} from "iconsax-react";
+import { Grid6, Edit as IconEdit } from "iconsax-react";
 
-import moment from "moment";
 import { debounce } from "lodash";
+import moment from "moment";
 import { useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "@/services/axios";
 
 import Popup_kho from "./components/popup";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable } from "@/components/UI/common/Table";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
 
-import { PopupParent } from "@/utils/lib/Popup";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
-import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import apiComons from "@/Api/apiComon/apiComon";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { PopupParent } from "@/utils/lib/Popup";
 
 const Index = (props) => {
     const dataLang = props.dataLang;

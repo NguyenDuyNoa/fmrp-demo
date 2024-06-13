@@ -120,7 +120,7 @@ const Popup_kho = (props) => {
         const url = props.id
             ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`
             : "/api_web/api_warehouse/warehouse/?csrf_protection=true";
-        const { isSuccess, message } = await apiWarehouse.apiHandingWarehouse(url, { data: data });
+        const { isSuccess, message } = await apiWarehouse.apiHandingWarehouse(url, data);
         if (isSuccess) {
             isShow("success", `${props.dataLang[message]}` || message);
             sErrInputCode(false);

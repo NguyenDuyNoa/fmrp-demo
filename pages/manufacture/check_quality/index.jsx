@@ -281,7 +281,7 @@ const Index = (props) => {
                                             {"Số phiếu QC"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {"Số LSX chi tiết"}
+                                            {"Số lệnh sản xuất"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
                                             {"Sản phẩm"}

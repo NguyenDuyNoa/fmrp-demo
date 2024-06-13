@@ -389,35 +389,29 @@ const Index = (props) => {
         });
     };
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         var data = new FormData();
+
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
+
         data.append("id", checkedWare?.id);
-        Axios(
-            "POST",
-            `/api_web/Api_transfer/confirmWarehouse?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message, alert_type, data_export } = response.data;
-                    if (isSuccess) {
-                        isShow(alert_type, dataLang[message] || message);
-                        setTimeout(() => {
-                            queryState({ onFetching: true });
-                        }, 300);
-                    } else {
-                        isShow("error", dataLang[message] || message);
-                    }
-                    if (data_export?.length > 0) {
-                        queryState({ data_export: data_export });
-                    }
-                }
-                queryState({ onSending: false });
-            }
+
+        const { isSuccess, message, alert_type, data_export } = await apiWarehouseTransfer.apiHandingStatusTransfer(
+            data
         );
+
+        if (isSuccess) {
+            isShow(alert_type, dataLang[message] || message);
+            await _ServerFetching();
+        } else {
+            isShow("error", dataLang[message] || message);
+        }
+
+        if (data_export?.length > 0) {
+            queryState({ data_export: data_export });
+        }
+
+        queryState({ onSending: false });
     };
 
     useEffect(() => {

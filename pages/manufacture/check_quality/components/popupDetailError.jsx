@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import NoData from "@/components/UI/noData/nodata";
 import useToast from "@/hooks/useToast";
+import { isAllowedNumber } from "@/utils/helpers/common";
 import { SelectCore, componentsCore } from "@/utils/lib/Select";
 import { Trash as IconDelete } from "iconsax-react";
 import { v4 as uuid } from "uuid";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import { isAllowedNumber } from "@/utils/helpers/common";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props }) => {
     const isShow = useToast();
 
@@ -86,9 +85,9 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
         queryStateQlty({ listData: arrData });
     };
 
-    // useEffect(() => {
-    //     addItemToParent(isState.dataDetailError);
-    // }, [isFinite.dataDetailError]);
+    useEffect(() => {
+        addItemToParent(isState.dataDetailError);
+    }, [isFinite.dataDetailError]);
     const _HandleChangeChild = (id, value) => {
         const newData = isState.dataDetailError.map((e) => {
             if (e.id == id) {
@@ -106,19 +105,13 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
     const handeSave = () => {
         const { idCategoryError, idDetailError, dataDetailError } = isState;
 
-        if (!idCategoryError) {
-            isShow("error", "Vui lòng kiểm tra dữ liệu");
-            queryState({ errorCategoryError: true });
-            return;
-        }
-
-        if (!idDetailError) {
-            isShow("error", "Vui lòng kiểm tra dữ liệu");
-            queryState({ errorDetailError: true });
-            return;
-        }
-
         const hasInvalidQuantity = dataDetailError.some((e) => !e.quantityDetailError || e.quantityDetailError === 0);
+
+        if (!idCategoryError || !idDetailError) {
+            isShow("error", "Vui lòng kiểm tra dữ liệu");
+            queryState({ errorCategoryError: !idCategoryError, errorDetailError: !idDetailError });
+            return;
+        }
 
         if (hasInvalidQuantity) {
             isShow("error", "Vui lòng nhập số lượng lỗi và số lượng lỗi phải lớn hơn 0");
@@ -139,6 +132,7 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
                     isShow("error", "Vui lòng nhập số lượng lỗi và số lượng lỗi phải lớn hơn 0");
                 }
             }}
+            lockScroll={true}
             open={isState.open}
             onClose={() => queryState({ open: false })}
             classNameBtn={`${props?.className}`}

@@ -1,36 +1,36 @@
-import Head from "next/head";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import { debounce } from "lodash";
 import moment from "moment/moment";
-import { v4 as uuidv4 } from "uuid";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { MdClear } from "react-icons/md";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import React, { useState, useEffect } from "react";
-import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
+import { MdClear } from "react-icons/md";
+import { v4 as uuidv4 } from "uuid";
 
-import { _ServerInstance as Axios } from "/services/axios";
-
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import Loading from "@/components/UI/loading";
-import { Container } from "@/components/UI/common/layout";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
-import { isAllowedNumber } from "@/utils/helpers/common";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { routerProductsWarehouse } from "@/routers/manufacture";
-import { SelectCore } from "@/utils/lib/Select";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { routerProductsWarehouse } from "@/routers/manufacture";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
 
 const Index = (props) => {
     const router = useRouter();
@@ -113,15 +113,11 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sOnLoading(true);
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-                sOnLoading(false);
-            }
-        });
+        const { result } = await apiComons.apiBranchCombobox();
+        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+        sOnLoading(false);
         sOnFetching(false);
     };
 
@@ -141,67 +137,58 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_product_receipt/getProductReceiptDetail/${id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let rResult = response.data;
-                    sIdBranch({
-                        label: rResult?.branch_name,
-                        value: rResult?.branch_id,
-                    });
-                    sIdImportWarehouse({
-                        label: rResult?.warehouse_name,
-                        value: rResult?.warehouse_id,
-                    });
-                    sListData(
-                        rResult?.items.map((e) => ({
-                            id: e?.item?.id,
-                            idParenBackend: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
-                                value: e.item?.id,
-                            },
-                            child: e?.child.map((ce) => ({
-                                idChildBackEnd: Number(ce?.id),
-                                id: Number(ce?.id),
-                                disabledDate:
-                                    (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                    (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                                location:
-                                    ce?.warehouse_location?.location_name ||
-                                    ce?.warehouse_location?.id ||
-                                    ce?.warehouse_location?.warehouse_name
-                                        ? {
-                                              label: ce?.warehouse_location?.location_name || null,
-                                              value: ce?.warehouse_location?.id || null,
-                                              warehouse_name: ce?.warehouse_location?.warehouse_name || null,
-                                          }
-                                        : null,
-                                serial: ce?.serial == null ? "" : ce?.serial,
-                                lot: ce?.lot == null ? "" : ce?.lot,
-                                date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                                unit: e.item?.unit_name,
-                                importQuantity: +ce?.quantity,
-                                exchangeValue: +ce?.coefficient,
-                                numberOfConversions: +ce?.quantity_exchange,
-                                note: ce?.note,
-                            })),
-                        }))
-                    );
-                    sCode(rResult?.code);
-                    sStartDate(moment(rResult?.date).toDate());
-                    sNote(rResult?.note);
-                }
-                sOnFetchingDetail(false);
-            }
+    const _ServerFetchingDetailPage = async () => {
+        const rResult = await apiProductsWarehouse.apiDetailPagePoductWarehouse(id);
+        sIdBranch({
+            label: rResult?.branch_name,
+            value: rResult?.branch_id,
+        });
+        sIdImportWarehouse({
+            label: rResult?.warehouse_name,
+            value: rResult?.warehouse_id,
+        });
+        sListData(
+            rResult?.items.map((e) => ({
+                id: e?.item?.id,
+                idParenBackend: e?.item?.id,
+                matHang: {
+                    e: e?.item,
+                    label: `${e.item?.name} <span style={{display: none}}>${
+                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                    }</span>`,
+                    value: e.item?.id,
+                },
+                child: e?.child.map((ce) => ({
+                    idChildBackEnd: Number(ce?.id),
+                    id: Number(ce?.id),
+                    disabledDate:
+                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                    location:
+                        ce?.warehouse_location?.location_name ||
+                        ce?.warehouse_location?.id ||
+                        ce?.warehouse_location?.warehouse_name
+                            ? {
+                                  label: ce?.warehouse_location?.location_name || null,
+                                  value: ce?.warehouse_location?.id || null,
+                                  warehouse_name: ce?.warehouse_location?.warehouse_name || null,
+                              }
+                            : null,
+                    serial: ce?.serial == null ? "" : ce?.serial,
+                    lot: ce?.lot == null ? "" : ce?.lot,
+                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                    unit: e.item?.unit_name,
+                    importQuantity: +ce?.quantity,
+                    exchangeValue: +ce?.coefficient,
+                    numberOfConversions: +ce?.quantity_exchange,
+                    note: ce?.note,
+                })),
+            }))
         );
+        sCode(rResult?.code);
+        sStartDate(moment(rResult?.date).toDate());
+        sNote(rResult?.note);
+        sOnFetchingDetail(false);
     };
 
     useEffect(() => {
@@ -221,96 +208,60 @@ const Index = (props) => {
             JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
-    const _ServerFetching_ItemsAll = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_product_receipt/getProduct/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
+    const _ServerFetching_ItemsAll = async () => {
+        const { result } = await apiProductsWarehouse.apiItemPoductWarehouse({
+            params: {
+                "filter[branch_id]": idBranch ? idBranch?.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    const { result } = response.data.data;
-                    sDataItems(result);
-                }
-            }
-        );
+        });
+        sDataItems(result);
         sOnFetchingItemsAll(false);
     };
     const _ServerFetching_ExportWarehouse = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null,
-                },
+        const data = await apiProductsWarehouse.apiWarehouseCombobox({
+            params: {
+                "filter[branch_id]": idBranch ? idBranch?.value : null,
+                "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let data = response?.data;
-                    sDataWarehouse(
-                        data?.map((e) => ({
-                            label: e?.warehouse_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
+        });
+        sDataWarehouse(
+            data?.map((e) => ({
+                label: e?.warehouse_name,
+                value: e?.id,
+            }))
         );
         sOnFetchingExportWarehouse(false);
     };
     const _ServerFetching_Location = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null,
-                },
+        const data = await apiProductsWarehouse.apiWarehouseLocationCombobox({
+            params: {
+                "filter[branch_id]": idBranch ? idBranch?.value : null,
+                "filter[warehouse_id]": idImportWarehouse ? idImportWarehouse?.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let data = response?.data;
-                    sDataLocation(
-                        data?.map((e) => ({
-                            label: e?.location_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
+        });
+        sDataLocation(
+            data?.map((e) => ({
+                label: e?.location_name,
+                value: e?.id,
+            }))
         );
         sOnFetchingLocation(false);
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
+    const _HandleSeachApi = debounce(async (inputValue) => {
         if (idBranch == null || idImportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
-
-                    data: {
-                        term: inputValue,
-                    },
+            const { result } = await apiProductsWarehouse.apiAjaxItemPoductWarehouse({
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
                 },
-                (err, response) => {
-                    if (!err) {
-                        let { result } = response?.data?.data;
-                        sDataItems(result);
-                    }
-                }
-            );
+
+                data: {
+                    term: inputValue,
+                },
+            });
+            sDataItems(result);
         }
     }, 500);
 
@@ -468,7 +419,7 @@ const Index = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         let formData = new FormData();
 
         formData.append("code", code);
@@ -506,40 +457,27 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.importQuantity);
             });
         });
-        Axios(
-            "POST",
-            `${
-                id
-                    ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true`
-                    : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    const { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message]}` || message);
-                        sCode("");
-                        sStartDate(new Date());
-                        sIdBranch(null);
-                        sIdImportWarehouse(null);
-                        sNote("");
-                        sErrBranch(false);
-                        sErrDate(false);
-                        sErrExportWarehouse(false);
-                        //new
-                        sListData([]);
-                        router.push(routerProductsWarehouse.home);
-                    } else {
-                        handleCheckError(dataLang[message] || message);
-                    }
-                }
-                sOnSending(false);
-            }
+        const { isSuccess, message } = await apiProductsWarehouse.apiHandingProdcutsWarehouse(
+            id ? id : undefined,
+            formData
         );
+        if (isSuccess) {
+            isShow("success", `${dataLang[message]}` || message);
+            sCode("");
+            sStartDate(new Date());
+            sIdBranch(null);
+            sIdImportWarehouse(null);
+            sNote("");
+            sErrBranch(false);
+            sErrDate(false);
+            sErrExportWarehouse(false);
+            //new
+            sListData([]);
+            router.push(routerProductsWarehouse.home);
+        } else {
+            handleCheckError(dataLang[message] || message);
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -1088,8 +1026,8 @@ const Index = (props) => {
                             <SelectCore
                                 options={options}
                                 value={null}
-                                onInputChange={(event) =>{
-                                    _HandleSeachApi(event)
+                                onInputChange={(event) => {
+                                    _HandleSeachApi(event);
                                 }}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
@@ -1287,9 +1225,9 @@ const Index = (props) => {
                                             <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-5 mt-5">
                                                     <SelectCore
-                                                       onInputChange={(event) =>{
-                                                        _HandleSeachApi(event)
-                                                    }}
+                                                        onInputChange={(event) => {
+                                                            _HandleSeachApi(event);
+                                                        }}
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""

@@ -32,6 +32,8 @@ import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 
 const Index = (props) => {
     const router = useRouter();
@@ -108,15 +110,11 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sOnLoading(true);
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-                sOnLoading(false);
-            }
-        });
+        const { result } = await apiComons.apiBranchCombobox();
+        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+        sOnLoading(false);
         sOnFetching(false);
     };
 
@@ -136,87 +134,77 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios(
-            "GET",
-
-            `/api_web/Api_stock/getExportProductionDetail/${id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let rResult = response.data;
-                    sIdBranch({
-                        label: rResult?.branch_name,
-                        value: rResult?.branch_id,
-                    });
-                    sIdExportWarehouse({
-                        label: rResult?.warehouse_name,
-                        value: rResult?.warehouse_id,
-                    });
-                    sCode(rResult?.code);
-                    sStartDate(moment(rResult?.date).toDate());
-                    sNote(rResult?.note);
-                    sListData(
-                        rResult?.items.map((e) => ({
-                            id: e?.item?.id,
-                            idParenBackend: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
-                                value: e.item?.id,
-                            },
-                            child: e?.child.map((ce) => ({
-                                idChildBackEnd: Number(ce?.id),
-                                id: Number(ce?.id),
-                                disabledDate:
-                                    (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                                    (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                                    (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                    (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                                location:
-                                    ce?.warehouse_location?.location_name ||
-                                    ce?.warehouse_location?.id ||
-                                    ce?.warehouse_location?.warehouse_name ||
-                                    ce?.warehouse_location?.quantity
-                                        ? {
-                                              label: ce?.warehouse_location?.location_name || null,
-                                              value: ce?.warehouse_location?.id || null,
-                                              warehouse_name: ce?.warehouse_location?.warehouse_name || null,
-                                              qty: +ce?.warehouse_location?.quantity || null,
-                                          }
-                                        : null,
-                                serial: ce?.serial == null ? "" : ce?.serial,
-                                lot: ce?.lot == null ? "" : ce?.lot,
-                                date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                                unit: {
-                                    label: ce?.unit_data.unit,
-                                    value: ce?.unit_data.id,
-                                    coefficient: +ce?.unit_data.coefficient,
-                                },
-                                dataWarehouse: e?.item?.warehouse.map((ye) => ({
-                                    label: ye?.location_name,
-                                    value: ye?.id,
-                                    warehouse_name: ye?.warehouse_name,
-                                    qty: +ye?.quantity,
-                                })),
-                                dataUnit: e?.item?.unit?.map((e) => ({
-                                    label: e?.unit,
-                                    value: e?.id,
-                                    coefficient: +e?.coefficient,
-                                })),
-                                exportQuantity: +ce?.quantity,
-                                exchangeValue: +ce?.coefficient,
-                                numberOfConversions: +ce?.quantity_exchange,
-                                note: ce?.note,
-                            })),
-                        }))
-                    );
-                }
-                sOnFetchingDetail(false);
-            }
+    const _ServerFetchingDetailPage = async () => {
+        const rResult = await apiProductionWarehouse.apiDetailPageProductionWarehouse(id);
+        sIdBranch({
+            label: rResult?.branch_name,
+            value: rResult?.branch_id,
+        });
+        sIdExportWarehouse({
+            label: rResult?.warehouse_name,
+            value: rResult?.warehouse_id,
+        });
+        sCode(rResult?.code);
+        sStartDate(moment(rResult?.date).toDate());
+        sNote(rResult?.note);
+        sListData(
+            rResult?.items.map((e) => ({
+                id: e?.item?.id,
+                idParenBackend: e?.item?.id,
+                matHang: {
+                    e: e?.item,
+                    label: `${e.item?.name} <span style={{display: none}}>${
+                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                    }</span>`,
+                    value: e.item?.id,
+                },
+                child: e?.child.map((ce) => ({
+                    idChildBackEnd: Number(ce?.id),
+                    id: Number(ce?.id),
+                    disabledDate:
+                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                    location:
+                        ce?.warehouse_location?.location_name ||
+                        ce?.warehouse_location?.id ||
+                        ce?.warehouse_location?.warehouse_name ||
+                        ce?.warehouse_location?.quantity
+                            ? {
+                                  label: ce?.warehouse_location?.location_name || null,
+                                  value: ce?.warehouse_location?.id || null,
+                                  warehouse_name: ce?.warehouse_location?.warehouse_name || null,
+                                  qty: +ce?.warehouse_location?.quantity || null,
+                              }
+                            : null,
+                    serial: ce?.serial == null ? "" : ce?.serial,
+                    lot: ce?.lot == null ? "" : ce?.lot,
+                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                    unit: {
+                        label: ce?.unit_data.unit,
+                        value: ce?.unit_data.id,
+                        coefficient: +ce?.unit_data.coefficient,
+                    },
+                    dataWarehouse: e?.item?.warehouse.map((ye) => ({
+                        label: ye?.location_name,
+                        value: ye?.id,
+                        warehouse_name: ye?.warehouse_name,
+                        qty: +ye?.quantity,
+                    })),
+                    dataUnit: e?.item?.unit?.map((e) => ({
+                        label: e?.unit,
+                        value: e?.id,
+                        coefficient: +e?.coefficient,
+                    })),
+                    exportQuantity: +ce?.quantity,
+                    exchangeValue: +ce?.coefficient,
+                    numberOfConversions: +ce?.quantity_exchange,
+                    note: ce?.note,
+                })),
+            }))
         );
+        sOnFetchingDetail(false);
     };
 
     useEffect(() => {
@@ -237,74 +225,49 @@ const Index = (props) => {
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data.data;
-                    sDataItems(result);
-                }
-            }
-        );
+        const params = {
+            "filter[branch_id]": idBranch ? idBranch?.value : null,
+            "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+        };
+
+        const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("GET", { params: params });
+
+        sDataItems(result);
+
         sOnFetchingItemsAll(false);
     };
 
     const _ServerFetching_ExportWarehouse = async () => {
-        await Axios(
-            "GET",
-            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                },
+        const data = await apiProductionWarehouse.apiComboboxWarehouse({
+            params: {
+                "filter[branch_id]": idBranch ? idBranch?.value : null,
+                "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
             },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sDataWarehouse(
-                        data?.map((e) => ({
-                            label: e?.warehouse_name,
-                            value: e?.id,
-                        }))
-                    );
-                }
-            }
+        });
+        sDataWarehouse(
+            data?.map((e) => ({
+                label: e?.warehouse_name,
+                value: e?.id,
+            }))
         );
         sOnFetchingExportWarehouse(false);
     };
 
     // Khai báo biến để theo dõi timeout
 
-    const _HandleSeachApi = debounce((inputValue) => {
+    const _HandleSeachApi = debounce(async (inputValue) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
-                    data: {
-                        term: inputValue,
-                    },
+            const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("POST", {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
                 },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response.data.data;
-                        sDataItems(result);
-                    }
-                }
-            );
+                data: {
+                    term: inputValue,
+                },
+            });
+            sDataItems(result);
         }
     }, 500);
 
@@ -434,7 +397,7 @@ const Index = (props) => {
         return formatNumberConfig(+number, dataSeting);
     };
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         var formData = new FormData();
         formData.append("code", code);
         formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
@@ -455,42 +418,27 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.exportQuantity);
             });
         });
-        Axios(
-            "POST",
-            `${
-                id
-                    ? `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true`
-                    : `/api_web/Api_stock/exportProduction/?csrf_protection=true`
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message, item } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message]}` || message);
-                        sCode("");
-                        sStartDate(new Date());
-                        sIdBranch(null);
-                        sIdExportWarehouse(null);
-                        sNote("");
-                        sErrBranch(false);
-                        sErrExportWarehouse(false);
-                        sErrDate(false);
-                        //new
-                        sListData([]);
-                        router.push(routerProductionWarehouse.home);
-                    } else {
-                        handleCheckError(
-                            `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
-                        );
-                    }
-                }
-                sOnSending(false);
-            }
+        const { isSuccess, message, item } = await apiProductionWarehouse.apiHangdingProductionWarehouse(
+            id ? id : undefined,
+            formData
         );
+        if (isSuccess) {
+            isShow("success", `${dataLang[message]}` || message);
+            sCode("");
+            sStartDate(new Date());
+            sIdBranch(null);
+            sIdExportWarehouse(null);
+            sNote("");
+            sErrBranch(false);
+            sErrExportWarehouse(false);
+            sErrDate(false);
+            //new
+            sListData([]);
+            router.push(routerProductionWarehouse.home);
+        } else {
+            handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -1257,8 +1205,8 @@ const Index = (props) => {
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
-                                                        onInputChange={(event) =>{
-                                                            _HandleSeachApi(event)
+                                                        onInputChange={(event) => {
+                                                            _HandleSeachApi(event);
                                                         }}
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}

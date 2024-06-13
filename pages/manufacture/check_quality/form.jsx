@@ -545,7 +545,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {"Số LSX chi tiết"} <span className="text-red-500">*</span>
+                                        {"Lệnh sản xuất tổng"} <span className="text-red-500">*</span>
                                     </label>
                                     <SelectCore
                                         options={isStateQlty.dataDetailedProduction}
@@ -559,7 +559,7 @@ const Index = (props) => {
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={"Số LSX chi tiết"}
+                                        placeholder={"Lệnh sản xuất tổng"}
                                         className={`${
                                             isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -601,6 +601,122 @@ const Index = (props) => {
                                         <label className="text-sm text-red-500">{"Vui lòng chọn LSX chi tiết"}</label>
                                     )}
                                 </div>
+                                <div className="col-span-2">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {"Kho QC"} <span className="text-red-500">*</span>
+                                    </label>
+                                    <SelectCore
+                                        options={[]}
+                                        // onChange={(e) => {
+                                        //     queryStateQlty({ idDetailedProduction: e });
+                                        // }}
+                                        // value={isStateQlty.idDetailedProduction}
+                                        // isLoading={
+                                        //     isStateQlty.idDetailedProduction != null ? false : isStateQlty.onLoading
+                                        // }
+                                        isClearable={true}
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={"Kho QC"}
+                                        className={`${
+                                            isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        style={{
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none",
+                                        }}
+                                        theme={(theme) => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                primary25: "#EBF5FF",
+                                                primary50: "#92BFF7",
+                                                primary: "#0F4F9E",
+                                            },
+                                        })}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                boxShadow: "none",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                    {isStateQlty.errDetailedProduction && (
+                                        <label className="text-sm text-red-500">{"Vui lòng chọn kho QC"}</label>
+                                    )}
+                                </div>
+                                <div className="col-span-2">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {"Kho lỗi"} <span className="text-red-500">*</span>
+                                    </label>
+                                    <SelectCore
+                                        options={[]}
+                                        // onChange={(e) => {
+                                        //     queryStateQlty({ idDetailedProduction: e });
+                                        // }}
+                                        // value={isStateQlty.idDetailedProduction}
+                                        // isLoading={
+                                        //     isStateQlty.idDetailedProduction != null ? false : isStateQlty.onLoading
+                                        // }
+                                        isClearable={true}
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={"Kho lỗi"}
+                                        className={`${
+                                            isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        style={{
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none",
+                                        }}
+                                        theme={(theme) => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                primary25: "#EBF5FF",
+                                                primary50: "#92BFF7",
+                                                primary: "#0F4F9E",
+                                            },
+                                        })}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                boxShadow: "none",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                    {isStateQlty.errDetailedProduction && (
+                                        <label className="text-sm text-red-500">{"Vui lòng chọn kho lỗi"}</label>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -614,7 +730,10 @@ const Index = (props) => {
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
                         <div className="col-span-9">
-                            <div className="grid grid-cols-6">
+                            <div className="grid grid-cols-7">
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {"Công đoạn"}
+                                </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
                                 </h4>
@@ -688,7 +807,15 @@ const Index = (props) => {
                             />
                         </div>
                         <div className="col-span-9">
-                            <div className="grid grid-cols-6  divide-x border-t border-b border-r border-l rounded">
+                            <div className="grid grid-cols-7  divide-x border-t border-b border-r border-l rounded">
+                                <div className="col-span-1">
+                                    <SelectCore
+                                        classNamePrefix="customDropdowDefault"
+                                        placeholder={"Công đoạn"}
+                                        className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
+                                        isDisabled={true}
+                                    />
+                                </div>
                                 <div className="col-span-1"></div>
                                 <div className="col-span-1 flex  justify-center items-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
@@ -788,7 +915,75 @@ const Index = (props) => {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="grid grid-cols-6 items-center col-span-9 border divide-x ml-1">
+                                            <div className="grid grid-cols-7 items-center col-span-9 border divide-x ml-1">
+                                                <div className="col-span-1 flex justify-center  h-full py-0.5 px-1 flex-col items-center ">
+                                                    <SelectCore
+                                                        options={[]}
+                                                        value={null}
+                                                        // isLoading={ce?.location != null ? false : onLoadingChild}
+                                                        // onChange={_HandleChangeChild.bind(
+                                                        //     this,
+                                                        //     e?.id,
+                                                        //     ce?.id,
+                                                        //     "location"
+                                                        // )}
+                                                        className={`
+                                                            ${
+                                                                // errWarehouse && ce?.location == null
+                                                                //     ? "border-red-500 border"
+                                                                //     : ""
+                                                                ""
+                                                            } 
+                                                         my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                        placeholder={"Công đoạn"}
+                                                        noOptionsMessage={() =>
+                                                            dataLang?.returns_nodata || "returns_nodata"
+                                                        }
+                                                        menuPortalTarget={document.body}
+                                                        formatOptionLabel={(option) => (
+                                                            <div className="cursor-pointer">
+                                                                <div className="flex gap-1">
+                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                        {option?.label}
+                                                                    </h2>
+                                                                </div>
+                                                                <div className="flex gap-1">
+                                                                    {/* {option?.qty && (
+                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                            {dataLang?.returns_survive ||
+                                                                                "returns_survive"}
+                                                                            :
+                                                                        </h2>
+                                                                    )}
+                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
+                                                                        {option?.qty && formatNumber(option?.qty)}
+                                                                    </h2> */}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        style={{
+                                                            border: "none",
+                                                            boxShadow: "none",
+                                                            outline: "none",
+                                                        }}
+                                                        theme={(theme) => ({
+                                                            ...theme,
+                                                            colors: {
+                                                                ...theme.colors,
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
+                                                            },
+                                                        })}
+                                                        styles={{
+                                                            menu: (provided, state) => ({
+                                                                ...provided,
+                                                                // width: "150%",
+                                                            }),
+                                                        }}
+                                                        classNamePrefix="customDropdow"
+                                                    />
+                                                </div>
                                                 <div className="col-span-1 py-5 flex justify-center items-center text-sm">
                                                     {e.unit}
                                                 </div>

@@ -91,6 +91,14 @@ const apiWarehouseTransfer = {
             throw error;
         }
     },
+    async apiHandingStatusTransfer(data) {
+        try {
+            const response = await axiosCustom('POST', `/api_web/Api_transfer/confirmWarehouse?csrf_protection=true`, data);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
 
 
 }

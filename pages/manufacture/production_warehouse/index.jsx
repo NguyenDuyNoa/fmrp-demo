@@ -29,6 +29,8 @@ import { useToggle } from "@/hooks/useToggle";
 
 import { routerProductionWarehouse } from "@/routers/manufacture";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
@@ -53,12 +55,13 @@ import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import NoData from "@/components/UI/noData/nodata";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
 import { useSelector } from "react-redux";
-
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -70,6 +73,8 @@ const Index = (props) => {
     const isShow = useToast();
 
     const { paginate } = usePagination();
+
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
@@ -97,6 +102,8 @@ const Index = (props) => {
         },
     };
 
+    const [checkedWare, sCheckedWare] = useState({});
+
     const [isState, sIsState] = useState(initialState);
 
     const queryState = (key) => sIsState((prve) => ({ ...prve, ...key }));
@@ -121,102 +128,72 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
+
         queryState({ onFetching_filter: true, onFetchingGroup: true });
     }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
-        Axios(
-            "GET",
-            `/api_web/Api_stock/exportProduction/?csrf_protection=true`,
-            {
-                params: {
-                    search: isState.keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                    "filter[warehouse_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult, output, rTotal } = response.data;
-                    queryState({ data: rResult, dataExcel: rResult });
-                    sTotalItems(output);
-                    sTotal(rTotal);
-                }
-                queryState({ onFetching: false });
-            }
-        );
+
+        const params = {
+            search: isState.keySearch,
+            limit: limit,
+            page: router.query?.page || 1,
+            "filter[status_bar]": tabPage ?? null,
+            "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+            "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+            "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+            "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+            "filter[warehouse_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
+        };
+
+        const { rResult, output, rTotal } = await apiProductionWarehouse.apiListProductionWarehouse({ params: params });
+
+        sTotalItems(output);
+
+        sTotal(rTotal);
+
+        queryState({ data: rResult, dataExcel: rResult, onFetching: false });
     };
 
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_stock/exportProductionFilterBar/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                    search: isState.keySearch,
-                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                    "filter[warehouse_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    queryState({ listDs: data });
-                }
-                queryState({ onFetchingGroup: false });
-            }
-        );
+    const _ServerFetching_group = async () => {
+        const params = {
+            limit: 0,
+            search: isState.keySearch,
+            "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+            "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+            "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+            "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+            "filter[warehouse_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
+        };
+
+        const data = await apiProductionWarehouse.apiListGroupProductionWarehouse({ params: params });
+
+        queryState({ listDs: data, onFetchingGroup: false });
     };
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                queryState({ listBr: result?.map((e) => ({ label: e.name, value: e.id })) });
-            }
+    const _ServerFetching_filter = async () => {
+        const { result: listBr } = await apiComons.apiBranchCombobox();
+
+        const { result: exportProductionCombobox } = await apiProductionWarehouse.apiCodeProductionWarehouse();
+
+        const data = await apiProductionWarehouse.apiComboboxWarehouse();
+
+        queryState({
+            listBr: listBr?.map((e) => ({ label: e.name, value: e.id })),
+            lisCode: exportProductionCombobox?.map((e) => ({ label: e.code, value: e.id })),
+            dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
+            onFetching_filter: false,
         });
-        Axios("GET", "/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response?.data;
-                queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
-            }
-        });
-        Axios("GET", "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response?.data;
-                queryState({ dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) });
-            }
-        });
-        queryState({ onFetching_filter: false });
     };
 
-    const _HandleSeachApi = debounce((inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
-                },
+    const _HandleSeachApi = debounce(async (inputValue) => {
+        const { result } = await apiProductionWarehouse.apiAjaxCodeProductionWarehouse({
+            data: {
+                term: inputValue,
             },
-            (err, response) => {
-                if (!err) {
-                    let { result } = response?.data;
-                    queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
-                }
-            }
-        );
+        });
+        queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
     }, 500);
 
     useEffect(() => {
@@ -245,12 +222,7 @@ const Index = (props) => {
     ]);
 
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        return formatNumberConfig(+number, dataSeting);
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -369,19 +341,21 @@ const Index = (props) => {
         },
     ];
 
-    const [checkedWare, sCheckedWare] = useState({});
-
     const handleSaveStatus = () => {
         if (isKeyState?.type === "browser") {
             const checked = isKeyState.value.target.checked;
+
             const warehousemanId = isKeyState.value.target.value;
+
             const dataChecked = {
                 checked: checked,
                 warehousemanId: warehousemanId,
                 id: isKeyState?.id,
                 checkedpost: isKeyState?.checkedUn,
             };
+
             sCheckedWare(dataChecked);
+
             queryState({ data: [...isState.data] });
         }
 
@@ -394,36 +368,26 @@ const Index = (props) => {
             initialKey: { id, checkedUn, type, value },
         });
     };
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         let data = new FormData();
 
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
 
         data.append("id", checkedWare?.id);
 
-        Axios(
-            "POST",
-            `/api_web/Api_stock/confirmWarehouse?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message, data_export } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
-                        setTimeout(() => {
-                            queryState({ onFetching: true });
-                        }, 300);
-                    } else {
-                        isShow("error", `${dataLang[message]}`);
-                    }
-                }
-                queryState({ onSending: false });
-            }
-        );
+        const { isSuccess, message, data_export } = await apiProductionWarehouse.apiHangdingStatusWarehouse({
+            data: data,
+        });
+
+        if (isSuccess) {
+            isShow("success", `${dataLang[message]}`);
+            await _ServerFetching();
+        } else {
+            isShow("error", `${dataLang[message]}`);
+        }
+        queryState({ onSending: false });
     };
+
     useEffect(() => {
         isState.onSending && _ServerSending();
     }, [isState.onSending]);
