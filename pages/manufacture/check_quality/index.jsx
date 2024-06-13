@@ -151,7 +151,16 @@ const Index = (props) => {
             ]),
         },
     ];
-
+    const items = [
+        { id: 1, text: "Item 1", colSpan: 1 },
+        { id: 2, text: "Item 2", colSpan: 2 },
+        { id: 3, text: "Item 3", colSpan: 1 },
+        { id: 4, text: "Item 4", colSpan: 2 },
+        { id: 5, text: "Item 5", colSpan: 1 },
+        { id: 6, text: "Item 6", colSpan: 2 },
+        { id: 7, text: "Item 7", colSpan: 1 },
+        { id: 8, text: "Item 8", colSpan: 2 },
+    ];
     return (
         <React.Fragment>
             <Head>

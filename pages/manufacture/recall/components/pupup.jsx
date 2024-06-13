@@ -1,16 +1,7 @@
-import React, { useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import ModalImage from "react-modal-image";
+import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-} from "iconsax-react";
+import ModalImage from "react-modal-image";
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -22,21 +13,20 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 
 import PopupEdit from "@/components/UI/popup";
 import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import { useEffect } from "react";
 
-import ExpandableContent from "@/components/UI/more";
-import ImageErrors from "@/components/UI/imageErrors";
-import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
+import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -45,9 +35,9 @@ const Popup_chitiet = (props) => {
 
     const [data, sData] = useState();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
-    const { dataMaterialExpiry } = useFeature()
+    const { dataMaterialExpiry } = useFeature();
 
     const [onFetching, sOnFetching] = useState(false);
 
@@ -56,26 +46,17 @@ const Popup_chitiet = (props) => {
     }, [open]);
 
     const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting)
+        return formatNumberConfig(+number, dataSeting);
     };
 
-    const _ServerFetching_detailOrder = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sData(data);
-                }
-                sOnFetching(false);
-            }
-        );
+    const _ServerFetching_detailOrder = async () => {
+        const data = await apiRecall.apiDetailRecall(props?.id);
+        sData(data);
+        sOnFetching(false);
     };
     useEffect(() => {
         setTimeout(() => {
-            (onFetching && _ServerFetching_detailOrder())
+            onFetching && _ServerFetching_detailOrder();
         }, 400);
     }, [open]);
 
@@ -131,7 +112,8 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang?.productsWarehouse_warehouseImport || "productsWarehouse_warehouseImport"}
+                                                {props?.dataLang?.productsWarehouse_warehouseImport ||
+                                                    "productsWarehouse_warehouseImport"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {/* {data?.warehouse_name} */}
@@ -146,7 +128,8 @@ const Popup_chitiet = (props) => {
                                     <div className="col-span-3 ">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props?.dataLang?.production_warehouse_Total_value || "production_warehouse_Total_value"}
+                                                {props?.dataLang?.production_warehouse_Total_value ||
+                                                    "production_warehouse_Total_value"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {formatNumber(data?.grand_total)}
@@ -154,10 +137,15 @@ const Popup_chitiet = (props) => {
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator ||
+                                                    "production_warehouse_creator"}
                                             </h3>
                                             <div className="flex items-center gap-2">
-                                                <CustomAvatar data={data} fullName={data?.staff_create?.full_name} profileImage={data?.staff_create?.profile_image} />
+                                                <CustomAvatar
+                                                    data={data}
+                                                    fullName={data?.staff_create?.full_name}
+                                                    profileImage={data?.staff_create?.profile_image}
+                                                />
                                             </div>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -176,11 +164,10 @@ const Popup_chitiet = (props) => {
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
                                         </ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
-                                            {props.dataLang?.productsWarehouse_warehouseLocaImport || "productsWarehouse_warehouseLocaImport"}
+                                            {props.dataLang?.productsWarehouse_warehouseLocaImport ||
+                                                "productsWarehouse_warehouseLocaImport"}
                                         </ColumnTablePopup>
-                                        <ColumnTablePopup>
-                                            {"ĐVT"}
-                                        </ColumnTablePopup>
+                                        <ColumnTablePopup>{"ĐVT"}</ColumnTablePopup>
                                         <ColumnTablePopup colSpan={2}>
                                             {props.dataLang?.recall_revenueQty || "recall_revenueQty"}
                                         </ColumnTablePopup>
@@ -192,9 +179,7 @@ const Popup_chitiet = (props) => {
                                         <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : data?.items?.length > 0 ? (
                                         <>
-                                            <Customscrollbar
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]"
-                                            >
+                                            <Customscrollbar className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px]">
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
                                                         <div
@@ -239,7 +224,7 @@ const Popup_chitiet = (props) => {
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                             {e?.lot == null ||
-                                                                                                e?.lot == ""
+                                                                                            e?.lot == ""
                                                                                                 ? "-"
                                                                                                 : e?.lot}
                                                                                         </h6>
@@ -251,8 +236,8 @@ const Popup_chitiet = (props) => {
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                             {e?.expiration_date
                                                                                                 ? moment(
-                                                                                                    e?.expiration_date
-                                                                                                ).format("DD/MM/YYYY")
+                                                                                                      e?.expiration_date
+                                                                                                  ).format("DD/MM/YYYY")
                                                                                                 : "-"}
                                                                                         </h6>
                                                                                     </div>
