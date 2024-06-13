@@ -1,7 +1,7 @@
 import { ArrowDown } from "iconsax-react";
 import React from "react";
 
-const ImportFileTemplate = ({ dataLang, urlApi, tabPage }) => {
+const ImportFileTemplate = ({ dataLang, tabPage }) => {
     const file = {
         fileTab5: "/file/products/import_stages.xlsx",
         fileTab6: "/file/products/import_bom.xlsx?vs=1.1",
@@ -13,7 +13,7 @@ const ImportFileTemplate = ({ dataLang, urlApi, tabPage }) => {
                 <ArrowDown size="20" className="absolute top-0 right-0 animate-bounce" color="blue" />
             </h5>
             <a
-                href={`${urlApi}${tabPage == 5 ? file?.fileTab5 : file?.fileTab6}`}
+                href={`${process.env.NEXT_PUBLIC_URL_API}${tabPage == 5 ? file?.fileTab5 : file?.fileTab6}`}
                 className="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
             >
                 <span className="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>

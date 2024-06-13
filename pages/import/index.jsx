@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -11,16 +10,7 @@ import Swal from "sweetalert2";
 
 import * as XLSX from "xlsx";
 
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    ArrowRight,
-    RefreshCircle,
-    Notification,
-} from "iconsax-react";
+import { ArrowRight, Trash as IconDelete, Notification, RefreshCircle } from "iconsax-react";
 
 import Loading from "components/UI/loading";
 
@@ -28,33 +18,31 @@ import dynamic from "next/dynamic";
 
 import moment from "moment/moment";
 
-import Select, { components } from "react-select";
+import Select from "react-select";
 
 import { TiTick } from "react-icons/ti";
 
-import { urlApi } from "services/URL";
-
-import Popup_status from "./components/popup/popup";
-import Popup_stages from "./components/popup/popupStages";
-import FormClient from "./components/formClient";
-import Progress from "./components/progress";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useSelector } from "react-redux";
 import ParentControls from "./components/button/buttonAddParent";
 import DeleteButton from "./components/button/buttonDeleteSlect";
-import TabClient from "./components/tabImport";
-import Stepper from "./components/stepper";
+import FormClient from "./components/formClient";
 import FormSupplier from "./components/formSupplier";
 import ImportFileTemplate from "./components/inputTab";
-import SampleImport from "./components/sample";
-import Row from "./components/row";
-import Radio from "./components/radio";
+import Popup_status from "./components/popup/popup";
 import Popup_bom from "./components/popup/popupBom";
-import { useSelector } from "react-redux";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import useActionRole from "@/hooks/useRole";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import useToast from "@/hooks/useToast";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import Popup_stages from "./components/popup/popupStages";
+import Progress from "./components/progress";
+import Radio from "./components/radio";
+import Row from "./components/row";
+import SampleImport from "./components/sample";
+import Stepper from "./components/stepper";
+import TabClient from "./components/tabImport";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -1300,12 +1288,8 @@ const Index = (props) => {
                             <div className="col-span-2"></div>
                             <div className="col-span-2"></div>
                             <div className="col-span-4 mb-2 mt-2">
-                                {(tabPage == 5 && (
-                                    <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} urlApi={urlApi} />
-                                )) ||
-                                    (tabPage == 6 && (
-                                        <ImportFileTemplate dataLang={dataLang} urlApi={urlApi} tabPage={tabPage} />
-                                    )) ||
+                                {(tabPage == 5 && <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} />) ||
+                                    (tabPage == 6 && <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} />) ||
                                     (tabPage != 5 && tabPage != 6 && (
                                         <React.Fragment>
                                             <h5 className="mb-1 block text-sm font-medium text-gray-700">

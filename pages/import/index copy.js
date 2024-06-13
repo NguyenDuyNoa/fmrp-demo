@@ -40,8 +40,6 @@ import Select, { components } from "react-select";
 
 import { TiTick } from "react-icons/ti";
 
-import { urlApi } from "services/URL";
-
 import Popup_status from "./components/popup/popup";
 import Popup_stages from "./components/popup/popupStages";
 import { flatMap } from "lodash";
@@ -1385,7 +1383,7 @@ const Index = (props) => {
                                                 />
                                             </h5>
                                             <a
-                                                href={`${urlApi}/file/products/import_stages.xlsx`}
+                                                href={`${process.env.NEXT_PUBLIC_URL_API}/file/products/import_stages.xlsx`}
                                                 className="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
                                             >
                                                 <span className="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
