@@ -1,41 +1,39 @@
-import Head from "next/head";
 import { debounce } from "lodash";
-import { v4 as uuidv4 } from "uuid";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
-import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 
 import moment from "moment/moment";
-import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
 
-import { _ServerInstance as Axios } from "/services/axios";
-
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { routerRecall } from "@/routers/manufacture";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { isAllowedNumber } from "@/utils/helpers/common";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import apiComons from "@/Api/apiComon/apiComon";
-import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
 const Index = (props) => {
     const router = useRouter();
 
@@ -220,27 +218,18 @@ const Index = (props) => {
         sOnFetchingItemsAll(false);
     };
 
-    const _ServerFetching_Warehouse = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id]": idBranch?.value,
-                },
+    const _ServerFetching_Warehouse = async () => {
+        const result = await apiRecall.apiWarehouseCombobox({
+            params: {
+                "filter[branch_id]": idBranch?.value,
             },
-            (err, response) => {
-                if (!err) {
-                    let result = response?.data;
-                    sDataWarehouse(
-                        result?.map((e) => ({
-                            label: e?.warehouse_name,
-                            value: e?.id,
-                            // warehouse_name: e?.warehouse_name,
-                        }))
-                    );
-                }
-            }
+        });
+        sDataWarehouse(
+            result?.map((e) => ({
+                label: e?.warehouse_name,
+                value: e?.id,
+                // warehouse_name: e?.warehouse_name,
+            }))
         );
         sOnFetchingWarehouse(false);
     };
