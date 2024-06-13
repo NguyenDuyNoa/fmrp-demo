@@ -22,6 +22,7 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import NoData from "@/components/UI/noData/nodata";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
@@ -30,7 +31,6 @@ import { Grid6 } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import PopupCheckQuality from "./components/popup";
-import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const router = useRouter();
