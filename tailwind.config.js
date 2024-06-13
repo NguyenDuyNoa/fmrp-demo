@@ -30,6 +30,10 @@ module.exports = {
                 24: "repeat(24, minmax(0, 1fr))",
                 25: "repeat(25, minmax(0, 1fr))",
                 26: "repeat(26, minmax(0, 1fr))",
+                27: "repeat(27, minmax(0, 1fr))",
+                28: "repeat(28, minmax(0, 1fr))",
+                29: "repeat(29, minmax(0, 1fr))",
+                30: "repeat(30, minmax(0, 1fr))",
             },
             backgroundImage: {
                 logo: "url('/logo_1.png')",
