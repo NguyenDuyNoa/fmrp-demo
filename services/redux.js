@@ -47,9 +47,9 @@ function adminReducer(state = adminState, action) {
             return { ...state, congdoan_finishedProduct: action.payload };
         case "vitrikho_kiemke/update":
             return { ...state, vitrikho_kiemke: action.payload };
-        case "trangthai":
-            return { ...state, trangthai: action.payload };
-        case "statusExprired":
+        case "status/user":
+            return { ...state, statusUser: action.payload };
+        case "status/exprired":
             return { ...state, statusExprired: action.payload };
         case "dataAuthentication":
             return { ...state, dataAuthentication: action.payload };

@@ -59,6 +59,7 @@ const Index = (props) => {
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
     const { checkExport, checkEdit, checkAdd } = useActionRole(auth, "client_group");
+    // đổi type
 
     const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
@@ -93,7 +94,7 @@ const Index = (props) => {
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
-        router.replace("/manufacture/category_errors");
+        router.replace("/manufacture/check_quality");
         queryState({ onFetching: true });
     }, 500);
 

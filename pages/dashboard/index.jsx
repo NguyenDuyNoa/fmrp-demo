@@ -18,12 +18,12 @@ import PopupAppTrial from "@/components/UI/popup/PopupAppTrial";
 
 const Dashboard = () => {
     const dispatch = useDispatch();
-    const dataPstWH = useSelector((state) => state.trangthai);
+    const dataPstWH = useSelector((state) => state.statusUser);
     const statusExprired = useStatusExprired();
 
     const _HandleExample = () => {
         dispatch({
-            type: "trangthai",
+            type: "status/user",
             payload: !dataPstWH,
         });
     };

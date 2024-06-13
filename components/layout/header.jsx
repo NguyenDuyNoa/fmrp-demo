@@ -1204,7 +1204,7 @@ const Header = () => {
         },
     ];
 
-    const dataPstWH = useSelector((state) => state.trangthai);
+    const dataPstWH = useSelector((state) => state.statusUser);
     // Khai báo biến state
     const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
     const [isLastDropdown, setIsLastDropdown] = useState(false);
@@ -1222,7 +1222,7 @@ const Header = () => {
                     setCurrentDropdownIndex(0);
                     setIsLastDropdown(false);
                     dispatch({
-                        type: "trangthai",
+                        type: "status/user",
                         payload: false,
                     });
                 }, 3000);
