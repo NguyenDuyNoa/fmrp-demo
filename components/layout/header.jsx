@@ -831,37 +831,37 @@ const Header = () => {
                     items: [
                         {
                             name: "Quy trình sử dụng phần mềm FMRP",
-                            link: "/process",
+                            link: "/process/use",
                             viewOwn: -1,
                             view: -1,
                         },
                         {
                             name: "Quy trình tổng quan các phân hệ",
-                            link: "/processOverview",
+                            link: "/process/overview",
                             viewOwn: -1,
                             view: -1,
                         },
                         {
                             name: "Quy trình quản lý sản xuất",
-                            link: "/process_manufacture",
+                            link: "/process/manufacture",
                             viewOwn: -1,
                             view: -1,
                         },
                         {
                             name: "Quy trình bán hàng",
-                            link: "/process_products",
+                            link: "/process/products",
                             viewOwn: -1,
                             view: -1,
                         },
                         {
                             name: "Quy trình tổng quan bán hàng - Sản xuất",
-                            link: "/process_sales",
+                            link: "/process/sales",
                             viewOwn: -1,
                             view: -1,
                         },
                         {
                             name: "Quy trình mua hàng - nhập kho",
-                            link: "/process_order",
+                            link: "/process/order",
                             viewOwn: -1,
                             view: -1,
                         },
