@@ -1,15 +1,14 @@
-import { ArrowLeft, ArrowRight, ArrowRight2 } from "iconsax-react";
-import { useRouter } from "next/router";
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { ArrowLeft, ArrowRight } from "iconsax-react";
+import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 
 const Index = React.memo(({ postsPerPage, paginate, totalPosts, currentPage }) => {
     const [pageCount, setPageCount] = useState(0);
+
     useEffect(() => {
         setPageCount(Math.ceil(totalPosts / (+postsPerPage || 25)));
     }, [postsPerPage, totalPosts]);
+
     const handlePageClick = (event) => {
         paginate(event.selected + 1);
     };
