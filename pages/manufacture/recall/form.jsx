@@ -179,7 +179,7 @@ const Index = (props) => {
                     serial: ce?.serial == null ? "" : ce?.serial,
                     lot: ce?.lot == null ? "" : ce?.lot,
                     date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                    unit: e.item?.unit,
+                    unit: e?.item?.unit_name || e.item?.unit,
                     recallQuantity: +ce?.quantity,
                     note: ce?.note,
                 })),

@@ -255,7 +255,8 @@ const Popup_chitiet = (props) => {
                                                                 </h6>
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
-                                                                {e?.item?.unit}
+                                                                {e?.item?.unit_name || e?.item?.unit}
+                                                                {/* {e?.item?.unit} */}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center mr-1">
                                                                 {formatNumber(e?.quantity)}
