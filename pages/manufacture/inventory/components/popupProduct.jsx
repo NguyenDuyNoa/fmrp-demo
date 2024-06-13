@@ -30,7 +30,7 @@ import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericF
 import { SelectCore } from "@/utils/lib/Select";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 const Popup_Product = React.memo((props) => {
-    const dataPstWH = useSelector((state) => state.vitrikho_kiemke);
+    const dataPstWH = useSelector((state) => state.location_inventory);
 
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {

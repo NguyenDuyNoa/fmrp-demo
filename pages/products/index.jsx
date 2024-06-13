@@ -245,7 +245,7 @@ const Index = (props) => {
             if (!err) {
                 const { rResult } = response.data;
                 dispatch({
-                    type: "congdoan_finishedProduct/update",
+                    type: "stage_finishedProduct/update",
                     payload: rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,

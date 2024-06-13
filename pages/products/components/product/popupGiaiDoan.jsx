@@ -28,7 +28,7 @@ import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 const Popup_GiaiDoan = React.memo((props) => {
-    const listCd = useSelector((state) => state.congdoan_finishedProduct);
+    const listCd = useSelector((state) => state.stage_finishedProduct);
 
     const isShow = useToast();
 
@@ -44,7 +44,7 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit } = useActionRole(auth, 'products');
+    const { checkAdd, checkEdit } = useActionRole(auth, "products");
 
     const [onSending, sOnSending] = useState(false);
 
@@ -275,8 +275,9 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 position: "absolute",
                             }),
                         }}
-                        className={`${errName && value.name == null ? "border-red-500" : "border-transparent"
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                        className={`${
+                            errName && value.name == null ? "border-red-500" : "border-transparent"
+                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                     />
                 </div>
                 <div className="w-[30%] flex items-center justify-center">
@@ -325,20 +326,27 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     return (
         <PopupEdit
-            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${props.name
-                })`}
+            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${
+                props.name
+            })`}
             button={
                 <div
                     onClick={() => {
                         if (role || checkEdit || checkAdd) {
-                            sIsOpen(true)
+                            sIsOpen(true);
                         } else {
-                            isShow("warning", WARNING_STATUS_ROLE)
+                            isShow("warning", WARNING_STATUS_ROLE);
                         }
                     }}
-                    className={props.type == 'add' && "group outline-none transition-all ease-in-out flex items-center justify-center gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"}>
-                    {props.type == "add" && <I3Square size={20} className="group-hover:text-amber-500 group-hover:scale-110" />}
-                    <button type="button" className="group-hover:text-amber-500" >
+                    className={
+                        props.type == "add" &&
+                        "group outline-none transition-all ease-in-out flex items-center justify-center gap-1 hover:bg-slate-50 text-left cursor-pointer roundedw-full"
+                    }
+                >
+                    {props.type == "add" && (
+                        <I3Square size={20} className="group-hover:text-amber-500 group-hover:scale-110" />
+                    )}
+                    <button type="button" className="group-hover:text-amber-500">
                         {props.type == "add"
                             ? `${props.dataLang?.stage_design_finishedProduct || "stage_design_finishedProduct"}`
                             : `${props.dataLang?.edit || "edit"}`}
@@ -384,8 +392,9 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 onClick={_HandleAddNew.bind(this)}
                                 disabled={statusBtnAdd}
                                 title="Thêm"
-                                className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
-                                    } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
+                                className={`${
+                                    statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
+                                } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
                             >
                                 <IconAdd />
                                 {props.dataLang?.stage_add_finishedProduct}
@@ -412,4 +421,4 @@ const Popup_GiaiDoan = React.memo((props) => {
         </PopupEdit>
     );
 });
-export default Popup_GiaiDoan
+export default Popup_GiaiDoan;

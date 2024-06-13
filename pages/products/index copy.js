@@ -289,7 +289,7 @@ const Index = (props) => {
             if (!err) {
                 var { rResult } = response.data;
                 dispatch({
-                    type: "congdoan_finishedProduct/update",
+                    type: "stage_finishedProduct/update",
                     payload: rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,
@@ -3115,7 +3115,7 @@ const Popup_ThongTin = React.memo((props) => {
 });
 
 const Popup_GiaiDoan = React.memo((props) => {
-    const listCd = useSelector((state) => state.congdoan_finishedProduct);
+    const listCd = useSelector((state) => state.stage_finishedProduct);
 
     const isShow = useToast();
 

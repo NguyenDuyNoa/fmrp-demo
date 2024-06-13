@@ -182,7 +182,7 @@ const Form = (props) => {
                 if (!err) {
                     const data = response.data;
                     dispatch({
-                        type: "vitrikho_kiemke/update",
+                        type: "location_inventory/update",
                         payload: data.map((e) => ({
                             label: e.name,
                             value: e.id,

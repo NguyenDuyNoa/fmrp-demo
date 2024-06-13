@@ -16,8 +16,8 @@ const adminState = {
     categoty_finishedProduct: null,
     type_finishedProduct: null,
     unit_finishedProduct: null,
-    congdoan_finishedProduct: null,
-    vitrikho_kiemke: null,
+    stage_finishedProduct: null,
+    location_inventory: null,
     setings: {}
 };
 
@@ -43,16 +43,14 @@ function adminReducer(state = adminState, action) {
             return { ...state, type_finishedProduct: action.payload };
         case "unit_finishedProduct/update":
             return { ...state, unit_finishedProduct: action.payload };
-        case "congdoan_finishedProduct/update":
-            return { ...state, congdoan_finishedProduct: action.payload };
-        case "vitrikho_kiemke/update":
-            return { ...state, vitrikho_kiemke: action.payload };
+        case "stage_finishedProduct/update":
+            return { ...state, stage_finishedProduct: action.payload };
+        case "location_inventory/update":
+            return { ...state, location_inventory: action.payload };
         case "status/user":
             return { ...state, statusUser: action.payload };
         case "status/exprired":
             return { ...state, statusExprired: action.payload };
-        case "dataAuthentication":
-            return { ...state, dataAuthentication: action.payload };
         case "setings/server":
             return { ...state, setings: action.payload };
         case "setings/feature":
