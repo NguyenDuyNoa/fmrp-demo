@@ -11,13 +11,10 @@ import {
     Grid6,
 } from "iconsax-react";
 
-
 import { _ServerInstance as Axios } from "/services/axios";
-
 
 import Popup_dsncc from "./components/popup/popup";
 import Popup_chitiet from "./components/popup/detail";
-
 
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
@@ -46,6 +43,7 @@ import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -60,7 +58,7 @@ const Index = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'suppliers');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "suppliers");
 
     const initalState = {
         keySearch: "",
@@ -73,16 +71,16 @@ const Index = (props) => {
         listBr: [],
         onFetchingBranch: false,
         onFetchingGroup: false,
-        onFetchingCt: false
+        onFetchingCt: false,
+    };
 
-    }
+    const [isState, setIsState] = useState(initalState);
 
-    const [isState, setIsState] = useState(initalState)
+    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }));
 
-    const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }))
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
-
+    const { paginate } = usePagination();
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -165,19 +163,21 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        isState.onFetchingBranch && _ServerFetching_brand()
-    }, [isState.onFetchingBranch])
+        isState.onFetchingBranch && _ServerFetching_brand();
+    }, [isState.onFetchingBranch]);
 
     useEffect(() => {
-        isState.onFetchingGroup && _ServerFetching_group()
-    }, [isState.onFetchingGroup])
+        isState.onFetchingGroup && _ServerFetching_group();
+    }, [isState.onFetchingGroup]);
 
     useEffect(() => {
-        isState.onFetchingCt && _ServerFetching_selectct()
-    }, [isState.onFetchingCt])
+        isState.onFetchingCt && _ServerFetching_selectct();
+    }, [isState.onFetchingCt]);
 
     const _ServerFetching_selectct = () => {
-        Axios("GET", `/api_web/Api_address/province?limit=0`,
+        Axios(
+            "GET",
+            `/api_web/Api_address/province?limit=0`,
             {
                 limit: 0,
             },
@@ -185,21 +185,10 @@ const Index = (props) => {
                 if (!err) {
                     const { rResult } = response.data;
                     queryState({ listSelectCt: rResult?.map((e) => ({ label: e.name, value: e.provinceid })) });
-
                 }
                 queryState({ onFetchingCt: false });
             }
         );
-    };
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -211,14 +200,14 @@ const Index = (props) => {
             },
         });
         queryState({ onFetching: true });
-    }, 500)
+    }, 500);
 
     useEffect(() => {
-        isState.onFetching && _ServerFetching()
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        queryState({ onFetching: true })
+        queryState({ onFetching: true });
     }, [limit, router.query?.page, router.query?.tab, isState.idBranch]);
 
     //excel
@@ -347,24 +336,26 @@ const Index = (props) => {
                                 {dataLang?.suppliers_supplier_title}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_dsncc
                                         isState={isState}
                                         onRefresh={_ServerFetching.bind(this)}
                                         onRefreshGroup={_ServerFetching_group.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"suppliers"}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
-                                    :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <ContainerFilterTab>
@@ -419,7 +410,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
                                                         <ExcelFileComponent
@@ -427,14 +418,18 @@ const Index = (props) => {
                                                             filename="Danh sách nhà cung cấp"
                                                             title="Dsncc"
                                                             dataLang={dataLang}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -444,30 +439,30 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar>
                                 <div className="w-full">
-                                    <HeaderTable gridCols={8} display={'grid'}>
-                                        <ColumnTable colSpan={1} textAlign='center'>
-                                            {dataLang?.suppliers_supplier_code || 'suppliers_supplier_code'}
+                                    <HeaderTable gridCols={8} display={"grid"}>
+                                        <ColumnTable colSpan={1} textAlign="center">
+                                            {dataLang?.suppliers_supplier_code || "suppliers_supplier_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.suppliers_supplier_name || 'suppliers_supplier_name'}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_name || "suppliers_supplier_name"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.suppliers_supplier_taxcode || "suppliers_supplier_taxcode"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.suppliers_supplier_phone || "suppliers_supplier_phone"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.suppliers_supplier_adress || 'suppliers_supplier_adress'}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_adress || "suppliers_supplier_adress"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.suppliers_supplier_group || 'suppliers_supplier_group'}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.suppliers_supplier_group || "suppliers_supplier_group"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.client_list_brand || 'client_list_brand'}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.client_list_brand || "client_list_brand"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.branch_popup_properties || 'branch_popup_properties'}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
                                     {isState.onFetching ? (
@@ -476,11 +471,11 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={8} key={e.id.toString()} >
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                    <RowTable gridCols={8} key={e.id.toString()}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e.code}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'}>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             <Popup_chitiet
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 col-span-1   rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear"
@@ -488,21 +483,24 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'}>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.tax_code}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e.phone_number}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'}>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.address}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex justify-start flex-wrap ">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="flex justify-start flex-wrap "
+                                                        >
                                                             {e.supplier_group?.map((h) => {
                                                                 return (
                                                                     <span
                                                                         key={h.id}
-                                                                        style={{ backgroundColor: "#e2f0fe", }}
+                                                                        style={{ backgroundColor: "#e2f0fe" }}
                                                                         className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] px-2 rounded-md py-0.5`}
                                                                     >
                                                                         {h.name}
@@ -510,15 +508,19 @@ const Index = (props) => {
                                                                 );
                                                             })}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex items-center gap-1 flex-wrap">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="flex items-center gap-1 flex-wrap"
+                                                        >
                                                             {e.branch?.map((i) => (
-                                                                <TagBranch key={i}>
-                                                                    {i.name}
-                                                                </TagBranch>
+                                                                <TagBranch key={i}>{i.name}</TagBranch>
                                                             ))}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="space-x-2 text-center flex items-center justify-center">
-                                                            {role == true || checkEdit ?
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                        >
+                                                            {role == true || checkEdit ? (
                                                                 <Popup_dsncc
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
@@ -541,9 +543,14 @@ const Index = (props) => {
                                                                     id={e?.id}
                                                                     nameModel={"contacts_suppliers"}
                                                                 />
-                                                                :
-                                                                <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                                                            }
+                                                            ) : (
+                                                                <IconEdit
+                                                                    className="cursor-pointer"
+                                                                    onClick={() =>
+                                                                        isShow("warning", WARNING_STATUS_ROLE)
+                                                                    }
+                                                                />
+                                                            )}
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
                                                                 onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -551,7 +558,6 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                                 type="suppliers"
                                                             />
-
                                                         </RowItemTable>
                                                     </RowTable>
                                                 ))}
@@ -566,10 +572,7 @@ const Index = (props) => {
                     </div>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItem?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}

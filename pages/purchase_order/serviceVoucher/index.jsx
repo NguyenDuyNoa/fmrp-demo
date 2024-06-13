@@ -20,7 +20,6 @@ import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
-
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Popup_servie from "./components/popup";
@@ -32,7 +31,13 @@ import Pagination from "@/components/UI/pagination";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { debounce } from "lodash";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import {
+    Container,
+    ContainerBody,
+    ContainerFilterTab,
+    ContainerTable,
+    ContainerTotal,
+} from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import TabFilter from "@/components/UI/TabFilter";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -56,22 +61,25 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
-    const isShow = useToast()
+    const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const { paginate } = usePagination();
+
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'serviceVoucher');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "serviceVoucher");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const [total, sTotal] = useState({});
 
@@ -90,8 +98,8 @@ const Index = (props) => {
         valueDate: {
             startDate: null,
             endDate: null,
-        }
-    }
+        },
+    };
 
     const [isState, sIsState] = useState(initialState);
 
@@ -114,7 +122,9 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        Axios("GET", `/api_web/Api_service/service/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_service/service/?csrf_protection=true`,
             {
                 params: {
                     search: isState.keySearch,
@@ -168,7 +178,9 @@ const Index = (props) => {
     }, [isState.onFetchingFilter]);
 
     const _HandleSeachApi = debounce((inputValue) => {
-        Axios("POST", `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
+        Axios(
+            "POST",
+            `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
             {
                 data: {
                     term: inputValue,
@@ -181,7 +193,7 @@ const Index = (props) => {
                 }
             }
         );
-    }, 500)
+    }, 500);
 
     const _ServerFetching_group = () => {
         Axios(
@@ -216,24 +228,14 @@ const Index = (props) => {
             },
         });
         queryState({ onFetching: true });
-    }, 500)
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
+    }, 500);
 
     useEffect(() => {
-        (isState.onFetching && _ServerFetching())
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        (isState.onFetchingGroup && _ServerFetching_group());
+        isState.onFetchingGroup && _ServerFetching_group();
     }, [isState.onFetchingGroup]);
 
     useEffect(() => {
@@ -251,11 +253,11 @@ const Index = (props) => {
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
-    }
+    };
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
-    }
+    };
 
     const multiDataSet = [
         {
@@ -402,22 +404,24 @@ const Index = (props) => {
                                 {dataLang?.serviceVoucher_title_lits || "serviceVoucher_title_lits"}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_servie
                                         onRefreshGroup={_ServerFetching_group.bind(this)}
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    /> :
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <ContainerFilterTab>
@@ -454,7 +458,8 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.serviceVoucher_branch || "serviceVoucher_branch",
+                                                        label:
+                                                            dataLang?.serviceVoucher_branch || "serviceVoucher_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
@@ -466,20 +471,23 @@ const Index = (props) => {
                                                 isClearable={true}
                                             />
                                             <SelectComponent
-                                                  onInputChange={(event) =>{
-                                                    _HandleSeachApi(event)
+                                                onInputChange={(event) => {
+                                                    _HandleSeachApi(event);
                                                 }}
                                                 options={[
                                                     {
                                                         value: "",
                                                         label:
-                                                            dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code",
+                                                            dataLang?.serviceVoucher_voucher_code ||
+                                                            "serviceVoucher_voucher_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ valueCode: e })}
-                                                placeholder={dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"
+                                                placeholder={
+                                                    dataLang?.serviceVoucher_voucher_code ||
+                                                    "serviceVoucher_voucher_code"
                                                 }
                                                 isClearable={true}
                                                 colSpan={2}
@@ -494,7 +502,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
                                                         <ExcelFileComponent
@@ -502,14 +510,18 @@ const Index = (props) => {
                                                             filename="Danh sách phiếu dịch vụ"
                                                             title="DSPDV"
                                                             dataLang={dataLang}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -520,34 +532,35 @@ const Index = (props) => {
                             <Customscrollbar>
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_supplier || "serviceVoucher_supplier"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_total_amount || "serviceVoucher_total_amount"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_tax_money || "serviceVoucher_tax_money"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
-                                            {dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.serviceVoucher_status_of_spending ||
+                                                "serviceVoucher_status_of_spending"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_note || "serviceVoucher_note"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_branch || "serviceVoucher_branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.serviceVoucher_operation || "serviceVoucher_operation"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -557,9 +570,11 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={12} key={e.id.toString()} >
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
+                                                    <RowTable gridCols={12} key={e.id.toString()}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {e?.date != null
+                                                                ? moment(e?.date).format("DD/MM/YYYY")
+                                                                : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
                                                             <Popup_chitiet
@@ -569,36 +584,45 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'left'} >
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e.supplier_name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatMoney(e.total_price)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatMoney(e.total_tax_price)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatMoney(e.total_amount)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className=" flex items-center justify-center w-fit mx-auto">
+                                                        <RowItemTable
+                                                            colSpan={2}
+                                                            className=" flex items-center justify-center w-fit mx-auto"
+                                                        >
                                                             {(e?.status_pay === "not_spent" && (
                                                                 <TagColorSky name={"Chưa chi"} />
                                                             )) ||
                                                                 (e?.status_pay === "spent_part" && (
-                                                                    <TagColorOrange name={`Chi 1 phần (${formatNumber(e?.amount_paid)})`} />
+                                                                    <TagColorOrange
+                                                                        name={`Chi 1 phần (${formatNumber(
+                                                                            e?.amount_paid
+                                                                        )})`}
+                                                                    />
                                                                 )) ||
                                                                 (e?.status_pay === "spent" && (
                                                                     <TagColorLime name={"Đã chi đủ"} />
                                                                 ))}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'} className="truncate">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            textAlign={"left"}
+                                                            className="truncate"
+                                                        >
                                                             {e.note}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className={'mx-auto'}>
-                                                            <TagBranch className='w-fit'>
-                                                                {e?.branch_name}
-                                                            </TagBranch>
+                                                        <RowItemTable colSpan={1} className={"mx-auto"}>
+                                                            <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex justify-center">
                                                             <BtnAction
@@ -623,25 +647,22 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     <ContainerTotal>
-                        <RowItemTable colSpan={4} textAlign={'center'}>
+                        <RowItemTable colSpan={4} textAlign={"center"}>
                             {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                        <RowItemTable colSpan={1} textAlign={"right"} className="justify-end p-2 flex gap-2 flex-wrap">
                             {formatMoney(total?.total_price)}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap ">
+                        <RowItemTable colSpan={1} textAlign={"right"} className="justify-end p-2 flex gap-2 flex-wrap ">
                             {formatMoney(total?.total_tax_price)}
                         </RowItemTable>
-                        <RowItemTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap">
+                        <RowItemTable colSpan={1} textAlign={"right"} className="justify-end p-2 flex gap-2 flex-wrap">
                             {formatMoney(total?.total_amount)}
                         </RowItemTable>
                     </ContainerTotal>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -652,9 +673,8 @@ const Index = (props) => {
                     )}
                 </ContainerBody>
             </Container>
-        </React.Fragment >
+        </React.Fragment>
     );
 };
-
 
 export default Index;

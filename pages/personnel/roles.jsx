@@ -50,15 +50,18 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const statusExprired = useStatusExprired();
 
+    const { paginate } = usePagination();
+
     const router = useRouter();
 
-    const isShow = useToast()
+    const isShow = useToast();
 
     const dispatch = useDispatch();
 
@@ -80,11 +83,11 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'personnel_roles');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "personnel_roles");
 
     const _ServerFetching = () => {
         Axios(
@@ -118,13 +121,6 @@ const Index = (props) => {
         sOnFetching(true);
     }, [limit, router.query?.page, idPosition, idBranch]);
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: { page: pageNumber },
-        });
-    };
-
     const _HandleFilterOpt = (type, value) => {
         if (type == "position") {
             sIdPosition(value);
@@ -137,7 +133,7 @@ const Index = (props) => {
         sKeySearch(value);
         router.replace(router.route);
         sOnFetching(true);
-    }, 500)
+    }, 500);
 
     const _ServerFetchingSub = () => {
         Axios("GET", "/api_web/api_staff/positionOption?csrf_protection=true", {}, (err, response) => {
@@ -237,8 +233,9 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.category_personnel_position_department || "category_personnel_position_department"
-                        }`,
+                    title: `${
+                        dataLang?.category_personnel_position_department || "category_personnel_position_department"
+                    }`,
                     width: { wch: 30 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -285,24 +282,27 @@ const Index = (props) => {
                     <div className="space-y-3 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.category_personnel_position_title || 'category_personnel_position_title'}
+                                {dataLang?.category_personnel_position_title || "category_personnel_position_title"}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_ChucVu
                                         dataLang={dataLang}
                                         onRefresh={_ServerFetching.bind(this)}
                                         onRefreshSub={_ServerFetchingSub.bind(this)}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <ContainerTable>
@@ -319,14 +319,14 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.price_quote_branch || 'price_quote_branch',
+                                                        label: dataLang?.price_quote_branch || "price_quote_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...options,
                                                 ]}
                                                 onChange={_HandleFilterOpt.bind(this, "branch")}
                                                 value={idBranch}
-                                                placeholder={dataLang?.price_quote_branch || 'price_quote_branch'}
+                                                placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
                                                 colSpan={3}
                                                 components={{ MultiValue }}
                                                 isMulti={true}
@@ -336,7 +336,9 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.category_personnel_position_name || "category_personnel_position_name",
+                                                        label:
+                                                            dataLang?.category_personnel_position_name ||
+                                                            "category_personnel_position_name",
                                                         isDisabled: true,
                                                     },
                                                     ...dataPositionOption,
@@ -352,7 +354,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={sOnFetching} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {data?.length > 0 && (
                                                         <ExcelFileComponent
@@ -363,14 +365,18 @@ const Index = (props) => {
                                                             }
                                                             title="DSCV"
                                                             dataLang={dataLang}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -381,19 +387,22 @@ const Index = (props) => {
                                     <div className="w-full">
                                         <HeaderTable gridCols={10} display={"grid"}>
                                             <ColumnTable colSpan={1} />
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                {dataLang?.category_personnel_position_name || "category_personnel_position_name"}
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                {dataLang?.category_personnel_position_name ||
+                                                    "category_personnel_position_name"}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                {dataLang?.category_personnel_position_amount || "category_personnel_position_amount"}
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                {dataLang?.category_personnel_position_amount ||
+                                                    "category_personnel_position_amount"}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
-                                                {dataLang?.category_personnel_position_department || "category_personnel_position_department"}
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
+                                                {dataLang?.category_personnel_position_department ||
+                                                    "category_personnel_position_department"}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
                                                 {dataLang?.client_list_brand || "client_list_brand"}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={1} textAlign={'center'}>
+                                            <ColumnTable colSpan={1} textAlign={"center"}>
                                                 {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                             </ColumnTable>
                                         </HeaderTable>
@@ -421,10 +430,7 @@ const Index = (props) => {
                     </div>
                     {data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -446,9 +452,9 @@ const Item = React.memo((props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkEdit } = useActionRole(auth, 'personnel_roles');
+    const { checkEdit } = useActionRole(auth, "personnel_roles");
 
-    const isShow = useToast()
+    const isShow = useToast();
 
     useEffect(() => {
         sHasChild(false);
@@ -461,40 +467,39 @@ const Item = React.memo((props) => {
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
-                        className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
-                            } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
+                        className={`${
+                            hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
+                        } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
                     >
                         <IconMinus size={16} />
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'left'} >
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.name}
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'center'}>
+                <RowItemTable colSpan={2} textAlign={"center"}>
                     Thành viên
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.department_name}
                 </RowItemTable>
                 <RowItemTable colSpan={2} className="flex items-center justify-start gap-1 flex-wrap">
                     {props?.data?.branch?.map((i) => (
-                        <TagBranch key={i} >
-                            {i.name}
-                        </TagBranch>
+                        <TagBranch key={i}>{i.name}</TagBranch>
                     ))}
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2 px-2">
-                    {role == true || checkEdit ?
+                    {role == true || checkEdit ? (
                         <Popup_ChucVu
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
                             id={props.data?.id}
                         />
-                        :
-                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                    }
+                    ) : (
+                        <IconEdit className="cursor-pointer" onClick={() => isShow("warning", WARNING_STATUS_ROLE)} />
+                    )}
                     <BtnAction
                         onRefresh={props.onRefresh}
                         onRefreshGroup={props.onRefreshOpt}
@@ -543,11 +548,11 @@ const Item = React.memo((props) => {
 });
 
 const ItemsChild = React.memo((props) => {
-    const isShow = useToast()
+    const isShow = useToast();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkEdit } = useActionRole(auth, 'personnel_roles');
+    const { checkEdit } = useActionRole(auth, "personnel_roles");
 
     return (
         <React.Fragment key={props.data?.id}>
@@ -573,33 +578,31 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className="mt-1.5" />
                     </RowItemTable>
                 )}
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.name}
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'center'}>
+                <RowItemTable colSpan={2} textAlign={"center"}>
                     0
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.department_name}
                 </RowItemTable>
                 <RowItemTable colSpan={2} className="flex gap-1 flex-wrap">
                     {props.data.branch?.map((i) => (
-                        <TagBranch key={i}  >
-                            {i.name}
-                        </TagBranch>
+                        <TagBranch key={i}>{i.name}</TagBranch>
                     ))}
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2">
-                    {role == true || checkEdit ?
+                    {role == true || checkEdit ? (
                         <Popup_ChucVu
                             onRefresh={props.onRefresh}
                             onRefreshSub={props.onRefreshSub}
                             dataLang={props.dataLang}
                             id={props.data?.id}
                         />
-                        :
-                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                    }
+                    ) : (
+                        <IconEdit className="cursor-pointer" onClick={() => isShow("warning", WARNING_STATUS_ROLE)} />
+                    )}
                     <BtnAction
                         onRefresh={props.onRefresh}
                         onRefreshGroup={props.onRefreshOpt}
@@ -613,7 +616,5 @@ const ItemsChild = React.memo((props) => {
         </React.Fragment>
     );
 });
-
-
 
 export default Index;

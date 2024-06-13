@@ -25,12 +25,11 @@ import { Container, ContainerBody, ContainerTable } from "@/components/UI/common
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 
-
-
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const initialData = {
         data: [],
@@ -46,15 +45,17 @@ const Index = (props) => {
             endDate: null,
         },
     };
+    const { paginate } = usePagination();
+
     const router = useRouter();
     const dataLang = props.dataLang;
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
     const [total, sTotal] = useState({});
     const [keySearch, sKeySearch] = useState("");
     const statusExprired = useStatusExprired();
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const [dataTable, sDataTable] = useState(initialData);
     const [valueChange, sValueChange] = useState(initialValue);
@@ -191,17 +192,7 @@ const Index = (props) => {
             },
         });
         sOnFetching(true);
-    }, 500)
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
+    }, 500);
 
     const onchangFilter = (type) => (value) => sValueChange((e) => ({ ...e, [type]: value }));
 
@@ -309,12 +300,9 @@ const Index = (props) => {
             <Container>
                 {statusExprired ? (
                     <EmptyExprired />
-
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.customerDebt_title || "customerDebt_title"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.customerDebt_title || "customerDebt_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.customerDebt_lits || "customerDebt_lits"}</h6>
                     </div>
@@ -324,7 +312,7 @@ const Index = (props) => {
                     <div className="space-y-3 h-[96%] overflow-hidden">
                         <div className="flex justify-between mt-1">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.customerDebt_lits || 'customerDebt_lits'}
+                                {dataLang?.customerDebt_lits || "customerDebt_lits"}
                             </h2>
                         </div>
                         <ContainerTable>
@@ -341,7 +329,9 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
+                                                        label:
+                                                            dataLang?.purchase_order_table_branch ||
+                                                            "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...dataTable.listBr,
@@ -349,14 +339,19 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 value={valueChange.idBranch}
                                                 onChange={onchangFilter("idBranch")}
-                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                                                placeholder={
+                                                    dataLang?.purchase_order_table_branch ||
+                                                    "purchase_order_table_branch"
+                                                }
                                                 colSpan={1}
                                             />
                                             <SelectComponent
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.customerDebt_suppliert || "customerDebt_suppliert",
+                                                        label:
+                                                            dataLang?.customerDebt_suppliert ||
+                                                            "customerDebt_suppliert",
                                                         isDisabled: true,
                                                     },
                                                     ...dataTable.listClients,
@@ -383,9 +378,7 @@ const Index = (props) => {
                                                 {dataTable.dataExcel?.length > 0 && (
                                                     <ExcelFileComponent
                                                         multiDataSet={multiDataSet}
-                                                        filename={
-                                                            dataLang?.customerDebt_lits || "customerDebt_lits"
-                                                        }
+                                                        filename={dataLang?.customerDebt_lits || "customerDebt_lits"}
                                                         title="DSCNKH"
                                                         dataLang={dataLang}
                                                     />
@@ -400,7 +393,7 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar className="min:h-[200px] 3xl:h-[92%] 2xl:h-[92%] xl:h-[82%] lg:h-[82%] max:h-[400px]">
                                 <div className="w-[100%]">
-                                    <HeaderTable gridCols={12} >
+                                    <HeaderTable gridCols={12}>
                                         <div className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] col-span-1 text-center text-gray-600 uppercase font-semibold">
                                             {dataLang?.customerDebt_code || "customerDebt_code"}
                                         </div>
@@ -598,10 +591,7 @@ const Index = (props) => {
                     </div>
                     {dataTable.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}

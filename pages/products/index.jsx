@@ -43,10 +43,13 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
+
+    const { paginate } = usePagination();
 
     const feature = useFeature()
 
@@ -146,12 +149,6 @@ const Index = (props) => {
             (valueFinishedPro && sOnFetching(true));
     }, [limit, router.query?.page, idBranch, router.query?.tab, valueCategory, valueFinishedPro]);
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: { page: pageNumber },
-        });
-    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);

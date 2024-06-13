@@ -39,7 +39,13 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import {
+    Container,
+    ContainerBody,
+    ContainerFilterTab,
+    ContainerTable,
+    ContainerTotal,
+} from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
@@ -49,7 +55,7 @@ import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePag
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -82,17 +88,19 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, "returnSales")
+    const { checkAdd, checkExport } = useActionRole(auth, "returnSales");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
-    const [isState, sIsState] = useState(initsArr)
+    const [isState, sIsState] = useState(initsArr);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
@@ -121,7 +129,9 @@ const Index = (props) => {
     }, []);
 
     const _ServerFetching = () => {
-        Axios("GET", `/api_web/Api_return_order/return_order/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_return_order/return_order/?csrf_protection=true`,
             {
                 params: {
                     search: isState.keySearch,
@@ -140,8 +150,7 @@ const Index = (props) => {
                     let { rResult, output, rTotal } = response?.data;
                     sTotalItems(output);
                     sTotal(rTotal);
-                    queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false })
-
+                    queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
                 }
             }
         );
@@ -160,8 +169,7 @@ const Index = (props) => {
                     "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
                     "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
                     "filter[client_id]": isState?.idClient ? isState?.idClient.value : null,
-                    "filter[start_date]":
-                        isState?.valueDate?.startDate != null ? isState?.valueDate?.startDate : null,
+                    "filter[start_date]": isState?.valueDate?.startDate != null ? isState?.valueDate?.startDate : null,
                     "filter[end_date]": isState?.valueDate?.endDate != null ? isState?.valueDate?.endDate : null,
                 },
             },
@@ -179,7 +187,7 @@ const Index = (props) => {
 
     const convertArray = (arr) => {
         return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
-    }
+    };
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
@@ -187,26 +195,25 @@ const Index = (props) => {
                 queryState({ listBr: convertArray(rResult) });
             }
         });
-        await Axios(
-            "GET", `/api_web/api_return_order/searchReturnOrder?csrf_protection=true`, {},
-            (err, response) => {
-                if (!err) {
-                    let { data } = response.data;
-                    queryState({ listCode: data?.return_order.map((e) => ({ label: e.reference_no, value: e.id })) });
-                }
+        await Axios("GET", `/api_web/api_return_order/searchReturnOrder?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                let { data } = response.data;
+                queryState({ listCode: data?.return_order.map((e) => ({ label: e.reference_no, value: e.id })) });
             }
-        );
+        });
         await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 let { data } = response?.data;
                 queryState({ listClient: convertArray(data?.clients) });
             }
-        })
+        });
         queryState({ onFetchingFilter: false });
     };
 
     const handleSearchCodesApi = debounce((inputValue) => {
-        Axios("GET", `/api_web/api_return_order/searchReturnOrder?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/api_return_order/searchReturnOrder?csrf_protection=true`,
             {
                 data: { term: inputValue },
             },
@@ -217,31 +224,36 @@ const Index = (props) => {
                 }
             }
         );
-    }, 500)
+    }, 500);
 
     const handleSearchClientsApi = debounce((value) => {
-        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
-            params: {
-                search: value ? value : "",
+        Axios(
+            "GET",
+            "/api_web/api_client/searchClients?csrf_protection=true",
+            {
+                params: {
+                    search: value ? value : "",
+                },
             },
-        }, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                queryState({ listClient: convertArray(data?.clients) });
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+                    queryState({ listClient: convertArray(data?.clients) });
+                }
             }
-        })
-    }, 500)
+        );
+    }, 500);
 
     useEffect(() => {
         isState.onFetchingFilter && _ServerFetching_filter();
     }, [isState.onFetchingFilter]);
 
     useEffect(() => {
-        (isState.onFetching && _ServerFetching())
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        (isState.onFetchingGroup && _ServerFetching_group());
+        isState.onFetchingGroup && _ServerFetching_group();
     }, [isState.onFetchingGroup]);
 
     useEffect(() => {
@@ -251,7 +263,6 @@ const Index = (props) => {
     useEffect(() => {
         queryState({ onFetchingGroup: true });
     }, [router.query?.page, router.query?.tab]);
-
 
     useEffect(() => {
         if (
@@ -267,10 +278,10 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                queryState({ onFetching: true, onFetchingGroup: true })
+                queryState({ onFetching: true, onFetchingGroup: true });
             }, 300);
         } else {
-            queryState({ onFetching: true, onFetchingGroup: true })
+            queryState({ onFetching: true, onFetchingGroup: true });
         }
     }, [
         limit,
@@ -284,16 +295,6 @@ const Index = (props) => {
 
     const onChangeFilter = (type, value) => queryState({ [type]: value });
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
-
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace({
@@ -304,7 +305,6 @@ const Index = (props) => {
         });
         queryState({ onFetching: true });
     }, 500);
-
 
     // excel
     const multiDataSet = [
@@ -436,7 +436,7 @@ const Index = (props) => {
                 checkedpost: isKeyState?.checkedUn,
             };
             sCheckedWare(dataChecked);
-            queryState({ data: [...isState.data] })
+            queryState({ data: [...isState.data] });
         }
 
         handleQueryId({ status: false });
@@ -466,13 +466,13 @@ const Index = (props) => {
                     if (isSuccess) {
                         isShow(alert_type, dataLang[message] || message);
                         setTimeout(() => {
-                            queryState({ onFetching: true })
+                            queryState({ onFetching: true });
                         }, 300);
                     } else {
                         isShow("error", dataLang[message] || message);
                     }
                     if (data_export?.length > 0) {
-                        queryState({ data_export: [...data_export] })
+                        queryState({ data_export: [...data_export] });
                     }
                 }
                 queryState({ onSending: false });
@@ -521,12 +521,11 @@ const Index = (props) => {
                                 <ButtonAddNew
                                     onClick={() => {
                                         if (role) {
-                                            router.push(routerReturnSales.form)
+                                            router.push(routerReturnSales.form);
                                         } else if (checkAdd) {
-                                            router.push(routerReturnSales.form)
-                                        }
-                                        else {
-                                            isShow("warning", WARNING_STATUS_ROLE)
+                                            router.push(routerReturnSales.form);
+                                        } else {
+                                            isShow("warning", WARNING_STATUS_ROLE);
                                         }
                                     }}
                                     dataLang={dataLang}
@@ -557,21 +556,29 @@ const Index = (props) => {
                                         <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                             <div className="grid grid-cols-5 gap-2">
                                                 <div className="col-span-1">
-                                                    <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch.bind(this)} />
+                                                    <SearchComponent
+                                                        dataLang={dataLang}
+                                                        onChange={handleOnChangeKeySearch.bind(this)}
+                                                    />
                                                 </div>
                                                 <div className="col-span-1">
                                                     <SelectComponent
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                                label:
+                                                                    dataLang?.price_quote_branch ||
+                                                                    "price_quote_branch",
                                                                 isDisabled: true,
                                                             },
                                                             ...isState.listBr,
                                                         ]}
                                                         onChange={onChangeFilter.bind(this, "idBranch")}
                                                         value={isState.idBranch}
-                                                        placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
+                                                        placeholder={
+                                                            dataLang?.price_quote_select_branch ||
+                                                            "price_quote_select_branch"
+                                                        }
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20"
@@ -582,7 +589,9 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
+                                                                label:
+                                                                    dataLang?.purchase_order_table_code ||
+                                                                    "purchase_order_table_code",
                                                                 isDisabled: true,
                                                             },
                                                             ...isState.listCode,
@@ -590,7 +599,10 @@ const Index = (props) => {
                                                         onInputChange={handleSearchCodesApi.bind(this)}
                                                         onChange={onChangeFilter.bind(this, "idCode")}
                                                         value={isState.idCode}
-                                                        placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
+                                                        placeholder={
+                                                            dataLang?.purchase_order_table_code ||
+                                                            "purchase_order_table_code"
+                                                        }
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                     />
@@ -600,7 +612,9 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: dataLang?.price_quote_select_customer || "price_quote_select_customer",
+                                                                label:
+                                                                    dataLang?.price_quote_select_customer ||
+                                                                    "price_quote_select_customer",
                                                                 isDisabled: true,
                                                             },
                                                             ...isState.listClient,
@@ -608,13 +622,18 @@ const Index = (props) => {
                                                         onInputChange={handleSearchClientsApi.bind(this)}
                                                         onChange={onChangeFilter.bind(this, "idClient")}
                                                         value={isState.idClient}
-                                                        placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
+                                                        placeholder={
+                                                            dataLang?.price_quote_customer || "price_quote_customer"
+                                                        }
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                     />
                                                 </div>
                                                 <div className="z-20 col-span-1">
-                                                    <DateToDateComponent value={isState.valueDate} onChange={onChangeFilter.bind(this, "valueDate")} />
+                                                    <DateToDateComponent
+                                                        value={isState.valueDate}
+                                                        onChange={onChangeFilter.bind(this, "valueDate")}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -622,17 +641,33 @@ const Index = (props) => {
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
                                                 <div>
-                                                    {(role == true || checkExport) ?
+                                                    {role == true || checkExport ? (
                                                         <div className={``}>
                                                             {isState.dataExcel?.length > 0 && (
-                                                                <ExcelFileComponent classBtn="!px-1" filename={dataLang?.returnSales_titleEx || "returnSales_titleEx"} title={"DSTLHB"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
+                                                                <ExcelFileComponent
+                                                                    classBtn="!px-1"
+                                                                    filename={
+                                                                        dataLang?.returnSales_titleEx ||
+                                                                        "returnSales_titleEx"
+                                                                    }
+                                                                    title={"DSTLHB"}
+                                                                    multiDataSet={multiDataSet}
+                                                                    dataLang={dataLang}
+                                                                />
+                                                            )}
                                                         </div>
-                                                        :
-                                                        <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                            <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                            className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                        >
+                                                            <Grid6
+                                                                className="2xl:scale-100 xl:scale-100 scale-75"
+                                                                size={18}
+                                                            />
                                                             <span>{dataLang?.client_list_exportexcel}</span>
                                                         </button>
-                                                    }
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
@@ -644,34 +679,34 @@ const Index = (props) => {
                                 <Customscrollbar>
                                     <div className="w-[100%] lg:w-[100%] ">
                                         <HeaderTable gridCols={10}>
-                                            <ColumnTable textAlign='center' colSpan={1}>
+                                            <ColumnTable textAlign="center" colSpan={1}>
                                                 {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.returnSales_client || "returnSales_client"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.import_total_amount || "import_total_amount"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.import_tax_money || "import_tax_money"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.import_into_money || "import_into_money"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.returns_form || "returns_form"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.import_branch || "import_branch"}
                                             </ColumnTable>
-                                            <ColumnTable textAlign={'center'} colSpan={1}>
+                                            <ColumnTable textAlign={"center"} colSpan={1}>
                                                 {dataLang?.import_action || "import_action"}
                                             </ColumnTable>
                                         </HeaderTable>
@@ -682,36 +717,49 @@ const Index = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                     {isState?.data?.map((e) => (
                                                         <RowTable gridCols={10} key={e.id.toString()}>
-                                                            <RowItemTable textAlign={'center'} colSpan={1}>
+                                                            <RowItemTable textAlign={"center"} colSpan={1}>
                                                                 {e?.date != null
                                                                     ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 <PopupDetail
                                                                     dataLang={dataLang}
-                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer " name={e?.code}
+                                                                    className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer "
+                                                                    name={e?.code}
                                                                     id={e?.id}
                                                                 />
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 {e.client_name}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            <RowItemTable colSpan={1} textAlign={"right"}>
                                                                 {formatMoney(e.total_price)}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            <RowItemTable colSpan={1} textAlign={"right"}>
                                                                 {formatMoney(e.total_tax_price)}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            <RowItemTable colSpan={1} textAlign={"right"}>
                                                                 {formatMoney(e.total_amount)}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className=" mx-auto">
                                                                 {(e?.handling_solution === "pay_down" && (
-                                                                    <TagColorSky className={'!py-1'} name={dataLang[e?.handling_solution] || e?.handling_solution} />
+                                                                    <TagColorSky
+                                                                        className={"!py-1"}
+                                                                        name={
+                                                                            dataLang[e?.handling_solution] ||
+                                                                            e?.handling_solution
+                                                                        }
+                                                                    />
                                                                 )) ||
                                                                     (e?.handling_solution === "debt_reduction" && (
-                                                                        <TagColorOrange className={'!py-1'} name={dataLang[e?.handling_solution] || e?.handling_solution} />
+                                                                        <TagColorOrange
+                                                                            className={"!py-1"}
+                                                                            name={
+                                                                                dataLang[e?.handling_solution] ||
+                                                                                e?.handling_solution
+                                                                            }
+                                                                        />
                                                                     ))}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1}>
@@ -722,9 +770,7 @@ const Index = (props) => {
                                                                 />
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className="w-fit mx-auto">
-                                                                <TagBranch>
-                                                                    {e?.branch_name}
-                                                                </TagBranch>
+                                                                <TagBranch>{e?.branch_name}</TagBranch>
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className="flex justify-center">
                                                                 <BtnAction
@@ -748,26 +794,23 @@ const Index = (props) => {
                                 </Customscrollbar>
                             </ContainerTable>
                         </div>
-                        <ContainerTotal className='!grid-cols-10'>
-                            <ColumnTable colSpan={3} textAlign={'center'} className="p-2">
+                        <ContainerTotal className="!grid-cols-10">
+                            <ColumnTable colSpan={3} textAlign={"center"} className="p-2">
                                 {dataLang?.import_total || "import_total"}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'right'}>
+                            <ColumnTable colSpan={1} textAlign={"right"}>
                                 {formatMoney(total?.total_price)}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'right'}>
+                            <ColumnTable colSpan={1} textAlign={"right"}>
                                 {formatMoney(total?.total_tax_price)}
                             </ColumnTable>
-                            <ColumnTable colSpan={1} textAlign={'right'}>
+                            <ColumnTable colSpan={1} textAlign={"right"}>
                                 {formatMoney(total?.total_amount)}
                             </ColumnTable>
                         </ContainerTotal>
                         {isState.data?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination
-                                    dataLang={dataLang}
-                                    totalItems={totalItems?.iTotalDisplayRecords}
-                                />
+                                <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -789,7 +832,7 @@ const Index = (props) => {
                 save={handleSaveStatus}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment >
+        </React.Fragment>
     );
 };
 

@@ -48,9 +48,15 @@ import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePag
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import {
+    Container,
+    ContainerBody,
+    ContainerFilterTab,
+    ContainerTable,
+    ContainerTotal,
+} from "@/components/UI/common/layout";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -77,11 +83,13 @@ const Index = (props) => {
 
     const isShow = useToast();
 
+    const { paginate } = usePagination();
+
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, "sales_product")
+    const { checkAdd, checkExport } = useActionRole(auth, "sales_product");
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
@@ -99,7 +107,7 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const [total, setTotal] = useState({});
 
@@ -121,7 +129,7 @@ const Index = (props) => {
         });
     }, []);
     useEffect(() => {
-        dataSeting?.tables_pagination_limit && sLimit(dataSeting?.tables_pagination_limit)
+        dataSeting?.tables_pagination_limit && sLimit(dataSeting?.tables_pagination_limit);
     }, [dataSeting?.tables_pagination_limit]);
 
     const _ServerFetching = () => {
@@ -146,7 +154,11 @@ const Index = (props) => {
             (err, response) => {
                 if (!err && response && response.data) {
                     let { rResult, output, rTotal } = response?.data;
-                    sInitData((e) => ({ ...e, data: rResult?.map((e) => ({ ...e, show: false })), dataExcel: rResult }));
+                    sInitData((e) => ({
+                        ...e,
+                        data: rResult?.map((e) => ({ ...e, show: false })),
+                        dataExcel: rResult,
+                    }));
                     sTotalItems(output);
                     setTotal(rTotal);
                     sOnFetching(false);
@@ -205,7 +217,6 @@ const Index = (props) => {
                     ...e,
                     listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
                 }));
-
             }
         });
 
@@ -213,40 +224,52 @@ const Index = (props) => {
     };
 
     const handleSearchApi = debounce((value) => {
-        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
-            params: {
-                search: value ? value : "",
+        Axios(
+            "GET",
+            "/api_web/api_client/searchClients?csrf_protection=true",
+            {
+                params: {
+                    search: value ? value : "",
+                },
             },
-        }, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                sInitData((e) => ({
-                    ...e,
-                    listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
-                }));
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+                    sInitData((e) => ({
+                        ...e,
+                        listCustomer: data?.clients?.map(({ name, id }) => ({ label: name, value: id })),
+                    }));
+                }
             }
-        }
-        )
-    }, 500)
+        );
+    }, 500);
 
     const handleSearchApiOrders = debounce((value) => {
-        Axios("GET", `/api_web/api_sale_order/searchOrders?csrf_protection=true`, {
-            params: {
-                search: value ? value : "",
+        Axios(
+            "GET",
+            `/api_web/api_sale_order/searchOrders?csrf_protection=true`,
+            {
+                params: {
+                    search: value ? value : "",
+                },
             },
-        }, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                sInitData((e) => ({
-                    ...e,
-                    listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({ label: reference_no, value: id })),
-                }));
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+                    sInitData((e) => ({
+                        ...e,
+                        listQuoteCode: data?.orders?.map(({ reference_no, id }) => ({
+                            label: reference_no,
+                            value: id,
+                        })),
+                    }));
+                }
             }
-        });
-    }, 500)
+        );
+    }, 500);
 
     useEffect(() => {
-        (onFetching && _ServerFetching())
+        onFetching && _ServerFetching();
     }, [onFetching]);
 
     useEffect(() => {
@@ -254,19 +277,25 @@ const Index = (props) => {
     }, [onFetching_filter]);
 
     useEffect(() => {
-        sOnFetchingGroup(true)
-    }, [valueChange.idBranch, valueChange.idQuoteCode, valueChange.idCustomer, valueChange.valueDate?.startDate, valueChange.valueDate?.endDate])
+        sOnFetchingGroup(true);
+    }, [
+        valueChange.idBranch,
+        valueChange.idQuoteCode,
+        valueChange.idCustomer,
+        valueChange.valueDate?.startDate,
+        valueChange.valueDate?.endDate,
+    ]);
 
     useEffect(() => {
-        onFetchingGroup && _ServerFetching_group()
-    }, [onFetchingGroup])
+        onFetchingGroup && _ServerFetching_group();
+    }, [onFetchingGroup]);
 
     useEffect(() => {
-        sOnFetching_filter(true)
-    }, [])
+        sOnFetching_filter(true);
+    }, []);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true))
+        router.query.tab && sOnFetching(true);
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
@@ -305,16 +334,6 @@ const Index = (props) => {
 
     const onChangeFilter = (type) => (event) => sValueChange((e) => ({ ...e, [type]: event }));
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
-
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace({
@@ -327,8 +346,8 @@ const Index = (props) => {
     }, 500);
 
     const formatNumber = (number) => {
-        const money = formatMoney(+number, dataSeting)
-        return money
+        const money = formatMoney(+number, dataSeting);
+        return money;
     };
     // excel
     const multiDataSet = [
@@ -446,10 +465,11 @@ const Index = (props) => {
                 },
                 { value: `${e?.staff_name ? e?.staff_name : ""}` },
                 {
-                    value: `${e?.status
-                        ? (e?.status === "un_approved" && "Chưa duyệt") || (e?.status === "approved" && "Đã duyệt")
-                        : ""
-                        }`,
+                    value: `${
+                        e?.status
+                            ? (e?.status === "un_approved" && "Chưa duyệt") || (e?.status === "approved" && "Đã duyệt")
+                            : ""
+                    }`,
                 },
                 { value: `${e?.process ? e?.process : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -492,7 +512,10 @@ const Index = (props) => {
                     let { isSuccess, message } = response.data;
 
                     if (isSuccess) {
-                        isShow("success", `${dataLang?.change_status_when_order || "change_status_when_order"}` || message);
+                        isShow(
+                            "success",
+                            `${dataLang?.change_status_when_order || "change_status_when_order"}` || message
+                        );
                     } else {
                         isShow("error", `${dataLang[message] || message}` || message);
                     }
@@ -513,13 +536,10 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.sales_product_list || "sales_product_list"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.sales_product_list || "sales_product_list"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.sales_product_list || "sales_product_list"}</h6>
                     </div>
-
                 )}
 
                 <ContainerBody>
@@ -532,12 +552,11 @@ const Index = (props) => {
                                 <ButtonAddNew
                                     onClick={() => {
                                         if (role) {
-                                            router.push(routerSalesOrder.form)
+                                            router.push(routerSalesOrder.form);
                                         } else if (checkAdd) {
-                                            router.push(routerSalesOrder.form)
-                                        }
-                                        else {
-                                            isShow("warning", WARNING_STATUS_ROLE)
+                                            router.push(routerSalesOrder.form);
+                                        } else {
+                                            isShow("warning", WARNING_STATUS_ROLE);
                                         }
                                     }}
                                     dataLang={dataLang}
@@ -574,7 +593,10 @@ const Index = (props) => {
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
                                             <div className="col-span-1">
-                                                <SearchComponent dataLang={dataLang} onChange={handleOnChangeKeySearch} />
+                                                <SearchComponent
+                                                    dataLang={dataLang}
+                                                    onChange={handleOnChangeKeySearch}
+                                                />
                                             </div>
                                             <div className="col-span-1">
                                                 <SelectComponent
@@ -606,9 +628,7 @@ const Index = (props) => {
                                                     onChange={onChangeFilter("idQuoteCode")}
                                                     onInputChange={handleSearchApiOrders}
                                                     value={valueChange.idQuoteCode}
-                                                    placeholder={
-                                                        dataLang?.sales_product_code || "sales_product_code"
-                                                    }
+                                                    placeholder={dataLang?.sales_product_code || "sales_product_code"}
                                                     isClearable={true}
                                                 />
                                             </div>
@@ -617,7 +637,9 @@ const Index = (props) => {
                                                     options={[
                                                         {
                                                             value: "",
-                                                            label: dataLang?.price_quote_customer || "price_quote_customer",
+                                                            label:
+                                                                dataLang?.price_quote_customer ||
+                                                                "price_quote_customer",
                                                             isDisabled: true,
                                                         },
                                                         ...initData.listCustomer,
@@ -625,30 +647,43 @@ const Index = (props) => {
                                                     onInputChange={handleSearchApi}
                                                     onChange={onChangeFilter("idCustomer")}
                                                     value={valueChange.idCustomer}
-                                                    placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
+                                                    placeholder={
+                                                        dataLang?.price_quote_customer || "price_quote_customer"
+                                                    }
                                                     isClearable={true}
                                                 />
                                             </div>
                                             <div className="z-20 col-span-1">
-                                                <DateToDateComponent value={valueChange.valueDate} onChange={onChangeFilter("valueDate")} />
+                                                <DateToDateComponent
+                                                    value={valueChange.valueDate}
+                                                    onChange={onChangeFilter("valueDate")}
+                                                />
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={sOnFetching} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {initData.dataExcel?.length > 0 && (
-                                                        <ExcelFileComponent dataLang={dataLang} filename="Danh sách đơn hàng bán" title="DSĐHB" multiDataSet={multiDataSet} />
+                                                        <ExcelFileComponent
+                                                            dataLang={dataLang}
+                                                            filename="Danh sách đơn hàng bán"
+                                                            title="DSĐHB"
+                                                            multiDataSet={multiDataSet}
+                                                        />
                                                     )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -661,34 +696,35 @@ const Index = (props) => {
                             <Customscrollbar className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px]">
                                 <div className="w-full">
                                     <HeaderTable gridCols={13}>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_date || "sales_product_date"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_code || "sales_product_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'left'}>
+                                        <ColumnTable colSpan={1} textAlign={"left"}>
                                             {dataLang?.customer || "customer"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_type_order || "sales_product_type_order"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.sales_product_total_into_money ||
+                                                "sales_product_total_into_money"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_status || "sales_product_status"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_statusTT || "sales_product_statusTT"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.branch || "branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={4} textAlign={'center'}>
+                                        <ColumnTable colSpan={4} textAlign={"center"}>
                                             {dataLang?.sales_product_order_process || "sales_product_order_process"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.sales_product_action || "sales_product_action"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -701,25 +737,26 @@ const Index = (props) => {
                                                 {initData.data?.map((e) => (
                                                     <>
                                                         <RowTable gridCols={13} key={e.id.toString()}>
-                                                            <RowItemTable colSpan={1} textAlign='center'>
+                                                            <RowItemTable colSpan={1} textAlign="center">
                                                                 {e?.date != null
                                                                     ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 <PopupDetailProduct
                                                                     dataLang={dataLang}
-                                                                    className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer" name={e?.code ? e?.code : ""}
+                                                                    className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
+                                                                    name={e?.code ? e?.code : ""}
                                                                     id={e?.id}
                                                                 />
                                                             </RowItemTable>
 
-                                                            <RowItemTable colSpan={1} textAlign='left'>
+                                                            <RowItemTable colSpan={1} textAlign="left">
                                                                 {e?.client_name}
                                                             </RowItemTable>
 
                                                             {/* fix */}
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 {e?.quote_code !== null && e?.quote_id !== "0" ? (
                                                                     // <div className="border  rounded-xl mx-auto w-2/3 group bg-lime-200 border-lime-200 text-lime-500">
                                                                     <Zoom
@@ -751,11 +788,11 @@ const Index = (props) => {
                                                                     </div>
                                                                 )}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                                            <RowItemTable colSpan={1} textAlign={"right"}>
                                                                 {formatNumber(e.total_amount)}
                                                             </RowItemTable>
 
-                                                            <RowItemTable colSpan={1} textAlign={'center'}>
+                                                            <RowItemTable colSpan={1} textAlign={"center"}>
                                                                 <h6 className="flex items-center justify-center text-center cursor-pointer">
                                                                     {(e?.status === "approved" && (
                                                                         <BtnStatusApproved
@@ -780,33 +817,44 @@ const Index = (props) => {
                                                                                 }
                                                                                 type="0"
                                                                             />
-
                                                                         ))}
                                                                 </h6>
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
-                                                                {(["payment_unpaid"].includes(
-                                                                    e?.status_payment
-                                                                ) && (
-                                                                        <TagColorSky className={''} name={dataLang[e?.status_payment] || e?.status_payment} />
-                                                                    )) ||
+                                                            <RowItemTable
+                                                                colSpan={1}
+                                                                className={"flex items-center justify-center"}
+                                                            >
+                                                                {(["payment_unpaid"].includes(e?.status_payment) && (
+                                                                    <TagColorSky
+                                                                        className={""}
+                                                                        name={
+                                                                            dataLang[e?.status_payment] ||
+                                                                            e?.status_payment
+                                                                        }
+                                                                    />
+                                                                )) ||
                                                                     (["payment_partially_paid"].includes(
                                                                         e?.status_payment
                                                                     ) && (
-                                                                            <TagColorOrange className={''} name={`${dataLang[e?.status_payment] ||
-                                                                                e?.status_payment} (${formatNumber(e?.total_payment)})`} />
-                                                                        )) ||
-                                                                    (["payment_paid"].includes(
-                                                                        e?.status_payment
-                                                                    ) && (
-                                                                            <TagColorLime name={dataLang[e?.status_payment] || e?.status_payment} />
-
-                                                                        ))}
+                                                                        <TagColorOrange
+                                                                            className={""}
+                                                                            name={`${
+                                                                                dataLang[e?.status_payment] ||
+                                                                                e?.status_payment
+                                                                            } (${formatNumber(e?.total_payment)})`}
+                                                                        />
+                                                                    )) ||
+                                                                    (["payment_paid"].includes(e?.status_payment) && (
+                                                                        <TagColorLime
+                                                                            name={
+                                                                                dataLang[e?.status_payment] ||
+                                                                                e?.status_payment
+                                                                            }
+                                                                        />
+                                                                    ))}
                                                             </RowItemTable>
                                                             <RowItemTable colSpan={1} className="w-fit mx-auto">
-                                                                <TagBranch>
-                                                                    {e?.branch_name}
-                                                                </TagBranch>
+                                                                <TagBranch>{e?.branch_name}</TagBranch>
                                                             </RowItemTable>
 
                                                             <RowItemTable colSpan={4}>
@@ -819,9 +867,9 @@ const Index = (props) => {
                                                                             "delivery",
                                                                         ].includes(item?.code);
 
-                                                                        const isValueDelivery = [
-                                                                            "delivery",
-                                                                        ].includes(item?.code);
+                                                                        const isValueDelivery = ["delivery"].includes(
+                                                                            item?.code
+                                                                        );
 
                                                                         return (
                                                                             <>
@@ -833,58 +881,63 @@ const Index = (props) => {
                                                                                         "keep_stock",
                                                                                         "import_outsourcing",
                                                                                     ].includes(item?.code) && (
-                                                                                            <>
-                                                                                                <div className="flex items-center">
-                                                                                                    <div
-                                                                                                        className={`${item?.active
+                                                                                        <>
+                                                                                            <div className="flex items-center">
+                                                                                                <div
+                                                                                                    className={`${
+                                                                                                        item?.active
                                                                                                             ? `h-2 w-2 rounded-full bg-green-500`
                                                                                                             : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                            } `}
-                                                                                                    />
-                                                                                                    {!isValueDelivery && (
-                                                                                                        <div
-                                                                                                            className={`${item?.active
+                                                                                                    } `}
+                                                                                                />
+                                                                                                {!isValueDelivery && (
+                                                                                                    <div
+                                                                                                        className={`${
+                                                                                                            item?.active
                                                                                                                 ? `w-full bg-green-500 h-0.5 `
                                                                                                                 : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                                }`}
-                                                                                                        />
-                                                                                                    )}
-                                                                                                </div>
-                                                                                                <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
-                                                                                                    <div
-                                                                                                        className={`${item?.active
+                                                                                                        }`}
+                                                                                                    />
+                                                                                                )}
+                                                                                            </div>
+                                                                                            <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
+                                                                                                <div
+                                                                                                    className={`${
+                                                                                                        item?.active
                                                                                                             ? "text-green-500"
                                                                                                             : "text-slate-500"
-                                                                                                            } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                    >
-                                                                                                        <div className="flex justify-center items-center w-full gap-1">
-                                                                                                            <h6>
-                                                                                                                {
-                                                                                                                    dataLang[
+                                                                                                    } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                                                                                >
+                                                                                                    <div className="flex justify-center items-center w-full gap-1">
+                                                                                                        <h6>
+                                                                                                            {
+                                                                                                                dataLang[
                                                                                                                     item
                                                                                                                         ?.name
-                                                                                                                    ]
-                                                                                                                }
-                                                                                                            </h6>
-                                                                                                            {isValueDelivery && (
-                                                                                                                <h6
-                                                                                                                    className={`${item?.active &&
-                                                                                                                        isValueDelivery
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        </h6>
+                                                                                                        {isValueDelivery && (
+                                                                                                            <h6
+                                                                                                                className={`${
+                                                                                                                    item?.active &&
+                                                                                                                    isValueDelivery
                                                                                                                         ? "text-green-500"
                                                                                                                         : "text-orange-500"
-                                                                                                                        } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
-                                                                                                                >{`(${dataLang[
+                                                                                                                } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                                                                            >{`(${
+                                                                                                                dataLang[
                                                                                                                     item
                                                                                                                         ?.status
                                                                                                                 ] ||
-                                                                                                                    item?.status
-                                                                                                                    })`}</h6>
-                                                                                                            )}
-                                                                                                        </div>
+                                                                                                                item?.status
+                                                                                                            })`}</h6>
+                                                                                                        )}
                                                                                                     </div>
                                                                                                 </div>
-                                                                                            </>
-                                                                                        )}
+                                                                                            </div>
+                                                                                        </>
+                                                                                    )}
                                                                                     <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
                                                                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
                                                                                         {isValue &&
@@ -894,27 +947,21 @@ const Index = (props) => {
                                                                                                     0,
                                                                                                     isExpanded
                                                                                                         ? item
-                                                                                                            ?.reference
-                                                                                                            .length
+                                                                                                              ?.reference
+                                                                                                              .length
                                                                                                         : 2
                                                                                                 )
-                                                                                                .map(
-                                                                                                    (ci, index) => (
-                                                                                                        <div
-                                                                                                            className="flex-col flex"
-                                                                                                            key={
-                                                                                                                index
-                                                                                                            }
-                                                                                                        >
-                                                                                                            {
-                                                                                                                ci?.code
-                                                                                                            }
-                                                                                                        </div>
-                                                                                                    )
-                                                                                                )}
+                                                                                                .map((ci, index) => (
+                                                                                                    <div
+                                                                                                        className="flex-col flex"
+                                                                                                        key={index}
+                                                                                                    >
+                                                                                                        {ci?.code}
+                                                                                                    </div>
+                                                                                                ))}
                                                                                         {item?.reference &&
                                                                                             item?.reference.length >
-                                                                                            2 && (
+                                                                                                2 && (
                                                                                                 <button
                                                                                                     onClick={
                                                                                                         toggleShowAll
@@ -932,7 +979,7 @@ const Index = (props) => {
                                                                     })}
                                                                 </div>
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={1} >
+                                                            <RowItemTable colSpan={1}>
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     dataLang={dataLang}
@@ -953,20 +1000,17 @@ const Index = (props) => {
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
-                    <ContainerTotal className={'grid-cols-12'}>
+                    <ContainerTotal className={"grid-cols-12"}>
                         <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
                             {dataLang?.total_outside || "total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'right'} className="ustify-end pr-4 flex gap-2 flex-wrap ">
+                        <ColumnTable colSpan={2} textAlign={"right"} className="ustify-end pr-4 flex gap-2 flex-wrap ">
                             {formatNumber(total?.total_amount)}
                         </ColumnTable>
                     </ContainerTotal>
                     {initData.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -988,7 +1032,7 @@ const Index = (props) => {
                 save={toggleStatus}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment >
+        </React.Fragment>
     );
 };
 

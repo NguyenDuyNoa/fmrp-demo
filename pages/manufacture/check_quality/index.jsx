@@ -30,6 +30,7 @@ import { Grid6 } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import PopupCheckQuality from "./components/popup";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const router = useRouter();
@@ -50,6 +51,8 @@ const Index = (props) => {
         dataBranch: [],
     };
     const [isState, sIsState] = useState(initilaState);
+
+    const { paginate } = usePagination();
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
@@ -87,13 +90,6 @@ const Index = (props) => {
     useEffect(() => {
         fetchBranch();
     }, []);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: "/manufacture/category_errors",
-            query: { page: pageNumber },
-        });
-    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -176,11 +172,6 @@ const Index = (props) => {
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
                                 {"Kiểm tra chất lượng"}
                             </h2>
-                            {/* <PopupCategoryErrors
-                                onRefresh={_ServerFetching.bind(this)}
-                                dataLang={dataLang}
-                                className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                            /> */}
                             <ButtonAddNew
                                 onClick={() => {
                                     // if (role) {

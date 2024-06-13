@@ -25,6 +25,7 @@ import Link from "next/link";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import usePagination from "@/hooks/usePagination";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -39,6 +40,7 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Index = (props) => {
     const router = useRouter();
+    const { paginate } = usePagination();
     const dataLang = props.dataLang;
     const id = router.query.slug;
     const [data, sData] = useState([]);
@@ -154,15 +156,6 @@ const Index = (props) => {
             (idVariantMain?.length > 0 && sOnFetching(true)) ||
             (idVariantSub?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, idLocation, idVariantMain, idVariantSub]);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            query: {
-                page: pageNumber,
-                slug: router.query.slug,
-            },
-        });
-    };
 
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);

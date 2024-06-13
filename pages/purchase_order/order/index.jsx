@@ -44,7 +44,13 @@ import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePag
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import {
+    Container,
+    ContainerBody,
+    ContainerFilterTab,
+    ContainerTable,
+    ContainerTotal,
+} from "@/components/UI/common/layout";
 
 import useActionRole from "@/hooks/useRole";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -55,16 +61,19 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
+    const { paginate } = usePagination();
+
     const statusExprired = useStatusExprired();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const [total, sTotal] = useState({});
 
@@ -87,9 +96,8 @@ const Index = (props) => {
         valueDate: {
             startDate: null,
             endDate: null,
-        }
-    }
-
+        },
+    };
 
     const [isState, sIsState] = useState(initalState);
 
@@ -97,9 +105,7 @@ const Index = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, "order")
-
-
+    const { checkAdd, checkExport } = useActionRole(auth, "order");
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -118,7 +124,9 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        Axios("GET", `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`,
             {
                 params: {
                     search: isState.keySearch,
@@ -136,18 +144,20 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     const { rResult, output, rTotal } = response.data;
-                    queryState({ data: rResult, dataExcel: rResult })
+                    queryState({ data: rResult, dataExcel: rResult });
                     sTotalItems(output);
                     sTotal(rTotal);
                 }
                 queryState({
-                    onFetching: false
-                })
+                    onFetching: false,
+                });
             }
         );
     };
     const _ServerFetching_group = () => {
-        Axios("GET", `/api_web/Api_purchase_order/filterBar/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_purchase_order/filterBar/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -203,11 +213,11 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        isState.onFetching && _ServerFetching()
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        (isState.onFetchingGr && _ServerFetching_group());
+        isState.onFetchingGr && _ServerFetching_group();
     }, [isState.onFetchingGr]);
 
     useEffect(() => {
@@ -228,28 +238,16 @@ const Index = (props) => {
         isState.valueDate.startDate,
     ]);
 
-
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
-
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        queryState({ keySearch: value })
+        queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true, });
-    }, 500)
+        queryState({ onFetching: true });
+    }, 500);
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
@@ -257,7 +255,7 @@ const Index = (props) => {
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
-    }
+    };
 
     const multiDataSet = [
         {
@@ -369,12 +367,13 @@ const Index = (props) => {
                     value: `${e?.order_type ? (e?.order_type == "0" ? "Tạo mới" : "Theo YCHM") : ""}`,
                 },
                 {
-                    value: `${e?.purchases
-                        ? e?.purchases?.map((e) => {
-                            return e?.code;
-                        })
-                        : ""
-                        }`,
+                    value: `${
+                        e?.purchases
+                            ? e?.purchases?.map((e) => {
+                                  return e?.code;
+                              })
+                            : ""
+                    }`,
                 },
                 {
                     value: `${e?.total_price ? formatMoney(e?.total_price) : ""}`,
@@ -387,12 +386,13 @@ const Index = (props) => {
                 },
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
-                    value: `${e?.status_pay
-                        ? (e?.status_pay === "0" && "Chưa nhập") ||
-                        (e?.status_pay === "1" && "Nhập 1 phần") ||
-                        (e?.status_pay === "2" && "Đã nhập đủ đủ")
-                        : ""
-                        }`,
+                    value: `${
+                        e?.status_pay
+                            ? (e?.status_pay === "0" && "Chưa nhập") ||
+                              (e?.status_pay === "1" && "Nhập 1 phần") ||
+                              (e?.status_pay === "2" && "Đã nhập đủ đủ")
+                            : ""
+                    }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -410,9 +410,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.purchase_purchase || "purchase_purchase"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.purchase_purchase || "purchase_purchase"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.purchase_order || "purchase_order"}</h6>
                     </div>
@@ -426,12 +424,11 @@ const Index = (props) => {
                             <button
                                 onClick={() => {
                                     if (role) {
-                                        router.push(routerOrder.form)
+                                        router.push(routerOrder.form);
                                     } else if (checkAdd) {
-                                        router.push(routerOrder.form)
-                                    }
-                                    else {
-                                        isShow("warning", WARNING_STATUS_ROLE)
+                                        router.push(routerOrder.form);
+                                    } else {
+                                        isShow("warning", WARNING_STATUS_ROLE);
                                     }
                                 }}
                                 type="button"
@@ -468,19 +465,29 @@ const Index = (props) => {
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-6 gap-2">
-                                            <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={_HandleOnChangeKeySearch.bind(this)} />
+                                            <SearchComponent
+                                                colSpan={1}
+                                                dataLang={dataLang}
+                                                placeholder={dataLang?.branch_search}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                            />
                                             <SelectComponent
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
+                                                        label:
+                                                            dataLang?.purchase_order_table_branch ||
+                                                            "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
                                                 ]}
                                                 onChange={(e) => queryState({ valueBr: e })}
                                                 value={isState.valueBr}
-                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                                                placeholder={
+                                                    dataLang?.purchase_order_table_branch ||
+                                                    "purchase_order_table_branch"
+                                                }
                                                 hideSelectedOptions={false}
                                                 isClearable={true}
                                                 colSpan={1}
@@ -489,14 +496,18 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_table_code || "purchase_order_table_code",
+                                                        label:
+                                                            dataLang?.purchase_order_table_code ||
+                                                            "purchase_order_table_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listCode,
                                                 ]}
                                                 onChange={(e) => queryState({ valueCode: e })}
                                                 value={isState.valueCode}
-                                                placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"}
+                                                placeholder={
+                                                    dataLang?.purchase_order_table_code || "purchase_order_table_code"
+                                                }
                                                 hideSelectedOptions={false}
                                                 isClearable={true}
                                                 colSpan={1}
@@ -505,14 +516,19 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier",
+                                                        label:
+                                                            dataLang?.purchase_order_table_supplier ||
+                                                            "purchase_order_table_supplier",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listSupplier,
                                                 ]}
                                                 onChange={(e) => queryState({ valueSupplier: e })}
                                                 value={isState.valueSupplier}
-                                                placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
+                                                placeholder={
+                                                    dataLang?.purchase_order_table_supplier ||
+                                                    "purchase_order_table_supplier"
+                                                }
                                                 hideSelectedOptions={false}
                                                 isClearable={true}
                                                 isSearchable={true}
@@ -535,41 +551,49 @@ const Index = (props) => {
                                                 colSpan={1}
                                             />
                                             <div className="z-20 col-span-1">
-                                                <DateToDateComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
+                                                <DateToDateComponent
+                                                    value={isState.valueDate}
+                                                    onChange={(e) => queryState({ valueDate: e })}
+                                                />
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
-                                                        <ExcelFileComponent dataLang={dataLang}
+                                                        <ExcelFileComponent
+                                                            dataLang={dataLang}
                                                             filename="Danh sách yêu cầu mua hàng"
                                                             title="DSYCMH"
                                                             multiDataSet={multiDataSet}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
                             <Customscrollbar>
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
-                                        <ColumnTable colSpan={1} textAlign='center'>
-                                            {dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}
+                                        <ColumnTable colSpan={1} textAlign="center">
+                                            {dataLang?.purchase_order_table_dayvoucers ||
+                                                "purchase_order_table_dayvoucers"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_code || "purchase_order_table_code"}
@@ -578,7 +602,8 @@ const Index = (props) => {
                                             {dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}
+                                            {dataLang?.purchase_order_table_ordertype ||
+                                                "purchase_order_table_ordertype"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_table_number || "purchase_order_table_number"}
@@ -590,10 +615,12 @@ const Index = (props) => {
                                             {dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}
+                                            {dataLang?.purchase_order_table_intoMoney ||
+                                                "purchase_order_table_intoMoney"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}
+                                            {dataLang?.purchase_order_table_importStatus ||
+                                                "purchase_order_table_importStatus"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_order_note || "purchase_order_note"}
@@ -602,7 +629,8 @@ const Index = (props) => {
                                             {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}
+                                            {dataLang?.purchase_order_table_operations ||
+                                                "purchase_order_table_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
                                     {isState.onFetching ? (
@@ -611,49 +639,60 @@ const Index = (props) => {
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                             {isState.data?.map((e) => (
                                                 <RowTable key={e?.id} gridCols={12}>
-                                                    <RowItemTable colSpan={1} textAlign='center'>
+                                                    <RowItemTable colSpan={1} textAlign="center">
                                                         {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1}>
                                                         <Popup_chitiet
                                                             dataLang={dataLang}
-                                                            className="3xl:text-base 2xl:text-[12.5px] hover:text-blue-600 transition-all ease-in-out xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer" name={e?.code}
+                                                            className="3xl:text-base 2xl:text-[12.5px] hover:text-blue-600 transition-all ease-in-out xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer"
+                                                            name={e?.code}
                                                             id={e?.id}
                                                         />
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign='left'>
+                                                    <RowItemTable colSpan={1} textAlign="left">
                                                         {e.supplier_name}
-                                                    </RowItemTable >
-                                                    <RowItemTable colSpan={1} className={'flex justify-center text-center'}>
+                                                    </RowItemTable>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className={"flex justify-center text-center"}
+                                                    >
                                                         {e?.order_type == "0" ? (
-                                                            <TagColorRed name={'Tạo mới'} />
+                                                            <TagColorRed name={"Tạo mới"} />
                                                         ) : (
-                                                            <TagColorOrange name={'YCMH'} />
+                                                            <TagColorOrange name={"YCMH"} />
                                                         )}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className={'flex-col items-center justify-center'}>
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className={"flex-col items-center justify-center"}
+                                                    >
                                                         {e?.purchases?.map((purchase, index) => (
                                                             <React.Fragment key={purchase.id}>
                                                                 {/* {index !== 0 && ","} */}
                                                                 <Popup_chitietThere
                                                                     dataLang={dataLang}
-                                                                    className="3xl:text-base 2xl:text-[12.5px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out" type={e?.order_type}
+                                                                    className="3xl:text-base 2xl:text-[12.5px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out"
+                                                                    type={e?.order_type}
                                                                     id={purchase.id}
                                                                     name={purchase.code}
                                                                 />
                                                             </React.Fragment>
                                                         ))}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
                                                         {formatMoney(e.total_price)}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
                                                         {formatMoney(e.total_tax_price)}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={'right'}>
+                                                    <RowItemTable colSpan={1} textAlign={"right"}>
                                                         {formatMoney(e.total_amount)}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} className="flex items-center justify-center text-center ">
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        className="flex items-center justify-center text-center "
+                                                    >
                                                         {(e?.import_status === "not_stocked" && (
                                                             <TagColorSky name={dataLang[e?.import_status]} />
                                                         )) ||
@@ -664,13 +703,15 @@ const Index = (props) => {
                                                                 <TagColorLime name={dataLang[e?.import_status]} />
                                                             ))}
                                                     </RowItemTable>
-                                                    <RowItemTable colSpan={1} textAlign={"text-left"} className="truncate ">
+                                                    <RowItemTable
+                                                        colSpan={1}
+                                                        textAlign={"text-left"}
+                                                        className="truncate "
+                                                    >
                                                         {e.note}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className="mx-auto">
-                                                        <TagBranch className='w-fit'>
-                                                            {e?.branch_name}
-                                                        </TagBranch>
+                                                        <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1} className=" flex justify-center">
                                                         <BtnAction
@@ -698,22 +739,31 @@ const Index = (props) => {
                         <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
                             {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap">
+                        <ColumnTable
+                            colSpan={1}
+                            textAlign={"right"}
+                            className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap"
+                        >
                             {formatMoney(total?.total_price)}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap ">
+                        <ColumnTable
+                            colSpan={1}
+                            textAlign={"right"}
+                            className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap "
+                        >
                             {formatMoney(total?.total_tax_price)}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap ">
+                        <ColumnTable
+                            colSpan={1}
+                            textAlign={"right"}
+                            className="justify-end mr-1.5 p-2 flex gap-2 flex-wrap "
+                        >
                             {formatMoney(total?.total_amount)}
                         </ColumnTable>
                     </ContainerTotal>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -727,6 +777,5 @@ const Index = (props) => {
         </React.Fragment>
     );
 };
-
 
 export default Index;

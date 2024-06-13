@@ -37,7 +37,13 @@ import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComp
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useActionRole from "@/hooks/useRole";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import {
+    Container,
+    ContainerBody,
+    ContainerFilterTab,
+    ContainerTable,
+    ContainerTotal,
+} from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import NoData from "@/components/UI/noData/nodata";
@@ -46,8 +52,8 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import usePagination from "@/hooks/usePagination";
 registerLocale("vi", vi);
-
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -56,7 +62,7 @@ const Index = (props) => {
 
     const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
@@ -64,9 +70,9 @@ const Index = (props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
-    const { checkAdd, checkExport } = useActionRole(auth, "price_quote")
+    const { checkAdd, checkExport } = useActionRole(auth, "price_quote");
 
     const initData = {
         data: [],
@@ -86,16 +92,17 @@ const Index = (props) => {
             endDate: null,
         },
         listTabStatus: [],
-    }
+    };
+    const { paginate } = usePagination();
 
-    const [isState, sIsState] = useState(initData)
+    const [isState, sIsState] = useState(initData);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const [total, sTotal] = useState({});
 
     const formatNumber = (number) => {
-        return formatMoney(+number, dataSeting)
+        return formatMoney(+number, dataSeting);
     };
 
     const _HandleSelectTab = (e) => {
@@ -166,16 +173,23 @@ const Index = (props) => {
 
     useEffect(() => {
         isState.onFetchingBar && _ServerFetching_group();
-    }, [isState.onFetchingBar])
+    }, [isState.onFetchingBar]);
 
     useEffect(() => {
         queryState({ onFetchingBar: true });
-    }, [limit, isState.idBranch, isState.idQuoteCode, isState.idCustomer, isState.valueDate.endDate, isState.valueDate.startDate])
+    }, [
+        limit,
+        isState.idBranch,
+        isState.idQuoteCode,
+        isState.idCustomer,
+        isState.valueDate.endDate,
+        isState.valueDate.startDate,
+    ]);
 
     // filter
     const convertArray = (arr) => {
         return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
-    }
+    };
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
@@ -185,7 +199,7 @@ const Index = (props) => {
         });
         Axios("GET", `/api_web/api_quotation/searchQuotes?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                const { data } = response.data
+                const { data } = response.data;
                 queryState({ listQuoteCode: data?.quotes?.map((e) => ({ label: e.reference_no, value: e.id })) || [] });
             }
         });
@@ -194,39 +208,48 @@ const Index = (props) => {
                 let { data } = response?.data;
                 queryState({ listCustomer: convertArray(data?.clients) });
             }
-        })
+        });
         queryState({ onFetching_filter: false });
     };
 
-
     const handleSearchClientsApi = debounce((value) => {
-        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
-            params: {
-                search: value ? value : "",
+        Axios(
+            "GET",
+            "/api_web/api_client/searchClients?csrf_protection=true",
+            {
+                params: {
+                    search: value ? value : "",
+                },
             },
-        }, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                queryState({ listCustomer: convertArray(data?.clients) });
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+                    queryState({ listCustomer: convertArray(data?.clients) });
+                }
             }
-        })
-    }, 500)
+        );
+    }, 500);
 
     const handleSearchApi = debounce((value) => {
-        Axios("GET", `/api_web/api_quotation/searchQuotes?csrf_protection=true`, {
-            params: {
-                search: value ? value : "",
+        Axios(
+            "GET",
+            `/api_web/api_quotation/searchQuotes?csrf_protection=true`,
+            {
+                params: {
+                    search: value ? value : "",
+                },
             },
-        }, (err, response) => {
-            if (!err) {
-                const { data } = response.data
-                queryState({ listQuoteCode: data?.quotes?.map((e) => ({ label: e.reference_no, value: e.id })) });
+            (err, response) => {
+                if (!err) {
+                    const { data } = response.data;
+                    queryState({ listQuoteCode: data?.quotes?.map((e) => ({ label: e.reference_no, value: e.id })) });
+                }
             }
-        })
-    }, 500)
+        );
+    }, 500);
 
     useEffect(() => {
-        (isState.onFetching && _ServerFetching())
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
@@ -234,7 +257,7 @@ const Index = (props) => {
     }, [isState.onFetching_filter]);
 
     useEffect(() => {
-        (router.query.tab && queryState({ onFetching: true }));
+        router.query.tab && queryState({ onFetching: true });
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
@@ -251,36 +274,31 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                queryState({ onFetching: true })
+                queryState({ onFetching: true });
             }, 300);
         } else {
-            queryState({ onFetching: true })
-
+            queryState({ onFetching: true });
         }
-    }, [limit, isState.idBranch, isState.idQuoteCode, isState.keySearch, isState.idCustomer, isState.valueDate.endDate, isState.valueDate.startDate]);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
+    }, [
+        limit,
+        isState.idBranch,
+        isState.idQuoteCode,
+        isState.keySearch,
+        isState.idCustomer,
+        isState.valueDate.endDate,
+        isState.valueDate.startDate,
+    ]);
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        queryState({ keySearch: value })
+        queryState({ keySearch: value });
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
             },
         });
-        queryState({ onFetching: true })
+        queryState({ onFetching: true });
     }, 500);
-
-
 
     // excel
     const multiDataSet = [
@@ -395,13 +413,14 @@ const Index = (props) => {
                 // order status chưa
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
-                    value: `${e?.status
-                        ? (e?.status === "not_confirmed" && "Chưa duyệt") ||
-                        (e?.status === "confirmed" && "Đã duyệt") ||
-                        (e?.status === "no_confirmed" && "Không duyệt") ||
-                        (e?.status === "ordered" && "Đã tạo đơn đặt hàng")
-                        : ""
-                        }`,
+                    value: `${
+                        e?.status
+                            ? (e?.status === "not_confirmed" && "Chưa duyệt") ||
+                              (e?.status === "confirmed" && "Đã duyệt") ||
+                              (e?.status === "no_confirmed" && "Không duyệt") ||
+                              (e?.status === "ordered" && "Đã tạo đơn đặt hàng")
+                            : ""
+                    }`,
                 },
 
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
@@ -480,14 +499,11 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.price_quote || "price_quote"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.price_quote || "price_quote"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.price_quote_list || "price_quote"}</h6>
                     </div>
                 )}
-
 
                 <ContainerBody>
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
@@ -498,12 +514,11 @@ const Index = (props) => {
                             <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
-                                        router.push(routerPriceQuote.form)
+                                        router.push(routerPriceQuote.form);
                                     } else if (checkAdd) {
-                                        router.push(routerPriceQuote.form)
-                                    }
-                                    else {
-                                        isShow("warning", WARNING_STATUS_ROLE)
+                                        router.push(routerPriceQuote.form);
+                                    } else {
+                                        isShow("warning", WARNING_STATUS_ROLE);
                                     }
                                 }}
                                 dataLang={dataLang}
@@ -534,7 +549,10 @@ const Index = (props) => {
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
                                             <div className="col-span-1">
-                                                <SearchComponent dataLang={dataLang} onChange={_HandleOnChangeKeySearch.bind(this)} />
+                                                <SearchComponent
+                                                    dataLang={dataLang}
+                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                />
                                             </div>
                                             <div className="col-span-1">
                                                 <SelectComponent
@@ -548,7 +566,8 @@ const Index = (props) => {
                                                     ]}
                                                     onChange={(e) => queryState({ idBranch: e })}
                                                     value={isState.idBranch}
-                                                    placeholder={dataLang?.price_quote_select_branch ||
+                                                    placeholder={
+                                                        dataLang?.price_quote_select_branch ||
                                                         "price_quote_select_branch"
                                                     }
                                                     isClearable={true}
@@ -560,7 +579,9 @@ const Index = (props) => {
                                                     options={[
                                                         {
                                                             value: "",
-                                                            label: dataLang?.price_quote_select_code || "price_quote_select_code",
+                                                            label:
+                                                                dataLang?.price_quote_select_code ||
+                                                                "price_quote_select_code",
                                                             isDisabled: true,
                                                         },
                                                         ...isState.listQuoteCode,
@@ -577,7 +598,9 @@ const Index = (props) => {
                                                     options={[
                                                         {
                                                             value: "",
-                                                            label: dataLang?.price_quote_select_customer || "price_quote_select_customer",
+                                                            label:
+                                                                dataLang?.price_quote_select_customer ||
+                                                                "price_quote_select_customer",
                                                             isDisabled: true,
                                                         },
                                                         ...isState.listCustomer,
@@ -592,24 +615,36 @@ const Index = (props) => {
                                                 />
                                             </div>
                                             <div className="z-20 col-span-1">
-                                                <DateToDateComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
+                                                <DateToDateComponent
+                                                    value={isState.valueDate}
+                                                    onChange={(e) => queryState({ valueDate: e })}
+                                                />
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
-                                                        <ExcelFileComponent filename={"Danh sách báo giá"} title={"DSBG"} multiDataSet={multiDataSet} dataLang={dataLang} />)}
+                                                        <ExcelFileComponent
+                                                            filename={"Danh sách báo giá"}
+                                                            title={"DSBG"}
+                                                            multiDataSet={multiDataSet}
+                                                            dataLang={dataLang}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -617,40 +652,40 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar >
+                            <Customscrollbar>
                                 <div className="w-[100%] lg:w-[100%] ">
                                     <HeaderTable gridCols={12}>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_date || "price_quote_table_date"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_code || "price_quote_table_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.price_quote_customer || "price_quote_table_customer"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_total || "price_quote_table_total"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_tax_money || "price_quote_tax_money"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_into_money || "price_quote_into_money"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_effective_date || "price_quote_table_effective_date"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_order_status || "price_quote_order_status"}
                                         </ColumnTable>
                                         <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-left">
                                             {dataLang?.price_quote_note || "price_quote_note"}
                                         </h4>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_branch || "price_quote_branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.price_quote_operations || "price_quote_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -661,13 +696,13 @@ const Index = (props) => {
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={12} key={e.id.toString()}>
-                                                        <RowItemTable colSpan={1} textAlign='center'>
+                                                        <RowItemTable colSpan={1} textAlign="center">
                                                             {e?.date != null
                                                                 ? moment(e?.date).format("DD/MM/YYYY")
                                                                 : ""}
                                                         </RowItemTable>
 
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <PopupDetailQuote
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer"
@@ -680,25 +715,28 @@ const Index = (props) => {
                                                             {e.client_name}
                                                         </RowItemTable>
 
-                                                        <RowItemTable textAlign={'right'}>
+                                                        <RowItemTable textAlign={"right"}>
                                                             {formatNumber(e.total_price)}
                                                         </RowItemTable>
 
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatNumber(e.total_tax_price)}
                                                         </RowItemTable>
 
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatNumber(e.total_amount)}
                                                         </RowItemTable>
 
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {e?.validity != null
                                                                 ? moment(e?.validity).format("DD/MM/YYYY")
                                                                 : ""}
                                                         </RowItemTable>
 
-                                                        <RowItemTable colSpan={1} className="flex items-center justify-center text-center ">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="flex items-center justify-center text-center "
+                                                        >
                                                             <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                                 {(e?.status === "confirmed" && (
                                                                     <BtnStatusApproved
@@ -721,7 +759,8 @@ const Index = (props) => {
                                                                                     idChild: "not_confirmed",
                                                                                 })
                                                                             }
-                                                                            type="0" />
+                                                                            type="0"
+                                                                        />
                                                                     )) ||
                                                                     (e?.status === "no_confirmed" && (
                                                                         <BtnStatusApproved
@@ -733,14 +772,13 @@ const Index = (props) => {
                                                                                 })
                                                                             }
                                                                             title="Không duyệt"
-                                                                            type="2" />
+                                                                            type="2"
+                                                                        />
                                                                     )) ||
                                                                     (e?.status === "ordered" && (
                                                                         <div
                                                                             className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400 bg-orange-500 hover:bg-orange-600  transition-all duration-300 ease-in-out rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center"
-                                                                            onClick={() =>
-                                                                                handleToggleOrdered(e?.id)
-                                                                            }
+                                                                            onClick={() => handleToggleOrdered(e?.id)}
                                                                         >
                                                                             Đã Tạo Đơn Đặt Hàng
                                                                             <TickCircle className=" absolute 3xl:top-[30%] 3lx:-right-[-5%] 2xl:top-[25%] 2lx:-right-[-5%] xl:top-[25%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4 xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 text-white border-orange-400" />
@@ -752,11 +790,12 @@ const Index = (props) => {
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="w-fit mx-auto">
-                                                            <TagBranch>
-                                                                {e?.branch_name}
-                                                            </TagBranch>
+                                                            <TagBranch>{e?.branch_name}</TagBranch>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex items-center justify-center">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="flex items-center justify-center"
+                                                        >
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
                                                                 dataLang={dataLang}
@@ -780,24 +819,33 @@ const Index = (props) => {
                         <ColumnTable colSpan={4} textAlign={"center"} className="p-2">
                             {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap mr-1">
+                        <ColumnTable
+                            colSpan={1}
+                            textAlign={"right"}
+                            className="justify-end p-2 flex gap-2 flex-wrap mr-1"
+                        >
                             <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                 {formatNumber(total?.total_price)}
                             </h3>
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap mr-1">
+                        <ColumnTable
+                            colSpan={1}
+                            textAlign={"right"}
+                            className="justify-end p-2 flex gap-2 flex-wrap mr-1"
+                        >
                             {formatNumber(total?.total_tax_price)}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap mr-1">
+                        <ColumnTable
+                            colSpan={1}
+                            textAlign={"right"}
+                            className="justify-end p-2 flex gap-2 flex-wrap mr-1"
+                        >
                             {formatNumber(total?.total_amount)}
                         </ColumnTable>
                     </ContainerTotal>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -807,7 +855,6 @@ const Index = (props) => {
                         </ContainerPagination>
                     )}
                 </ContainerBody>
-
             </Container>
             <PopupConfim
                 dataLang={dataLang}
@@ -821,7 +868,7 @@ const Index = (props) => {
                 handleNoconfim={handleNoconfim}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment >
+        </React.Fragment>
     );
 };
 

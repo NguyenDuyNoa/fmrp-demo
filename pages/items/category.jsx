@@ -44,13 +44,16 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
-    const isShow = useToast()
+    const { paginate } = usePagination();
+
+    const isShow = useToast();
 
     const dispatch = useDispatch();
 
@@ -81,12 +84,16 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems: totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const {
+        limit,
+        updateLimit: sLimit,
+        totalItems: totalItems,
+        updateTotalItems: sTotalItems,
+    } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, 'material_category');
-
+    const { checkAdd, checkExport } = useActionRole(auth, "material_category");
 
     const _ServerFetching = () => {
         Axios(
@@ -162,18 +169,11 @@ const Index = (props) => {
             (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, idCategory, idBranch]);
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: { page: pageNumber },
-        });
-    };
-
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace(router.route);
         sOnFetching(true);
-    }, 500)
+    }, 500);
 
     //excel
     const multiDataSet = [
@@ -250,22 +250,25 @@ const Index = (props) => {
                                 {dataLang?.category_material_group_title}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_NVL
                                         onRefresh={_ServerFetching.bind(this)}
                                         onRefreshOpt={_ServerFetchingOtp.bind(this)}
                                         dataLang={dataLang}
                                         data={data}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <ContainerTable>
@@ -300,7 +303,9 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.category_material_group_code || "category_material_group_code",
+                                                        label:
+                                                            dataLang?.category_material_group_code ||
+                                                            "category_material_group_code",
                                                         isDisabled: true,
                                                     },
                                                     ...dataOption,
@@ -308,7 +313,10 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 onChange={_HandleFilterOpt.bind(this, "category")}
                                                 value={idCategory}
-                                                placeholder={dataLang?.category_material_group_code || "category_material_group_code"}
+                                                placeholder={
+                                                    dataLang?.category_material_group_code ||
+                                                    "category_material_group_code"
+                                                }
                                                 colSpan={3}
                                                 formatOptionLabel={SelectOptionLever}
                                             />
@@ -318,7 +326,7 @@ const Index = (props) => {
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={sOnFetching} />
 
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {data?.length > 0 && (
                                                         <ExcelFileComponent
@@ -329,12 +337,15 @@ const Index = (props) => {
                                                         />
                                                     )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -344,42 +355,40 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar className="min:h-[200px] h-[90%] max:h-[650px]o pb-2">
                                 <div className="w-full">
-                                    <HeaderTable gridCols={11} display={'grid'}>
+                                    <HeaderTable gridCols={11} display={"grid"}>
                                         <ColumnTable colSpan={1} />
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
-                                            {dataLang?.category_material_group_code || 'category_material_group_code'}
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.category_material_group_code || "category_material_group_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={3} textAlign={'center'}>
-                                            {dataLang?.category_material_group_name || 'category_material_group_name'}
+                                        <ColumnTable colSpan={3} textAlign={"center"}>
+                                            {dataLang?.category_material_group_name || "category_material_group_name"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
-                                            {dataLang?.client_popup_note || 'client_popup_note'}
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.client_popup_note || "client_popup_note"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
-                                            {dataLang?.price_quote_branch || 'price_quote_branch'}
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.price_quote_branch || "price_quote_branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
-                                            {dataLang?.branch_popup_properties || 'branch_popup_properties'}
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
+                                            {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
                                     <div className="divide-y divide-slate-200">
-                                        {
-                                            onFetching ? (
-                                                <Loading />
-                                            ) : data?.length > 0 ? (
-                                                data.map((e) => (
-                                                    <Items
-                                                        onRefresh={_ServerFetching.bind(this)}
-                                                        onRefreshOpt={_ServerFetchingOtp.bind(this)}
-                                                        dataLang={dataLang}
-                                                        key={e.id}
-                                                        data={e}
-                                                    />
-                                                ))
-                                            ) : (
-                                                <NoData />
-                                            )
-                                        }
+                                        {onFetching ? (
+                                            <Loading />
+                                        ) : data?.length > 0 ? (
+                                            data.map((e) => (
+                                                <Items
+                                                    onRefresh={_ServerFetching.bind(this)}
+                                                    onRefreshOpt={_ServerFetchingOtp.bind(this)}
+                                                    dataLang={dataLang}
+                                                    key={e.id}
+                                                    data={e}
+                                                />
+                                            ))
+                                        ) : (
+                                            <NoData />
+                                        )}
                                     </div>
                                 </div>
                             </Customscrollbar>
@@ -387,10 +396,7 @@ const Index = (props) => {
                     </div>
                     {data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -414,8 +420,7 @@ const Items = React.memo((props) => {
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkEdit } = useActionRole(auth, 'material_category');
-
+    const { checkEdit } = useActionRole(auth, "material_category");
 
     useEffect(() => {
         sHasChild(false);
@@ -428,32 +433,32 @@ const Items = React.memo((props) => {
                     <button
                         disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
-                        className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
-                            } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
+                        className={`${
+                            hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
+                        } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
                     >
                         <IconMinus size={16} />
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.code}
                 </RowItemTable>
-                <RowItemTable colSpan={3} textAlign={'left'}>
+                <RowItemTable colSpan={3} textAlign={"left"}>
                     {props.data?.name}
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.note}
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     <span className="flex gap-2 flex-wrap justify-start ">
                         {props.data?.branch?.map((e) => (
                             <TagBranch>{e.name}</TagBranch>
                         ))}
                     </span>
-
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2">
-                    {role == true || checkEdit ?
+                    {role == true || checkEdit ? (
                         <Popup_NVL
                             onRefresh={props.onRefresh}
                             onRefreshOpt={props.onRefreshOpt}
@@ -461,9 +466,9 @@ const Items = React.memo((props) => {
                             data={props.data}
                             dataOption={props.dataOption}
                         />
-                        :
-                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                    }
+                    ) : (
+                        <IconEdit className="cursor-pointer" onClick={() => isShow("warning", WARNING_STATUS_ROLE)} />
+                    )}
                     <BtnAction
                         onRefresh={props.onRefresh}
                         onRefreshGroup={props.onRefreshOpt}
@@ -471,7 +476,6 @@ const Items = React.memo((props) => {
                         id={props.data?.id}
                         type="material_category"
                     />
-
                 </RowItemTable>
             </RowTable>
             {hasChild && (
@@ -513,12 +517,12 @@ const Items = React.memo((props) => {
 });
 
 const ItemsChild = React.memo((props) => {
-    const isShow = useToast()
+    const isShow = useToast();
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-    const { checkEdit } = useActionRole(auth, 'material_category');
+    const { checkEdit } = useActionRole(auth, "material_category");
     return (
         <React.Fragment key={props.data?.id}>
-            <RowTable gridCols={11} >
+            <RowTable gridCols={11}>
                 {props.data?.level == "3" && (
                     <RowItemTable colSpan={1} className="h-full flex justify-center items-center pl-24">
                         <IconDown className="rotate-45" />
@@ -540,33 +544,31 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className="mt-1.5" />
                     </RowItemTable>
                 )}
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.code}
                 </RowItemTable>
-                <RowItemTable colSpan={3} textAlign={'left'}>
+                <RowItemTable colSpan={3} textAlign={"left"}>
                     {props.data?.name}
                 </RowItemTable>
-                <RowItemTable colSpan={2} textAlign={'left'}>
+                <RowItemTable colSpan={2} textAlign={"left"}>
                     {props.data?.note}
                 </RowItemTable>
                 <RowItemTable colSpan={2} className="gap-2 flex flex-wrap px-2">
                     {props.data?.branch.map((e) => (
-                        <TagBranch key={e?.id}>
-                            {e.name}
-                        </TagBranch>
+                        <TagBranch key={e?.id}>{e.name}</TagBranch>
                     ))}
                 </RowItemTable>
                 <RowItemTable colSpan={1} className="flex justify-center space-x-2">
-                    {role == true || checkEdit ?
+                    {role == true || checkEdit ? (
                         <Popup_NVL
                             onRefresh={props.onRefresh}
                             onRefreshOpt={props.onRefreshOpt}
                             dataLang={props.dataLang}
                             data={props.data}
                         />
-                        :
-                        <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                    }
+                    ) : (
+                        <IconEdit className="cursor-pointer" onClick={() => isShow("warning", WARNING_STATUS_ROLE)} />
+                    )}
                     <BtnAction
                         onRefresh={props.onRefresh}
                         onRefreshGroup={props.onRefreshOpt}
@@ -580,6 +582,5 @@ const ItemsChild = React.memo((props) => {
         </React.Fragment>
     );
 });
-
 
 export default Index;

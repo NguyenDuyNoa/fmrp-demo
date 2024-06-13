@@ -10,7 +10,6 @@ import PhoneInput from "react-phone-input-2";
 import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch } from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 
-
 import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
 
@@ -28,11 +27,14 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const router = useRouter();
 
     const dataLang = props.dataLang;
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
@@ -42,11 +44,12 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems()
-
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems();
 
     const _ServerFetching = () => {
-        Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_Branch/branch?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
@@ -73,18 +76,11 @@ const Index = (props) => {
         sOnFetching(true) || (keySearch && sOnFetching(true));
     }, [limit, router.query?.page]);
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: "/settings/branch",
-            query: { page: pageNumber },
-        });
-    };
-
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/settings/branch");
         sOnFetching(true);
-    }, 500)
+    }, 500);
     return (
         <React.Fragment>
             <Head>
@@ -95,9 +91,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.branch_seting || "branch_seting"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting || "branch_seting"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.branch_title || "branch_title"}</h6>
                     </div>
@@ -116,7 +110,8 @@ const Index = (props) => {
                                     <Popup_ChiNhanh
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
                                 </div>
                             </div>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
@@ -134,16 +129,16 @@ const Index = (props) => {
                                 <Customscrollbar className="min:h-[200px] h-[83%] max:h-[500px] overflow-auto pb-2">
                                     <div className="w-full">
                                         <HeaderTable gridCols={12}>
-                                            <ColumnTable colSpan={4} textAlign={'left'}>
+                                            <ColumnTable colSpan={4} textAlign={"left"}>
                                                 {dataLang?.branch_popup_name}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={3} textAlign={'left'}>
+                                            <ColumnTable colSpan={3} textAlign={"left"}>
                                                 {dataLang?.branch_popup_address}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={3} textAlign={'left'}>
+                                            <ColumnTable colSpan={3} textAlign={"left"}>
                                                 {dataLang?.branch_popup_phone}
                                             </ColumnTable>
-                                            <ColumnTable colSpan={2} textAlign={'center'}>
+                                            <ColumnTable colSpan={2} textAlign={"center"}>
                                                 {dataLang?.branch_popup_properties}
                                             </ColumnTable>
                                         </HeaderTable>
@@ -153,17 +148,20 @@ const Index = (props) => {
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
                                                     {data.map((e) => (
-                                                        <RowTable gridCols={12} key={e.id.toString()} >
-                                                            <RowItemTable colSpan={4} textAlign={'left'}>
+                                                        <RowTable gridCols={12} key={e.id.toString()}>
+                                                            <RowItemTable colSpan={4} textAlign={"left"}>
                                                                 {e.name}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={3} textAlign={'left'}>
+                                                            <RowItemTable colSpan={3} textAlign={"left"}>
                                                                 {e.address}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={3} textAlign={'left'}>
+                                                            <RowItemTable colSpan={3} textAlign={"left"}>
                                                                 {e.number_phone}
                                                             </RowItemTable>
-                                                            <RowItemTable colSpan={2} className="flex justify-center items-center gap-2">
+                                                            <RowItemTable
+                                                                colSpan={2}
+                                                                className="flex justify-center items-center gap-2"
+                                                            >
                                                                 <Popup_ChiNhanh
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs"
@@ -175,7 +173,7 @@ const Index = (props) => {
                                                                 />
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
-                                                                    onRefreshGroup={() => { }}
+                                                                    onRefreshGroup={() => {}}
                                                                     dataLang={dataLang}
                                                                     id={e?.id}
                                                                     type="settings_branch"
@@ -185,17 +183,16 @@ const Index = (props) => {
                                                     ))}
                                                 </div>
                                             </>
-                                        ) : <NoData />}
+                                        ) : (
+                                            <NoData />
+                                        )}
                                     </div>
                                 </Customscrollbar>
                             </div>
                         </div>
                         {data?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination
-                                    dataLang={dataLang}
-                                    totalItems={totalItem?.iTotalDisplayRecords}
-                                />
+                                <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItem?.iTotalDisplayRecords)}
@@ -255,9 +252,10 @@ const Popup_ChiNhanh = (props) => {
 
         Axios(
             "POST",
-            `${props.id
-                ? `/api_web/Api_Branch/branch/${id}?csrf_protection=true`
-                : "/api_web/Api_Branch/branch?csrf_protection=true"
+            `${
+                props.id
+                    ? `/api_web/Api_Branch/branch/${id}?csrf_protection=true`
+                    : "/api_web/Api_Branch/branch?csrf_protection=true"
             }`,
             {
                 data: data,
@@ -323,8 +321,9 @@ const Popup_ChiNhanh = (props) => {
                             onChange={_HandleChangeInput.bind(this, "name")}
                             name="fname"
                             type="text"
-                            className={`${required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
+                            className={`${
+                                required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
                         />
                         {required && <label className="text-sm text-red-500">Vui lòng nhập tên chi nhánh</label>}
                     </div>

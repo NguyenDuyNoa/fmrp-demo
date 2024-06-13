@@ -46,6 +46,7 @@ import BtnAction from "@/components/UI/BtnAction";
 import Popup_Vitrikho from "./components/popup";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiLocationWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouseLocation/apiWarehouseLocation";
+import usePagination from "@/hooks/usePagination";
 const Location = (props) => {
     const dataLang = props.dataLang;
 
@@ -65,6 +66,8 @@ const Location = (props) => {
         onSending: null,
         onFetchingWarehouse: false,
     };
+
+    const { paginate } = usePagination();
 
     const [isState, sIsState] = useState(initialState);
 
@@ -168,13 +171,6 @@ const Location = (props) => {
     useEffect(() => {
         queryState({ onSending: true });
     }, [active]);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: { page: pageNumber },
-        });
-    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });

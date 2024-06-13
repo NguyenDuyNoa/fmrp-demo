@@ -1,45 +1,43 @@
 import { ArrowLeft, ArrowRight, ArrowRight2 } from "iconsax-react";
+import { useRouter } from "next/router";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import ReactPaginate from "react-paginate";
 
-const Index = React.memo(
-  ({ postsPerPage, totalPosts, paginate, currentPage }) => {
+const Index = React.memo(({ postsPerPage, paginate, totalPosts, currentPage }) => {
     const [pageCount, setPageCount] = useState(0);
     useEffect(() => {
-      setPageCount(Math.ceil(totalPosts / (+postsPerPage || 25)));
+        setPageCount(Math.ceil(totalPosts / (+postsPerPage || 25)));
     }, [postsPerPage, totalPosts]);
     const handlePageClick = (event) => {
-      paginate(event.selected + 1);
+        paginate(event.selected + 1);
     };
 
-
     return (
-      <ReactPaginate
-        nextLabel={<ArrowRight size="22" color="blue" />}
-        onPageChange={handlePageClick}
-        pageRangeDisplayed={3}
-        marginPagesDisplayed={2}
-        pageCount={pageCount}
-        previousLabel={<ArrowLeft size="22" color="blue" />}
-        pageClassName="page-item"
-        pageLinkClassName="page-link"
-        previousClassName="page-item"
-        previousLinkClassName="page-link"
-        nextClassName="page-item"
-        nextLinkClassName="page-link"
-        breakLabel="..."
-        breakClassName="page-item"
-        breakLinkClassName="page-link"
-        containerClassName="pagination"
-        activeClassName="active"
-        renderOnZeroPageCount={null}
-        forcePage={currentPage - 1}
-      />
+        <ReactPaginate
+            nextLabel={<ArrowRight size="22" color="blue" />}
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={2}
+            pageCount={pageCount}
+            previousLabel={<ArrowLeft size="22" color="blue" />}
+            pageClassName="page-item"
+            pageLinkClassName="page-link"
+            previousClassName="page-item"
+            previousLinkClassName="page-link"
+            nextClassName="page-item"
+            nextLinkClassName="page-link"
+            breakLabel="..."
+            breakClassName="page-item"
+            breakLinkClassName="page-link"
+            containerClassName="pagination"
+            activeClassName="active"
+            renderOnZeroPageCount={null}
+            forcePage={currentPage - 1}
+        />
     );
-  }
-);
+});
 
 // const Index = React.memo(
 //   ({ postsPerPage, totalPosts, paginate, currentPage }) => {

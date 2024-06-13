@@ -33,12 +33,15 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
-    const dataSeting = useSetingServer()
+    const { paginate } = usePagination();
+
+    const dataSeting = useSetingServer();
 
     const [data, sData] = useState([]);
 
@@ -52,7 +55,7 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const [total, sTotal] = useState({});
 
@@ -82,7 +85,7 @@ const Index = (props) => {
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
-        sOnFetching_filter(true)
+        sOnFetching_filter(true);
     }, []);
 
     const _ServerFetching = async () => {
@@ -96,8 +99,14 @@ const Index = (props) => {
                     page: router.query?.page || 1,
                     "filter[branch_id]": isValue?.idBranch != null ? isValue?.idBranch.value : null,
                     "filter[supplier_id]": isValue?.idSupplier ? isValue?.idSupplier.value : null,
-                    "filter[start_date]": isValue?.valueDate?.startDate != null ? moment(isValue?.valueDate?.startDate).format("YYYY-MM-DD") : null,
-                    "filter[end_date]": isValue?.valueDate?.endDate != null ? moment(isValue?.valueDate?.endDate).format("YYYY-MM-DD") : null,
+                    "filter[start_date]":
+                        isValue?.valueDate?.startDate != null
+                            ? moment(isValue?.valueDate?.startDate).format("YYYY-MM-DD")
+                            : null,
+                    "filter[end_date]":
+                        isValue?.valueDate?.endDate != null
+                            ? moment(isValue?.valueDate?.endDate).format("YYYY-MM-DD")
+                            : null,
                 },
             },
             (err, response) => {
@@ -139,7 +148,7 @@ const Index = (props) => {
     }, [onFetching]);
 
     useEffect(() => {
-        sOnFetching(true)
+        sOnFetching(true);
     }, [
         limit,
         router.query?.page,
@@ -152,7 +161,7 @@ const Index = (props) => {
     ]);
 
     const formatNumber = (number) => {
-        return formatMoneyConfig(+number, dataSeting)
+        return formatMoneyConfig(+number, dataSeting);
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -164,16 +173,7 @@ const Index = (props) => {
             },
         });
         sOnFetching(true);
-    }, 500)
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
+    }, 500);
 
     const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
 
@@ -276,9 +276,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.debt_suppliers || "debt_suppliers"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.debt_suppliers || "debt_suppliers"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.debt_suppliers || "debt_suppliers"}</h6>
                     </div>
@@ -288,7 +286,7 @@ const Index = (props) => {
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.debt_suppliers || 'debt_suppliers'}
+                                {dataLang?.debt_suppliers || "debt_suppliers"}
                             </h2>
                         </div>
                         <ContainerTable>
@@ -305,7 +303,9 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_table_branch || "purchase_order_table_branch",
+                                                        label:
+                                                            dataLang?.purchase_order_table_branch ||
+                                                            "purchase_order_table_branch",
                                                         isDisabled: true,
                                                     },
                                                     ...listBr_filter,
@@ -314,13 +314,18 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 value={isValue.idBranch}
                                                 onChange={onChangeValue("idBranch")}
-                                                placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
+                                                placeholder={
+                                                    dataLang?.purchase_order_table_branch ||
+                                                    "purchase_order_table_branch"
+                                                }
                                             />
                                             <SelectComponent
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier",
+                                                        label:
+                                                            dataLang?.purchase_order_table_supplier ||
+                                                            "purchase_order_table_supplier",
                                                         isDisabled: true,
                                                     },
                                                     ...listSupplier,
@@ -329,7 +334,10 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 value={isValue?.idSupplier}
                                                 onChange={onChangeValue("idSupplier")}
-                                                placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}
+                                                placeholder={
+                                                    dataLang?.purchase_order_table_supplier ||
+                                                    "purchase_order_table_supplier"
+                                                }
                                             />
                                             <DateToDateComponent
                                                 value={isValue?.valueDate}
@@ -522,7 +530,9 @@ const Index = (props) => {
                                                 ))}
                                             </div>
                                         </>
-                                    ) : <NoData />}
+                                    ) : (
+                                        <NoData />
+                                    )}
                                 </div>
                             </Customscrollbar>
                         </ContainerTable>
@@ -561,10 +571,7 @@ const Index = (props) => {
                     </div>
                     {data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}

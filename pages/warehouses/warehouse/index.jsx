@@ -48,6 +48,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import apiComons from "@/Api/apiComon/apiComon";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -55,6 +56,8 @@ const Index = (props) => {
     const router = useRouter();
 
     const isShow = useToast();
+
+    const { paginate } = usePagination();
 
     const dataSeting = useSetingServer();
 
@@ -238,13 +241,6 @@ const Index = (props) => {
         router.push({
             pathname: router.route,
             query: { page: 1 },
-        });
-    };
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: { page: pageNumber },
         });
     };
 

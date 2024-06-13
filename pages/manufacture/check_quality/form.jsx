@@ -45,8 +45,6 @@ const Index = (props) => {
         load: false,
         errBranch: false,
         errQuantityQc: false,
-        // errQuantityReached: false,
-        errQuantityError: false,
         errPlan: false,
         errDate: false,
         code: "",
@@ -86,8 +84,7 @@ const Index = (props) => {
     };
 
     const resetAllStates = () => {
-        // sIdChange(initsValue);
-        // sErrors(initsErors);
+        sIsStateQlty(initialState);
     };
 
     useEffect(() => {
@@ -223,9 +220,9 @@ const Index = (props) => {
                 matHang: value,
                 idParenBackend: "",
                 unit: value?.e?.unit_name,
-                quantityQc: null,
-                quantityReached: null,
-                quantityError: null,
+                quantityQc: 1,
+                quantityReached: 1,
+                quantityError: 0,
                 date: isStateQlty.dateAll ? isStateQlty.dateAll : "",
                 note: null,
             },
@@ -237,9 +234,9 @@ const Index = (props) => {
         if (!checkData) {
             const { parent } = _DataValueItem(value);
             queryStateQlty({ listData: [parent, ...isStateQlty.listData] });
-        } else {
-            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            return;
         }
+        isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
     };
 
     const _HandleDeleteParent = (parentId) => {
@@ -252,16 +249,14 @@ const Index = (props) => {
             if (e?.id == parentId) {
                 switch (type) {
                     case "quantityQc":
-                        e.quantityQc = Number(value?.value);
-                        break;
-                    case "quantityReached":
-                        e.quantityReached = Number(value?.value);
+                        e.quantityQc = +value?.value;
                         break;
                     case "quantityError":
-                        e.quantityError = Number(value?.value);
+                        e.quantityError = +value?.value;
                         break;
                     default:
                 }
+                e.quantityReached = +e.quantityQc - +e.quantityError;
             }
             return e;
         });
@@ -274,14 +269,13 @@ const Index = (props) => {
                 if (e?.id === parentId) {
                     const { parent } = _DataValueItem(value);
                     return parent;
-                } else {
-                    return e;
                 }
+                return e;
             });
             queryStateQlty({ listData: [...newData] });
-        } else {
-            isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
+            return;
         }
+        isShow("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
     };
 
     const selectItemsLabel = (option) => {
@@ -326,50 +320,44 @@ const Index = (props) => {
         );
     };
 
+    const handleErrors = (errors, dataLang) => {
+        queryStateQlty(errors);
+        if (errors.errBranch || errors.errDetailedProduction) {
+            isShow("error", `${dataLang?.required_field_null}`);
+        } else if (errors.isEmpty) {
+            isShow("error", `Chưa nhập thông tin mặt hàng`);
+        } else {
+            isShow("error", `${dataLang?.required_field_null}`);
+        }
+    };
+
     const _HandleSubmit = (e) => {
         e.preventDefault();
+        const { listData, idBranch, idDetailedProduction, errDetailedProduction } = isStateQlty;
 
-        const checkNullQuantity = (property) => isStateQlty.listData.some((e) => !e[property] || e[property] == 0);
+        const checkNullQuantity = (property) => listData.some((e) => !e[property] || e[property] == 0);
 
         const hasNullQuantityQc = checkNullQuantity("quantity");
 
-        // const hasNullQuantityReached = checkNullQuantity("quantityReached");
+        const hasNullDate = listData.some((e) => e.date == null || e.date == "");
 
-        const hasNullQuantityError = checkNullQuantity("quantityError");
+        const isEmpty = listData?.length == 0;
 
-        const hasNullDate = isStateQlty.listData.some((e) => e.date == null || e.date == "");
-
-        const isEmpty = isStateQlty.listData?.length == 0;
-
-        const checkConditions = [
-            !isStateQlty.idBranch,
-            !isStateQlty.idDetailedProduction,
-            hasNullQuantityQc,
-            // hasNullQuantityReached,
-            hasNullQuantityError,
-            isEmpty,
-            hasNullDate,
-        ].some((condition) => condition);
+        const checkConditions = [!idBranch, !idDetailedProduction, hasNullQuantityQc, isEmpty, hasNullDate].some(
+            (condition) => condition
+        );
 
         if (checkConditions) {
-            queryStateQlty({
-                errBranch: !isStateQlty.idBranch,
+            const errors = {
+                errBranch: !idBranch,
                 errQuantityQc: hasNullQuantityQc,
-                errQuantityError: hasNullQuantityError,
-                // errQuantityReached: hasNullQuantityReached,
-                errDetailedProduction: !isStateQlty.errDetailedProduction,
+                errDetailedProduction: !errDetailedProduction,
                 errDate: hasNullDate,
-            });
-            if (!isStateQlty.idBranch || !isStateQlty.errDetailedProduction) {
-                isShow("error", `${dataLang?.required_field_null}`);
-            } else if (isEmpty) {
-                isShow("error", `Chưa nhập thông tin mặt hàng`);
-            } else {
-                isShow("error", `${dataLang?.required_field_null}`);
-            }
-        } else {
-            queryStateQlty({ onSending: true });
+            };
+            handleErrors(errors, dataLang);
+            return;
         }
+        queryStateQlty({ onSending: true });
     };
     const _ServerSending = async () => {
         // let formData = new FormData();
@@ -408,7 +396,6 @@ const Index = (props) => {
     useEffect(() => {
         isStateQlty.onSending && _ServerSending();
     }, [isStateQlty.onSending]);
-
     return (
         <React.Fragment>
             <Head>
@@ -634,11 +621,11 @@ const Index = (props) => {
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"Số lượng QC"}
                                 </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {"Số lượng đạt"}
-                                </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
                                     {"Số lượng lỗi"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {"Số lượng đạt"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
                                     {"Chi tiết lỗi"}
@@ -714,7 +701,6 @@ const Index = (props) => {
                                         <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
                                     </button>
                                 </div>
-
                                 <div className="col-span-1 flex  justify-center items-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
                                         <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
@@ -726,16 +712,8 @@ const Index = (props) => {
                                         <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
                                     </button>
                                 </div>
-                                <div className="col-span-1 flex  justify-center items-center">
-                                    <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
-                                    </button>
-                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b border-gray-200">
-                                        1
-                                    </div>
-                                    <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
-                                    </button>
+                                <div className="col-span-1 flex justify-center items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                    1
                                 </div>
                                 <input
                                     placeholder={"Chi tiết lỗi"}
@@ -839,7 +817,7 @@ const Index = (props) => {
                                                             onValueChange={(event) =>
                                                                 _HandleChangeChild(e?.id, "quantityQc", event)
                                                             }
-                                                            value={e.quantityQc || null}
+                                                            value={e.quantityQc}
                                                             className={`${
                                                                 isStateQlty.errQuantityQc &&
                                                                 (e.quantityQc == null ||
@@ -877,50 +855,6 @@ const Index = (props) => {
                                                     <div className="flex items-center justify-center h-full p-0.5">
                                                         <button
                                                             disabled={
-                                                                // e.quantityReached === 1 ||
-                                                                e.quantityReached === "" ||
-                                                                e.quantityReached === null ||
-                                                                e.quantityReached === 0
-                                                            }
-                                                            className=" text-gray-400  hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                            onClick={() => {
-                                                                _HandleChangeChild(e?.id, "quantityReached", {
-                                                                    value: e.quantityReached - 1,
-                                                                });
-                                                            }}
-                                                        >
-                                                            <Minus
-                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                size="16"
-                                                            />
-                                                        </button>
-                                                        <InPutNumericFormat
-                                                            onValueChange={(event) =>
-                                                                _HandleChangeChild(e?.id, "quantityReached", event)
-                                                            }
-                                                            value={e.quantityReached || null}
-                                                            className={`appearance-none border-b border-gray-200 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                                            isAllowed={isAllowedNumber}
-                                                        />
-                                                        <button
-                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                            onClick={() => {
-                                                                _HandleChangeChild(e?.id, "quantityReached", {
-                                                                    value: e.quantityReached + 1,
-                                                                });
-                                                            }}
-                                                        >
-                                                            <Add
-                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                size="16"
-                                                            />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div className="col-span-1 py-5 relative">
-                                                    <div className="flex items-center justify-center h-full p-0.5">
-                                                        <button
-                                                            disabled={
                                                                 e.quantityError === 1 ||
                                                                 e.quantityError === "" ||
                                                                 e.quantityError === null ||
@@ -942,23 +876,8 @@ const Index = (props) => {
                                                             onValueChange={(event) =>
                                                                 _HandleChangeChild(e?.id, "quantityError", event)
                                                             }
-                                                            value={e.quantityError || null}
-                                                            className={`${
-                                                                isStateQlty.errQuantityError &&
-                                                                (e.quantityError == null ||
-                                                                    e.quantityError == "" ||
-                                                                    e.quantityError == 0)
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
-                                                            }
-                                                                ${
-                                                                    e.quantityError == null ||
-                                                                    e.quantityError == "" ||
-                                                                    e.quantityError == 0
-                                                                        ? "border-b border-red-500"
-                                                                        : "border-b border-gray-200"
-                                                                }
-                                                                appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                            value={e.quantityError}
+                                                            className={`border-b border-gray-200 appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                             isAllowed={isAllowedNumber}
                                                         />
                                                         <button
@@ -976,15 +895,27 @@ const Index = (props) => {
                                                         </button>
                                                     </div>
                                                 </div>
+                                                {/* e.quantityReached === "" || */}
+                                                <div className="flex items-center justify-center h-full p-0.5 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                    {formatNumber(e.quantityReached) || 0}
+                                                </div>
                                                 <div className="col-span-1 py-4 flex items-center justify-center ">
                                                     <PopupDetailError
                                                         dataLang={dataLang}
-                                                        name="Nhập chi tiết lỗi"
+                                                        name={`Chi tiết lỗi ${
+                                                            e?.dataDetailError?.length > 0
+                                                                ? `(${e?.dataDetailError?.length})`
+                                                                : ""
+                                                        }`}
                                                         data={isStateQlty.listData}
                                                         id={e?.id}
                                                         quantityError={e.quantityError}
                                                         queryStateQlty={queryStateQlty}
-                                                        className="px-4 py-1.5 rounded-2xl bg-[#0F4F9E] hover:bg-[#0F4F9E]/80 hover:scale-105 text-xs font-medium text-[9px] text-center text-white  transition-all ease-linear cursor-pointer "
+                                                        className={`px-4 py-1.5 rounded-2xl ${
+                                                            e?.dataDetailError && e?.dataDetailError?.length > 0
+                                                                ? "bg-blue-300 hover:bg-blue-500/80 text-blue-600 hover:text-white"
+                                                                : "bg-gray-300 hover:bg-gray-500/80 text-gray-600 hover:text-white"
+                                                        } hover:scale-105 text-xs font-medium text-[9px] text-center   transition-all ease-linear cursor-pointer`}
                                                     />
                                                 </div>
                                                 <div className="col-span-1  h-full flex items-center justify-center">

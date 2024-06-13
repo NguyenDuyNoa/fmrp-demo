@@ -2,9 +2,7 @@ import moment from "moment/moment";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
 
-import {
-    Grid6
-} from "iconsax-react";
+import { Grid6 } from "iconsax-react";
 
 import { useRouter } from "next/router";
 
@@ -15,7 +13,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { _ServerInstance as Axios } from "/services/axios";
 
 dayjs.locale("vi");
-
 
 import Popup_chitiet from "./components/popup";
 
@@ -55,17 +52,18 @@ import useActionRole from "@/hooks/useRole";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
 import { useSelector } from "react-redux";
-
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
-    const dataSeting = useSetingServer()
-    const formatNumber = (number) => {
-        return formatNumberConfig(+number, dataSeting)
+    const { paginate } = usePagination();
 
+    const dataSeting = useSetingServer();
+    const formatNumber = (number) => {
+        return formatNumberConfig(+number, dataSeting);
     };
 
     const isShow = useToast();
@@ -96,18 +94,18 @@ const Index = (props) => {
         valueDate: {
             startDate: null,
             endDate: null,
-        }
-    }
+        },
+    };
 
-    const [isState, sIsState] = useState(initialData)
+    const [isState, sIsState] = useState(initialData);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, 'purchases');
+    const { checkAdd, checkExport } = useActionRole(auth, "purchases");
 
     const tabPage = router.query?.tab;
 
@@ -125,7 +123,9 @@ const Index = (props) => {
         queryState({ onFetchingFilter: true });
     }, []);
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_purchases/purchases/?csrf_protection=true",
+        Axios(
+            "GET",
+            "/api_web/Api_purchases/purchases/?csrf_protection=true",
             {
                 params: {
                     search: isState.keySearch,
@@ -173,9 +173,10 @@ const Index = (props) => {
         queryState({ onFetchingFilter: false });
     };
 
-
     const _ServerFetching_group = () => {
-        Axios("GET", `/api_web/Api_purchases/purchasesFilterBar/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_purchases/purchasesFilterBar/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -197,16 +198,6 @@ const Index = (props) => {
         );
     };
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
-
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace({
@@ -216,14 +207,14 @@ const Index = (props) => {
             },
         });
         queryState({ onFetching: true });
-    }, 500)
+    }, 500);
 
     useEffect(() => {
-        (isState.onFetching && _ServerFetching())
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        (isState.onFetchingGroup && _ServerFetching_group());
+        isState.onFetchingGroup && _ServerFetching_group();
     }, [isState.onFetchingGroup]);
 
     useEffect(() => {
@@ -253,7 +244,9 @@ const Index = (props) => {
     };
 
     const _ServerSending = (id, newStatus) => {
-        Axios("POST", `${`/api_web/Api_purchases/updateStatus/${id}/${newStatus}?csrf_protection=true`}`,
+        Axios(
+            "POST",
+            `${`/api_web/Api_purchases/updateStatus/${id}/${newStatus}?csrf_protection=true`}`,
             {
                 headers: { "Content-Type": "multipart/form-data" },
             },
@@ -381,14 +374,16 @@ const Index = (props) => {
                         e?.order_status?.status === "purchase_ordered"
                             ? dataLang[e?.order_status?.status]
                             : "" ||
-                            `${e?.order_status.status === "purchase_portion"
-                                ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
-                                : ""
-                            }` ||
-                            `${e?.order_status.status === "purchase_enough"
-                                ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
-                                : ""
-                            }`,
+                              `${
+                                  e?.order_status.status === "purchase_portion"
+                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
+                                      : ""
+                              }` ||
+                              `${
+                                  e?.order_status.status === "purchase_enough"
+                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
+                                      : ""
+                              }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -406,9 +401,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.purchase_purchase || "purchase_purchase"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.purchase_purchase || "purchase_purchase"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.purchase_title || "purchase_title"}</h6>
                     </div>
@@ -417,17 +410,16 @@ const Index = (props) => {
                     <div className="space-y-0.5 h-[96%] overflow-hidden">
                         <div className="flex justify-between  mt-1 mr-2">
                             <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                {dataLang?.purchase_title || 'purchase_title'}
+                                {dataLang?.purchase_title || "purchase_title"}
                             </h2>
                             <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
-                                        router.push(routerPurchases.form)
+                                        router.push(routerPurchases.form);
                                     } else if (checkAdd) {
-                                        router.push(routerPurchases.form)
-                                    }
-                                    else {
-                                        isShow("warning", WARNING_STATUS_ROLE)
+                                        router.push(routerPurchases.form);
+                                    } else {
+                                        isShow("warning", WARNING_STATUS_ROLE);
                                     }
                                 }}
                                 dataLang={dataLang}
@@ -465,7 +457,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.client_list_brand || 'client_list_brand',
+                                                        label: dataLang?.client_list_brand || "client_list_brand",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listBr,
@@ -483,7 +475,7 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.purchase_code || 'purchase_code',
+                                                        label: dataLang?.purchase_code || "purchase_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listCode,
@@ -514,7 +506,10 @@ const Index = (props) => {
                                                 colSpan={1}
                                             />
                                             <div className="ml-1 col-span-1 z-20">
-                                                <DateToDateComponent value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
+                                                <DateToDateComponent
+                                                    value={isState.valueDate}
+                                                    onChange={(e) => queryState({ valueDate: e })}
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -522,21 +517,29 @@ const Index = (props) => {
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
                                             <div className="flex space-x-2 items-center justify-end">
-                                                {(role == true || checkExport) ?
+                                                {role == true || checkExport ? (
                                                     <div className={``}>
                                                         {isState.dataExcel?.length > 0 && (
-                                                            <ExcelFileComponent dataLang={dataLang}
+                                                            <ExcelFileComponent
+                                                                dataLang={dataLang}
                                                                 filename="Danh sách đơn đặt hàng (PO)"
                                                                 title="DSDDH"
                                                                 multiDataSet={multiDataSet}
-                                                            />)}
+                                                            />
+                                                        )}
                                                     </div>
-                                                    :
-                                                    <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                                        <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
+                                                ) : (
+                                                    <button
+                                                        onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                        className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                    >
+                                                        <Grid6
+                                                            className="2xl:scale-100 xl:scale-100 scale-75"
+                                                            size={18}
+                                                        />
                                                         <span>{dataLang?.client_list_exportexcel}</span>
                                                     </button>
-                                                }
+                                                )}
                                                 <div>
                                                     <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
@@ -545,37 +548,37 @@ const Index = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <Customscrollbar >
+                            <Customscrollbar>
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
-                                        <ColumnTable colSpan={1} textAlign={"center"} >
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_day || "purchase_day"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={"center"} >
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_code || "purchase_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_planNumber || "purchase_planNumber"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_propnent || "purchase_propnent"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_status || "purchase_status"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_totalitem || "purchase_totalitem"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.purchase_orderStatus || "purchase_orderStatus"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.purchase_note || "purchase_note"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_branch || "purchase_branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.purchase_action || "purchase_action"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -585,52 +588,72 @@ const Index = (props) => {
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
                                             {isState.data?.map((e) => (
                                                 <>
-                                                    <RowTable key={e?.id.toString()} gridCols={12} >
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
+                                                    <RowTable key={e?.id.toString()} gridCols={12}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
+                                                            {e?.date != null
+                                                                ? moment(e?.date).format("DD/MM/YYYY")
+                                                                : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
                                                             <Popup_chitiet
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear  cursor-pointer"
-
                                                                 name={e?.code}
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e?.reference_no}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e?.staff_create_name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="flex items-center justify-center">
-                                                            <BtnStatusApproved type={e?.status == "1" ? 1 : 0} onClick={() => handleQueryId({ id: e?.id, status: true })} />
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="flex items-center justify-center"
+                                                        >
+                                                            <BtnStatusApproved
+                                                                type={e?.status == "1" ? 1 : 0}
+                                                                onClick={() =>
+                                                                    handleQueryId({ id: e?.id, status: true })
+                                                                }
+                                                            />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {formatNumber(e?.total_item)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className="flex items-center justify-center ">
+                                                        <RowItemTable
+                                                            colSpan={2}
+                                                            className="flex items-center justify-center "
+                                                        >
                                                             {(e?.order_status?.status === "purchase_ordered" && (
                                                                 <TagColorSky name={dataLang[e?.order_status?.status]} />
                                                             )) ||
                                                                 (e?.order_status?.status === "purchase_portion" && (
-                                                                    <TagColorOrange name={`${dataLang[e?.order_status?.status]} (${formatNumber(e?.order_status?.count)})`} />
+                                                                    <TagColorOrange
+                                                                        name={`${
+                                                                            dataLang[e?.order_status?.status]
+                                                                        } (${formatNumber(e?.order_status?.count)})`}
+                                                                    />
                                                                 )) ||
                                                                 (e?.order_status?.status === "purchase_enough" && (
-                                                                    <TagColorLime name={`${dataLang[e?.order_status?.status]} (${e?.order_status?.count})`} />
-
+                                                                    <TagColorLime
+                                                                        name={`${dataLang[e?.order_status?.status]} (${
+                                                                            e?.order_status?.count
+                                                                        })`}
+                                                                    />
                                                                 ))}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'left'}>
+                                                        <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className=" w-fit mx-auto">
-                                                            <TagBranch>
-                                                                {e?.branch_name}
-                                                            </TagBranch>
+                                                            <TagBranch>{e?.branch_name}</TagBranch>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="pl-2 py-2.5 flex space-x-2 justify-center">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className="pl-2 py-2.5 flex space-x-2 justify-center"
+                                                        >
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
                                                                 onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -655,10 +678,7 @@ const Index = (props) => {
                     </div>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -675,7 +695,7 @@ const Index = (props) => {
                 title={TITLE_STATUS}
                 subtitle={CONFIRMATION_OF_CHANGES}
                 isOpen={isOpen}
-                nameModel={'change_item'}
+                nameModel={"change_item"}
                 save={_ToggleStatus}
                 cancel={() => handleQueryId({ status: false })}
             />

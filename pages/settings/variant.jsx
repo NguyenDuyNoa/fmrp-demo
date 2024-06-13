@@ -27,11 +27,14 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const router = useRouter();
 
     const dataLang = props.dataLang;
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
@@ -41,8 +44,7 @@ const Index = (props) => {
 
     const [keySearch, sKeySearch] = useState("");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
-
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const _ServerFetching = () => {
         Axios(
@@ -74,18 +76,11 @@ const Index = (props) => {
         sOnFetching(true) || (keySearch && sOnFetching(true));
     }, [limit, router.query?.page]);
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: "/settings/variant",
-            query: { page: pageNumber },
-        });
-    };
-
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);
         router.replace("/settings/variant");
         sOnFetching(true);
-    }, 500)
+    }, 500);
     return (
         <React.Fragment>
             <Head>
@@ -96,9 +91,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.branch_seting || "branch_seting"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.branch_seting || "branch_seting"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.list_btn_seting_variant || "list_btn_seting_variant"}</h6>
                     </div>
@@ -117,7 +110,8 @@ const Index = (props) => {
                                     <Popup_ChiNhanh
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
                                 </div>
                             </div>
                             <div className="xl:space-y-3 space-y-2">
@@ -134,13 +128,13 @@ const Index = (props) => {
                             <Customscrollbar className="min:h-[200px] h-[72%] max:h-[500px]">
                                 <div className="w-full">
                                     <HeaderTable gridCols={10}>
-                                        <ColumnTable colSpan={3} textAlign={'left'}>
+                                        <ColumnTable colSpan={3} textAlign={"left"}>
                                             {dataLang?.variant_name}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={5} textAlign={'left'}>
+                                        <ColumnTable colSpan={5} textAlign={"left"}>
                                             {dataLang?.branch_popup_variant_option}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.branch_popup_properties}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -148,30 +142,26 @@ const Index = (props) => {
                                         <Loading className="h-80" color="#0f4f9e" />
                                     ) : (
                                         <React.Fragment>
-                                            {data.length == 0 && (
-                                                <NoData />
-                                            )}
+                                            {data.length == 0 && <NoData />}
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                                                 {data.map((e) => (
-                                                    <RowTable
-                                                        key={e.id.toString()}
-                                                        gridCols={10}
-                                                    >
-                                                        <RowItemTable colSpan={3}>
-                                                            {e?.name}
-                                                        </RowItemTable>
+                                                    <RowTable key={e.id.toString()} gridCols={10}>
+                                                        <RowItemTable colSpan={3}>{e?.name}</RowItemTable>
                                                         <RowItemTable colSpan={5} className="gap-1 flex flex-wrap">
                                                             {e?.option?.map((e) => (
                                                                 <TagBranch
                                                                     key={e.id.toString()}
                                                                     className="w-fit"
-                                                                // className="mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg"
+                                                                    // className="mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg"
                                                                 >
                                                                     {e.name}
                                                                 </TagBranch>
                                                             ))}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className="space-x-2 flex justify-center items-start">
+                                                        <RowItemTable
+                                                            colSpan={2}
+                                                            className="space-x-2 flex justify-center items-start"
+                                                        >
                                                             <Popup_ChiNhanh
                                                                 onRefresh={_ServerFetching.bind(this)}
                                                                 name={e.name}
@@ -182,7 +172,7 @@ const Index = (props) => {
                                                             />
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => { }}
+                                                                onRefreshGroup={() => {}}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type={"settings_variant"}
@@ -198,10 +188,7 @@ const Index = (props) => {
                         </div>
                         {data?.length != 0 && (
                             <ContainerPagination>
-                                <TitlePagination
-                                    dataLang={dataLang}
-                                    totalItems={totalItems?.iTotalDisplayRecords}
-                                />
+                                <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -264,9 +251,10 @@ const Popup_ChiNhanh = (props) => {
     const _ServerSending = () => {
         Axios(
             "POST",
-            `${props.id
-                ? `/api_web/Api_variation/variation/${id}?csrf_protection=true`
-                : "/api_web/Api_variation/variation?csrf_protection=true"
+            `${
+                props.id
+                    ? `/api_web/Api_variation/variation/${id}?csrf_protection=true`
+                    : "/api_web/Api_variation/variation?csrf_protection=true"
             }`,
             {
                 data: {
@@ -346,8 +334,9 @@ const Popup_ChiNhanh = (props) => {
                             onChange={_HandleChangeInput.bind(this, "name")}
                             placeholder={props.dataLang?.variant_name}
                             type="text"
-                            className={`${required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
+                            className={`${
+                                required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
                         />
                         {required && <label className="text-sm text-red-500">Vui lòng nhập tên biến thể</label>}
                     </div>
@@ -364,10 +353,11 @@ const Popup_ChiNhanh = (props) => {
                                         placeholder="Nhập tùy chọn"
                                         name="optionVariant"
                                         type="text"
-                                        className={`${listOptErr?.some((i) => i === e.name)
-                                            ? "border-red-500"
-                                            : "border-[#d0d5dd] focus:border-[#92BFF7]"
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
+                                        className={`${
+                                            listOptErr?.some((i) => i === e.name)
+                                                ? "border-red-500"
+                                                : "border-[#d0d5dd] focus:border-[#92BFF7]"
+                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
                                     />
                                     <button
                                         onClick={_HandleDelete.bind(this, e.id)}

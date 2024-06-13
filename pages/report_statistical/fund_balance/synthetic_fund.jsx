@@ -21,6 +21,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import Navbar from '../components/navbar';
 import TitleHeader from '../components/titleHeader';
+import usePagination from '@/hooks/usePagination';
 
 const Index = (props) => {
     const dataLang = props.dataLang
@@ -28,6 +29,8 @@ const Index = (props) => {
     const dataSeting = useSetingServer()
 
     const router = useRouter()
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
@@ -45,16 +48,6 @@ const Index = (props) => {
     const [isState, setState] = useState(initialState)
 
     const queryState = (key) => setState((prev) => ({ ...prev, ...key }));
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
 
     return (
         <React.Fragment>

@@ -1,4 +1,3 @@
-
 import Head from "next/head";
 import { debounce } from "lodash";
 import moment from "moment/moment";
@@ -30,8 +29,14 @@ import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecompon
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import { Container, ContainerBody, ContainerFilterTab, ContainerTable, ContainerTotal, FilterTab } from "@/components/UI/common/layout";
-
+import {
+    Container,
+    ContainerBody,
+    ContainerFilterTab,
+    ContainerTable,
+    ContainerTotal,
+    FilterTab,
+} from "@/components/UI/common/layout";
 
 import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
@@ -40,7 +45,6 @@ import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
-
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { routerDeliveryReceipt } from "routers/sellingGoods";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
@@ -48,25 +52,27 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
-
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
     const isShow = useToast();
 
+    const { paginate } = usePagination();
+
     const statusExprired = useStatusExprired();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkExport } = useActionRole(auth, "deliveryReceipt")
+    const { checkAdd, checkExport } = useActionRole(auth, "deliveryReceipt");
 
-    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
     const [total, setTotal] = useState({});
 
@@ -86,9 +92,8 @@ const Index = (props) => {
         valueDate: {
             startDate: null,
             endDate: null,
-        }
-
-    }
+        },
+    };
     const [isState, sIsState] = useState(initialState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
@@ -134,9 +139,8 @@ const Index = (props) => {
                     queryState({
                         data: rResult,
                         dataExcel: rResult,
-                        onFetching: false
+                        onFetching: false,
                     });
-
                 }
             }
         );
@@ -169,7 +173,7 @@ const Index = (props) => {
     // filter
     const convertArray = (arr) => {
         return arr?.map((e) => ({ label: e?.name, value: e?.id })) || [];
-    }
+    };
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
@@ -180,7 +184,9 @@ const Index = (props) => {
         await Axios("GET", `api_web/api_delivery/searchDeliveries?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { data } = response?.data;
-                queryState({ listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
+                queryState({
+                    listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [],
+                });
             }
         });
         await Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {}, (err, response) => {
@@ -193,34 +199,42 @@ const Index = (props) => {
     };
 
     const handleSearchApiClient = debounce((value) => {
-        Axios("GET", "/api_web/api_client/searchClients?csrf_protection=true", {
-            params: {
-                search: value ? value : "",
+        Axios(
+            "GET",
+            "/api_web/api_client/searchClients?csrf_protection=true",
+            {
+                params: {
+                    search: value ? value : "",
+                },
             },
-        }, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                queryState({ listCustomer: convertArray(data?.clients) });
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+                    queryState({ listCustomer: convertArray(data?.clients) });
+                }
             }
-        }
-        )
-    }, 500)
+        );
+    }, 500);
 
     const handleSearchApiOrders = debounce((value) => {
-        Axios("GET", "/api_web/api_delivery/searchDeliveries?csrf_protection=true", {
-            params: {
-                search: value ? value : "",
+        Axios(
+            "GET",
+            "/api_web/api_delivery/searchDeliveries?csrf_protection=true",
+            {
+                params: {
+                    search: value ? value : "",
+                },
             },
-        }, (err, response) => {
-            if (!err) {
-                let { data } = response?.data;
-                queryState({ listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [] });
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+                    queryState({
+                        listDelivery: data?.orders?.map((e) => ({ label: e?.reference_no, value: e?.id })) || [],
+                    });
+                }
             }
-        }
-        )
-    }, 500)
-
-
+        );
+    }, 500);
 
     useEffect(() => {
         isState.onFetchingFilter && _ServerFetching_filter();
@@ -248,23 +262,20 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                queryState({ onFetching: true })
+                queryState({ onFetching: true });
             }, 300);
         } else {
-            queryState({ onFetching: true })
+            queryState({ onFetching: true });
         }
-    }, [limit, isState.idBranch, isState.keySearch, isState.idDelivery, isState.idCustomer, isState.valueDate?.endDate, isState.valueDate?.startDate]);
-
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
+    }, [
+        limit,
+        isState.idBranch,
+        isState.keySearch,
+        isState.idDelivery,
+        isState.idCustomer,
+        isState.valueDate?.endDate,
+        isState.valueDate?.startDate,
+    ]);
 
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
@@ -486,12 +497,11 @@ const Index = (props) => {
                             <ButtonAddNew
                                 onClick={() => {
                                     if (role) {
-                                        router.push(routerDeliveryReceipt.form)
+                                        router.push(routerDeliveryReceipt.form);
                                     } else if (checkAdd) {
-                                        router.push(routerDeliveryReceipt.form)
-                                    }
-                                    else {
-                                        isShow("warning", WARNING_STATUS_ROLE)
+                                        router.push(routerDeliveryReceipt.form);
+                                    } else {
+                                        isShow("warning", WARNING_STATUS_ROLE);
                                     }
                                 }}
                                 dataLang={dataLang}
@@ -521,7 +531,12 @@ const Index = (props) => {
                                 <div className="bg-slate-100 w-full rounded-t-lg items-center grid grid-cols-7 2xl:grid-cols-9 xl:col-span-8 lg:col-span-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                     <div className="col-span-6 2xl:col-span-7 xl:col-span-5 lg:col-span-5">
                                         <div className="grid grid-cols-5 gap-2">
-                                            <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleOnChangeKeySearch.bind(this)} />
+                                            <SearchComponent
+                                                colSpan={1}
+                                                dataLang={dataLang}
+                                                placeholder={dataLang?.branch_search}
+                                                onChange={handleOnChangeKeySearch.bind(this)}
+                                            />
                                             <SelectComponent
                                                 options={[
                                                     {
@@ -541,7 +556,8 @@ const Index = (props) => {
                                                 options={[
                                                     {
                                                         value: "",
-                                                        label: dataLang?.delivery_receipt_code || "delivery_receipt_code",
+                                                        label:
+                                                            dataLang?.delivery_receipt_code || "delivery_receipt_code",
                                                         isDisabled: true,
                                                     },
                                                     ...isState.listDelivery,
@@ -569,27 +585,39 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 colSpan={1}
                                             />
-                                            <DateToDateComponent colSpan={1} value={isState.valueDate} onChange={(e) => queryState({ valueDate: e })} />
+                                            <DateToDateComponent
+                                                colSpan={1}
+                                                value={isState.valueDate}
+                                                onChange={(e) => queryState({ valueDate: e })}
+                                            />
                                         </div>
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.dataExcel?.length > 0 && (
-                                                        <ExcelFileComponent dataLang={dataLang}
-                                                            filename={dataLang?.delivery_receipt_list || "delivery_receipt_list"}
-                                                            title={'DSPGH'}
+                                                        <ExcelFileComponent
+                                                            dataLang={dataLang}
+                                                            filename={
+                                                                dataLang?.delivery_receipt_list ||
+                                                                "delivery_receipt_list"
+                                                            }
+                                                            title={"DSPGH"}
                                                             multiDataSet={multiDataSet}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -601,37 +629,38 @@ const Index = (props) => {
                                 {/* className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100" */}
                                 <div className="w-full">
                                     <HeaderTable gridCols={12}>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.delivery_receipt_date || "delivery_receipt_date"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center' colSpan={2}>
+                                        <ColumnTable textAlign="center" colSpan={2}>
                                             {dataLang?.price_quote_customer || "price_quote_table_customer"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.delivery_receipt_OrderNumber || "delivery_receipt_OrderNumber"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.price_quote_into_money || "price_quote_into_money"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
-                                            {dataLang?.delivery_receipt_BrowseStorekeepers || "delivery_receipt_BrowseStorekeepers"}
+                                        <ColumnTable textAlign="center">
+                                            {dataLang?.delivery_receipt_BrowseStorekeepers ||
+                                                "delivery_receipt_BrowseStorekeepers"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.price_quote_note || "price_quote_note"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.price_quote_branch || "price_quote_branch"}
                                         </ColumnTable>
-                                        <ColumnTable textAlign='center'>
+                                        <ColumnTable textAlign="center">
                                             {dataLang?.price_quote_operations || "price_quote_operations"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -642,7 +671,7 @@ const Index = (props) => {
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                 {isState.data?.map((e) => (
                                                     <RowTable key={e?.id} gridCols={12}>
-                                                        <RowItemTable colSpan={1} textAlign='center'>
+                                                        <RowItemTable colSpan={1} textAlign="center">
                                                             {e?.date != null
                                                                 ? moment(e?.date).format("DD/MM/YYYY")
                                                                 : ""}
@@ -650,7 +679,7 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1}>
                                                             <PopupDetail
                                                                 dataLang={dataLang}
-                                                                className=" transition-all text-[#0F4F9E] hover:text-blue-600 ease-linear  cursor-pointer"                                                                // className="text-left"
+                                                                className=" transition-all text-[#0F4F9E] hover:text-blue-600 ease-linear  cursor-pointer" // className="text-left"
                                                                 name={e?.reference_no}
                                                                 id={e?.id}
                                                             />
@@ -675,7 +704,11 @@ const Index = (props) => {
                                                         <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatMoney(e.grand_total)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={"left"} className="flex items-center space-x-1">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            textAlign={"left"}
+                                                            className="flex items-center space-x-1"
+                                                        >
                                                             <div className="relative">
                                                                 <ModalImage
                                                                     small={
@@ -707,9 +740,7 @@ const Index = (props) => {
                                                                     </span>
                                                                 </span>
                                                             </div>
-                                                            <h6 className="capitalize">
-                                                                {e?.created_by_full_name}
-                                                            </h6>
+                                                            <h6 className="capitalize">{e?.created_by_full_name}</h6>
                                                         </RowItemTable>
 
                                                         <RowItemTable colSpan={1}>
@@ -724,11 +755,12 @@ const Index = (props) => {
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className=" w-fit mx-auto">
-                                                            <TagBranch>
-                                                                {e?.name_branch}
-                                                            </TagBranch>
+                                                            <TagBranch>{e?.name_branch}</TagBranch>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className=" flex items-center justify-center">
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className=" flex items-center justify-center"
+                                                        >
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
                                                                 onRefreshGroup={_ServerFetching_group.bind(this)}
@@ -751,10 +783,10 @@ const Index = (props) => {
                         </ContainerTable>
                     </div>
                     <ContainerTotal>
-                        <ColumnTable colSpan={5} textAlign={'center'} className="p-2">
+                        <ColumnTable colSpan={5} textAlign={"center"} className="p-2">
                             {dataLang?.total_outside || "total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={2} textAlign={'right'} className="justify-end pr-4 flex gap-2 flex-wrap ">
+                        <ColumnTable colSpan={2} textAlign={"right"} className="justify-end pr-4 flex gap-2 flex-wrap ">
                             {formatMoney(total?.grand_total)}
                         </ColumnTable>
                         <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
@@ -763,10 +795,7 @@ const Index = (props) => {
                     </ContainerTotal>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItems?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItems?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItems?.iTotalDisplayRecords)}
@@ -787,7 +816,7 @@ const Index = (props) => {
                 save={handleSaveStatus}
                 cancel={() => handleQueryId({ status: false })}
             />
-        </React.Fragment >
+        </React.Fragment>
     );
 };
 

@@ -35,21 +35,24 @@ import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
-    const isShow = useToast()
+    const isShow = useToast();
 
     const router = useRouter();
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkExport } = useActionRole(auth, 'client_customers');
+    const { checkExport } = useActionRole(auth, "client_customers");
     // const { checkExport } = useActionRole(auth, 'client_contact');
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
     const initilalState = {
         keySearch: "",
@@ -61,15 +64,17 @@ const Index = (props) => {
         idBranch: null,
         idClient: null,
         listClient: [],
-        listBr: []
-    }
+        listBr: [],
+    };
 
-    const [isState, sIsState] = useState(initilalState)
+    const [isState, sIsState] = useState(initilalState);
 
-    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_client/contact/?csrf_protection=true",
+        Axios(
+            "GET",
+            "/api_web/api_client/contact/?csrf_protection=true",
             {
                 params: {
                     search: isState.keySearch,
@@ -91,7 +96,9 @@ const Index = (props) => {
     };
 
     const _ServerFetching_brand = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -100,7 +107,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     const { rResult, output } = response.data;
-                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) })
+                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) });
                 }
                 queryState({ onFetchingBranch: false });
             }
@@ -108,7 +115,9 @@ const Index = (props) => {
     };
 
     const _ServerFetching_client = () => {
-        Axios("GET", `/api_web/api_client/client_option/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/api_client/client_option/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -124,16 +133,6 @@ const Index = (props) => {
         );
     };
 
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                page: pageNumber,
-            },
-        });
-    };
-
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace({
@@ -142,7 +141,7 @@ const Index = (props) => {
                 // tab: router.query?.page,
             },
         });
-        queryState({ onFetching: true })
+        queryState({ onFetching: true });
     }, 500);
 
     useEffect(() => {
@@ -151,8 +150,7 @@ const Index = (props) => {
             (isState.onFetching && _ServerFetching_client());
     }, [isState.onFetching]);
     useEffect(() => {
-
-        queryState({ onFetching: true })
+        queryState({ onFetching: true });
     }, [limit, router.query?.page, isState.idBranch, isState.idClient]);
     //excel
     const multiDataSet = [
@@ -239,8 +237,9 @@ const Index = (props) => {
                 { value: `${e.position ? e.position : ""}` },
                 { value: `${e.email ? e.email : ""}` },
                 {
-                    value: `${e.birthday ? (e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "") : ""
-                        }`,
+                    value: `${
+                        e.birthday ? (e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "") : ""
+                    }`,
                 },
                 { value: `${e.address ? e.address : ""}` },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
@@ -322,7 +321,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
                                                         <ExcelFileComponent
@@ -330,14 +329,18 @@ const Index = (props) => {
                                                             filename="Danh sách liên hệ"
                                                             title="Dslh"
                                                             dataLang={dataLang}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -348,7 +351,7 @@ const Index = (props) => {
                             <Customscrollbar className="min:h-[200px] h-[90%] max:h-[750px] pb-2">
                                 {/* <div className="h-[100%] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
                                 <div className="w-[100%] lg:w-[100%] ">
-                                    <HeaderTable display={'grid'} gridCols={12}>
+                                    <HeaderTable display={"grid"} gridCols={12}>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
                                             {dataLang?.client_contact_table_fulname || "client_contact_table_fulname"}
                                         </ColumnTable>
@@ -356,22 +359,22 @@ const Index = (props) => {
                                             {dataLang?.client_contact_table_name || "client_contact_table_name"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.client_contact_table_phone || 'client_contact_table_phone'}
+                                            {dataLang?.client_contact_table_phone || "client_contact_table_phone"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.client_contact_table_mail || 'client_contact_table_mail'}
+                                            {dataLang?.client_contact_table_mail || "client_contact_table_mail"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.client_contact_table_pos || 'client_contact_table_pos'}
+                                            {dataLang?.client_contact_table_pos || "client_contact_table_pos"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.client_contact_table_hapy || 'client_contact_table_hapy'}
+                                            {dataLang?.client_contact_table_hapy || "client_contact_table_hapy"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={1} textAlign={"center"}>
-                                            {dataLang?.client_contact_table_address || 'client_contact_table_address'}
+                                            {dataLang?.client_contact_table_address || "client_contact_table_address"}
                                         </ColumnTable>
                                         <ColumnTable colSpan={2} textAlign={"center"}>
-                                            {dataLang?.client_contact_table_brand || 'client_contact_table_brand'}
+                                            {dataLang?.client_contact_table_brand || "client_contact_table_brand"}
                                         </ColumnTable>
                                     </HeaderTable>
                                     {isState.onFetching ? (
@@ -397,7 +400,9 @@ const Index = (props) => {
                                                             {e.position}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e.birthday != "0000-00-00" ? moment(e.birthday).format("DD/MM/YYYY") : ""}
+                                                            {e.birthday != "0000-00-00"
+                                                                ? moment(e.birthday).format("DD/MM/YYYY")
+                                                                : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.address}
@@ -424,10 +429,7 @@ const Index = (props) => {
                     </div>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItem?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
@@ -438,7 +440,7 @@ const Index = (props) => {
                     )}
                 </ContainerBody>
             </Container>
-        </React.Fragment >
+        </React.Fragment>
     );
 };
 export default Index;

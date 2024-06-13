@@ -42,12 +42,15 @@ import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const router = useRouter();
 
-    const dataSeting = useSetingServer()
+    const { paginate } = usePagination();
+
+    const dataSeting = useSetingServer();
 
     const statusExprired = useStatusExprired();
 
@@ -58,7 +61,7 @@ const Index = (props) => {
         valueDate: { startDate: null, endDate: null },
     };
 
-    const isShow = useToast()
+    const isShow = useToast();
 
     const initstialData = { table: [], excel: [], total: {}, listBr: [], dataMethod: [], dataObject: [] };
 
@@ -67,12 +70,17 @@ const Index = (props) => {
     const [keySearch, sKeySearch] = useState("");
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
-    console.log("auth", auth);
+
     //thay type
     // other_payslips_coupon
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'receipts');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "receipts");
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItems } = useLimitAndTotalItems()
+    const {
+        limit,
+        updateLimit: sLimit,
+        totalItems: totalItem,
+        updateTotalItems: sTotalItems,
+    } = useLimitAndTotalItems();
 
     const [fetching, sFetching] = useState(inistialFetch);
 
@@ -155,16 +163,7 @@ const Index = (props) => {
             },
         });
         updateFetch({ onFetching: true });
-    }, 500)
-
-    const paginate = (pageNumber) => {
-        const queryParams = { ...router.query, page: pageNumber };
-
-        router.push({
-            pathname: router.route,
-            query: queryParams,
-        });
-    };
+    }, 500);
 
     useEffect(() => {
         fetching.onFetching_filter && _ServerFetching_filter();
@@ -182,7 +181,10 @@ const Index = (props) => {
 
     useEffect(() => {
         if (
-            value.idBranch != null || (value.valueDate.startDate != null && value.valueDate.endDate != null) || value.idMethod != null || value.idObject != null
+            value.idBranch != null ||
+            (value.valueDate.startDate != null && value.valueDate.endDate != null) ||
+            value.idMethod != null ||
+            value.idObject != null
         ) {
             router.push({
                 pathname: router.route,
@@ -336,9 +338,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.receipts_title || "receipts_title"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.receipts_title || "receipts_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.receipts_title || "receipts_title"}</h6>
                     </div>
@@ -351,20 +351,23 @@ const Index = (props) => {
                                 {dataLang?.receipts_title}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_dspt
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <ContainerTable>
@@ -389,7 +392,7 @@ const Index = (props) => {
                                                 isClearable={true}
                                                 value={value.idBranch}
                                                 onChange={onChangeValue("idBranch")}
-                                                placeholder={dataLang?.price_quote_branch || 'price_quote_branch'}
+                                                placeholder={dataLang?.price_quote_branch || "price_quote_branch"}
                                                 colSpan={2}
                                             />
                                             <SelectComponent
@@ -432,7 +435,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex justify-end items-center gap-2">
                                             <OnResetData sOnFetching={sFetching} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {dataTable.excel?.length > 0 && (
                                                         <ExcelFileComponent
@@ -440,14 +443,18 @@ const Index = (props) => {
                                                             filename={dataLang?.receipts_lits || "receipts_lits"}
                                                             title="DSPT"
                                                             dataLang={dataLang}
-                                                        />)}
+                                                        />
+                                                    )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div className="">
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -457,41 +464,41 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar className="min:h-[200px] h-[88%] max:h-[500px]">
                                 <div className="w-full">
-                                    <HeaderTable gridCols={12} display={'grid'}>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                    <HeaderTable gridCols={12} display={"grid"}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_date || "payment_date"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_code || "payment_code"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_obType || "payment_obType"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_ob || "payment_ob"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_voucherCode || "payment_voucherCode"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {"PTTT"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_creator || "payment_creator"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_branch || "payment_branch"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_note || "payment_note"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={1} textAlign={'center'}>
+                                        <ColumnTable colSpan={1} textAlign={"center"}>
                                             {dataLang?.payment_action || "payment_action"}
                                         </ColumnTable>
                                     </HeaderTable>
@@ -501,13 +508,13 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                 {dataTable.table?.map((e) => (
-                                                    <RowTable gridCols={12} key={e.id.toString()}  >
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                    <RowTable gridCols={12} key={e.id.toString()}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e?.date != null
                                                                 ? moment(e?.date).format("DD/MM/YYYY")
                                                                 : ""}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'} >
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet
                                                                 dataLang={dataLang}
                                                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]"
@@ -515,36 +522,73 @@ const Index = (props) => {
                                                                 id={e?.id}
                                                             />
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'} className={'flex items-center justify-center'}>
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            textAlign={"center"}
+                                                            className={"flex items-center justify-center"}
+                                                        >
                                                             {(e?.objects === "client" && (
-                                                                <TagColorSky name={dataLang[e?.objects] || e?.objects} />
+                                                                <TagColorSky
+                                                                    name={dataLang[e?.objects] || e?.objects}
+                                                                />
                                                             )) ||
                                                                 (e?.objects === "supplier" && (
-                                                                    <TagColorOrange name={dataLang[e?.objects] || e?.objects} />
+                                                                    <TagColorOrange
+                                                                        name={dataLang[e?.objects] || e?.objects}
+                                                                    />
                                                                 )) ||
                                                                 (e?.objects === "other" && (
-                                                                    <TagColorRed name={dataLang[e?.objects] || e?.objects} />
+                                                                    <TagColorRed
+                                                                        name={dataLang[e?.objects] || e?.objects}
+                                                                    />
                                                                 ))}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'}>
+                                                        <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e?.object_text}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className={'flex items-center justify-center'}>
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            className={"flex items-center justify-center"}
+                                                        >
                                                             {(e?.type_vouchers === "import" && (
-                                                                <TagColorMore color={'#a855f7'} backgroundColor={"#e9d5ff"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
+                                                                <TagColorMore
+                                                                    color={"#a855f7"}
+                                                                    backgroundColor={"#e9d5ff"}
+                                                                    name={
+                                                                        dataLang[e?.type_vouchers] || e?.type_vouchers
+                                                                    }
+                                                                />
                                                             )) ||
                                                                 (e?.type_vouchers === "deposit" && (
-                                                                    <TagColorMore color={'#06b6d4'} backgroundColor={"#a5f3fc"} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
+                                                                    <TagColorMore
+                                                                        color={"#06b6d4"}
+                                                                        backgroundColor={"#a5f3fc"}
+                                                                        name={
+                                                                            dataLang[e?.type_vouchers] ||
+                                                                            e?.type_vouchers
+                                                                        }
+                                                                    />
                                                                 )) ||
                                                                 (e?.type_vouchers === "service" && (
-                                                                    <TagColorRed name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
+                                                                    <TagColorRed
+                                                                        name={
+                                                                            dataLang[e?.type_vouchers] ||
+                                                                            e?.type_vouchers
+                                                                        }
+                                                                    />
                                                                 )) ||
                                                                 (e?.type_vouchers === "order" && (
-                                                                    <TagColorMore color={'#22c55e'} backgroundColor={'#bbf7d0'} name={dataLang[e?.type_vouchers] || e?.type_vouchers} />
-
+                                                                    <TagColorMore
+                                                                        color={"#22c55e"}
+                                                                        backgroundColor={"#bbf7d0"}
+                                                                        name={
+                                                                            dataLang[e?.type_vouchers] ||
+                                                                            e?.type_vouchers
+                                                                        }
+                                                                    />
                                                                 ))}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className="" textAlign={'left'}>
+                                                        <RowItemTable colSpan={1} className="" textAlign={"left"}>
                                                             {e?.voucher?.map((code, index) => (
                                                                 <Popup_chitietThere
                                                                     key={code?.id}
@@ -558,21 +602,26 @@ const Index = (props) => {
                                                                 </Popup_chitietThere>
                                                             ))}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'center'}>
+                                                        <RowItemTable colSpan={1} textAlign={"center"}>
                                                             {e?.payment_mode_name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'right'}>
+                                                        <RowItemTable colSpan={1} textAlign={"right"}>
                                                             {formatMoney(e?.total)}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} className={''}>
-                                                            <CustomAvatar fullName={e?.staff_name} profileImage={e?.profile_image} />
+                                                        <RowItemTable colSpan={1} className={""}>
+                                                            <CustomAvatar
+                                                                fullName={e?.staff_name}
+                                                                profileImage={e?.profile_image}
+                                                            />
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="col-span-1 mx-auto">
-                                                            <TagBranch className='w-fit'>
-                                                                {e?.branch_name}
-                                                            </TagBranch>
+                                                            <TagBranch className="w-fit">{e?.branch_name}</TagBranch>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={1} textAlign={'left'} className={'truncate'}>
+                                                        <RowItemTable
+                                                            colSpan={1}
+                                                            textAlign={"left"}
+                                                            className={"truncate"}
+                                                        >
                                                             {e?.note}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} className="flex justify-center">
@@ -588,25 +637,24 @@ const Index = (props) => {
                                                 ))}
                                             </div>
                                         </>
-                                    ) : <NoData />}
+                                    ) : (
+                                        <NoData />
+                                    )}
                                 </div>
                             </Customscrollbar>
                         </ContainerTable>
                     </div>
                     <ContainerTotal>
-                        <ColumnTable colSpan={7} className="p-2" textAlign={'center'}>
+                        <ColumnTable colSpan={7} className="p-2" textAlign={"center"}>
                             {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                         </ColumnTable>
-                        <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+                        <ColumnTable colSpan={1} textAlign={"right"} className="p-2 mr-1">
                             {formatMoney(dataTable.total?.sum_total)}
                         </ColumnTable>
                     </ContainerTotal>
                     {dataTable.table?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItem?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}

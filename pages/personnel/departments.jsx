@@ -5,7 +5,13 @@ import { debounce } from "lodash";
 import { useSelector } from "react-redux";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch, Grid6 } from "iconsax-react";
+import {
+    Edit as IconEdit,
+    Trash as IconDelete,
+    Grid6 as IconExcel,
+    SearchNormal1 as IconSearch,
+    Grid6,
+} from "iconsax-react";
 import "react-phone-input-2/lib/style.css";
 import Popup_phongban from "./components/departments/popup";
 
@@ -35,6 +41,7 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const router = useRouter();
@@ -43,33 +50,36 @@ const Index = (props) => {
 
     const dataLang = props.dataLang;
 
-    const isShow = useToast()
+    const { paginate } = usePagination();
+
+    const isShow = useToast();
 
     const statusExprired = useStatusExprired();
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems: sTotalItem } = useLimitAndTotalItems();
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, 'department');
+    const { checkAdd, checkEdit, checkExport } = useActionRole(auth, "department");
 
     const initalState = {
-        keySearch: '',
+        keySearch: "",
         onFetching: false,
         onFetchingBrand: false,
         data: [],
         data_ex: [],
         valueBr: [],
-        listBr: []
-    }
+        listBr: [],
+    };
 
-    const [isState, sIsState] = useState(initalState)
+    const [isState, sIsState] = useState(initalState);
 
     const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
-
     const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_staff/department/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/api_staff/department/?csrf_protection=true`,
             {
                 params: {
                     search: isState.keySearch,
@@ -91,7 +101,9 @@ const Index = (props) => {
     };
 
     const _ServerFetching_brand = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -107,35 +119,27 @@ const Index = (props) => {
         );
     };
 
-
     useEffect(() => {
-        (isState.onFetching && _ServerFetching())
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        (isState.onFetchingBrand && _ServerFetching_brand());
+        isState.onFetchingBrand && _ServerFetching_brand();
     }, [isState.onFetchingBrand]);
 
     useEffect(() => {
-        queryState({ onFetching: true })
+        queryState({ onFetching: true });
     }, [limit, router.query?.page, isState.valueBr, isState.keySearch]);
 
     useEffect(() => {
-        queryState({ onFetchingBrand: true })
-    }, [])
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: "/personnels/departments",
-            query: { page: pageNumber },
-        });
-    };
+        queryState({ onFetchingBrand: true });
+    }, []);
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        queryState({ keySearch: value })
+        queryState({ keySearch: value });
         router.replace("/personnels/departments");
-        queryState({ onFetching: true })
-    }, 500)
+        queryState({ onFetching: true });
+    }, 500);
 
     const multiDataSet = [
         {
@@ -204,22 +208,25 @@ const Index = (props) => {
                                 {dataLang?.personnels_deparrtments_title}
                             </h2>
                             <div className="flex justify-end items-center gap-2">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_phongban
                                         isState={isState}
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
                                         nameModel={"client_contact"}
-                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> :
-                                    < button
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    />
+                                ) : (
+                                    <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
 
@@ -255,7 +262,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
                                                         <ExcelFileComponent
@@ -266,12 +273,15 @@ const Index = (props) => {
                                                         />
                                                     )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -281,18 +291,18 @@ const Index = (props) => {
                             </div>
                             <Customscrollbar className="min:h-[500px] 2xl:h-[92%] xl:h-[69%] h-[72%] max:h-[800px]   overflow-auto pb-2">
                                 <div className="w-full">
-                                    <HeaderTable gridCols={12} display={'grid'}>
-                                        <ColumnTable colSpan={3} textAlign={'center'}>
-                                            {dataLang?.personnels_deparrtments_name || 'personnels_deparrtments_name'}
+                                    <HeaderTable gridCols={12} display={"grid"}>
+                                        <ColumnTable colSpan={3} textAlign={"center"}>
+                                            {dataLang?.personnels_deparrtments_name || "personnels_deparrtments_name"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={3} textAlign={'center'}>
-                                            {dataLang?.personnels_deparrtments_email || 'personnels_deparrtments_email'}
+                                        <ColumnTable colSpan={3} textAlign={"center"}>
+                                            {dataLang?.personnels_deparrtments_email || "personnels_deparrtments_email"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={4} textAlign={'center'}>
-                                            {dataLang?.client_list_brand || 'client_list_brand'}
+                                        <ColumnTable colSpan={4} textAlign={"center"}>
+                                            {dataLang?.client_list_brand || "client_list_brand"}
                                         </ColumnTable>
-                                        <ColumnTable colSpan={2} textAlign={'center'}>
-                                            {dataLang?.branch_popup_properties || 'branch_popup_properties'}
+                                        <ColumnTable colSpan={2} textAlign={"center"}>
+                                            {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                         </ColumnTable>
                                     </HeaderTable>
                                     {isState.onFetching ? (
@@ -302,23 +312,24 @@ const Index = (props) => {
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={12} key={e.id.toString()}>
-                                                        <RowItemTable colSpan={3} textAlign={'left'}>
+                                                        <RowItemTable colSpan={3} textAlign={"left"}>
                                                             {e.name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={3} textAlign={'left'}>
+                                                        <RowItemTable colSpan={3} textAlign={"left"}>
                                                             {e.email}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={4}>
                                                             <span className="flex flex-wrap space-x-2">
                                                                 {e.branch?.map((i) => (
-                                                                    <TagBranch key={i} >
-                                                                        {i.name}
-                                                                    </TagBranch>
+                                                                    <TagBranch key={i}>{i.name}</TagBranch>
                                                                 ))}
                                                             </span>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className="space-x-2 text-center flex items-center justify-center">
-                                                            {role == true || checkEdit ?
+                                                        <RowItemTable
+                                                            colSpan={2}
+                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                        >
+                                                            {role == true || checkEdit ? (
                                                                 <Popup_phongban
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
@@ -329,12 +340,17 @@ const Index = (props) => {
                                                                     email={e.email}
                                                                     id={e.id}
                                                                 />
-                                                                :
-                                                                <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                                                            }
+                                                            ) : (
+                                                                <IconEdit
+                                                                    className="cursor-pointer"
+                                                                    onClick={() =>
+                                                                        isShow("warning", WARNING_STATUS_ROLE)
+                                                                    }
+                                                                />
+                                                            )}
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => { }}
+                                                                onRefreshGroup={() => {}}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="department"
@@ -353,10 +369,7 @@ const Index = (props) => {
                     </div>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItem?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
@@ -366,8 +379,8 @@ const Index = (props) => {
                         </ContainerPagination>
                     )}
                 </ContainerBody>
-            </Container >
-        </React.Fragment >
+            </Container>
+        </React.Fragment>
     );
 };
 

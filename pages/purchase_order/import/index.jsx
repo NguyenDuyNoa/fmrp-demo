@@ -66,6 +66,7 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -73,6 +74,8 @@ const Index = (props) => {
     const router = useRouter();
 
     const isShow = useToast();
+
+    const { paginate } = usePagination();
 
     const dataSeting = useSetingServer();
 
@@ -268,16 +271,6 @@ const Index = (props) => {
         });
         queryState({ onFetching: true });
     }, 500);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
 
     const multiDataSet = [
         {

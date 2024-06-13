@@ -50,10 +50,11 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ModalImage from "react-modal-image";
 import Popup_NVL from "./components/items/popupNvl";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
-
+    const { paginate } = usePagination();
 
     const router = useRouter();
 
@@ -205,13 +206,6 @@ const Index = (props) => {
     useEffect(() => {
         sOnFetchingUnit(true);
     }, []);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: { page: pageNumber },
-        });
-    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value);

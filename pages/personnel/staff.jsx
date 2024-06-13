@@ -51,11 +51,14 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
 
     const isShow = useToast();
+
+    const { paginate } = usePagination();
 
     const { isOpen, isKeyState, handleQueryId } = useToggle();
 
@@ -187,16 +190,6 @@ const Index = (props) => {
             onFetchingBranch: true,
         });
     }, []);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });

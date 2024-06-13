@@ -19,6 +19,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import TitleHeader from "../components/titleHeader";
+import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -29,6 +30,8 @@ const Index = (props) => {
     const refHeader = useRef(null);
 
     const refRow = useRef();
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
@@ -58,16 +61,6 @@ const Index = (props) => {
     const [isState, setState] = useState(initialState);
 
     const queryState = (key) => setState((prev) => ({ ...prev, ...key }));
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
 
     useEffect(() => {
         if (isState.valueYear.length === 0 || isState.valueMonth.length === 0) {

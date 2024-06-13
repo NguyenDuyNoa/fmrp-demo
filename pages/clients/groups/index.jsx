@@ -37,9 +37,12 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { RowItemTable, RowTable } from "@/components/UI/common/Table";
+import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const router = useRouter();
+
+    const { paginate } = usePagination();
 
     const statusExprired = useStatusExprired();
 
@@ -55,19 +58,21 @@ const Index = (props) => {
         onFetchingBranch: false,
         idBranch: [],
         listBr: [],
-    }
-    const [isState, sIsState] = useState(initilaState)
+    };
+    const [isState, sIsState] = useState(initilaState);
 
-    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }))
+    const queryState = (key) => sIsState((prev) => ({ ...prev, ...key }));
 
     const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth);
 
-    const { checkExport, checkEdit, checkAdd } = useActionRole(auth, 'client_group');
+    const { checkExport, checkEdit, checkAdd } = useActionRole(auth, "client_group");
 
-    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems()
+    const { limit, updateLimit: sLimit, totalItems: totalItem, updateTotalItems } = useLimitAndTotalItems();
 
     const _ServerFetching = () => {
-        Axios("GET", `/api_web/Api_client/group?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_client/group?csrf_protection=true`,
             {
                 params: {
                     search: isState.keySearch,
@@ -86,7 +91,9 @@ const Index = (props) => {
         );
     };
     const _ServerFetching_brand = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`,
+        Axios(
+            "GET",
+            `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -95,41 +102,36 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     const { rResult } = response.data;
-                    queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) || [], onFetchingBranch: false });
+                    queryState({
+                        listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) || [],
+                        onFetchingBranch: false,
+                    });
                 }
             }
         );
-    }
+    };
 
     useEffect(() => {
-        (isState.onFetching && _ServerFetching())
+        isState.onFetching && _ServerFetching();
     }, [isState.onFetching]);
 
     useEffect(() => {
-        isState.onFetchingBranch && _ServerFetching_brand()
+        isState.onFetchingBranch && _ServerFetching_brand();
     }, [isState.onFetchingBranch]);
 
     useEffect(() => {
-        queryState({ onFetching: true })
+        queryState({ onFetching: true });
     }, [limit, router.query?.page, isState.idBranch]);
 
     useEffect(() => {
-        queryState({ onFetchingBranch: true })
+        queryState({ onFetchingBranch: true });
     }, [limit, router.query?.page]);
-
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: "/clients/groups",
-            query: { page: pageNumber },
-        });
-    };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         queryState({ keySearch: value });
         router.replace("/clients/groups");
         queryState({ onFetching: true });
-    }, 500
-    )
+    }, 500);
     const multiDataSet = [
         {
             columns: [
@@ -187,9 +189,7 @@ const Index = (props) => {
                     <EmptyExprired />
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.client_group_client || "client_group_client"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.client_group_client || "client_group_client"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.client_groupuser_title || "client_groupuser_title"}</h6>
                     </div>
@@ -201,22 +201,24 @@ const Index = (props) => {
                                 {dataLang?.client_groupuser || "client_groupuser"}
                             </h2>
                             <div className="flex justify-end items-center">
-                                {role == true || checkAdd ?
+                                {role == true || checkAdd ? (
                                     <Popup_groupKh
                                         listBr={isState.listBr}
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    /> :
+                                    />
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={() => {
                                             isShow("warning", WARNING_STATUS_ROLE);
                                         }}
                                         className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
-                                    >{dataLang?.branch_popup_create_new}
+                                    >
+                                        {dataLang?.branch_popup_create_new}
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                         <ContainerTable>
@@ -251,7 +253,7 @@ const Index = (props) => {
                                     <div className="col-span-2">
                                         <div className="flex space-x-2 items-center justify-end">
                                             <OnResetData sOnFetching={(e) => queryState({ onFetching: e })} />
-                                            {(role == true || checkExport) ?
+                                            {role == true || checkExport ? (
                                                 <div className={``}>
                                                     {isState.data_ex?.length > 0 && (
                                                         <ExcelFileComponent
@@ -262,12 +264,15 @@ const Index = (props) => {
                                                         />
                                                     )}
                                                 </div>
-                                                :
-                                                <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
+                                            ) : (
+                                                <button
+                                                    onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
+                                                    className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
+                                                >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
                                                     <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
-                                            }
+                                            )}
                                             <div>
                                                 <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
@@ -300,31 +305,34 @@ const Index = (props) => {
                                         <>
                                             <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
                                                 {isState.data?.map((e) => (
-                                                    <RowTable gridCols={12} key={e.id.toString()} >
-                                                        <RowItemTable colSpan={4} textAlign={'left'}>
+                                                    <RowTable gridCols={12} key={e.id.toString()}>
+                                                        <RowItemTable colSpan={4} textAlign={"left"}>
                                                             {e.name}
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} textAlign={'center'}>
+                                                        <RowItemTable colSpan={2} textAlign={"center"}>
                                                             {e.color}
                                                         </RowItemTable>
                                                         <RowItemTable
                                                             backgroundColor={e.color}
                                                             colSpan={2}
-                                                            textAlign={'center'}
-                                                            className={'py-1 rounded-md'}
-                                                        > {e.color}
+                                                            textAlign={"center"}
+                                                            className={"py-1 rounded-md"}
+                                                        >
+                                                            {" "}
+                                                            {e.color}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2}>
                                                             <span className="flex items-center flex-wrap justify-start gap-2">
                                                                 {e?.branch?.map((e) => (
-                                                                    <TagBranch key={e.id}>
-                                                                        {e.name}
-                                                                    </TagBranch>
+                                                                    <TagBranch key={e.id}>{e.name}</TagBranch>
                                                                 ))}
                                                             </span>
                                                         </RowItemTable>
-                                                        <RowItemTable colSpan={2} className="space-x-2 text-center flex items-center justify-center">
-                                                            {role == true || checkEdit ?
+                                                        <RowItemTable
+                                                            colSpan={2}
+                                                            className="space-x-2 text-center flex items-center justify-center"
+                                                        >
+                                                            {role == true || checkEdit ? (
                                                                 <Popup_groupKh
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
@@ -335,12 +343,17 @@ const Index = (props) => {
                                                                     color={e.color}
                                                                     id={e.id}
                                                                 />
-                                                                :
-                                                                <IconEdit className="cursor-pointer" onClick={() => isShow('warning', WARNING_STATUS_ROLE)} />
-                                                            }
+                                                            ) : (
+                                                                <IconEdit
+                                                                    className="cursor-pointer"
+                                                                    onClick={() =>
+                                                                        isShow("warning", WARNING_STATUS_ROLE)
+                                                                    }
+                                                                />
+                                                            )}
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => { }}
+                                                                onRefreshGroup={() => {}}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="client_group"
@@ -359,10 +372,7 @@ const Index = (props) => {
                     </div>
                     {isState.data?.length != 0 && (
                         <ContainerPagination>
-                            <TitlePagination
-                                dataLang={dataLang}
-                                totalItems={totalItem?.iTotalDisplayRecords}
-                            />
+                            <TitlePagination dataLang={dataLang} totalItems={totalItem?.iTotalDisplayRecords} />
                             <Pagination
                                 postsPerPage={limit}
                                 totalPosts={Number(totalItem?.iTotalDisplayRecords)}
@@ -373,7 +383,6 @@ const Index = (props) => {
                     )}
                 </ContainerBody>
             </Container>
-
         </React.Fragment>
     );
 };
