@@ -1,57 +1,51 @@
-import Head from "next/head";
 import { PopupParent } from "@/utils/lib/Popup";
 import { debounce } from "lodash";
 import moment from "moment/moment";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
-import React, { useEffect, useState } from "react";
-import Pagination from "/components/UI/pagination";
+import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
+import Pagination from "/components/UI/pagination";
 
-import {
-    SearchNormal1 as IconSearch,
-    Grid6 as IconExcel,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    Grid6,
-} from "iconsax-react";
-
-import { _ServerInstance as Axios } from "/services/axios";
+import { Grid6, Trash as IconDelete } from "iconsax-react";
 
 import Popup_chitiet from "./components/popupDetail";
 import Popup_status from "./components/popupStatus";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
 import Loading from "@/components/UI/loading";
-import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import NoData from "@/components/UI/noData/nodata";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import NoData from "@/components/UI/noData/nodata";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import usePagination from "@/hooks/usePagination";
 import { routerInventory } from "@/routers/manufacture";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -94,11 +88,9 @@ const Index = (props) => {
 
     const { limit, updateLimit: sLimit, totalItems, updateTotalItems: sTotalItems } = useLimitAndTotalItems();
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_inventory/inventory",
-            {
+    const _ServerFetching = async () => {
+        try {
+            const { output, rResult } = await apiInventory.apiListInventory({
                 params: {
                     search: isState.keySearch,
                     limit: limit,
@@ -107,46 +99,40 @@ const Index = (props) => {
                     "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
                     "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { output, rResult } = response.data;
-                    sTotalItems(output);
-                    queryState({ data: rResult || [], dataExcel: rResult || [] });
-                }
-                queryState({ onFetching: false });
-            }
-        );
+            });
+
+            sTotalItems(output);
+
+            queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
+        } catch (error) {}
     };
 
-    const handleDelete = () => {
-        Axios("DELETE", `/api_web/api_inventory/inventory/${isId}`, {}, (err, response) => {
-            if (!err) {
-                let { isSuccess, message, data_export } = response?.data;
-                if (isSuccess) {
-                    isShow("success", dataLang[message] || message);
-                } else {
-                    isShow("error", dataLang[message] || message);
+    const handleDelete = async () => {
+        try {
+            const { isSuccess, message, data_export } = await apiInventory.apiDeleteInventory(isId);
+            if (isSuccess) {
+                isShow("success", dataLang[message] || message);
+            } else {
+                isShow("error", dataLang[message] || message);
 
-                    if (data_export?.length > 0) {
-                        queryState({ data_export: data_export || [] });
-                    }
+                if (data_export?.length > 0) {
+                    queryState({ data_export: data_export || [] });
                 }
             }
-            _ServerFetching();
-        });
+            await _ServerFetching();
 
-        handleQueryId({ status: false });
+            handleQueryId({ status: false });
+        } catch (error) {}
     };
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                const { rResult } = response.data;
-                queryState({ listBr: rResult?.map((e) => ({ label: e?.name, value: e?.id } || [])) });
-            }
-        });
-        queryState({ onFetching_filter: false });
+    const _ServerFetching_filter = async () => {
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            queryState({
+                listBr: result?.map((e) => ({ label: e?.name, value: e?.id } || [])),
+                onFetching_filter: false,
+            });
+        } catch (error) {}
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -162,6 +148,10 @@ const Index = (props) => {
     useEffect(() => {
         isState.onFetching_filter && _ServerFetching_filter();
     }, [isState.onFetching_filter]);
+
+    useEffect(() => {
+        queryState({ onFetching_filter: true });
+    }, []);
 
     useEffect(() => {
         queryState({ onFetching: true });

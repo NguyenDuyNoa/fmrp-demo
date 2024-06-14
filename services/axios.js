@@ -85,23 +85,25 @@ const _ServerInstance = (method, url, dataObject = {}, callback) => {
             if (callback) {
                 callback(error, null);
             }
-            if (error.response && error.response.status === 500) {
-                console.log("error.response 500", error.response);
-                // store.dispatch({type: "auth/update", payload: null});
-                // showToat("error", 'Đã xảy ra lỗi vui lòng làm mới trang');
-                // window.location.href = '/error/405';
-            } else if (error.response && error.response.status === 403) {
-                console.log("error.response 403", error.response.data);
-                showToat("error", error.response.data?.message);
-                setTimeout(() => {
-                    window.location.href = '/error/403';
-                }, 1500);
-                // store.dispatch({type: "auth/update", payload: null});
-            } else if (error.response && error.response.status === 404) {
-                console.log("error.response 404", error.response.data);
-                showToat("error", error.response.data?.message);
-                window.location.href = '/error/404';
-                // store.dispatch({type: "auth/update", payload: null});
+            if (error.response) {
+                const status = error.response.status;
+
+                const message = error.response.data?.message || "An error occurred";
+
+                if (status === 500) {
+                    console.log("error.response 500", error.response);
+                    // window.location.href = '/error/500';
+                } else if (status === 403) {
+                    console.log("error.response 403", error.response.data);
+                    showToat("error", message);
+                    setTimeout(() => window.location.href = '/error/403', 1500);
+                } else if (status === 404) {
+                    console.log("error.response 404", error.response.data);
+                    showToat("error", message);
+                    window.location.href = '/error/404';
+                }
+            } else {
+                console.log("error", error);
             }
             throw error;
         });

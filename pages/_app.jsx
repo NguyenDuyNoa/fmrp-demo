@@ -47,25 +47,29 @@ function MainPage({ Component, pageProps }) {
     }, []);
 
     const _ServerLang = async () => {
-        const res = await apiDashboard.apiLang(langDefault);
-        if (res) {
-            sData(res);
-            sChangeLang(false);
-        }
+        try {
+            const res = await apiDashboard.apiLang(langDefault);
+            if (res) {
+                sData(res);
+                sChangeLang(false);
+            }
+        } catch (error) {}
     };
 
     const FetchSetingServer = async () => {
-        const res = await apiDashboard.apiSettings();
-        dispatch({ type: "setings/server", payload: res?.settings });
+        try {
+            const res = await apiDashboard.apiSettings();
+            dispatch({ type: "setings/server", payload: res?.settings });
 
-        const fature = await apiDashboard.apiFeature();
-        const newData = {
-            dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
-            dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
-            dataProductSerial: fature.find((x) => x.code == "product_serial"),
-        };
-        dispatch({ type: "setings/feature", payload: newData });
-        sOnSeting(false);
+            const fature = await apiDashboard.apiFeature();
+            const newData = {
+                dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
+                dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
+                dataProductSerial: fature.find((x) => x.code == "product_serial"),
+            };
+            dispatch({ type: "setings/feature", payload: newData });
+            sOnSeting(false);
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -90,13 +94,15 @@ function MainPage({ Component, pageProps }) {
     const [onChecking, sOnChecking] = useState(false);
 
     const ServerFetching = async () => {
-        const { isSuccess, info } = await apiDashboard.apiAuthentication();
-        if (isSuccess) {
-            dispatch({ type: "auth/update", payload: info });
-        } else {
-            dispatch({ type: "auth/update", payload: false });
-        }
-        sOnChecking(false);
+        try {
+            const { isSuccess, info } = await apiDashboard.apiAuthentication();
+            if (isSuccess) {
+                dispatch({ type: "auth/update", payload: info });
+            } else {
+                dispatch({ type: "auth/update", payload: false });
+            }
+            sOnChecking(false);
+        } catch (error) {}
     };
 
     useEffect(() => {

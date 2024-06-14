@@ -1,42 +1,36 @@
-import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
-import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 
-import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
 
-import {
-    Calendar as IconCalendar,
-    Add as IconAdd,
-    SearchNormal1 as IconSearch,
-    Image as IconImage,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    ArrowRotateLeft as IconLoad,
-} from "iconsax-react";
-import DatePicker from "react-datepicker";
+import { Add as IconAdd, Calendar as IconCalendar, Trash as IconDelete, Image as IconImage } from "iconsax-react";
 import moment from "moment";
+import DatePicker from "react-datepicker";
 
-import useToast from "@/hooks/useToast";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 
-import NoData from "@/components/UI/noData/nodata";
-import { Container } from "@/components/UI/common/layout";
-import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import NoData from "@/components/UI/noData/nodata";
+import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 
-import { SelectCore } from "@/utils/lib/Select";
-import { isAllowedNumber } from "@/utils/helpers/common";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import Popup_Product from "./components/popupProduct";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
+import Popup_Product from "./components/popupProduct";
 const Form = (props) => {
     const dataLang = props.dataLang;
     const dispatch = useDispatch();
@@ -48,9 +42,9 @@ const Form = (props) => {
         return { menuPortalTarget };
     };
 
-    const isShow = useToast()
+    const isShow = useToast();
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingPstWH, sOnFetchingPstWH] = useState(false);
@@ -81,53 +75,36 @@ const Form = (props) => {
     const [isSubmitted, sIsSubmitted] = useState(false);
     const [dataErr, sDataErr] = useState(false);
 
-    const statusExprired = useStatusExprired()
+    const statusExprired = useStatusExprired();
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
     const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [dataProductSerial, sDataProductSerial] = useState({});
 
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
-    }
+    };
 
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting);
-    }
+    };
 
-    const _ServerFetching = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataBranch(
-                        rResult.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
-            }
-        );
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
-            }
-        );
+    const _ServerFetching = async () => {
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+
+            const data = await apiDashboard.apiFeature();
+
+            sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+
+            sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+
+            sDataProductSerial(data.find((x) => x.code == "product_serial"));
+
+            sDataBranch(result.map((e) => ({ label: e.name, value: e.id })));
+        } catch (error) {}
         sOnFetching(false);
     };
 
@@ -152,19 +129,26 @@ const Form = (props) => {
         }
     };
 
-    const _ServerFetchingWH = () => {
-        Axios("GET", `api_web/api_warehouse/warehouse?csrf_protection=true&filter[is_system]=2&filter[branch_id]=${branch?.value}`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataWareHouse(
-                        rResult.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
-                sOnFetchingWH(false);
-            }
-        );
+    const _ServerFetchingWH = async () => {
+        try {
+            const { rResult } = await apiInventory.apiWarehouseInventory(branch?.value);
+
+            sDataWareHouse(rResult.map((e) => ({ label: e.name, value: e.id })));
+        } catch (error) {}
+
+        sOnFetchingWH(false);
+        // Axios(
+        //     "GET",
+        //     `api_web/api_warehouse/warehouse?csrf_protection=true&filter[is_system]=2&filter[branch_id]=${branch?.value}`,
+        //     {},
+        //     (err, response) => {
+        //         if (!err) {
+        //             var { rResult } = response.data;
+        //             sDataWareHouse(rResult.map((e) => ({ label: e.name, value: e.id })));
+        //         }
+        //         sOnFetchingWH(false);
+        //     }
+        // );
     };
 
     useEffect(() => {
@@ -175,26 +159,21 @@ const Form = (props) => {
         branch !== null && sOnFetchingWH(true); //chọn chi nhánh để Get data Kho hàng
     }, [branch]);
 
-    const _ServerFetchingPstWH = () => {
-        Axios("GET", `/api_web/api_warehouse/LocationInWarehouse/${warehouse?.value}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    const data = response.data;
-                    dispatch({
-                        type: "location_inventory/update",
-                        payload: data.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        })),
-                    });
-                    sDataPstWH(
-                        data.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
-                sOnFetchingPstWH(false);
-            }
-        );
+    const _ServerFetchingPstWH = async () => {
+        try {
+            const data = await apiInventory.apiLocationInWarehouseInventory(warehouse?.value);
+
+            dispatch({
+                type: "location_inventory/update",
+                payload: data.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                })),
+            });
+
+            sDataPstWH(data.map((e) => ({ label: e.name, value: e.id })));
+        } catch (error) {}
+        sOnFetchingPstWH(false);
     };
 
     useEffect(() => {
@@ -255,22 +234,11 @@ const Form = (props) => {
                                 ce?.locate !== null &&
                                 ce?.lot !== null &&
                                 ce.date !== null &&
-                                _HandleCheckSameLot(
-                                    parentId,
-                                    id,
-                                    ce?.locate,
-                                    ce?.lot,
-                                    ce?.date
-                                );
+                                _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
                             e?.checkSerial == "1" &&
                                 ce?.locate !== null &&
                                 ce?.serial !== null &&
-                                _HandleCheckSameSerial(
-                                    parentId,
-                                    id,
-                                    ce?.locate,
-                                    ce?.serial
-                                );
+                                _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
                             e?.checkExpiry == "0" &&
                                 e?.checkSerial == "0" &&
                                 _HandleCheckSameLoca(parentId, id, ce?.locate);
@@ -280,26 +248,14 @@ const Form = (props) => {
                             ce?.locate !== null &&
                                 ce?.lot !== null &&
                                 ce.date !== null &&
-                                _HandleCheckSameLot(
-                                    parentId,
-                                    id,
-                                    ce?.locate,
-                                    ce?.lot,
-                                    ce?.date
-                                );
+                                _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
                             return { ...ce };
                         } else if (type === "date") {
                             ce.date = value;
                             ce?.locate !== null &&
                                 ce?.lot !== null &&
                                 ce.date !== null &&
-                                _HandleCheckSameLot(
-                                    parentId,
-                                    id,
-                                    ce?.locate,
-                                    ce?.lot,
-                                    ce?.date
-                                );
+                                _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
                             return { ...ce };
                         } else if (type === "serial") {
                             ce.serial = value?.target.value;
@@ -307,12 +263,7 @@ const Form = (props) => {
                                 e?.checkSerial == "1" &&
                                     ce?.locate !== null &&
                                     ce?.serial !== null &&
-                                    _HandleCheckSameSerial(
-                                        parentId,
-                                        id,
-                                        ce?.locate,
-                                        ce?.serial
-                                    );
+                                    _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
                             }, 1000);
                             setTimeout(() => {
                                 return { ...ce };
@@ -338,7 +289,8 @@ const Form = (props) => {
                         ?.some(
                             (item) =>
                                 item?.locate?.value === locate?.value &&
-                                item.lot?.value === lot?.value && moment(item.date).format("DD/MM/yyyy") == moment(date).format("DD/MM/yyyy")
+                                item.lot?.value === lot?.value &&
+                                moment(item.date).format("DD/MM/yyyy") == moment(date).format("DD/MM/yyyy")
                         );
                     const newChild = e.child
                         ?.map((ce) => {
@@ -390,12 +342,8 @@ const Form = (props) => {
 
     const _HandleCheckSameSerial = (parentId, id, locate, serial) => {
         setTimeout(() => {
-            const dataChild = dataChoose
-                ?.map((e) => e?.child)
-                ?.flatMap((innerList) => innerList);
-            const checkData = dataChild?.some(
-                (item) => item?.serial === serial && item?.id !== id
-            );
+            const dataChild = dataChoose?.map((e) => e?.child)?.flatMap((innerList) => innerList);
+            const checkData = dataChild?.some((item) => item?.serial === serial && item?.id !== id);
 
             const newData = dataChoose?.map((e) => {
                 if (e.id === parentId && checkData) {
@@ -408,13 +356,10 @@ const Form = (props) => {
                 }
                 return e;
             });
-            const parent =
-                newData?.find((item) => item.id === parentId) || null;
+            const parent = newData?.find((item) => item.id === parentId) || null;
             const child = parent?.child.find((e) => e.id === id) || null;
             const check = parent?.checkChild.find(
-                (e) =>
-                    e.locate === child?.locate?.value &&
-                    e.serial === child?.serial
+                (e) => e.locate === child?.locate?.value && e.serial === child?.serial
             );
 
             const newData1 = newData.map((e) => {
@@ -467,9 +412,7 @@ const Form = (props) => {
             const parent = newData.find((item) => item.id === parentId);
             if (!parent) return null;
             const child = parent.child.find((e) => e.id === id) || null;
-            const check = parent.checkChild.find(
-                (e) => e.locate === child?.locate?.value
-            );
+            const check = parent.checkChild.find((e) => e.locate === child?.locate?.value);
             const newData1 = newData.map((e) => {
                 if (e.id === parentId) {
                     const newChild = e.child?.map((ce) => {
@@ -487,18 +430,13 @@ const Form = (props) => {
         }, 1000);
     };
 
-
     const _HandleCheckSame = (parentId, id, locate, serial) => {
         setTimeout(() => {
             const newData = dataChoose.map((e) => {
                 if (e.id === parentId) {
                     const newChild = e.child
                         ?.map((ce) => {
-                            if (
-                                ce.id !== id &&
-                                ce.locate?.value === locate?.value &&
-                                ce.serial === serial
-                            ) {
+                            if (ce.id !== id && ce.locate?.value === locate?.value && ce.serial === serial) {
                                 isShow("error", `Trùng mặt hàng`);
                                 return {
                                     ...ce,
@@ -522,11 +460,7 @@ const Form = (props) => {
             if (!parent) return null;
             const child = parent.child.find((e) => e.id === id);
             if (!child) return null;
-            const check = parent.checkChild.find(
-                (e) =>
-                    e.locate === child.locate?.value &&
-                    e.serial === child.serial
-            );
+            const check = parent.checkChild.find((e) => e.locate === child.locate?.value && e.serial === child.serial);
             const newData1 = newData.map((e) => {
                 if (e.id === parentId) {
                     const newChild = e.child?.map((ce) => {
@@ -543,8 +477,8 @@ const Form = (props) => {
         }, 500);
     };
 
-    const _ServerSending = () => {
-        var formData = new FormData();
+    const _ServerSending = async () => {
+        let formData = new FormData();
 
         formData.append("code", code);
         formData.append("date", voucherdate);
@@ -570,38 +504,35 @@ const Form = (props) => {
                 formData.append(`data[${index}][child][${indexChild}][serial]`, itemChild?.serial || null);
             });
         });
+        try {
+            const { isSuccess, message, items_error, result } = await apiInventory.apiHandingInventory(formData);
+            if (isSuccess) {
+                sIsSubmitted(false);
 
-        Axios("POST", "/api_web/api_inventory/addDetail?csrf_protection=true",
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message, items_error, result } =
-                        response.data;
-                    if (isSuccess) {
-                        sIsSubmitted(false);
-                        sErrData([]);
-                        isShow("success", `${dataLang[message]}` || message);
-                        setTimeout(() => {
-                            router.back();
-                        }, 1000);
-                    } else {
-                        isShow("error", `${dataLang[message]}` || message);
-                        sErrData(items_error);
-                        sIsSubmitted(true);
-                        const hasStatus2 = items_error?.some((item) => item.status === 2);
-                        if (hasStatus2) {
-                            sDataErr(true);
-                        } else {
-                            sDataErr(false);
-                        }
-                    }
+                sErrData([]);
+
+                isShow("success", `${dataLang[message]}` || message);
+
+                setTimeout(() => {
+                    router.back();
+                }, 1000);
+            } else {
+                isShow("error", `${dataLang[message]}` || message);
+
+                sErrData(items_error);
+
+                sIsSubmitted(true);
+
+                const hasStatus2 = items_error?.some((item) => item.status === 2);
+
+                if (hasStatus2) {
+                    sDataErr(true);
+                } else {
+                    sDataErr(false);
                 }
-                sOnSending(false);
             }
-        );
+        } catch (error) {}
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -609,27 +540,21 @@ const Form = (props) => {
     }, [onSending]);
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const checkLotDate = dataChoose.some(
-            (item) => item?.checkExpiry == "1"
-        );
+        const checkLotDate = dataChoose.some((item) => item?.checkExpiry == "1");
         const checkSerial = dataChoose.some((item) => item?.checkSerial == "1");
 
-        const checkErrNullLocate = dataChoose.some((item) =>
-            item.child.some((itemChild) => itemChild.locate === null)
-        );
+        const checkErrNullLocate = dataChoose.some((item) => item.child.some((itemChild) => itemChild.locate === null));
 
         const checkErrNullLot = dataChoose.some(
             (item) =>
-                (dataProductExpiry?.is_enable === "1" ||
-                    dataMaterialExpiry?.is_enable === "1") &&
+                (dataProductExpiry?.is_enable === "1" || dataMaterialExpiry?.is_enable === "1") &&
                 item.checkExpiry === "1" &&
                 item.child.some((itemChild) => itemChild.lot === null)
         );
 
         const checkErrNullDate = dataChoose.some(
             (item) =>
-                (dataProductExpiry?.is_enable === "1" ||
-                    dataMaterialExpiry?.is_enable === "1") &&
+                (dataProductExpiry?.is_enable === "1" || dataMaterialExpiry?.is_enable === "1") &&
                 item.checkExpiry === "1" &&
                 item.child.some((itemChild) => itemChild.date === null)
         );
@@ -643,9 +568,7 @@ const Form = (props) => {
 
         const ChildData = dataChoose?.map((e) => e?.child)?.flatMap((e) => e);
         const checkErrNullQty = ChildData?.some((e) => e?.amount === null);
-        const hasEmptyChild = dataChoose.some(
-            (item) => item.child.length === 0
-        );
+        const hasEmptyChild = dataChoose.some((item) => item.child.length === 0);
 
         if (
             branch == null ||
@@ -653,12 +576,8 @@ const Form = (props) => {
             dataChoose.length == 0 ||
             checkErrNullLocate ||
             (dataProductSerial?.is_enable == "1" && checkErrNullSerial) ||
-            ((dataProductExpiry?.is_enable == "1" ||
-                dataMaterialExpiry?.is_enable == "1") &&
-                checkErrNullLot) ||
-            ((dataProductExpiry?.is_enable == "1" ||
-                dataMaterialExpiry?.is_enable == "1") &&
-                checkErrNullDate) ||
+            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && checkErrNullLot) ||
+            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") && checkErrNullDate) ||
             hasEmptyChild ||
             checkErrNullQty
         ) {
@@ -690,10 +609,7 @@ const Form = (props) => {
             dataChoose?.forEach((parentItem) => {
                 parentItem.child.forEach((childItem) => {
                     const hasDuplicate = errData?.some((responseItem) => {
-                        return (
-                            responseItem.serial === childItem.serial &&
-                            Number(responseItem.id) === childItem.id
-                        );
+                        return responseItem.serial === childItem.serial && Number(responseItem.id) === childItem.id;
                     });
 
                     if (hasDuplicate) {
@@ -714,7 +630,7 @@ const Form = (props) => {
                 <title>Thêm phiếu kiểm kê kho</title>
             </Head>
 
-            <Container className={'!h-auto'}>
+            <Container className={"!h-auto"}>
                 <Popup_status
                     dataErr={dataErr}
                     sDataErr={sDataErr}
@@ -729,11 +645,8 @@ const Form = (props) => {
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
-
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            Kiểm kê kho
-                        </h6>
+                        <h6 className="text-[#141522]/40">Kiểm kê kho</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>Thêm phiếu kiểm kê kho</h6>
                     </div>
@@ -743,21 +656,15 @@ const Form = (props) => {
                 </h2>
                 <div className="space-y-5">
                     <div className="space-y-2">
-                        <h2 className="bg-slate-100 py-2 px-4 rounded">
-                            Thông tin chung
-                        </h2>
+                        <h2 className="bg-slate-100 py-2 px-4 rounded">Thông tin chung</h2>
                         <div className="grid grid-cols-4 gap-5">
                             <div className="space-y-1">
                                 <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                    {"Mã chứng từ"}{" "}
-                                    <span className="text-red-500">*</span>
+                                    {"Mã chứng từ"} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     value={code}
-                                    onChange={_HandleChangeValue.bind(
-                                        this,
-                                        "code"
-                                    )}
+                                    onChange={_HandleChangeValue.bind(this, "code")}
                                     type="text"
                                     placeholder={"Mặc định theo hệ thống"}
                                     className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
@@ -765,8 +672,7 @@ const Form = (props) => {
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                    {"Ngày chứng từ"}{" "}
-                                    <span className="text-red-500">*</span>
+                                    {"Ngày chứng từ"} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative flex items-center">
                                     <DatePicker
@@ -775,37 +681,25 @@ const Form = (props) => {
                                         disabled
                                         className={`disabled:bg-[#f2f2f2] disabled:text-[#9999b0] focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                     />
-                                    <IconCalendar
-                                        size={22}
-                                        className="absolute right-3 text-[#cccccc]"
-                                    />
+                                    <IconCalendar size={22} className="absolute right-3 text-[#cccccc]" />
                                 </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[#344054] text-sm mb-1 ">
-                                    {"Chi nhánh"}{" "}
-                                    <span className="text-red-500">*</span>
+                                    {"Chi nhánh"} <span className="text-red-500">*</span>
                                 </label>
                                 <SelectCore
                                     options={dataBranch}
                                     value={branch}
-                                    onChange={_HandleChangeValue.bind(
-                                        this,
-                                        "branch"
-                                    )}
-                                    placeholder={
-                                        dataLang?.client_list_filterbrand
-                                    }
+                                    onChange={_HandleChangeValue.bind(this, "branch")}
+                                    placeholder={dataLang?.client_list_filterbrand}
                                     isClearable={true}
                                     isDisabled={dataChoose.length > 0}
-                                    className={`${errBranch && branch == null
-                                        ? "border-red-500"
-                                        : "border-transparent"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `}
+                                    className={`${
+                                        errBranch && branch == null ? "border-red-500" : "border-transparent"
+                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `}
                                     isSearchable={true}
-                                    noOptionsMessage={() =>
-                                        `${dataLang?.no_data_found}`
-                                    }
+                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     style={{
                                         border: "none",
                                         boxShadow: "none",
@@ -837,27 +731,20 @@ const Form = (props) => {
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[#344054] text-sm mb-1 ">
-                                    {"Kho hàng"}{" "}
-                                    <span className="text-red-500">*</span>
+                                    {"Kho hàng"} <span className="text-red-500">*</span>
                                 </label>
                                 <SelectCore
                                     options={dataWareHouse}
                                     value={warehouse}
-                                    onChange={_HandleChangeValue.bind(
-                                        this,
-                                        "warehouse"
-                                    )}
+                                    onChange={_HandleChangeValue.bind(this, "warehouse")}
                                     placeholder={"Chọn kho hàng"}
                                     isDisabled={dataChoose.length > 0}
                                     isClearable={true}
-                                    className={`${errWareHouse
-                                        ? "border-red-500"
-                                        : "border-transparent"
-                                        } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `}
+                                    className={`${
+                                        errWareHouse ? "border-red-500" : "border-transparent"
+                                    } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `}
                                     isSearchable={true}
-                                    noOptionsMessage={() =>
-                                        `${dataLang?.no_data_found}`
-                                    }
+                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     style={{
                                         border: "none",
                                         boxShadow: "none",
@@ -893,9 +780,7 @@ const Form = (props) => {
                         <h2 className="">Mặt hàng cần kiểm kê</h2>
                         <div>
                             {errProduct && dataChoose?.length == 0 && (
-                                <span className="text-red-500 mr-5">
-                                    Vui lòng thêm mặt hàng để kiểm kê
-                                </span>
+                                <span className="text-red-500 mr-5">Vui lòng thêm mặt hàng để kiểm kê</span>
                             )}
                             <Popup_Product
                                 dataLang={props.dataLang}
@@ -909,97 +794,63 @@ const Form = (props) => {
                         </div>
                     </div>
                     <div className="">
-                        <h2 className="bg-slate-100 py-2 px-4 rounded">
-                            Thông tin mặt hàng
-                        </h2>
+                        <h2 className="bg-slate-100 py-2 px-4 rounded">Thông tin mặt hàng</h2>
                         {dataChoose.length > 0 && (
                             <>
                                 <div className="grid grid-cols-6 pt-3 pb-2 shadow">
-                                    <h5 className="font-[300] text-slate-600 col-span-1 px-1.5">
-                                        Tên mặt hàng
-                                    </h5>
+                                    <h5 className="font-[300] text-slate-600 col-span-1 px-1.5">Tên mặt hàng</h5>
                                     {/* <div className={`${(dataMaterialExpiry.is_enable == "0" && dataProductSerial.is_enable == "0") ? "grid-cols-7" : (dataProductExpiry.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                     <div
-                                        className={`${dataProductSerial.is_enable == "1"
-                                            ? dataMaterialExpiry.is_enable !=
-                                                dataProductExpiry.is_enable
-                                                ? "grid-cols-10"
-                                                : dataMaterialExpiry.is_enable ==
-                                                    "1"
+                                        className={`${
+                                            dataProductSerial.is_enable == "1"
+                                                ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                    ? "grid-cols-10"
+                                                    : dataMaterialExpiry.is_enable == "1"
                                                     ? "grid-cols-[repeat(10_minmax(0_1fr))]"
                                                     : "grid-cols-8"
-                                            : dataMaterialExpiry.is_enable !=
-                                                dataProductExpiry.is_enable
+                                                : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                                 ? "grid-cols-9"
-                                                : dataMaterialExpiry.is_enable ==
-                                                    "1"
-                                                    ? "grid-cols-9"
-                                                    : "grid-cols-7"
-                                            } grid col-span-5 `}
+                                                : dataMaterialExpiry.is_enable == "1"
+                                                ? "grid-cols-9"
+                                                : "grid-cols-7"
+                                        } grid col-span-5 `}
                                     >
-                                        <h5 className="font-[300] text-slate-600  px-1.5">
-                                            Vị trí kho
-                                        </h5>
+                                        <h5 className="font-[300] text-slate-600  px-1.5">Vị trí kho</h5>
                                         {/* {dataMaterialExpiry?.is_enable == "1" && <h5 className='font-[300] text-slate-600 text-center px-1.5'>LOT</h5>}
                                         {dataProductExpiry?.is_enable == "1" && <h5 className='font-[300] text-slate-600 text-center px-1.5'>Date</h5>}
                                         {dataProductSerial?.is_enable == "1" && <h5 className='font-[300] text-slate-600 text-center px-1.5'>Serial</h5>} */}
-                                        {dataProductSerial.is_enable ===
-                                            "1" && (
-                                                <h4 className="font-[300] text-slate-600 text-center px-1.5">
-                                                    {"Serial"}
-                                                </h4>
-                                            )}
-                                        {dataMaterialExpiry.is_enable === "1" ||
-                                            dataProductExpiry.is_enable === "1" ? (
+                                        {dataProductSerial.is_enable === "1" && (
+                                            <h4 className="font-[300] text-slate-600 text-center px-1.5">{"Serial"}</h4>
+                                        )}
+                                        {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                             <>
                                                 <h4 className="font-[300] text-slate-600 text-center px-1.5">
                                                     {"Lot"}
                                                 </h4>
                                                 <h4 className="font-[300] text-slate-600 text-center px-1.5">
-                                                    {props.dataLang
-                                                        ?.warehouses_detail_date ||
-                                                        "warehouses_detail_date"}
+                                                    {props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}
                                                 </h4>
                                             </>
                                         ) : (
                                             ""
                                         )}
-                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">
-                                            Đơn giá
-                                        </h5>
-                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">
-                                            SL phần mềm
-                                        </h5>
-                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">
-                                            SL thực
-                                        </h5>
-                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">
-                                            Chênh lệch
-                                        </h5>
-                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">
-                                            Thành tiền
-                                        </h5>
-                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">
-                                            Tác vụ
-                                        </h5>
+                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">Đơn giá</h5>
+                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">SL phần mềm</h5>
+                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">SL thực</h5>
+                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">Chênh lệch</h5>
+                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">Thành tiền</h5>
+                                        <h5 className="font-[300] text-slate-600 text-center px-1.5">Tác vụ</h5>
                                     </div>
                                 </div>
                                 <div className="2xl:max-h-[300px] max-h-[320px] overflow-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-slate-50">
                                     {dataChoose.map((e) => (
-                                        <div
-                                            key={e.id}
-                                            className="grid grid-cols-6 items-start mt-3 "
-                                        >
+                                        <div key={e.id} className="grid grid-cols-6 items-start mt-3 ">
                                             <div className="col-span-1 grid grid-cols-12 items-center p-1.5 space-y-1 border  h-full">
                                                 <div className="flex justify-between  col-span-3">
                                                     <div className="w-[60px] h-[60px] bg-gray-200 flex flex-col items-center justify-center rounded">
                                                         {" "}
                                                         {e?.img ? (
-                                                            <img
-                                                                src={e?.img}
-                                                                alt=""
-                                                                className="rounded"
-                                                            ></img>
+                                                            <img src={e?.img} alt="" className="rounded"></img>
                                                         ) : (
                                                             <IconImage />
                                                         )}
@@ -1019,11 +870,7 @@ const Form = (props) => {
                                                         {props.dataLang[e.type]}
                                                     </h5>
                                                     <button
-                                                        onClick={_HandleActionItem.bind(
-                                                            this,
-                                                            e.id,
-                                                            "add"
-                                                        )}
+                                                        onClick={_HandleActionItem.bind(this, e.id, "add")}
                                                         className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 absolute transition flex flex-col justify-center items-center -top-4 hover:rotate-45 right-1.5 hover:scale-105 hover:text-red-500 ease-in-out "
                                                     >
                                                         <IconAdd />
@@ -1032,310 +879,204 @@ const Form = (props) => {
                                             </div>
                                             {/* <div className={`${(e?.checkExpiry == "0" && e?.checkSerial == "0") ? "grid-cols-7" : (e?.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                             <div
-                                                className={`${dataProductSerial.is_enable ==
-                                                    "1"
-                                                    ? dataMaterialExpiry.is_enable !=
-                                                        dataProductExpiry.is_enable
-                                                        ? "grid-cols-10"
-                                                        : dataMaterialExpiry.is_enable ==
-                                                            "1"
+                                                className={`${
+                                                    dataProductSerial.is_enable == "1"
+                                                        ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                            ? "grid-cols-10"
+                                                            : dataMaterialExpiry.is_enable == "1"
                                                             ? "grid-cols-[repeat(10_minmax(0_1fr))]"
                                                             : "grid-cols-8"
-                                                    : dataMaterialExpiry.is_enable !=
-                                                        dataProductExpiry.is_enable
+                                                        : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                                         ? "grid-cols-9"
-                                                        : dataMaterialExpiry.is_enable ==
-                                                            "1"
-                                                            ? "grid-cols-9"
-                                                            : "grid-cols-7"
-                                                    } grid col-span-5  h-full items-center`}
+                                                        : dataMaterialExpiry.is_enable == "1"
+                                                        ? "grid-cols-9"
+                                                        : "grid-cols-7"
+                                                } grid col-span-5  h-full items-center`}
                                             >
                                                 {/* {loadingData ? <h1 className='text-4xl font-bold'>Loading</h1> */}
                                                 {/* : */}
                                                 <>
                                                     {e.child?.map((ce) => (
-                                                        <React.Fragment
-                                                            key={ce?.id}
-                                                        >
+                                                        <React.Fragment key={ce?.id}>
                                                             <div className="p-1.5 border h-full flex items-center">
                                                                 <SelectCore
-                                                                    options={
-                                                                        dataPstWH
-                                                                    }
-                                                                    value={
-                                                                        ce?.locate
-                                                                    }
+                                                                    options={dataPstWH}
+                                                                    value={ce?.locate}
                                                                     onChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
                                                                         ce?.id,
                                                                         "locate"
                                                                     )}
-                                                                    placeholder={
-                                                                        "Vị trí kho"
-                                                                    }
-                                                                    isClearable={
-                                                                        true
-                                                                    }
+                                                                    placeholder={"Vị trí kho"}
+                                                                    isClearable={true}
                                                                     classNamePrefix="Select"
-                                                                    className={`${errNullLocate &&
-                                                                        ce.locate ==
-                                                                        null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                        } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
-                                                                    isSearchable={
-                                                                        true
-                                                                    }
+                                                                    className={`${
+                                                                        errNullLocate && ce.locate == null
+                                                                            ? "border-red-500"
+                                                                            : "border-transparent"
+                                                                    } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                                    isSearchable={true}
                                                                     noOptionsMessage={() =>
                                                                         `${dataLang?.no_data_found}`
                                                                     }
-                                                                    menuPortalTarget={
-                                                                        document.body
-                                                                    }
-                                                                    onMenuOpen={
-                                                                        handleMenuOpen
-                                                                    }
+                                                                    menuPortalTarget={document.body}
+                                                                    onMenuOpen={handleMenuOpen}
                                                                     style={{
                                                                         border: "none",
-                                                                        boxShadow:
-                                                                            "none",
-                                                                        outline:
-                                                                            "none",
+                                                                        boxShadow: "none",
+                                                                        outline: "none",
                                                                     }}
-                                                                    theme={(
-                                                                        theme
-                                                                    ) => ({
+                                                                    theme={(theme) => ({
                                                                         ...theme,
                                                                         colors: {
                                                                             ...theme.colors,
-                                                                            primary25:
-                                                                                "#EBF5FF",
-                                                                            primary50:
-                                                                                "#92BFF7",
-                                                                            primary:
-                                                                                "#0F4F9E",
+                                                                            primary25: "#EBF5FF",
+                                                                            primary50: "#92BFF7",
+                                                                            primary: "#0F4F9E",
                                                                         },
                                                                     })}
                                                                     styles={{
-                                                                        placeholder:
-                                                                            (
-                                                                                base
-                                                                            ) => ({
-                                                                                ...base,
-                                                                                color: "#cbd5e1",
+                                                                        placeholder: (base) => ({
+                                                                            ...base,
+                                                                            color: "#cbd5e1",
+                                                                        }),
+                                                                        menuPortal: (base) => ({
+                                                                            ...base,
+                                                                            zIndex: 9999,
+                                                                            position: "absolute",
+                                                                        }),
+                                                                        control: (base, state) => ({
+                                                                            ...base,
+                                                                            boxShadow: "none",
+                                                                            ...(state.isFocused && {
+                                                                                border: "0 0 0 1px #92BFF7",
                                                                             }),
-                                                                        menuPortal:
-                                                                            (
-                                                                                base
-                                                                            ) => ({
-                                                                                ...base,
-                                                                                zIndex: 9999,
-                                                                                position:
-                                                                                    "absolute",
-                                                                            }),
-                                                                        control:
-                                                                            (
-                                                                                base,
-                                                                                state
-                                                                            ) => ({
-                                                                                ...base,
-                                                                                boxShadow:
-                                                                                    "none",
-                                                                                ...(state.isFocused && {
-                                                                                    border: "0 0 0 1px #92BFF7",
-                                                                                }),
-                                                                            }),
+                                                                        }),
                                                                     }}
                                                                 />
                                                             </div>
-                                                            {dataProductSerial.is_enable ===
-                                                                "1" ? (
+                                                            {dataProductSerial.is_enable === "1" ? (
                                                                 <div className="p-1.5 border h-full  flex flex-col justify-center ">
                                                                     <input
-                                                                        disabled={
-                                                                            e?.checkSerial ==
-                                                                            "0"
-                                                                        }
-                                                                        value={
-                                                                            ce?.serial
-                                                                        }
+                                                                        disabled={e?.checkSerial == "0"}
+                                                                        value={ce?.serial}
                                                                         onChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,
                                                                             ce?.id,
                                                                             "serial"
                                                                         )}
-                                                                        className={`${e?.checkSerial ==
-                                                                            "0"
-                                                                            ? "border-transparent"
-                                                                            : errNullSerial &&
-                                                                                (ce.serial ===
-                                                                                    null ||
-                                                                                    ce.serial ===
-                                                                                    "")
+                                                                        className={`${
+                                                                            e?.checkSerial == "0"
+                                                                                ? "border-transparent"
+                                                                                : errNullSerial &&
+                                                                                  (ce.serial === null ||
+                                                                                      ce.serial === "")
                                                                                 ? "border-red-500"
                                                                                 : "border-gray-200"
-                                                                            } text-center py-1 px-1 font-medium w-full focus:outline-none border-b-2 `}
+                                                                        } text-center py-1 px-1 font-medium w-full focus:outline-none border-b-2 `}
                                                                     />
-                                                                    {isSubmitted &&
-                                                                        duplicateIds.includes(
-                                                                            ce.id
-                                                                        ) && (
-                                                                            <span className="text-red-500 text-[12px]">
-                                                                                Serial
-                                                                                đã
-                                                                                tồn
-                                                                                tại
-                                                                                trong
-                                                                                phần
-                                                                                mềm
-                                                                            </span>
-                                                                        )}
+                                                                    {isSubmitted && duplicateIds.includes(ce.id) && (
+                                                                        <span className="text-red-500 text-[12px]">
+                                                                            Serial đã tồn tại trong phần mềm
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                             ) : (
                                                                 ""
                                                             )}
-                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                                            {dataMaterialExpiry.is_enable === "1" ||
+                                                            dataProductExpiry.is_enable === "1" ? (
                                                                 <>
                                                                     <div className="p-1.5 border h-full flex items-center">
                                                                         <CreatableSelectCore
                                                                             isDisabled={e?.checkExpiry == "0"}
                                                                             placeholder={"Lot"}
-                                                                            options={
-                                                                                e?.dataLot
-                                                                            }
-                                                                            value={
-                                                                                ce?.lot
-                                                                            }
+                                                                            options={e?.dataLot}
+                                                                            value={ce?.lot}
                                                                             onChange={_HandleChangeChild.bind(
                                                                                 this,
                                                                                 e?.id,
                                                                                 ce?.id,
                                                                                 "lot"
                                                                             )}
-                                                                            isClearable={
-                                                                                true
-                                                                            }
+                                                                            isClearable={true}
                                                                             classNamePrefix="Select"
-                                                                            className={`${e?.checkExpiry ==
-                                                                                "0"
-                                                                                ? "border-transparent"
-                                                                                : errNullLot &&
-                                                                                    ce.lot ==
-                                                                                    null
+                                                                            className={`${
+                                                                                e?.checkExpiry == "0"
+                                                                                    ? "border-transparent"
+                                                                                    : errNullLot && ce.lot == null
                                                                                     ? "border-red-500"
                                                                                     : "border-transparent"
-                                                                                } Select__custom removeDivide placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
-                                                                            isSearchable={
-                                                                                true
-                                                                            }
-                                                                            menuPortalTarget={
-                                                                                document.body
-                                                                            }
-                                                                            onMenuOpen={
-                                                                                handleMenuOpen
-                                                                            }
-                                                                            noOptionsMessage={() =>
-                                                                                `Chưa có gợi ý`
-                                                                            }
-                                                                            formatCreateLabel={(
-                                                                                value
-                                                                            ) =>
+                                                                            } Select__custom removeDivide placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                                            isSearchable={true}
+                                                                            menuPortalTarget={document.body}
+                                                                            onMenuOpen={handleMenuOpen}
+                                                                            noOptionsMessage={() => `Chưa có gợi ý`}
+                                                                            formatCreateLabel={(value) =>
                                                                                 `Tạo "${value}"`
                                                                             }
                                                                             style={{
                                                                                 border: "none",
-                                                                                boxShadow:
-                                                                                    "none",
-                                                                                outline:
-                                                                                    "none",
+                                                                                boxShadow: "none",
+                                                                                outline: "none",
                                                                             }}
-                                                                            theme={(
-                                                                                theme
-                                                                            ) => ({
+                                                                            theme={(theme) => ({
                                                                                 ...theme,
                                                                                 colors: {
                                                                                     ...theme.colors,
-                                                                                    primary25:
-                                                                                        "#EBF5FF",
-                                                                                    primary50:
-                                                                                        "#92BFF7",
-                                                                                    primary:
-                                                                                        "#0F4F9E",
+                                                                                    primary25: "#EBF5FF",
+                                                                                    primary50: "#92BFF7",
+                                                                                    primary: "#0F4F9E",
                                                                                 },
                                                                             })}
                                                                             styles={{
-                                                                                placeholder:
-                                                                                    (
-                                                                                        base
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        color: "#cbd5e1",
+                                                                                placeholder: (base) => ({
+                                                                                    ...base,
+                                                                                    color: "#cbd5e1",
+                                                                                }),
+                                                                                menuPortal: (base) => ({
+                                                                                    ...base,
+                                                                                    zIndex: 9999,
+                                                                                    position: "absolute",
+                                                                                }),
+                                                                                control: (base, state) => ({
+                                                                                    ...base,
+                                                                                    boxShadow: "none",
+                                                                                    ...(state.isFocused && {
+                                                                                        border: "0 0 0 1px #92BFF7",
                                                                                     }),
-                                                                                menuPortal:
-                                                                                    (
-                                                                                        base
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        zIndex: 9999,
-                                                                                        position:
-                                                                                            "absolute",
-                                                                                    }),
-                                                                                control:
-                                                                                    (
-                                                                                        base,
-                                                                                        state
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        boxShadow:
-                                                                                            "none",
-                                                                                        ...(state.isFocused && {
-                                                                                            border: "0 0 0 1px #92BFF7",
-                                                                                        }),
-                                                                                    }),
-                                                                                dropdownIndicator:
-                                                                                    (
-                                                                                        base
-                                                                                    ) => ({
-                                                                                        ...base,
-                                                                                        display:
-                                                                                            "none",
-                                                                                    }),
+                                                                                }),
+                                                                                dropdownIndicator: (base) => ({
+                                                                                    ...base,
+                                                                                    display: "none",
+                                                                                }),
                                                                             }}
                                                                         />
                                                                     </div>
                                                                     <div className="relative flex items-center p-1.5 border h-full">
                                                                         <DatePicker
-                                                                            disabled={
-                                                                                e?.checkExpiry ==
-                                                                                "0"
-                                                                            }
+                                                                            disabled={e?.checkExpiry == "0"}
                                                                             dateFormat="dd/MM/yyyy"
                                                                             placeholderText="date"
-                                                                            selected={
-                                                                                ce?.date
-                                                                            }
+                                                                            selected={ce?.date}
                                                                             onChange={_HandleChangeChild.bind(
                                                                                 this,
                                                                                 e?.id,
                                                                                 ce?.id,
                                                                                 "date"
                                                                             )}
-                                                                            className={`${e?.checkExpiry ==
-                                                                                "0"
-                                                                                ? "border-gray-200"
-                                                                                : errNullDate &&
-                                                                                    ce?.date ==
-                                                                                    null
+                                                                            className={`${
+                                                                                e?.checkExpiry == "0"
+                                                                                    ? "border-gray-200"
+                                                                                    : errNullDate && ce?.date == null
                                                                                     ? "border-red-500"
                                                                                     : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                } bg-transparent disabled:bg-gray-100  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
+                                                                            } bg-transparent disabled:bg-gray-100  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
                                                                         />
                                                                         <IconCalendar
-                                                                            size={
-                                                                                22
-                                                                            }
+                                                                            size={22}
                                                                             className="absolute right-3 text-[#cccccc]"
                                                                         />
                                                                     </div>
@@ -1345,9 +1086,7 @@ const Form = (props) => {
                                                             )}
                                                             <div className="p-1.5 border  flex flex-col justify-center h-full">
                                                                 <InPutMoneyFormat
-                                                                    value={
-                                                                        ce?.price
-                                                                    }
+                                                                    value={ce?.price}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -1363,62 +1102,35 @@ const Form = (props) => {
                                                             </h6>
                                                             <div className="p-1.5 border h-full  flex flex-col justify-center ">
                                                                 <InPutNumericFormat
-                                                                    value={
-                                                                        ce?.amount
-                                                                    }
+                                                                    value={ce?.amount}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
                                                                         ce?.id,
                                                                         "amount"
                                                                     )}
-                                                                    className={`${errNullQty &&
-                                                                        ce?.amount ==
-                                                                        null
-                                                                        ? "border-red-500 border-b-2"
-                                                                        : " border-gray-200 border-b-2"
-                                                                        }  appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none  `}
-                                                                    isAllowed={(
-                                                                        values
-                                                                    ) => {
-                                                                        const {
-                                                                            floatValue,
-                                                                        } =
-                                                                            values;
-                                                                        if (
-                                                                            e?.checkSerial ==
-                                                                            "1"
-                                                                        ) {
-                                                                            return (
-                                                                                floatValue >=
-                                                                                0 &&
-                                                                                floatValue <
-                                                                                2
-                                                                            );
+                                                                    className={`${
+                                                                        errNullQty && ce?.amount == null
+                                                                            ? "border-red-500 border-b-2"
+                                                                            : " border-gray-200 border-b-2"
+                                                                    }  appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none  `}
+                                                                    isAllowed={(values) => {
+                                                                        const { floatValue } = values;
+                                                                        if (e?.checkSerial == "1") {
+                                                                            return floatValue >= 0 && floatValue < 2;
                                                                         } else {
-                                                                            return (
-                                                                                floatValue >=
-                                                                                0
-                                                                            );
+                                                                            return floatValue >= 0;
                                                                         }
                                                                     }}
                                                                 />
                                                             </div>
                                                             <h6 className="flex flex-col justify-center items-center p-1.5 border h-full ">
-                                                                {ce?.amount !=
-                                                                    null &&
-                                                                    formatNumber(
-                                                                        ce?.amount -
-                                                                        ce?.quantity
-                                                                    )}
+                                                                {ce?.amount != null &&
+                                                                    formatNumber(ce?.amount - ce?.quantity)}
                                                             </h6>
                                                             <h6 className="p-1.5 border h-full  flex flex-col justify-center items-center ">
-                                                                {ce?.amount !=
-                                                                    null &&
-                                                                    formatNumber(
-                                                                        ce?.amount *
-                                                                        ce?.price
-                                                                    )}
+                                                                {ce?.amount != null &&
+                                                                    formatNumber(ce?.amount * ce?.price)}
                                                             </h6>
                                                             <div className="flex flex-col justify-center items-center p-1.5 border h-full ">
                                                                 <button
@@ -1458,92 +1170,63 @@ const Form = (props) => {
                         </div>
                         <div className="space-y-2 flex flex-col items-end">
                             <div className="flex">
-                                <h5 className="min-w-[230px]">
-                                    Tổng số lượng :{" "}
-                                </h5>
+                                <h5 className="min-w-[230px]">Tổng số lượng : </h5>
                                 <span className="min-w-[150px] text-right">
-                                    {formatNumber(dataChoose
-                                        .reduce((acc, obj) => {
+                                    {formatNumber(
+                                        dataChoose.reduce((acc, obj) => {
                                             return (
                                                 acc +
-                                                obj.child?.reduce(
-                                                    (acc2, obj2) => {
-                                                        return (
-                                                            acc2 + obj2.quantity
-                                                        );
-                                                    },
-                                                    0
-                                                )
+                                                obj.child?.reduce((acc2, obj2) => {
+                                                    return acc2 + obj2.quantity;
+                                                }, 0)
                                             );
-                                        }, 0))
-                                    }
+                                        }, 0)
+                                    )}
                                 </span>
                             </div>
                             <div className="flex">
-                                <h5 className="min-w-[230px]">
-                                    Tổng số lượng thực :{" "}
-                                </h5>
+                                <h5 className="min-w-[230px]">Tổng số lượng thực : </h5>
                                 <span className="min-w-[150px] text-right">
-                                    {formatNumber(dataChoose
-                                        .reduce((acc, obj) => {
+                                    {formatNumber(
+                                        dataChoose.reduce((acc, obj) => {
                                             return (
                                                 acc +
-                                                obj.child?.reduce(
-                                                    (acc2, obj2) => {
-                                                        return (
-                                                            acc2 + obj2.amount
-                                                        );
-                                                    },
-                                                    0
-                                                )
+                                                obj.child?.reduce((acc2, obj2) => {
+                                                    return acc2 + obj2.amount;
+                                                }, 0)
                                             );
-                                        }, 0))
-                                    }
+                                        }, 0)
+                                    )}
                                 </span>
                             </div>
                             <div className="flex">
-                                <h5 className="min-w-[230px]">
-                                    Tổng số lượng chênh lệch :{" "}
-                                </h5>
+                                <h5 className="min-w-[230px]">Tổng số lượng chênh lệch : </h5>
                                 <span className="min-w-[150px] text-right">
-                                    {formatNumber(dataChoose
-                                        .reduce((acc, obj) => {
+                                    {formatNumber(
+                                        dataChoose.reduce((acc, obj) => {
                                             return (
                                                 acc +
-                                                obj.child?.reduce(
-                                                    (acc2, obj2) => {
-                                                        return (
-                                                            acc2 +
-                                                            (obj2.amount -
-                                                                obj2.quantity)
-                                                        );
-                                                    },
-                                                    0
-                                                )
+                                                obj.child?.reduce((acc2, obj2) => {
+                                                    return acc2 + (obj2.amount - obj2.quantity);
+                                                }, 0)
                                             );
-                                        }, 0))
-                                    }
+                                        }, 0)
+                                    )}
                                 </span>
                             </div>
                             <div className="flex">
                                 <h5 className="min-w-[230px]">Thành tiền : </h5>
                                 <span className="min-w-[150px] text-right">
-                                    {formatMoney(dataChoose
-                                        .reduce((acc, obj) => {
+                                    {formatMoney(
+                                        dataChoose.reduce((acc, obj) => {
                                             return (
                                                 acc +
-                                                obj.child?.reduce(
-                                                    (acc2, obj2) => {
-                                                        return (
-                                                            acc2 +
-                                                            obj2.amount *
-                                                            obj2.price
-                                                        );
-                                                    },
-                                                    0
-                                                )
+                                                obj.child?.reduce((acc2, obj2) => {
+                                                    return acc2 + obj2.amount * obj2.price;
+                                                }, 0)
                                             );
-                                        }, 0))}
+                                        }, 0)
+                                    )}
                                 </span>
                             </div>
                             <div className="space-x-2">
@@ -1564,11 +1247,11 @@ const Popup_status = (props) => {
 
     const [open, sOpen] = useState(false);
 
-    const dataSeting = useSetingServer()
+    const dataSeting = useSetingServer();
 
     const formatnumber = (num) => {
-        return formatNumberConfig(+num, dataSeting)
-    }
+        return formatNumberConfig(+num, dataSeting);
+    };
 
     const _HandleClose = () => {
         sOpen(false);
@@ -1586,9 +1269,7 @@ const Popup_status = (props) => {
         ?.filter((errItem) => errItem.status === 2)
         .map((errItem) => {
             const matchingChild = props?.dataChoose?.find((dataItem) =>
-                dataItem.child.some(
-                    (childItem) => childItem.id.toString() === errItem.id
-                )
+                dataItem.child.some((childItem) => childItem.id.toString() === errItem.id)
             );
             return {
                 ...errItem,
@@ -1600,16 +1281,12 @@ const Popup_status = (props) => {
         const updatedData = props?.dataChoose.map((parent) => {
             const updatedChild = parent.child.map((child) => {
                 const matchedItem = props?.errData?.find(
-                    (item) =>
-                        item.id_parent === parent.id &&
-                        Number(item.id) === child.id
+                    (item) => item.id_parent === parent.id && Number(item.id) === child.id
                 );
                 if (matchedItem) {
                     return {
                         ...child,
-                        quantity: isNaN(
-                            Number(matchedItem.check_quantity_stock)
-                        )
+                        quantity: isNaN(Number(matchedItem.check_quantity_stock))
                             ? 0
                             : Number(matchedItem.check_quantity_stock),
                     };
@@ -1626,11 +1303,7 @@ const Popup_status = (props) => {
 
     return (
         <PopupEdit
-            title={
-                "Phiếu kiểm kê bị thay đổi về số lượng thực" +
-                " " +
-                `${moment(new Date()).format("DD/MM/YYYY")}`
-            }
+            title={"Phiếu kiểm kê bị thay đổi về số lượng thực" + " " + `${moment(new Date()).format("DD/MM/YYYY")}`}
             open={open}
             onClose={_HandleClose.bind(this)}
             classNameBtn={props.className}
@@ -1638,9 +1311,7 @@ const Popup_status = (props) => {
             <div className="mt-4 space-x-5 w-[990px] h-auto">
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     <div className="pr-2 w-[100%] lx:w-[120%] ">
-                        <div
-                            className={`grid-cols-10 grid sticky top-0 bg-white shadow  z-10`}
-                        >
+                        <div className={`grid-cols-10 grid sticky top-0 bg-white shadow  z-10`}>
                             <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center">
                                 {"Tên hàng"}
                             </h4>
@@ -1663,9 +1334,7 @@ const Popup_status = (props) => {
                             <>
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] mt-2 ">
                                     {newDataChoose?.map((e) => (
-                                        <div
-                                            className={`grid-cols-10  grid hover:bg-slate-50 items-center`}
-                                        >
+                                        <div className={`grid-cols-10  grid hover:bg-slate-50 items-center`}>
                                             <h6 className="text-[13px]  px-2 col-span-2 text-center capitalize">
                                                 {e?.name}
                                             </h6>
@@ -1676,28 +1345,18 @@ const Popup_status = (props) => {
                                                 {formatnumber(e?.quantity_net)}
                                             </h6>
                                             <h6 className="text-[13px]  px-2 col-span-2 text-center capitalize">
-                                                {formatnumber(e?.quantity_net -
-                                                    e?.check_quantity_stock)}
+                                                {formatnumber(e?.quantity_net - e?.check_quantity_stock)}
                                             </h6>
                                             <h6 className="text-[13px]  px-2 col-span-2 text-center capitalize">
-                                                {e?.quantity_net -
-                                                    e?.check_quantity_stock >
-                                                    0
-                                                    ? `Mặt hàng cần điều chỉnh tăng ${formatnumber(
-                                                        e?.quantity_net
-                                                    ) -
-                                                    formatnumber(
-                                                        e?.check_quantity_stock
-                                                    )
-                                                    }`
+                                                {e?.quantity_net - e?.check_quantity_stock > 0
+                                                    ? `Mặt hàng cần điều chỉnh tăng ${
+                                                          formatnumber(e?.quantity_net) -
+                                                          formatnumber(e?.check_quantity_stock)
+                                                      }`
                                                     : `Mặt hàng cần điều chỉnh giảm ${Math.abs(
-                                                        formatnumber(
-                                                            e?.quantity_net
-                                                        ) -
-                                                        formatnumber(
-                                                            e?.check_quantity_stock
-                                                        )
-                                                    )}`}
+                                                          formatnumber(e?.quantity_net) -
+                                                              formatnumber(e?.check_quantity_stock)
+                                                      )}`}
                                             </h6>
                                         </div>
                                     ))}
@@ -1712,8 +1371,7 @@ const Popup_status = (props) => {
                             onClick={_HandleClose.bind(this)}
                             className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                         >
-                            {dataLang?.purchase_order_purchase_back ||
-                                "purchase_order_purchase_back"}
+                            {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
                         </button>
                         <button
                             onClick={_HandleSave.bind(this)}
