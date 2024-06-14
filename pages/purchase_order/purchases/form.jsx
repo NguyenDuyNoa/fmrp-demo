@@ -40,6 +40,8 @@ import { Container, ContainerBody } from "@/components/UI/common/layout";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 
 const Index = (props) => {
     const router = useRouter();
@@ -118,48 +120,51 @@ const Index = (props) => {
 
     sortedArr.unshift(option[0]);
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {
-                params: {
-                    limit: 0,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-                    sListBr(rResult);
-                }
-            }
-        );
-        sOnFetching(false);
+    const _ServerFetching = async () => {
+        try {
+            const { result: listBr } = await apiComons.apiBranchCombobox();
+            // Axios(
+            //     "GET",
+            //     `/api_web/Api_Branch/branch/?csrf_protection=true`,
+            //     {
+            //         params: {
+            //             limit: 0,
+            //         },
+            //     },
+            //     (err, response) => {
+            //         if (!err) {
+            //             let { rResult } = response.data;
+            //             sListBr(rResult);
+            //         }
+            //     }
+            // );
+            sListBr(listBr);
+            sOnFetching(false);
+        } catch (error) {
+
+        }
     };
 
 
 
-    const _ServerFetchingItem = () => {
+    const _ServerFetchingItem = async () => {
         let form = new FormData()
         if (idBranch != null) {
             [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
         }
-        Axios("POST", "/api_web/api_product/searchItemsVariant?csrf_protection=true", {
-            data: form,
-            headers: { "Content-Type": "multipart/form-data" },
-        }, (err, response) => {
-            if (!err) {
-                let { result } = response.data.data;
-                sData(
-                    result?.map((e) => ({
-                        label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-                        value: e.id,
-                        e,
-                    }))
-                );
-            }
-        });
-        sOnFetchingItem(false)
+        try {
+            const { result } = await apiPurchases.apiItemsVariantPurchases(form)
+            sData(
+                result?.map((e) => ({
+                    label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                    value: e.id,
+                    e,
+                }))
+            );
+            sOnFetchingItem(false)
+        } catch (error) {
+
+        }
     }
 
     useEffect(() => {
@@ -172,45 +177,45 @@ const Index = (props) => {
 
 
 
-    const _ServerFetchingDetail = () => {
-        Axios("GET", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let rResult = response.data;
-                sCode(rResult?.code);
-                sNamePromis(rResult?.name);
-                // setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
-                sStartDate(moment(rResult?.date).toDate());
-                sNote(rResult?.note);
-                sIdBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
-                });
-                const itemlast = [{ mathang: null }];
-                const item = itemlast?.concat(
-                    rResult?.items?.map((e) => ({
-                        id: e.item.id,
-                        data: e.item.id,
-                        ghichu: e.note,
-                        donvitinh: e.item.unit_name,
-                        soluong: Number(e.quantity),
-                        mathang: {
-                            e: e.item,
-                            label: `${e.item.name} <span style={{display: none}}>${e.item.code}</span><span style={{display: none}}>${e.item.product_variation} </span><span style={{display: none}}>${e.item.text_type} ${e.item.unit_name} </span>`,
-                            value: e.item.id,
-                        },
-                    }))
-                );
-                sOption(item);
-                let listQty = rResult?.items;
-                let totalQuantity = 0;
-                for (let i = 0; i < listQty.length; i++) {
-                    totalQuantity += parseInt(listQty[i].quantity);
-                }
-                setTotalSoluong(totalQuantity);
-                setTotalQty(rResult?.items?.length);
+    const _ServerFetchingDetail = async () => {
+        const rResult = await apiPurchases.apiDetailPagePurchases(id)
+        try {
+            sCode(rResult?.code);
+            sNamePromis(rResult?.name);
+            // setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            const itemlast = [{ mathang: null }];
+            const item = itemlast?.concat(
+                rResult?.items?.map((e) => ({
+                    id: e.item.id,
+                    data: e.item.id,
+                    ghichu: e.note,
+                    donvitinh: e.item.unit_name,
+                    soluong: Number(e.quantity),
+                    mathang: {
+                        e: e.item,
+                        label: `${e.item.name} <span style={{display: none}}>${e.item.code}</span><span style={{display: none}}>${e.item.product_variation} </span><span style={{display: none}}>${e.item.text_type} ${e.item.unit_name} </span>`,
+                        value: e.item.id,
+                    },
+                }))
+            );
+            sOption(item);
+            let listQty = rResult?.items;
+            let totalQuantity = 0;
+            for (let i = 0; i < listQty.length; i++) {
+                totalQuantity += parseInt(listQty[i].quantity);
             }
-            sOnFetchingDetail(false);
-        });
+            setTotalSoluong(totalQuantity);
+            setTotalQty(rResult?.items?.length);
+        } catch (error) {
+
+        }
+        sOnFetchingDetail(false);
     };
 
     const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
@@ -354,8 +359,8 @@ const Index = (props) => {
     });
     const newDataOption = dataOption?.filter((e) => e?.data !== undefined);
 
-    const _ServerSending = () => {
-        var formData = new FormData();
+    const _ServerSending = async () => {
+        let formData = new FormData();
         formData.append("code", code);
         formData.append("name", namePromis);
         formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
@@ -366,78 +371,60 @@ const Index = (props) => {
             formData.append(`items[${index}][quantity]`, item?.soluong.toString());
             formData.append(`items[${index}][note]`, item?.ghichu);
         });
-        Axios(
-            "POST",
-            `${id
-                ? `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`
-                : `/api_web/Api_purchases/purchases/?csrf_protection=true`
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", dataLang[message] || message);
-                        sCode("");
-                        sNamePromis("Yêu cầu mua hàng (PR)");
-                        sStartDate(new Date());
-                        sNote("");
-                        sIdBranch(null);
-                        sErrDate(false);
-                        sErrName(false);
-                        sErrBranch(false);
-                        sOption([
-                            {
-                                id: Date.now(),
-                                mathang: null,
-                                donvitinh: "",
-                                soluong: 0,
-                                ghichu: "",
-                            },
-                        ]);
-                        setTotalSoluong(0); // cập nhật lại tổng số lượng
-                        setTotalQty(0);
-                        router.push(routerPurchases.home);
-                    } else {
-                        if (totalQty == 0) {
-                            isShow("success", `Chưa nhập thông tin mặt hàng`);
-                        } else {
-                            isShow("error", dataLang[message] || message);
-                        }
-                    }
+        try {
+            const { isSuccess, message } = await apiPurchases.apiHandingPurchases(id, formData)
+            if (isSuccess) {
+                isShow("success", dataLang[message] || message);
+                sCode("");
+                sNamePromis("Yêu cầu mua hàng (PR)");
+                sStartDate(new Date());
+                sNote("");
+                sIdBranch(null);
+                sErrDate(false);
+                sErrName(false);
+                sErrBranch(false);
+                sOption([
+                    {
+                        id: Date.now(),
+                        mathang: null,
+                        donvitinh: "",
+                        soluong: 0,
+                        ghichu: "",
+                    },
+                ]);
+                setTotalSoluong(0); // cập nhật lại tổng số lượng
+                setTotalQty(0);
+                router.push(routerPurchases.home);
+            } else {
+                if (totalQty == 0) {
+                    isShow("success", `Chưa nhập thông tin mặt hàng`);
+                } else {
+                    isShow("error", dataLang[message] || message);
                 }
-                sOnSending(false);
             }
-        );
+        } catch (error) {
+
+        }
+        sOnSending(false);
     };
-    const _HandleSeachApi = debounce((inputValue) => {
+    const _HandleSeachApi = debounce(async (inputValue) => {
         let form = new FormData()
         if (idBranch != null) {
             [+idBranch?.value].forEach((e, index) => form.append(`branch_id[${index}]`, e))
         }
         form.append("term", inputValue)
-        Axios(
-            "POST",
-            `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
-            {
-                data: form
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response?.data.data;
-                    sData(
-                        result?.map((e) => ({
-                            label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-                            value: e.id,
-                            e,
-                        }))
-                    );
-                }
-            }
-        );
+        try {
+            const { result } = await apiPurchases.apiItemsVariantPurchases(form)
+            sData(
+                result?.map((e) => ({
+                    label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                    value: e.id,
+                    e,
+                }))
+            );
+        } catch (error) {
+
+        }
     }, 500)
     useEffect(() => {
         onSending && _ServerSending();
@@ -695,7 +682,7 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-4  z-[100] my-auto">
                                                 <Select
-                                                      onInputChange={(event) =>{
+                                                    onInputChange={(event) => {
                                                         _HandleSeachApi(event)
                                                     }}
                                                     dangerouslySetInnerHTML={{

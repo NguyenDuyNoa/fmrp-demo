@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import ModalImage from "react-modal-image";
 import PopupEdit from "/components/UI/popup";
 
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
@@ -16,9 +17,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
 import moment from "moment/moment";
-import { _ServerInstance as Axios } from "/services/axios";
 const Popup_chitiet = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
@@ -27,20 +26,14 @@ const Popup_chitiet = (props) => {
     useEffect(() => {
         props?.id && sOnFetching(true);
     }, [open]);
-    const _ServerFetching_detailUser = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
+    const _ServerFetching_detailUser = async () => {
+        try {
+            const db = await apiPurchases.apiDetailPurchases(props?.id);
+            sData(db);
+            sOnFetching(false);
+        } catch (error) {
 
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
+        }
     };
     useEffect(() => {
         onFetching && _ServerFetching_detailUser();

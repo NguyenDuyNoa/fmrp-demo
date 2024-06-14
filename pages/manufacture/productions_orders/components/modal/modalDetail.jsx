@@ -19,24 +19,21 @@ import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOr
 const dataTotal = [
     {
         title: "Chi phí vật tư",
-        number: 20,
+        number: 0,
         bgColor: "#EBFEF2",
         bgSmall: "#0BAA2E",
-        percent: 23,
     },
     {
         title: "Chi phí khác",
-        number: 20,
+        number: 0,
         bgColor: "#FEF8EC",
         bgSmall: "#FF8F0D",
-        percent: -23,
     },
     {
         title: "Tổng chi phí",
-        number: 20,
+        number: 0,
         bgColor: "#FFEEF0",
         bgSmall: "#EE1E1E",
-        percent: 23,
     },
 ];
 const listTab = [
@@ -244,8 +241,8 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                         </div>
                         <div className="flex flex-col">
                             <div className="my-2 col-span-3 flex items-center gap-1">
-                                <h3 className="text-[13px]">Đơn hàng bán:</h3>
-                                <h3 className="text-[13px] font-medium">SO-27112304</h3>
+                                <h3 className="text-[13px]">Đơn hàng bán/KHNB:</h3>
+                                <h3 className="text-[13px] font-medium">{isStateModal.dataDetail?.poi?.object?.reference_no}</h3>
                             </div>
                             <div className="my-2 col-span-3 flex items-center gap-1">
                                 <h3 className="text-[13px]">Khách hàng:</h3>
@@ -253,7 +250,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             </div>
                             <div className="my-2 flex items-center gap-1">
                                 <h3 className=" text-[13px]">Chi nhánh:</h3>
-                                <TagBranch className="w-fit">HCM</TagBranch>
+                                <TagBranch className="w-fit">{isStateModal.dataDetail?.poi?.branch_name}</TagBranch>
                             </div>
                         </div>
                     </div>

@@ -10,7 +10,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
 dayjs.locale("vi");
 
@@ -25,6 +24,8 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
 import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -48,11 +49,11 @@ import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
 import { useSelector } from "react-redux";
-import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -122,11 +123,9 @@ const Index = (props) => {
         });
         queryState({ onFetchingFilter: true });
     }, []);
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_purchases/purchases/?csrf_protection=true",
-            {
+    const _ServerFetching = async () => {
+        try {
+            const { output, rResult } = await apiPurchases.apiListPurchases({
                 params: {
                     search: isState.keySearch,
                     limit: limit,
@@ -138,46 +137,34 @@ const Index = (props) => {
                     "filter[start_date]": isState.valueDate?.startDate,
                     "filter[end_date]": isState.valueDate?.endDate,
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { output, rResult } = response.data;
-                    queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
-                    sTotalItems(output);
-                }
-            }
-        );
+            })
+            queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
+            sTotalItems(output);
+        } catch (error) {
+
+        }
     };
 
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                queryState({ listBr: rResult?.map((e) => ({ label: e.name, value: e.id })) || [] });
-            }
-        });
+    const _ServerFetching_filter = async () => {
+        try {
+            const { result: listBr } = await apiComons.apiBranchCombobox();
+            const { rResult: listCode } = await apiPurchases.apiComboboxPurchases()
+            const { rResult: listUser } = await apiPurchases.apiStaffOptionPurchases()
+            queryState({
+                listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
+                listCode: listCode?.map((e) => ({ label: e.code, value: e.id || [] })),
+                listUser: listUser?.map((e) => ({ label: e.name, value: e.staffid })) || [],
+                onFetchingFilter: false
+            });
+        } catch (error) {
 
-        Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                queryState({ listCode: rResult?.map((e) => ({ label: e.code, value: e.id || [] })) });
-            }
-        });
+        }
 
-        Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                queryState({ listUser: rResult?.map((e) => ({ label: e.name, value: e.staffid })) || [] });
-            }
-        });
-        queryState({ onFetchingFilter: false });
     };
 
-    const _ServerFetching_group = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_purchases/purchasesFilterBar/?csrf_protection=true`,
-            {
+    const _ServerFetching_group = async () => {
+        try {
+            const data = await apiPurchases.apiGroupPurchases({
                 params: {
                     limit: 0,
                     search: isState.keySearch,
@@ -187,15 +174,11 @@ const Index = (props) => {
                     "filter[start_date]": isState.valueDate?.startDate,
                     "filter[end_date]": isState.valueDate?.endDate,
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    queryState({ listDs: data || [] });
-                }
-                queryState({ onFetchingGroup: false });
-            }
-        );
+            })
+            queryState({ listDs: data || [], onFetchingGroup: false });
+        } catch (error) {
+
+        }
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -243,30 +226,25 @@ const Index = (props) => {
         handleQueryId({ status: false, active: newStatus });
     };
 
-    const _ServerSending = (id, newStatus) => {
-        Axios(
-            "POST",
-            `${`/api_web/Api_purchases/updateStatus/${id}/${newStatus}?csrf_protection=true`}`,
-            {
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", `${dataLang[message]}`);
-                    } else {
-                        isShow("error", `${dataLang[message]}`);
-                    }
-                }
+    const _ServerSending = async (id, newStatus) => {
+        try {
 
-                queryState({ onSending: false });
+            const { isSuccess, message } = await apiPurchases.apiHandingStatusPurchases(id, newStatus)
 
-                _ServerFetching();
-
-                _ServerFetching_group();
+            if (isSuccess) {
+                isShow("success", `${dataLang[message]}`);
+            } else {
+                isShow("error", `${dataLang[message]}`);
             }
-        );
+
+            queryState({ onSending: false });
+
+            await _ServerFetching();
+
+            await _ServerFetching_group();
+        } catch (error) {
+
+        }
     };
 
     useEffect(() => {
@@ -374,16 +352,14 @@ const Index = (props) => {
                         e?.order_status?.status === "purchase_ordered"
                             ? dataLang[e?.order_status?.status]
                             : "" ||
-                              `${
-                                  e?.order_status.status === "purchase_portion"
-                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
-                                      : ""
-                              }` ||
-                              `${
-                                  e?.order_status.status === "purchase_enough"
-                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
-                                      : ""
-                              }`,
+                            `${e?.order_status.status === "purchase_portion"
+                                ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
+                                : ""
+                            }` ||
+                            `${e?.order_status.status === "purchase_enough"
+                                ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
+                                : ""
+                            }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -631,16 +607,14 @@ const Index = (props) => {
                                                             )) ||
                                                                 (e?.order_status?.status === "purchase_portion" && (
                                                                     <TagColorOrange
-                                                                        name={`${
-                                                                            dataLang[e?.order_status?.status]
-                                                                        } (${formatNumber(e?.order_status?.count)})`}
+                                                                        name={`${dataLang[e?.order_status?.status]
+                                                                            } (${formatNumber(e?.order_status?.count)})`}
                                                                     />
                                                                 )) ||
                                                                 (e?.order_status?.status === "purchase_enough" && (
                                                                     <TagColorLime
-                                                                        name={`${dataLang[e?.order_status?.status]} (${
-                                                                            e?.order_status?.count
-                                                                        })`}
+                                                                        name={`${dataLang[e?.order_status?.status]} (${e?.order_status?.count
+                                                                            })`}
                                                                     />
                                                                 ))}
                                                         </RowItemTable>
