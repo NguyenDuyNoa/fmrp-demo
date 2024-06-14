@@ -31,7 +31,15 @@ const apiDashboard = {
         } catch (error) {
             throw error;
         }
-    }
+    },
+    async apiLogOut() {
+        try {
+            const response = await axiosCustom('POST', `/api_web/Api_Login/logout?csrf_protection=true`);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
 
 }
 export default apiDashboard

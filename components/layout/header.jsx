@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Dropdown, DropdownThongBao } from "../UI/dropdown";
-import { _ServerInstance as Axios } from "/services/axios";
 
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import { WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import useToast from "@/hooks/useToast";
 import { CookieCore } from "@/utils/lib/cookie";
@@ -271,212 +271,6 @@ const Header = () => {
         },
     ];
 
-    // const ListKhoSanXuat = [
-    //     {
-    //         title: "Kho hàng",
-    //         sub: [
-    //             {
-    //                 title: "Kho hàng",
-    //                 img: "/icon/header/kho/kho.png",
-    //                 items: [
-    //                     {
-    //                         viewOwn: auth?.warehouse?.is_view_own,
-    //                         view: auth?.warehouse?.is_view,
-    //                         name: "Kho",
-    //                         link: "/warehouses/warehouse"
-    //                     },
-    //                     {
-    //                         viewOwn: auth?.warehouse_location?.is_view_own,
-    //                         view: auth?.warehouse_location?.is_view,
-    //                         name: "Vị trí kho",
-    //                         link: "/warehouses/location"
-    //                     },
-    //                 ],
-    //             },
-    //             // {
-    //             //     title: "Cảnh báo tồn kho",
-    //             //     img: "/icon/header/kho/canhbao.png",
-    //             //     link: "#",
-    //             //     viewOwn: 0,
-    //             //     view: 0,
-    //             // },
-    //             {
-    //                 viewOwn: auth?.transfer?.is_view_own,
-    //                 view: auth?.transfer?.is_view,
-    //                 title: "Chuyển kho",
-    //                 img: "/icon/header/kho/chuyenkho.png",
-    //                 link: "/manufacture/warehouse_transfer",
-    //             },
-    //             {
-    //                 viewOwn: auth?.suggest_exporting?.is_view_own,
-    //                 view: auth?.suggest_exporting?.is_view,
-    //                 title: "Xuất kho sản xuất",
-    //                 img: "/icon/header/kho/xuatkho.png",
-    //                 link: "/manufacture/production_warehouse",
-    //             },
-    //             {
-    //                 viewOwn: auth?.purchase_products?.is_view_own,
-    //                 view: auth?.purchase_products?.is_view,
-    //                 title: "Nhập kho thành phẩm",
-    //                 img: "/icon/header/kho/nhapkho.png",
-    //                 link: "/manufacture/products_warehouse",
-    //             },
-    //             {
-    //                 viewOwn: auth?.purchase_internal?.is_view_own,
-    //                 view: auth?.purchase_internal?.is_view,
-    //                 title: "Thu hồi nguyên vật liệu",
-    //                 img: "/icon/header/kho/thuhoi.png",
-    //                 link: "/manufacture/recall",
-    //             },
-    //             {
-    //                 viewOwn: auth?.export_different?.is_view_own,
-    //                 view: auth?.export_different?.is_view,
-    //                 title: "Xuất kho khác",
-    //                 img: "/icon/header/kho/xuatkho.png",
-    //                 link: "/manufacture/export_to_other",
-    //             },
-    //             {
-    //                 viewOwn: auth?.inventory?.is_view_own,
-    //                 view: auth?.inventory?.is_view,
-    //                 title: "Kiểm kê kho",
-    //                 img: "/icon/header/kho/kk.png",
-    //                 link: "/manufacture/inventory",
-    //             },
-    //         ],
-    //     },
-    //     {
-    //         title: "Sản xuất",
-    //         sub: [
-    //             {
-    //                 viewOwn: auth?.internal_plans?.is_view_own,
-    //                 view: auth?.internal_plans?.is_view,
-    //                 title: "Kế hoạch nội bộ",
-    //                 img: "/icon/header/kho/kehoach.png",
-    //                 link: "/manufacture/internal_plan",
-    //             },
-    //             {
-    //                 viewOwn: auth?.production_plan?.is_view_own,
-    //                 view: auth?.production_plan?.is_view,
-    //                 title: "Kế hoạch sản xuất",
-    //                 img: "/icon/header/kho/kehoach.png",
-    //                 link: "/manufacture/production_plan",
-    //             },
-    //             {
-    //                 viewOwn: auth?.production_plans_fmrp?.is_view_own,
-    //                 view: auth?.production_plans_fmrp?.is_view,
-    //                 title: "Kế hoạch NVL",
-    //                 img: "/icon/header/kho/kehoach.png",
-    //                 link: "/manufacture/materials_planning",
-    //             },
-    //             {
-    //                 viewOwn: -1,
-    //                 view: -1,
-    //                 title: "Điều độ sản xuất",
-    //                 img: "/icon/header/kho/dieudo.png",
-    //                 link: "/manufacture/production_smoothing",
-    //             },
-    //             {
-    //                 title: "Sản xuất",
-    //                 img: "/icon/header/kho/sx.png",
-    //                 items: [
-    //                     {
-    //                         viewOwn: -1,
-    //                         view: -1,
-    //                         name: "Tổng quan sản xuất",
-    //                         link: "/manufacture/production_overview"
-    //                     },
-    //                     {
-    //                         viewOwn: -1,
-    //                         view: -1,
-    //                         name: "Lệnh sản xuất tổng",
-    //                         link: "/manufacture/productions_orders"
-    //                     },
-    //                     {
-    //                         viewOwn: -1,
-    //                         view: -1,
-    //                         name: "Lệnh sản xuất chi tiết"
-    //                     },
-    //                 ],
-    //             },
-    //             // {
-    //             //     title: "Cảnh báo tồn kho",
-    //             //     img: "/icon/header/kho/canhbao.png",
-    //             //     link: "#",
-    //             //     viewOwn: -1,
-    //             //     view: -1,
-    //             // },
-    //             {
-    //                 title: "Lịch sản xuất",
-    //                 img: "/icon/header/kho/lich.png",
-    //                 link: "/manufacture/production_schedule",
-    //                 viewOwn: -1,
-    //                 view: -1,
-    //             },
-    //             // {
-    //             //     title: "Năng suất sản lượng",
-    //             //     img: "/icon/header/kho/nssl.png",
-    //             //     link: "#",
-    //             // },
-    //         ],
-    //     },
-    //     {
-    //         title: "Gia công ngoài",
-    //         sub: [
-    //             // {
-    //             //     title: "Xuất gia công",
-    //             //     img: "/icon/header/khac/xgc.png",
-    //             //     items: [{ name: "Xuất gia công" }, { name: "Nhập gia công" }],
-    //             // },
-    //             {
-    //                 items: [
-    //                     {
-    //                         viewOwn: -1,
-    //                         view: -1,
-    //                         name: "Xuất gia công"
-    //                     },
-    //                     {
-    //                         viewOwn: -1,
-    //                         view: -1,
-    //                         name: "Nhập gia công"
-    //                     }
-    //                 ],
-    //             }
-    //         ],
-    //     },
-    //     {
-    //         title: "QC",
-    //         sub: [
-    //             {
-    //                 title: "Kiểm tra chất lượng",
-    //                 img: "/icon/header/kho/kt.png",
-    //                 link: "#",
-    //                 viewOwn: -1,
-    //                 view: -1,
-    //             },
-    //             {
-    //                 title: "Danh mục lỗi",
-    //                 img: "/icon/header/kho/dml.png",
-    //                 link: "#",
-    //                 viewOwn: -1,
-    //                 view: -1,
-    //             },
-    //             {
-    //                 title: "Điều độ sản xuất",
-    //                 img: "/icon/header/kho/dieudo.png",
-    //                 link: "#",
-    //                 viewOwn: -1,
-    //                 view: -1,
-    //             },
-    //             {
-    //                 title: "Chi tiết lỗi",
-    //                 img: "/icon/header/kho/ctl.png",
-    //                 link: "#",
-    //                 viewOwn: -1,
-    //                 view: -1,
-    //             },
-    //         ],
-    //     },
-    // ];
     const ListKhoSanXuat = [
         {
             title: "Kho hàng",
@@ -574,13 +368,6 @@ const Header = () => {
                     title: "Lệnh sản xuất",
                     link: "/manufacture/productions_orders",
                 },
-                // {
-                //     viewOwn: -1,
-                //     view: -1,
-                //     title: "Lệnh sản xuất chi tiết",
-                //     link: "#",
-                // },
-
                 {
                     title: "Lịch sản xuất",
                     link: "/manufacture/production_schedule",
@@ -654,16 +441,16 @@ const Header = () => {
                         {
                             viewOwn:
                                 auth?.customers?.is_view_own == "1" ||
-                                auth?.suppliers?.is_view_own == "1" ||
-                                auth?.materials?.is_view_own == "1" ||
-                                auth?.products?.is_view_own == "1"
+                                    auth?.suppliers?.is_view_own == "1" ||
+                                    auth?.materials?.is_view_own == "1" ||
+                                    auth?.products?.is_view_own == "1"
                                     ? "1"
                                     : "0",
                             view:
                                 auth?.customers?.is_view == "1" ||
-                                auth?.suppliers?.is_view == "1" ||
-                                auth?.materials?.is_view == "1" ||
-                                auth?.products?.is_view == "1"
+                                    auth?.suppliers?.is_view == "1" ||
+                                    auth?.materials?.is_view == "1" ||
+                                    auth?.products?.is_view == "1"
                                     ? "1"
                                     : "0",
                             name: "Import dữ liệu",
@@ -672,16 +459,16 @@ const Header = () => {
                         {
                             viewOwn:
                                 auth?.customers?.is_view_own == "1" ||
-                                auth?.suppliers?.is_view_own == "1" ||
-                                auth?.materials?.is_view_own == "1" ||
-                                auth?.products?.is_view_own == "1"
+                                    auth?.suppliers?.is_view_own == "1" ||
+                                    auth?.materials?.is_view_own == "1" ||
+                                    auth?.products?.is_view_own == "1"
                                     ? "1"
                                     : "0",
                             view:
                                 auth?.customers?.is_view == "1" ||
-                                auth?.suppliers?.is_view == "1" ||
-                                auth?.materials?.is_view == "1" ||
-                                auth?.products?.is_view == "1"
+                                    auth?.suppliers?.is_view == "1" ||
+                                    auth?.materials?.is_view == "1" ||
+                                    auth?.products?.is_view == "1"
                                     ? "1"
                                     : "0",
                             name: "Export dữ liệu",
@@ -1207,15 +994,18 @@ const Header = () => {
     const dataPstWH = useSelector((state) => state.statusUser);
     // Khai báo biến state
     const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
+
     const [isLastDropdown, setIsLastDropdown] = useState(false);
+
     useEffect(() => {
         setIsLastDropdown(currentDropdownIndex === dropdowns.length - 1);
     }, [currentDropdownIndex, dropdowns.length]);
+
     const dispatch = useDispatch();
+
     useEffect(() => {
         if (dataPstWH) {
             // Ẩn phần tử hiện tại
-
             // Kiểm tra xem nó có phải là cuối cùng hay không
             if (isLastDropdown) {
                 setTimeout(() => {
@@ -1236,22 +1026,9 @@ const Header = () => {
                     clearTimeout(timer);
                 };
             }
-            // const timer = setTimeout(() => {
-            //   setCurrentDropdownIndex(
-            //     (prevIndex) => (prevIndex + 1) % dropdowns.length
-            //   );
-            // }, 3000);
 
-            // return () => {
-            //   clearTimeout(timer);
-            // };
         }
     }, [dataPstWH, isLastDropdown, dropdowns.length, currentDropdownIndex]);
-    // useEffect(() => {
-    //   if (dataPstWH) {
-    //     body.style;
-    //   }
-    // }, [dataPstWH]);
     const currentDropdown = dropdowns[currentDropdownIndex];
     return (
         <header className="z-40 w-full bg-[#013da0] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
@@ -1272,35 +1049,6 @@ const Header = () => {
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
                         </Link>
-                        {/* {dropdowns.map((dropdown, index) => (
-              <Tooltip
-                titleStyle={{
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  color: "white",
-                }}
-                titleClassName="custom-title-class"
-                trigger="manual"
-                key={index}
-                title={dropdown.text}
-                open={dataPstWH && index === currentDropdownIndex}
-                arrow={true}
-                position="bottom"
-                animation="scale"
-                duration={200}
-                hideOnClick={false}
-                theme="light"
-              >
-                <Dropdown
-                  data={dropdown.data}
-                  position={dropdown.position}
-                  className={dropdown.className}
-                  onClick={() => dispatch({ type: "trangthai", payload: true })}
-                >
-                  {dropdown.title}
-                </Dropdown>
-              </Tooltip>
-            ))} */}
                         {dropdowns.map((dropdown, index) => (
                             <React.Fragment key={index}>
                                 <Tooltip
@@ -1320,18 +1068,6 @@ const Header = () => {
                                                     </h2>
                                                 </div>
                                             </div>
-                                            {/* <div className=" mt-[20px]   bg-gray-100 shadow-2xl rounded-lg  w-auto h-auto min-h-[30px] ">
-                        <div className="flex justify-center items-center shadow-2xl rounded-lg">
-                          <ArrowUp
-                            size="32"
-                            color="green"
-                            className="rotate-45 animate-pulse "
-                          />
-                          <h2 className="text-black font-semibold  py-2 px-3 max-w-[200px] ">
-                            {dropdown.text}
-                          </h2>
-                        </div>
-                      </div> */}
                                         </React.Fragment>
                                     }
                                     title={dropdown.text}
@@ -1347,72 +1083,14 @@ const Header = () => {
                                         position={dropdown.position}
                                         className={dropdown.className}
                                         style={dataPstWH}
-                                        // onClick={() =>
-                                        //   dispatch({ type: "trangthai", payload: true })
-                                        // }
                                     >
                                         {dropdown.title}
                                     </Dropdown>
                                 </Tooltip>
                             </React.Fragment>
                         ))}
-
-                        {/* <Dropdown
-              data={ListDanhMuc}
-              position={"bottom left"}
-              className="popover-bottom-left arrow-danhmuc "
-            >
-              Danh mục
-            </Dropdown>
-
-            <Dropdown
-              data={ListBanXuatHang}
-              position={"bottom left"}
-              className="popover-bottom-left arrow-banxuathang"
-            >
-              Bán & Xuất hàng
-            </Dropdown>
-            <Dropdown
-              data={ListMuaNhapHang}
-              position="bottom left"
-              className="popover-bottom-left-muanhaphang arrow-muanhaphang"
-            >
-              Mua & Nhập hàng
-            </Dropdown>
-            <Dropdown data={ListKhoSanXuat} className="popover-khosanxuat">
-              Kho & Sản xuất
-            </Dropdown>
-            <Dropdown data={ListBaoCao} className="">
-              Báo cáo & Thống kê
-            </Dropdown>
-            <Dropdown data={ListKhac} className="popover-khac">
-              Tiện ích
-            </Dropdown>
-            <Dropdown data={ListAdd} position={"bottom center"}>
-              <div>+ Thêm</div>
-            </Dropdown> */}
-                        {/* <Dropdown data={ListKhoSanXuat} className="popover-khosanxuat">
-              Kho & Sản xuất
-            </Dropdown> */}
                     </div>
                     <div className="flex 3xl:space-x-5 2xl:space-x-4 xl:space-x-3 lg:space-x-2  items-center">
-                        {/* <a
-                            href="#"
-                            title="Thông báo"
-                            className="hover:scale-105 transition 3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px]   "
-                        >
-                            <Image
-                                alt=""
-                                src="/icon/header/tb.png"
-                                width={18}
-                                height={18}
-                                quality={100}
-                                className="w-full h-full object-contain"
-                                loading="lazy"
-                                crossOrigin="anonymous"
-                                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                            />
-                        </a> */}
                         <form className="flex items-center relative">
                             <div className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] absolute left-3">
                                 <Image
@@ -1443,7 +1121,6 @@ const Header = () => {
                                 }
                             }}
                             className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition"
-                            // className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
                         >
                             <Image
                                 alt=""
@@ -1457,31 +1134,10 @@ const Header = () => {
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
                         </button>
-                        {/* <a
-              href="#"
-              title="Thông báo"
-              className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
-            >
-              <Image
-                alt=""
-                src="/icon/header/tb2.png"
-                width={18}
-                height={18}
-                quality={100}
-                className="object-contain min-w-[18px]"
-                loading="lazy"
-                crossOrigin="anonymous"
-                blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-              />
-              <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
-                2
-              </div>
-            </a> */}
                         <Link
                             href="#"
                             title="Thông báo"
                             className="3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] transition relative  "
-                            // className="3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
                         >
                             <DropdownThongBao
                                 data={ListThongBao}
@@ -1512,7 +1168,6 @@ const Header = () => {
                                 height={18}
                                 quality={100}
                                 className="object-contain 3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px]  transition"
-                                // className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
                                 loading="lazy"
                                 crossOrigin="anonymous"
                                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -1524,7 +1179,6 @@ const Header = () => {
             </div>
             <div className="px-10 py-0  pt-1 overflow-x-auto">
                 <Expirred />
-                {/* <PopupModelTime /> */}
             </div>
         </header>
     );
@@ -1534,22 +1188,24 @@ const DropdownAvatar = React.memo(() => {
     const auth = useSelector((state) => state.auth);
 
     const router = useRouter();
+
     const dispatch = useDispatch();
 
     const [onSending, sOnSending] = useState(false);
 
-    const _ServerSending = () => {
-        Axios("POST", "/api_web/Api_Login/logout?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                dispatch({ type: "auth/update", payload: false });
-                // localStorage.removeItem("tokenFMRP");
-                // localStorage.removeItem("databaseappFMRP");
-                CookieCore.remove("tokenFMRP");
-                CookieCore.remove("databaseappFMRP");
-                router.push("/");
-            }
+    const _ServerSending = async () => {
+        try {
+            const res = await apiDashboard.apiLogOut();
+            dispatch({ type: "auth/update", payload: false });
+            // localStorage.removeItem("tokenFMRP");
+            // localStorage.removeItem("databaseappFMRP");
+            CookieCore.remove("tokenFMRP");
+            CookieCore.remove("databaseappFMRP");
+            router.push("/");
             sOnSending(false);
-        });
+        } catch (error) {
+
+        }
     };
 
     useEffect(() => {
@@ -1562,9 +1218,11 @@ const DropdownAvatar = React.memo(() => {
 
     ///languages
     const data = useSelector((state) => state.availableLang);
+
     const defaultLang = useSelector((state) => state.lang);
 
     const [lang, sLang] = useState(defaultLang);
+
     const _HandleChangeLang = (e) => sLang(e.target?.value);
 
     useEffect(() => {

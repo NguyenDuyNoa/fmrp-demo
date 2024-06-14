@@ -34,7 +34,9 @@ axios.interceptors.request.use(
 
 const _ServerInstance = (method, url, dataObject = {}, callback) => {
     const showToat = useToast()
-    var token = null;
+
+    let token = null;
+
     try {
         // token = localStorage?.getItem("tokenFMRP");
         token = Cookies.get("tokenFMRP") ?? ""
@@ -42,7 +44,8 @@ const _ServerInstance = (method, url, dataObject = {}, callback) => {
         token = null;
     }
 
-    var databaseApp = null;
+    let databaseApp = null;
+
     try {
         databaseApp = Cookies.get("databaseappFMRP") ?? ""
         // databaseApp = localStorage?.getItem("databaseappFMRP");
@@ -52,7 +55,7 @@ const _ServerInstance = (method, url, dataObject = {}, callback) => {
 
     const headers = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "x-api-key": databaseApp,
         ...dataObject.headers
     };
@@ -62,7 +65,6 @@ const _ServerInstance = (method, url, dataObject = {}, callback) => {
     } else if (dataObject.headers?.["Content-Type"]) {
         headers["Content-Type"] = dataObject.headers["Content-Type"] ? dataObject.headers["Content-Type"] : 'application/json';
     }
-
     // const controller = new AbortController();
 
     return axios({
@@ -78,7 +80,6 @@ const _ServerInstance = (method, url, dataObject = {}, callback) => {
             if (callback) {
                 callback(null, response);
             }
-
             return await response;
         })
         .catch((error) => {
@@ -87,7 +88,6 @@ const _ServerInstance = (method, url, dataObject = {}, callback) => {
             }
             if (error.response) {
                 const status = error.response.status;
-
                 const message = error.response.data?.message || "An error occurred";
 
                 if (status === 500) {

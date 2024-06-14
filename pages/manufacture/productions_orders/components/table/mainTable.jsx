@@ -237,7 +237,7 @@ const MainTable = ({ dataLang }) => {
                             showChild: true,
                             arrListData: e?.items_products?.map((i) => {
                                 return {
-                                    id: uddid(),
+                                    id: i?.poi_id,
                                     image: i?.images ? i?.images : "/no_img.png",
                                     name: i?.item_name,
                                     itemVariation: i?.product_variation,

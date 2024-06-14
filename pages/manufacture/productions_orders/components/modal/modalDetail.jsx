@@ -14,6 +14,7 @@ import TabExportHistory from "./tabExportHistory";
 import TabWarehouseHistory from "./tabWarehouseHistory";
 import TabRecallMaterials from "./tabRecallMaterials";
 import TabProcessingCost from "./tabProcessingCost";
+import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 
 const dataTotal = [
     {
@@ -77,17 +78,27 @@ const listTab = [
 ];
 
 const ModalDetail = memo(({ isState, queryState, dataLang }) => {
-    console.log("isState", isState);
     const router = useRouter();
+
     const [width, setWidth] = useState(900);
+
     const [isResizing, setIsResizing] = useState(false);
+
     const [initialX, setInitialX] = useState(null);
+
     const [initialWidth, setInitialWidth] = useState(null);
+
     const minWidth = 900; // Đặt giá trị chiều rộng tối thiểu
+
     const maxWidth = window.innerWidth; // Đặt giá trị chiều rộng tối đa
+
     const initialState = {
         isTab: 1,
+        dataDetail: {},
     };
+
+    const [isMounted, setIsMounted] = useState(false);
+
     const [isStateModal, setIsStateModal] = useState(initialState);
 
     const queryStateModal = (key) => setIsStateModal((x) => ({ ...x, ...key }));
@@ -95,6 +106,10 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
     const dataSeting = useSetingServer();
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, [])
 
     useEffect(() => {
         const handleResize = (event) => {
@@ -136,11 +151,21 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         queryStateModal({ isTab: e });
     };
 
-    useEffect(() => {
-        queryStateModal({ ...initialState });
-    }, [isState.openModal]);
+    const fetchDetailOrder = async () => {
+        try {
+            const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
+            queryStateModal({ dataDetail: data });
+            console.log("data", data);
+        } catch (error) { }
+    };
 
-    const shareProps = { queryStateModal, dataLang, isStateModal, width, listTab };
+    useEffect(() => {
+        if (isState.openModal && isMounted) {
+            fetchDetailOrder();
+        }
+    }, [isState.openModal, isMounted]);
+
+    const shareProps = { queryStateModal, isState, dataLang, isStateModal, width, listTab };
 
     const components = {
         1: <TabInFormation {...shareProps} />,
@@ -150,6 +175,8 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         5: <TabRecallMaterials {...shareProps} />,
         6: <TabProcessingCost {...shareProps} />,
     };
+
+    if (!isMounted) return null
 
     return (
         <div
@@ -212,7 +239,7 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             </div>
                             <div className="my-2 flex items-center gap-1">
                                 <h3 className="text-[13px]">Số LSX chi tiết:</h3>
-                                <h3 className=" text-[13px] font-medium">Lsxct-28112302</h3>
+                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_detail}</h3>
                             </div>
                         </div>
                         <div className="flex flex-col">
@@ -259,23 +286,17 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                             <button
                                 key={e.id}
                                 onClick={() => handleActiveTab(e.id)}
-                                className={`hover:bg-[#F7FBFF] ${
-                                    isStateModal.isTab == e.id && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
-                                } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
+                                className={`hover:bg-[#F7FBFF] ${isStateModal.isTab == e.id && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
+                                    } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none min-w-fit`}
                             >
                                 <h3
-                                    className={`relative py-[10px] px-2  font-normal ${
-                                        isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"
-                                    } ${
-                                        width > 1100 ? "text-base" : "text-sm"
-                                    } group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
+                                    className={`relative py-[10px] px-2  font-normal ${isStateModal.isTab == e.id ? "text-[#0F4F9E]" : "text-[#667085]"} ${width > 1100 ? "text-base" : "text-sm"} group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
                                 >
                                     {e.name}
                                     <span
-                                        className={`${
-                                            e?.count > 0 &&
+                                        className={`${e?.count > 0 &&
                                             "absolute top-0 right-0 3xl:translate-x-[65%] translate-x-1/2 3xl:w-[24px]  2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-sm lg:text-sm  bg-[#ff6f00]  text-white rounded-full text-center items-center flex justify-center"
-                                        } `}
+                                            } `}
                                     >
                                         {e?.count > 0 && e?.count}
                                     </span>

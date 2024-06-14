@@ -37,7 +37,6 @@ export async function middleware(request, event) {
         });
 
         const data = await response.json();
-        console.log("data", data);
         if (data.isSuccess) {
             return NextResponse.next();
         } else {
@@ -45,9 +44,7 @@ export async function middleware(request, event) {
             CookieCore.remove("databaseappFMRP");
         }
     } catch (error) {
-        console.error("error", error);
     }
-
 
     if (pathname.startsWith("/")) {
         if ((!token || token == "" || token?.value == "") || (!databaseappFMRP || databaseappFMRP == "" || databaseappFMRP?.value == "")) {

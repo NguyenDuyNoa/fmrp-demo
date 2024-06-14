@@ -36,5 +36,14 @@ const apiProductionsOrders = {
             throw error;
         }
     },
+    // api chi tiết lsx
+    async apiItemOrdersDetail(id) {
+        try {
+            const response = await axiosCustom('GET', `/api_web/api_manufactures/getPOD/${id}`);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
 }
 export default apiProductionsOrders
