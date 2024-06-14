@@ -10,7 +10,7 @@ import { memo } from "react";
 import { FiCornerDownRight } from "react-icons/fi";
 import ModalImage from "react-modal-image";
 
-const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang, handleShowModel }) => {
+const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang }) => {
     const dataSeting = useSetingServer();
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
     return (
@@ -57,10 +57,9 @@ const TabSemi = memo(({ isState, handShowItem, isFetching, dataLang, handleShowM
                                     e.arrListData.map((i, index) => (
                                         <div
                                             key={i.id}
-                                            onClick={() => handleShowModel(i)}
                                             className={`grid grid-cols-12 ${
                                                 isState.dataModal.id == i.id ? "bg-gray-100" : ""
-                                            } items-center col-span-12 group hover:bg-gray-100 cursor-pointer transition-all duration-150 ease-in-out
+                                            } items-center col-span-12 group hover:bg-gray-100 transition-all duration-150 ease-in-out
                                                  ${e.arrListData?.length - 1 == index ? "" : "border-b"}`}
                                         >
                                             <h4 className="col-span-4 text-[#344054] font-normal text-xs flex flex-col py-2 px-4 gap-2">

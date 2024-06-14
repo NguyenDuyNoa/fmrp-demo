@@ -6,11 +6,15 @@ import { useSelector } from "react-redux";
 
 const PopupModelTime = (props) => {
     const [open, sOpen] = useState(false);
+
     const _ToggleModal = (e) => sOpen(e);
+
     const data = useSelector((state) => state.auth);
+
     useEffect(() => {
         data.trial && sOpen(data.trial);
     }, [data]);
+
     return (
         // <div className={`${open ? props?.hidden : props?.hidden}`}>
         <>
@@ -38,77 +42,50 @@ const PopupModelTime = (props) => {
                                 <div className=" flex flex-col gap-6">
                                     <div className="flex items-center gap-2 mb-2">
                                         <h1 className="text-gray-700 font-semibold text-[20px]">
-                                            Khởi đầu chuyển đổi số ngay với phần
-                                            mềm FMRP !
+                                            Khởi đầu chuyển đổi số ngay với phần mềm FMRP !
                                         </h1>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div>
-                                            <Verify
-                                                size="18"
-                                                color="green"
-                                                className="animate-bounce"
-                                            />
+                                            <Verify size="18" color="green" className="animate-bounce" />
                                         </div>
                                         <h1 className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
                                             Chào mừng
-                                            <span className="text-blue-500 uppercase mx-1">
-                                                {data?.user_full_name}
-                                            </span>
-                                            đến với FMRP! Hãy dành thời gian để
-                                            khám phá các tính năng hữu ích mà
-                                            FMRP mang lại nhé.
+                                            <span className="text-blue-500 uppercase mx-1">{data?.user_full_name}</span>
+                                            đến với FMRP! Hãy dành thời gian để khám phá các tính năng hữu ích mà FMRP
+                                            mang lại nhé.
                                         </h1>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div>
-                                            <Verify
-                                                size="18"
-                                                color="green"
-                                                className="animate-bounce"
-                                            />
+                                            <Verify size="18" color="green" className="animate-bounce" />
                                         </div>
                                         <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
-                                            FMRP mong rằng bạn sẽ tìm được giải
-                                            pháp hiệu quả cho quá trình quản lý
-                                            sản xuất của doanh nghiệp bạn.
+                                            FMRP mong rằng bạn sẽ tìm được giải pháp hiệu quả cho quá trình quản lý sản
+                                            xuất của doanh nghiệp bạn.
                                         </h2>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div>
-                                            <Verify
-                                                size="18"
-                                                color="green"
-                                                className="animate-bounce"
-                                            />
+                                            <Verify size="18" color="green" className="animate-bounce" />
                                         </div>
                                         <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
                                             Thời gian dùng thử: Bắt đầu từ ngày
                                             <span className="text-blue-500 mx-1">
-                                                {moment(
-                                                    data?.start_date
-                                                ).format("DD/MM/YYYY")}
+                                                {moment(data?.start_date).format("DD/MM/YYYY")}
                                             </span>
                                             đến ngày
                                             <span className="text-blue-500 mx-1">
-                                                {moment(
-                                                    data?.expiration_date
-                                                ).format("DD/MM/YYYY")}
+                                                {moment(data?.expiration_date).format("DD/MM/YYYY")}
                                             </span>
                                             và kết thúc sau
-                                            <span className="text-red-500 mx-1">
-                                                {data?.day_expiration}
-                                            </span>
+                                            <span className="text-red-500 mx-1">{data?.day_expiration}</span>
                                             ngày.
                                         </h2>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div>
-                                            <Verify
-                                                size="18"
-                                                color="green"
-                                                className="animate-bounce"
-                                            />
+                                            <Verify size="18" color="green" className="animate-bounce" />
                                         </div>
                                         <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju flex flex-col ">
                                             <span>
@@ -129,10 +106,7 @@ const PopupModelTime = (props) => {
                                         {/* <button>Bắt đầu trải nghiệm</button> */}
                                         <button
                                             type="button"
-                                            onClick={_ToggleModal.bind(
-                                                this,
-                                                false
-                                            )}
+                                            onClick={_ToggleModal.bind(this, false)}
                                             className="px-7 py-3 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm"
                                         >
                                             Bắt đầu trải nghiệm

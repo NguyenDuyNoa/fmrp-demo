@@ -77,6 +77,7 @@ const listTab = [
 ];
 
 const ModalDetail = memo(({ isState, queryState, dataLang }) => {
+    console.log("isState", isState);
     const router = useRouter();
     const [width, setWidth] = useState(900);
     const [isResizing, setIsResizing] = useState(false);
