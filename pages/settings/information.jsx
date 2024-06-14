@@ -1,18 +1,19 @@
 import Head from "next/head";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import LoadingItems from "/components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { Camera as IconCamera } from "iconsax-react";
 
-import useToast from "@/hooks/useToast";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import apiInformation from "@/Api/apiSettings/apiInformation";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -33,18 +34,18 @@ const Index = (props) => {
 
     const [data, sData] = useState({});
 
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_setting/companyInfo?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var { isSuccess, data } = response.data;
-                if (isSuccess) {
-                    sData({ ...data });
-                } else {
-                    dispatch({ type: "auth/update", payload: false });
-                }
-                sOnFetching(false);
+    const _ServerFetching = async () => {
+        try {
+            const { isSuccess, data } = await apiInformation.apiInfo();
+            if (isSuccess) {
+                sData({ ...data });
+            } else {
+                dispatch({ type: "auth/update", payload: false });
             }
-        });
+        } catch (error) {
+
+        }
+        sOnFetching(false);
     };
 
     useEffect(() => {
@@ -81,10 +82,7 @@ const Index = (props) => {
         } else if (type == "nameDD") {
             sData({ ...data, representative_name: value.target?.value });
         } else if (type == "phoneDD") {
-            sData({
-                ...data,
-                representative_phone_number: value.target?.value,
-            });
+            sData({ ...data, representative_phone_number: value.target?.value });
         } else if (type == "emailDD") {
             sData({ ...data, representative_email: value.target?.value });
         } else if (type == "addressDD") {
@@ -92,8 +90,8 @@ const Index = (props) => {
         }
     };
 
-    const _ServerSending = () => {
-        var formData = new FormData();
+    const _ServerSending = async () => {
+        let formData = new FormData();
 
         formData.append("company_name", data?.company_name);
         formData.append("company_email", data?.company_email);
@@ -105,27 +103,18 @@ const Index = (props) => {
         formData.append("representative_name", data?.representative_name);
         formData.append("representative_phone_number", data?.representative_phone_number);
         formData.append("company_logo", data?.thumb);
-
-        Axios(
-            "POST",
-            "/api_web/Api_setting/companyInfo?csrf_protection=true",
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess } = response.data;
-                    if (isSuccess) {
-                        isShow("success", "Cập nhật dữ liệu thành công");
-                    } else {
-                        isShow("error", "Cập nhật dữ liệu thất bại");
-                    }
-                }
-                _ServerFetching();
-                sOnSending(false);
+        try {
+            const { isSuccess } = await apiInformation.apiHandingInfo(formData);
+            if (isSuccess) {
+                isShow("success", "Cập nhật dữ liệu thành công");
+            } else {
+                isShow("error", "Cập nhật dữ liệu thất bại");
             }
-        );
+            await _ServerFetching();
+        } catch (error) {
+
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {
@@ -450,16 +439,14 @@ const Btn_Setting = React.memo((props) => {
     return (
         <Link href={props.url ? props.url : "#"} alt={props.children}>
             <button
-                className={`${
-                    router.asPath.includes(props.isActive)
-                        ? "text-white bg-[#11315B]"
-                        : "text-[#11315B] hover:bg-[#11315B]/5"
-                } flex items-center space-x-2 rounded w-full text-left font-[400] py-2 px-3 my-1`}
+                className={`${router.asPath.includes(props.isActive)
+                    ? "text-white bg-[#11315B]"
+                    : "text-[#11315B] hover:bg-[#11315B]/5"
+                    } flex items-center space-x-2 rounded w-full text-left font-[400] py-2 px-3 my-1`}
             >
                 <div
-                    className={`${
-                        router.asPath.includes(props.isActive) ? "bg-white" : "bg-[#11315B]"
-                    } w-1.5 h-1.5 rounded `}
+                    className={`${router.asPath.includes(props.isActive) ? "bg-white" : "bg-[#11315B]"
+                        } w-1.5 h-1.5 rounded `}
                 />
                 <span>{props.children}</span>
             </button>

@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
+import React, { useEffect, useState } from "react";
 
 import { ListBtn_Setting } from "./information";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Swal from "sweetalert2";
-import useStatusExprired from "@/hooks/useStatusExprired";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import Swal from "sweetalert2";
+import apiPrefix from "@/Api/apiSettings/apiPrefix";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -26,18 +27,13 @@ const Index = (props) => {
     const [data, sData] = useState([]);
     const [err, sErr] = useState(false);
 
-    const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_prefix/prefix?limit=0?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sData(rResult);
-                }
-            }
-        );
+    const _ServerFetching = async () => {
+        try {
+            const { rResult } = await apiPrefix.apiListPrefix()
+            sData(rResult);
+        } catch (error) {
+
+        }
     };
 
     useEffect(() => {
@@ -49,13 +45,13 @@ const Index = (props) => {
     }, []);
 
     const _HandleChangeInput = (id, value) => {
-        var index = data.findIndex((x) => x.id === id);
+        const index = data.findIndex((x) => x.id === id);
         data[index].prefix = value.target?.value;
         sData([...data]);
     };
 
-    const _ServerSending = () => {
-        var formData = new FormData();
+    const _ServerSending = async () => {
+        let formData = new FormData();
 
         data.forEach((item, index) => {
             formData.append(`data[${index}][id]`, item.id);
@@ -63,30 +59,24 @@ const Index = (props) => {
             formData.append(`data[${index}][prefix]`, item.prefix);
         });
 
-        Axios(
-            "POST",
-            "/api_web/api_prefix/prefix?csrf_protection=true",
-            {
-                data: formData,
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: dataLang[message],
-                        });
-                    } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: dataLang[message],
-                        });
-                    }
-                }
-                sOnSending(false);
+        try {
+            const { isSuccess, message } = await apiPrefix.apiHandingPrefix(formData)
+
+            if (isSuccess) {
+                Toast.fire({
+                    icon: "success",
+                    title: dataLang[message] || message,
+                });
+            } else {
+                Toast.fire({
+                    icon: "error",
+                    title: dataLang[message] || message,
+                });
             }
-        );
+        } catch (error) {
+
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {

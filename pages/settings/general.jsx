@@ -1,15 +1,18 @@
 import Head from "next/head";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { ListBtn_Setting } from "./information";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import useToast from "@/hooks/useToast";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import apiComons from "@/Api/apiComon/apiComon";
+import apiDashboard from "@/Api/apiDashboard/apiDashboard";
+import apiGeneral from "@/Api/apiSettings/apiGeneral";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -30,15 +33,15 @@ const Index = (props) => {
 
     const [data, sData] = useState([]);
 
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-        });
+    const _ServerFetching = async () => {
+        try {
+            const data = await apiDashboard.apiFeature();
+            sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+            sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+            sDataProductSerial(data.find((x) => x.code == "product_serial"));
+        } catch (error) {
+
+        }
     };
 
     useEffect(() => {
@@ -59,19 +62,10 @@ const Index = (props) => {
         } else if (code == "product_expiry") {
             if (dataProductExpiry?.is_enable == "0") {
                 if (dataProductSerial?.is_enable == "0") {
-                    sDataProductExpiry({
-                        ...dataProductExpiry,
-                        is_enable: "1",
-                    });
+                    sDataProductExpiry({ ...dataProductExpiry, is_enable: "1", });
                 } else {
-                    sDataProductExpiry({
-                        ...dataProductExpiry,
-                        is_enable: "1",
-                    });
-                    sDataProductSerial({
-                        ...dataProductSerial,
-                        is_enable: "0",
-                    });
+                    sDataProductExpiry({ ...dataProductExpiry, is_enable: "1", });
+                    sDataProductSerial({ ...dataProductSerial, is_enable: "0", });
                 }
             } else if (dataProductExpiry?.is_enable == "1") {
                 sDataProductExpiry({ ...dataProductExpiry, is_enable: "0" });
@@ -79,19 +73,10 @@ const Index = (props) => {
         } else if (code == "product_serial") {
             if (dataProductSerial?.is_enable == "0") {
                 if (dataProductExpiry?.is_enable == "0") {
-                    sDataProductSerial({
-                        ...dataProductSerial,
-                        is_enable: "1",
-                    });
+                    sDataProductSerial({ ...dataProductSerial, is_enable: "1", });
                 } else {
-                    sDataProductSerial({
-                        ...dataProductSerial,
-                        is_enable: "1",
-                    });
-                    sDataProductExpiry({
-                        ...dataProductExpiry,
-                        is_enable: "0",
-                    });
+                    sDataProductSerial({ ...dataProductSerial, is_enable: "1", });
+                    sDataProductExpiry({ ...dataProductExpiry, is_enable: "0", });
                 }
             } else if (dataProductSerial?.is_enable == "1") {
                 sDataProductSerial({ ...dataProductSerial, is_enable: "0" });
@@ -99,33 +84,24 @@ const Index = (props) => {
         }
     };
 
-    const _ServerSending = () => {
-        var formData = new FormData();
+    const _ServerSending = async () => {
+        let formData = new FormData();
 
         data.forEach((item, index) => {
             formData.append(`feature[${index}][code]`, item.code);
             formData.append(`feature[${index}][is_enable]`, item.is_enable);
         });
-
-        data;
-        Axios(
-            "POST",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {
-                data: formData,
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        isShow("success", props.dataLang[message]);
-                    } else {
-                        isShow("error", props.dataLang[message]);
-                    }
-                }
-                sOnSending(false);
+        try {
+            const { isSuccess, message } = await apiGeneral.apiHanding(formData);
+            if (isSuccess) {
+                isShow("success", props.dataLang[message]);
+            } else {
+                isShow("error", props.dataLang[message]);
             }
-        );
+        } catch (error) {
+
+        }
+        sOnSending(false);
     };
 
     useEffect(() => {

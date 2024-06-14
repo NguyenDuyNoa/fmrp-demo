@@ -231,15 +231,15 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                         <div className="flex flex-col">
                             <div className="my-2 flex items-center gap-1">
                                 <h3 className="text-[13px]">Số lệnh sản xuất:</h3>
-                                <h3 className=" text-[13px] font-medium">LSX-28112303</h3>
+                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_po ?? ""}</h3>
                             </div>
                             <div className="my-2  col-span-3 flex items-center gap-1">
-                                <h3 className="text-[13px] ">Kế hoạch NVL:</h3>
-                                <h3 className=" text-[13px] font-medium">KHSX-28112302</h3>
+                                <h3 className="text-[13px] ">Kế hoạch sản xuất:</h3>
+                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_pp ?? ""}</h3>
                             </div>
                             <div className="my-2 flex items-center gap-1">
                                 <h3 className="text-[13px]">Số LSX chi tiết:</h3>
-                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_detail}</h3>
+                                <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_detail ?? ""}</h3>
                             </div>
                         </div>
                         <div className="flex flex-col">

@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 
 import { ListBtn_Setting } from "./information";
 
-import { Money2 as IconMoney, Refresh as IconRefresh, Clock as IconClock } from "iconsax-react"
-import { useSelector } from "react-redux";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
-import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Clock as IconClock, Money2 as IconMoney, Refresh as IconRefresh } from "iconsax-react";
+import { useSelector } from "react-redux";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
