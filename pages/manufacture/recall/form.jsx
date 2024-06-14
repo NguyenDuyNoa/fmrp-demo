@@ -116,10 +116,12 @@ const Index = (props) => {
 
     const _ServerFetching = async () => {
         sOnLoading(true);
-        const { result } = await apiComons.apiBranchCombobox();
-        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-        sOnLoading(false);
-        sOnFetching(false);
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+            sOnLoading(false);
+            sOnFetching(false);
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -139,54 +141,56 @@ const Index = (props) => {
     }));
 
     const _ServerFetchingDetailPage = async () => {
-        const rResult = await apiRecall.apiDetailPageRecall(id);
-        sIdBranch({
-            label: rResult?.branch_name,
-            value: rResult?.branch_id,
-        });
-        sIdRecalltWarehouse({
-            label: rResult?.warehouse_name,
-            value: rResult?.warehouse_id,
-        });
-        sListData(
-            rResult?.items.map((e) => ({
-                id: e?.item?.id,
-                idParenBackend: e?.item?.id,
-                matHang: {
-                    e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${
-                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                    }</span>`,
-                    value: e.item?.id,
-                },
-                child: e?.child.map((ce) => ({
-                    idChildBackEnd: Number(ce?.id),
-                    id: Number(ce?.id),
-                    disabledDate:
-                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true),
-                    location:
-                        ce?.warehouse?.location_name || ce?.warehouse?.id || ce?.warehouse?.warehouse_name
-                            ? {
-                                  label: ce?.warehouse?.location_name || null,
-                                  value: ce?.warehouse?.id || null,
-                                  warehouse_name: ce?.warehouse?.warehouse_name || null,
-                              }
-                            : null,
-                    price: ce?.price,
-                    serial: ce?.serial == null ? "" : ce?.serial,
-                    lot: ce?.lot == null ? "" : ce?.lot,
-                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                    unit: e?.item?.unit_name || e.item?.unit,
-                    recallQuantity: +ce?.quantity,
-                    note: ce?.note,
-                })),
-            }))
-        );
-        sCode(rResult?.code);
-        sStartDate(moment(rResult?.date).toDate());
-        sNote(rResult?.note);
-        sOnFetchingDetail(false);
+        try {
+            const rResult = await apiRecall.apiDetailPageRecall(id);
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            sIdRecalltWarehouse({
+                label: rResult?.warehouse_name,
+                value: rResult?.warehouse_id,
+            });
+            sListData(
+                rResult?.items.map((e) => ({
+                    id: e?.item?.id,
+                    idParenBackend: e?.item?.id,
+                    matHang: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${
+                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                        }</span>`,
+                        value: e.item?.id,
+                    },
+                    child: e?.child.map((ce) => ({
+                        idChildBackEnd: Number(ce?.id),
+                        id: Number(ce?.id),
+                        disabledDate:
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true),
+                        location:
+                            ce?.warehouse?.location_name || ce?.warehouse?.id || ce?.warehouse?.warehouse_name
+                                ? {
+                                      label: ce?.warehouse?.location_name || null,
+                                      value: ce?.warehouse?.id || null,
+                                      warehouse_name: ce?.warehouse?.warehouse_name || null,
+                                  }
+                                : null,
+                        price: ce?.price,
+                        serial: ce?.serial == null ? "" : ce?.serial,
+                        lot: ce?.lot == null ? "" : ce?.lot,
+                        date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                        unit: e?.item?.unit_name || e.item?.unit,
+                        recallQuantity: +ce?.quantity,
+                        note: ce?.note,
+                    })),
+                }))
+            );
+            sCode(rResult?.code);
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+            sOnFetchingDetail(false);
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -207,30 +211,34 @@ const Index = (props) => {
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
-        const {
-            data: { result },
-        } = await apiRecall.apiItemsRecall("GET", {
-            params: {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-            },
-        });
-        sDataItems(result);
+        try {
+            const {
+                data: { result },
+            } = await apiRecall.apiItemsRecall("GET", {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                },
+            });
+            sDataItems(result);
+        } catch (error) {}
         sOnFetchingItemsAll(false);
     };
 
     const _ServerFetching_Warehouse = async () => {
-        const result = await apiRecall.apiWarehouseCombobox({
-            params: {
-                "filter[branch_id]": idBranch?.value,
-            },
-        });
-        sDataWarehouse(
-            result?.map((e) => ({
-                label: e?.warehouse_name,
-                value: e?.id,
-                // warehouse_name: e?.warehouse_name,
-            }))
-        );
+        try {
+            const result = await apiRecall.apiWarehouseCombobox({
+                params: {
+                    "filter[branch_id]": idBranch?.value,
+                },
+            });
+            sDataWarehouse(
+                result?.map((e) => ({
+                    label: e?.warehouse_name,
+                    value: e?.id,
+                    // warehouse_name: e?.warehouse_name,
+                }))
+            );
+        } catch (error) {}
         sOnFetchingWarehouse(false);
     };
 
@@ -238,34 +246,38 @@ const Index = (props) => {
         if (idBranch == null || inputValue == "") {
             return;
         } else {
-            const {
-                data: { result },
-            } = await apiRecall.apiItemsRecall("POST", {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
+            try {
+                const {
+                    data: { result },
+                } = await apiRecall.apiItemsRecall("POST", {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    },
 
-                data: {
-                    term: inputValue,
-                },
-            });
-            sDataItems(result);
+                    data: {
+                        term: inputValue,
+                    },
+                });
+                sDataItems(result);
+            } catch (error) {}
         }
     }, 500);
 
     const _ServerFetching_Location = async () => {
-        const data = await apiRecall.apiWarehouseLocationCombobox({
-            params: {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-                "filter[warehouse_id]": idRecalltWarehouse ? idRecalltWarehouse?.value : null,
-            },
-        });
-        sDataLocation(
-            data?.map((e) => ({
-                label: e?.location_name,
-                value: e?.id,
-            }))
-        );
+        try {
+            const data = await apiRecall.apiWarehouseLocationCombobox({
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": idRecalltWarehouse ? idRecalltWarehouse?.value : null,
+                },
+            });
+            sDataLocation(
+                data?.map((e) => ({
+                    label: e?.location_name,
+                    value: e?.id,
+                }))
+            );
+        } catch (error) {}
         sOnFetchingLocation(false);
     };
 
@@ -460,21 +472,23 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.recallQuantity);
             });
         });
-        const { isSuccess, message } = await apiRecall.apiHandingRecall(id ? id : undefined, formData);
-        if (isSuccess) {
-            isShow("success", `${dataLang[message]}` || message);
-            sCode("");
-            sStartDate(new Date());
-            sIdBranch(null);
-            sNote("");
-            sErrBranch(false);
-            sErrDate(false);
-            //new
-            sListData([]);
-            router.push(routerRecall.home);
-        } else {
-            handleCheckError(dataLang[message] || message);
-        }
+        try {
+            const { isSuccess, message } = await apiRecall.apiHandingRecall(id ? id : undefined, formData);
+            if (isSuccess) {
+                isShow("success", `${dataLang[message]}` || message);
+                sCode("");
+                sStartDate(new Date());
+                sIdBranch(null);
+                sNote("");
+                sErrBranch(false);
+                sErrDate(false);
+                //new
+                sListData([]);
+                router.push(routerRecall.home);
+            } else {
+                handleCheckError(dataLang[message] || message);
+            }
+        } catch (error) {}
         sOnSending(false);
     };
 

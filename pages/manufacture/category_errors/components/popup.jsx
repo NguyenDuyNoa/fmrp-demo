@@ -36,17 +36,19 @@ const PopupCategoryErrors = (props) => {
         formData.append("code", data?.code ?? "");
         formData.append("name", data?.name ?? "");
         formData.append("branch_id", data?.branch?.value ?? "");
-        const { message, result } = await apiCategoryErrors.apiHandingCategoryErrors(formData);
-        if (result == 1) {
-            isShow("success", message);
-            queryState({ open: false });
-            props.onRefresh && props.onRefresh();
-            return;
-        }
-        message?.name && isShow("error", message?.name);
-        message?.code && isShow("error", message?.code);
-        message?.branch_id && isShow("error", message?.branch_id);
-        message?.error && isShow("error", message?.error);
+        try {
+            const { message, result } = await apiCategoryErrors.apiHandingCategoryErrors(formData);
+            if (result == 1) {
+                isShow("success", message);
+                queryState({ open: false });
+                props.onRefresh && props.onRefresh();
+                return;
+            }
+            message?.name && isShow("error", message?.name);
+            message?.code && isShow("error", message?.code);
+            message?.branch_id && isShow("error", message?.branch_id);
+            message?.error && isShow("error", message?.error);
+        } catch (error) {}
     };
 
     const fetchBranch = async () => {
@@ -54,12 +56,14 @@ const PopupCategoryErrors = (props) => {
         queryState({ dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })) });
     };
     const fetchDetailCategory = async () => {
-        const { data } = await apiCategoryErrors.apiGetDetailCategoryErrors(props.id);
-        const findBranch = isState.dataBranch?.find((e) => e?.value == data?.dtData?.branch_id);
-        setValue("code", data?.dtData?.code);
-        setValue("name", data?.dtData?.name);
-        setValue("branch", findBranch);
-        setValue("note", data?.dtData?.note);
+        try {
+            const { data } = await apiCategoryErrors.apiGetDetailCategoryErrors(props.id);
+            const findBranch = isState.dataBranch?.find((e) => e?.value == data?.dtData?.branch_id);
+            setValue("code", data?.dtData?.code);
+            setValue("name", data?.dtData?.name);
+            setValue("branch", findBranch);
+            setValue("note", data?.dtData?.note);
+        } catch (error) {}
     };
 
     useEffect(() => {

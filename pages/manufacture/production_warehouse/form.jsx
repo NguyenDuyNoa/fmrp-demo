@@ -112,10 +112,12 @@ const Index = (props) => {
 
     const _ServerFetching = async () => {
         sOnLoading(true);
-        const { result } = await apiComons.apiBranchCombobox();
-        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-        sOnLoading(false);
-        sOnFetching(false);
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+            sOnLoading(false);
+            sOnFetching(false);
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -135,75 +137,77 @@ const Index = (props) => {
     }));
 
     const _ServerFetchingDetailPage = async () => {
-        const rResult = await apiProductionWarehouse.apiDetailPageProductionWarehouse(id);
-        sIdBranch({
-            label: rResult?.branch_name,
-            value: rResult?.branch_id,
-        });
-        sIdExportWarehouse({
-            label: rResult?.warehouse_name,
-            value: rResult?.warehouse_id,
-        });
-        sCode(rResult?.code);
-        sStartDate(moment(rResult?.date).toDate());
-        sNote(rResult?.note);
-        sListData(
-            rResult?.items.map((e) => ({
-                id: e?.item?.id,
-                idParenBackend: e?.item?.id,
-                matHang: {
-                    e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${
-                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                    }</span>`,
-                    value: e.item?.id,
-                },
-                child: e?.child.map((ce) => ({
-                    idChildBackEnd: Number(ce?.id),
-                    id: Number(ce?.id),
-                    disabledDate:
-                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                    location:
-                        ce?.warehouse_location?.location_name ||
-                        ce?.warehouse_location?.id ||
-                        ce?.warehouse_location?.warehouse_name ||
-                        ce?.warehouse_location?.quantity
-                            ? {
-                                  label: ce?.warehouse_location?.location_name || null,
-                                  value: ce?.warehouse_location?.id || null,
-                                  warehouse_name: ce?.warehouse_location?.warehouse_name || null,
-                                  qty: +ce?.warehouse_location?.quantity || null,
-                              }
-                            : null,
-                    serial: ce?.serial == null ? "" : ce?.serial,
-                    lot: ce?.lot == null ? "" : ce?.lot,
-                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                    unit: {
-                        label: ce?.unit_data.unit,
-                        value: ce?.unit_data.id,
-                        coefficient: +ce?.unit_data.coefficient,
+        try {
+            const rResult = await apiProductionWarehouse.apiDetailPageProductionWarehouse(id);
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            sIdExportWarehouse({
+                label: rResult?.warehouse_name,
+                value: rResult?.warehouse_id,
+            });
+            sCode(rResult?.code);
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+            sListData(
+                rResult?.items.map((e) => ({
+                    id: e?.item?.id,
+                    idParenBackend: e?.item?.id,
+                    matHang: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${
+                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                        }</span>`,
+                        value: e.item?.id,
                     },
-                    dataWarehouse: e?.item?.warehouse.map((ye) => ({
-                        label: ye?.location_name,
-                        value: ye?.id,
-                        warehouse_name: ye?.warehouse_name,
-                        qty: +ye?.quantity,
+                    child: e?.child.map((ce) => ({
+                        idChildBackEnd: Number(ce?.id),
+                        id: Number(ce?.id),
+                        disabledDate:
+                            (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                            (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                            (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                            (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                        location:
+                            ce?.warehouse_location?.location_name ||
+                            ce?.warehouse_location?.id ||
+                            ce?.warehouse_location?.warehouse_name ||
+                            ce?.warehouse_location?.quantity
+                                ? {
+                                      label: ce?.warehouse_location?.location_name || null,
+                                      value: ce?.warehouse_location?.id || null,
+                                      warehouse_name: ce?.warehouse_location?.warehouse_name || null,
+                                      qty: +ce?.warehouse_location?.quantity || null,
+                                  }
+                                : null,
+                        serial: ce?.serial == null ? "" : ce?.serial,
+                        lot: ce?.lot == null ? "" : ce?.lot,
+                        date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                        unit: {
+                            label: ce?.unit_data.unit,
+                            value: ce?.unit_data.id,
+                            coefficient: +ce?.unit_data.coefficient,
+                        },
+                        dataWarehouse: e?.item?.warehouse.map((ye) => ({
+                            label: ye?.location_name,
+                            value: ye?.id,
+                            warehouse_name: ye?.warehouse_name,
+                            qty: +ye?.quantity,
+                        })),
+                        dataUnit: e?.item?.unit?.map((e) => ({
+                            label: e?.unit,
+                            value: e?.id,
+                            coefficient: +e?.coefficient,
+                        })),
+                        exportQuantity: +ce?.quantity,
+                        exchangeValue: +ce?.coefficient,
+                        numberOfConversions: +ce?.quantity_exchange,
+                        note: ce?.note,
                     })),
-                    dataUnit: e?.item?.unit?.map((e) => ({
-                        label: e?.unit,
-                        value: e?.id,
-                        coefficient: +e?.coefficient,
-                    })),
-                    exportQuantity: +ce?.quantity,
-                    exchangeValue: +ce?.coefficient,
-                    numberOfConversions: +ce?.quantity_exchange,
-                    note: ce?.note,
-                })),
-            }))
-        );
+                }))
+            );
+        } catch (error) {}
         sOnFetchingDetail(false);
     };
 
@@ -230,26 +234,30 @@ const Index = (props) => {
             "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
         };
 
-        const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("GET", { params: params });
+        try {
+            const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("GET", { params: params });
 
-        sDataItems(result);
+            sDataItems(result);
 
-        sOnFetchingItemsAll(false);
+            sOnFetchingItemsAll(false);
+        } catch (error) {}
     };
 
     const _ServerFetching_ExportWarehouse = async () => {
-        const data = await apiProductionWarehouse.apiComboboxWarehouse({
-            params: {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-                "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-            },
-        });
-        sDataWarehouse(
-            data?.map((e) => ({
-                label: e?.warehouse_name,
-                value: e?.id,
-            }))
-        );
+        try {
+            const data = await apiProductionWarehouse.apiComboboxWarehouse({
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+                },
+            });
+            sDataWarehouse(
+                data?.map((e) => ({
+                    label: e?.warehouse_name,
+                    value: e?.id,
+                }))
+            );
+        } catch (error) {}
         sOnFetchingExportWarehouse(false);
     };
 
@@ -259,15 +267,17 @@ const Index = (props) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("POST", {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
-                data: {
-                    term: inputValue,
-                },
-            });
-            sDataItems(result);
+            try {
+                const { result } = await apiProductionWarehouse.apiSemiItemsProductionWarehouse("POST", {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    },
+                    data: {
+                        term: inputValue,
+                    },
+                });
+                sDataItems(result);
+            } catch (error) {}
         }
     }, 500);
 
@@ -418,26 +428,30 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.exportQuantity);
             });
         });
-        const { isSuccess, message, item } = await apiProductionWarehouse.apiHangdingProductionWarehouse(
-            id ? id : undefined,
-            formData
-        );
-        if (isSuccess) {
-            isShow("success", `${dataLang[message]}` || message);
-            sCode("");
-            sStartDate(new Date());
-            sIdBranch(null);
-            sIdExportWarehouse(null);
-            sNote("");
-            sErrBranch(false);
-            sErrExportWarehouse(false);
-            sErrDate(false);
-            //new
-            sListData([]);
-            router.push(routerProductionWarehouse.home);
-        } else {
-            handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
-        }
+        try {
+            const { isSuccess, message, item } = await apiProductionWarehouse.apiHangdingProductionWarehouse(
+                id ? id : undefined,
+                formData
+            );
+            if (isSuccess) {
+                isShow("success", `${dataLang[message]}` || message);
+                sCode("");
+                sStartDate(new Date());
+                sIdBranch(null);
+                sIdExportWarehouse(null);
+                sNote("");
+                sErrBranch(false);
+                sErrExportWarehouse(false);
+                sErrDate(false);
+                //new
+                sListData([]);
+                router.push(routerProductionWarehouse.home);
+            } else {
+                handleCheckError(
+                    `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
+                );
+            }
+        } catch (error) {}
         sOnSending(false);
     };
 

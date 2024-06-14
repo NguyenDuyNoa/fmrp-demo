@@ -92,25 +92,31 @@ const Index = (props) => {
     };
 
     const fetchListBranchWarehouse = async () => {
-        const { result } = await apiComons.apiBranchCombobox();
-        queryKeyIsState({ listBranchWarehouse: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            queryKeyIsState({ listBranchWarehouse: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
+        } catch (error) {}
     };
 
     const fetchFilterLocationWarehouse = async () => {
-        const { rResult } = await apiWarehouse.apiLocationWarehouse(isState.idWarehouse);
-        queryKeyIsState({ listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })) });
+        try {
+            const { rResult } = await apiWarehouse.apiLocationWarehouse(isState.idWarehouse);
+            queryKeyIsState({ listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })) });
+        } catch (error) {}
     };
 
     // fetch list biến thể
     const fetchFilterVariationWarehouse = async () => {
-        const { rResult } = await apiWarehouse.apiVariation();
-        const options = rResult?.flatMap(({ option }) => option) ?? [];
-        queryKeyIsState({
-            listVariant: options?.map(({ id, name }) => ({
-                label: name,
-                value: id,
-            })),
-        });
+        try {
+            const { rResult } = await apiWarehouse.apiVariation();
+            const options = rResult?.flatMap(({ option }) => option) ?? [];
+            queryKeyIsState({
+                listVariant: options?.map(({ id, name }) => ({
+                    label: name,
+                    value: id,
+                })),
+            });
+        } catch (error) {}
     };
 
     const handleOpenSelect = (type) => {
@@ -137,18 +143,20 @@ const Index = (props) => {
             "filter[branch_id]": isState?.idBranch?.length > 0 ? isState?.idBranch.map((e) => e.value) : null,
         };
         queryKeyIsState({ isLoading: true });
-        const { rResult, output } = await apiWarehouse.apiListWarehouse({ param: param });
-        if (rResult.length > 0) {
-            queryKeyIsState({ idWarehouse: rResult[0].id });
-        } else {
-            queryKeyIsState({ idWarehouse: null, dataWarehouseDetail: [] });
-        }
-        queryKeyIsState({ dataWarehouse: rResult });
-        sTotalItems(output);
-        sData_ex(rResult);
-        setTimeout(() => {
-            queryKeyIsState({ isLoading: false });
-        }, 500);
+        try {
+            const { rResult, output } = await apiWarehouse.apiListWarehouse({ param: param });
+            if (rResult.length > 0) {
+                queryKeyIsState({ idWarehouse: rResult[0].id });
+            } else {
+                queryKeyIsState({ idWarehouse: null, dataWarehouseDetail: [] });
+            }
+            queryKeyIsState({ dataWarehouse: rResult });
+            sTotalItems(output);
+            sData_ex(rResult);
+            setTimeout(() => {
+                queryKeyIsState({ isLoading: false });
+            }, 500);
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -163,12 +171,14 @@ const Index = (props) => {
 
     // fetch data ẩn hiện cột trong table
     const fetchDataOnOffCol = async () => {
-        const fature = await apiDashboard.apiFeature();
-        queryKeyIsState({
-            dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
-            dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
-            dataProductSerial: fature.find((x) => x.code == "product_serial"),
-        });
+        try {
+            const fature = await apiDashboard.apiFeature();
+            queryKeyIsState({
+                dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
+                dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
+                dataProductSerial: fature.find((x) => x.code == "product_serial"),
+            });
+        } catch (error) {}
     };
 
     // fetch data chi tiết của kho
@@ -182,17 +192,19 @@ const Index = (props) => {
             "filter[variation_option_id_2]": isState.idVariantSub?.value ? isState.idVariantSub?.value : null,
         };
         queryKeyIsState({ isLoading: true });
-        const { rResult, output } = await apiWarehouse.apiWarehouseDetail(isState.idWarehouse, { params: params });
-        queryKeyIsState({
-            dataWarehouseDetail: rResult,
-            dataWarehouseExcel: rResult,
-            totalItemWarehouseDetail: output,
-        });
-        setTimeout(() => {
+        try {
+            const { rResult, output } = await apiWarehouse.apiWarehouseDetail(isState.idWarehouse, { params: params });
             queryKeyIsState({
-                isLoading: false,
+                dataWarehouseDetail: rResult,
+                dataWarehouseExcel: rResult,
+                totalItemWarehouseDetail: output,
             });
-        }, 500);
+            setTimeout(() => {
+                queryKeyIsState({
+                    isLoading: false,
+                });
+            }, 500);
+        } catch (error) {}
     };
 
     useEffect(() => {

@@ -111,94 +111,100 @@ const Index = (props) => {
             branch_id: isValue.valueBr?.value ? isValue.valueBr?.value : "",
             product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,
         };
-        const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: params });
-        updateData({
-            listOrder: data?.rResult?.map((i) => {
-                return {
-                    id: i.id,
-                    nameOrder: i.nameOrder,
-                    status: i.status,
-                    process: i.process,
-                    processDefault: i.processDefault,
-                    listProducts: i.listProducts.map((s) => {
-                        const check = arrIdChecked.includes(s.id);
-                        return {
-                            id: s.id,
-                            name: s.name,
-                            images: s.images,
-                            desription: s.desription,
-                            status: s.status,
-                            quantity: +s.quantity,
-                            quantityRemaining: +s.quantity_rest,
-                            quantityPlan: +s.quantity_plan,
-                            actions: s.actions,
-                            processArr: s?.processArr?.items.map((j) => {
-                                return {
-                                    id: uuid(),
-                                    date: isMoment(j?.date, "DD/MM/YYYY"),
-                                    active: j?.active,
-                                    outDate: j?.outDate,
-                                };
-                            }),
-                            unitName: s.unit_name,
-                            checked: check,
-                            productVariation: s.product_variation,
-                        };
-                    }),
-                };
-            }),
-            timeLine: data?.listDate?.map((e) => {
-                return {
-                    id: uuid(),
-                    title: e?.title,
-                    month: isMoment(e?.month_year, "MM"),
-                    days: e?.days?.map((i) => {
-                        return {
-                            id: uuid(),
-                            day: `${i?.day_name} ${isMoment(i?.date, "DD")}`,
-                            date: isMoment(i?.date, "DD/MM/YYYY"),
-                        };
-                    }),
-                };
-            }),
-        });
-        updateTotalItems({
-            iTotalDisplayRecords: data?.output?.iTotalDisplayRecords,
-            iTotalRecords: data?.output?.iTotalRecords,
-        });
+        try {
+            const { data } = await apiProductionPlan.apiListOrderPlan(url, { params: params });
+            updateData({
+                listOrder: data?.rResult?.map((i) => {
+                    return {
+                        id: i.id,
+                        nameOrder: i.nameOrder,
+                        status: i.status,
+                        process: i.process,
+                        processDefault: i.processDefault,
+                        listProducts: i.listProducts.map((s) => {
+                            const check = arrIdChecked.includes(s.id);
+                            return {
+                                id: s.id,
+                                name: s.name,
+                                images: s.images,
+                                desription: s.desription,
+                                status: s.status,
+                                quantity: +s.quantity,
+                                quantityRemaining: +s.quantity_rest,
+                                quantityPlan: +s.quantity_plan,
+                                actions: s.actions,
+                                processArr: s?.processArr?.items.map((j) => {
+                                    return {
+                                        id: uuid(),
+                                        date: isMoment(j?.date, "DD/MM/YYYY"),
+                                        active: j?.active,
+                                        outDate: j?.outDate,
+                                    };
+                                }),
+                                unitName: s.unit_name,
+                                checked: check,
+                                productVariation: s.product_variation,
+                            };
+                        }),
+                    };
+                }),
+                timeLine: data?.listDate?.map((e) => {
+                    return {
+                        id: uuid(),
+                        title: e?.title,
+                        month: isMoment(e?.month_year, "MM"),
+                        days: e?.days?.map((i) => {
+                            return {
+                                id: uuid(),
+                                day: `${i?.day_name} ${isMoment(i?.date, "DD")}`,
+                                date: isMoment(i?.date, "DD/MM/YYYY"),
+                            };
+                        }),
+                    };
+                }),
+            });
+            updateTotalItems({
+                iTotalDisplayRecords: data?.output?.iTotalDisplayRecords,
+                iTotalRecords: data?.output?.iTotalRecords,
+            });
+        } catch (error) {}
         sIsFetching(false);
     };
     const _ServerFetching_filter = async () => {
-        const { rResult: client } = await apiProductionPlan.apiClientOption();
-        const { rResult: productGroup } = await apiProductionPlan.apiCategoryOption();
-        const { result: listBr } = await apiComons.apiBranchCombobox();
-        const { data } = await apiProductionPlan.apiSearchProductsVariant({
-            params: { "filter[branch_id]": 0 },
-        });
-        updateData({
-            client: client?.map(({ name, id }) => ({ label: name, value: id })),
-            productGroup: productGroup.map((e) => ({
-                label: `${e.name + " " + "(" + e.code + ")"}`,
-                value: e.id,
-                level: e.level,
-                code: e.code,
-                parent_id: e.parent_id,
-            })),
-            listBr: listBr?.map((e) => ({ label: e?.name, value: e?.id })) || [],
-            product: data?.result,
-        });
+        try {
+            const { rResult: client } = await apiProductionPlan.apiClientOption();
+            const { rResult: productGroup } = await apiProductionPlan.apiCategoryOption();
+            const { result: listBr } = await apiComons.apiBranchCombobox();
+            const { data } = await apiProductionPlan.apiSearchProductsVariant({
+                params: { "filter[branch_id]": 0 },
+            });
+            updateData({
+                client: client?.map(({ name, id }) => ({ label: name, value: id })),
+                productGroup: productGroup.map((e) => ({
+                    label: `${e.name + " " + "(" + e.code + ")"}`,
+                    value: e.id,
+                    level: e.level,
+                    code: e.code,
+                    parent_id: e.parent_id,
+                })),
+                listBr: listBr?.map((e) => ({ label: e?.name, value: e?.id })) || [],
+                product: data?.result,
+            });
+        } catch (error) {}
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        const { data } = await apiProductionPlan.apiSearchProductsVariant({
-            params: {
-                "filter[branch_id]": 0,
-            },
-            data: {
-                term: inputValue,
-            },
-        });
-        updateData({ product: data?.result });
+        try {
+            const { data } = await apiProductionPlan.apiSearchProductsVariant({
+                params: {
+                    "filter[branch_id]": 0,
+                },
+                data: {
+                    term: inputValue,
+                },
+            });
+            updateData({ product: data?.result });
+        } catch (error) {}
     }, 500);
 
     const options = isData?.product?.map((e) => ({

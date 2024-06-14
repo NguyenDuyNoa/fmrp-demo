@@ -47,11 +47,13 @@ const Popup_chitiet = (props) => {
     };
 
     const _ServerFetching_detailOrder = async () => {
-        const data = await apiExportToOther.apiDetailExportToOther(props?.id);
+        try {
+            const data = await apiExportToOther.apiDetailExportToOther(props?.id);
 
-        sData(data);
+            sData(data);
 
-        sOnFetching(false);
+            sOnFetching(false);
+        } catch (error) {}
     };
     useEffect(() => {
         setTimeout(() => {

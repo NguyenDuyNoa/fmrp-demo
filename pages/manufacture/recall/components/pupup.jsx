@@ -50,9 +50,11 @@ const Popup_chitiet = (props) => {
     };
 
     const _ServerFetching_detailOrder = async () => {
-        const data = await apiRecall.apiDetailRecall(props?.id);
-        sData(data);
-        sOnFetching(false);
+        try {
+            const data = await apiRecall.apiDetailRecall(props?.id);
+            sData(data);
+            sOnFetching(false);
+        } catch (error) {}
     };
     useEffect(() => {
         setTimeout(() => {

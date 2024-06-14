@@ -136,31 +136,33 @@ const MainTable = ({ dataLang }) => {
     };
 
     const fetchisState = async (page) => {
-        const { data } = await apiProductionsOrders.apiProductionOrders(page, isState.limit, { params: params });
-        const arrayItem = convertArrData(data?.productionOrders);
-        queryState({
-            countAll: data?.countAll,
-            listDataLeft: arrayItem.map((e, index) => {
-                return {
-                    ...e,
-                    showParent: index == 0,
-                };
-            }),
-            next: data?.next == 1,
-        });
-        if (isState.search == "" && arrayItem[0]?.id) {
-            fetchisStateRight(arrayItem[0]?.id);
-        }
-        if (data?.productionOrders?.length == 0) {
+        try {
+            const { data } = await apiProductionsOrders.apiProductionOrders(page, isState.limit, { params: params });
+            const arrayItem = convertArrData(data?.productionOrders);
             queryState({
-                listDataRight: {
-                    ...isState.listDataRight,
-                    title: null,
-                    dataPPItems: [],
-                    dataSemiItems: [],
-                },
+                countAll: data?.countAll,
+                listDataLeft: arrayItem.map((e, index) => {
+                    return {
+                        ...e,
+                        showParent: index == 0,
+                    };
+                }),
+                next: data?.next == 1,
             });
-        }
+            if (isState.search == "" && arrayItem[0]?.id) {
+                fetchisStateRight(arrayItem[0]?.id);
+            }
+            if (data?.productionOrders?.length == 0) {
+                queryState({
+                    listDataRight: {
+                        ...isState.listDataRight,
+                        title: null,
+                        dataPPItems: [],
+                        dataSemiItems: [],
+                    },
+                });
+            }
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -182,34 +184,36 @@ const MainTable = ({ dataLang }) => {
     const handleFilter = (type, value) => queryState({ [type]: value, page: 1 });
 
     const fetchisStateSeeMore = async () => {
-        const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, {
-            params: params,
-        });
-        const item = convertArrData(data?.productionOrders);
-        let arrayItem = [...isState.listDataLeft, ...item];
-        queryState({
-            countAll: data?.countAll,
-            listDataLeft: arrayItem.map((e, index) => {
-                return {
-                    ...e,
-                    showParent: index == 0,
-                };
-            }),
-            next: data?.next == 1,
-        });
-        if (isState.search == "" && arrayItem[0]?.id) {
-            fetchisStateRight(arrayItem[0]?.id);
-        }
-        if (data?.productionOrders?.length == 0) {
-            queryState({
-                listDataRight: {
-                    ...isState.listDataRight,
-                    title: null,
-                    dataPPItems: [],
-                    dataSemiItems: [],
-                },
+        try {
+            const { data } = await apiProductionsOrders.apiProductionOrders(isState.page, isState.limit, {
+                params: params,
             });
-        }
+            const item = convertArrData(data?.productionOrders);
+            let arrayItem = [...isState.listDataLeft, ...item];
+            queryState({
+                countAll: data?.countAll,
+                listDataLeft: arrayItem.map((e, index) => {
+                    return {
+                        ...e,
+                        showParent: index == 0,
+                    };
+                }),
+                next: data?.next == 1,
+            });
+            if (isState.search == "" && arrayItem[0]?.id) {
+                fetchisStateRight(arrayItem[0]?.id);
+            }
+            if (data?.productionOrders?.length == 0) {
+                queryState({
+                    listDataRight: {
+                        ...isState.listDataRight,
+                        title: null,
+                        dataPPItems: [],
+                        dataSemiItems: [],
+                    },
+                });
+            }
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -219,139 +223,153 @@ const MainTable = ({ dataLang }) => {
     }, [isState.page]);
 
     const fetchisStateRight = async (id) => {
-        const { data, isSuccess } = await apiProductionsOrders.apiDetailProductionOrders(id);
-        if (!isSuccess == 1) return;
-        queryState({
-            listDataRight: {
-                title: data?.productionOrder?.reference_no,
-                idCommand: data?.productionOrder?.id,
-                dataPPItems: data?.listPOItems?.map((e) => {
-                    return {
-                        id: e?.object_id,
-                        title: e?.reference_no,
-                        showChild: true,
-                        arrListData: e?.items_products?.map((i) => {
-                            return {
-                                id: uddid(),
-                                image: i?.images ? i?.images : "/no_img.png",
-                                name: i?.item_name,
-                                itemVariation: i?.product_variation,
-                                code: i?.item_code,
-                                quantity: +i?.quantity,
-                                unit: i?.unit_name,
-                                processBar: i?.list_stages?.map((j) => {
-                                    return {
-                                        id: uddid(),
-                                        active: false,
-                                        date: new Date(),
-                                        title: j?.name_stage,
-                                        status: "",
-                                        quantity: 0,
-                                    };
-                                }),
-                                childProducts: i?.semi_products,
-                            };
-                        }),
-                    };
-                }),
-                dataSemiItems: data?.listSemiItems?.map((e) => {
-                    return {
-                        id: e?.object_id,
-                        title: e?.reference_no,
-                        showChild: true,
-                        arrListData: e?.semi_products?.map((i) => {
-                            return {
-                                id: uddid(),
-                                image: i?.images ? i?.images : "/no_img.png",
-                                name: i?.item_name,
-                                itemVariation: i?.product_variation,
-                                code: i?.item_code,
-                                quantity: +i?.quantity,
+        try {
+            const { data, isSuccess } = await apiProductionsOrders.apiDetailProductionOrders(id);
+            if (!isSuccess == 1) return;
+            queryState({
+                listDataRight: {
+                    title: data?.productionOrder?.reference_no,
+                    idCommand: data?.productionOrder?.id,
+                    dataPPItems: data?.listPOItems?.map((e) => {
+                        return {
+                            id: e?.object_id,
+                            title: e?.reference_no,
+                            showChild: true,
+                            arrListData: e?.items_products?.map((i) => {
+                                return {
+                                    id: uddid(),
+                                    image: i?.images ? i?.images : "/no_img.png",
+                                    name: i?.item_name,
+                                    itemVariation: i?.product_variation,
+                                    code: i?.item_code,
+                                    quantity: +i?.quantity,
+                                    unit: i?.unit_name,
+                                    processBar: i?.list_stages?.map((j) => {
+                                        return {
+                                            id: uddid(),
+                                            active: false,
+                                            date: new Date(),
+                                            title: j?.name_stage,
+                                            status: "",
+                                            quantity: 0,
+                                        };
+                                    }),
+                                    childProducts: i?.semi_products,
+                                };
+                            }),
+                        };
+                    }),
+                    dataSemiItems: data?.listSemiItems?.map((e) => {
+                        return {
+                            id: e?.object_id,
+                            title: e?.reference_no,
+                            showChild: true,
+                            arrListData: e?.semi_products?.map((i) => {
+                                return {
+                                    id: uddid(),
+                                    image: i?.images ? i?.images : "/no_img.png",
+                                    name: i?.item_name,
+                                    itemVariation: i?.product_variation,
+                                    code: i?.item_code,
+                                    quantity: +i?.quantity,
 
-                                unit: i?.unit_name,
-                                processBar: i?.list_stages?.map((j) => {
-                                    return {
-                                        id: uddid(),
-                                        active: false,
-                                        date: new Date(),
-                                        title: j?.name_stage,
-                                        status: "",
-                                        quantity: 0,
-                                    };
-                                }),
-                                childProducts: {
-                                    ...i?.products_parent,
-                                    image: i?.products_parent?.image ? i?.products_parent?.image : "/no_img.png",
-                                },
-                            };
-                        }),
-                    };
-                }),
-            },
-        });
+                                    unit: i?.unit_name,
+                                    processBar: i?.list_stages?.map((j) => {
+                                        return {
+                                            id: uddid(),
+                                            active: false,
+                                            date: new Date(),
+                                            title: j?.name_stage,
+                                            status: "",
+                                            quantity: 0,
+                                        };
+                                    }),
+                                    childProducts: {
+                                        ...i?.products_parent,
+                                        image: i?.products_parent?.image ? i?.products_parent?.image : "/no_img.png",
+                                    },
+                                };
+                            }),
+                        };
+                    }),
+                },
+            });
+        } catch (error) {}
     };
 
     const fetchComboboxProductionOrders = debounce(async (value) => {
-        const { data } = await apiProductionsOrders.apiComboboxProductionOrders({ params: { search: value } });
-        queryState({
-            comboboxProductionOrders: data?.po?.map((e) => {
-                return { value: e?.id, label: e?.reference_no };
-            }),
-        });
+        try {
+            const { data } = await apiProductionsOrders.apiComboboxProductionOrders({ params: { search: value } });
+            queryState({
+                comboboxProductionOrders: data?.po?.map((e) => {
+                    return { value: e?.id, label: e?.reference_no };
+                }),
+            });
+        } catch (error) {}
     }, 500);
 
     const fetchComboboxProductionOrdersDetail = debounce(async (value) => {
-        const { data } = await apiProductionsOrders.apiComboboxProductionOrdersDetail();
-        queryState({
-            comboboxProductionOrdersDetail: data?.pod?.map((e) => {
-                return { value: e?.id, label: e?.reference_no_detail };
-            }),
-        });
+        try {
+            const { data } = await apiProductionsOrders.apiComboboxProductionOrdersDetail();
+            queryState({
+                comboboxProductionOrdersDetail: data?.pod?.map((e) => {
+                    return { value: e?.id, label: e?.reference_no_detail };
+                }),
+            });
+        } catch (error) {}
     }, 500);
 
     const fetchDataBranch = debounce(async (value) => {
-        const { result } = await apiComons.apiBranchCombobox();
-        queryState({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            queryState({ listBr: result?.map((e) => ({ label: e?.name, value: e?.id })) || [] });
+        } catch (error) {}
     }, 500);
 
     const fetchDataItems = debounce(async (value) => {
-        const { data } = await apiComons.apiListItemsVariant({ data: { term: value } });
-        const newData = data?.result.map((e) => ({
-            label: `${e.name}
+        try {
+            const { data } = await apiComons.apiListItemsVariant({ data: { term: value } });
+            const newData = data?.result.map((e) => ({
+                label: `${e.name}
                     <span style={{display: none}}>${e.code}</span>
                     <span style={{display: none}}>${e.text_type} ${e.unit_name} ${e.product_variation} </span>`,
-            value: e.id,
-            e,
-        }));
-        queryState({ listProducts: newData });
+                value: e.id,
+                e,
+            }));
+            queryState({ listProducts: newData });
+        } catch (error) {}
     }, 500);
 
     const fetDataOrder = debounce(async (value) => {
-        const { data } = await apiMaterialsPlanning.apiSearchOrders({ params: { search: value } });
-        if (data?.items) {
-            queryState({
-                listOrders: data?.items?.map((e) => {
-                    return {
-                        value: e?.id,
-                        label: e?.reference_no,
-                    };
-                }),
-            });
-        }
+        try {
+            const { data } = await apiMaterialsPlanning.apiSearchOrders({ params: { search: value } });
+            if (data?.items) {
+                queryState({
+                    listOrders: data?.items?.map((e) => {
+                        return {
+                            value: e?.id,
+                            label: e?.reference_no,
+                        };
+                    }),
+                });
+            }
+        } catch (error) {}
     }, 500);
 
     const fetchDataPlan = debounce(async (value) => {
-        const { data } = await apiMaterialsPlanning.apiSearchInternalPlans({ params: { search: value } });
-        if (data?.items) {
-            queryState({
-                listPlan: data?.items?.map((e) => {
-                    return {
-                        value: e?.id,
-                        label: e?.reference_no,
-                    };
-                }),
-            });
-        }
+        try {
+            const { data } = await apiMaterialsPlanning.apiSearchInternalPlans({ params: { search: value } });
+            if (data?.items) {
+                queryState({
+                    listPlan: data?.items?.map((e) => {
+                        return {
+                            value: e?.id,
+                            label: e?.reference_no,
+                        };
+                    }),
+                });
+            }
+        } catch (error) {}
     }, 500);
 
     useEffect(() => {
@@ -366,7 +384,6 @@ const MainTable = ({ dataLang }) => {
     }, [isMouted]);
 
     const handleShow = (id) => {
-        console.log(id, isState.isTab);
         queryState({
             listDataLeft: isState.listDataLeft.map((e) => {
                 const showParent = e.id == id;

@@ -147,13 +147,17 @@ const Index = (props) => {
             "filter[warehouse_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
         };
 
-        const { rResult, output, rTotal } = await apiProductionWarehouse.apiListProductionWarehouse({ params: params });
+        try {
+            const { rResult, output, rTotal } = await apiProductionWarehouse.apiListProductionWarehouse({
+                params: params,
+            });
 
-        sTotalItems(output);
+            sTotalItems(output);
 
-        sTotal(rTotal);
+            sTotal(rTotal);
 
-        queryState({ data: rResult, dataExcel: rResult, onFetching: false });
+            queryState({ data: rResult, dataExcel: rResult, onFetching: false });
+        } catch (error) {}
     };
 
     const _ServerFetching_group = async () => {
@@ -167,33 +171,39 @@ const Index = (props) => {
             "filter[warehouse_id]": isState.idExportWarehouse != null ? isState.idExportWarehouse?.value : null,
         };
 
-        const data = await apiProductionWarehouse.apiListGroupProductionWarehouse({ params: params });
+        try {
+            const data = await apiProductionWarehouse.apiListGroupProductionWarehouse({ params: params });
 
-        queryState({ listDs: data, onFetchingGroup: false });
+            queryState({ listDs: data, onFetchingGroup: false });
+        } catch (error) {}
     };
 
     const _ServerFetching_filter = async () => {
-        const { result: listBr } = await apiComons.apiBranchCombobox();
+        try {
+            const { result: listBr } = await apiComons.apiBranchCombobox();
 
-        const { result: exportProductionCombobox } = await apiProductionWarehouse.apiCodeProductionWarehouse();
+            const { result: exportProductionCombobox } = await apiProductionWarehouse.apiCodeProductionWarehouse();
 
-        const data = await apiProductionWarehouse.apiComboboxWarehouse();
+            const data = await apiProductionWarehouse.apiComboboxWarehouse();
 
-        queryState({
-            listBr: listBr?.map((e) => ({ label: e.name, value: e.id })),
-            lisCode: exportProductionCombobox?.map((e) => ({ label: e.code, value: e.id })),
-            dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
-            onFetching_filter: false,
-        });
+            queryState({
+                listBr: listBr?.map((e) => ({ label: e.name, value: e.id })),
+                lisCode: exportProductionCombobox?.map((e) => ({ label: e.code, value: e.id })),
+                dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
+                onFetching_filter: false,
+            });
+        } catch (error) {}
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        const { result } = await apiProductionWarehouse.apiAjaxCodeProductionWarehouse({
-            data: {
-                term: inputValue,
-            },
-        });
-        queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
+        try {
+            const { result } = await apiProductionWarehouse.apiAjaxCodeProductionWarehouse({
+                data: {
+                    term: inputValue,
+                },
+            });
+            queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
+        } catch (error) {}
     }, 500);
 
     useEffect(() => {
@@ -375,17 +385,19 @@ const Index = (props) => {
 
         data.append("id", checkedWare?.id);
 
-        const { isSuccess, message, data_export } = await apiProductionWarehouse.apiHangdingStatusWarehouse({
-            data: data,
-        });
+        try {
+            const { isSuccess, message, data_export } = await apiProductionWarehouse.apiHangdingStatusWarehouse({
+                data: data,
+            });
 
-        if (isSuccess) {
-            isShow("success", `${dataLang[message]}`);
-            await _ServerFetching();
-            await _ServerFetching_group();
-        } else {
-            isShow("error", `${dataLang[message]}`);
-        }
+            if (isSuccess) {
+                isShow("success", `${dataLang[message]}`);
+                await _ServerFetching();
+                await _ServerFetching_group();
+            } else {
+                isShow("error", `${dataLang[message]}`);
+            }
+        } catch (error) {}
         queryState({ onSending: false });
     };
 

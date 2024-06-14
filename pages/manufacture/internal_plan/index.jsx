@@ -103,21 +103,25 @@ const Index = (props) => {
                     ? moment(idFillter?.valueDate?.endDate).format("DD/MM/YYYY")
                     : null,
         };
-        const { data } = await apiInternalPlan.apiListInternalPlan({ params: params });
-        sListData((e) => ({
-            ...e,
-            data: data?.rResult,
-            dataExcel: data?.rResult,
-        }));
-        sTotalItems(data?.output);
+        try {
+            const { data } = await apiInternalPlan.apiListInternalPlan({ params: params });
+            sListData((e) => ({
+                ...e,
+                data: data?.rResult,
+                dataExcel: data?.rResult,
+            }));
+            sTotalItems(data?.output);
+        } catch (error) {}
         sOnFetching(false);
     };
 
     // filter
     const _ServerFetching_filter = async () => {
-        const { result } = await apiComons.apiBranchCombobox();
-        sListData((e) => ({ ...e, listBr: result.map((e) => ({ label: e.name, value: e.id })) }));
-        sOnFetching_filter(false);
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            sListData((e) => ({ ...e, listBr: result.map((e) => ({ label: e.name, value: e.id })) }));
+            sOnFetching_filter(false);
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -167,14 +171,16 @@ const Index = (props) => {
     };
 
     const handlePostStatus = async (id, newStatus) => {
-        const { isSuccess, message } = await apiInternalPlan.apiPostStatus(id, newStatus);
-        if (isSuccess == 1) {
-            isShow("success", `${dataLang[message] || message}`);
-            handleQueryId({ status: false });
-            _ServerFetching();
-            return;
-        }
-        isShow("error", `${dataLang[message] || message}`);
+        try {
+            const { isSuccess, message } = await apiInternalPlan.apiPostStatus(id, newStatus);
+            if (isSuccess == 1) {
+                isShow("success", `${dataLang[message] || message}`);
+                handleQueryId({ status: false });
+                _ServerFetching();
+                return;
+            }
+            isShow("error", `${dataLang[message] || message}`);
+        } catch (error) {}
     };
 
     // excel

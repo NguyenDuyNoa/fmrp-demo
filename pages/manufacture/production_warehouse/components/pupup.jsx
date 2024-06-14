@@ -43,11 +43,13 @@ const Popup_chitiet = (props) => {
     };
 
     const _ServerFetching_detailOrder = async () => {
-        const data = await apiProductionWarehouse.apiDetailProductionWarehouse(props?.id);
+        try {
+            const data = await apiProductionWarehouse.apiDetailProductionWarehouse(props?.id);
 
-        sData(data);
+            sData(data);
 
-        sOnFetching(false);
+            sOnFetching(false);
+        } catch (error) {}
     };
 
     useEffect(() => {

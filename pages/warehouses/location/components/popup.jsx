@@ -72,20 +72,22 @@ const Popup_Vitrikho = (props) => {
         const url = props.id
             ? `/api_web/api_warehouse/location/${id}?csrf_protection=true`
             : "/api_web/api_warehouse/location/?csrf_protection=true";
-        const { isSuccess, message } = await apiLocationWarehouse.apiHandingLocation(url, data);
-        if (isSuccess) {
-            isShow("success", `${props.dataLang[message]}`);
-            props.onRefresh && props.onRefresh();
-            sOpen(false);
-            sErrInputCode(false);
-            sErrInputName(false);
-            sErrInputKho(false);
-            sName("");
-            sCode("");
-            sValuekho(null);
-        } else {
-            isShow("error", `${props.dataLang[message]}`);
-        }
+        try {
+            const { isSuccess, message } = await apiLocationWarehouse.apiHandingLocation(url, data);
+            if (isSuccess) {
+                isShow("success", `${props.dataLang[message]}`);
+                props.onRefresh && props.onRefresh();
+                sOpen(false);
+                sErrInputCode(false);
+                sErrInputName(false);
+                sErrInputKho(false);
+                sName("");
+                sCode("");
+                sValuekho(null);
+            } else {
+                isShow("error", `${props.dataLang[message]}`);
+            }
+        } catch (error) {}
         sOnSending(false);
     };
 

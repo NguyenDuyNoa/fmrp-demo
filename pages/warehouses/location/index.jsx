@@ -83,20 +83,24 @@ const Location = (props) => {
             page: router.query?.page || 1,
             "filter[warehouse_id]": isState.valueWarehouse ? isState.valueWarehouse?.value : null,
         };
-        const { rResult, output } = await apiLocationWarehouse.apiLocationWarehouse({ params: params });
-        sTotalItems(output);
-        queryState({ data: rResult, data_ex: rResult, onFetching: false });
+        try {
+            const { rResult, output } = await apiLocationWarehouse.apiLocationWarehouse({ params: params });
+            sTotalItems(output);
+            queryState({ data: rResult, data_ex: rResult, onFetching: false });
+        } catch (error) {}
     };
     const _ServerFetching_kho = async () => {
         const params = {
             limit: 0,
             "filter[is_system]": 2,
         };
-        const { rResult } = await apiLocationWarehouse.apiListWarehouse({ params: params });
-        queryState({
-            listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })),
-            onFetchingWarehouse: false,
-        });
+        try {
+            const { rResult } = await apiLocationWarehouse.apiListWarehouse({ params: params });
+            queryState({
+                listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })),
+                onFetchingWarehouse: false,
+            });
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -134,17 +138,19 @@ const Location = (props) => {
     const _ServerSending = async () => {
         let id = active;
         if (!id) return;
-        const { isSuccess, message } = await apiLocationWarehouse.apiHandingStatus(id, {
-            data: {
-                status: status,
-            },
-        });
-        if (isSuccess) {
-            isShow("success", `${dataLang[message] || message}`);
-        } else {
-            isShow("error", `${dataLang[message] || message}`);
-        }
-        _ServerFetching(true);
+        try {
+            const { isSuccess, message } = await apiLocationWarehouse.apiHandingStatus(id, {
+                data: {
+                    status: status,
+                },
+            });
+            if (isSuccess) {
+                isShow("success", `${dataLang[message] || message}`);
+            } else {
+                isShow("error", `${dataLang[message] || message}`);
+            }
+            await _ServerFetching();
+        } catch (error) {}
         queryState({ onSending: false });
     };
     useEffect(() => {

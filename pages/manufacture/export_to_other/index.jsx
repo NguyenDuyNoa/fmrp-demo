@@ -125,73 +125,81 @@ const Index = (props) => {
     const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
 
-        const { rResult, output, rTotal } = await apiExportToOther.apiListExportOther({
-            params: {
-                search: isState.keySearch,
-                limit: limit,
-                page: router.query?.page || 1,
-                "filter[status_bar]": tabPage ?? null,
-                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
-                "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
-            },
-        });
+        try {
+            const { rResult, output, rTotal } = await apiExportToOther.apiListExportOther({
+                params: {
+                    search: isState.keySearch,
+                    limit: limit,
+                    page: router.query?.page || 1,
+                    "filter[status_bar]": tabPage ?? null,
+                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+                    "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
+                    "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
+                },
+            });
 
-        sTotalItems(output);
+            sTotalItems(output);
 
-        sTotal(rTotal);
+            sTotal(rTotal);
 
-        queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
+            queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
+        } catch (error) {}
     };
 
     const _ServerFetching_group = async () => {
-        const data = await apiExportToOther.apiListGroupExportOther({
-            params: {
-                limit: 0,
-                search: isState.keySearch,
-                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                "filter[end_date]": isState.valueDate?.endDate != null ? isStatevalueDate?.endDate : null,
-                "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
-                "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
-            },
-        });
-        queryState({ listDs: data || [], onFetchingGroup: false });
+        try {
+            const data = await apiExportToOther.apiListGroupExportOther({
+                params: {
+                    limit: 0,
+                    search: isState.keySearch,
+                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    "filter[end_date]": isState.valueDate?.endDate != null ? isStatevalueDate?.endDate : null,
+                    "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
+                    "filter[object]": isState.idObject != null ? isState.idObject?.value : null,
+                },
+            });
+            queryState({ listDs: data || [], onFetchingGroup: false });
+        } catch (error) {}
     };
 
     const _ServerFetching_filter = async () => {
-        const { result: listBr } = await apiComons.apiBranchCombobox();
+        try {
+            const { result: listBr } = await apiComons.apiBranchCombobox();
 
-        const { result: listCode } = await apiExportToOther.apiExportOtherCombobox();
+            const { result: listCode } = await apiExportToOther.apiExportOtherCombobox();
 
-        const data = await apiExportToOther.apiWarehouseCombobox();
+            const data = await apiExportToOther.apiWarehouseCombobox();
 
-        const dataObject = await apiExportToOther.apiListObject();
+            const dataObject = await apiExportToOther.apiListObject();
 
-        queryState({
-            listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
-            listCode:
-                listCode?.map((e) => ({
-                    label: e?.code,
-                    value: e.id,
-                })) || [],
-            dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [],
-            listObject: dataObject?.map((e) => ({ label: dataLang[e?.name], value: e?.id })) || [],
-            onFetching_filter: false,
-        });
+            queryState({
+                listBr: listBr?.map((e) => ({ label: e.name, value: e.id })) || [],
+                listCode:
+                    listCode?.map((e) => ({
+                        label: e?.code,
+                        value: e.id,
+                    })) || [],
+                dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [],
+                listObject: dataObject?.map((e) => ({ label: dataLang[e?.name], value: e?.id })) || [],
+                onFetching_filter: false,
+            });
+        } catch (error) {}
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        const { isSuccess, result } = await apiExportToOther.apiAjaxWarehouseCombobox({
-            data: {
-                term: inputValue,
-            },
-        });
-        queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
+        try {
+            const { isSuccess, result } = await apiExportToOther.apiAjaxWarehouseCombobox({
+                data: {
+                    term: inputValue,
+                },
+            });
+            queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
+        } catch (error) {}
     }, 500);
 
     useEffect(() => {
@@ -385,17 +393,19 @@ const Index = (props) => {
 
         data.append("id", checkedWare?.id);
 
-        const { isSuccess, message, data_export } = await apiExportToOther.apiHandingStatus(data);
-        if (isSuccess) {
-            isShow("success", dataLang[message] || message);
-            await _ServerFetching();
-            await _ServerFetching_group();
-        } else {
-            isShow("error", dataLang[message] || message);
-        }
-        if (data_export?.length > 0) {
-            queryState({ data_export: data_export });
-        }
+        try {
+            const { isSuccess, message, data_export } = await apiExportToOther.apiHandingStatus(data);
+            if (isSuccess) {
+                isShow("success", dataLang[message] || message);
+                await _ServerFetching();
+                await _ServerFetching_group();
+            } else {
+                isShow("error", dataLang[message] || message);
+            }
+            if (data_export?.length > 0) {
+                queryState({ data_export: data_export });
+            }
+        } catch (error) {}
         queryState({ onSending: false });
     };
 

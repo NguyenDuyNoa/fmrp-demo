@@ -66,14 +66,18 @@ const Index = (props) => {
             page: router.query?.page || 1,
             branch_id: isState.idBranch?.value ?? "",
         };
-        const { data } = await apiCategoryErrors.apiCategoryErrors({ params: params });
-        updateTotalItems(data);
-        queryState({ data: data?.dtResult, data_ex: data?.dtResult, onFetching: false });
+        try {
+            const { data } = await apiCategoryErrors.apiCategoryErrors({ params: params });
+            updateTotalItems(data);
+            queryState({ data: data?.dtResult, data_ex: data?.dtResult, onFetching: false });
+        } catch (error) {}
     };
 
     const fetchBranch = async () => {
-        const { result } = await apiComons.apiBranchCombobox();
-        queryState({ dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })) });
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            queryState({ dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })) });
+        } catch (error) {}
     };
 
     useEffect(() => {

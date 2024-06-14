@@ -122,18 +122,20 @@ const Index = (props) => {
     const _ServerFetching = async () => {
         sOnLoading(true);
 
-        const { result } = await apiComons.apiBranchCombobox();
-        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-        sOnLoading(false);
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+            sOnLoading(false);
 
-        const data = await apiWarehouseTransfer.apiWarehouseComboboxNotSystem();
-        sDataReceiveWarehouse(
-            data?.map((e) => ({
-                label: e?.warehouse_name,
-                value: e?.id,
-            }))
-        );
-        sOnFetching(false);
+            const data = await apiWarehouseTransfer.apiWarehouseComboboxNotSystem();
+            sDataReceiveWarehouse(
+                data?.map((e) => ({
+                    label: e?.warehouse_name,
+                    value: e?.id,
+                }))
+            );
+            sOnFetching(false);
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -153,75 +155,77 @@ const Index = (props) => {
     }));
 
     const _ServerFetchingDetailPage = async () => {
-        const rResult = await apiWarehouseTransfer.apiDetailTransfer(id);
-        sIdBranch({
-            label: rResult?.branch_name_id,
-            value: rResult?.branch_id,
-        });
-        sIdExportWarehouse({
-            label: rResult?.warehouses_id_name,
-            value: rResult?.warehouses_id,
-        });
-        sIdReceiveWarehouse({
-            label: rResult?.warehouses_to_name,
-            value: rResult?.warehouses_to,
-        });
-        sCode(rResult?.code);
-        sStartDate(moment(rResult?.date).toDate());
-        sNote(rResult?.note);
-        sListData(
-            rResult?.items.map((e) => ({
-                id: e?.item?.id,
-                idParenBackend: e?.item?.id,
-                matHang: {
-                    e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${
-                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                    }</span>`,
-                    value: e.item?.id,
-                },
-                child: e?.child.map((ce) => ({
-                    idChildBackEnd: Number(ce?.id),
-                    id: Number(ce?.id),
-                    disabledDate:
-                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                        (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                        (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                    location:
-                        ce?.warehouse_location?.location_name ||
-                        ce?.warehouse_location?.id ||
-                        ce?.warehouse_location?.warehouse_name ||
-                        ce?.warehouse_location?.quantity
-                            ? {
-                                  label: ce?.warehouse_location?.location_name,
-                                  value: ce?.warehouse_location?.id,
-                                  warehouse_name: ce?.warehouse_location?.warehouse_name,
-                                  qty: +ce?.warehouse_location?.quantity,
-                              }
-                            : null,
-                    receivingLocation:
-                        ce?.warehouse_location_to?.location_name || ce?.warehouse_location_to?.location_id
-                            ? {
-                                  label: ce?.warehouse_location_to?.location_name,
-                                  value: ce?.warehouse_location_to?.id,
-                              }
-                            : null,
-                    serial: ce?.serial == null ? "" : ce?.serial,
-                    lot: ce?.lot == null ? "" : ce?.lot,
-                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                    unit: e?.item?.unit_name,
-                    dataWarehouse: e?.item?.warehouse.map((ye) => ({
-                        label: ye?.location_name,
-                        value: ye?.id,
-                        warehouse_name: ye?.warehouse_name,
-                        qty: +ye?.quantity,
+        try {
+            const rResult = await apiWarehouseTransfer.apiDetailTransfer(id);
+            sIdBranch({
+                label: rResult?.branch_name_id,
+                value: rResult?.branch_id,
+            });
+            sIdExportWarehouse({
+                label: rResult?.warehouses_id_name,
+                value: rResult?.warehouses_id,
+            });
+            sIdReceiveWarehouse({
+                label: rResult?.warehouses_to_name,
+                value: rResult?.warehouses_to,
+            });
+            sCode(rResult?.code);
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+            sListData(
+                rResult?.items.map((e) => ({
+                    id: e?.item?.id,
+                    idParenBackend: e?.item?.id,
+                    matHang: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${
+                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                        }</span>`,
+                        value: e.item?.id,
+                    },
+                    child: e?.child.map((ce) => ({
+                        idChildBackEnd: Number(ce?.id),
+                        id: Number(ce?.id),
+                        disabledDate:
+                            (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                            (ce?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                            (ce?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                            (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                        location:
+                            ce?.warehouse_location?.location_name ||
+                            ce?.warehouse_location?.id ||
+                            ce?.warehouse_location?.warehouse_name ||
+                            ce?.warehouse_location?.quantity
+                                ? {
+                                      label: ce?.warehouse_location?.location_name,
+                                      value: ce?.warehouse_location?.id,
+                                      warehouse_name: ce?.warehouse_location?.warehouse_name,
+                                      qty: +ce?.warehouse_location?.quantity,
+                                  }
+                                : null,
+                        receivingLocation:
+                            ce?.warehouse_location_to?.location_name || ce?.warehouse_location_to?.location_id
+                                ? {
+                                      label: ce?.warehouse_location_to?.location_name,
+                                      value: ce?.warehouse_location_to?.id,
+                                  }
+                                : null,
+                        serial: ce?.serial == null ? "" : ce?.serial,
+                        lot: ce?.lot == null ? "" : ce?.lot,
+                        date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                        unit: e?.item?.unit_name,
+                        dataWarehouse: e?.item?.warehouse.map((ye) => ({
+                            label: ye?.location_name,
+                            value: ye?.id,
+                            warehouse_name: ye?.warehouse_name,
+                            qty: +ye?.quantity,
+                        })),
+                        exportQuantity: +ce?.quantity,
+                        note: ce?.note,
                     })),
-                    exportQuantity: +ce?.quantity,
-                    note: ce?.note,
-                })),
-            }))
-        );
+                }))
+            );
+        } catch (error) {}
         sOnFetchingDetail(false);
     };
 
@@ -243,57 +247,65 @@ const Index = (props) => {
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
-        const params = {
-            "filter[branch_id]": idBranch ? idBranch?.value : null,
-            "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-        };
-        const { data } = await apiWarehouseTransfer.apiGetSemiItems("GET", { params: params });
-        sDataItems(data?.result);
-        sOnFetchingItemsAll(false);
+        try {
+            const params = {
+                "filter[branch_id]": idBranch ? idBranch?.value : null,
+                "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+            };
+            const { data } = await apiWarehouseTransfer.apiGetSemiItems("GET", { params: params });
+            sDataItems(data?.result);
+            sOnFetchingItemsAll(false);
+        } catch (error) {}
     };
     const _ServerFetching_ExportWarehouse = async () => {
-        const params = {
-            "filter[branch_id]": idBranch ? idBranch?.value : null,
-            "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-        };
-        const data = await apiWarehouseTransfer.apiWarehouseCombobox({ params: params });
-        sDataWarehouse(
-            data?.map((e) => ({
-                label: e?.warehouse_name,
-                value: e?.id,
-            }))
-        );
-        sOnFetchingExportWarehouse(false);
+        try {
+            const params = {
+                "filter[branch_id]": idBranch ? idBranch?.value : null,
+                "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+            };
+            const data = await apiWarehouseTransfer.apiWarehouseCombobox({ params: params });
+            sDataWarehouse(
+                data?.map((e) => ({
+                    label: e?.warehouse_name,
+                    value: e?.id,
+                }))
+            );
+            sOnFetchingExportWarehouse(false);
+        } catch (error) {}
     };
     const _ServerFetching_ReceivingLocation = async () => {
-        const params = {
-            "filter[warehouse_id]": idReceiveWarehouse ? idReceiveWarehouse?.value : null,
-        };
-        const data = await apiWarehouseTransfer.apiwarehouseLocationCombobox({ params: params });
-        sDataReceivingLocation(
-            data?.map((e) => ({
-                label: e?.location_name,
-                value: e?.id,
-            }))
-        );
-        sOnFetchingReceivingLocation(false);
+        try {
+            const params = {
+                "filter[warehouse_id]": idReceiveWarehouse ? idReceiveWarehouse?.value : null,
+            };
+            const data = await apiWarehouseTransfer.apiwarehouseLocationCombobox({ params: params });
+            sDataReceivingLocation(
+                data?.map((e) => ({
+                    label: e?.location_name,
+                    value: e?.id,
+                }))
+            );
+            sOnFetchingReceivingLocation(false);
+        } catch (error) {}
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        if (idBranch == null || idExportWarehouse == null || inputValue == "") {
-            return;
-        } else {
-            const { data } = await apiWarehouseTransfer.apiGetSemiItems("POST", {
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
+        try {
+            if (idBranch == null || idExportWarehouse == null || inputValue == "") {
+                return;
+            } else {
+                const { data } = await apiWarehouseTransfer.apiGetSemiItems("POST", {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    },
 
-                data: {
-                    term: inputValue,
-                },
-            });
-            sDataItems(data?.result);
-        }
+                    data: {
+                        term: inputValue,
+                    },
+                });
+                sDataItems(data?.result);
+            }
+        } catch (error) {}
     }, 500);
 
     const resetValue = () => {
@@ -488,24 +500,28 @@ const Index = (props) => {
         const url = id
             ? `/api_web/Api_transfer/transfer/${id}?csrf_protection=true`
             : `/api_web/Api_transfer/transfer/?csrf_protection=true`;
-        const { isSuccess, message, item } = apiWarehouseTransfer.apiHandingTransfer(url, formData);
-        if (isSuccess) {
-            isShow("success", dataLang[message]);
-            sCode("");
-            sStartDate(new Date());
-            sIdBranch(null);
-            sIdExportWarehouse(null);
-            sIdReceiveWarehouse(null);
-            sNote("");
-            sErrBranch(false);
-            sErrExportWarehouse(false);
-            sErrReceiveWarehouse(false);
-            sErrDate(false);
-            sListData([]);
-            router.push(routerWarehouseTransfer.home);
-        } else {
-            handleCheckError(`${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`);
-        }
+        try {
+            const { isSuccess, message, item } = await apiWarehouseTransfer.apiHandingTransfer(url, formData);
+            if (isSuccess) {
+                isShow("success", dataLang[message]);
+                sCode("");
+                sStartDate(new Date());
+                sIdBranch(null);
+                sIdExportWarehouse(null);
+                sIdReceiveWarehouse(null);
+                sNote("");
+                sErrBranch(false);
+                sErrExportWarehouse(false);
+                sErrReceiveWarehouse(false);
+                sErrDate(false);
+                sListData([]);
+                router.push(routerWarehouseTransfer.home);
+            } else {
+                handleCheckError(
+                    `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
+                );
+            }
+        } catch (error) {}
         sOnSending(false);
     };
 
@@ -1064,9 +1080,9 @@ const Index = (props) => {
                     <div className="grid grid-cols-12 items-center gap-1 my-1 py-2">
                         <div className="col-span-3">
                             <SelectCore
-                               onInputChange={(event) =>{
-                                _HandleSeachApi(event)
-                            }}
+                                onInputChange={(event) => {
+                                    _HandleSeachApi(event);
+                                }}
                                 options={options}
                                 value={null}
                                 onChange={_HandleAddParent.bind(this)}
@@ -1244,8 +1260,8 @@ const Index = (props) => {
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
-                                                        onInputChange={(event) =>{
-                                                            _HandleSeachApi(event)
+                                                        onInputChange={(event) => {
+                                                            _HandleSeachApi(event);
                                                         }}
                                                         onChange={_HandleChangeValue.bind(this, e?.id)}
                                                         menuPortalTarget={document.body}

@@ -101,8 +101,10 @@ const Popup_kho = (props) => {
 
     useEffect(() => {
         const fetchListBranchWarehouse = async () => {
-            const { result } = await apiComons.apiBranchCombobox();
-            sListBrand(result?.map((e) => ({ label: e.name, value: e.id })));
+            try {
+                const { result } = await apiComons.apiBranchCombobox();
+                sListBrand(result?.map((e) => ({ label: e.name, value: e.id })));
+            } catch (error) {}
         };
         if (open) {
             fetchListBranchWarehouse();
@@ -120,24 +122,26 @@ const Popup_kho = (props) => {
         const url = props.id
             ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`
             : "/api_web/api_warehouse/warehouse/?csrf_protection=true";
-        const { isSuccess, message } = await apiWarehouse.apiHandingWarehouse(url, data);
-        if (isSuccess) {
-            isShow("success", `${props.dataLang[message]}` || message);
-            sErrInputCode(false);
-            sErrInputName(false);
-            sErrInputAddress(false);
-            sName("");
-            sCode("");
-            sAddress("");
-            sNote("");
-            sErrInputBr(false);
-            sValueBr([]);
-            props.onRefresh && props.onRefresh();
-            props.onRefreshGroup && props.onRefreshGroup();
-            sOpen(false);
-        } else {
-            isShow("error", `${props.dataLang[message]}` || message);
-        }
+        try {
+            const { isSuccess, message } = await apiWarehouse.apiHandingWarehouse(url, data);
+            if (isSuccess) {
+                isShow("success", `${props.dataLang[message]}` || message);
+                sErrInputCode(false);
+                sErrInputName(false);
+                sErrInputAddress(false);
+                sName("");
+                sCode("");
+                sAddress("");
+                sNote("");
+                sErrInputBr(false);
+                sValueBr([]);
+                props.onRefresh && props.onRefresh();
+                props.onRefreshGroup && props.onRefreshGroup();
+                sOpen(false);
+            } else {
+                isShow("error", `${props.dataLang[message]}` || message);
+            }
+        } catch (error) {}
         sOnSending(false);
     };
     //da up date

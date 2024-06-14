@@ -49,45 +49,50 @@ const PopupCategoryErrors = (props) => {
         formData.append("category_error_id", data.categoryError?.value);
         formData.append("note", data.note);
 
-        const { message, result } = await apiCategoryDetailErrors.apiHandingDetailError(formData);
+        try {
+            const { message, result } = await apiCategoryDetailErrors.apiHandingDetailError(formData);
 
-        if (result == 1) {
-            isShow("success", message);
-            queryState({ open: false });
-            props.onRefresh && props.onRefresh();
-            return;
-        }
+            if (result == 1) {
+                isShow("success", message);
+                queryState({ open: false });
+                props.onRefresh && props.onRefresh();
+                return;
+            }
 
-        message?.name && isShow("error", message?.name);
-        message?.code && isShow("error", message?.code);
-        message?.branch_id && isShow("error", message?.branch_id);
-        message?.category_error_id && isShow("error", message?.category_error_id);
-        message?.error && isShow("error", message?.error);
+            message?.name && isShow("error", message?.name);
+            message?.code && isShow("error", message?.code);
+            message?.branch_id && isShow("error", message?.branch_id);
+            message?.category_error_id && isShow("error", message?.category_error_id);
+            message?.error && isShow("error", message?.error);
+        } catch (error) {}
     };
 
     const fetchCategoryError = debounce(async (value) => {
-        const { data } = await apiCategoryDetailErrors.apiCategoryDetailError({ params: { search: value } });
-        console.log("data", data);
-        if (data) {
-            queryState({
-                listCategoryError:
-                    data?.dtResult?.map((e) => ({
-                        label: e?.name,
-                        value: e?.id,
-                        branchId: e?.branch_id,
-                    })) || [],
-            });
-        }
+        try {
+            const { data } = await apiCategoryDetailErrors.apiCategoryDetailError({ params: { search: value } });
+            if (data) {
+                queryState({
+                    listCategoryError:
+                        data?.dtResult?.map((e) => ({
+                            label: e?.name,
+                            value: e?.id,
+                            branchId: e?.branch_id,
+                        })) || [],
+                });
+            }
+        } catch (error) {}
     }, 500);
 
     const fetchDetailCategory = async () => {
-        const { data } = await apiCategoryDetailErrors.apiEditDetailError(props.id);
-        const findCategory = isState.listCategoryError?.find((e) => e?.value == data?.dtData?.category_error_id);
+        try {
+            const { data } = await apiCategoryDetailErrors.apiEditDetailError(props.id);
+            const findCategory = isState.listCategoryError?.find((e) => e?.value == data?.dtData?.category_error_id);
 
-        setValue("code", data?.dtData?.code);
-        setValue("name", data?.dtData?.name);
-        setValue("categoryError", findCategory);
-        setValue("note", data?.dtData?.note);
+            setValue("code", data?.dtData?.code);
+            setValue("name", data?.dtData?.name);
+            setValue("categoryError", findCategory);
+            setValue("note", data?.dtData?.note);
+        } catch (error) {}
     };
 
     useEffect(() => {

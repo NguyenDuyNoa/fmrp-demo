@@ -136,20 +136,22 @@ const Index = (props) => {
 
     const _ServerFetching = async () => {
         sOnLoading(true);
-        const { result } = await apiComons.apiBranchCombobox();
-        const data = await apiExportToOther.apiWarehouseCombobox();
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            const data = await apiExportToOther.apiWarehouseCombobox();
 
-        sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+            sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
 
-        sDataObjects(
-            data?.map((e) => ({
-                label: dataLang[e?.name],
-                value: e?.id,
-            }))
-        );
-        sOnLoading(false);
+            sDataObjects(
+                data?.map((e) => ({
+                    label: dataLang[e?.name],
+                    value: e?.id,
+                }))
+            );
+            sOnLoading(false);
 
-        sOnFetching(false);
+            sOnFetching(false);
+        } catch (error) {}
     };
 
     const options = dataItems?.map((e) => ({
@@ -165,80 +167,82 @@ const Index = (props) => {
     }));
 
     const _ServerFetchingDetailPage = async () => {
-        const rResult = await apiExportToOther.apiDetaiPageExportToOther(id);
-        sIdBranch({
-            label: rResult?.branch_name,
-            value: rResult?.branch_id,
-        });
-        sIdExportWarehouse({
-            label: rResult?.warehouse_name,
-            value: rResult?.warehouse_id,
-        });
+        try {
+            const rResult = await apiExportToOther.apiDetaiPageExportToOther(id);
+            sIdBranch({
+                label: rResult?.branch_name,
+                value: rResult?.branch_id,
+            });
+            sIdExportWarehouse({
+                label: rResult?.warehouse_name,
+                value: rResult?.warehouse_id,
+            });
 
-        sCode(rResult?.code);
-        sObject({
-            label: dataLang[rResult?.object] || rResult?.object,
-            value: rResult?.object,
-        });
-        sListObject(
-            rResult?.object === "other"
-                ? {
-                      label: rResult?.object_text,
-                      value: rResult?.object_text,
-                  }
-                : {
-                      label: dataLang[rResult?.object_text] || rResult?.object_text,
-                      value: rResult?.object_id,
-                  }
-        );
-        sListData(
-            rResult?.items.map((e) => ({
-                id: e?.item?.id,
-                idParenBackend: e?.item?.id,
-                matHang: {
-                    e: e?.item,
-                    label: `${e.item?.name} <span style={{display: none}}>${
-                        e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                    }</span>`,
-                    value: e.item?.id,
-                },
-                child: e?.child.map((ce) => ({
-                    idChildBackEnd: Number(ce?.id),
-                    id: Number(ce?.id),
-                    disabledDate:
-                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                        (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                        (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                    location:
-                        ce?.warehouse_location?.location_name ||
-                        ce?.warehouse_location?.id ||
-                        ce?.warehouse_location?.warehouse_name ||
-                        ce?.warehouse_location?.quantity
-                            ? {
-                                  label: ce?.warehouse_location?.location_name,
-                                  value: ce?.warehouse_location?.id,
-                                  warehouse_name: ce?.warehouse_location?.warehouse_name,
-                                  qty: ce?.warehouse_location?.quantity,
-                              }
-                            : null,
-                    dataWarehouse: e?.item?.warehouseList.map((ye) => ({
-                        label: ye?.location_name,
-                        value: ye?.id,
-                        warehouse_name: ye?.warehouse_name,
-                        qty: +ye?.quantity,
+            sCode(rResult?.code);
+            sObject({
+                label: dataLang[rResult?.object] || rResult?.object,
+                value: rResult?.object,
+            });
+            sListObject(
+                rResult?.object === "other"
+                    ? {
+                          label: rResult?.object_text,
+                          value: rResult?.object_text,
+                      }
+                    : {
+                          label: dataLang[rResult?.object_text] || rResult?.object_text,
+                          value: rResult?.object_id,
+                      }
+            );
+            sListData(
+                rResult?.items.map((e) => ({
+                    id: e?.item?.id,
+                    idParenBackend: e?.item?.id,
+                    matHang: {
+                        e: e?.item,
+                        label: `${e.item?.name} <span style={{display: none}}>${
+                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                        }</span>`,
+                        value: e.item?.id,
+                    },
+                    child: e?.child.map((ce) => ({
+                        idChildBackEnd: Number(ce?.id),
+                        id: Number(ce?.id),
+                        disabledDate:
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                            (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                            (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                            (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                        location:
+                            ce?.warehouse_location?.location_name ||
+                            ce?.warehouse_location?.id ||
+                            ce?.warehouse_location?.warehouse_name ||
+                            ce?.warehouse_location?.quantity
+                                ? {
+                                      label: ce?.warehouse_location?.location_name,
+                                      value: ce?.warehouse_location?.id,
+                                      warehouse_name: ce?.warehouse_location?.warehouse_name,
+                                      qty: ce?.warehouse_location?.quantity,
+                                  }
+                                : null,
+                        dataWarehouse: e?.item?.warehouseList.map((ye) => ({
+                            label: ye?.location_name,
+                            value: ye?.id,
+                            warehouse_name: ye?.warehouse_name,
+                            qty: +ye?.quantity,
+                        })),
+                        serial: ce?.serial == null ? "" : ce?.serial,
+                        lot: ce?.lot == null ? "" : ce?.lot,
+                        date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                        unit: e.item?.unit_name,
+                        toOtherQuantity: +ce?.quantity,
+                        note: ce?.note,
                     })),
-                    serial: ce?.serial == null ? "" : ce?.serial,
-                    lot: ce?.lot == null ? "" : ce?.lot,
-                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                    unit: e.item?.unit_name,
-                    toOtherQuantity: +ce?.quantity,
-                    note: ce?.note,
-                })),
-            }))
-        );
-        sStartDate(moment(rResult?.date).toDate());
-        sNote(rResult?.note);
+                }))
+            );
+            sStartDate(moment(rResult?.date).toDate());
+            sNote(rResult?.note);
+        } catch (error) {}
         sOnFetchingDetail(false);
     };
 
@@ -264,61 +268,69 @@ const Index = (props) => {
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
-        const { result } = await apiExportToOther.apiItemComboboxExportToOther({
-            params: {
-                "filter[branch_id]": idBranch ? idBranch?.value : null,
-                "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-            },
-        });
-        sDataItems(result);
-        sOnFetchingItemsAll(false);
+        try {
+            const { result } = await apiExportToOther.apiItemComboboxExportToOther({
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+                },
+            });
+            sDataItems(result);
+            sOnFetchingItemsAll(false);
+        } catch (error) {}
     };
 
     const _ServerFetching_Warehouse = async () => {
-        const result = await apiExportToOther.apiWarehouseComboboxExportToOther({
-            params: {
-                "filter[branch_id]": idBranch?.value,
-            },
-        });
-        sDataWarehouse(
-            result?.map((e) => ({
-                label: e?.warehouse_name,
-                value: e?.id,
-            }))
-        );
-        sOnFetchingWarehouse(false);
+        try {
+            const result = await apiExportToOther.apiWarehouseComboboxExportToOther({
+                params: {
+                    "filter[branch_id]": idBranch?.value,
+                },
+            });
+            sDataWarehouse(
+                result?.map((e) => ({
+                    label: e?.warehouse_name,
+                    value: e?.id,
+                }))
+            );
+            sOnFetchingWarehouse(false);
+        } catch (error) {}
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             return;
         } else {
-            const { result } = await apiExportToOther.apiAjaxItemComboboxExportToOther({
-                params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
-                },
-                data: {
-                    term: inputValue,
-                },
-            });
-            sDataItems(result);
+            try {
+                const { result } = await apiExportToOther.apiAjaxItemComboboxExportToOther({
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
+                        "filter[warehouse_id]": idExportWarehouse ? idExportWarehouse?.value : null,
+                    },
+                    data: {
+                        term: inputValue,
+                    },
+                });
+                sDataItems(result);
+            } catch (error) {}
         }
     }, 500);
 
     const _ServerFetching_LisObject = async () => {
-        const { rResult } = await apiExportToOther.apiObjectListComboboxExportToOther({
-            params: {
-                type: object?.value,
-                "filter[branch_id]": idBranch?.value,
-            },
-        });
-        sDataListObject(
-            rResult?.map((e) => ({
-                label: e.name,
-                value: e.id,
-            }))
-        );
+        try {
+            const { rResult } = await apiExportToOther.apiObjectListComboboxExportToOther({
+                params: {
+                    type: object?.value,
+                    "filter[branch_id]": idBranch?.value,
+                },
+            });
+            sDataListObject(
+                rResult?.map((e) => ({
+                    label: e.name,
+                    value: e.id,
+                }))
+            );
+        } catch (error) {}
         sOnFetchingLisObject(false);
     };
 
@@ -720,28 +732,33 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.toOtherQuantity);
             });
         });
-        const { isSuccess, message } = await apiExportToOther.apiHandingExportToOther(id ? id : undefined, formData);
-        if (isSuccess) {
-            isShow("success", `${dataLang[message]}` || message);
-            sCode("");
-            sStartDate(new Date());
-            sIdBranch(null);
-            sIdExportWarehouse(null);
-            sObject(null);
-            sListObject(null);
-            sNote("");
-            sErrBranch(false);
-            sErrListObject(false);
-            sErrObject(false);
-            sErrWarehouse(false);
-            sErrDate(false);
-            sErrExportWarehouse(false);
-            //new
-            sListData([]);
-            router.push(routerExportToOther.home);
-        } else {
-            handleCheckError(dataLang[message] || message);
-        }
+        try {
+            const { isSuccess, message } = await apiExportToOther.apiHandingExportToOther(
+                id ? id : undefined,
+                formData
+            );
+            if (isSuccess) {
+                isShow("success", `${dataLang[message]}` || message);
+                sCode("");
+                sStartDate(new Date());
+                sIdBranch(null);
+                sIdExportWarehouse(null);
+                sObject(null);
+                sListObject(null);
+                sNote("");
+                sErrBranch(false);
+                sErrListObject(false);
+                sErrObject(false);
+                sErrWarehouse(false);
+                sErrDate(false);
+                sErrExportWarehouse(false);
+                //new
+                sListData([]);
+                router.push(routerExportToOther.home);
+            } else {
+                handleCheckError(dataLang[message] || message);
+            }
+        } catch (error) {}
         sOnSending(false);
     };
 

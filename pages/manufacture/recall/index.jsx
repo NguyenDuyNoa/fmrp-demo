@@ -123,67 +123,75 @@ const Index = (props) => {
     }, []);
 
     const _ServerFetching = async () => {
-        const tabPage = router.query?.tab;
+        try {
+            const tabPage = router.query?.tab;
 
-        const { rResult, output, rTotal } = await apiRecall.apiListRecall({
-            params: {
-                search: isState.keySearch,
-                limit: limit,
-                page: router.query?.page || 1,
-                "filter[status_bar]": tabPage ?? null,
-                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
-            },
-        });
+            const { rResult, output, rTotal } = await apiRecall.apiListRecall({
+                params: {
+                    search: isState.keySearch,
+                    limit: limit,
+                    page: router.query?.page || 1,
+                    "filter[status_bar]": tabPage ?? null,
+                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+                    "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
+                },
+            });
 
-        sTotal(rTotal);
+            sTotal(rTotal);
 
-        sTotalItems(output);
+            sTotalItems(output);
 
-        queryState({ data: rResult, dataExcel: rResult, onFetching: false });
+            queryState({ data: rResult, dataExcel: rResult, onFetching: false });
+        } catch (error) {}
     };
 
     const _ServerFetching_group = async () => {
-        const data = await apiRecall.apiListGroupRecall({
-            params: {
-                limit: 0,
-                search: isState.keySearch,
-                "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
-                "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
-                "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
-                "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
-                "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
-            },
-        });
+        try {
+            const data = await apiRecall.apiListGroupRecall({
+                params: {
+                    limit: 0,
+                    search: isState.keySearch,
+                    "filter[id]": isState.idCode != null ? isState.idCode?.value : null,
+                    "filter[branch_id]": isState.idBranch != null ? isState.idBranch.value : null,
+                    "filter[start_date]": isState.valueDate?.startDate != null ? isState.valueDate?.startDate : null,
+                    "filter[end_date]": isState.valueDate?.endDate != null ? isState.valueDate?.endDate : null,
+                    "filter[warehouse_id]": isState.idRecallWarehouse != null ? isState.idRecallWarehouse?.value : null,
+                },
+            });
 
-        queryState({ listDs: data, onFetchingGroup: false });
+            queryState({ listDs: data, onFetchingGroup: false });
+        } catch (error) {}
     };
 
     const _ServerFetching_filter = async () => {
-        const { result: listBr } = await apiComons.apiBranchCombobox();
+        try {
+            const { result: listBr } = await apiComons.apiBranchCombobox();
 
-        const { result: listCode } = await apiRecall.apiMaterialRecallCombobox();
+            const { result: listCode } = await apiRecall.apiMaterialRecallCombobox();
 
-        const data = await apiRecall.apiWarehouseCombobox();
+            const data = await apiRecall.apiWarehouseCombobox();
 
-        queryState({
-            listBr: listBr?.map((e) => ({ label: e?.name, value: e?.id })) || [],
-            lisCode: listCode?.map((e) => ({ label: e?.code, value: e?.id })) || [],
-            dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [],
-            onFetching_filter: false,
-        });
+            queryState({
+                listBr: listBr?.map((e) => ({ label: e?.name, value: e?.id })) || [],
+                lisCode: listCode?.map((e) => ({ label: e?.code, value: e?.id })) || [],
+                dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [],
+                onFetching_filter: false,
+            });
+        } catch (error) {}
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        const { result } = await apiRecall.apiAjaxMaterialRecallCombobox({
-            data: {
-                term: inputValue,
-            },
-        });
-        queryState({ lisCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
+        try {
+            const { result } = await apiRecall.apiAjaxMaterialRecallCombobox({
+                data: {
+                    term: inputValue,
+                },
+            });
+            queryState({ lisCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
+        } catch (error) {}
     }, 500);
 
     useEffect(() => {
@@ -363,17 +371,19 @@ const Index = (props) => {
         let data = new FormData();
         data.append("id", checkedWare?.id);
         data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
-        const { isSuccess, message, data_export } = await apiRecall.apiHandingStatusRecall(data);
-        if (isSuccess) {
-            isShow("success", `${dataLang[message]}` || message);
-            await _ServerFetching();
-            await _ServerFetching_group();
-        } else {
-            isShow("error", `${dataLang[message]}` || message);
-        }
-        if (data_export?.length > 0) {
-            queryState({ data_export: data_export });
-        }
+        try {
+            const { isSuccess, message, data_export } = await apiRecall.apiHandingStatusRecall(data);
+            if (isSuccess) {
+                isShow("success", `${dataLang[message]}` || message);
+                await _ServerFetching();
+                await _ServerFetching_group();
+            } else {
+                isShow("error", `${dataLang[message]}` || message);
+            }
+            if (data_export?.length > 0) {
+                queryState({ data_export: data_export });
+            }
+        } catch (error) {}
         queryState({ onSending: false });
     };
     useEffect(() => {

@@ -103,13 +103,15 @@ const Index = (props) => {
 
     const _ServerFetching = async () => {
         sFetchingData((e) => ({ ...e, onLoading: true }));
-        const { result } = await apiComons.apiBranchCombobox();
-        sDataSelect((e) => ({
-            ...e,
-            dataBranch: result?.map(({ name, id }) => ({ label: name, value: id })),
-        }));
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            sDataSelect((e) => ({
+                ...e,
+                dataBranch: result?.map(({ name, id }) => ({ label: name, value: id })),
+            }));
 
-        sFetchingData((e) => ({ ...e, onLoading: false }));
+            sFetchingData((e) => ({ ...e, onLoading: false }));
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -125,36 +127,38 @@ const Index = (props) => {
     }));
 
     const _ServerFetchingDetailPage = async () => {
-        const { data } = await apiInternalPlan.apiDetailInternalPlan(id);
-        sListData(
-            data?.internalPlansItems.map((e) => {
-                return {
-                    id: e?.id,
-                    idParenBackend: e?.id,
-                    matHang: {
-                        e: e,
-                        label: `${e?.item_name} <span style={{display: none}}>${
-                            e?.code + e?.product_variation + e?.text_type + e?.unit_name
-                        }</span>`,
-                        value: e?.item_id,
-                    },
-                    unit: e?.unit_name,
-                    quantity: Number(e?.quantity),
-                    note: e?.note_item,
-                    date: moment(e?.date_needed).toDate(),
-                };
-            })
-        );
-        sIdChange({
-            code: data?.internalPlans?.reference_no,
-            date: moment(data?.internalPlans?.date).toDate(),
-            idBranch: {
-                label: data?.internalPlans?.name_branch,
-                value: data?.internalPlans?.branch_id,
-            },
-            namePlan: data?.internalPlans.plan_name,
-            note: data?.internalPlans?.note,
-        });
+        try {
+            const { data } = await apiInternalPlan.apiDetailInternalPlan(id);
+            sListData(
+                data?.internalPlansItems.map((e) => {
+                    return {
+                        id: e?.id,
+                        idParenBackend: e?.id,
+                        matHang: {
+                            e: e,
+                            label: `${e?.item_name} <span style={{display: none}}>${
+                                e?.code + e?.product_variation + e?.text_type + e?.unit_name
+                            }</span>`,
+                            value: e?.item_id,
+                        },
+                        unit: e?.unit_name,
+                        quantity: Number(e?.quantity),
+                        note: e?.note_item,
+                        date: moment(e?.date_needed).toDate(),
+                    };
+                })
+            );
+            sIdChange({
+                code: data?.internalPlans?.reference_no,
+                date: moment(data?.internalPlans?.date).toDate(),
+                idBranch: {
+                    label: data?.internalPlans?.name_branch,
+                    value: data?.internalPlans?.branch_id,
+                },
+                namePlan: data?.internalPlans.plan_name,
+                note: data?.internalPlans?.note,
+            });
+        } catch (error) {}
         sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
     };
 
@@ -163,25 +167,29 @@ const Index = (props) => {
     }, [fetChingData.onFetchingDetail]);
 
     const _ServerFetching_ItemsAll = async () => {
-        const { data } = await apiComons.apiSearchProductsVariant({
-            params: {
-                "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
-            },
-        });
-        sDataSelect((e) => ({ ...e, dataItems: data?.result }));
-        sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
+        try {
+            const { data } = await apiComons.apiSearchProductsVariant({
+                params: {
+                    "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
+                },
+            });
+            sDataSelect((e) => ({ ...e, dataItems: data?.result }));
+            sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
+        } catch (error) {}
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
-        const { data } = await apiComons.apiSearchProductsVariant({
-            params: {
-                "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
-            },
-            data: {
-                term: inputValue,
-            },
-        });
-        sDataSelect((e) => ({ ...e, dataItems: data?.result }));
+        try {
+            const { data } = await apiComons.apiSearchProductsVariant({
+                params: {
+                    "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
+                },
+                data: {
+                    term: inputValue,
+                },
+            });
+            sDataSelect((e) => ({ ...e, dataItems: data?.result }));
+        } catch (error) {}
     }, 500);
 
     const handleSaveStatus = () => {
@@ -466,18 +474,20 @@ const Index = (props) => {
             ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
             : "/api_web/api_internal_plan/handling?csrf_protection=true";
 
-        const { isSuccess, message } = await apiInternalPlan.apiHandlingInternalPlan(url, formData);
-        if (isSuccess) {
-            isShow("success", `${dataLang[message] || message}`);
+        try {
+            const { isSuccess, message } = await apiInternalPlan.apiHandlingInternalPlan(url, formData);
+            if (isSuccess) {
+                isShow("success", `${dataLang[message] || message}`);
 
-            resetAllStates();
+                resetAllStates();
 
-            sListData([]);
+                sListData([]);
 
-            router.push(routerInternalPlan.home);
-        } else {
-            isShow("error", `${dataLang[message] || data?.message}`);
-        }
+                router.push(routerInternalPlan.home);
+            } else {
+                isShow("error", `${dataLang[message] || data?.message}`);
+            }
+        } catch (error) {}
         sFetchingData((e) => ({ ...e, onSending: false }));
     };
 

@@ -70,21 +70,31 @@ const Index = (props) => {
             category_error_search: isState.idCategoryError?.value ?? "",
             branch_id: isState.idBranch?.value ?? "",
         };
-        const { data } = await apiCategoryDetailErrors.apiListDetailError({ params: params });
-        updateTotalItems(data);
-        queryState({ data: data?.dtResult, data_ex: data?.dtResult, onFetching: false });
+        try {
+            const { data } = await apiCategoryDetailErrors.apiListDetailError({ params: params });
+            updateTotalItems(data);
+            queryState({ data: data?.dtResult, data_ex: data?.dtResult, onFetching: false });
+        } catch (error) {}
     };
 
     const fetchCategoryError = debounce(async (value) => {
-        const { data } = await apiCategoryDetailErrors.apiCategoryDetailError({ params: { search: value } });
-        queryState({
-            listCategoryError: data?.dtResult?.map((e) => ({ label: e?.name, value: e?.id, branchId: e?.branch_id })),
-        });
+        try {
+            const { data } = await apiCategoryDetailErrors.apiCategoryDetailError({ params: { search: value } });
+            queryState({
+                listCategoryError: data?.dtResult?.map((e) => ({
+                    label: e?.name,
+                    value: e?.id,
+                    branchId: e?.branch_id,
+                })),
+            });
+        } catch (error) {}
     }, 500);
 
     const fetchBranch = async () => {
-        const { result } = await apiComons.apiBranchCombobox();
-        queryState({ dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })) });
+        try {
+            const { result } = await apiComons.apiBranchCombobox();
+            queryState({ dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })) });
+        } catch (error) {}
     };
 
     useEffect(() => {

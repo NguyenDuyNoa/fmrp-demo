@@ -84,10 +84,12 @@ const FormAdd = (props) => {
     }, []);
 
     const fetcDataBranch = async () => {
-        const { isSuccess, result } = await apiComons.apiBranchCombobox();
-        if (isSuccess) {
-            queryData({ dataBrand: result?.map((e) => ({ value: e?.id, label: e?.name })) });
-        }
+        try {
+            const { isSuccess, result } = await apiComons.apiBranchCombobox();
+            if (isSuccess) {
+                queryData({ dataBrand: result?.map((e) => ({ value: e?.id, label: e?.name })) });
+            }
+        } catch (error) {}
     };
 
     const handleSendItem = async () => {
@@ -95,25 +97,27 @@ const FormAdd = (props) => {
         dataLocals.forEach((e) => {
             form.append(tab == "plan" ? "dataBusinessitemId[]" : "dataOrderItemId[]", e?.id);
         });
-        const { data, isSuccess } = await apiProductionPlan.apiHandlingManufacture(form);
-        data.items?.length < 1 && backPage();
-        queryData({
-            dataProduction: data?.items.map((e) => {
-                return {
-                    ...e,
-                    bom: e?.is_bom,
-                    stage: e?.is_stage,
-                    idParent: e?.order_id,
-                    unitName: e?.unit_name,
-                    nameOrder: e?.reference_no,
-                    quantityRemaining: +e?.quantity_rest,
-                    quantityWarehouse: +e?.quantity_warehouse,
-                    productVariation: e?.product_variation,
-                    date: { startDate: null, endDate: null },
-                    deliveryDate: isMoment(e?.delivery_date, "DD/MM/YYYY"),
-                };
-            }),
-        });
+        try {
+            const { data, isSuccess } = await apiProductionPlan.apiHandlingManufacture(form);
+            data.items?.length < 1 && backPage();
+            queryData({
+                dataProduction: data?.items.map((e) => {
+                    return {
+                        ...e,
+                        bom: e?.is_bom,
+                        stage: e?.is_stage,
+                        idParent: e?.order_id,
+                        unitName: e?.unit_name,
+                        nameOrder: e?.reference_no,
+                        quantityRemaining: +e?.quantity_rest,
+                        quantityWarehouse: +e?.quantity_warehouse,
+                        productVariation: e?.product_variation,
+                        date: { startDate: null, endDate: null },
+                        deliveryDate: isMoment(e?.delivery_date, "DD/MM/YYYY"),
+                    };
+                }),
+            });
+        } catch (error) {}
     };
 
     ///Xóa từng button dấu X
@@ -270,14 +274,15 @@ const FormAdd = (props) => {
 
             formData.append(`items[${index}][object_item_id]`, e?.object_item_id ? e?.object_item_id : "");
         });
-        const { isSuccess, message } = await apiProductionPlan.apiHandlingProductionPlans(formData);
-        if (isSuccess == 1) {
-            showToat("success", message);
-            router.push(routerPproductionPlan.home);
-        } else {
-            showToat("error", message);
-        }
-
+        try {
+            const { isSuccess, message } = await apiProductionPlan.apiHandlingProductionPlans(formData);
+            if (isSuccess == 1) {
+                showToat("success", message);
+                router.push(routerPproductionPlan.home);
+            } else {
+                showToat("error", message);
+            }
+        } catch (error) {}
         // showToat("success", "Thêm kế hoạch NVL thành công");
     };
 
