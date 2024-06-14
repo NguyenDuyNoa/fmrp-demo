@@ -37,8 +37,11 @@ function MainPage({ Component, pageProps }) {
 
     ///Language
     const langDefault = useSelector((state) => state.lang);
+
     const [changeLang, sChangeLang] = useState(false);
+
     const [data, sData] = useState();
+
     const [onSeting, sOnSeting] = useState(false);
 
     useEffect(() => {
@@ -119,7 +122,7 @@ function MainPage({ Component, pageProps }) {
         return <LoadingPage />;
     }
 
-    if (auth === false) {
+    if (auth == false) {
         return <LoginPage dataLang={data} />;
     }
 

@@ -3,7 +3,6 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { _ServerInstance as Axios } from "/services/axios";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "sweetalert2/src/sweetalert2.scss";
@@ -151,16 +150,21 @@ const LoginPage = React.memo((props) => {
     }, []);
 
     const FetchSetingServer = async () => {
-        const res = await apiDashboard.apiSettings();
-        dispatch({ type: "setings/server", payload: res?.settings });
+        try {
+            const res = await apiDashboard.apiSettings();
 
-        const fature = await apiDashboard.apiFeature();
-        const newData = {
-            dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
-            dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
-            dataProductSerial: fature.find((x) => x.code == "product_serial"),
-        };
-        dispatch({ type: "setings/feature", payload: newData });
+            dispatch({ type: "setings/server", payload: res?.settings });
+
+            const fature = await apiDashboard.apiFeature();
+
+            const newData = {
+                dataMaterialExpiry: fature.find((x) => x.code == "material_expiry"),
+                dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
+                dataProductSerial: fature.find((x) => x.code == "product_serial"),
+            };
+
+            dispatch({ type: "setings/feature", payload: newData });
+        } catch (error) {}
     };
 
     ///Đăng ký
@@ -171,8 +175,10 @@ const LoginPage = React.memo((props) => {
     };
 
     const _ServerFetching_Majior = async () => {
-        const res = await apiLogin.apiMajior();
-        queryState({ listMajor: res?.career, listPosition: res?.role_user, onFechingRegister: false });
+        try {
+            const res = await apiLogin.apiMajior();
+            queryState({ listMajor: res?.career, listPosition: res?.role_user, onFechingRegister: false });
+        } catch (error) {}
     };
 
     useEffect(() => {
@@ -188,38 +194,42 @@ const LoginPage = React.memo((props) => {
     };
     const onSubmit = async (data, type) => {
         if (type == "login") {
-            const res = await apiLogin.apiLoginMain({
-                data: {
-                    company_code: data.code,
-                    user_name: data.name,
-                    password: data.password,
-                },
-            });
-            const { isSuccess, message, token, database_app } = res;
-            if (isSuccess) {
-                FetchSetingServer();
-                dispatch({ type: "auth/update", payload: res.data?.data });
-                CookieCore.set("tokenFMRP", token, {
-                    path: "/",
-                    expires: new Date(Date.now() + 86400 * 1000),
-                    sameSite: true,
+            try {
+                const res = await apiLogin.apiLoginMain({
+                    data: {
+                        company_code: data.code,
+                        user_name: data.name,
+                        password: data.password,
+                    },
                 });
-                CookieCore.set("databaseappFMRP", database_app, {
-                    path: "/",
-                    expires: new Date(Date.now() + 86400 * 1000),
-                    sameSite: true,
-                });
-                showToat("success", message);
-                if (isState.rememberMe) {
-                    localStorage.setItem("usernameFMRP", data.name);
-                    localStorage.setItem("usercodeFMRP", data.code);
-                    localStorage.setItem("remembermeFMRP", isState.rememberMe);
+                const { isSuccess, message, token, database_app } = res;
+                if (isSuccess) {
+                    FetchSetingServer();
+                    dispatch({ type: "auth/update", payload: res.data?.data });
+                    CookieCore.set("tokenFMRP", token, {
+                        path: "/",
+                        expires: new Date(Date.now() + 86400 * 1000),
+                        sameSite: true,
+                    });
+                    CookieCore.set("databaseappFMRP", database_app, {
+                        path: "/",
+                        expires: new Date(Date.now() + 86400 * 1000),
+                        sameSite: true,
+                    });
+                    showToat("success", message);
+                    if (isState.rememberMe) {
+                        localStorage.setItem("usernameFMRP", data.name);
+                        localStorage.setItem("usercodeFMRP", data.code);
+                        localStorage.setItem("remembermeFMRP", isState.rememberMe);
+                    } else {
+                        ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) =>
+                            localStorage.removeItem(key)
+                        );
+                    }
                 } else {
-                    ["usernameFMRP", "usercodeFMRP", "remembermeFMRP"].forEach((key) => localStorage.removeItem(key));
+                    showToat("error", `${message || "Đăng nhập thất bại"}`);
                 }
-            } else {
-                showToat("error", `${message || "Đăng nhập thất bại"}`);
-            }
+            } catch (error) {}
         }
         if (type == "sendOtp") {
             await handleSendOtp(data?.phone);
@@ -239,15 +249,17 @@ const LoginPage = React.memo((props) => {
             dataSubmit.append("password", data?.password);
             dataSubmit.append("role_user", data?.location);
             dataSubmit.append("otp", 111111);
-            const { isSuccess, message, code, email } = await apiLogin.apiRegister(dataSubmit);
-            if (isSuccess) {
-                showToat("success", message);
-                queryState({ name: email, code: code });
-                router.push("/");
-            } else {
-                showToat("error", message);
-                queryState({ loadingRegester: false });
-            }
+            try {
+                const { isSuccess, message, code, email } = await apiLogin.apiRegister(dataSubmit);
+                if (isSuccess) {
+                    showToat("success", message);
+                    queryState({ name: email, code: code });
+                    router.push("/");
+                } else {
+                    showToat("error", message);
+                    queryState({ loadingRegester: false });
+                }
+            } catch (error) {}
         }
     };
 
