@@ -171,7 +171,7 @@ const Index = (props) => {
                             <MdAddBox className="text-xl hover:scale-110 transition-all duration-200 ease-linear" />
                         </PopupAddTask>
                     }
-                    <div className={`text-base font-normal ${dayData.day === new Date().getDate() && +isStateCalender.month === new Date().getMonth() + 1 ? "bg-red-500 text-white rounded-full px-2 py-1" : ""}`}>
+                    <div className={`text-base font-normal ${dayData.day === new Date().getDate() && +isStateCalender.month === new Date().getMonth() + 1 ? "bg-red-500 text-white rounded-full px-2 py-1 my-0.5" : ""}`}>
                         {dayData.day}
                     </div>
                 </div>
@@ -298,7 +298,7 @@ const Index = (props) => {
                                         {dayComponents}
                                     </div> */}
                                     <DragDropContext onDragEnd={onDragEnd}>
-                                        <div className="grid grid-cols-7 gap-2">
+                                        <div className="grid grid-cols-7 border-[#F1F4F9] border-l-2">
                                             {dayComponents}
                                         </div>
                                     </DragDropContext>
