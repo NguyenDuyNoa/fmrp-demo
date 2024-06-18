@@ -15,6 +15,7 @@ import formatNumberConfig from "@/utils/helpers/formatnumber";
 import saveAs from 'file-saver';
 import html2canvas from 'html2canvas';
 import { Grid6 } from 'iconsax-react';
+import { forEach, groupBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
@@ -436,85 +437,37 @@ const ChartColumn = memo(({ dataChart }) => {
         });
     };
 
+    const data = [
+        { name: 'Đã xuất', column: 'Cúc', value: 502 },
+        { name: 'Kế hoạch', column: 'Cúc', value: 900 },
+        { name: 'Kế hoạch', column: 'Áo', value: 1766 },
+        { name: 'Đã xuất', column: 'Áo', value: 5268 },
+    ];
+
     const config = {
-        data: dataChart,
-        xField: 'type',
-        seriesField: 'column', // Chia màu theo loại
+        data,
+        xField: 'column',
         yField: 'value',
-        yAxis: {
-            title: {
-                text: 'Số lượng',
-                style: {
-                    fill: '#000', // Màu chữ
-                    fontSize: 14, // Kích thước font chữ
-                },
-            },
-            max: 5, // Thiết lập giá trị tối đa cho trục y
-        },
-        color: ({ column }) => {
-            if (column === 'plan') return '#2989FF'; // Màu cho 'plan'
-            if (column === 'export') return '#22CBCC'; // Màu cho 'export'
-            if (column === 'import') return '#FF4D4F'; // Màu cho 'import'
-            return '#2989FF';
-        },
-        tooltip: {
-            customContent: (title, items) => {
-                const color = items[0]?.color || '#2989FF'; // Lấy màu của cột
-                const column = items[0]?.data?.column;
-                const label = column === 'plan' ? 'Kế hoạch' : column === 'export' ? 'Đã xuất' : 'Thu hồi';
-                return `
-            <div style="padding: 10px;">
-                <p style="margin: 0;">${title}</p>
-                <p style="margin: 0;">
-                    <span style="display: inline-block; width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></span>
-                    ${label}: ${items[0]?.data?.value}
-                </p>
-            </div>`;
-            },
-        },
+        seriesField: 'name',
+        isStack: true,
         label: {
-            position: 'middle', // Vị trí nhãn ở giữa cột
-            style: {
-                fill: '#FFFFFF',
-                opacity: 0.6,
-                fontSize: 16,
-            },
-            text: (originData) => {
-                const val = parseFloat(originData.value);
-                return (val * 100).toFixed(1) + '%';
-            },
-            offset: 10,
+            position: 'middle', // Đặt vị trí nhãn là giữa cột
+            content: ({ value }) => `${value}`, // Hiển thị giá trị của cột
         },
         legend: {
-            // position: 'top-right', // Vị trí của legend
-            position: 'right', // Vị trí của legend nằm bên phải ngoài canvas
-            layout: 'vertical', // Bố trí legend theo chiều dọc
-            itemName: {
-                formatter: (text) => {
-                    // Định nghĩa nhãn tùy chỉnh cho legend
-                    if (text === 'plan') return 'Kế hoạch';
-                    if (text === 'export') return 'Đã xuất';
-                    if (text === 'import') return 'Thu hồi';
-                    return text;
-                },
-                style: {
-                    fontSize: 14, // Kích thước font chữ của item
-                },
-            },
-            marker: {
-                symbol: 'square', // Kiểu của marker (ô màu)
-                style: {
-                    r: 8, // Kích thước của ô màu (radius)
-                },
-            },
+            position: 'right-top', // Vị trí của legend
         },
-        slider: {
-            x: {
-                values: [0.1, 0.2],
+        interaction: {
+            tooltip: {
+                shared: true,
+                showMarkers: false, // Optional: Hide tooltip markers if desired
+                formatter: (datum) => ({
+                    name: datum.name,
+                    value: datum.value,
+                }),
             },
         },
     };
-
     return (
         <div className='relative'>
             <div ref={setChartRef}>

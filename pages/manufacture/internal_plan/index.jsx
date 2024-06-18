@@ -1,48 +1,47 @@
-import Head from "next/head";
 import { debounce } from "lodash";
-import dynamic from "next/dynamic";
 import moment from "moment/moment";
+import dynamic from "next/dynamic";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 
-import { Grid6, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { Grid6 } from "iconsax-react";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
-import { useToggle } from "@/hooks/useToggle";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { routerInternalPlan } from "routers/manufacture";
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import apiComons from "@/Api/apiComon/apiComon";
+import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { routerInternalPlan } from "routers/manufacture";
 
 const PopupDetail = dynamic(() => import("./components/PopupDetail"), { ssr: false });
 const Index = (props) => {
@@ -111,7 +110,7 @@ const Index = (props) => {
                 dataExcel: data?.rResult,
             }));
             sTotalItems(data?.output);
-        } catch (error) {}
+        } catch (error) { }
         sOnFetching(false);
     };
 
@@ -121,7 +120,7 @@ const Index = (props) => {
             const { result } = await apiComons.apiBranchCombobox();
             sListData((e) => ({ ...e, listBr: result.map((e) => ({ label: e.name, value: e.id })) }));
             sOnFetching_filter(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -180,7 +179,7 @@ const Index = (props) => {
                 return;
             }
             isShow("error", `${dataLang[message] || message}`);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     // excel

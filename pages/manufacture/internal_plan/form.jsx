@@ -1,39 +1,38 @@
-import Head from "next/head";
 import { debounce } from "lodash";
 import moment from "moment/moment";
-import { v4 as uuidv4 } from "uuid";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { MdClear } from "react-icons/md";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import React, { useState, useEffect } from "react";
+import { MdClear } from "react-icons/md";
+import { v4 as uuidv4 } from "uuid";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
-import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import Loading from "@/components/UI/loading";
-import { Container } from "@/components/UI/common/layout";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import { SelectCore } from "@/utils/lib/Select";
 import { isAllowedNumber } from "@/utils/helpers/common";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { SelectCore } from "@/utils/lib/Select";
 
 import { routerInternalPlan } from "@/routers/manufacture";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 const Index = (props) => {
     const initsFetching = {
         onFetching: false,
@@ -111,7 +110,7 @@ const Index = (props) => {
             }));
 
             sFetchingData((e) => ({ ...e, onLoading: false }));
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -136,9 +135,8 @@ const Index = (props) => {
                         idParenBackend: e?.id,
                         matHang: {
                             e: e,
-                            label: `${e?.item_name} <span style={{display: none}}>${
-                                e?.code + e?.product_variation + e?.text_type + e?.unit_name
-                            }</span>`,
+                            label: `${e?.item_name} <span style={{display: none}}>${e?.code + e?.product_variation + e?.text_type + e?.unit_name
+                                }</span>`,
                             value: e?.item_id,
                         },
                         unit: e?.unit_name,
@@ -158,7 +156,7 @@ const Index = (props) => {
                 namePlan: data?.internalPlans.plan_name,
                 note: data?.internalPlans?.note,
             });
-        } catch (error) {}
+        } catch (error) { }
         sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
     };
 
@@ -175,7 +173,7 @@ const Index = (props) => {
             });
             sDataSelect((e) => ({ ...e, dataItems: data?.result }));
             sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -189,7 +187,7 @@ const Index = (props) => {
                 },
             });
             sDataSelect((e) => ({ ...e, dataItems: data?.result }));
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     const handleSaveStatus = () => {
@@ -487,7 +485,7 @@ const Index = (props) => {
             } else {
                 isShow("error", `${dataLang[message] || data?.message}`);
             }
-        } catch (error) {}
+        } catch (error) { }
         sFetchingData((e) => ({ ...e, onSending: false }));
     };
 
@@ -602,9 +600,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${
-                                            errors.errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errors.errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -656,9 +653,8 @@ const Index = (props) => {
                                         name="fname"
                                         type="text"
                                         placeholder={dataLang?.internal_plan_name || "internal_plan_name"}
-                                        className={`focus:border-[#92BFF7] ${
-                                            errors.errPlan ? "border-red-500 " : "border-[#d0d5dd]"
-                                        }   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
+                                        className={`focus:border-[#92BFF7] ${errors.errPlan ? "border-red-500 " : "border-[#d0d5dd]"
+                                            }   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                     {errors.errPlan && (
                                         <label className="text-sm text-red-500">
@@ -869,20 +865,18 @@ const Index = (props) => {
                                                                 "quantity"
                                                             )}
                                                             value={e.quantity || null}
-                                                            className={`${
-                                                                errors.errQuantity &&
-                                                                (e.quantity == null ||
-                                                                    e.quantity == "" ||
-                                                                    e.quantity == 0)
+                                                            className={`${errors.errQuantity &&
+                                                                    (e.quantity == null ||
+                                                                        e.quantity == "" ||
+                                                                        e.quantity == 0)
                                                                     ? "border-b border-red-500"
                                                                     : "border-b border-gray-200"
-                                                            }
-                                                                ${
-                                                                    e.quantity == null ||
+                                                                }
+                                                                ${e.quantity == null ||
                                                                     e.quantity == "" ||
                                                                     e.quantity == 0
-                                                                        ? "border-b border-red-500"
-                                                                        : "border-b border-gray-200"
+                                                                    ? "border-b border-red-500"
+                                                                    : "border-b border-gray-200"
                                                                 }
                                                                 appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                             isAllowed={isAllowedNumber}
@@ -907,11 +901,10 @@ const Index = (props) => {
                                                             isClearable
                                                             value={e.date}
                                                             placeholderText="Chọn ngày"
-                                                            className={`outline-none ${
-                                                                errors.errDate && (e.date == null || e.date == "")
+                                                            className={`outline-none ${errors.errDate && (e.date == null || e.date == "")
                                                                     ? "border-b border-red-500"
                                                                     : "border-b border-gray-200"
-                                                            } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
+                                                                } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
                                                         />
                                                     </div>
                                                 </div>

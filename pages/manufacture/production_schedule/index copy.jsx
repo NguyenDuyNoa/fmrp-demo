@@ -5,7 +5,7 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import { isSameDay } from "date-fns";
 import "moment/locale/vi";
 import Head from "next/head";
-import { memo, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { v4 as uuidV4 } from "uuid";
@@ -13,10 +13,6 @@ import PopupAddTask from "./components/popupAddTask";
 import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
 import moment from "moment";
 import { MdAddBox } from "react-icons/md";
-import { SortableContainer, SortableElement, arrayMove, sortableHandle } from "react-sortable-hoc";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import NoData from "@/components/UI/noData/nodata";
-import useDragAndDrop from "@/hooks/useDragAndDrop";
 
 const Index = (props) => {
     const dataLang = props?.dataLang
@@ -34,14 +30,10 @@ const Index = (props) => {
         year: new Date().getFullYear(),
     }
 
-
     const [isStateCalender, setIsStateCalender] = useState(inittialState);
 
     const queryStateCalender = (key) => setIsStateCalender((prev) => ({ ...prev, ...key }));
 
-    const { onDragEnd } = useDragAndDrop(isStateCalender.dataCaleander, (updatedData) => {
-        queryStateCalender({ dataCaleander: updatedData });
-    });
     useEffect(() => {
         // Lưu ý: isStateCalender.month phải trừ đi 1 vì months trong JavaScript bắt đầu từ 0 (tháng 1 là tháng 0)
         const firstDayOfMonth = new Date(isStateCalender.year, isStateCalender.month - 1, 1);
@@ -72,7 +64,6 @@ const Index = (props) => {
                 date: new Date(d),
                 day: d.getDate(),
                 isPreviousMonthDay: true,
-                tasks: []
             });
         }
         const currentMonthDays = [];
@@ -83,26 +74,7 @@ const Index = (props) => {
                     id: uuidV4(),
                     date: new Date(d),
                     day: d.getDate(),
-                    tasks: [
-                        {
-                            id: uuidV4(),
-                            name: 'Phun côn trùng 1',
-                            time: '8:00',
-                            status: 'Hoàn thành',
-                            bg: '#F2F9EC',
-                            color: '#32AA00',
-                            note: 'Phun côn trùng vào sáng sớm'
-                        },
-                        {
-                            id: uuidV4(),
-                            name: 'Phun côn trùng 2',
-                            time: '8:00',
-                            status: 'Hoàn thành',
-                            bg: '#F2F9EC',
-                            color: '#32AA00',
-                            note: 'Phun côn trùng vào sáng sớm'
-                        }
-                    ]
+                    tasks: []
                 });
             }
         }
@@ -114,92 +86,79 @@ const Index = (props) => {
                 date: new Date(d),
                 day: d.getDate(),
                 isNextMonthDay: true,
-                tasks: []
             });
         }
         queryStateCalender({ dataCaleander: [...previousMonthDays, ...currentMonthDays, ...nextMonthDays] })
     }, [isStateCalender.month]);
 
-    const SortableItem = memo(({ value, index }) => (
-        <Draggable draggableId={value.id.toString()} index={index}>
-            {(provided, snapshot) => (
-                <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={{
-                        ...provided.draggableProps.style,
-                        background: snapshot.isDragging ? '#f0f0f0' : value.bg, // Thay đổi màu nền khi kéo
-                        color: value.color
-                    }}
-                    className="w-full flex flex-col gap-1 cursor-grab text-start py-3 px-2 rounded-md"
-                >
-                    <div className="text-base font-medium">
-                        <span className="font-semibold">{value.time}</span> {value.name}
-                    </div>
-                    <div className="bg-green-100 text-green-500 rounded-lg w-fit">
-                        <h1 className="text-[11px] font-medium py-0.5 px-2 flex items-center gap-1">
-                            <span className="h-2 w-2 rounded-full bg-green-500 block"></span>
-                            <span>{value?.status}</span>
-                        </h1>
-                    </div>
-                    <div className="text-xs font-medium">
-                        Mô tả: {value?.note}
-                    </div>
-                </div>
-            )}
-        </Draggable>
-    ));
 
 
-    const dayComponents = isStateCalender.dataCaleander.map((dayData, i) => (
-        <div
-            key={`day-${i}`}
-            className={`col-span-1 group transition-all duration-200 ease-linear border-[#F1F4F9] border-r-2 border-b-2 w-full h-full min-h-[140px] group text-center p-2 ${dayData.isNextMonthDay || dayData.isPreviousMonthDay ? "text-gray-400 font-normal" : " hover:bg-[#E0E0E0]/20 text-gray-600"}`}
-        >
-            <div className="h-full">
-                <div className={`flex items-center ${!(dayData.isNextMonthDay || dayData.isPreviousMonthDay) ? `group-hover:justify-between justify-end` : "justify-end"} `}>
-                    {!(dayData.isNextMonthDay || dayData.isPreviousMonthDay) &&
-                        <PopupAddTask
-                            id={dayData.id}
-                            dataLang={dataLang}
-                            queryStateCalender={queryStateCalender}
-                            isStateCalender={isStateCalender}
-                            disableClick={(dayData.isNextMonthDay || dayData.isPreviousMonthDay)}
-                            className={'group-hover:block hidden'}
-                        >
-                            <MdAddBox className="text-xl hover:scale-110 transition-all duration-200 ease-linear" />
-                        </PopupAddTask>
-                    }
-                    <div className={`text-base font-normal ${dayData.day === new Date().getDate() && +isStateCalender.month === new Date().getMonth() + 1 ? "bg-red-500 text-white rounded-full px-2 py-1" : ""}`}>
-                        {dayData.day}
-                    </div>
-                </div>
-                {!(dayData.isNextMonthDay || dayData.isPreviousMonthDay) &&
-                    <Droppable droppableId={`day-${i}`}>
-                        {(provided, snapshot) => (
-                            <div
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                                className={`${snapshot.isDraggingOver ? 'bg-gray-200 rounded-md h-fit' : 'h-full'} transition-all duration-100 ease-in-out`}
+
+    const dayComponents = isStateCalender.dataCaleander.map((dayData, i, arr) => {
+        // So sánh ngày hiện tại với ngày trong danh sách
+        const dayDate = dayData.date;
+        const isPastDay = dayDate < isStateCalender.currentDate && !isSameDay(dayDate, isStateCalender.currentDate);
+        // Xác định xem ngày hiện tại là thứ mấy
+        const dayOfWeek = dayData.date.getDay(); // 0 là Chủ Nhật, 1 là Thứ 2, ..., 6 là Thứ 7
+
+        // Kiểm tra xem ngày hiện tại là thứ 7 hay chủ nhật không
+        const isSaturday = dayOfWeek === 6;
+        const isSunday = dayOfWeek === 0;
+        return (
+            <div
+                key={`day-${i}`}
+                className={`col-span-1 group transition-all duration-200 ease-linear border-[#F1F4F9] border-r-2 border-b-2  w-full h-full min-h-[140px] group text-center p-2                          
+                ${dayData.isNextMonthDay || dayData.isPreviousMonthDay ? "text-gray-400 font-normal" : " hover:bg-[#E0E0E0]/20 text-gray-600 "}
+                `}
+            >
+                <div className="h-full">
+                    <div className={`flex items-center ${!(dayData.isNextMonthDay || dayData.isPreviousMonthDay) ? `group-hover:justify-between justify-end` : "justify-end"} `}>
+                        {!(dayData.isNextMonthDay || dayData.isPreviousMonthDay) &&
+                            <PopupAddTask
+                                id={dayData.id}
+                                dataLang={dataLang}
+                                queryStateCalender={queryStateCalender}
+                                isStateCalender={isStateCalender}
+                                disbleClick={(dayData.isNextMonthDay || dayData.isPreviousMonthDay)}
+                                className={'group-hover:block hidden'}
                             >
-                                <div className="flex flex-col gap-2">
-                                    {dayData.tasks.length > 0 ? (
-                                        dayData.tasks.map((value, index) => (
-                                            <SortableItem key={`item-${value.id}`} index={index} value={value} />
-                                        ))
-                                    ) : ''}
-                                    {provided.placeholder}
+                                <MdAddBox className="text-xl hover:scale-110 transition-all duration-200 ease-linear" />
+
+                            </PopupAddTask>
+                        }
+                        <div className={`text-base font-normal ${dayData.day == new Date().getDate() && isStateCalender.month == new Date().getMonth() ? "bg-red-500 text-white rounded-full px-2 py-1" : ""}`}>
+                            {dayData.day}
+                        </div>
+                    </div>
+                    {!(dayData.isNextMonthDay || dayData.isPreviousMonthDay) &&
+                        <Customscrollbar className="flex justify-start flex-col gap-1.5 items-start min-h-32">
+                            {dayData.tasks.map((task, index) => (
+                                <div
+                                    key={index}
+                                    className=" w-full flex flex-col gap-1 text-start py-3 px-2 rounded-md"
+                                    style={{ background: task.bg, color: task.color }}
+                                >
+                                    <div className="text-base font-medium">
+                                        <span className="font-semibold">{task.time}</span> {task.name}
+                                    </div>
+                                    <div className="bg-green-500 text-white rounded-xl w-fit">
+                                        <h1 className="text-[11px] font-semibold py-0.5 px-2 flex items-center gap-1">
+                                            <span className="h-2 w-2 rounded-full bg-green-400 block"></span>
+                                            <span>{task?.status}</span>
+                                        </h1>
+                                    </div>
+                                    <div className="text-sm font-semibold">
+                                        Mô tả: {task?.note}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </Droppable>
-                }
+                            ))}
+                        </Customscrollbar>
+                    }
+                </div>
+
             </div>
-        </div>
-    ));
-
-
+        );
+    });
     const handleMonthChange = (change) => {
         const currentMonth = isStateCalender.month;
         const newMonth = currentMonth + change;
@@ -294,14 +253,9 @@ const Index = (props) => {
                                         }
                                     </div>
                                     {/* Render các ngày trong tuần */}
-                                    {/* <div className='grid grid-cols-7 items-center border-[#F1F4F9] border-l-2 '>
+                                    <div className='grid grid-cols-7 items-center border-[#F1F4F9] border-l-2 '>
                                         {dayComponents}
-                                    </div> */}
-                                    <DragDropContext onDragEnd={onDragEnd}>
-                                        <div className="grid grid-cols-7 gap-2">
-                                            {dayComponents}
-                                        </div>
-                                    </DragDropContext>
+                                    </div>
                                 </div>
                             </Customscrollbar>
                         </ContainerTable>

@@ -1,9 +1,7 @@
 import SelectComponent from "components/UI/filterComponents/selectComponent";
-import { ArrowDown2 } from "iconsax-react";
-import { useState } from "react";
-import DatePicker from "react-datepicker";
-import { v4 as uuid } from "uuid";
 import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
+import { ArrowDown2 } from "iconsax-react";
+import DatePicker from "react-datepicker";
 const FilterHeader = () => {
     const renderMonthContent = (month, shortMonth, longMonth) => {
         const tooltipText = `Tooltip for month: ${longMonth}`;

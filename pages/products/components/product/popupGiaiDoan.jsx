@@ -1,32 +1,21 @@
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
+import { arrayMoveImmutable } from "array-move";
+import {
+    I3Square,
+    Add as IconAdd,
+    Trash as IconDelete,
+    Maximize4 as IconMax
+} from "iconsax-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import PopupEdit from "@/components/UI/popup";
-import { useToggle } from "@/hooks/useToggle";
 import Select from "react-select";
-import {
-    SearchNormal1 as IconSearch,
-    Trash as IconDelete,
-    UserEdit as IconUserEdit,
-    Grid6 as IconExcel,
-    Image as IconImage,
-    GalleryEdit as IconEditImg,
-    ArrowDown2 as IconDown,
-    Add as IconAdd,
-    Maximize4 as IconMax,
-    CloseCircle as IconClose,
-    TickCircle as IconTick,
-    I3Square,
-} from "iconsax-react";
-import { NumericFormat } from "react-number-format";
-import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import Loading from "@/components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
 import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
-import { arrayMoveImmutable } from "array-move";
-import useActionRole from "@/hooks/useRole";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { _ServerInstance as Axios } from "/services/axios";
 const Popup_GiaiDoan = React.memo((props) => {
     const listCd = useSelector((state) => state.stage_finishedProduct);
 
@@ -169,6 +158,7 @@ const Popup_GiaiDoan = React.memo((props) => {
     };
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
+        console.log("oldIndex, newIndex ", oldIndex, newIndex);
         var newItems = arrayMoveImmutable([...option], oldIndex, newIndex);
         sOption(newItems);
     };
@@ -275,9 +265,8 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 position: "absolute",
                             }),
                         }}
-                        className={`${
-                            errName && value.name == null ? "border-red-500" : "border-transparent"
-                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                        className={`${errName && value.name == null ? "border-red-500" : "border-transparent"
+                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                     />
                 </div>
                 <div className="w-[30%] flex items-center justify-center">
@@ -326,9 +315,8 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     return (
         <PopupEdit
-            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${
-                props.name
-            })`}
+            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${props.name
+                })`}
             button={
                 <div
                     onClick={() => {
@@ -392,9 +380,8 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 onClick={_HandleAddNew.bind(this)}
                                 disabled={statusBtnAdd}
                                 title="Thêm"
-                                className={`${
-                                    statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
-                                } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
+                                className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
+                                    } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
                             >
                                 <IconAdd />
                                 {props.dataLang?.stage_add_finishedProduct}
