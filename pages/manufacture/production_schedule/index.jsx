@@ -1,22 +1,19 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import useDragAndDrop from "@/hooks/useDragAndDrop";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import { isSameDay } from "date-fns";
-import "moment/locale/vi";
-import Head from "next/head";
-import { memo, useCallback, useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import { GrFormNext, GrFormPrevious } from "react-icons/gr";
-import { v4 as uuidV4 } from "uuid";
-import PopupAddTask from "./components/popupAddTask";
 import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
 import moment from "moment";
+import "moment/locale/vi";
+import Head from "next/head";
+import { memo, useEffect, useState } from "react";
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import DatePicker from "react-datepicker";
+import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { MdAddBox } from "react-icons/md";
-import { SortableContainer, SortableElement, arrayMove, sortableHandle } from "react-sortable-hoc";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import NoData from "@/components/UI/noData/nodata";
-import useDragAndDrop from "@/hooks/useDragAndDrop";
+import { v4 as uuidV4 } from "uuid";
+import PopupAddTask from "./components/popupAddTask";
 
 const Index = (props) => {
     const dataLang = props?.dataLang
@@ -39,9 +36,8 @@ const Index = (props) => {
 
     const queryStateCalender = (key) => setIsStateCalender((prev) => ({ ...prev, ...key }));
 
-    const { onDragEnd } = useDragAndDrop(isStateCalender.dataCaleander, (updatedData) => {
-        queryStateCalender({ dataCaleander: updatedData });
-    });
+    const { onDragEnd } = useDragAndDrop(isStateCalender.dataCaleander, (updatedData) => { queryStateCalender({ dataCaleander: updatedData }) }, "tasks");
+
     useEffect(() => {
         // Lưu ý: isStateCalender.month phải trừ đi 1 vì months trong JavaScript bắt đầu từ 0 (tháng 1 là tháng 0)
         const firstDayOfMonth = new Date(isStateCalender.year, isStateCalender.month - 1, 1);
@@ -181,7 +177,7 @@ const Index = (props) => {
                             <div
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
-                                className={`${snapshot.isDraggingOver ? 'bg-gray-200 rounded-md h-fit' : 'h-full'} transition-all duration-100 ease-in-out`}
+                                className={`${snapshot.isDraggingOver ? 'bg-gray-100 rounded-md h-fit' : 'h-full bg-transparent'} transition-all duration-100 ease-in-out`}
                             >
                                 <div className="flex flex-col gap-2">
                                     {dayData.tasks.length > 0 ? (

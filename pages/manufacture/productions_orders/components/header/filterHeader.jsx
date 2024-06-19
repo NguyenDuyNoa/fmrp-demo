@@ -19,7 +19,7 @@ const FilterHeader = memo(
             <>
                 <div className="grid grid-cols-14 items-center gap-2">
                     <div className="col-span-2">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{"Số lệnh sản xuất"}</h3>
+                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}</h3>
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueProductionOrders}
@@ -29,40 +29,40 @@ const FilterHeader = memo(
                             onChange={(e) => handleFilter("valueProductionOrders", e)}
                             options={isState.comboboxProductionOrders}
                             classNamePrefix={"productionSmoothing"}
-                            placeholder={"Số lệnh sản xuất"}
+                            placeholder={dataLang?.productions_orders_details_number || 'productions_orders_details_number'}
                         />
                     </div>
                     <div className="col-span-2">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{"Chi nhánh"}</h3>
+                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}</h3>
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueBr}
                             onChange={(e) => handleFilter("valueBr", e)}
                             options={isState.listBr}
                             classNamePrefix={"productionSmoothing"}
-                            placeholder={"Chi nhánh"}
+                            placeholder={dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}
                         />
                     </div>
                     <div className="col-span-2">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{"Số LSX chi tiết"}</h3>
+                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}</h3>
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueProductionOrdersDetail}
                             onChange={(e) => handleFilter("valueProductionOrdersDetail", e)}
                             options={isState.comboboxProductionOrdersDetail}
                             classNamePrefix={"productionSmoothing"}
-                            placeholder={"Số LSX chi tiết"}
+                            placeholder={dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}
                         />
                     </div>
                     <div className="col-span-2">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{"Mặt hàng"}</h3>
+                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_item || 'productions_orders_item'}</h3>
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueProducts}
                             options={[{ label: "Mặt hàng", value: "", isDisabled: true }, ...isState.listProducts]}
                             onChange={(e) => handleFilter("valueProducts", e)}
                             classNamePrefix={"productionSmoothing"}
-                            placeholder={"Mặt hàng"}
+                            placeholder={dataLang?.productions_orders_item || 'productions_orders_item'}
                             onInputChange={(e) => {
                                 fetchDataItems(e);
                             }}
@@ -136,7 +136,7 @@ const FilterHeader = memo(
                         />
                     </div>
                     <div className="col-span-2">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{"Đơn hàng bán"}</h3>
+                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}</h3>
                         <SelectComponent
                             isClearable={true}
                             value={isState.valueOrders}
@@ -146,11 +146,11 @@ const FilterHeader = memo(
                             }}
                             onChange={(e) => handleFilter("valueOrders", e)}
                             classNamePrefix={"productionSmoothing"}
-                            placeholder={"Đơn hàng bán"}
+                            placeholder={dataLang?.productions_orders_sales_order || 'productions_orders_sales_order'}
                         />
                     </div>
                     <div className="col-span-2">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{"Kế hoạch nội bộ"}</h3>
+                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}</h3>
                         <SelectComponent
                             isClearable={true}
                             value={isState.valuePlan}
@@ -160,11 +160,11 @@ const FilterHeader = memo(
                             }}
                             onChange={(e) => handleFilter("valuePlan", e)}
                             classNamePrefix={"productionSmoothing"}
-                            placeholder={"Kế hoạch nội bộ"}
+                            placeholder={dataLang?.productions_orders_internal_plan || 'productions_orders_internal_plan'}
                         />
                     </div>
                     <div className="w-full col-span-2 relative">
-                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{"Từ ngày đến ngày"}</h3>
+                        <h3 className="text-sm text-[#051B44] font-medium ml-1">{dataLang?.productions_orders_day_to_day || 'productions_orders_day_to_day'}</h3>
                         <DatePicker
                             id="start"
                             portalId="menu-time"
@@ -184,7 +184,7 @@ const FilterHeader = memo(
                                 });
                             }}
                             isClearable
-                            placeholderText="Từ ngày đến ngày"
+                            placeholderText={dataLang?.productions_orders_day_to_day || 'productions_orders_day_to_day'}
                             className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] focus:border-[#0F4F9E] focus:border-2 border  rounded-md"
                         />
                         <ArrowDown2

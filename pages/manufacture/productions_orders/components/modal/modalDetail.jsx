@@ -1,3 +1,4 @@
+import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { ContainerFilterTab } from "@/components/UI/common/layout";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -8,73 +9,75 @@ import { memo, useEffect, useState } from "react";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { FaUpRightAndDownLeftFromCenter } from "react-icons/fa6";
 import { RxDragHandleDots1 } from "react-icons/rx";
+import TabExportHistory from "./tabExportHistory";
 import TabExportSituation from "./tabExportSituation";
 import TabInFormation from "./tabInFormation";
-import TabExportHistory from "./tabExportHistory";
-import TabWarehouseHistory from "./tabWarehouseHistory";
-import TabRecallMaterials from "./tabRecallMaterials";
 import TabProcessingCost from "./tabProcessingCost";
-import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
+import TabRecallMaterials from "./tabRecallMaterials";
+import TabWarehouseHistory from "./tabWarehouseHistory";
 
-const dataTotal = [
-    {
-        title: "Chi phí vật tư",
-        number: 0,
-        bgColor: "#EBFEF2",
-        bgSmall: "#0BAA2E",
-    },
-    {
-        title: "Chi phí khác",
-        number: 0,
-        bgColor: "#FEF8EC",
-        bgSmall: "#FF8F0D",
-    },
-    {
-        title: "Tổng chi phí",
-        number: 0,
-        bgColor: "#FFEEF0",
-        bgSmall: "#EE1E1E",
-    },
-];
-const listTab = [
-    {
-        id: 1,
-        name: "Thông tin",
-        count: 0,
-    },
-    {
-        id: 2,
-        name: "Tình hình xuất NVL",
-        count: 0,
-    },
-    {
-        id: 3,
-        name: "Lịch sử xuất NVL/BTP",
-        count: 1,
-    },
-    {
-        id: 4,
-        name: "Lịch sử nhập kho TP",
-        count: 1,
-    },
-    {
-        id: 5,
-        name: "Thu hồi NVL",
-        count: 2,
-    },
-    // {
-    //     id: 6,
-    //     name: 'Phiếu công việc',
-    //     count: 3
-    // },
-    {
-        id: 6,
-        name: "Chi phí NVL - Gia công",
-        count: 0,
-    },
-];
 
 const ModalDetail = memo(({ isState, queryState, dataLang }) => {
+
+    const dataTotal = [
+        {
+            title: dataLang?.productions_orders_details_material_costs || 'productions_orders_details_material_costs',
+            number: 0,
+            bgColor: "#EBFEF2",
+            bgSmall: "#0BAA2E",
+        },
+        {
+            title: dataLang?.productions_orders_details_other_costs || 'productions_orders_details_other_costs',
+            number: 0,
+            bgColor: "#FEF8EC",
+            bgSmall: "#FF8F0D",
+        },
+        {
+            title: dataLang?.productions_orders_details_total_costs || 'productions_orders_details_total_costs',
+            number: 0,
+            bgColor: "#FFEEF0",
+            bgSmall: "#EE1E1E",
+        },
+    ];
+    const listTab = [
+        {
+            id: 1,
+            name: "Thông tin",
+            count: 0,
+        },
+        {
+            id: 2,
+            name: "Tình hình xuất NVL",
+            count: 0,
+        },
+        {
+            id: 3,
+            name: "Lịch sử xuất NVL/BTP",
+            count: 1,
+        },
+        {
+            id: 4,
+            name: "Lịch sử nhập kho TP",
+            count: 1,
+        },
+        {
+            id: 5,
+            name: "Thu hồi NVL",
+            count: 2,
+        },
+        // {
+        //     id: 6,
+        //     name: 'Phiếu công việc',
+        //     count: 3
+        // },
+        {
+            id: 6,
+            name: "Chi phí NVL - Gia công",
+            count: 0,
+        },
+    ];
+
+
     const router = useRouter();
 
     const [width, setWidth] = useState(900);
@@ -152,7 +155,6 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         try {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
             queryStateModal({ dataDetail: data });
-            console.log("data", data);
         } catch (error) { }
     };
 
@@ -172,7 +174,6 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
         5: <TabRecallMaterials {...shareProps} />,
         6: <TabProcessingCost {...shareProps} />,
     };
-
     if (!isMounted) return null
 
     return (
@@ -227,29 +228,29 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
                     <div className={`grid grid-cols-2 ${width >= 1100 ? "col-span-5" : "col-span-12"} `}>
                         <div className="flex flex-col">
                             <div className="my-2 flex items-center gap-1">
-                                <h3 className="text-[13px]">Số lệnh sản xuất:</h3>
+                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_number || 'productions_orders_details_number'}:</h3>
                                 <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_po ?? ""}</h3>
                             </div>
                             <div className="my-2  col-span-3 flex items-center gap-1">
-                                <h3 className="text-[13px] ">Kế hoạch sản xuất:</h3>
+                                <h3 className="text-[13px] ">{dataLang?.productions_orders_details_plan || 'productions_orders_details_plan'}:</h3>
                                 <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_pp ?? ""}</h3>
                             </div>
                             <div className="my-2 flex items-center gap-1">
-                                <h3 className="text-[13px]">Số LSX chi tiết:</h3>
+                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_lxs_number || 'productions_orders_details_lxs_number'}:</h3>
                                 <h3 className=" text-[13px] font-medium">{isStateModal.dataDetail?.poi?.reference_no_detail ?? ""}</h3>
                             </div>
                         </div>
                         <div className="flex flex-col">
                             <div className="my-2 col-span-3 flex items-center gap-1">
-                                <h3 className="text-[13px]">Đơn hàng bán/KHNB:</h3>
+                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_orders || 'productions_orders_details_orders'}:</h3>
                                 <h3 className="text-[13px] font-medium">{isStateModal.dataDetail?.poi?.object?.reference_no}</h3>
                             </div>
                             <div className="my-2 col-span-3 flex items-center gap-1">
-                                <h3 className="text-[13px]">Khách hàng:</h3>
-                                <h3 className="text-[13px] font-medium">Anh Nghĩa</h3>
+                                <h3 className="text-[13px]">{dataLang?.productions_orders_details_client || 'productions_orders_details_client'}:</h3>
+                                <h3 className="text-[13px] font-medium">{isStateModal.dataDetail?.poi?.object?.company ?? ""}</h3>
                             </div>
                             <div className="my-2 flex items-center gap-1">
-                                <h3 className=" text-[13px]">Chi nhánh:</h3>
+                                <h3 className=" text-[13px]">{dataLang?.productions_orders_details_branch || 'productions_orders_details_branch'}:</h3>
                                 <TagBranch className="w-fit">{isStateModal.dataDetail?.poi?.branch_name}</TagBranch>
                             </div>
                         </div>

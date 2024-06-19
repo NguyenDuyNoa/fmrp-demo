@@ -1,21 +1,18 @@
 // tình hình xuất NVL
+import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
 import OnResetData from '@/components/UI/btnResetData/btnReset';
-import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
-import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import { ContainerTotal } from '@/components/UI/common/layout';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
+import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
 import Loading from '@/components/UI/loading';
 import NoData from '@/components/UI/noData/nodata';
-import Pagination from "@/components/UI/pagination";
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import saveAs from 'file-saver';
 import html2canvas from 'html2canvas';
-import { Grid6 } from 'iconsax-react';
-import { forEach, groupBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
@@ -32,161 +29,10 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     const initialState = {
         onFetching: false,
-        dataChart: [
-            { type: 'Vải', value: 1, column: 'plan' },
-            { type: 'Quần', value: 1.5, column: 'plan' },
-            { type: 'Áo', value: 4.5, column: 'export' },
-            { type: 'Cúc', value: 3, column: 'export' },
-            { type: 'Chỉ may', value: 2, column: 'import' },
-            { type: 'Kim', value: 1, column: 'import' },
-        ],
-        dataTable: [
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-            {
-                id: uddid(),
-                image: '/no_img.png',
-                name: 'ÁO SƠ MI - S - TRẮNG',
-                itemVariation: 'Biến thể 1',
-                code: 'SMM',
-                unit: 'Cái',
-                type: 'materials',
-                quantityPlan: 1000,
-                quantityExport: 500,
-                quantityImport: 1000,
-                quantityRemaining: 500
-            },
-        ]
+        dataChart: [],
+        dataTable: [],
+        dataDefault: [],
     }
-
 
     const router = useRouter()
 
@@ -202,24 +48,163 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
 
     const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
 
-    const paginate = (pageNumber) => {
-        router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-                page: pageNumber,
-            },
-        });
-    };
+    const fetchDataExport = async () => {
+        queryStatesetExportSituation({ onFetching: true })
+        try {
+            const { data } = await apiProductionsOrders.apiExportSituation(isStateModal.dataDetail?.poi?.poi_id)
+            const newData = data?.boms?.map(e => {
+                return {
+                    id: uddid(),
+                    image: '/no_img.png',
+                    name: e?.item_name,
+                    itemVariation: e?.product_variation,
+                    code: e?.item_code,
+                    unit: e?.unit_name,
+                    type: e?.type_products,
+                    quantityPlan: e?.quantity_total_quota,
+                    quantityExport: e?.quantity_exported,
+                    quantityImport: e?.quantity_recovery,
+                    quantityRemaining: e?.quantity_rest
+                }
+            })
 
+            const chart = data?.boms?.flatMap(e => {
+                const nameMap = {
+                    'quantity_total_quota': 'Kế hoạch',
+                    'quantity_exported': 'Đã xuất',
+                    'quantity_recovery': 'Thu hồi',
+                    'quantity_rest': 'Còn lại'
+                };
+                const columnName = e.item_code;
+                return Object.entries(e).map(([key, value]) => {
+                    if (key in nameMap) {
+                        return {
+                            name: nameMap[key],
+                            column: columnName,
+                            value: Number(value),
+                        };
+                    }
+                    return undefined;
+                }).filter(item => item !== undefined);
+            });
+            queryStatesetExportSituation({ dataTable: newData, dataDefault: newData, dataChart: chart, onFetching: false })
+        } catch (error) {
+
+        }
+    }
+
+    const totals = isExportSituation.dataTable?.reduce((acc, e) => {
+        return {
+            quantityPlan: acc.quantityPlan + (+e?.quantityPlan || 0),
+            quantityExport: acc.quantityExport + (+e?.quantityExport || 0),
+            quantityImport: acc.quantityImport + (+e?.quantityImport || 0),
+            quantityRemaining: acc.quantityRemaining + (+e?.quantityRemaining || 0)
+        };
+    }, { quantityPlan: 0, quantityExport: 0, quantityImport: 0, quantityRemaining: 0 });
 
     useEffect(() => {
-        sTotalItems(10)
-        queryStatesetExportSituation({ onFetching: true })
-        setTimeout(() => {
-            queryStatesetExportSituation({ onFetching: false })
-        }, 2000)
-    }, [isTab])
+        if (!isStateModal.dataDetail) return;
+        fetchDataExport()
+
+    }, [isStateModal.dataDetail, isTab, limit]);
+
+
+    function removeDiacritics(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+
+    const handleSearch = (e) => {
+        const value = e.target.value;
+        const sData = JSON.parse(JSON.stringify(isExportSituation.dataTable));
+        const newData = sData?.filter(item => {
+            const itemName = removeDiacritics(item?.name?.toLowerCase());
+            const searchValue = removeDiacritics(value.toLowerCase());
+            return itemName.includes(searchValue);
+        });
+        queryStatesetExportSituation({ dataTable: value ? newData : isExportSituation.dataDefault });
+    }
+
+    const multiDataSet = [
+        {
+            columns: [
+                {
+                    title: "ID",
+                    width: { wch: 4 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.productions_orders_details_name_nvl || 'productions_orders_details_name_nvl'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.productions_orders_details_type || 'productions_orders_details_type'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.productions_orders_details_unit || 'productions_orders_details_unit'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.productions_orders_details_table_export_plan || 'productions_orders_details_table_export_plan'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.productions_orders_details_table_export_exported || 'productions_orders_details_table_export_exported'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.productions_orders_details_table_export_remaining || 'productions_orders_details_table_export_remaining'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.productions_orders_details_table_export_recall || 'productions_orders_details_table_export_recall'}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+            ],
+            data: isExportSituation?.dataDefault?.map((e, index) => [
+                { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
+                { value: `${e?.name ? e?.name : ""}` },
+                { value: `${dataLang[e?.type] || e?.type_products}` },
+                { value: `${e?.unit_name ? e?.unit_name : ""}` },
+                { value: `${e?.quantityPlan ? formatNumber(e?.quantityPlan) : ""}` },
+                { value: `${e?.quantityExport ? formatNumber(e?.quantityExport) : ""}` },
+                { value: `${e?.quantityRemaining ? formatNumber(e?.quantityRemaining) : ""}` },
+                { value: `${e?.quantityImport ? formatNumber(e?.quantityImport) : ""}` },
+            ]),
+        },
+    ];
 
     return (
         <div className='h-full'>
@@ -228,37 +213,28 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                     <h1 className="3xl:text-basse text-sm my-1 w-1/3">{listTab[isStateModal.isTab - 1]?.name}</h1>
                     <div className="flex justify-start items-center gap-4">
                         <button type="button" onClick={() => setIsTab('chart')} className={`${isTab === 'chart' && 'border-green-500 border'} bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
-                            Biểu đồ thống kê
+                            {dataLang?.productions_orders_details_table_export_chart || 'productions_orders_details_table_export_chart'}
                         </button>
                         <button type="button" onClick={() => setIsTab('table')} className={`${isTab === 'table' && 'border-[#EE1E1E] border'} bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit min-w-fit rounded-md  flex gap-1 items-center`}>
-                            Danh sách dữ liệu
+                            {dataLang?.productions_orders_details_table_export_list || 'productions_orders_details_table_export_list'}
                         </button>
                     </div>
                 </div>
                 {
                     isTab == 'table' &&
                     <div className="flex justify-end items-center gap-1">
-                        <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={() => { }} classInput={'border'} />
-                        <OnResetData sOnFetching={(e) => queryStatesetExportSituation({ onFetching: e })} />
-                        {/* {(role == true || checkExport) ?
-                            <div className={``}>
-                                {isState.dataExcel?.length > 0 && (
-                                    <ExcelFileComponent dataLang={dataLang}
-                                        filename={"Danh sách tình hình xuất NVL"}
-                                        title="DSNKTP"
-                                        multiDataSet={multiDataSet}
-                                    />)}
-                            </div>
-                            :
-                            <button onClick={() => isShow('warning', WARNING_STATUS_ROLE)} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                                <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
-                                <span>{dataLang?.client_list_exportexcel}</span>
-                            </button>
-                        } */}
-                        <button onClick={() => { }} className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}>
-                            <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
-                            <span>{dataLang?.client_list_exportexcel}</span>
-                        </button>
+                        <SearchComponent colSpan={1} dataLang={dataLang} placeholder={dataLang?.branch_search} onChange={handleSearch} classInput={'border'} />
+                        <OnResetData onClick={() => fetchDataExport()} sOnFetching={() => { }} />
+                        <div className={``}>
+                            {isExportSituation.dataDefault?.length > 0 && (
+                                <ExcelFileComponent
+                                    dataLang={dataLang}
+                                    filename={"Danh sách dữ liệu tình hình xuất NVL"}
+                                    multiDataSet={multiDataSet}
+                                    title="DSDLTHXNVL"
+                                />
+                            )}
+                        </div>
                         <div>
                             <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                         </div>
@@ -266,7 +242,8 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                 }
             </div>
             <div className={`${isTab === 'chart' && (width > 1100 ? "h-[calc(100vh_-_343px)]" : 'h-[calc(100vh_-_473px)]') ||
-                isTab === 'table' && (width > 1100 ? "3xl:h-[calc(100vh_-_450px)] 2xl:h-[calc(100vh_-_430px)] xl:h-[calc(100vh_-_440px)] h-[calc(100vh_-_455px)]" : '3xl:h-[calc(100vh_-_575px)] 2xl:h-[calc(100vh_-_550px)] xl:h-[calc(100vh_-_530px)] h-[calc(100vh_-_525px)]')
+                isTab === 'table' && (width > 1100 ? "3xl:h-[calc(100vh_-_405px)] xxl:h-[calc(100vh_-_380px)] 2xl:h-[calc(100vh_-_380px)] xl:h-[calc(100vh_-_380px)] lg:h-[calc(100vh_-_426px)] h-[calc(100vh_-_426px)]" :
+                    '3xl:h-[calc(100vh_-_510px)] 2xl:h-[calc(100vh_-_480px)] xl:h-[calc(100vh_-_480px)] lg:h-[calc(100vh_-_470px)] h-[calc(100vh_-_470px)]')
                 }  scrollbar-thin scrollbar-thumb-slate-300 bg-white scrollbar-track-slate-100`}>
                 {isTab === 'table' &&
                     <div>
@@ -275,25 +252,25 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                 STT
                             </ColumnTable>
                             <ColumnTable colSpan={3} textAlign={'center'}>
-                                Tên NVL
+                                {dataLang?.productions_orders_details_name_nvl || 'productions_orders_details_name_nvl'}
                             </ColumnTable>
                             <ColumnTable colSpan={2} textAlign={'center'}>
-                                Loại
+                                {dataLang?.productions_orders_details_type || 'productions_orders_details_type'}
                             </ColumnTable>
                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                Đơn vị
+                                {dataLang?.productions_orders_details_unit || 'productions_orders_details_unit'}
                             </ColumnTable>
                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                Kế hoạch
+                                {dataLang?.productions_orders_details_table_export_plan || 'productions_orders_details_table_export_plan'}
                             </ColumnTable>
                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                Đã xuất
+                                {dataLang?.productions_orders_details_table_export_exported || 'productions_orders_details_table_export_exported'}
                             </ColumnTable>
                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                Còn lại
+                                {dataLang?.productions_orders_details_table_export_remaining || 'productions_orders_details_table_export_remaining'}
                             </ColumnTable>
                             <ColumnTable colSpan={1} textAlign={'center'}>
-                                Thu hồi
+                                {dataLang?.productions_orders_details_table_export_recall || 'productions_orders_details_table_export_recall'}
                             </ColumnTable>
                         </HeaderTable>
                         {isExportSituation.onFetching ? (
@@ -324,28 +301,30 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
                                             </RowItemTable>
                                             <RowItemTable colSpan={2} textAlign={'center'}>
                                                 <span
-                                                    className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-sm
-                                                        ${(e?.type == "materials" && "text-lime-500 border-lime-500") ||
-                                                        (e?.type == 1 && "text-orange-500 border-orange-500") ||
-                                                        (e?.type == 2 && "text-sky-500 border-sky-500")
+                                                    className={`py-[1px] px-1 rounded border h-fit w-fit font-[300] break-words leading-relaxed text-xs
+                                                                     ${(e?.type === "products" && "text-lime-500 border-lime-500") ||
+                                                        (e?.type == "semi_products" && "text-orange-500 border-orange-500") ||
+                                                        (e?.type == "out_side" && "text-sky-500 border-sky-500") ||
+                                                        (e?.type == "materials" && "text-purple-500 border-purple-500") ||
+                                                        (e?.type == "semi_products_outside" && "text-green-500 border-green-500")
                                                         }`}
                                                 >
-                                                    {'Nguyên vật liệu'}
+                                                    {dataLang[e?.type] || e?.type}
                                                 </span>
                                             </RowItemTable>
                                             <RowItemTable colSpan={1} textAlign={'center'}>
                                                 {e.unit}
                                             </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                            <RowItemTable colSpan={1} textAlign={e?.quantityPlan > 0 ? "right" : 'center'}>
                                                 {e.quantityPlan > 0 ? formatNumber(e.quantityPlan) : '-'}
                                             </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                            <RowItemTable colSpan={1} textAlign={e?.quantityExport > 0 ? "right" : 'center'}>
                                                 {e.quantityExport > 0 ? formatNumber(e.quantityExport) : '-'}
                                             </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                            <RowItemTable colSpan={1} textAlign={e?.quantityRemaining > 0 ? "right" : 'center'}>
                                                 {e.quantityRemaining > 0 ? formatNumber(e.quantityRemaining) : '-'}
                                             </RowItemTable>
-                                            <RowItemTable colSpan={1} textAlign={'right'}>
+                                            <RowItemTable colSpan={1} textAlign={e?.quantityImport > 0 ? "right" : 'center'}>
                                                 {e.quantityImport > 0 ? formatNumber(e.quantityImport) : '-'}
                                             </RowItemTable>
                                         </RowTable>
@@ -366,53 +345,43 @@ const TabExportSituation = memo(({ isStateModal, width, dataLang, listTab }) => 
             </div>
             {
                 isTab === 'table' &&
-                <ContainerTotal className="!grid-cols-10">
-                    <ColumnTable colSpan={6} textAlign={'center'} className="p-2">
+                <ContainerTotal className="!grid-cols-11">
+                    <ColumnTable colSpan={7} textAlign={'center'} className="p-2">
                         {dataLang?.productsWarehouse_total || "productsWarehouse_total"}
                     </ColumnTable>
                     <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
-                        0
+                        {formatNumber(totals.quantityPlan)}
                     </ColumnTable>
                     <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
-                        0
+                        {formatNumber(totals.quantityExport)}
                     </ColumnTable>
                     <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
-                        0
+                        {formatNumber(totals.quantityRemaining)}
                     </ColumnTable>
                     <ColumnTable colSpan={1} textAlign={'right'} className="justify-end p-2 flex gap-2 flex-wrap  mr-1">
-                        0
+                        {formatNumber(totals.quantityImport)}
                     </ColumnTable>
                 </ContainerTotal>
             }
-            {isTab === 'table' && isExportSituation.dataTable?.length != 0 && (
-                <ContainerPagination>
-                    <TitlePagination
-                        dataLang={dataLang}
-                        totalItems={10}
-                    // totalItems={totalItems?.iTotalDisplayRecords}
-                    />
-                    <Pagination
-                        postsPerPage={limit}
-                        totalPosts={100}
-                        // totalPosts={Number(totalItems?.iTotalDisplayRecords)}
-                        paginate={paginate}
-                        currentPage={router.query?.page || 1}
-                    />
-                </ContainerPagination>
-            )}
         </div>
     )
 })
 
 const ChartColumn = memo(({ dataChart }) => {
     const [chartRef, setChartRef] = useState(null);
+
+    const dataSeting = useSetingServer()
+
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting)
+
     const handleExportExcel = () => {
         if (!chartRef) return;
         // Tạo dữ liệu mới với tên cột được đổi
-        const newData = data.map(item => ({
-            'Loại sản phẩm': item.type, // Đổi tên cột 'type' thành 'Loại sản phẩm'
+        const newData = dataChart.map(item => ({
+            'Loại sản phẩm': item.name, // Đổi tên cột 'type' thành 'Loại sản phẩm'
             'Số lượng': item.value, // Đổi tên cột 'value' thành 'Số lượng'
-            'Loại': item.column === 'plan' ? 'Kế hoạch' : item.column === 'export' ? 'Đã xuất' : 'Thu hồi', // Đổi tên cột 'column' thành 'Loại'
+            'Loại': item.column
+
         }));
 
         const ws = XLSX.utils.json_to_sheet(newData);
@@ -437,36 +406,38 @@ const ChartColumn = memo(({ dataChart }) => {
         });
     };
 
-    const data = [
-        { name: 'Đã xuất', column: 'Cúc', value: 502 },
-        { name: 'Kế hoạch', column: 'Cúc', value: 900 },
-        { name: 'Kế hoạch', column: 'Áo', value: 1766 },
-        { name: 'Đã xuất', column: 'Áo', value: 5268 },
-    ];
-
     const config = {
-        data,
+        data: dataChart,
         xField: 'column',
         yField: 'value',
         seriesField: 'name',
         isStack: true,
         label: {
             position: 'middle', // Đặt vị trí nhãn là giữa cột
-            content: ({ value }) => `${value}`, // Hiển thị giá trị của cột
+            content: ({ value }) => `${formatNumber(value)}`, // Hiển thị giá trị của cột
         },
         legend: {
             position: 'right-top', // Vị trí của legend
         },
-        interaction: {
-            tooltip: {
-                shared: true,
-                showMarkers: false, // Optional: Hide tooltip markers if desired
-                formatter: (datum) => ({
+        tooltip: {
+            shared: true,
+            showMarkers: false, // Optional: Hide tooltip markers if desired
+            formatter: (datum) => {
+                return {
                     name: datum.name,
-                    value: datum.value,
-                }),
+                    value: formatNumber(datum.value),
+                }
             },
         },
+        color: ({ name }) => {
+            const colors = {
+                'Kế hoạch': '#1f77b4',
+                'Đã xuất': '#ff7f0e',
+                'Còn lại': '#2ca02c',
+                'Hồi phục': '#d62728'
+            };
+            return colors[name];
+        }
     };
     return (
         <div className='relative'>

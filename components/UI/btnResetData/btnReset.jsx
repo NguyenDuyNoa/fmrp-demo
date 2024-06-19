@@ -1,11 +1,12 @@
 import { Refresh2 } from "iconsax-react";
 
-const OnResetData = ({ sOnFetching }) => {
+const OnResetData = ({ sOnFetching, ...res }) => {
     const _HandleFresh = () =>
         sOnFetching(true) || sOnFetching((prev) => ({ ...prev, onFetching: true, onFetching_filter: true }));
     return (
-        <div>
+        <div {...res}>
             <button
+                {...res}
                 onClick={_HandleFresh}
                 type="button"
                 className="bg-green-50 hover:bg-green-200 hover:scale-105 group xxl:p-2.5 p-2 rounded-md transition-all ease-in-out"

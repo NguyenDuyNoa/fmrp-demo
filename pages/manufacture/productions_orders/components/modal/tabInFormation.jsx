@@ -35,7 +35,6 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
 
     useEffect(() => {
         if (!isStateModal.dataDetail) return;
-        console.log("isStateModal.dataDetail", isStateModal.dataDetail);
         queryStateInfomation({
             dataInformation: {
                 ...isInfomation.dataInformation,
@@ -56,7 +55,32 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                         itemVariation: e?.product_variation,
                         quantity: e?.quota_primary,
                         show: true,
-                        processBar: []
+                        processBar: e?.stages?.map(i => {
+                            return {
+                                id: uddid(),
+                                active: true,
+                                date: new Date(),
+                                title: i?.stage_name,
+                                status: "Đã điều độ",
+                                quantity: 100,
+                                arraySemi: [
+                                    // {
+                                    //     id: uddid(),
+                                    //     image: "/no_img.png",
+                                    //     name: "ÁO SƠ MI - S - TRẮNG",
+                                    //     itemVariation: "Biến thể 1",
+                                    //     quantity: 1000,
+                                    // },
+                                    // {
+                                    //     id: uddid(),
+                                    //     image: "/no_img.png",
+                                    //     name: "ÁO SƠ MI - S - TRẮNG",
+                                    //     itemVariation: "Biến thể 1",
+                                    //     quantity: 1000,
+                                    // },
+                                ],
+                            }
+                        })
                     }
                 })
                 // arrayProducts: [
@@ -176,19 +200,19 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                         </h1>
 
                         <h1 className="text-[#9295A4] font-normal text-sm">
-                            Đơn vị tính:{" "}
+                            {dataLang?.productions_orders_details_unit || 'productions_orders_details_unit'}:{" "}
                             <span className="text-sm font-semibold text-black">
                                 {isInfomation.dataInformation?.unit ?? ""}
                             </span>
                         </h1>
                         <h1 className="text-[#9295A4] font-normal text-sm">
-                            Số lượng:{" "}
+                            {dataLang?.productions_orders_details_quantity || 'productions_orders_details_quantity'}:{" "}
                             <span className="text-sm font-semibold text-black">
                                 {isInfomation.dataInformation?.quantity > 0 ? formatNumber(isInfomation.dataInformation?.quantity) : "-"}
                             </span>
                         </h1>
                         <h1 className="text-[#9295A4] font-normal text-sm">
-                            Đã hoàn thành:{" "}
+                            {dataLang?.productions_orders_details_accomplished || 'productions_orders_details_accomplished'}:{" "}
                             <span className="text-sm font-semibold text-black">
                                 {isInfomation.dataInformation?.quantitySussces > 0 ? formatNumber(isInfomation?.dataInformation?.quantitySussces) : "-"}
                             </span>
@@ -225,12 +249,12 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                                                         className={`${jIndex == e.processBar?.length - 1 ? "relative flex-1" : `relative flex-1 after:content-['']  after:w-0.5 after:h-full  after:inline-block after:absolute after:top-0 after:left-[5px] 
                                                             ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} `}`}
                                                     >
-                                                        <div className="flex font-medium w-full">
+                                                        <div className="flex items-start font-medium w-full">
                                                             <span
                                                                 className={`w-3 h-3 ${j?.active ? "bg-[#00C170]" : "bg-gray-500"} border-2 border-transparent rounded-full mr-3 text-sm text-white`}
                                                             ></span>
                                                             <div className="block">
-                                                                <h4 className={`3xl:text-base xxl:text-sm text-xs ${j?.active ? "text-[#00C170]" : "text-gray-500"} my-2`}>
+                                                                <h4 className={`3xl:text-base xxl:text-sm text-xs ${j?.active ? "text-[#00C170]" : "text-gray-500"} ${j?.arraySemi?.length > 0 ? 'mb-1' : 'mb-2'}`}>
                                                                     {j?.title}{" "}
                                                                     <span className="3xl:text-[12px] xxl:text-[12px] text-[10px]">
                                                                         ({moment(j?.date).format("DD/MM/YYYY, HH:mm:ss")})

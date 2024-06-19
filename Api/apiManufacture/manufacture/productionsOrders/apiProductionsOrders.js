@@ -45,5 +45,14 @@ const apiProductionsOrders = {
             throw error;
         }
     },
+    // Tình hình xuất NVL danh sách giữ liệu
+    async apiExportSituation(id) {
+        try {
+            const response = await axiosCustom('GET', `/api_web/api_manufactures/getListBomPOD/${id}`);
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    },
 }
 export default apiProductionsOrders
