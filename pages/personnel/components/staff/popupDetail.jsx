@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Eye as IconEye,
-    EyeSlash as IconEyeSlash,
-    Image as IconImage,
-    GalleryEdit as IconEditImg,
-} from "iconsax-react";
-import moment from "moment/moment";
-import Image from "next/image";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import Loading from "components/UI/loading";
+import {
+    Image as IconImage
+} from "iconsax-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import PopupEdit from "/components/UI/popup";
+import { _ServerInstance as Axios } from "/services/axios";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -201,28 +194,18 @@ const Popup_chitiet = (props) => {
                                                     :
                                                 </span>{" "}
                                                 <span className="font-normal capitalize">
-                                                    {data?.admin === "1"
-                                                        ? "Có"
-                                                        : data?.admin === "0" &&
-                                                        "Không"}
+                                                    {data?.admin === "1" ? "Có" : data?.admin === "0" && "Không"}
                                                 </span>
                                             </div>
                                             <div className="mb-4 flex justify-between flex-wrap p-2">
                                                 <span className="text-slate-400 text-sm      w-[40%]">
                                                     {
-                                                        props.dataLang
-                                                            ?.personnels_staff_table_logged
+                                                        props.dataLang?.personnels_staff_table_logged
                                                     }
                                                     :
                                                 </span>{" "}
                                                 <span className="font-normal capitalize">
-                                                    {data?.last_login != null
-                                                        ? moment(
-                                                            data?.last_login
-                                                        ).format(
-                                                            "DD/MM/YYYY, h:mm:ss"
-                                                        )
-                                                        : ""}
+                                                    {data?.last_login != null ? formatMoment(data?.last_login, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                 </span>
                                             </div>
                                             <div className="mb-4 flex justify-between flex-wrap p-2">

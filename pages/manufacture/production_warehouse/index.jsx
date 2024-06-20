@@ -6,10 +6,8 @@ import ModalImage from "react-modal-image";
 
 import { Grid6 } from "iconsax-react";
 
-import moment from "moment/moment";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
 import ReactExport from "react-data-export";
 
@@ -54,11 +52,13 @@ import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import NoData from "@/components/UI/noData/nodata";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
 import { useSelector } from "react-redux";
@@ -157,7 +157,7 @@ const Index = (props) => {
             sTotal(rTotal);
 
             queryState({ data: rResult, dataExcel: rResult, onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_group = async () => {
@@ -175,7 +175,7 @@ const Index = (props) => {
             const data = await apiProductionWarehouse.apiListGroupProductionWarehouse({ params: params });
 
             queryState({ listDs: data, onFetchingGroup: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_filter = async () => {
@@ -192,7 +192,7 @@ const Index = (props) => {
                 dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })),
                 onFetching_filter: false,
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -203,7 +203,7 @@ const Index = (props) => {
                 },
             });
             queryState({ lisCode: result?.map((e) => ({ label: e.code, value: e.id })) });
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     useEffect(() => {
@@ -397,7 +397,7 @@ const Index = (props) => {
             } else {
                 isShow("error", `${dataLang[message]}`);
             }
-        } catch (error) {}
+        } catch (error) { }
         queryState({ onSending: false });
     };
 
@@ -624,9 +624,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={10} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet

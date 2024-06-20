@@ -1,40 +1,33 @@
-import React, { useRef, useState } from "react";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import "react-datepicker/dist/react-datepicker.css";
 
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-} from "iconsax-react";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-import moment from "moment/moment";
 
-import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
+import PopupEdit from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 
 
-import { useEffect } from "react";
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
-import useFeature from "@/hooks/useConfigFeature";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import NoData from "@/components/UI/noData/nodata";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagSingle } from "@/components/UI/common/Tag/TagSingle";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import ImageErrors from "components/UI/imageErrors";
+import ExpandableContent from "components/UI/more";
+import { useEffect } from "react";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -106,7 +99,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
@@ -320,7 +313,7 @@ const Popup_chitiet = (props) => {
                                                                                     dụng:
                                                                                 </h6>{" "}
                                                                                 <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                    {e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                    {e.expiration_date ? formatMoment(e.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                 </h6>
                                                                             </div>
                                                                         </>

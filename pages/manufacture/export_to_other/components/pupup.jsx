@@ -1,25 +1,25 @@
-import moment from "moment/moment";
-import React, { useState, useEffect } from "react";
-import ModalImage from "react-modal-image";
+import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
+import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading";
-import PopupEdit from "@/components/UI/popup";
-import useFeature from "@/hooks/useConfigFeature";
-import NoData from "@/components/UI/noData/nodata";
 import ExpandableContent from "@/components/UI/more";
+import NoData from "@/components/UI/noData/nodata";
+import PopupEdit from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
-import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -53,7 +53,7 @@ const Popup_chitiet = (props) => {
             sData(data);
 
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
     useEffect(() => {
         setTimeout(() => {
@@ -84,7 +84,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -231,27 +231,20 @@ const Popup_chitiet = (props) => {
                                                                                         Serial:
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e.serial == null ||
-                                                                                        e.serial == ""
-                                                                                            ? "-"
-                                                                                            : e.serial}
+                                                                                        {e.serial == null || e.serial == "" ? "-" : e.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
                                                                                             Lot:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e.lot == null ||
-                                                                                            e.lot == ""
-                                                                                                ? "-"
-                                                                                                : e.lot}
+                                                                                            {e.lot == null || e.lot == "" ? "-" : e.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className="flex gap-0.5">
@@ -259,11 +252,7 @@ const Popup_chitiet = (props) => {
                                                                                             Hạn sử dụng:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e.expiration_date
-                                                                                                ? moment(
-                                                                                                      e.expiration_date
-                                                                                                  ).format("DD/MM/YYYY")
-                                                                                                : "-"}
+                                                                                            {e.expiration_date ? formatMoment(e.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>

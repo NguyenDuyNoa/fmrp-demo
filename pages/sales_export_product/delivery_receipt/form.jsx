@@ -1,44 +1,46 @@
-import Head from "next/head";
 import { PopupParent } from "@/utils/lib/Popup";
 import moment from "moment/moment";
-import { v4 as uuidv4 } from "uuid";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
-import { BsCalendarEvent } from "react-icons/bs";
 import { AiFillPlusCircle } from "react-icons/ai";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 
 import Select, { components } from "react-select";
 
-import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
+import { Add, Trash as IconDelete, Minus, TableDocument } from "iconsax-react";
 
 import PopupAddress from "./components/PopupAddress";
 
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import Loading from "@/components/UI/loading";
-import { Container } from "@/components/UI/common/layout";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import formatMoneyConfig from '@/utils/helpers/formatMoney'
-import formatNumberConfig from '@/utils/helpers/formatnumber'
-import { routerDeliveryReceipt } from "routers/sellingGoods";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from '@/utils/helpers/formatMoney';
+import formatNumberConfig from '@/utils/helpers/formatnumber';
+import { routerDeliveryReceipt } from "routers/sellingGoods";
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
@@ -87,7 +89,7 @@ const Index = (props) => {
 
     const [note, sNote] = useState("");
 
-    const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+    const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
     const [dataClient, sDataClient] = useState([]);
 
@@ -458,7 +460,7 @@ const Index = (props) => {
         if (type == "code") {
             sCode(value.target.value);
         } else if (type === "date") {
-            sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+            sDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type === "idClient" && idClient != value) {
             if (listData?.length > 0) {
                 checkListData(value, sDataItems, sListData, sIdClient, idClient, sIdProductOrder);
@@ -1040,7 +1042,7 @@ const Index = (props) => {
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code ? code : "");
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss") ? moment(startDate).format("YYYY-MM-DD HH:mm:ss") : "");
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG) ? formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG) : "");
         formData.append("branch_id", idBranch?.value ? idBranch?.value : "");
         formData.append("client_id", idClient?.value ? idClient?.value : "");
         formData.append("person_contact_id", idContactPerson?.value ? idContactPerson?.value : "");
@@ -1884,31 +1886,18 @@ const Index = (props) => {
                                                                                                 "1" && (
                                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                                         Serial:{" "}
-                                                                                                        {option?.serial
-                                                                                                            ? option?.serial
-                                                                                                            : "-"}
+                                                                                                        {option?.serial ? option?.serial : "-"}
                                                                                                     </div>
                                                                                                 )}
-                                                                                            {dataMaterialExpiry.is_enable ===
-                                                                                                "1" ||
-                                                                                                dataProductExpiry.is_enable ===
-                                                                                                "1" ? (
+                                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                                 <>
                                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                                         Lot:{" "}
-                                                                                                        {option?.lot
-                                                                                                            ? option?.lot
-                                                                                                            : "-"}
+                                                                                                        {option?.lot ? option?.lot : "-"}
                                                                                                     </div>
                                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                                         Date:{" "}
-                                                                                                        {option?.date
-                                                                                                            ? moment(
-                                                                                                                option?.date
-                                                                                                            ).format(
-                                                                                                                "DD/MM/YYYY"
-                                                                                                            )
-                                                                                                            : "-"}
+                                                                                                        {option?.date ? formatMoment(option?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                                     </div>
                                                                                                 </>
                                                                                             ) : (

@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -16,34 +15,30 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { NumericFormat } from "react-number-format";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
     Add,
-    ArrowRight,
-    RefreshCircle,
-    ColorsSquare,
-    Colorfilter,
-    Notification,
     ArrowDown,
+    ArrowRight,
+    Colorfilter,
+    ColorsSquare,
+    Trash as IconDelete,
+    Notification,
+    RefreshCircle
 } from "iconsax-react";
 
 import Loading from "components/UI/loading";
 
 import dynamic from "next/dynamic";
 
-import moment from "moment/moment";
 
 import Select, { components } from "react-select";
 
 import { TiTick } from "react-icons/ti";
 
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import FormClient from "./components/formClient";
 import Popup_status from "./components/popup/popup";
 import Popup_stages from "./components/popup/popupStages";
-import { flatMap } from "lodash";
-import FormClient from "./components/formClient";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -233,7 +228,7 @@ const Index = (props) => {
                         db?.map((e) => ({
                             label: e?.code,
                             value: e?.id,
-                            date: moment(e?.date_create).format("DD/MM/YYYY"),
+                            date: formatMoment(e?.date_create, FORMAT_MOMENT.DATE_SLASH_LONG),
                             setup_colums: e?.setup_colums,
                         }))
                     );

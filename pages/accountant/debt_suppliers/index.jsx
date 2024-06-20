@@ -1,39 +1,39 @@
-import Head from "next/head";
 import { debounce } from "lodash";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import moment from "moment";
 
 import Popup_chitietPhatsinh from "./components/details_arises";
 import Popup_chitietDauki from "./components/details_first";
 
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { HeaderTable } from "@/components/UI/common/Table";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import { HeaderTable } from "@/components/UI/common/Table";
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useChangeValue } from "@/hooks/useChangeValue";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -101,11 +101,11 @@ const Index = (props) => {
                     "filter[supplier_id]": isValue?.idSupplier ? isValue?.idSupplier.value : null,
                     "filter[start_date]":
                         isValue?.valueDate?.startDate != null
-                            ? moment(isValue?.valueDate?.startDate).format("YYYY-MM-DD")
+                            ? formatMoment(isValue?.valueDate?.startDate, FORMAT_MOMENT.DATE_LONG)
                             : null,
                     "filter[end_date]":
                         isValue?.valueDate?.endDate != null
-                            ? moment(isValue?.valueDate?.endDate).format("YYYY-MM-DD")
+                            ? formatMoment(isValue?.valueDate?.endDate, FORMAT_MOMENT.DATE_LONG)
                             : null,
                 },
             },

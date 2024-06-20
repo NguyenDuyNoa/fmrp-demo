@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import { NotificationBing } from "iconsax-react";
-import moment from "moment";
-import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Expirred = () => {
     const router = useRouter();
@@ -22,8 +23,8 @@ const Expirred = () => {
     useEffect(() => {
         sCheckDate(data?.fail_expiration);
         sDate({
-            dateStart: moment(data?.start_date).format("DD/MM/YYYY"),
-            dateEnd: moment(data?.expiration_date).format("DD/MM/YYYY"),
+            dateStart: formatMoment(data?.start_date, FORMAT_MOMENT.DATE_SLASH_LONG),
+            dateEnd: formatMoment(data?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG),
             dateLimit: data?.day_expiration,
         });
     }, [data]);

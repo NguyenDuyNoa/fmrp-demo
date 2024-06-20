@@ -1,34 +1,35 @@
-import Head from "next/head";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import moment from "moment";
-import DatePicker from "react-datepicker";
-import React, { useState, useEffect } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { MdClear } from "react-icons/md";
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
-import { Trash as IconDelete, Add, Minus } from "iconsax-react";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { routerPriceQuote } from "@/routers/sellingGoods";
-import { debounce } from "lodash";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { routerPriceQuote } from "@/routers/sellingGoods";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -697,8 +698,8 @@ const Index = (props) => {
     const _ServerSending = () => {
         const formData = new FormData();
         formData.append("reference_no", code ? code : "");
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
-        formData.append("validity", moment(effectiveDate).format("YYYY-MM-DD"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
+        formData.append("validity", formatMoment(effectiveDate, FORMAT_MOMENT.DATE_LONG));
         formData.append("client_id", idCustomer?.value ? idCustomer?.value : "");
         formData.append("branch_id", idBranch?.value ? idBranch?.value : "");
         formData.append("person_contact_id", idContactPerson?.value ? idContactPerson?.value : "");
@@ -1089,9 +1090,9 @@ const Index = (props) => {
                                         <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
                                             <div className="col-span-3 z-10 my-auto ">
                                                 <SelectComponent
-                                                  onInputChange={(event) =>{
-                                                    _HandleSeachApi(event)
-                                                }}
+                                                    onInputChange={(event) => {
+                                                        _HandleSeachApi(event)
+                                                    }}
                                                     dangerouslySetInnerHTML={{
                                                         __html: option.label,
                                                     }}

@@ -7,11 +7,12 @@ import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericF
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupEdit from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Trash as IconDelete } from "iconsax-react";
-import moment from "moment";
 import DatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
 import { BsCalendarEvent } from "react-icons/bs";
@@ -130,7 +131,7 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
         formData.append("name", value.purchaseName);
         formData.append("type", value.type == "material" ? 1 : 2);
         formData.append("plan_id", dataTable?.listDataRight?.idCommand);
-        formData.append("date", moment(value.date).format("DD/MM/YYYY HH:mm:ss"));
+        formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG));
         value.arrayItem.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
             formData.append(`items[${index}][quantity]`, e?.quantity);
@@ -215,9 +216,8 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                     placeholderText="DD/MM/YYYY HH:mm:ss"
                                                     dateFormat="dd/MM/yyyy h:mm:ss aa"
                                                     timeInputLabel={"Time: "}
-                                                    className={`border ${
-                                                        fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
-                                                    } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                                    className={`border ${fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
+                                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                                 />
                                                 {field.value && (
                                                     <MdClear
@@ -290,11 +290,10 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                 name="fname"
                                                 type="text"
                                                 placeholder={dataLang?.purchase_name || "purchase_name"}
-                                                className={`${
-                                                    fieldState.error
-                                                        ? "border-red-500"
-                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                                                className={`${fieldState.error
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                             />
                                             {fieldState.error && (
                                                 <span className="text-[12px]  text-red-500">
@@ -438,9 +437,8 @@ const PopupPurchase = ({ dataLang, icon, title, dataTable, className, queryValue
                                                             return (
                                                                 <duv className="flex flex-col justify-center items-center">
                                                                     <InPutNumericFormat
-                                                                        className={`${
-                                                                            fieldState.error && "border-red-500"
-                                                                        } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                                        className={`${fieldState.error && "border-red-500"
+                                                                            } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                                         {...field}
                                                                         onChange={(event) =>
                                                                             field.onChange(

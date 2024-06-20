@@ -1,41 +1,40 @@
-import Head from "next/head";
-import Popup from "reactjs-popup";
+import { Add, Trash as IconDelete, Minus, TableDocument } from "iconsax-react";
 import moment from "moment/moment";
-import Select from "react-select";
-import { v4 as uuidv4 } from "uuid";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { MdClear } from "react-icons/md";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import React, { useState, useEffect } from "react";
-import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
+import { MdClear } from "react-icons/md";
+import Select from "react-select";
+import Popup from "reactjs-popup";
+import { v4 as uuidv4 } from "uuid";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { NumericFormat } from "react-number-format";
 
 import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { routerReturnSales } from "routers/sellingGoods";
 
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
-import useActionRole from "@/hooks/useRole";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Index = (props) => {
     const router = useRouter();
@@ -378,7 +377,7 @@ const Index = (props) => {
         const onChange = {
             code: () => sIdChange((e) => ({ ...e, code: value.target.value })),
 
-            date: () => sIdChange((e) => ({ ...e, date: moment(value).format("YYYY-MM-DD HH:mm:ss") })),
+            date: () => sIdChange((e) => ({ ...e, date: formatMoment(value, FORMAT_MOMENT.DATE_TIME_LONG) })),
 
             startDate: () => sIdChange((e) => ({ ...e, date: new Date() })),
 
@@ -736,9 +735,7 @@ const Index = (props) => {
                                     </div>
                                     <div className="text-[11px] text-[#667085] font-[500]">
                                         Date:{" "}
-                                        {option.e?.expiration_date
-                                            ? moment(option.e?.expiration_date).format("DD/MM/YYYY")
-                                            : "-"}
+                                        {option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                     </div>
                                 </>
                             ) : (
@@ -818,8 +815,8 @@ const Index = (props) => {
 
         formData.append(
             "date",
-            moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
-                ? moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
+            formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)
+                ? formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)
                 : ""
         );
         formData.append("branch_id", idChange.idBranch?.value ? idChange.idBranch?.value : "");

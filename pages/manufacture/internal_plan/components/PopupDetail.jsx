@@ -6,10 +6,11 @@ import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
 import PopupEdit from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
-import moment from "moment/moment";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
@@ -39,7 +40,7 @@ const PopupDetail = (props) => {
             const { data } = await apiInternalPlan.apiDetailInternalPlan(props?.id);
             sData(data);
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -69,15 +70,12 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.internalPlans?.date != null
-                                                    ? moment(data?.internalPlans?.date).format("DD/MM/YYYY")
-                                                    : ""}
+                                                {data?.internalPlans?.date != null ? formatMoment(data?.internalPlans?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2 items-center">
                                             <h3 className=" text-[13px] font-medium">
-                                                {props?.dataLang?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="font-medium grid grid-cols-2">
                                                 <CustomAvatar
@@ -253,7 +251,7 @@ const PopupDetail = (props) => {
                                                                 {formatNumber(e?.quantity)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
-                                                                {moment(e?.date_needed).format("DD/MM/YYYY")}
+                                                                {formatMoment(e?.date_needed, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                                             </h6>
 
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">

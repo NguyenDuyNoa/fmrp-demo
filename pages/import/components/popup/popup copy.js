@@ -1,26 +1,23 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ReactExport from "react-data-export";
 
 import PopupEdit from "/components/UI/popup";
 
-import Popup from "reactjs-popup";
 
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import {
+  ArrowRight,
+  FilterRemove,
+  Grid6 as IconExcel,
+  SearchNormal1 as IconSearch
+} from "iconsax-react";
 import dynamic from "next/dynamic";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
-import {
-  Edit as IconEdit,
-  Grid6 as IconExcel,
-  Trash as IconDelete,
-  SearchNormal1 as IconSearch,
-  Add as IconAdd,
-  FilterRemove,
-  ArrowRight,
-} from "iconsax-react";
-import moment from "moment";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -93,7 +90,7 @@ const Popup_status = (props) => {
           return {
             ...e,
             date_incorporation: e?.date_incorporation
-              ? moment(e?.date_incorporation).format("DD/MM/YYYY")
+              ? formatMoment(e?.date_incorporation, FORMAT_MOMENT.DATE_SLASH_LONG)
               : "",
           };
         }
@@ -129,11 +126,10 @@ const Popup_status = (props) => {
       });
 
       const columns = allFields.map((header) => ({
-        title: `${
-          header.dataFields?.label ||
+        title: `${header.dataFields?.label ||
           header.dataFieldsContact?.label ||
           header.dataFieldsDelivery?.label
-        }`,
+          }`,
         width: { wpx: 150 },
         style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
       }));
@@ -158,11 +154,11 @@ const Popup_status = (props) => {
             style:
               value === ""
                 ? {
-                    fill: {
-                      patternType: "solid",
-                      fgColor: { rgb: "FFCCEEFF" },
-                    },
-                  }
+                  fill: {
+                    patternType: "solid",
+                    fgColor: { rgb: "FFCCEEFF" },
+                  },
+                }
                 : "",
           };
         })
@@ -177,7 +173,7 @@ const Popup_status = (props) => {
           return {
             ...e,
             date_incorporation: e?.date_incorporation
-              ? moment(e?.date_incorporation).format("DD/MM/YYYY")
+              ? formatMoment(e?.date_incorporation, FORMAT_MOMENT.DATE_SLASH_LONG)
               : "",
           };
         }
@@ -230,9 +226,8 @@ const Popup_status = (props) => {
       title={
         <>
           <span className="text-red-500 capitalize">
-            {`${dataLang?.import_total_detection || "import_total_detection"} ${
-              props?.totalFalse
-            } ${dataLang?.import_error || "import_error"} `}{" "}
+            {`${dataLang?.import_total_detection || "import_total_detection"} ${props?.totalFalse
+              } ${dataLang?.import_error || "import_error"} `}{" "}
           </span>{" "}
         </>
       }
@@ -257,14 +252,12 @@ const Popup_status = (props) => {
             </div>
             {props?.router != 5 && (
               <ExcelFile
-                filename={`${
-                  dataLang?.import_error_data || "import_error_data"
-                } ${
-                  (props?.router == 1 && "danh mục khách hàng") ||
+                filename={`${dataLang?.import_error_data || "import_error_data"
+                  } ${(props?.router == 1 && "danh mục khách hàng") ||
                   (props?.router == 2 && "danh mục nhà cung cấp") ||
                   (props?.router == 3 && "danh mục nguyên vật liệu") ||
                   (props?.router == 4 && "danh mục thành phẩm")
-                }`}
+                  }`}
                 title="DLL"
                 element={
                   <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
@@ -311,11 +304,10 @@ const Popup_status = (props) => {
                           {e?.error?.map((e, index, array) => (
                             <div key={e} className="flex gap-1 items-center ">
                               <h6
-                                className={`${
-                                  e.includes("*")
-                                    ? "text-blue-500 font-bold"
-                                    : "text-black-500 font-semibold"
-                                } text-[13px] col-span-12     py-2.5 text-left "`}
+                                className={`${e.includes("*")
+                                  ? "text-blue-500 font-bold"
+                                  : "text-black-500 font-semibold"
+                                  } text-[13px] col-span-12     py-2.5 text-left "`}
                               >
                                 {" "}
                                 {dataLang[e] || e?.replace("*", "") || e}

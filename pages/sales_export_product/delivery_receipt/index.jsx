@@ -1,58 +1,58 @@
-import Head from "next/head";
+import { Grid6 } from "iconsax-react";
 import { debounce } from "lodash";
-import moment from "moment/moment";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
-import ModalImage from "react-modal-image";
-import React, { useState, useEffect } from "react";
-import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
+import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
+import { useSelector } from "react-redux";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import PopupDetail from "./components/PopupDetail";
-import PopupDetailProduct from "../sales_order/components/PopupDetailProduct";
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import ImageErrors from "@/components/UI/imageErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import {
     Container,
     ContainerBody,
     ContainerFilterTab,
     ContainerTable,
-    ContainerTotal,
-    FilterTab,
+    ContainerTotal
 } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ImageErrors from "@/components/UI/imageErrors";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import PopupDetailProduct from "../sales_order/components/PopupDetailProduct";
+import PopupDetail from "./components/PopupDetail";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
-import { useToggle } from "@/hooks/useToggle";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import { routerDeliveryReceipt } from "routers/sellingGoods";
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { routerDeliveryReceipt } from "routers/sellingGoods";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -672,9 +672,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable key={e?.id} gridCols={12}>
                                                         <RowItemTable colSpan={1} textAlign="center">
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
                                                             <PopupDetail

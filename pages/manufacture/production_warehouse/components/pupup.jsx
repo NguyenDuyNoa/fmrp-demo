@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 
-import moment from "moment/moment";
 
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
@@ -17,8 +16,10 @@ import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Popup_chitiet = (props) => {
@@ -49,7 +50,7 @@ const Popup_chitiet = (props) => {
             sData(data);
 
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -81,7 +82,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -242,7 +243,7 @@ const Popup_chitiet = (props) => {
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                         {e?.item?.serial == null ||
-                                                                                        e?.item?.serial == ""
+                                                                                            e?.item?.serial == ""
                                                                                             ? "-"
                                                                                             : e?.item?.serial}
                                                                                     </h6>
@@ -251,7 +252,7 @@ const Popup_chitiet = (props) => {
                                                                                 ""
                                                                             )}
                                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                                dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
@@ -259,7 +260,7 @@ const Popup_chitiet = (props) => {
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                             {e?.item?.lot == null ||
-                                                                                            e?.item?.lot == ""
+                                                                                                e?.item?.lot == ""
                                                                                                 ? "-"
                                                                                                 : e?.item?.lot}
                                                                                         </h6>
@@ -270,11 +271,7 @@ const Popup_chitiet = (props) => {
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                             {e?.item?.expiration_date
-                                                                                                ? moment(
-                                                                                                      e?.item
-                                                                                                          ?.expiration_date
-                                                                                                  ).format("DD/MM/YYYY")
-                                                                                                : "-"}
+                                                                                                ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>

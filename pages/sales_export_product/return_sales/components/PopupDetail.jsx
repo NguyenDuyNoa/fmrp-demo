@@ -8,7 +8,6 @@ import {
 
 
 import vi from "date-fns/locale/vi";
-import moment from "moment/moment";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
@@ -23,11 +22,13 @@ import Swal from "sweetalert2";
 import { useEffect } from "react";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import ImageErrors from "components/UI/imageErrors";
 import ExpandableContent from "components/UI/more";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -115,13 +116,12 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2 items-center">
                                             <h3 className=" text-[13px] font-medium">
-                                                {props?.dataLang?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
+                                                {props?.dataLang?.production_warehouse_creator || "production_warehouse_creator"}
                                             </h3>
                                             <div className="font-medium grid grid-cols-2">
                                                 <div className="flex items-center gap-2">
@@ -301,27 +301,20 @@ const PopupDetail = (props) => {
                                                                                         Serial:
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e?.item?.serial == null ||
-                                                                                            e?.item?.serial == ""
-                                                                                            ? "-"
-                                                                                            : e?.item?.serial}
+                                                                                        {e?.item?.serial == null || e?.item?.serial == "" ? "-" : e?.item?.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                                dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
                                                                                             Lot:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e?.item?.lot == null ||
-                                                                                                e?.item?.lot == ""
-                                                                                                ? "-"
-                                                                                                : e?.item?.lot}
+                                                                                            {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className="flex gap-0.5">
@@ -329,12 +322,7 @@ const PopupDetail = (props) => {
                                                                                             Date:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e?.item?.expiration_date
-                                                                                                ? moment(
-                                                                                                    e?.item
-                                                                                                        ?.expiration_date
-                                                                                                ).format("DD/MM/YYYY")
-                                                                                                : "-"}
+                                                                                            {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>

@@ -9,12 +9,13 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupEdit from "@/components/UI/popup";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Add, Trash as IconDelete, ArrowDown2 as IconDown, TickCircle } from "iconsax-react";
-import moment from "moment";
 import DatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
 import { BsCalendarEvent } from "react-icons/bs";
@@ -75,7 +76,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
         formData.append("note", value.note);
         formData.append("type", value.type == "material" ? 1 : 2);
         formData.append("plan_id", dataTable?.listDataRight?.idCommand);
-        formData.append("date", moment(value.date).format("DD/MM/YYYY"));
+        formData.append("date", formatMoment(value.date, FORMAT_MOMENT.DATE_SLASH_LONG));
         value.arrayItem.forEach((e, index) => {
             formData.append(`items[${index}][id]`, e?.idParent);
             formData.append(`items[${index}][item_id]`, e?.item?.item_id);
@@ -300,9 +301,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                     placeholderText="DD/MM/YYYY"
                                                     dateFormat="dd/MM/yyyy"
                                                     // timeInputLabel={"Time: "}
-                                                    className={`border ${
-                                                        fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
-                                                    } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                                    className={`border ${fieldState.error ? "border-red-500" : "border-[#d0d5dd]"
+                                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                                 />
                                                 {field.value && (
                                                     <MdClear
@@ -486,11 +486,10 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                             return (
                                                                 <>
                                                                     <SelectComponent
-                                                                        className={`${
-                                                                            fieldState.error
-                                                                                ? "border-red-500"
-                                                                                : "border-gray-400"
-                                                                        } border  rounded`}
+                                                                        className={`${fieldState.error
+                                                                            ? "border-red-500"
+                                                                            : "border-gray-400"
+                                                                            } border  rounded`}
                                                                         isClearable={true}
                                                                         placeholder={
                                                                             dataLang?.salesOrder_select_warehouse ||
@@ -500,10 +499,9 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                         formatOptionLabel={(option) => (
                                                                             <div className="flex justify-start items-center gap-1 z-[99]">
                                                                                 <h2>{option?.label}</h2>
-                                                                                <h2>{`(${
-                                                                                    dataLang?.materials_planning_exist ||
+                                                                                <h2>{`(${dataLang?.materials_planning_exist ||
                                                                                     "materials_planning_exist"
-                                                                                }: ${option?.value})`}</h2>
+                                                                                    }: ${option?.value})`}</h2>
                                                                             </div>
                                                                         )}
                                                                         {...field}
@@ -516,7 +514,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                 return isShow(
                                                                                     "error",
                                                                                     dataLang?.materials_planning_warehouse_has_been_selected ||
-                                                                                        "materials_planning_warehouse_has_been_selected"
+                                                                                    "materials_planning_warehouse_has_been_selected"
                                                                                 );
                                                                             }
 
@@ -626,67 +624,48 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                                     </span>
                                                                                                 </h3>
                                                                                                 <div className="flex items-center font-oblique flex-wrap">
-                                                                                                    {dataProductSerial.is_enable ===
-                                                                                                        "1" && (
+                                                                                                    {dataProductSerial.is_enable === "1" && (
                                                                                                         <div className="flex gap-0.5">
                                                                                                             <h6 className="text-[8px]">
                                                                                                                 Serial:
                                                                                                             </h6>
                                                                                                             <h6 className="text-[9px] px-1  w-[full] text-left ">
-                                                                                                                {x.serial ==
-                                                                                                                    null ||
-                                                                                                                x.serial ==
-                                                                                                                    ""
-                                                                                                                    ? "-"
-                                                                                                                    : x?.serial}
+                                                                                                                {x.serial == null ||
+                                                                                                                    x.serial == "" ? "-" : x?.serial}
                                                                                                             </h6>
                                                                                                         </div>
                                                                                                     )}
-                                                                                                    {(dataMaterialExpiry.is_enable ===
-                                                                                                        "1" ||
-                                                                                                        dataProductExpiry.is_enable ===
-                                                                                                            "1") && (
-                                                                                                        <>
-                                                                                                            <div className="flex gap-0.5">
-                                                                                                                <h6 className="text-[8px]">
-                                                                                                                    Lot:
-                                                                                                                </h6>{" "}
-                                                                                                                <h6 className="text-[9px] px-1  w-[full] text-left ">
-                                                                                                                    {x.lot ==
-                                                                                                                        null ||
-                                                                                                                    x.lot ==
-                                                                                                                        ""
-                                                                                                                        ? "-"
-                                                                                                                        : x?.lot}
-                                                                                                                </h6>
-                                                                                                            </div>
-                                                                                                            <div className="flex gap-0.5">
-                                                                                                                <h6 className="text-[8px]">
-                                                                                                                    Date:
-                                                                                                                </h6>{" "}
-                                                                                                                <h6 className="text-[9px] px-1  w-[full] text-center ">
-                                                                                                                    {x?.expiration_date
-                                                                                                                        ? moment(
-                                                                                                                              x?.expiration_date
-                                                                                                                          ).format(
-                                                                                                                              "DD/MM/YYYY"
-                                                                                                                          )
-                                                                                                                        : "-"}
-                                                                                                                </h6>
-                                                                                                            </div>
-                                                                                                        </>
-                                                                                                    )}
+                                                                                                    {(dataMaterialExpiry.is_enable === "1" ||
+                                                                                                        dataProductExpiry.is_enable === "1") && (
+                                                                                                            <>
+                                                                                                                <div className="flex gap-0.5">
+                                                                                                                    <h6 className="text-[8px]">
+                                                                                                                        Lot:
+                                                                                                                    </h6>{" "}
+                                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-left ">
+                                                                                                                        {x.lot == null || x.lot == "" ? "-" : x?.lot}
+                                                                                                                    </h6>
+                                                                                                                </div>
+                                                                                                                <div className="flex gap-0.5">
+                                                                                                                    <h6 className="text-[8px]">
+                                                                                                                        Date:
+                                                                                                                    </h6>{" "}
+                                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-center ">
+                                                                                                                        {x?.expiration_date ? formatMoment(x?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
+                                                                                                                    </h6>
+                                                                                                                </div>
+                                                                                                            </>
+                                                                                                        )}
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
                                                                                     </Zoom>
                                                                                     {x.show && (
                                                                                         <InPutNumericFormat
-                                                                                            className={`py-1 px-2 my-1 ${
-                                                                                                fieldState.error
-                                                                                                    ? "border-red-500"
-                                                                                                    : "border-gray-400"
-                                                                                            }  border outline-none rounded-3xl w-full`}
+                                                                                            className={`py-1 px-2 my-1 ${fieldState.error
+                                                                                                ? "border-red-500"
+                                                                                                : "border-gray-400"
+                                                                                                }  border outline-none rounded-3xl w-full`}
                                                                                             {...field}
                                                                                             onChange={(event) =>
                                                                                                 field.onChange({
@@ -695,8 +674,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                                             .value == ""
                                                                                                             ? null
                                                                                                             : event
-                                                                                                                  .target
-                                                                                                                  .value,
+                                                                                                                .target
+                                                                                                                .value,
                                                                                                     ...x,
                                                                                                 })
                                                                                             }
@@ -716,9 +695,8 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                                 ) {
                                                                                                     isShow(
                                                                                                         "warning",
-                                                                                                        `${
-                                                                                                            dataLang?.materials_planning_llease_enter ||
-                                                                                                            "materials_planning_llease_enter"
+                                                                                                        `${dataLang?.materials_planning_llease_enter ||
+                                                                                                        "materials_planning_llease_enter"
                                                                                                         } ${formatNumber(
                                                                                                             x.value
                                                                                                         )}`
@@ -729,7 +707,7 @@ const PopupKeepStock = ({ dataLang, icon, title, dataTable, className, queryValu
                                                                                                     isShow(
                                                                                                         "warning",
                                                                                                         dataLang?.materials_planning_please_enter_greater ||
-                                                                                                            "materials_planning_please_enter_greater"
+                                                                                                        "materials_planning_please_enter_greater"
                                                                                                     );
                                                                                                     return false;
                                                                                                 }

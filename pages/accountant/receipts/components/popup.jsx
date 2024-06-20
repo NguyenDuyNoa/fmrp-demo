@@ -1,47 +1,42 @@
-import React, { useState, useRef, useEffect } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { _ServerInstance as Axios } from "/services/axios";
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import { NumericFormat } from "react-number-format";
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
-import "react-datepicker/dist/react-datepicker.css";
-import DatePicker, { registerLocale } from "react-datepicker";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import CreatableSelect from "react-select/creatable";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import configSelectPopup from "configs/configSelectPopup";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
+import { SelectCore } from "@/utils/lib/Select";
 import {
     getListBranch,
     getListLisObject,
-    getListObject,
     getListMethod,
+    getListObject,
     getListTypeOfDocument,
     getTypeOfDocument,
     getdataDetail,
     postData,
     postdataListTypeofDoc,
 } from "Api/apiReceipts/api";
+import configSelectPopup from "configs/configSelectPopup";
 import { debounce } from "lodash";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { SelectCore } from "@/utils/lib/Select";
-import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import moment from "moment/moment";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { BiEdit } from "react-icons/bi";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
-import useToast from "@/hooks/useToast";
+import { components } from "react-select";
+import PopupEdit from "/components/UI/popup";
+const ScrollArea = dynamic(() => import("react-scrollbar"), {
+    ssr: false,
+});
 const Popup_dspt = (props) => {
     let id = props?.id;
     const dataLang = props.dataLang;
@@ -143,10 +138,10 @@ const Popup_dspt = (props) => {
                     : null,
                 listTypeOfDocument: result?.type_vouchers
                     ? result?.voucher?.map(({ code, id, money }) => ({
-                          label: code,
-                          value: id,
-                          money: money,
-                      }))
+                        label: code,
+                        value: id,
+                        money: money,
+                    }))
                     : [],
                 price: +result?.total,
                 method: { label: result?.payment_mode_name, value: result?.payment_mode_id },
@@ -396,7 +391,7 @@ const Popup_dspt = (props) => {
                 errListObject: !listValue.listObject,
                 errPrice:
                     listValue.typeOfDocument?.value == "import" &&
-                    (listValue.price == 0 || listValue.price == "" || listValue.price == null)
+                        (listValue.price == 0 || listValue.price == "" || listValue.price == null)
                         ? true
                         : listValue.price == 0 || listValue.price == null || listValue.price == "",
                 errMethod: !listValue.method,
@@ -473,7 +468,7 @@ const Popup_dspt = (props) => {
     const _ServerSending = () => {
         let formData = new FormData();
         formData.append("code", listValue.code ? listValue.code : "");
-        formData.append("date", moment(listValue.date).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(listValue.date, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", listValue.branch?.value);
         formData.append("objects", listValue.object?.value);
         formData.append("type_vouchers", listValue.typeOfDocument ? listValue.typeOfDocument?.value : "");
@@ -619,9 +614,8 @@ const Popup_dspt = (props) => {
                                             value={listValue.branch}
                                             closeMenuOnSelect={true}
                                             {...configSelectPopup}
-                                            className={`${
-                                                error.errBranch ? "border-red-500" : "border-transparent"
-                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${error.errBranch ? "border-red-500" : "border-transparent"
+                                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errBranch && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -642,9 +636,8 @@ const Popup_dspt = (props) => {
                                             maxMenuHeight="200px"
                                             closeMenuOnSelect={true}
                                             {...configSelectPopup}
-                                            className={`${
-                                                error.errMethod ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                            className={`${error.errMethod ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
                                         {error.errMethod && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -666,9 +659,8 @@ const Popup_dspt = (props) => {
                                             menuPortalTarget={document.body}
                                             onMenuOpen={handleMenuOpen}
                                             closeMenuOnSelect={true}
-                                            className={`${
-                                                error.errObject ? "border-red-500" : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            className={`${error.errObject ? "border-red-500" : "border-transparent"
+                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errObject && (
                                             <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -689,9 +681,8 @@ const Popup_dspt = (props) => {
                                                 isClearable={true}
                                                 value={listValue.listObject}
                                                 classNamePrefix="Select"
-                                                className={`${
-                                                    error.errListObject ? "border-red-500" : "border-transparent"
-                                                } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
+                                                    } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                 isSearchable={true}
                                                 noOptionsMessage={() => `Chưa có gợi ý`}
                                                 formatCreateLabel={(value) => `Tạo "${value}"`}
@@ -744,9 +735,8 @@ const Popup_dspt = (props) => {
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 closeMenuOnSelect={true}
-                                                className={`${
-                                                    error.errListObject ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                className={`${error.errListObject ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                         )}
                                         {error.errListObject && (
@@ -792,13 +782,12 @@ const Popup_dspt = (props) => {
                                             isMulti
                                             menuPortalTarget={document.body}
                                             onMenuOpen={handleMenuOpen}
-                                            className={`${
-                                                error.errListTypeDoc &&
+                                            className={`${error.errListTypeDoc &&
                                                 listValue.typeOfDocument != null &&
                                                 listValue.listTypeOfDocument?.length == 0
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                                ? "border-red-500"
+                                                : "border-transparent"
+                                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
                                             listValue.typeOfDocument != null &&
@@ -839,9 +828,8 @@ const Popup_dspt = (props) => {
                                                         if (floatValue > totalMoney) {
                                                             ToatstNotifi(
                                                                 "error",
-                                                                `${
-                                                                    props.dataLang?.payment_errPlease ||
-                                                                    "payment_errPlease"
+                                                                `${props.dataLang?.payment_errPlease ||
+                                                                "payment_errPlease"
                                                                 } ${formatNumber(totalMoney)}`
                                                             );
                                                         }
@@ -854,11 +842,10 @@ const Popup_dspt = (props) => {
                                                     return true;
                                                 }
                                             }}
-                                            className={`${
-                                                error.errPrice && (listValue.price == null || listValue.price == "")
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
-                                            } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
+                                            className={`${error.errPrice && (listValue.price == null || listValue.price == "")
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                                } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
                                         />
                                         {error.errPrice && (
                                             <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -896,11 +883,10 @@ const Popup_dspt = (props) => {
                                 {listValue.listTypeOfDocument.length > 0 && (
                                     <div className="col-span-12 border border-b-0 rounded transition-all duration-200 ease-linear">
                                         <div
-                                            className={`${
-                                                listValue.listTypeOfDocument.length > 5
-                                                    ? " h-[170px] overflow-auto"
-                                                    : ""
-                                            } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+                                            className={`${listValue.listTypeOfDocument.length > 5
+                                                ? " h-[170px] overflow-auto"
+                                                : ""
+                                                } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
                                         >
                                             {listValue.listTypeOfDocument.map((e, index) => {
                                                 return (

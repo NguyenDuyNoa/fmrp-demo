@@ -1,10 +1,11 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useDragAndDrop from "@/hooks/useDragAndDrop";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
-import moment from "moment";
 import "moment/locale/vi";
 import Head from "next/head";
 import { memo, useEffect, useState } from "react";
@@ -261,7 +262,7 @@ const Index = (props) => {
                                         }}
                                         onChange={(date) => {
                                             if (date) {
-                                                queryStateCalender({ dateSelected: date, month: moment(date).format("MM"), year: moment(date).format("YYYY") })
+                                                queryStateCalender({ dateSelected: date, month: formatMoment(date, FORMAT_MOMENT.MONTH), year: formatMoment(date, FORMAT_MOMENT.YYYY) })
                                                 return
                                             }
                                             queryStateCalender({ dateSelected: new Date(), month: new Date().getMonth() + 1, year: new Date().getFullYear() })

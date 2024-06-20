@@ -154,7 +154,25 @@ const ModalDetail = memo(({ isState, queryState, dataLang }) => {
     const fetchDetailOrder = async () => {
         try {
             const { data } = await apiProductionsOrders.apiItemOrdersDetail(isState?.dataModal?.id);
-            queryStateModal({ dataDetail: data });
+            console.log("data", data);
+            queryStateModal({
+                dataDetail: {
+                    ...data,
+                    poi: {
+                        ...data?.poi,
+                        stages: data?.poi.stages?.map(e => {
+                            return {
+                                ...e,
+                                name: e?.stage_name,
+                                active: false,
+                                date: new Date(),
+                                quantity: 100,
+                                arraySemi: []
+                            }
+                        })
+                    }
+                }
+            });
         } catch (error) { }
     };
 

@@ -1,31 +1,20 @@
-import React, { useEffect, useState, useRef } from "react";
-import Popup from "reactjs-popup";
-import moment from "moment/moment";
-import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-    ArrowCircleDown,
-} from "iconsax-react";
-import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-import ModalImage from "react-modal-image";
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import formatNumberConfig from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import { default as formatMoneyConfig, default as formatNumberConfig } from "@/utils/helpers/formatMoney";
+import ImageErrors from "components/UI/imageErrors";
+import Loading from "components/UI/loading";
+import ExpandableContent from "components/UI/more";
+import ModalImage from "react-modal-image";
+import { _ServerInstance as Axios } from "/services/axios";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
@@ -91,7 +80,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">
@@ -99,7 +88,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}
+                                                {data?.delivery_date != null ? formatMoment(data?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">

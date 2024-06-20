@@ -32,6 +32,7 @@ import PopupKeepStock from "../popup/popupKeepStock";
 import PopupPurchase from "../popup/popupPurchase";
 import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
 import apiComons from "@/Api/apiComon/apiComon";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 
 const MainTable = ({ dataLang }) => {
     const arrButton = [
@@ -73,8 +74,6 @@ const MainTable = ({ dataLang }) => {
     ];
 
     const isShow = useToast();
-
-    const { isMoment } = formatMoment();
 
     const initialState = {
         isTab: "item",
@@ -130,7 +129,7 @@ const MainTable = ({ dataLang }) => {
             return {
                 id: e?.id,
                 title: e?.reference_no,
-                time: isMoment(e?.date, "DD/MM/YYYY"),
+                time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
                 name: e?.created_by_full_name,
                 nameBranch: e?.name_branch,
                 productionOrder: [],
@@ -148,8 +147,8 @@ const MainTable = ({ dataLang }) => {
     };
 
     const params = {
-        date_start: isValue.dateStart ? isMoment(isValue.dateStart, "DD/MM/YYYY") : "",
-        date_end: isValue.dateEnd ? isMoment(isValue.dateEnd, "DD/MM/YYYY") : "",
+        date_start: isValue.dateStart ? formatMoment(isValue.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        date_end: isValue.dateEnd ? formatMoment(isValue.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         search: isValue.search == "" ? "" : isValue.search,
         orders_id: [isValue.valueOrder?.value]?.length > 0 ? [isValue.valueOrder?.value].map((e) => e) : "",
         internal_plans_id: [isValue.valuePlan?.value]?.length > 0 ? [isValue.valuePlan?.value].map((e) => e) : "",
@@ -265,8 +264,8 @@ const MainTable = ({ dataLang }) => {
                                     quantity: +i?.quantity,
                                     unit: i?.unit_name,
                                     timeline: {
-                                        start: isMoment(i?.timeline_start, "DD/MM/YYYY"),
-                                        end: isMoment(i?.timeline_end, "DD/MM/YYYY"),
+                                        start: formatMoment(i?.timeline_start, FORMAT_MOMENT.DATE_SLASH_LONG),
+                                        end: formatMoment(i?.timeline_end, FORMAT_MOMENT.DATE_SLASH_LONG),
                                     },
                                 };
                             }),
@@ -307,7 +306,7 @@ const MainTable = ({ dataLang }) => {
                         return {
                             id: e?.id,
                             title: e?.code,
-                            time: isMoment(e?.date, "DD/MM/YYYY"),
+                            time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
                             user: e?.created_by_name,
                             warehousemanId: e?.warehouseman_id,
                             warehouseFrom: e?.name_w_from,
@@ -334,7 +333,7 @@ const MainTable = ({ dataLang }) => {
                         return {
                             id: e?.id,
                             title: e?.code,
-                            time: isMoment(e?.date, "DD/MM/YYYY"),
+                            time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
                             user: e?.created_by_name,
                             status: e?.status,
                             arrListData: e?.items?.map((i) => {
@@ -513,7 +512,7 @@ const MainTable = ({ dataLang }) => {
     const shareProps = {
         dataTable,
         dataLang,
-        filterItem: () => {},
+        filterItem: () => { },
         handShowItem,
         handDeleteItem,
         isFetching,
@@ -554,11 +553,9 @@ const MainTable = ({ dataLang }) => {
                                 <div
                                     key={e.id}
                                     onClick={() => handleShow(e.id)}
-                                    className={`py-2 pl-2 pr-3 ${
-                                        e.showParent && "bg-[#F0F7FF]"
-                                    } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${
-                                        dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
-                                    } `}
+                                    className={`py-2 pl-2 pr-3 ${e.showParent && "bg-[#F0F7FF]"
+                                        } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
+                                        } `}
                                 >
                                     <div className="flex justify-between">
                                         <div className="flex flex-col gap-1">
@@ -652,7 +649,7 @@ const MainTable = ({ dataLang }) => {
                                                         return isShow(
                                                             "error",
                                                             dataLang?.materials_planning_please_add ||
-                                                                "materials_planning_please_add"
+                                                            "materials_planning_please_add"
                                                         );
                                                     }
                                                     if (e.id == 3) {
@@ -706,14 +703,12 @@ const MainTable = ({ dataLang }) => {
                                         <button
                                             key={e.id}
                                             onClick={() => handleActiveTab(e.type)}
-                                            className={`hover:bg-[#F7FBFF] ${
-                                                dataTable.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
-                                            } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
+                                            className={`hover:bg-[#F7FBFF] ${dataTable.isTab == e.type && "border-[#0F4F9E] border-b bg-[#F7FBFF]"
+                                                } hover:border-[#0F4F9E] hover:border-b group transition-all duration-200 ease-linear outline-none focus:outline-none`}
                                         >
                                             <h3
-                                                className={`py-[10px] px-2  font-normal ${
-                                                    dataTable.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
-                                                } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
+                                                className={`py-[10px] px-2  font-normal ${dataTable.isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
+                                                    } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
                                             >
                                                 {e.name}
                                             </h3>

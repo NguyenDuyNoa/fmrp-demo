@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 
 import { Grid6 } from "iconsax-react";
 
-import moment from "moment/moment";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 
@@ -55,8 +54,10 @@ import apiComons from "@/Api/apiComon/apiComon";
 import apiProductsWarehouse from "@/Api/apiManufacture/warehouse/productsWarehouse/apiProductsWarehouse";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Index = (props) => {
@@ -601,9 +602,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={10} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet

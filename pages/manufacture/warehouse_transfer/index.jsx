@@ -1,5 +1,4 @@
 import { debounce } from "lodash";
-import moment from "moment/moment";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -9,7 +8,6 @@ import { Grid6 } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
 import LinkWarehouse from "../components/linkWarehouse";
 import Popup_status from "../components/popupStatus";
@@ -27,6 +25,8 @@ import { routerWarehouseTransfer } from "routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 
+import apiComons from "@/Api/apiComon/apiComon";
+import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
 import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
@@ -56,10 +56,10 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
-import apiComons from "@/Api/apiComon/apiComon";
 import usePagination from "@/hooks/usePagination";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -151,7 +151,7 @@ const Index = (props) => {
             sTotalItems(output);
             sTotal(rTotal);
             queryState({ data: rResult, dataExcel: rResult, onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_group = async () => {
@@ -169,7 +169,7 @@ const Index = (props) => {
             };
             const db = await apiWarehouseTransfer.apiTransferFilterBar({ params: params });
             queryState({ listDs: db || [], onFetchingGroup: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_filter = async () => {
@@ -188,7 +188,7 @@ const Index = (props) => {
                 dataReceivingWarehouse: db || [],
                 onFetching_filter: false,
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -199,7 +199,7 @@ const Index = (props) => {
                 },
             });
             queryState({ lisCode: listCode?.map((e) => ({ label: e.code, value: e.id })) || [] });
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     useEffect(() => {
@@ -288,9 +288,8 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"
-                    }`,
+                    title: `${dataLang?.warehouseTransfer_receivingWarehouse || "warehouseTransfer_receivingWarehouse"
+                        }`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -422,7 +421,7 @@ const Index = (props) => {
             if (data_export?.length > 0) {
                 queryState({ data_export: data_export });
             }
-        } catch (error) {}
+        } catch (error) { }
 
         queryState({ onSending: false });
     };
@@ -687,9 +686,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={11} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet

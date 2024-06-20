@@ -1,25 +1,26 @@
-import React, { useEffect, useState } from "react";
 import {
     SearchNormal1 as IconSearch,
-    UserEdit as IconUserEdit,
     TickCircle as IconTick,
+    UserEdit as IconUserEdit,
 } from "iconsax-react";
+import React, { useEffect, useState } from "react";
 
 import Loading from "@/components/UI/loading";
 import PopupEdit from "@/components/UI/popup";
 
-import { _ServerInstance as Axios } from "/services/axios";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import NoData from "@/components/UI/noData/nodata";
-import Image from "next/image";
-import Popup_GiaiDoan from "./popupGiaiDoan";
-import Popup_Bom from "./popupBom";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import Image from "next/image";
+import Popup_Bom from "./popupBom";
+import Popup_GiaiDoan from "./popupGiaiDoan";
+import { _ServerInstance as Axios } from "/services/axios";
 const Popup_ThongTin = React.memo((props) => {
     const dataSeting = useSetingServer()
 
@@ -30,8 +31,6 @@ const Popup_ThongTin = React.memo((props) => {
     const formatMoney = (number) => {
         return formatMoneyConfig(+number, dataSeting)
     }
-
-    const { isMoment } = formatMoment()
 
     const [open, sOpen] = useState(false);
 
@@ -305,7 +304,7 @@ const Popup_ThongTin = React.memo((props) => {
                                             <h5 className="text-slate-400 text-sm w-[30%]">
                                                 {props.dataLang?.date_created || "date_created"}:
                                             </h5>
-                                            <h6 className="w-[65%] text-right">{isMoment(list?.date_created, 'DD/MM/YYYY, HH:mm:ss')}</h6>
+                                            <h6 className="w-[65%] text-right">{formatMoment(list?.date_created, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}</h6>
                                         </div>
                                     </div>
                                 </div>

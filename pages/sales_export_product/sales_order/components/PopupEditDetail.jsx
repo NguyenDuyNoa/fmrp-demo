@@ -1,25 +1,25 @@
 // Chi tiết giữ kho
 
-import moment from "moment";
-import Swal from "sweetalert2";
+import { Trash as IconDelete, SearchNormal1 as IconSearch, SearchNormal1 } from "iconsax-react";
+import { useEffect, useState } from "react";
 import { BiEdit } from "react-icons/bi";
 import ModalImage from "react-modal-image";
-import { useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
-import { SearchNormal1 as IconSearch, Trash as IconDelete, SearchNormal1 } from "iconsax-react";
 
-import PopupEdit from "@/components/UI/popup";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
+import PopupEdit from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Popup_EditDetail = (props) => {
     const { dataLang, id, dataClone, sIsFetchingParent } = props;
@@ -301,11 +301,7 @@ const Popup_EditDetail = (props) => {
                                                                         <div className="flex gap-0.5">
                                                                             <h6 className="text-[12px]">Date:</h6>{" "}
                                                                             <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                {e?.item?.expiration_date
-                                                                                    ? moment(
-                                                                                        e?.item?.expiration_date
-                                                                                    ).format("DD/MM/YYYY")
-                                                                                    : "-"}
+                                                                                {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                             </h6>
                                                                         </div>
                                                                     </>

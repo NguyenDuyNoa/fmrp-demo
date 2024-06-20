@@ -1,19 +1,20 @@
-import moment from "moment";
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import PopupEdit from "@/components/UI/popup";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import Loading from "@/components/UI/loading";
+import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
-import ExpandableContent from "@/components/UI/more";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import PopupEdit from "@/components/UI/popup";
 
-import useSetingServer from "@/hooks/useConfigNumber";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 const Popup_chitietPhatsinh = (props) => {
     const dataLang = props?.dataLang;
     const dataSeting = useSetingServer()
@@ -45,8 +46,8 @@ const Popup_chitietPhatsinh = (props) => {
                     page: currentPage,
                     "filter[branch_id]": props?.idBranch != null ? props?.idBranch.value : null,
                     "filter[supplier_id]": props?.idSupplier ? props?.idSupplier.value : null,
-                    "filter[start_date]": props?.date?.startDate ? moment(props?.date?.startDate).format("YYYY-MM-DD") : "",
-                    "filter[end_date]": props?.date?.endDate ? moment(props?.date?.endDate).format("YYYY-MM-DD") : "",
+                    "filter[start_date]": props?.date?.startDate ? formatMoment(props?.date?.startDate, FORMAT_MOMENT.DATE_LONG) : "",
+                    "filter[end_date]": props?.date?.endDate ? formatMoment(props?.date?.endDate, FORMAT_MOMENT.DATE_LONG) : "",
                 },
             },
             (err, response) => {
@@ -95,11 +96,11 @@ const Popup_chitietPhatsinh = (props) => {
                                 <h2 className="font-medium flex gap-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                                     <h2>{dataLang?.debt_suppliers_filter_Detail || "debt_suppliers_filter_Detail"}</h2>
                                     <h2 className="text-blue-600">
-                                        {props?.date?.startDate ? moment(props?.date?.startDate).format("DD/MM/YYYY") : "-"}
+                                        {props?.date?.startDate ? formatMoment(props?.date?.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                     </h2>
                                     <h2>{dataLang?.debt_suppliers_todate_Detail || "debt_suppliers_todate_Detail"}</h2>
                                     <h2 className="text-blue-600 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                                        {props?.date?.endDate ? moment(props?.date?.endDate).format("DD/MM/YYYY") : "-"}
+                                        {props?.date?.endDate ? formatMoment(props?.date?.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                     </h2>
                                 </h2>
                             </div>
@@ -145,7 +146,7 @@ const Popup_chitietPhatsinh = (props) => {
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px]   py-2.5 px-2 col-span-2 font-medium text-center ">
-                                                                {moment(e?.date).format("DD/MM/YYYY")}
+                                                                {formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2.5 px-2 col-span-2 font-medium text-center ">
                                                                 {e?.code}

@@ -1,9 +1,16 @@
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import moment from "moment";
+import Image from "next/image";
 import { memo, useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-import { v4 as uddid } from "uuid";
+import { FaArrowDown } from "react-icons/fa6";
+import { AiOutlineFileText } from "react-icons/ai";
+import { FaArrowAltCircleRight, FaCheck, FaCheckCircle } from "react-icons/fa";
+import { FaRegCalendarCheck } from "react-icons/fa";
+import PopupImportProducts from "../popup/PopupImportProducts";
+
 const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }) => {
     const dataSeting = useSetingServer();
 
@@ -47,6 +54,7 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                 unit: isStateModal.dataDetail?.poi?.unit_name,
                 type: "products",
                 arrayProducts: isStateModal.dataDetail?.items_semi?.map(e => {
+                    console.log("eeeee", e);
                     return {
                         id: e?.id,
                         image: "/no_img.png",
@@ -57,20 +65,12 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                         show: true,
                         processBar: e?.stages?.map(i => {
                             return {
-                                id: uddid(),
-                                active: true,
+                                ...i,
+                                name: i?.stage_name,
+                                active: false,
                                 date: new Date(),
-                                title: i?.stage_name,
-                                status: "Đã điều độ",
                                 quantity: 100,
                                 arraySemi: [
-                                    // {
-                                    //     id: uddid(),
-                                    //     image: "/no_img.png",
-                                    //     name: "ÁO SƠ MI - S - TRẮNG",
-                                    //     itemVariation: "Biến thể 1",
-                                    //     quantity: 1000,
-                                    // },
                                     // {
                                     //     id: uddid(),
                                     //     image: "/no_img.png",
@@ -83,85 +83,6 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                         })
                     }
                 })
-                // arrayProducts: [
-                //     {
-                //         id: uddid(),
-                //         image: "/no_img.png",
-                //         name: "ÁO SƠ MI - S - TRẮNG",
-                //         itemVariation: "Biến thể 1",
-                //         quantity: 1000,
-                //         show: true,
-                //         processBar: [
-                //             {
-                //                 id: uddid(),
-                //                 active: true,
-                //                 date: new Date(),
-                //                 title: "Bồi",
-                //                 status: "Đã điều độ",
-                //                 quantity: 100,
-                //                 arraySemi: [
-                //                     {
-                //                         id: uddid(),
-                //                         image: "/no_img.png",
-                //                         name: "ÁO SƠ MI - S - TRẮNG",
-                //                         itemVariation: "Biến thể 1",
-                //                         quantity: 1000,
-                //                     },
-                //                     {
-                //                         id: uddid(),
-                //                         image: "/no_img.png",
-                //                         name: "ÁO SƠ MI - S - TRẮNG",
-                //                         itemVariation: "Biến thể 1",
-                //                         quantity: 1000,
-                //                     },
-                //                 ],
-                //             },
-                //             {
-                //                 id: uddid(),
-                //                 active: true,
-                //                 date: new Date(),
-                //                 title: "Bế",
-                //                 status: "Đã điều độ",
-                //                 quantity: 150,
-                //                 arraySemi: [
-                //                     {
-                //                         id: uddid(),
-                //                         image: "/no_img.png",
-                //                         name: "ÁO SƠ MI - S - TRẮNG",
-                //                         itemVariation: "Biến thể 1",
-                //                         quantity: 1000,
-                //                     },
-                //                 ],
-                //             },
-                //             {
-                //                 id: uddid(),
-                //                 active: true,
-                //                 date: new Date(),
-                //                 title: "Dán TP",
-                //                 status: "Đã điều độ",
-                //                 quantity: 200,
-                //                 arraySemi: [
-                //                     {
-                //                         id: uddid(),
-                //                         image: "/no_img.png",
-                //                         name: "ÁO SƠ MI - S - TRẮNG",
-                //                         itemVariation: "Biến thể 1",
-                //                         quantity: 1000,
-                //                     },
-                //                 ],
-                //             },
-                //             {
-                //                 id: uddid(),
-                //                 active: true,
-                //                 date: new Date(),
-                //                 title: "Hoàn thành sản xuất",
-                //                 status: "Hoàn thành sản xuất",
-                //                 quantity: 0,
-                //                 arraySemi: [],
-                //             },
-                //         ],
-                //     },
-                // ],
             },
         });
     }, [isStateModal.dataDetail]);
@@ -185,7 +106,7 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                         <h1 className="text-[#0F4F9E] font-semibold xl:text-sm text-sm">
                             {isInfomation.dataInformation?.name ?? ""}
                         </h1>
-                        <h1 className={`text-[#9295A4] font-normal text-sm`}>
+                        <h1 className={`text-[#9295A4] font-normal text-sm italic`}>
                             {isInfomation.dataInformation?.itemVariation ?? ""}
                         </h1>
                         <h1 className={`text-[#9295A4] font-normal text-sm`}>
@@ -227,76 +148,195 @@ const TabInFormation = memo(({ isStateModal, width, isState, dataLang, listTab }
                     {isInfomation.dataInformation?.arrayProducts?.map((e) => {
                         const shownElements = isInfomation.dataInformation?.arrayProducts?.filter((e) => e?.show);
                         return (
-                            <div key={e?.id} className="min-w-fit max-w-fit w-fit">
-                                <div className="bg-white sticky top-0 z-10 ">
-                                    <div
-                                        onClick={() => handleShowProcess(e?.id)}
-                                        className={` text-xs flex flex-col py-2 px-4 gap-2 ${e?.show ? "bg-blue-500 text-white" : "bg-gray-50"} hover:bg-blue-500 hover:text-white transition-all duration-150 ease-linear border rounded-md w-fit cursor-pointer`}
-                                    >
-                                        <div className="">
-                                            {e?.name} - {e?.code}
-                                        </div>
-                                        <div className="">{e?.itemVariation} - SL: {e?.quantity > 0 ? formatNumber(e?.quantity) : "-"}</div>
-                                    </div>
-                                </div>
-                                <div className="w-full pt-3">
-                                    {e?.show && (
-                                        <ol className={`flex flex-col border-r ${shownElements?.length > 0 && shownElements[shownElements?.length - 1] === e ? "border-r-0" : ""} pr-2`}>
-                                            {e?.processBar?.map((j, jIndex) => {
-                                                return (
-                                                    <li
-                                                        key={jIndex}
-                                                        className={`${jIndex == e.processBar?.length - 1 ? "relative flex-1" : `relative flex-1 after:content-['']  after:w-0.5 after:h-full  after:inline-block after:absolute after:top-0 after:left-[5px] 
-                                                            ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} `}`}
-                                                    >
-                                                        <div className="flex items-start font-medium w-full">
-                                                            <span
-                                                                className={`w-3 h-3 ${j?.active ? "bg-[#00C170]" : "bg-gray-500"} border-2 border-transparent rounded-full mr-3 text-sm text-white`}
-                                                            ></span>
-                                                            <div className="block">
-                                                                <h4 className={`3xl:text-base xxl:text-sm text-xs ${j?.active ? "text-[#00C170]" : "text-gray-500"} ${j?.arraySemi?.length > 0 ? 'mb-1' : 'mb-2'}`}>
-                                                                    {j?.title}{" "}
-                                                                    <span className="3xl:text-[12px] xxl:text-[12px] text-[10px]">
-                                                                        ({moment(j?.date).format("DD/MM/YYYY, HH:mm:ss")})
-                                                                    </span>
-                                                                </h4>
-                                                                <div className="flex flex-col gap-2">
-                                                                    {j?.arraySemi?.map((s) => {
-                                                                        return (
-                                                                            <div key={s?.id} className="">
-                                                                                <div className="border border-gray-400 px-2 py-1 rounded-xl flex items-center gap-1">
-                                                                                    <ModalImage
-                                                                                        small={s?.image}
-                                                                                        large={s?.image}
-                                                                                        width={18}
-                                                                                        height={18}
-                                                                                        alt={s?.name}
-                                                                                        className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
-                                                                                    />
-                                                                                    <span className="text-[#9295A4] 3xl:text-[12px]  2xl:text-[10px] xxl:text-[12px] text-[10px]">
-                                                                                        {s?.name} - SL:{" "}
-                                                                                        {s?.quantity > 0 ? formatNumber(s?.quantity) : "-"}{" "}-{" "} {moment(s?.date).format("DD/MM/YYYY")}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                        );
-                                                                    })}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                );
-                                            })}
-                                        </ol>
-                                    )}
-                                </div>
-                            </div>
+                            <Renderitem
+                                name={e.name}
+                                code={e.code}
+                                checkBorder={shownElements}
+                                id={e?.id}
+                                image={e?.image}
+                                itemVariation={e?.itemVariation}
+                                quantity={e?.quantity}
+                                processBar={e?.processBar}
+                                type='semi'
+                            />
                         );
                     })}
+                    <div className="">
+                        <Renderitem
+                            name={isStateModal.dataDetail?.poi?.item_name}
+                            code={isStateModal.dataDetail?.poi?.item_code}
+                            checkBorder={''}
+                            id={undefined}
+                            image={"/no_img.png"}
+                            type='products'
+                            itemVariation={isStateModal.dataDetail?.poi?.product_variation}
+                            quantity={isStateModal.dataDetail?.poi?.quantity}
+                            processBar={isStateModal.dataDetail?.poi?.stages}
+                        />
+                    </div>
+
                 </div>
             </div>
         </div>
     );
 });
+
+const Renderitem = ({ type, id, image, name, code, itemVariation, quantity, processBar, checkBorder }) => {
+    const dataSeting = useSetingServer()
+    const formatNumber = (num) => formatNumberConfig(+num, dataSeting);
+    return (
+        <div key={id ?? ""} className="max-w-sm">
+            <div className={`bg-white sticky top-0 z-10`}>
+                <div
+                    className={`flex items-start py-2 px-4 h-[90px]  gap-2 border-[#5599EC]/50 border-[0.5px] shadow-[0_0_2px_rgba(0,0,0,0.2) rounded-xl w-full`}
+                >
+                    <div className="h-8 w-8">
+                        <Image src={image} width={1280} height={1024} alt="" className="object-cover w-full h-full" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                        <div className={`text-xs ${type === "semi" ? "font-medium" : "text-[#5599EC] font-semibold"}`}>
+                            {name} - {code}
+                        </div>
+                        <div className={`text-[10px] italic text-gray-500 w-fit`}>
+                            {itemVariation}
+                        </div>
+                        <div className="text-[10px] border border-[#5599EC] text-[#5599EC] font-medium w-fit px-2 py-0.5 rounded-2xl">
+                            Số lượng: {quantity > 0 ? formatNumber(quantity) : "-"}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {processBar?.map((j, jIndex) => {
+                console.log("j", processBar);
+                const checkLast = processBar?.length - 1 != jIndex
+                return (
+                    <div className={`px-4 mx-auto ${jIndex == 0 && 'mt-5'} `}>
+                        <div className="flex min-h-[70px] gap-3">
+                            <div className={`text-[10px] ${j?.active ? 'text-black' : "text-black/70"} font-normal text-right`}>
+                                <div className="">
+                                    {formatMoment(j?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}
+                                </div>
+                                <div className="">
+                                    {formatMoment(j?.date, FORMAT_MOMENT.TIME_SHORT)}
+                                </div>
+                            </div>
+                            <div className="flex">
+                                <div className={`mr-3 flex flex-col items-center`}>
+                                    <div className="">
+                                        <div className={`flex h-5 w-5 ${j?.active ? "border-[#14b8a6] bg-[#14b8a6]" : "border-gray-400"}  items-center justify-center rounded-full border `}>
+                                            {
+                                                processBar?.length - 1 != jIndex ?
+                                                    <>
+                                                        {jIndex % 2 == 0 && <FaArrowDown size={9} className={`${j?.active ? 'text-white' : "text-gray-400"}`} />}
+                                                        {jIndex % 2 != 0 && <AiOutlineFileText size={9} className={`${j?.active ? 'text-white' : "text-gray-400"}`} />}
+                                                    </>
+                                                    : <FaCheck size={8} className={`${j?.active ? 'text-white' : "text-gray-400"}`} />
+                                            }
+                                        </div>
+                                    </div>
+                                    {checkLast && <div className="h-full w-px bg-gray-300"></div>}
+                                </div>
+                                <div className="mt-0.5">
+                                    <div className="flex items-center gap-2">
+                                        <p className={`-mt-1 text-sm font-medium ${j?.active ? "text-[#14b8a6]" : "text-black/60"}`}>{j.name}</p>
+
+                                        {(+j?.type == 2 || +j?.type == 3) ?
+                                            <div className="flex items-center gap-1">
+                                                <PopupImportProducts>
+                                                    <FaArrowAltCircleRight className="text-[#5599EC] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
+                                                </PopupImportProducts>
+                                                <PopupImportProducts>
+                                                    <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
+                                                </PopupImportProducts>
+                                            </div>
+                                            :
+                                            +j?.type == 0 &&
+                                            <PopupImportProducts>
+                                                <FaCheckCircle className="text-[#10b981] cursor-pointer hover:scale-110 transition-all duration-150 ease-linear" />
+                                            </PopupImportProducts>
+                                        }
+                                    </div>
+
+                                    <p className="text-gray-600 text-xs dark:text-slate-400"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })}
+            {/* <ol className={`flex flex-col overflow-hidden ${checkBorder ? "border-r-0" : ""} ${type === "products" ? "border-l pl-2" : ""} `}>
+                    {processBar?.map((j, jIndex) => {
+                        return (
+                            <li
+                                key={jIndex}
+                                className={`${jIndex == processBar?.length - 1 ? "relative flex-1" : `relative flex-1 after:content-['']  
+                                    after:w-[1px] after:h-full  after:inline-block after:absolute after:top-1/2  ${type === "semi" ? "after:left-[82px] " : "after:left-[76px] "}
+                                                            ${j.active ? "after:bg-[#00C170]" : "after:bg-gray-500"} `}`}
+                            >
+
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] text-right inline-block">
+                                        {moment(j?.date).format("DD/MM/YYYY, HH:mm:ss")}
+                                    </span>
+                                    <div className="flex items-center font-medium w-full min-h-[70px]">
+                                        <span
+                                            className={`w-[6px] h-[6px] ${j?.active ? "bg-[#00C170]" : "bg-gray-500"} border-2 border-transparent rounded-full mr-3 text-sm text-white`}
+                                        ></span>
+                                        <div className="block">
+                                            <h4 className={`3xl:text-base xxl:text-sm text-xs ${j?.active ? "text-[#00C170]" : "text-gray-500"}`}>
+                                                {j?.name}
+
+                                            </h4>
+                                            <div className="flex flex-col gap-2">
+                                                {j?.arraySemi?.map((s) => {
+                                                    return (
+                                                        <div key={s?.id} className="">
+                                                            <div className="border border-gray-400 px-2 py-1 rounded-xl flex items-center gap-1">
+                                                                <ModalImage
+                                                                    small={s?.image}
+                                                                    large={s?.image}
+                                                                    width={18}
+                                                                    height={18}
+                                                                    alt={s?.name}
+                                                                    className="object-cover rounded-md min-w-[18px] min-h-[18px] w-[18px] h-[18px] max-w-[18px] max-h-[18px]"
+                                                                />
+                                                                <span className="text-[#9295A4] 3xl:text-[12px]  2xl:text-[10px] xxl:text-[12px] text-[10px]">
+                                                                    {s?.name} - SL:{" "}
+                                                                    {s?.quantity > 0 ? formatNumber(s?.quantity) : "-"}{" "}-{" "} {moment(s?.date).format("DD/MM/YYYY")}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ol> */}
+
+
+            {/* <div className="flex">
+                    <div className="mr-4 flex flex-col items-center">
+                        <div>
+                            <div
+                                className="flex h-3 w-3 items-center justify-center rounded-full border-2 border-blue-900 bg-blue-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    className="h-3 w-3 text-white">
+                                    <path d="M5 12l5 5l10 -10"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="">
+                        <p className="mb-2 text-xl font-bold text-gray-900 ">Ready!</p>
+                    </div>
+                </div> */}
+        </div>
+    )
+}
 
 export default TabInFormation;

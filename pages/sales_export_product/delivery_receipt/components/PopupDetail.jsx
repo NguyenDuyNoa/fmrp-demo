@@ -1,29 +1,30 @@
-import React, { useRef, useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import ModalImage from "react-modal-image";
-import "react-datepicker/dist/react-datepicker.css";
 import PopupEdit from "@/components/UI/popup";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 
 import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
-import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-import ExpandableContent from "components/UI/more";
-import formatNumberConfig from '@/utils/helpers/formatnumber'
-import formatMoneyConfig from '@/utils/helpers/formatMoney'
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from '@/utils/helpers/formatMoney';
+import formatNumberConfig from '@/utils/helpers/formatnumber';
+import Loading from "components/UI/loading";
+import ExpandableContent from "components/UI/more";
+import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
@@ -86,7 +87,7 @@ const PopupDetail = (props) => {
                                         {props.dataLang?.delivery_receipt_date || "delivery_receipt_date"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium items-start col-span-4 ml-3">
-                                        {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                        {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                     </h3>
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -281,10 +282,7 @@ const PopupDetail = (props) => {
                                                                                 <h6 className="text-[12px]">Date:</h6>{" "}
                                                                                 <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                     {e?.expiration_date
-                                                                                        ? moment(
-                                                                                            e?.expiration_date
-                                                                                        ).format("DD/MM/YYYY")
-                                                                                        : "-"}
+                                                                                        ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                 </h6>
                                                                             </div>
                                                                         </>

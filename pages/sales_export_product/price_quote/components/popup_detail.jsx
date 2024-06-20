@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import ModalImage from "react-modal-image";
-import 'react-datepicker/dist/react-datepicker.css';
 import PopupEdit from "@/components/UI/popup";
+import { useEffect, useState } from 'react';
+import 'react-datepicker/dist/react-datepicker.css';
+import ModalImage from "react-modal-image";
 
 import {
-    Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
+    SearchNormal1 as IconSearch
 } from "iconsax-react";
 import 'react-datepicker/dist/react-datepicker.css';
-import moment from 'moment/moment';
 
 
 import Loading from "components/UI/loading";
@@ -19,9 +16,11 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
-import useSetingServer from "@/hooks/useConfigNumber";
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar';
 import TagBranch from '@/components/UI/common/Tag/TagBranch';
+import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate';
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from '@/utils/helpers/formatMoment';
 
 
 const PopupDetail = (props) => {
@@ -83,7 +82,7 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.price_quote_date || "price_quote_date"}
                                             </h3>
                                             <h3 className=' text-[13px]  font-normal'>
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className='my-4 font-medium grid grid-cols-2'>
@@ -91,7 +90,7 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.price_quote_effective_date || "price_quote_effective_date"}
                                             </h3>
                                             <h3 className=' text-[13px]  font-normal'>
-                                                {data?.validity != null ? moment(data?.validity).format("DD/MM/YYYY") : ""}
+                                                {data?.validity != null ? formatMoment(data?.validity, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className='my-4 font-medium grid grid-cols-2'>

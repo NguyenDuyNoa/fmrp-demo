@@ -6,7 +6,6 @@ import ModalImage from "react-modal-image";
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 
 import { debounce } from "lodash";
-import moment from "moment";
 import { useSelector } from "react-redux";
 
 import Popup_kho from "./components/popup";
@@ -36,8 +35,10 @@ import Pagination from "@/components/UI/pagination";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiDashboard from "@/Api/apiDashboard/apiDashboard";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { PopupParent } from "@/utils/lib/Popup";
 
@@ -95,14 +96,14 @@ const Index = (props) => {
         try {
             const { result } = await apiComons.apiBranchCombobox();
             queryKeyIsState({ listBranchWarehouse: result?.map((e) => ({ label: e.name, value: e.id })) || [] });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const fetchFilterLocationWarehouse = async () => {
         try {
             const { rResult } = await apiWarehouse.apiLocationWarehouse(isState.idWarehouse);
             queryKeyIsState({ listLocationWarehouse: rResult.map((e) => ({ label: e.name, value: e.id })) });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     // fetch list biến thể
@@ -116,7 +117,7 @@ const Index = (props) => {
                     value: id,
                 })),
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const handleOpenSelect = (type) => {
@@ -156,7 +157,7 @@ const Index = (props) => {
             setTimeout(() => {
                 queryKeyIsState({ isLoading: false });
             }, 500);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -178,7 +179,7 @@ const Index = (props) => {
                 dataProductExpiry: fature.find((x) => x.code == "product_expiry"),
                 dataProductSerial: fature.find((x) => x.code == "product_serial"),
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     // fetch data chi tiết của kho
@@ -204,7 +205,7 @@ const Index = (props) => {
                     isLoading: false,
                 });
             }, 500);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -458,31 +459,28 @@ const Index = (props) => {
                     value: `${e?.detail.option_name_2 ? e?.detail.option_name_2 : ""}`,
                 },
                 {
-                    value: `${
-                        isState?.dataProductSerial.is_enable === "1"
-                            ? e?.detail.serial != null
-                                ? e?.detail.serial
-                                : ""
+                    value: `${isState?.dataProductSerial.is_enable === "1"
+                        ? e?.detail.serial != null
+                            ? e?.detail.serial
                             : ""
-                    }`,
+                        : ""
+                        }`,
                 },
                 {
-                    value: `${
-                        isState?.dataMaterialExpiry.is_enable === "1"
-                            ? e?.detail.lot != null
-                                ? e?.detail.lot
-                                : ""
+                    value: `${isState?.dataMaterialExpiry.is_enable === "1"
+                        ? e?.detail.lot != null
+                            ? e?.detail.lot
                             : ""
-                    }`,
+                        : ""
+                        }`,
                 },
                 {
-                    value: `${
-                        isState?.dataMaterialExpiry.is_enable === "1"
-                            ? e?.detail.expiration_date != null
-                                ? e?.detail.expiration_date
-                                : ""
+                    value: `${isState?.dataMaterialExpiry.is_enable === "1"
+                        ? e?.detail.expiration_date != null
+                            ? e?.detail.expiration_date
                             : ""
-                    }`,
+                        : ""
+                        }`,
                 },
                 {
                     value: `${e?.detail.quantity != null ? e?.detail.quantity : ""}`,
@@ -692,11 +690,10 @@ const Index = (props) => {
                                             trigger={
                                                 <div key={item.id} className="grid grid-cols-12 relative">
                                                     <li
-                                                        className={`group col-span-12 ${
-                                                            isState.idWarehouse === item.id
-                                                                ? "bg-[#3276FA] text-white"
-                                                                : ""
-                                                        } font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
+                                                        className={`group col-span-12 ${isState.idWarehouse === item.id
+                                                            ? "bg-[#3276FA] text-white"
+                                                            : ""
+                                                            } font-medium capitalize flex gap-2 3xl:px-4 px-3 py-2  items-center justify-between w-full rounded-lg cursor-pointer hover:bg-[#3276FA] hover:text-white duration-200 ease-in-out transition`}
                                                         onClick={() => handleClickChooseWarehouse(item)}
                                                     >
                                                         <div className="flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2">
@@ -770,17 +767,17 @@ const Index = (props) => {
                                         gridCols={
                                             isState.dataProductSerial.is_enable == "1"
                                                 ? isState.dataMaterialExpiry.is_enable !=
-                                                  isState.dataProductExpiry.is_enable
+                                                    isState.dataProductExpiry.is_enable
                                                     ? 10
                                                     : isState.dataMaterialExpiry.is_enable == "1"
-                                                    ? 10
-                                                    : 8
+                                                        ? 10
+                                                        : 8
                                                 : isState.dataMaterialExpiry.is_enable !=
-                                                  isState.dataProductExpiry.is_enable
-                                                ? 9
-                                                : isState.dataMaterialExpiry.is_enable == "1"
-                                                ? 9
-                                                : 7
+                                                    isState.dataProductExpiry.is_enable
+                                                    ? 9
+                                                    : isState.dataMaterialExpiry.is_enable == "1"
+                                                        ? 9
+                                                        : 7
                                         }
                                     >
                                         <ColumnTable colSpan={2} textAlign={"center"}>
@@ -801,7 +798,7 @@ const Index = (props) => {
                                             </ColumnTable>
                                         )}
                                         {isState.dataMaterialExpiry.is_enable === "1" ||
-                                        isState.dataProductExpiry.is_enable === "1" ? (
+                                            isState.dataProductExpiry.is_enable === "1" ? (
                                             <>
                                                 <ColumnTable colSpan={1} textAlign={"center"}>
                                                     {"Lot"}
@@ -831,21 +828,20 @@ const Index = (props) => {
                                             {isState?.dataWarehouseDetail &&
                                                 isState?.dataWarehouseDetail?.map((e) => (
                                                     <div
-                                                        className={`${
-                                                            isState?.dataProductSerial.is_enable == "1"
-                                                                ? isState?.dataMaterialExpiry.is_enable !=
-                                                                  isState?.dataProductExpiry.is_enable
-                                                                    ? "grid-cols-10"
-                                                                    : isState?.dataMaterialExpiry.is_enable == "1"
+                                                        className={`${isState?.dataProductSerial.is_enable == "1"
+                                                            ? isState?.dataMaterialExpiry.is_enable !=
+                                                                isState?.dataProductExpiry.is_enable
+                                                                ? "grid-cols-10"
+                                                                : isState?.dataMaterialExpiry.is_enable == "1"
                                                                     ? "grid-cols-10"
                                                                     : "grid-cols-8"
-                                                                : isState?.dataMaterialExpiry.is_enable !=
-                                                                  isState?.dataProductExpiry.is_enable
+                                                            : isState?.dataMaterialExpiry.is_enable !=
+                                                                isState?.dataProductExpiry.is_enable
                                                                 ? "grid-cols-9"
                                                                 : isState?.dataMaterialExpiry.is_enable == "1"
-                                                                ? "grid-cols-9"
-                                                                : "grid-cols-7"
-                                                        }  grid hover:bg-slate-50 px-2`}
+                                                                    ? "grid-cols-9"
+                                                                    : "grid-cols-7"
+                                                            }  grid hover:bg-slate-50 px-2`}
                                                     >
                                                         <RowItemTable
                                                             colSpan={2}
@@ -876,11 +872,10 @@ const Index = (props) => {
 
                                                                             <h6 className="w-fit text-left ">
                                                                                 <span
-                                                                                    className={`${
-                                                                                        e.item_type == "product"
-                                                                                            ? "text-lime-500  border-lime-500 "
-                                                                                            : " text-orange-500 border-orange-500"
-                                                                                    } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
+                                                                                    className={`${e.item_type == "product"
+                                                                                        ? "text-lime-500  border-lime-500 "
+                                                                                        : " text-orange-500 border-orange-500"
+                                                                                        } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
                                                                                 >
                                                                                     {e.item_type
                                                                                         ? dataLang[e?.item_type]
@@ -913,11 +908,10 @@ const Index = (props) => {
 
                                                                             <h6 className="w-fit text-left ">
                                                                                 <span
-                                                                                    className={`${
-                                                                                        e.item_type == "product"
-                                                                                            ? "text-lime-500  border-lime-500"
-                                                                                            : " text-orange-500 border-orange-500"
-                                                                                    } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
+                                                                                    className={`${e.item_type == "product"
+                                                                                        ? "text-lime-500  border-lime-500"
+                                                                                        : " text-orange-500 border-orange-500"
+                                                                                        } border rounded 3xl:py-1 3xl:px-1.5 py-0.5 px-1 w-fit 3xl:text-xs xl:text-[11px] text-[9px]`}
                                                                                 >
                                                                                     {e.item_type
                                                                                         ? dataLang[e?.item_type]
@@ -931,41 +925,39 @@ const Index = (props) => {
                                                         </RowItemTable>
 
                                                         <div
-                                                            className={` grid ${
-                                                                isState.dataProductSerial.is_enable == "1"
-                                                                    ? isState.dataMaterialExpiry.is_enable !=
-                                                                      isState.dataProductExpiry.is_enable
-                                                                        ? "col-span-8"
-                                                                        : isState.dataMaterialExpiry.is_enable == "1"
+                                                            className={` grid ${isState.dataProductSerial.is_enable == "1"
+                                                                ? isState.dataMaterialExpiry.is_enable !=
+                                                                    isState.dataProductExpiry.is_enable
+                                                                    ? "col-span-8"
+                                                                    : isState.dataMaterialExpiry.is_enable == "1"
                                                                         ? "col-span-8"
                                                                         : "col-span-6"
-                                                                    : isState.dataMaterialExpiry.is_enable !=
-                                                                      isState.dataProductExpiry.is_enable
+                                                                : isState.dataMaterialExpiry.is_enable !=
+                                                                    isState.dataProductExpiry.is_enable
                                                                     ? "col-span-7"
                                                                     : isState.dataMaterialExpiry.is_enable == "1"
-                                                                    ? "col-span-7"
-                                                                    : "col-span-5"
-                                                            }`}
+                                                                        ? "col-span-7"
+                                                                        : "col-span-5"
+                                                                }`}
                                                         >
                                                             {e?.detail.map((item) => (
                                                                 <div
-                                                                    className={`grid ${
-                                                                        isState.dataProductSerial.is_enable == "1"
-                                                                            ? isState.dataMaterialExpiry.is_enable !=
-                                                                              isState.dataProductExpiry.is_enable
-                                                                                ? "grid-cols-8"
-                                                                                : isState.dataMaterialExpiry
-                                                                                      .is_enable == "1"
+                                                                    className={`grid ${isState.dataProductSerial.is_enable == "1"
+                                                                        ? isState.dataMaterialExpiry.is_enable !=
+                                                                            isState.dataProductExpiry.is_enable
+                                                                            ? "grid-cols-8"
+                                                                            : isState.dataMaterialExpiry
+                                                                                .is_enable == "1"
                                                                                 ? "grid-cols-8"
                                                                                 : "grid-cols-6"
-                                                                            : isState.dataMaterialExpiry.is_enable !=
-                                                                              isState.dataProductExpiry.is_enable
+                                                                        : isState.dataMaterialExpiry.is_enable !=
+                                                                            isState.dataProductExpiry.is_enable
                                                                             ? "grid-cols-7"
                                                                             : isState.dataMaterialExpiry.is_enable ==
-                                                                              "1"
-                                                                            ? "grid-cols-7"
-                                                                            : " grid-cols-5"
-                                                                    }`}
+                                                                                "1"
+                                                                                ? "grid-cols-7"
+                                                                                : " grid-cols-5"
+                                                                        }`}
                                                                 >
                                                                     <RowItemTable colSpan={1} className="border-b py-3">
                                                                         {item.location_name == null
@@ -1004,7 +996,7 @@ const Index = (props) => {
                                                                         ""
                                                                     )}
                                                                     {isState.dataMaterialExpiry.is_enable === "1" ||
-                                                                    isState.dataProductExpiry.is_enable === "1" ? (
+                                                                        isState.dataProductExpiry.is_enable === "1" ? (
                                                                         <>
                                                                             <RowItemTable
                                                                                 colSpan={1}
@@ -1021,9 +1013,7 @@ const Index = (props) => {
                                                                                 textAlign={"center"}
                                                                             >
                                                                                 {item.expiration_date
-                                                                                    ? moment(
-                                                                                          item.expiration_date
-                                                                                      ).format("DD/MM/YYYY")
+                                                                                    ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
                                                                                     : "-"}
                                                                             </RowItemTable>
                                                                         </>

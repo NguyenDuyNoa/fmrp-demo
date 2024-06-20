@@ -1,42 +1,34 @@
-import Head from "next/head";
-import Link from "next/link";
-import { debounce } from "lodash";
 import vi from "date-fns/locale/vi";
+import { debounce } from "lodash";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PopupDetailQuote from "./components/PopupDetailQuote";
 
-import moment from "moment/moment";
+import { Grid6, TickCircle } from "iconsax-react";
 import { registerLocale } from "react-datepicker";
-import { _ServerInstance as Axios } from "/services/axios";
-import { Grid6, Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
+import { _ServerInstance as Axios } from "/services/axios";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
-import Pagination from "@/components/UI/pagination";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
 
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-import { routerPriceQuote } from "@/routers/sellingGoods";
-import { useSelector } from "react-redux";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
-import formatMoney from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import useActionRole from "@/hooks/useRole";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
     Container,
     ContainerBody,
@@ -44,15 +36,23 @@ import {
     ContainerTable,
     ContainerTotal,
 } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import NoData from "@/components/UI/noData/nodata";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import { routerPriceQuote } from "@/routers/sellingGoods";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoney from "@/utils/helpers/formatMoney";
+import { useSelector } from "react-redux";
 registerLocale("vi", vi);
 
 const Index = (props) => {
@@ -413,14 +413,13 @@ const Index = (props) => {
                 // order status chưa
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
-                    value: `${
-                        e?.status
-                            ? (e?.status === "not_confirmed" && "Chưa duyệt") ||
-                              (e?.status === "confirmed" && "Đã duyệt") ||
-                              (e?.status === "no_confirmed" && "Không duyệt") ||
-                              (e?.status === "ordered" && "Đã tạo đơn đặt hàng")
-                            : ""
-                    }`,
+                    value: `${e?.status
+                        ? (e?.status === "not_confirmed" && "Chưa duyệt") ||
+                        (e?.status === "confirmed" && "Đã duyệt") ||
+                        (e?.status === "no_confirmed" && "Không duyệt") ||
+                        (e?.status === "ordered" && "Đã tạo đơn đặt hàng")
+                        : ""
+                        }`,
                 },
 
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
@@ -698,7 +697,7 @@ const Index = (props) => {
                                                     <RowTable gridCols={12} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign="center">
                                                             {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
+                                                                ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG)
                                                                 : ""}
                                                         </RowItemTable>
 
@@ -728,9 +727,7 @@ const Index = (props) => {
                                                         </RowItemTable>
 
                                                         <RowItemTable colSpan={1} textAlign={"right"}>
-                                                            {e?.validity != null
-                                                                ? moment(e?.validity).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.validity != null ? formatMoment(e?.validity, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
 
                                                         <RowItemTable

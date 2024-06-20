@@ -1,29 +1,25 @@
 import dynamic from "next/dynamic";
-import moment from "moment/moment";
+import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-import React, { useEffect, useState } from "react";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    ArrowDown2 as IconDown,
-    TickCircle,
-    Trash as IconDelete,
     SearchNormal1 as IconSearch,
-    Add as IconAdd,
+    TickCircle
 } from "iconsax-react";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 
-import PopupEdit from "@/components/UI/popup";
+import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
-import ImageErrors from "@/components/UI/imageErrors";
+import PopupEdit from "@/components/UI/popup";
 
-import { useToggle } from "@/hooks/useToggle";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useSetData } from "@/hooks/useSetData";
+import { useToggle } from "@/hooks/useToggle";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const Popup_chitietThere = (props) => {
     const { isOpen, handleOpen } = useToggle();
@@ -129,9 +125,7 @@ const Popup_chitietThere = (props) => {
                                                     {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                                 </h3>
                                                 <h3 className=" text-[13px]  font-medium">
-                                                    {data?.date != null
-                                                        ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss")
-                                                        : ""}
+                                                    {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                 </h3>
                                             </div>
                                             <div className="my-4 font-semibold grid grid-cols-2">
@@ -361,9 +355,9 @@ const Popup_chitietThere = (props) => {
                                                                                     </h6>{" "}
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-center ">
                                                                                         {e.expiration_date
-                                                                                            ? moment(
-                                                                                                e.expiration_date
-                                                                                            ).format("DD/MM/YYYY")
+                                                                                            ? formatMoment(
+                                                                                                e.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG
+                                                                                            )
                                                                                             : "-"}
                                                                                     </h6>
                                                                                 </div>
@@ -511,8 +505,7 @@ const Popup_chitietThere = (props) => {
                                 <div className="w-[1100px]">
                                     <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                         <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
-                                            {props?.dataLang?.purchase_order_detail_general_informatione ||
-                                                "purchase_order_detail_general_informatione"}
+                                            {props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}
                                         </h2>
                                         <div className="grid grid-cols-8  min-h-[100px] px-2">
                                             <div className="col-span-3">
@@ -522,9 +515,7 @@ const Popup_chitietThere = (props) => {
                                                             "serviceVoucher_day_vouchers"}
                                                     </h3>
                                                     <h3 className=" text-[13px]  font-medium">
-                                                        {data?.date != null
-                                                            ? moment(data?.date).format("DD/MM/YYYY")
-                                                            : ""}
+                                                        {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
                                                 <div className="my-2 items-center font-medium grid grid-cols-2">
@@ -805,9 +796,7 @@ const Popup_chitietThere = (props) => {
                                                             "purchase_order_detail_day_vouchers"}
                                                     </h3>
                                                     <h3 className=" text-[13px]  font-medium">
-                                                        {data?.date != null
-                                                            ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss")
-                                                            : ""}
+                                                        {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
@@ -816,9 +805,7 @@ const Popup_chitietThere = (props) => {
                                                             "purchase_order_detail_delivery_date"}
                                                     </h3>
                                                     <h3 className=" text-[13px]  font-medium">
-                                                        {data?.delivery_date != null
-                                                            ? moment(data?.delivery_date).format("DD/MM/YYYY")
-                                                            : ""}
+                                                        {data?.delivery_date != null ? formatMoment(data?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
@@ -1175,9 +1162,7 @@ const Popup_chitietThere = (props) => {
                                                         {props.dataLang?.purchase_day || "purchase_day"}
                                                     </h3>
                                                     <h3 className="col-span-1 font-medium text-[13px]">
-                                                        {data?.date != null
-                                                            ? moment(data?.date).format("DD/MM/YYYY")
-                                                            : ""}
+                                                        {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
@@ -1470,9 +1455,7 @@ const Popup_chitietThere = (props) => {
                                                             "purchase_order_detail_day_vouchers"}
                                                     </h3>
                                                     <h3 className=" text-[13px]  font-medium">
-                                                        {data?.date != null
-                                                            ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss")
-                                                            : ""}
+                                                        {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
@@ -1481,9 +1464,7 @@ const Popup_chitietThere = (props) => {
                                                             "purchase_order_detail_delivery_date"}
                                                     </h3>
                                                     <h3 className=" text-[13px]  font-medium">
-                                                        {data?.delivery_date != null
-                                                            ? moment(data?.delivery_date).format("DD/MM/YYYY")
-                                                            : ""}
+                                                        {data?.delivery_date != null ? formatMoment(data?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h3>
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
@@ -1837,9 +1818,7 @@ const Popup_chitietThere = (props) => {
                                                 {props.dataLang?.sales_product_date || "sales_product_date"}:
                                             </h3>
                                             <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal items-start col-span-4 ml-3">
-                                                {data?.date != null
-                                                    ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss")
-                                                    : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -2039,9 +2018,7 @@ const Popup_chitietThere = (props) => {
                                                                 {formatNumber(e?.amount)}
                                                             </h6>
                                                             <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] col-span-1 rounded-md text-center whitespace-normal">
-                                                                {e?.delivery_date != null
-                                                                    ? moment(e?.delivery_date).format("DD/MM/YYYY")
-                                                                    : ""}
+                                                                {e?.delivery_date != null ? formatMoment(e?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                             </h6>
                                                             <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] pl-4 col-span-1 rounded-md text-left whitespace-normal">
                                                                 {e?.note != undefined ? e?.note : ""}

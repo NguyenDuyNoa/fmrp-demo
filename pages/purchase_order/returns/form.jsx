@@ -2,16 +2,15 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
-import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 
-import Popup from "reactjs-popup";
+import { Add, Trash as IconDelete, Minus, TableDocument } from "iconsax-react";
 import moment from "moment/moment";
-import { v4 as uuidv4 } from "uuid";
-import Select, { components } from "react-select";
 import { NumericFormat } from "react-number-format";
-import { Add, Trash as IconDelete, Image as IconImage, Minus, TableDocument } from "iconsax-react";
+import Select from "react-select";
+import { v4 as uuidv4 } from "uuid";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -19,22 +18,24 @@ import Loading from "@/components/UI/loading";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { routerReturns } from "routers/buyImportGoods";
 
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { PopupParent } from "@/utils/lib/Popup";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { PopupParent } from "@/utils/lib/Popup";
 const Index = (props) => {
     const router = useRouter();
 
@@ -80,7 +81,7 @@ const Index = (props) => {
 
     const [note, sNote] = useState("");
 
-    const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+    const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
     const [dataSupplier, sDataSupplier] = useState([]);
 
@@ -393,7 +394,7 @@ const Index = (props) => {
         if (type == "code") {
             sCode(value.target.value);
         } else if (type === "date") {
-            sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+            sDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type === "supplier" && idSupplier != value) {
             if (listData?.length > 0) {
                 if (type === "supplier" && idSupplier != value) {
@@ -667,7 +668,7 @@ const Index = (props) => {
     const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
         formData.append("supplier_id", idSupplier?.value);
         formData.append("treatment_methods", idTreatment?.value);
@@ -1428,7 +1429,7 @@ const Index = (props) => {
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
                                                             </div>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
-                                                                Date:{" "}{option.e?.expiration_date ? moment(option.e?.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                Date:{" "}{option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                             </div>
                                                         </>
                                                     ) : (
@@ -1611,7 +1612,7 @@ const Index = (props) => {
                                                                                         Lot:{" "}{option.e?.lot ? option.e?.lot : "-"}
                                                                                     </div>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                        Date:{" "}{option.e?.expiration_date ? moment(option.e?.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                        Date:{" "}{option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                     </div>
                                                                                 </>
                                                                             ) : (

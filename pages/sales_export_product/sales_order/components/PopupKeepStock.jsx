@@ -1,29 +1,28 @@
 // giữ kho
 
-import moment from "moment";
-import Swal from "sweetalert2";
-import dynamic from "next/dynamic";
+import { Box1, Trash as IconDelete, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
+import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-import React, { useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
-import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
 
-import PopupEdit from "@/components/UI/popup";
-import Loading from "@/components/UI/loading";
-import Zoom from "@/components/UI/zoomElement/zoomElement";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
+import PopupEdit from "@/components/UI/popup";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const initialFetch = {
@@ -315,7 +314,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                         {dataLang?.sales_product_date || "sales_product_date"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal items-start col-span-4 ml-3">
-                                        {data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}
+                                        {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                     </h3>
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -559,13 +558,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
                                                                                                         Date:
                                                                                                     </h6>{" "}
                                                                                                     <h6 className="text-[9px] px-1  w-[full] text-center ">
-                                                                                                        {i?.expiration_date
-                                                                                                            ? moment(
-                                                                                                                i?.expiration_date
-                                                                                                            ).format(
-                                                                                                                "DD/MM/YYYY"
-                                                                                                            )
-                                                                                                            : "-"}
+                                                                                                        {i?.expiration_date ? formatMoment(i?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                                     </h6>
                                                                                                 </div>
                                                                                             </>

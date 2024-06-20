@@ -1,27 +1,19 @@
-import dynamic from "next/dynamic";
-import "react-datepicker/dist/react-datepicker.css";
-import { NumericFormat } from "react-number-format";
-import React, { useRef, useState, useEffect } from "react";
 import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Minus,
-    Edit as IconEdit,
     Add,
     Trash as IconDelete,
+    Minus
 } from "iconsax-react";
-
-import Select from "react-select";
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
+import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import DatePicker, { registerLocale } from "react-datepicker";
 
-import moment from "moment/moment";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
+import Select from "react-select";
+
 import vi from "date-fns/locale/vi";
+import moment from "moment/moment";
 registerLocale("vi", vi);
 
 import PopupEdit from "@/components/UI/popup";
@@ -29,18 +21,19 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { v4 as uuidv4 } from "uuid";
 
-import useToast from "@/hooks/useToast";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useActionRole from "@/hooks/useRole";
+import useToast from "@/hooks/useToast";
 import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { useSelector } from "react-redux";
 const Popup_servie = (props) => {
     let id = props?.id;
 
@@ -563,7 +556,7 @@ const Popup_servie = (props) => {
     const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
-        formData.append("date", moment(date).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(date, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", valueBr.value);
         formData.append("suppliers_id", valueSupplier.value);
         formData.append("note", note);
@@ -578,10 +571,9 @@ const Popup_servie = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_service/service/${id}?csrf_protection=true`
-                    : "/api_web/Api_service/service/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_service/service/${id}?csrf_protection=true`
+                : "/api_web/Api_service/service/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -733,9 +725,8 @@ const Popup_servie = (props) => {
                                                 position: "absolute",
                                             }),
                                         }}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                     />
                                     {errBranch && (
                                         <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -780,9 +771,8 @@ const Popup_servie = (props) => {
                                                 position: "absolute",
                                             }),
                                         }}
-                                        className={`${
-                                            errSupplier ? "border-red-500" : "border-transparent"
-                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] mb-2 rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] mb-2 rounded text-[#52575E] font-normal outline-none border `}
                                     />
                                     {errSupplier && (
                                         <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -842,9 +832,8 @@ const Popup_servie = (props) => {
                                             name="optionEmail"
                                             placeholder="Dịch vụ"
                                             type="text"
-                                            className={`${
-                                                errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"
-                                            } placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
+                                            className={`${errService && e?.dichvu == "" ? "border-red-500" : "border-gray-300"
+                                                } placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] min-h-[40px] h-[40px] max-h-[80px] 2xl:text-[12px] xl:text-[13px] text-[12px] w-full font-normal outline-none border  p-1.5 `}
                                         />
                                     </div>
                                     <div className="col-span-2 flex items-center justify-center">
@@ -857,10 +846,9 @@ const Popup_servie = (props) => {
                                                 <Minus className="scale-70" size="16" />
                                             </button>
                                             <InPutNumericFormat
-                                                className={`${
-                                                    (e?.soluong == 0 && "border-red-500") ||
+                                                className={`${(e?.soluong == 0 && "border-red-500") ||
                                                     (e?.soluong == "" && "border-red-500")
-                                                } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                    } appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-0.5 font-normal 2xl:w-20 xl:w-[55px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong", e)}
                                                 value={e?.soluong}
                                                 isAllowed={isAllowedNumber}
@@ -879,10 +867,9 @@ const Popup_servie = (props) => {
                                             value={e?.dongia}
                                             onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia", index)}
                                             className={`
-                                            ${
-                                                (e?.dongia == 0 && "border-red-500") ||
+                                            ${(e?.dongia == 0 && "border-red-500") ||
                                                 (e?.dongia == "" && "border-red-500")
-                                            }
+                                                }
                                             appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none border-b-2 border-gray-200`}
                                         />
                                     </div>

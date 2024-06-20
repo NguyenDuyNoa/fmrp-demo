@@ -1,60 +1,54 @@
-import Head from "next/head";
 import { debounce } from "lodash";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Grid6,
+    Grid6
 } from "iconsax-react";
 
-import moment from "moment/moment";
-import { useSelector } from "react-redux";
-import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
 
-import Popup_dspc from "./components/popup";
-import Popup_chitiet from "./components/detail";
 import Popup_chitietThere from "../components/detailThere";
+import Popup_chitiet from "./components/detail";
+import Popup_dspc from "./components/popup";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
-import Pagination from "@/components/UI/pagination";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
 
+import { useChangeValue } from "@/hooks/useChangeValue";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import { useSetData } from "@/hooks/useSetData";
-import usePagination from "@/hooks/usePagination";
-import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import NoData from "@/components/UI/noData/nodata";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
 import useToast from "@/hooks/useToast";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -545,9 +539,7 @@ const Index = (props) => {
                                                     <RowTable gridCols={13} key={e.id.toString()}
                                                     >
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={'center'}>
                                                             <Popup_chitiet

@@ -17,11 +17,11 @@ import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOr
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { CONFIRM_DELETION, TITLE_DELETE_PRODUCTIONS_ORDER } from "@/constants/delete/deleteTable";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { debounce } from "lodash";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import ModalDetail from "../modal/modalDetail";
 import TabSemi from "./tabSemi";
 
@@ -40,8 +40,6 @@ const MainTable = ({ dataLang }) => {
     ];
 
     const isShow = useToast();
-
-    const { isMoment } = formatMoment();
 
     const initialState = {
         isTab: "products",
@@ -99,7 +97,7 @@ const MainTable = ({ dataLang }) => {
             return {
                 id: e?.id,
                 title: e?.reference_no,
-                time: isMoment(e?.date, "DD/MM/YYYY"),
+                time: formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
                 name: e?.created_by_full_name,
                 nameBranch: e?.name_branch,
                 productionOrder: [],
@@ -123,8 +121,8 @@ const MainTable = ({ dataLang }) => {
     };
 
     const params = {
-        date_start: isState.date.dateStart ? isMoment(isState.date.dateStart, "DD/MM/YYYY") : "",
-        date_end: isState.date.dateEnd ? isMoment(isState.date.dateEnd, "DD/MM/YYYY") : "",
+        date_start: isState.date.dateStart ? formatMoment(isState.date.dateStart, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+        date_end: isState.date.dateEnd ? formatMoment(isState.date.dateEnd, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
         search: isState.search == "" ? "" : isState.search,
         branch_id: isState.valueBr?.value || "",
         _po_id: isState.valueProductionOrders?.value || "",

@@ -1,11 +1,10 @@
-import Head from "next/head";
 import { debounce } from "lodash";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import React, { useState, useEffect } from "react";
 
-import moment from "moment/moment";
-import { Grid6 as IconExcel, ArrowDown2 as IconDown, SearchNormal1 as IconSearch, Grid6 } from "iconsax-react";
+import { Grid6 } from "iconsax-react";
 
 import Popup_chitietThere from "../components/detailThere";
 import Popup_chitiet from "./components/detail";
@@ -13,36 +12,38 @@ import Popup_dspt from "./components/popup";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
-import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
-import { useSetData } from "@/hooks/useSetData";
-import useSetingServer from "@/hooks/useConfigNumber";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useChangeValue } from "@/hooks/useChangeValue";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import { useSetData } from "@/hooks/useSetData";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -510,9 +511,7 @@ const Index = (props) => {
                                                 {dataTable.table?.map((e) => (
                                                     <RowTable gridCols={12} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet

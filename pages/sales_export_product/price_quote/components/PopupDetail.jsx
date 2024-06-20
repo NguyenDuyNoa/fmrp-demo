@@ -1,18 +1,12 @@
-import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import ModalImage from "react-modal-image";
+import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 import PopupEdit from "../../../../components/UI/popup";
 
 import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
+    SearchNormal1 as IconSearch
 } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment/moment";
 
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
@@ -21,9 +15,11 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
-import useSetingServer from "@/hooks/useConfigNumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 const PopupDetail = (props) => {
     const dataSeting = useSetingServer();
 
@@ -87,7 +83,7 @@ const PopupDetail = (props) => {
                                             </h3>
                                             <h3 className=" text-[13px]  font-normal">
                                                 {data?.date != null
-                                                    ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss")
+                                                    ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)
                                                     : ""}
                                             </h3>
                                         </div>
@@ -98,7 +94,7 @@ const PopupDetail = (props) => {
                                             </h3>
                                             <h3 className=" text-[13px]  font-normal">
                                                 {data?.validity != null
-                                                    ? moment(data?.validity).format("DD/MM/YYYY")
+                                                    ? formatMoment(data?.validity, FORMAT_MOMENT.DATE_SLASH_LONG)
                                                     : ""}
                                             </h3>
                                         </div>

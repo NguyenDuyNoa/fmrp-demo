@@ -1,6 +1,5 @@
 import { PopupParent } from "@/utils/lib/Popup";
 import { debounce } from "lodash";
-import moment from "moment/moment";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -42,9 +41,11 @@ import apiComons from "@/Api/apiComon/apiComon";
 import apiInventory from "@/Api/apiManufacture/warehouse/inventory/apiInventory";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
 import { routerInventory } from "@/routers/manufacture";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Index = (props) => {
@@ -104,7 +105,7 @@ const Index = (props) => {
             sTotalItems(output);
 
             queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const handleDelete = async () => {
@@ -122,7 +123,7 @@ const Index = (props) => {
             await _ServerFetching();
 
             handleQueryId({ status: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_filter = async () => {
@@ -132,7 +133,7 @@ const Index = (props) => {
                 listBr: result?.map((e) => ({ label: e?.name, value: e?.id } || [])),
                 onFetching_filter: false,
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
@@ -240,15 +241,14 @@ const Index = (props) => {
                 { value: `${e?.waidname ? e?.waidname : ""}` },
                 { value: `${e?.total_item ? formatNumber(e?.total_item) : ""}` },
                 {
-                    value: `${
-                        e?.adjusted
+                    value: `${e?.adjusted
                             ? e?.adjusted
-                                  ?.split("|||")
-                                  ?.map((item) => item?.split("--")[1])
-                                  ?.map((e) => e)
-                                  .join(", ")
+                                ?.split("|||")
+                                ?.map((item) => item?.split("--")[1])
+                                ?.map((e) => e)
+                                .join(", ")
                             : ""
-                    }`,
+                        }`,
                 },
                 {
                     value: `${e?.staff_create_name ? e?.staff_create_name : ""}`,
@@ -402,9 +402,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={11} key={e?.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet

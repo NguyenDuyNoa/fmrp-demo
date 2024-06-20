@@ -1,57 +1,41 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import "react-datepicker/dist/react-datepicker.css";
 
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-} from "iconsax-react";
 
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
 
-import Select from "react-select";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from "reactjs-popup";
-import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
+import PopupEdit from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import { useEffect } from "react";
 
-import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
+import ExpandableContent from "components/UI/more";
 
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import useFeature from "@/hooks/useConfigFeature";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import NoData from "@/components/UI/noData/nodata";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
-import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
 
@@ -121,7 +105,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2 items-center">
@@ -320,7 +304,7 @@ const Popup_chitiet = (props) => {
                                                                                             Date:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e?.item?.expiration_date ? moment(e?.item?.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                                            {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>

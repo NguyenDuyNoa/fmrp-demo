@@ -9,7 +9,6 @@ import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import PopupEdit from "@/components/UI/popup";
 import { debounce } from "lodash";
-import moment from "moment";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import {
@@ -39,18 +38,20 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import ModalImage from "react-modal-image";
 import Popup_NVL from "./components/items/popupNvl";
-import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -788,7 +789,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                 {props.dataLang?.date_created || "date_created"}:
                                             </h5>
                                             <h6 className="w-[65%] text-right">
-                                                {moment(list?.date_created).format("DD/MM/YYYY")}
+                                                {formatMoment(list?.date_created, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                             </h6>
                                         </div>
                                     </div>

@@ -34,6 +34,7 @@ import Header from "./components/header";
 // const FilterHeader = dynamic(() => import("./components/fillter/filterHeader"), { ssr: false });
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import FilterHeader from "./components/fillter/filterHeader";
 
 const Index = (props) => {
@@ -67,8 +68,6 @@ const Index = (props) => {
         valueBr: null,
         planStatus: null,
     };
-
-    const { isMoment } = formatMoment();
 
     const { paginate } = usePagination();
 
@@ -104,8 +103,8 @@ const Index = (props) => {
             page: router.query?.page || 1,
             limit: limit,
             sort: isSort,
-            date_start: isValue.startDate ? isMoment(isValue.startDate, "DD/MM/YYYY") : "",
-            date_end: isValue.endDate ? isMoment(isValue.endDate, "DD/MM/YYYY") : "",
+            date_start: isValue.startDate ? formatMoment(isValue.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+            date_end: isValue.endDate ? formatMoment(isValue.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
             customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
             category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
             branch_id: isValue.valueBr?.value ? isValue.valueBr?.value : "",
@@ -136,7 +135,7 @@ const Index = (props) => {
                                 processArr: s?.processArr?.items.map((j) => {
                                     return {
                                         id: uuid(),
-                                        date: isMoment(j?.date, "DD/MM/YYYY"),
+                                        date: formatMoment(j?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
                                         active: j?.active,
                                         outDate: j?.outDate,
                                     };
@@ -152,12 +151,12 @@ const Index = (props) => {
                     return {
                         id: uuid(),
                         title: e?.title,
-                        month: isMoment(e?.month_year, "MM"),
+                        month: formatMoment(e?.month_year, FORMAT_MOMENT.MONTH),
                         days: e?.days?.map((i) => {
                             return {
                                 id: uuid(),
-                                day: `${i?.day_name} ${isMoment(i?.date, "DD")}`,
-                                date: isMoment(i?.date, "DD/MM/YYYY"),
+                                day: `${i?.day_name} ${formatMoment(i?.date, FORMAT_MOMENT.MONTH)}`,
+                                date: formatMoment(i?.date, FORMAT_MOMENT.DATE_SLASH_LONG),
                             };
                         }),
                     };
@@ -167,7 +166,7 @@ const Index = (props) => {
                 iTotalDisplayRecords: data?.output?.iTotalDisplayRecords,
                 iTotalRecords: data?.output?.iTotalRecords,
             });
-        } catch (error) {}
+        } catch (error) { }
         sIsFetching(false);
     };
     const _ServerFetching_filter = async () => {
@@ -190,7 +189,7 @@ const Index = (props) => {
                 listBr: listBr?.map((e) => ({ label: e?.name, value: e?.id })) || [],
                 product: data?.result,
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -204,7 +203,7 @@ const Index = (props) => {
                 },
             });
             updateData({ product: data?.result });
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     const options = isData?.product?.map((e) => ({

@@ -1,25 +1,26 @@
-import Head from "next/head";
-import { v4 as uuid } from "uuid";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useMemo, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { v4 as uuid } from "uuid";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
+import { useChangeValue } from "@/hooks/useChangeValue";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
+import { useSetData } from "@/hooks/useSetData";
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useTab from "@/hooks/useTab";
 import { useToggle } from "@/hooks/useToggle";
-import { useSetData } from "@/hooks/useSetData";
-import usePagination from "@/hooks/usePagination";
-import { useChangeValue } from "@/hooks/useChangeValue";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
 const BodyGantt = dynamic(() => import("./components/gantt"), { ssr: false });
 
@@ -564,8 +565,6 @@ const Index = (props) => {
         planStatus: null,
     };
 
-    const { isMoment } = formatMoment();
-
     const { paginate } = usePagination();
 
     const { handleTab } = useTab("order");
@@ -599,8 +598,8 @@ const Index = (props) => {
                     page: router.query?.page || 1,
                     limit: limit,
                     sort: isSort,
-                    date_start: isValue.startDate ? isMoment(isValue.startDate, "DD/MM/YYYY") : "",
-                    date_end: isValue.endDate ? isMoment(isValue.endDate, "DD/MM/YYYY") : "",
+                    date_start: isValue.startDate ? formatMoment(isValue.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
+                    date_end: isValue.endDate ? formatMoment(isValue.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : "",
                     customer_id: isValue.idClient?.value ? isValue.idClient?.value : "",
                     category_id: isValue.idProductGroup?.value ? isValue.idProductGroup?.value : "",
                     product_id: isValue.idProduct?.length > 0 ? isValue.idProduct.map((e) => e?.value) : null,

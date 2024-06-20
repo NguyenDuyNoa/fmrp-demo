@@ -1,18 +1,19 @@
-import moment from "moment/moment";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { getdataDetail } from "../../../../Api/apiReceipts/api";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import useSetingServer from "@/hooks/useConfigNumber";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import { getdataDetail } from "../../../../Api/apiReceipts/api";
 
-import PopupEdit from "@/components/UI/popup";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import PopupEdit from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
@@ -63,7 +64,7 @@ const Popup_chitiet = (props) => {
                                                     {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                                 </h3>
                                                 <h3 className=" text-[13px]  font-medium">
-                                                    {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                    {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </h3>
                                             </div>
                                             <div className="my-4 font-semibold grid grid-cols-2">

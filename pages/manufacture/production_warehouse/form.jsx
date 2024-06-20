@@ -1,39 +1,40 @@
+import { SelectCore } from "@/utils/lib/Select";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
+import { debounce } from "lodash";
+import moment from "moment/moment";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
-import { debounce } from "lodash";
-import { SelectCore } from "@/utils/lib/Select";
-import moment from "moment/moment";
-import { v4 as uuidv4 } from "uuid";
-import { MdClear } from "react-icons/md";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
+import { MdClear } from "react-icons/md";
+import { v4 as uuidv4 } from "uuid";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
-import useToast from "@/hooks/useToast";
-import { useToggle } from "@/hooks/useToggle";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import Loading from "@/components/UI/loading";
-import { Container } from "@/components/UI/common/layout";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import Loading from "@/components/UI/loading";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 
 import { routerProductionWarehouse } from "@/routers/manufacture";
 
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
 
-import { isAllowedNumber } from "@/utils/helpers/common";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Index = (props) => {
     const router = useRouter();
@@ -70,7 +71,7 @@ const Index = (props) => {
 
     const [note, sNote] = useState("");
 
-    const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+    const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
     const [dataBranch, sDataBranch] = useState([]);
 
@@ -117,7 +118,7 @@ const Index = (props) => {
             sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
             sOnLoading(false);
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -156,9 +157,8 @@ const Index = (props) => {
                     idParenBackend: e?.item?.id,
                     matHang: {
                         e: e?.item,
-                        label: `${e.item?.name} <span style={{display: none}}>${
-                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
                         value: e.item?.id,
                     },
                     child: e?.child.map((ce) => ({
@@ -171,15 +171,15 @@ const Index = (props) => {
                             (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                         location:
                             ce?.warehouse_location?.location_name ||
-                            ce?.warehouse_location?.id ||
-                            ce?.warehouse_location?.warehouse_name ||
-                            ce?.warehouse_location?.quantity
+                                ce?.warehouse_location?.id ||
+                                ce?.warehouse_location?.warehouse_name ||
+                                ce?.warehouse_location?.quantity
                                 ? {
-                                      label: ce?.warehouse_location?.location_name || null,
-                                      value: ce?.warehouse_location?.id || null,
-                                      warehouse_name: ce?.warehouse_location?.warehouse_name || null,
-                                      qty: +ce?.warehouse_location?.quantity || null,
-                                  }
+                                    label: ce?.warehouse_location?.location_name || null,
+                                    value: ce?.warehouse_location?.id || null,
+                                    warehouse_name: ce?.warehouse_location?.warehouse_name || null,
+                                    qty: +ce?.warehouse_location?.quantity || null,
+                                }
                                 : null,
                         serial: ce?.serial == null ? "" : ce?.serial,
                         lot: ce?.lot == null ? "" : ce?.lot,
@@ -207,7 +207,7 @@ const Index = (props) => {
                     })),
                 }))
             );
-        } catch (error) {}
+        } catch (error) { }
         sOnFetchingDetail(false);
     };
 
@@ -224,8 +224,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
@@ -240,7 +240,7 @@ const Index = (props) => {
             sDataItems(result);
 
             sOnFetchingItemsAll(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_ExportWarehouse = async () => {
@@ -257,7 +257,7 @@ const Index = (props) => {
                     value: e?.id,
                 }))
             );
-        } catch (error) {}
+        } catch (error) { }
         sOnFetchingExportWarehouse(false);
     };
 
@@ -277,7 +277,7 @@ const Index = (props) => {
                     },
                 });
                 sDataItems(result);
-            } catch (error) {}
+            } catch (error) { }
         }
     }, 500);
 
@@ -300,7 +300,7 @@ const Index = (props) => {
         if (type == "code") {
             sCode(value.target.value);
         } else if (type === "date") {
-            sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+            sDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type === "note") {
             sNote(value.target.value);
         } else if (type == "branch" && idBranch != value) {
@@ -410,7 +410,7 @@ const Index = (props) => {
     const _ServerSending = async () => {
         var formData = new FormData();
         formData.append("code", code);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
         formData.append("warehouse_id", idExportWarehouse?.value);
         formData.append("note", note);
@@ -451,7 +451,7 @@ const Index = (props) => {
                     `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
                 );
             }
-        } catch (error) {}
+        } catch (error) { }
         sOnSending(false);
     };
 
@@ -810,9 +810,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -840,9 +839,8 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -902,9 +900,8 @@ const Index = (props) => {
                                             dataLang?.production_warehouse_expWarehouse ||
                                             "production_warehouse_expWarehouse"
                                         }
-                                        className={`${
-                                            errExportWarehouse ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1088,19 +1085,14 @@ const Index = (props) => {
                                                             Serial: {option.e?.serial ? option.e?.serial : "-"}
                                                         </div>
                                                     )}
-                                                    {dataMaterialExpiry.is_enable === "1" ||
-                                                    dataProductExpiry.is_enable === "1" ? (
+                                                    {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
                                                             </div>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Date:{" "}
-                                                                {option.e?.expiration_date
-                                                                    ? moment(option.e?.expiration_date).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
-                                                                    : "-"}
+                                                                {option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                             </div>
                                                         </>
                                                     ) : (
@@ -1269,7 +1261,7 @@ const Index = (props) => {
                                                                                 </div>
                                                                             )}
                                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                                dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
@@ -1280,11 +1272,7 @@ const Index = (props) => {
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Date:{" "}
                                                                                         {option.e?.expiration_date
-                                                                                            ? moment(
-                                                                                                  option.e
-                                                                                                      ?.expiration_date
-                                                                                              ).format("DD/MM/YYYY")
-                                                                                            : "-"}
+                                                                                            ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                     </div>
                                                                                 </>
                                                                             ) : (
@@ -1377,16 +1365,15 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "location"
                                                                         )}
-                                                                        className={`${
-                                                                            errWarehouse && ce?.location == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        className={`${errWarehouse && ce?.location == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
                                                                                 ? ""
                                                                                 : dataLang?.production_warehouse_expLoca ||
-                                                                                  "production_warehouse_expLoca"
+                                                                                "production_warehouse_expLoca"
                                                                         }
                                                                         noOptionsMessage={() =>
                                                                             dataLang?.returns_nodata || "returns_nodata"
@@ -1453,11 +1440,10 @@ const Index = (props) => {
                                                                             dataLang?.production_warehouse_unit ||
                                                                             "production_warehouse_unit"
                                                                         }
-                                                                        className={`${
-                                                                            errUnit && ce?.unit == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
+                                                                        className={`${errUnit && ce?.unit == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
                                                                         menuPortalTarget={document.body}
                                                                         style={{
                                                                             border: "none",
@@ -1472,10 +1458,9 @@ const Index = (props) => {
                                                                                     : {option?.label}
                                                                                 </h2>
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">
-                                                                                    {`${
-                                                                                        dataLang?.production_warehouse_exchange_value ||
+                                                                                    {`${dataLang?.production_warehouse_exchange_value ||
                                                                                         "production_warehouse_exchange_value"
-                                                                                    }: (${option?.coefficient})`}
+                                                                                        }: (${option?.coefficient})`}
                                                                                 </h2>
                                                                             </div>
                                                                         )}
@@ -1516,19 +1501,17 @@ const Index = (props) => {
                                                                         disabled={
                                                                             ce?.location == null || ce?.unit == null
                                                                         }
-                                                                        className={`${
-                                                                            errQty &&
+                                                                        className={`${errQty &&
                                                                             (ce?.exportQuantity == null ||
                                                                                 ce?.exportQuantity == "" ||
                                                                                 ce?.exportQuantity == 0)
-                                                                                ? "border-red-500 border-b"
-                                                                                : ""
-                                                                        }
-                                                                            ${
-                                                                                (ce?.exportQuantity == null ||
-                                                                                    ce?.exportQuantity == "" ||
-                                                                                    ce?.exportQuantity == 0) &&
-                                                                                "border-b border-red-500"
+                                                                            ? "border-red-500 border-b"
+                                                                            : ""
+                                                                            }
+                                                                            ${(ce?.exportQuantity == null ||
+                                                                                ce?.exportQuantity == "" ||
+                                                                                ce?.exportQuantity == 0) &&
+                                                                            "border-b border-red-500"
                                                                             }
                                                                             placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 font-normal w-full focus:outline-none border-b border-gray-200 disabled:bg-transparent`}
                                                                         onValueChange={_HandleChangeChild.bind(

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import PopupEdit from "/components/UI/popup";
-import moment from "moment/moment";
-import { Cd, Verify } from "iconsax-react";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import { Verify } from "iconsax-react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import PopupEdit from "/components/UI/popup";
 
 const PopupModelTime = (props) => {
     const [open, sOpen] = useState(false);
@@ -72,11 +73,11 @@ const PopupModelTime = (props) => {
                                         <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
                                             Thời gian dùng thử: Bắt đầu từ ngày
                                             <span className="text-blue-500 mx-1">
-                                                {moment(data?.start_date).format("DD/MM/YYYY")}
+                                                {formatMoment(data?.start_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                             </span>
                                             đến ngày
                                             <span className="text-blue-500 mx-1">
-                                                {moment(data?.expiration_date).format("DD/MM/YYYY")}
+                                                {formatMoment(data?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                             </span>
                                             và kết thúc sau
                                             <span className="text-red-500 mx-1">{data?.day_expiration}</span>

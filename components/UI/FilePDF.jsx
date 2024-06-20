@@ -1,10 +1,10 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import React, { useEffect, useState } from "react";
 import { VscFilePdf } from "react-icons/vsc";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { _ServerInstance as Axios } from "services/axios";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import {
     bottomForm,
@@ -14,6 +14,10 @@ import {
     uppercaseTextHeaderTabel,
 } from "../../configs/stylePdf/style";
 
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import {
     lineHeght,
     styleForm,
@@ -24,9 +28,6 @@ import {
     titleHeader,
     titleValue,
 } from "../../configs/stylePdf/receiptsEndPayment";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import { Varela_Round } from "@next/font/google";
 
 const FilePDF = ({
     props,
@@ -242,10 +243,9 @@ const FilePDF = ({
 
         const docDefinition = {
             info: {
-                title: `${
-                    (props?.type === "price_quote" && `Báo Giá - ${data?.reference_no}`) ||
+                title: `${(props?.type === "price_quote" && `Báo Giá - ${data?.reference_no}`) ||
                     (props?.type === "sales_product" && `Đơn Hàng Bán - ${data?.code}`)
-                }`,
+                    }`,
                 author: "Foso",
                 subject: "Quotation",
                 keywords: "PDF",
@@ -278,20 +278,18 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_code + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_code + ": " ||
                                                 "purchase_order_table_code"
-                                            }`,
+                                                }`,
 
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${
-                                                (props?.type === "price_quote" && `${data?.reference_no}`) ||
+                                            text: `${(props?.type === "price_quote" && `${data?.reference_no}`) ||
                                                 (props?.type === "sales_product" && `${data?.code}`)
-                                            }`,
+                                                }`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -303,10 +301,9 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
                                                 "purchase_order_table_dayvoucers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -314,9 +311,9 @@ const FilePDF = ({
                                         {
                                             text:
                                                 (props?.type === "price_quote" &&
-                                                    `${moment(data?.date).format("DD/MM/YYYY")}`) ||
+                                                    `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`) ||
                                                 (props?.type === "sales_product" &&
-                                                    `${moment(data?.date).format("DD/MM/YYYY")}`),
+                                                    `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`),
 
                                             bold: true,
                                             fontSize: 8,
@@ -362,71 +359,71 @@ const FilePDF = ({
                             ],
                             // Data rows
                             ...((data && props?.type === "price_quote") ||
-                            (props?.type === "sales_product" && data?.items.length > 0)
+                                (props?.type === "sales_product" && data?.items.length > 0)
                                 ? data?.items.map((item, index) => {
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text:
-                                                  item?.item?.name && item?.item?.code
-                                                      ? `${item?.item?.name} (${item?.item?.product_variation})`
-                                                      : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price ? `${formatMoney(item?.price)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.discount_percent ? `${item?.discount_percent}%` : "",
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text:
+                                                item?.item?.name && item?.item?.code
+                                                    ? `${item?.item?.name} (${item?.item?.product_variation})`
+                                                    : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price ? `${formatMoney(item?.price)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.discount_percent ? `${item?.discount_percent}%` : "",
 
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? `${formatMoney(item?.price_after_discount)}`
-                                                  : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? `${formatMoney(item?.price_after_discount * item?.quantity)}`
-                                                  : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              // note_item
-                                              text: item?.note ? `${item?.note}` : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? `${formatMoney(item?.price_after_discount)}`
+                                                : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? `${formatMoney(item?.price_after_discount * item?.quantity)}`
+                                                : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            // note_item
+                                            text: item?.note ? `${item?.note}` : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
@@ -512,37 +509,37 @@ const FilePDF = ({
                 },
                 props?.type != "deliveryReceipt"
                     ? {
-                          columns: [
-                              {
-                                  text: "",
-                                  width: "50%",
-                              },
-                              {
-                                  width: "50%",
-                                  stack: [
-                                      {
-                                          text: currentDate,
-                                          style: "dateText",
-                                          alignment: "center",
-                                          fontSize: 10,
-                                      },
-                                      {
-                                          text: "Người Lập Phiếu",
-                                          style: "signatureText",
-                                          alignment: "center",
-                                          fontSize: 10,
-                                      },
-                                      {
-                                          text: "(Ký, ghi rõ họ tên)",
-                                          style: "signatureText",
-                                          alignment: "center",
-                                          fontSize: 10,
-                                      },
-                                  ],
-                              },
-                          ],
-                          columnGap: 2,
-                      }
+                        columns: [
+                            {
+                                text: "",
+                                width: "50%",
+                            },
+                            {
+                                width: "50%",
+                                stack: [
+                                    {
+                                        text: currentDate,
+                                        style: "dateText",
+                                        alignment: "center",
+                                        fontSize: 10,
+                                    },
+                                    {
+                                        text: "Người Lập Phiếu",
+                                        style: "signatureText",
+                                        alignment: "center",
+                                        fontSize: 10,
+                                    },
+                                    {
+                                        text: "(Ký, ghi rõ họ tên)",
+                                        style: "signatureText",
+                                        alignment: "center",
+                                        fontSize: 10,
+                                    },
+                                ],
+                            },
+                        ],
+                        columnGap: 2,
+                    }
                     : null,
             ],
             styles: styles,
@@ -587,9 +584,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -607,15 +603,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -645,12 +640,12 @@ const FilePDF = ({
                 },
                 props?.type == "deliveryReceipt"
                     ? {
-                          text: [
-                              { text: "Địa chỉ giao hàng: ", inline: true, fontSize: 10 },
-                              { text: `${data?.name_address_delivery}`, bold: true, fontSize: 10 },
-                          ],
-                          margin: [0, 2, 0, 2],
-                      }
+                        text: [
+                            { text: "Địa chỉ giao hàng: ", inline: true, fontSize: 10 },
+                            { text: `${data?.name_address_delivery}`, bold: true, fontSize: 10 },
+                        ],
+                        margin: [0, 2, 0, 2],
+                    }
                     : null,
                 {
                     text: [
@@ -719,145 +714,144 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "deliveryReceipt" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          { stack: stackBt },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? formatMoney(item?.price_after_discount)
-                                                  : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date
+                                                            ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        { stack: stackBt },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? formatMoney(item?.price_after_discount)
+                                                : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.tax_rate_item ? `${item?.tax_rate_item + "%"}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.amount ? `${formatMoney(item?.amount)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            text: item?.tax_rate_item ? `${item?.tax_rate_item + "%"}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.amount ? `${formatMoney(item?.amount)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                    }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -881,10 +875,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_discounty ||
+                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
                                         "purchase_order_detail_discounty"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     margin: styleMarginChildTotal,
@@ -909,10 +902,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
                                         "purchase_order_detail_money_after_discount"
-                                    }`,
+                                        }`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -936,10 +928,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_tax_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
                                         "purchase_order_detail_tax_money"
-                                    }`,
+                                        }`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -963,10 +954,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_into_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
                                         "purchase_order_detail_into_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -1054,9 +1044,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -1074,15 +1063,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -1112,12 +1100,12 @@ const FilePDF = ({
                 },
                 props?.type == "deliveryReceipt"
                     ? {
-                          text: [
-                              { text: "Địa chỉ giao hàng: ", inline: true, fontSize: 10 },
-                              { text: `${data?.name_address_delivery}`, bold: true, fontSize: 10 },
-                          ],
-                          margin: [0, 2, 0, 2],
-                      }
+                        text: [
+                            { text: "Địa chỉ giao hàng: ", inline: true, fontSize: 10 },
+                            { text: `${data?.name_address_delivery}`, bold: true, fontSize: 10 },
+                        ],
+                        margin: [0, 2, 0, 2],
+                    }
                     : null,
                 {
                     text: [
@@ -1174,140 +1162,140 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "deliveryReceipt" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          //   location_name
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              stack: [
-                                                  {
-                                                      text: item?.item?.warehouse_location?.warehouse_name
-                                                          ? item?.item?.warehouse_location?.warehouse_name
-                                                          : "",
-                                                      fontSize: 10,
-                                                      margin: styleMarginChild,
-                                                  },
-                                                  {
-                                                      text: item?.item?.warehouse_location?.location_name
-                                                          ? `(${item?.item?.warehouse_location?.location_name})`
-                                                          : "",
-                                                      fontSize: 9,
-                                                      italics: true,
-                                                      margin: styleMarginChild,
-                                                  },
-                                              ],
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date
+                                                            ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        //   location_name
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            stack: [
+                                                {
+                                                    text: item?.item?.warehouse_location?.warehouse_name
+                                                        ? item?.item?.warehouse_location?.warehouse_name
+                                                        : "",
+                                                    fontSize: 10,
+                                                    margin: styleMarginChild,
+                                                },
+                                                {
+                                                    text: item?.item?.warehouse_location?.location_name
+                                                        ? `(${item?.item?.warehouse_location?.location_name})`
+                                                        : "",
+                                                    fontSize: 9,
+                                                    italics: true,
+                                                    margin: styleMarginChild,
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
@@ -1408,9 +1396,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -1428,15 +1415,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -1534,148 +1520,147 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "returnSales" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item?.serial == null || item?.item?.serial == ""
-                                                                  ? "-"
-                                                                  : item?.item?.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item?.serial == null || item?.item?.serial == ""
+                                                                ? "-"
+                                                                : item?.item?.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item?.lot == null || item?.item?.lot == ""
-                                                                  ? "-"
-                                                                  : item?.item?.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item?.item?.expiration_date
-                                                              ? moment(item?.item?.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          { stack: stackBt },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? formatMoney(item?.price_after_discount)
-                                                  : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item?.lot == null || item?.item?.lot == ""
+                                                                ? "-"
+                                                                : item?.item?.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item?.item?.expiration_date
+                                                            ? formatMoment(item?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        { stack: stackBt },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? formatMoney(item?.price_after_discount)
+                                                : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.amount ? `${formatMoney(item?.amount)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.amount ? `${formatMoney(item?.amount)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                    }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -1699,10 +1684,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_discounty ||
+                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
                                         "purchase_order_detail_discounty"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     margin: styleMarginChildTotal,
@@ -1727,10 +1711,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
                                         "purchase_order_detail_money_after_discount"
-                                    }`,
+                                        }`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -1754,10 +1737,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_tax_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
                                         "purchase_order_detail_tax_money"
-                                    }`,
+                                        }`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -1781,10 +1763,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_into_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
                                         "purchase_order_detail_into_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -1872,9 +1853,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -1892,15 +1872,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG).format("DD/MM/YYYY")}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -1978,139 +1957,139 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "returnSales" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item?.serial == null || item?.item?.serial == ""
-                                                                  ? "-"
-                                                                  : item?.item?.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item?.serial == null || item?.item?.serial == ""
+                                                                ? "-"
+                                                                : item?.item?.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item?.lot == null || item?.item?.lot == ""
-                                                                  ? "-"
-                                                                  : item?.item?.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item?.item.expiration_date
-                                                              ? moment(item?.item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          //   location_name
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              stack: [
-                                                  {
-                                                      text: item?.warehouse_name ? item?.warehouse_name : "",
-                                                      fontSize: 10,
-                                                      margin: styleMarginChild,
-                                                  },
-                                                  {
-                                                      text: item?.location_name ? `(${item?.location_name})` : "",
-                                                      fontSize: 9,
-                                                      italics: true,
-                                                      margin: styleMarginChild,
-                                                  },
-                                              ],
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item?.lot == null || item?.item?.lot == ""
+                                                                ? "-"
+                                                                : item?.item?.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item?.item.expiration_date
+                                                            ? formatMoment(item?.item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        //   location_name
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            stack: [
+                                                {
+                                                    text: item?.warehouse_name ? item?.warehouse_name : "",
+                                                    fontSize: 10,
+                                                    margin: styleMarginChild,
+                                                },
+                                                {
+                                                    text: item?.location_name ? `(${item?.location_name})` : "",
+                                                    fontSize: 9,
+                                                    italics: true,
+                                                    margin: styleMarginChild,
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
@@ -2211,9 +2190,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -2231,15 +2209,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.internalPlans?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.internalPlans?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -2311,53 +2288,53 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "internal_plan" && data?.internalPlansItems.length > 0
                                 ? data?.internalPlansItems.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item_name ? item?.item_name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item_name ? item?.item_name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          //   location_name
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              text: item?.unit_name ? item?.unit_name : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note_item ? item?.note_item : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        //   location_name
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            text: item?.unit_name ? item?.unit_name : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note_item ? item?.note_item : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
@@ -2398,10 +2375,9 @@ const FilePDF = ({
         /// yêu cầu mua hàng
         const docDefinitionPurchases = {
             info: {
-                title: `${
-                    props?.type === "purchases" &&
+                title: `${props?.type === "purchases" &&
                     `${props.dataLang?.purchase_title || "purchase_title"} - ${data?.code}`
-                }`,
+                    }`,
                 author: "Foso",
                 subject: "Quotation",
                 keywords: "PDF",
@@ -2461,7 +2437,7 @@ const FilePDF = ({
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -2540,94 +2516,94 @@ const FilePDF = ({
 
                             ...(data && props?.type == "purchases" && data?.items?.length > 0
                                 ? data?.items.map((item, index) => {
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.name ? item?.item?.name : "",
-                                              fontSize: 11,
-                                              noWrap: true,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.product_variation
-                                                  ? ` ${item?.item?.product_variation}`
-                                                  : "",
-                                              fontSize: 10,
-                                              noWrap: true,
-                                              alignment: "left",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? `${item?.note}` : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.name ? item?.item?.name : "",
+                                            fontSize: 11,
+                                            noWrap: true,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.product_variation
+                                                ? ` ${item?.item?.product_variation}`
+                                                : "",
+                                            fontSize: 10,
+                                            noWrap: true,
+                                            alignment: "left",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? `${item?.note}` : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
 
                             props?.type == "purchases"
                                 ? [
-                                      {
-                                          text: `${props.dataLang?.purchase_totalItem || "purchase_totalItem"}`,
-                                          bold: true,
-                                          colSpan: 2,
-                                          fontSize: 10,
-                                          margin: styleMarginChildTotal,
-                                      },
-                                      "",
-                                      {
-                                          text: `${formatNumber(data?.total_item)}`,
-                                          bold: true,
-                                          alignment: "right",
-                                          colSpan: 4,
-                                          fontSize: 10,
-                                          margin: styleMarginChildTotal,
-                                      },
-                                      "",
-                                      "",
-                                      "",
-                                  ]
+                                    {
+                                        text: `${props.dataLang?.purchase_totalItem || "purchase_totalItem"}`,
+                                        bold: true,
+                                        colSpan: 2,
+                                        fontSize: 10,
+                                        margin: styleMarginChildTotal,
+                                    },
+                                    "",
+                                    {
+                                        text: `${formatNumber(data?.total_item)}`,
+                                        bold: true,
+                                        alignment: "right",
+                                        colSpan: 4,
+                                        fontSize: 10,
+                                        margin: styleMarginChildTotal,
+                                    },
+                                    "",
+                                    "",
+                                    "",
+                                ]
                                 : ["", ""],
                             props?.type == "purchases"
                                 ? [
-                                      {
-                                          text: `${props.dataLang?.purchase_totalCount || "purchase_totalCount"}`,
-                                          bold: true,
-                                          colSpan: 2,
-                                          margin: styleMarginChildTotal,
-                                          fontSize: 10,
-                                      },
-                                      "",
-                                      {
-                                          text: `${formatNumber(data?.total_item_quantity)}`,
-                                          bold: true,
-                                          alignment: "right",
-                                          colSpan: 4,
-                                          fontSize: 10,
-                                          margin: styleMarginChildTotal,
-                                      },
-                                      "",
-                                      "",
-                                      "",
-                                  ]
+                                    {
+                                        text: `${props.dataLang?.purchase_totalCount || "purchase_totalCount"}`,
+                                        bold: true,
+                                        colSpan: 2,
+                                        margin: styleMarginChildTotal,
+                                        fontSize: 10,
+                                    },
+                                    "",
+                                    {
+                                        text: `${formatNumber(data?.total_item_quantity)}`,
+                                        bold: true,
+                                        alignment: "right",
+                                        colSpan: 4,
+                                        fontSize: 10,
+                                        margin: styleMarginChildTotal,
+                                    },
+                                    "",
+                                    "",
+                                    "",
+                                ]
                                 : ["", ""],
                         ],
                     },
@@ -2730,16 +2706,15 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
                                                 "purchase_order_table_dayvoucers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -2758,10 +2733,9 @@ const FilePDF = ({
                         {
                             text:
                                 props?.type === "order"
-                                    ? `${
-                                          props.dataLang?.purchase_order_table_supplier + ": " ||
-                                          "purchase_order_table_supplier"
-                                      }`
+                                    ? `${props.dataLang?.purchase_order_table_supplier + ": " ||
+                                    "purchase_order_table_supplier"
+                                    }`
                                     : "",
                             inline: true,
                             fontSize: 10,
@@ -2777,15 +2751,14 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: `${
-                                props.dataLang?.purchase_order_detail_delivery_date + ": " ||
+                            text: `${props.dataLang?.purchase_order_detail_delivery_date + ": " ||
                                 "purchase_order_detail_delivery_date"
-                            }`,
+                                }`,
                             inline: true,
                             fontSize: 10,
                         },
                         {
-                            text: `${moment(data?.delivery_date).format("DD/MM/YYYY")}`,
+                            text: `${formatMoment(data?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                             bold: true,
                             fontSize: 10,
                         },
@@ -2798,10 +2771,9 @@ const FilePDF = ({
                         {
                             text:
                                 props?.type === "order"
-                                    ? `${
-                                          props.dataLang?.purchase_order_table_number + ": " ||
-                                          "purchase_order_table_number"
-                                      }`
+                                    ? `${props.dataLang?.purchase_order_table_number + ": " ||
+                                    "purchase_order_table_number"
+                                    }`
                                     : "",
                             inline: true,
                             fontSize: 10,
@@ -2863,9 +2835,8 @@ const FilePDF = ({
                                 uppercaseTextHeaderTabel("ĐVT", "headerTable", "center"),
                                 uppercaseTextHeaderTabel("SL", "headerTable", "center"),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.purchase_order_detail_unit_price ||
-                                        "purchase_order_detail_unit_price"
+                                    `${props.dataLang?.purchase_order_detail_unit_price ||
+                                    "purchase_order_detail_unit_price"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -2886,9 +2857,8 @@ const FilePDF = ({
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.purchase_order_detail_into_money ||
-                                        "purchase_order_detail_into_money"
+                                    `${props.dataLang?.purchase_order_detail_into_money ||
+                                    "purchase_order_detail_into_money"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -2903,92 +2873,91 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "order" && data?.item.length > 0
                                 ? data?.item.map((item, index) => {
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.name ? item?.item?.name : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.product_variation
-                                                  ? ` ${item?.item?.product_variation}`
-                                                  : "",
-                                              fontSize: 9,
-                                              italics: false,
-                                              //   margin: [0, 5, 0, 0],
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? `${formatMoney(item?.price_after_discount)}`
-                                                  : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          //   {
-                                          //       text: item?.discount_percent
-                                          //           ? `${
-                                          //                 item?.discount_percent + "%"
-                                          //             }`
-                                          //           : "",
-                                          //       alignment: "center",
-                                          //       fontSize: 10,
-                                          //       margin: styleMarginChild,
-                                          //   },
-                                          //   {
-                                          //       text: item?.price_after_discount
-                                          //           ? `${formatNumber(
-                                          //                 item?.price_after_discount
-                                          //             )}`
-                                          //           : "",
-                                          //       alignment: "right",
-                                          //       fontSize: 10,
-                                          //       margin: styleMarginChild,
-                                          //   },
-                                          {
-                                              text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.amount ? `${formatMoney(item?.amount)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? `${item?.note}` : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.name ? item?.item?.name : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.product_variation
+                                                ? ` ${item?.item?.product_variation}`
+                                                : "",
+                                            fontSize: 9,
+                                            italics: false,
+                                            //   margin: [0, 5, 0, 0],
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? `${item?.item?.unit_name}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? `${formatMoney(item?.price_after_discount)}`
+                                                : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        //   {
+                                        //       text: item?.discount_percent
+                                        //           ? `${
+                                        //                 item?.discount_percent + "%"
+                                        //             }`
+                                        //           : "",
+                                        //       alignment: "center",
+                                        //       fontSize: 10,
+                                        //       margin: styleMarginChild,
+                                        //   },
+                                        //   {
+                                        //       text: item?.price_after_discount
+                                        //           ? `${formatNumber(
+                                        //                 item?.price_after_discount
+                                        //             )}`
+                                        //           : "",
+                                        //       alignment: "right",
+                                        //       fontSize: 10,
+                                        //       margin: styleMarginChild,
+                                        //   },
+                                        {
+                                            text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.amount ? `${formatMoney(item?.amount)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? `${item?.note}` : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                    }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3011,10 +2980,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_discounty ||
+                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
                                         "purchase_order_detail_discounty"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -3037,10 +3005,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
                                         "purchase_order_detail_money_after_discount"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3063,10 +3030,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_tax_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
                                         "purchase_order_detail_tax_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3089,10 +3055,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_into_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
                                         "purchase_order_detail_into_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -3210,10 +3175,9 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.serviceVoucher_voucher_code + ": " ||
+                                            text: `${props.dataLang?.serviceVoucher_voucher_code + ": " ||
                                                 "serviceVoucher_voucher_code"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -3231,16 +3195,15 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.serviceVoucher_day_vouchers + ": " ||
+                                            text: `${props.dataLang?.serviceVoucher_day_vouchers + ": " ||
                                                 "serviceVoucher_day_vouchers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -3300,9 +3263,8 @@ const FilePDF = ({
                             [
                                 uppercaseTextHeaderTabel("STT", "headerTable", "center"),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.serviceVoucher_services_arising ||
-                                        "serviceVoucher_services_arising"
+                                    `${props.dataLang?.serviceVoucher_services_arising ||
+                                    "serviceVoucher_services_arising"
                                     }`,
                                     "headerTable",
                                     "left"
@@ -3335,69 +3297,68 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "servicev_voucher" && data?.item.length > 0
                                 ? data?.item.map((item, index) => {
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.name ? item?.name : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price ? `${formatMoney(item?.price)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.discount_percent ? `${item?.discount_percent + "%"}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? `${formatMoney(item?.price_after_discount)}`
-                                                  : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.amount ? `${formatMoney(item?.amount)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? `${item?.note}` : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.name ? item?.name : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? `${formatNumber(item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price ? `${formatMoney(item?.price)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.discount_percent ? `${item?.discount_percent + "%"}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? `${formatMoney(item?.price_after_discount)}`
+                                                : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.amount ? `${formatMoney(item?.amount)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? `${item?.note}` : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                    }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3421,10 +3382,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_discounty ||
+                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
                                         "purchase_order_detail_discounty"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3448,10 +3408,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
                                         "purchase_order_detail_money_after_discount"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3475,10 +3434,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_tax_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
                                         "purchase_order_detail_tax_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3502,10 +3460,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_into_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
                                         "purchase_order_detail_into_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3621,9 +3578,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -3641,15 +3597,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -3745,144 +3700,143 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "import" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          { stack: stackBt },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? formatMoney(item?.price_after_discount)
-                                                  : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.amount ? `${formatMoney(item?.amount)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date
+                                                            ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        { stack: stackBt },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? formatMoney(item?.price_after_discount)
+                                                : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.amount ? `${formatMoney(item?.amount)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                    }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -3906,10 +3860,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_discounty ||
+                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
                                         "purchase_order_detail_discounty"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     margin: styleMarginChildTotal,
@@ -3934,10 +3887,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
                                         "purchase_order_detail_money_after_discount"
-                                    }`,
+                                        }`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -3961,10 +3913,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_tax_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
                                         "purchase_order_detail_tax_money"
-                                    }`,
+                                        }`,
                                     margin: styleMarginChildTotal,
                                     bold: true,
                                     colSpan: 2,
@@ -3988,10 +3939,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_into_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
                                         "purchase_order_detail_into_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     margin: styleMarginChildTotal,
                                     colSpan: 2,
@@ -4155,9 +4105,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
@@ -4175,15 +4124,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -4260,136 +4208,136 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "import" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          //   location_name
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              stack: [
-                                                  {
-                                                      text: item?.warehouse_name ? item?.warehouse_name : "",
-                                                      fontSize: 10,
-                                                      margin: styleMarginChild,
-                                                  },
-                                                  {
-                                                      text: item?.location_name ? `(${item?.location_name})` : "",
-                                                      fontSize: 9,
-                                                      italics: true,
-                                                      margin: styleMarginChild,
-                                                  },
-                                              ],
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date
+                                                            ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        //   location_name
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            stack: [
+                                                {
+                                                    text: item?.warehouse_name ? item?.warehouse_name : "",
+                                                    fontSize: 10,
+                                                    margin: styleMarginChild,
+                                                },
+                                                {
+                                                    text: item?.location_name ? `(${item?.location_name})` : "",
+                                                    fontSize: 9,
+                                                    italics: true,
+                                                    margin: styleMarginChild,
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
@@ -4587,15 +4535,14 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -4694,152 +4641,149 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "returns" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item.serial == null || item?.item.serial == ""
-                                                                  ? "-"
-                                                                  : item?.item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item.lot == null || item?.item.lot == ""
-                                                                  ? "-"
-                                                                  : item?.item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item.serial == null || item?.item.serial == ""
+                                                                ? "-"
+                                                                : item?.item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item.lot == null || item?.item.lot == ""
+                                                                ? "-"
+                                                                : item?.item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
 
-                                                      {
-                                                          text: [
-                                                              {
-                                                                  text: " Date: ",
-                                                                  fontSize: 9,
-                                                                  italics: true,
-                                                              },
-                                                              {
-                                                                  text: item?.item.expiration_date
-                                                                      ? moment(item?.item.expiration_date).format(
-                                                                            "DD/MM/YYYY"
-                                                                        )
-                                                                      : "-",
-                                                                  fontSize: 8.5,
-                                                                  italics: true,
-                                                                  margin: [0, 5, 0, 0],
-                                                              },
-                                                          ],
-                                                          fontSize: 9,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
+                                                    {
+                                                        text: [
+                                                            {
+                                                                text: " Date: ",
+                                                                fontSize: 9,
+                                                                italics: true,
+                                                            },
+                                                            {
+                                                                text: item?.item.expiration_date
+                                                                    ? formatMoment(item?.item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                                    : "-",
+                                                                fontSize: 8.5,
+                                                                italics: true,
+                                                                margin: [0, 5, 0, 0],
+                                                            },
+                                                        ],
+                                                        fontSize: 9,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
 
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.price_after_discount
-                                                  ? formatMoney(item?.price_after_discount)
-                                                  : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.amount ? `${formatMoney(item?.amount)}` : "",
-                                              alignment: "right",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.price_after_discount
+                                                ? formatMoney(item?.price_after_discount)
+                                                : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.amount ? `${formatMoney(item?.amount)}` : "",
+                                            alignment: "right",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
-                                    }`,
+                                    text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -4863,10 +4807,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_discounty ||
+                                    text: `${props.dataLang?.purchase_order_detail_discounty ||
                                         "purchase_order_detail_discounty"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -4890,10 +4833,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    text: `${props.dataLang?.purchase_order_detail_money_after_discount ||
                                         "purchase_order_detail_money_after_discount"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -4917,10 +4859,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_tax_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_tax_money ||
                                         "purchase_order_detail_tax_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -4944,10 +4885,9 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props.dataLang?.purchase_order_detail_into_money ||
+                                    text: `${props.dataLang?.purchase_order_detail_into_money ||
                                         "purchase_order_detail_into_money"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     margin: styleMarginChildTotal,
@@ -5113,9 +5053,8 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
-                                            }`,
+                                            text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                                }`,
 
                                             inline: true,
                                             fontSize: 8,
@@ -5140,7 +5079,7 @@ const FilePDF = ({
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -5216,142 +5155,140 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "returns" && data?.items.length > 0
                                 ? data?.items.map((item, index) => {
-                                      const stack = [];
-                                      const stackSub = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackSub.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: styleMarginChild,
-                                      });
+                                    const stack = [];
+                                    const stackSub = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackSub.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: styleMarginChild,
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item.serial == null || item?.item.serial == ""
-                                                                  ? "-"
-                                                                  : item?.item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackSub.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item.serial == null || item?.item.serial == ""
+                                                                ? "-"
+                                                                : item?.item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackSub.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.item.lot == null || item?.item.lot == ""
-                                                                  ? "-"
-                                                                  : item?.item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                      {
-                                                          text: [
-                                                              {
-                                                                  text: " Date: ",
-                                                                  fontSize: 9,
-                                                                  italics: true,
-                                                              },
-                                                              {
-                                                                  text: item?.item.expiration_date
-                                                                      ? moment(item?.item.expiration_date).format(
-                                                                            "DD/MM/YYYY"
-                                                                        )
-                                                                      : "-",
-                                                                  fontSize: 8.5,
-                                                                  italics: true,
-                                                                  margin: [0, 5, 0, 0],
-                                                              },
-                                                          ],
-                                                          fontSize: 9,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackSub.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          {
-                                              stack: stackSub,
-                                          },
-                                          //   location_name
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.item.lot == null || item?.item.lot == ""
+                                                                ? "-"
+                                                                : item?.item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                    {
+                                                        text: [
+                                                            {
+                                                                text: " Date: ",
+                                                                fontSize: 9,
+                                                                italics: true,
+                                                            },
+                                                            {
+                                                                text: item?.item.expiration_date
+                                                                    ? formatMoment(item?.item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                                    : "-",
+                                                                fontSize: 8.5,
+                                                                italics: true,
+                                                                margin: [0, 5, 0, 0],
+                                                            },
+                                                        ],
+                                                        fontSize: 9,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackSub.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        {
+                                            stack: stackSub,
+                                        },
+                                        //   location_name
 
-                                          {
-                                              stack: [
-                                                  {
-                                                      text: item?.warehouse_name ? item?.warehouse_name : "",
-                                                      fontSize: 10,
-                                                      margin: styleMarginChild,
-                                                  },
-                                                  {
-                                                      text: item?.location_name ? `(${item?.location_name})` : "",
-                                                      fontSize: 10,
-                                                      italics: true,
-                                                      margin: styleMarginChild,
-                                                  },
-                                              ],
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity ? formatNumber(item?.quantity) : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            stack: [
+                                                {
+                                                    text: item?.warehouse_name ? item?.warehouse_name : "",
+                                                    fontSize: 10,
+                                                    margin: styleMarginChild,
+                                                },
+                                                {
+                                                    text: item?.location_name ? `(${item?.location_name})` : "",
+                                                    fontSize: 10,
+                                                    italics: true,
+                                                    margin: styleMarginChild,
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
@@ -5532,10 +5469,9 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_code + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_code + ": " ||
                                                 "purchase_order_table_code"
-                                            }`,
+                                                }`,
 
                                             inline: true,
                                             fontSize: 8,
@@ -5554,16 +5490,15 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
                                                 "purchase_order_table_dayvoucers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -5581,10 +5516,9 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: `${
-                                props.dataLang?.warehouseTransfer_transferWarehouse + ": " ||
+                            text: `${props.dataLang?.warehouseTransfer_transferWarehouse + ": " ||
                                 "warehouseTransfer_transferWarehouse"
-                            } `,
+                                } `,
                             inline: true,
                             fontSize: 10,
                         },
@@ -5599,10 +5533,9 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: `${
-                                props.dataLang?.warehouseTransfer_receivingWarehouse + ": " ||
+                            text: `${props.dataLang?.warehouseTransfer_receivingWarehouse + ": " ||
                                 "warehouseTransfer_receivingWarehouse"
-                            } `,
+                                } `,
                             inline: true,
                             fontSize: 10,
                         },
@@ -5669,17 +5602,15 @@ const FilePDF = ({
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.warehouseTransfer_rransferPosition ||
-                                        "warehouseTransfer_rransferPosition"
+                                    `${props.dataLang?.warehouseTransfer_rransferPosition ||
+                                    "warehouseTransfer_rransferPosition"
                                     }`,
                                     "headerTable",
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.warehouseTransfer_receivingLocation ||
-                                        "warehouseTransfer_receivingLocation"
+                                    `${props.dataLang?.warehouseTransfer_receivingLocation ||
+                                    "warehouseTransfer_receivingLocation"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -5687,9 +5618,8 @@ const FilePDF = ({
                                 uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
 
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props?.dataLang?.production_warehouse_export_slPDF ||
-                                        "production_warehouse_export_slPDF"
+                                    `${props?.dataLang?.production_warehouse_export_slPDF ||
+                                    "production_warehouse_export_slPDF"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -5705,146 +5635,143 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "warehouseTransfer" && data?.items?.length > 0
                                 ? data?.items?.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          //   margin: [0, 5, 0, 5],
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        //   margin: [0, 5, 0, 5],
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 2, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 2, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 2, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 2, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 2, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 2, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              text: item?.warehouse_location?.location_name
-                                                  ? `${item?.warehouse_location?.location_name}`
-                                                  : "",
-                                              margin: [0, 5, 0, 0],
-                                              fontSize: 10,
-                                              alignment: "left",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.warehouse_location?.location_name
-                                                  ? `${item?.warehouse_location_to?.location_name}`
-                                                  : "",
-                                              margin: [0, 5, 0, 0],
-                                              fontSize: 10,
-                                              alignment: "left",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 2, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 2, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 2, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 2, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            text: item?.warehouse_location?.location_name
+                                                ? `${item?.warehouse_location?.location_name}`
+                                                : "",
+                                            margin: [0, 5, 0, 0],
+                                            fontSize: 10,
+                                            alignment: "left",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.warehouse_location?.location_name
+                                                ? `${item?.warehouse_location_to?.location_name}`
+                                                : "",
+                                            margin: [0, 5, 0, 0],
+                                            fontSize: 10,
+                                            alignment: "left",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.production_warehouse_totalItem ||
+                                    text: `${props?.dataLang?.production_warehouse_totalItem ||
                                         "production_warehouse_totalItem"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -5866,9 +5793,8 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.warehouseTransfer_totalPDF || "warehouseTransfer_totalPDF"
-                                    }`,
+                                    text: `${props?.dataLang?.warehouseTransfer_totalPDF || "warehouseTransfer_totalPDF"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -6020,10 +5946,9 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_code + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_code + ": " ||
                                                 "purchase_order_table_code"
-                                            }`,
+                                                }`,
 
                                             inline: true,
                                             fontSize: 8,
@@ -6042,16 +5967,15 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
                                                 "purchase_order_table_dayvoucers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -6069,10 +5993,9 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: `${
-                                props.dataLang?.production_warehouse_expWarehouse + ": " ||
+                            text: `${props.dataLang?.production_warehouse_expWarehouse + ": " ||
                                 "production_warehouse_expWarehouse"
-                            } `,
+                                } `,
                             inline: true,
                             fontSize: 10,
                         },
@@ -6143,25 +6066,22 @@ const FilePDF = ({
                                 uppercaseTextHeaderTabel(`${"VTX"}`, "headerTable", "center"),
                                 uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props?.dataLang?.production_warehouse_export_slPDF ||
-                                        "production_warehouse_export_slPDF"
+                                    `${props?.dataLang?.production_warehouse_export_slPDF ||
+                                    "production_warehouse_export_slPDF"
                                     }`,
                                     "headerTable",
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props?.dataLang?.production_warehouse_conversion_gt ||
-                                        "production_warehouse_conversion_gt"
+                                    `${props?.dataLang?.production_warehouse_conversion_gt ||
+                                    "production_warehouse_conversion_gt"
                                     }`,
                                     "headerTable",
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props?.dataLang?.production_warehouse_conversion_sl ||
-                                        "production_warehouse_conversion_sl"
+                                    `${props?.dataLang?.production_warehouse_conversion_sl ||
+                                    "production_warehouse_conversion_sl"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -6176,152 +6096,149 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "production_warehouse" && data?.items?.length > 0
                                 ? data?.items?.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: [0, 5, 0, 5],
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: [0, 5, 0, 5],
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              text: item?.warehouse_location?.location_name
-                                                  ? `${item?.warehouse_location?.location_name}`
-                                                  : "",
-                                              margin: [0, 5, 0, 0],
-                                              fontSize: 10,
-                                              alignment: "left",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.unit_data?.unit ? item?.unit_data?.unit : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            text: item?.warehouse_location?.location_name
+                                                ? `${item?.warehouse_location?.location_name}`
+                                                : "",
+                                            margin: [0, 5, 0, 0],
+                                            fontSize: 10,
+                                            alignment: "left",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.unit_data?.unit ? item?.unit_data?.unit : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.coefficient ? `${formatNumber(+item?.coefficient)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.quantity_exchange
-                                                  ? `${formatNumber(+item?.quantity_exchange)} ${item?.unit_data?.unit}`
-                                                  : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
+                                        {
+                                            text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.coefficient ? `${formatNumber(+item?.coefficient)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.quantity_exchange
+                                                ? `${formatNumber(+item?.quantity_exchange)} ${item?.unit_data?.unit}`
+                                                : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.production_warehouse_totalItem ||
+                                    text: `${props?.dataLang?.production_warehouse_totalItem ||
                                         "production_warehouse_totalItem"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -6344,9 +6261,8 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.production_warehouse_sales || "production_warehouse_sales"
-                                    }`,
+                                    text: `${props?.dataLang?.production_warehouse_sales || "production_warehouse_sales"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -6499,10 +6415,9 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_code + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_code + ": " ||
                                                 "purchase_order_table_code"
-                                            }`,
+                                                }`,
 
                                             inline: true,
                                             fontSize: 8,
@@ -6521,16 +6436,15 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
                                                 "purchase_order_table_dayvoucers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -6548,10 +6462,9 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: `${
-                                props.dataLang?.productsWarehouse_warehouseImport + ": " ||
+                            text: `${props.dataLang?.productsWarehouse_warehouseImport + ": " ||
                                 "productsWarehouse_warehouseImport"
-                            } `,
+                                } `,
                             inline: true,
                             fontSize: 10,
                         },
@@ -6617,18 +6530,16 @@ const FilePDF = ({
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.productsWarehouse_warehouseLocaImport ||
-                                        "productsWarehouse_warehouseLocaImport"
+                                    `${props.dataLang?.productsWarehouse_warehouseLocaImport ||
+                                    "productsWarehouse_warehouseLocaImport"
                                     }`,
                                     "headerTable",
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.productsWarehouse_QtyImportPDF ||
-                                        "productsWarehouse_QtyImportPDF"
+                                    `${props.dataLang?.productsWarehouse_QtyImportPDF ||
+                                    "productsWarehouse_QtyImportPDF"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -6643,146 +6554,143 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "productsWarehouse" && data?.items?.length > 0
                                 ? data?.items?.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: [0, 5, 0, 5],
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: [0, 5, 0, 5],
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item?.serial == null || item?.serial == ""
-                                                                  ? "-"
-                                                                  : item?.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item?.serial == null || item?.serial == ""
+                                                                ? "-"
+                                                                : item?.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (dataProductExpiry?.is_enable === "1") {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item?.lot == null || item?.lot == "" ? "-" : item?.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item?.expiration_date
-                                                              ? moment(item?.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              stack: [
-                                                  //   {
-                                                  //       text: item?.warehouse_location
-                                                  //           ?.warehouse_name
-                                                  //           ? `${item?.warehouse_location?.warehouse_name}`
-                                                  //           : "",
-                                                  //   },
-                                                  {
-                                                      text: item?.warehouse_location?.location_name
-                                                          ? `${item?.warehouse_location?.location_name}`
-                                                          : "",
-                                                      //   italics: true,
-                                                      margin: [0, 5, 0, 0],
-                                                  },
-                                              ],
-                                              fontSize: 10,
-                                              alignment: "left",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
+                                    if (dataProductExpiry?.is_enable === "1") {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item?.lot == null || item?.lot == "" ? "-" : item?.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item?.expiration_date ? formatMoment(item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            stack: [
+                                                //   {
+                                                //       text: item?.warehouse_location
+                                                //           ?.warehouse_name
+                                                //           ? `${item?.warehouse_location?.warehouse_name}`
+                                                //           : "",
+                                                //   },
+                                                {
+                                                    text: item?.warehouse_location?.location_name
+                                                        ? `${item?.warehouse_location?.location_name}`
+                                                        : "",
+                                                    //   italics: true,
+                                                    margin: [0, 5, 0, 0],
+                                                },
+                                            ],
+                                            fontSize: 10,
+                                            alignment: "left",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
+                                        {
+                                            text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.production_warehouse_totalItem ||
+                                    text: `${props?.dataLang?.production_warehouse_totalItem ||
                                         "production_warehouse_totalItem"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -6952,10 +6860,9 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_code + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_code + ": " ||
                                                 "purchase_order_table_code"
-                                            }`,
+                                                }`,
 
                                             inline: true,
                                             fontSize: 8,
@@ -6974,16 +6881,15 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
                                                 "purchase_order_table_dayvoucers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -7000,10 +6906,9 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: `${
-                                props.dataLang?.productsWarehouse_warehouseImport + ": " ||
+                            text: `${props.dataLang?.productsWarehouse_warehouseImport + ": " ||
                                 "productsWarehouse_warehouseImport"
-                            } `,
+                                } `,
                             inline: true,
                             fontSize: 10,
                         },
@@ -7090,9 +6995,8 @@ const FilePDF = ({
                                     "center"
                                 ),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props.dataLang?.productsWarehouse_warehouseLocaImport ||
-                                        "productsWarehouse_warehouseLocaImport"
+                                    `${props.dataLang?.productsWarehouse_warehouseLocaImport ||
+                                    "productsWarehouse_warehouseLocaImport"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -7133,155 +7037,154 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "recall" && data?.items?.length > 0
                                 ? data?.items?.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: [0, 5, 0, 5],
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: [0, 5, 0, 5],
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              text: item?.warehouse?.location_name
-                                                  ? `${item?.warehouse?.location_name}`
-                                                  : "",
-                                              //   italics: true,
-                                              margin: [0, 5, 0, 0],
-                                              fontSize: 10,
-                                              alignment: "left",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: (item?.item?.unit_name || item?.item?.unit) ?? "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date
+                                                            ? formatMoment(item.expiration_date?.date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            text: item?.warehouse?.location_name
+                                                ? `${item?.warehouse?.location_name}`
+                                                : "",
+                                            //   italics: true,
+                                            margin: [0, 5, 0, 0],
+                                            fontSize: 10,
+                                            alignment: "left",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: (item?.item?.unit_name || item?.item?.unit) ?? "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          //   {
-                                          //       text: item?.price
-                                          //           ? `${formatNumber(+item?.price)}`
-                                          //           : "",
-                                          //       alignment: "center",
-                                          //       fontSize: 10,
-                                          //       margin: styleMarginChild,
-                                          //   },
-                                          //   {
-                                          //       text: item?.amount
-                                          //           ? `${formatNumber(+item?.amount)}`
-                                          //           : "",
-                                          //       alignment: "center",
-                                          //       fontSize: 10,
-                                          //       margin: styleMarginChild,
-                                          //   },
+                                        {
+                                            text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        //   {
+                                        //       text: item?.price
+                                        //           ? `${formatNumber(+item?.price)}`
+                                        //           : "",
+                                        //       alignment: "center",
+                                        //       fontSize: 10,
+                                        //       margin: styleMarginChild,
+                                        //   },
+                                        //   {
+                                        //       text: item?.amount
+                                        //           ? `${formatNumber(+item?.amount)}`
+                                        //           : "",
+                                        //       alignment: "center",
+                                        //       fontSize: 10,
+                                        //       margin: styleMarginChild,
+                                        //   },
 
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.production_warehouse_totalItem ||
+                                    text: `${props?.dataLang?.production_warehouse_totalItem ||
                                         "production_warehouse_totalItem"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -7430,9 +7333,8 @@ const FilePDF = ({
         ///Xuất kho khác
         const docDefinitionexportToOther = {
             info: {
-                title: `${`${props.dataLang?.exportToOthe_exporttoOther || "exportToOthe_exporttoOther"} - ${
-                    data?.code
-                }`}`,
+                title: `${`${props.dataLang?.exportToOthe_exporttoOther || "exportToOthe_exporttoOther"} - ${data?.code
+                    }`}`,
                 author: "Foso",
                 subject: "Quotation",
                 keywords: "PDF",
@@ -7466,10 +7368,9 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_code + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_code + ": " ||
                                                 "purchase_order_table_code"
-                                            }`,
+                                                }`,
 
                                             inline: true,
                                             fontSize: 8,
@@ -7488,16 +7389,15 @@ const FilePDF = ({
                                 {
                                     text: [
                                         {
-                                            text: `${
-                                                props.dataLang?.purchase_order_table_dayvoucers + ": " ||
+                                            text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " ||
                                                 "purchase_order_table_dayvoucers"
-                                            }`,
+                                                }`,
                                             inline: true,
                                             fontSize: 8,
                                             italics: true,
                                         },
                                         {
-                                            text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
@@ -7515,10 +7415,9 @@ const FilePDF = ({
                 {
                     text: [
                         {
-                            text: `${
-                                props.dataLang?.production_warehouse_expWarehouse + ": " ||
+                            text: `${props.dataLang?.production_warehouse_expWarehouse + ": " ||
                                 "production_warehouse_expWarehouse"
-                            } `,
+                                } `,
                             inline: true,
                             fontSize: 10,
                         },
@@ -7578,9 +7477,8 @@ const FilePDF = ({
                                 uppercaseTextHeaderTabel(`${"VTX"}`, "headerTable", "center"),
                                 uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
                                 uppercaseTextHeaderTabel(
-                                    `${
-                                        props?.dataLang?.production_warehouse_export_slPDF ||
-                                        "production_warehouse_export_slPDF"
+                                    `${props?.dataLang?.production_warehouse_export_slPDF ||
+                                    "production_warehouse_export_slPDF"
                                     }`,
                                     "headerTable",
                                     "center"
@@ -7595,137 +7493,136 @@ const FilePDF = ({
                             // Data rows
                             ...(data && props?.type == "exportToOther" && data?.items?.length > 0
                                 ? data?.items?.map((item, index) => {
-                                      const stack = [];
-                                      const stackBt = [];
-                                      stack.push({
-                                          text: item?.item?.name ? item?.item?.name : "",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      });
-                                      stackBt.push({
-                                          text: `Biến thể: ${item?.item?.product_variation}`,
-                                          fontSize: 9,
-                                          italics: true,
-                                          margin: [0, 5, 0, 5],
-                                      });
+                                    const stack = [];
+                                    const stackBt = [];
+                                    stack.push({
+                                        text: item?.item?.name ? item?.item?.name : "",
+                                        fontSize: 10,
+                                        margin: styleMarginChild,
+                                    });
+                                    stackBt.push({
+                                        text: `Biến thể: ${item?.item?.product_variation}`,
+                                        fontSize: 9,
+                                        italics: true,
+                                        margin: [0, 5, 0, 5],
+                                    });
 
-                                      if (dataProductSerial?.is_enable === "1") {
-                                          const serialStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Serial: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text:
-                                                              item.serial == null || item.serial == ""
-                                                                  ? "-"
-                                                                  : item.serial,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                              },
-                                          ];
-                                          stackBt.push(serialStack);
-                                      }
+                                    if (dataProductSerial?.is_enable === "1") {
+                                        const serialStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Serial: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text:
+                                                            item.serial == null || item.serial == ""
+                                                                ? "-"
+                                                                : item.serial,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                            },
+                                        ];
+                                        stackBt.push(serialStack);
+                                    }
 
-                                      if (
-                                          dataMaterialExpiry?.is_enable === "1" ||
-                                          dataProductExpiry?.is_enable === "1"
-                                      ) {
-                                          const subStack = [
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Lot: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.lot == null || item.lot == "" ? "-" : item.lot,
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                              {
-                                                  text: [
-                                                      {
-                                                          text: "Date: ",
-                                                          fontSize: 9,
-                                                          italics: true,
-                                                      },
-                                                      {
-                                                          text: item.expiration_date
-                                                              ? moment(item.expiration_date).format("DD/MM/YYYY")
-                                                              : "-",
-                                                          fontSize: 8.5,
-                                                          italics: true,
-                                                          margin: [0, 5, 0, 0],
-                                                      },
-                                                  ],
-                                                  fontSize: 9,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ];
-                                          stackBt.push(subStack);
-                                      }
-                                      return [
-                                          {
-                                              text: `${index + 1}`,
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              stack: stack,
-                                          },
-                                          {
-                                              stack: stackBt,
-                                          },
-                                          {
-                                              text: item?.warehouse_location?.location_name
-                                                  ? `${item?.warehouse_location?.location_name}`
-                                                  : "",
-                                              margin: [0, 5, 0, 0],
-                                              fontSize: 10,
-                                              alignment: "left",
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.item?.unit_name ? item?.item?.unit_name : "",
-                                              fontSize: 10,
-                                              alignment: "center",
-                                              margin: styleMarginChild,
-                                          },
+                                    if (
+                                        dataMaterialExpiry?.is_enable === "1" ||
+                                        dataProductExpiry?.is_enable === "1"
+                                    ) {
+                                        const subStack = [
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Lot: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                            {
+                                                text: [
+                                                    {
+                                                        text: "Date: ",
+                                                        fontSize: 9,
+                                                        italics: true,
+                                                    },
+                                                    {
+                                                        text: item.expiration_date
+                                                            ? formatMoment(item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                            : "-",
+                                                        fontSize: 8.5,
+                                                        italics: true,
+                                                        margin: [0, 5, 0, 0],
+                                                    },
+                                                ],
+                                                fontSize: 9,
+                                                margin: [0, 5, 0, 0],
+                                            },
+                                        ];
+                                        stackBt.push(subStack);
+                                    }
+                                    return [
+                                        {
+                                            text: `${index + 1}`,
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            stack: stack,
+                                        },
+                                        {
+                                            stack: stackBt,
+                                        },
+                                        {
+                                            text: item?.warehouse_location?.location_name
+                                                ? `${item?.warehouse_location?.location_name}`
+                                                : "",
+                                            margin: [0, 5, 0, 0],
+                                            fontSize: 10,
+                                            alignment: "left",
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                            fontSize: 10,
+                                            alignment: "center",
+                                            margin: styleMarginChild,
+                                        },
 
-                                          {
-                                              text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
-                                              alignment: "center",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                          {
-                                              text: item?.note ? item?.note : "",
-                                              fontSize: 10,
-                                              margin: styleMarginChild,
-                                          },
-                                      ];
-                                  })
+                                        {
+                                            text: item?.quantity ? `${formatNumber(+item?.quantity)}` : "",
+                                            alignment: "center",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                        {
+                                            text: item?.note ? item?.note : "",
+                                            fontSize: 10,
+                                            margin: styleMarginChild,
+                                        },
+                                    ];
+                                })
                                 : ""),
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.production_warehouse_totalItem ||
+                                    text: `${props?.dataLang?.production_warehouse_totalItem ||
                                         "production_warehouse_totalItem"
-                                    }`,
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,
@@ -7748,9 +7645,8 @@ const FilePDF = ({
                             ],
                             [
                                 {
-                                    text: `${
-                                        props?.dataLang?.production_warehouse_sales || "production_warehouse_sales"
-                                    }`,
+                                    text: `${props?.dataLang?.production_warehouse_sales || "production_warehouse_sales"
+                                        }`,
                                     bold: true,
                                     colSpan: 2,
                                     fontSize: 10,

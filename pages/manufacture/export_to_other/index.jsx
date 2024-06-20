@@ -1,5 +1,4 @@
 import { debounce } from "lodash";
-import moment from "moment/moment";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -53,9 +52,11 @@ import apiComons from "@/Api/apiComon/apiComon";
 import apiExportToOther from "@/Api/apiManufacture/warehouse/exportToOther/apiExportToOther";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
 import { routerExportToOther } from "@/routers/manufacture";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -146,7 +147,7 @@ const Index = (props) => {
             sTotal(rTotal);
 
             queryState({ data: rResult || [], dataExcel: rResult || [], onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_group = async () => {
@@ -164,7 +165,7 @@ const Index = (props) => {
                 },
             });
             queryState({ listDs: data || [], onFetchingGroup: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_filter = async () => {
@@ -188,7 +189,7 @@ const Index = (props) => {
                 listObject: dataObject?.map((e) => ({ label: dataLang[e?.name], value: e?.id })) || [],
                 onFetching_filter: false,
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -199,7 +200,7 @@ const Index = (props) => {
                 },
             });
             queryState({ listCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     useEffect(() => {
@@ -405,7 +406,7 @@ const Index = (props) => {
             if (data_export?.length > 0) {
                 queryState({ data_export: data_export });
             }
-        } catch (error) {}
+        } catch (error) { }
         queryState({ onSending: false });
     };
 
@@ -660,9 +661,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={11} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1}>
                                                             <Popup_chitiet

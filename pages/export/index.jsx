@@ -1,24 +1,23 @@
-import moment from "moment";
+import Loading from "@/components/UI/loading";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useRef, useState, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-import Loading from "@/components/UI/loading";
 
-import TabClient from "./components/tabExport";
-import Client from "./components/client/client";
-import Progress from "./components/common/progress";
-import Products from "./components/products/products";
-import BtnParent from "./components/common/btnParent";
-import Supplier from "./components/supplier/supplier";
-import Materials from "./components/materials/materials";
-import TitleHeader from "./components/common/titleHeader";
-import { Container } from "@/components/UI/common/layout";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import Client from "./components/client/client";
+import BtnParent from "./components/common/btnParent";
+import Progress from "./components/common/progress";
+import TitleHeader from "./components/common/titleHeader";
+import Materials from "./components/materials/materials";
+import Products from "./components/products/products";
+import Supplier from "./components/supplier/supplier";
+import TabClient from "./components/tabExport";
 
 const Index = (props) => {
     const initsArr = {
@@ -154,7 +153,7 @@ const Index = (props) => {
                     const data = db?.map((e) => ({
                         label: e?.code,
                         value: e?.id,
-                        date: moment(e?.date_create).format("DD/MM/YYYY"),
+                        date: formatMoment(e?.date_create, FORMAT_MOMENT.DATE_SLASH_LONG),
                         setup_colums: e?.setup_colums,
                     }));
                     sDataTemplate(data);

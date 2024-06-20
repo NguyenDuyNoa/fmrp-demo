@@ -1,6 +1,5 @@
 import { Grid6, Edit as IconEdit } from "iconsax-react";
 import { debounce } from "lodash";
-import moment from "moment/moment";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -29,9 +28,11 @@ import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/U
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import NoData from "@/components/UI/noData/nodata";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import { useSelector } from "react-redux";
 import Popup_Vitrikho from "./components/popup";
 const Location = (props) => {
@@ -74,7 +75,7 @@ const Location = (props) => {
 
     const [active, sActive] = useState(null);
 
-    const _HandleFresh = () => {};
+    const _HandleFresh = () => { };
 
     const _ServerFetching = async () => {
         const params = {
@@ -87,7 +88,7 @@ const Location = (props) => {
             const { rResult, output } = await apiLocationWarehouse.apiLocationWarehouse({ params: params });
             sTotalItems(output);
             queryState({ data: rResult, data_ex: rResult, onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
     const _ServerFetching_kho = async () => {
         const params = {
@@ -100,7 +101,7 @@ const Location = (props) => {
                 listWarehouse: rResult?.map((e) => ({ label: e.name, value: e.id })),
                 onFetchingWarehouse: false,
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -150,7 +151,7 @@ const Location = (props) => {
                 isShow("error", `${dataLang[message] || message}`);
             }
             await _ServerFetching();
-        } catch (error) {}
+        } catch (error) { }
         queryState({ onSending: false });
     };
     useEffect(() => {
@@ -412,7 +413,7 @@ const Location = (props) => {
                                                         {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.email}</h6>                 */}
                                                         <RowItemTable colSpan={2} textAlign={"left"}>
                                                             {e?.date_create != null
-                                                                ? moment(e.date_create).format("DD/MM/YYYY, h:mm:ss")
+                                                                ? formatMoment(e.date_create, FORMAT_MOMENT.TIME_SHORT)
                                                                 : ""}
                                                         </RowItemTable>
 
@@ -442,7 +443,7 @@ const Location = (props) => {
                                                             )}
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => {}}
+                                                                onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="warehouse_location"

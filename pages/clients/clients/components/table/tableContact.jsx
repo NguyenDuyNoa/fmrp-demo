@@ -1,10 +1,9 @@
-import React from "react";
-import Link from "next/link";
-import Loading from "components/UI/loading";
-import dynamic from "next/dynamic";
-import moment from "moment";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import Loading from "components/UI/loading";
+import dynamic from "next/dynamic";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
@@ -62,9 +61,7 @@ const TableContact = (props) => {
                           {e?.position}
                         </h6>
                         <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">
-                          {e?.birthday != "0000-00-00"
-                            ? moment(e?.birthday).format("DD/MM/YYYY")
-                            : ""}
+                          {e?.birthday != "0000-00-00" ? formatMoment(e?.birthday, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                         </h6>
                         <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
                           {e?.address}

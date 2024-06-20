@@ -29,6 +29,8 @@ import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransf
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 /// Hậu viết API
@@ -70,7 +72,7 @@ const Index = (props) => {
 
     const [note, sNote] = useState("");
 
-    const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+    const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
     const [dataBranch, sDataBranch] = useState([]);
 
@@ -135,7 +137,7 @@ const Index = (props) => {
                 }))
             );
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -178,9 +180,8 @@ const Index = (props) => {
                     idParenBackend: e?.item?.id,
                     matHang: {
                         e: e?.item,
-                        label: `${e.item?.name} <span style={{display: none}}>${
-                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
                         value: e.item?.id,
                     },
                     child: e?.child.map((ce) => ({
@@ -193,22 +194,22 @@ const Index = (props) => {
                             (ce?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                         location:
                             ce?.warehouse_location?.location_name ||
-                            ce?.warehouse_location?.id ||
-                            ce?.warehouse_location?.warehouse_name ||
-                            ce?.warehouse_location?.quantity
+                                ce?.warehouse_location?.id ||
+                                ce?.warehouse_location?.warehouse_name ||
+                                ce?.warehouse_location?.quantity
                                 ? {
-                                      label: ce?.warehouse_location?.location_name,
-                                      value: ce?.warehouse_location?.id,
-                                      warehouse_name: ce?.warehouse_location?.warehouse_name,
-                                      qty: +ce?.warehouse_location?.quantity,
-                                  }
+                                    label: ce?.warehouse_location?.location_name,
+                                    value: ce?.warehouse_location?.id,
+                                    warehouse_name: ce?.warehouse_location?.warehouse_name,
+                                    qty: +ce?.warehouse_location?.quantity,
+                                }
                                 : null,
                         receivingLocation:
                             ce?.warehouse_location_to?.location_name || ce?.warehouse_location_to?.location_id
                                 ? {
-                                      label: ce?.warehouse_location_to?.location_name,
-                                      value: ce?.warehouse_location_to?.id,
-                                  }
+                                    label: ce?.warehouse_location_to?.location_name,
+                                    value: ce?.warehouse_location_to?.id,
+                                }
                                 : null,
                         serial: ce?.serial == null ? "" : ce?.serial,
                         lot: ce?.lot == null ? "" : ce?.lot,
@@ -225,7 +226,7 @@ const Index = (props) => {
                     })),
                 }))
             );
-        } catch (error) {}
+        } catch (error) { }
         sOnFetchingDetail(false);
     };
 
@@ -242,8 +243,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
@@ -255,7 +256,7 @@ const Index = (props) => {
             const { data } = await apiWarehouseTransfer.apiGetSemiItems("GET", { params: params });
             sDataItems(data?.result);
             sOnFetchingItemsAll(false);
-        } catch (error) {}
+        } catch (error) { }
     };
     const _ServerFetching_ExportWarehouse = async () => {
         try {
@@ -271,7 +272,7 @@ const Index = (props) => {
                 }))
             );
             sOnFetchingExportWarehouse(false);
-        } catch (error) {}
+        } catch (error) { }
     };
     const _ServerFetching_ReceivingLocation = async () => {
         try {
@@ -286,7 +287,7 @@ const Index = (props) => {
                 }))
             );
             sOnFetchingReceivingLocation(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -305,7 +306,7 @@ const Index = (props) => {
                 });
                 sDataItems(data?.result);
             }
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     const resetValue = () => {
@@ -339,7 +340,7 @@ const Index = (props) => {
         if (type == "code") {
             sCode(value.target.value);
         } else if (type === "date") {
-            sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+            sDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type === "note") {
             sNote(value.target.value);
         } else if (type == "branch" && idBranch != value) {
@@ -475,7 +476,7 @@ const Index = (props) => {
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_LONG));
         formData.append("branch_id", idBranch?.value);
         formData.append("warehouses_id", idExportWarehouse?.value);
         formData.append("warehouses_to", idReceiveWarehouse?.value);
@@ -521,7 +522,7 @@ const Index = (props) => {
                     `${dataLang[message]} ${item !== undefined && item !== null && item !== "" ? item : ""}`
                 );
             }
-        } catch (error) {}
+        } catch (error) { }
         sOnSending(false);
     };
 
@@ -847,9 +848,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -877,9 +877,8 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -939,9 +938,8 @@ const Index = (props) => {
                                             dataLang?.warehouseTransfer_transferWarehouse ||
                                             "warehouseTransfer_transferWarehouse"
                                         }
-                                        className={`${
-                                            errExportWarehouse ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errExportWarehouse ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -999,9 +997,8 @@ const Index = (props) => {
                                             dataLang?.warehouseTransfer_receivingWarehouse ||
                                             "warehouseTransfer_receivingWarehouse"
                                         }
-                                        className={`${
-                                            errReceiveWarehouse ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errReceiveWarehouse ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1132,18 +1129,14 @@ const Index = (props) => {
                                                         </div>
                                                     )}
                                                     {dataMaterialExpiry.is_enable === "1" ||
-                                                    dataProductExpiry.is_enable === "1" ? (
+                                                        dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Lot: {option.e?.lot ? option.e?.lot : "-"}
                                                             </div>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Date:{" "}
-                                                                {option.e?.expiration_date
-                                                                    ? moment(option.e?.expiration_date).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
-                                                                    : "-"}
+                                                                {option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                             </div>
                                                         </>
                                                     ) : (
@@ -1304,13 +1297,10 @@ const Index = (props) => {
                                                                             {dataProductSerial.is_enable === "1" && (
                                                                                 <div className="text-[11px] text-[#667085] font-[500]">
                                                                                     Serial:{" "}
-                                                                                    {option.e?.serial
-                                                                                        ? option.e?.serial
-                                                                                        : "-"}
+                                                                                    {option.e?.serial ? option.e?.serial : "-"}
                                                                                 </div>
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
@@ -1320,12 +1310,7 @@ const Index = (props) => {
                                                                                     </div>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Date:{" "}
-                                                                                        {option.e?.expiration_date
-                                                                                            ? moment(
-                                                                                                  option.e
-                                                                                                      ?.expiration_date
-                                                                                              ).format("DD/MM/YYYY")
-                                                                                            : "-"}
+                                                                                        {option.e?.expiration_date ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                     </div>
                                                                                 </>
                                                                             ) : (
@@ -1386,24 +1371,24 @@ const Index = (props) => {
                                                 {e?.child?.filter(
                                                     (e) => e?.location == null && e?.receivingLocation == null
                                                 )?.length >= 2 && (
-                                                    <button
-                                                        onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
-                                                        className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
-                                                    >
-                                                        <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
-                                                        <span className="relative text-xs">
-                                                            Xóa{" "}
-                                                            {
-                                                                e?.child?.filter(
-                                                                    (e) =>
-                                                                        e?.location == null &&
-                                                                        e?.receivingLocation == null
-                                                                )?.length
-                                                            }{" "}
-                                                            hàng chưa chọn vị trí
-                                                        </span>
-                                                    </button>
-                                                )}
+                                                        <button
+                                                            onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
+                                                            className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
+                                                        >
+                                                            <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                                                            <span className="relative text-xs">
+                                                                Xóa{" "}
+                                                                {
+                                                                    e?.child?.filter(
+                                                                        (e) =>
+                                                                            e?.location == null &&
+                                                                            e?.receivingLocation == null
+                                                                    )?.length
+                                                                }{" "}
+                                                                hàng chưa chọn vị trí
+                                                            </span>
+                                                        </button>
+                                                    )}
                                             </div>
                                             <div className="col-span-9  items-center">
                                                 <div className="grid grid-cols-8  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
@@ -1427,16 +1412,15 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "location"
                                                                         )}
-                                                                        className={`${
-                                                                            errWarehouse && ce?.location == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
-                                                                        } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        className={`${errWarehouse && ce?.location == null
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                            } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
                                                                                 ? ""
                                                                                 : dataLang?.warehouseTransfer_rransferPosition ||
-                                                                                  "warehouseTransfer_rransferPosition"
+                                                                                "warehouseTransfer_rransferPosition"
                                                                         }
                                                                         noOptionsMessage={() =>
                                                                             dataLang?.returns_nodata || "returns_nodata"
@@ -1496,17 +1480,16 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "receivingLocation"
                                                                         )}
-                                                                        className={`${
-                                                                            errReceivingLocation &&
+                                                                        className={`${errReceivingLocation &&
                                                                             ce?.receivingLocation == null
-                                                                                ? "border-red-500 border"
-                                                                                : ""
-                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                            ? "border-red-500 border"
+                                                                            : ""
+                                                                            }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
                                                                                 ? ""
                                                                                 : dataLang?.warehouseTransfer_receivingLocation ||
-                                                                                  "warehouseTransfer_receivingLocation"
+                                                                                "warehouseTransfer_receivingLocation"
                                                                         }
                                                                         noOptionsMessage={() =>
                                                                             dataLang?.returns_nodata || "returns_nodata"
@@ -1567,19 +1550,17 @@ const Index = (props) => {
                                                                         disabled={
                                                                             ce?.location == null || ce?.unit == null
                                                                         }
-                                                                        className={`${
-                                                                            errQty &&
+                                                                        className={`${errQty &&
                                                                             (ce?.exportQuantity == null ||
                                                                                 ce?.exportQuantity == "" ||
                                                                                 ce?.exportQuantity == 0)
-                                                                                ? "border-red-500 border-b"
-                                                                                : ""
-                                                                        }
-                                                                            ${
-                                                                                (ce?.exportQuantity == null ||
-                                                                                    ce?.exportQuantity == "" ||
-                                                                                    ce?.exportQuantity == 0) &&
-                                                                                "border-red-500 border-b"
+                                                                            ? "border-red-500 border-b"
+                                                                            : ""
+                                                                            }
+                                                                            ${(ce?.exportQuantity == null ||
+                                                                                ce?.exportQuantity == "" ||
+                                                                                ce?.exportQuantity == 0) &&
+                                                                            "border-red-500 border-b"
                                                                             }
                                                                             placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-1 disabled:bg-transparent font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                         onValueChange={_HandleChangeChild.bind(

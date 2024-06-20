@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment/moment";
 
-import PopupEdit from "@/components/UI/popup";
-import Loading from "@/components/UI/loading";
-import useFeature from "@/hooks/useConfigFeature";
-import NoData from "@/components/UI/noData/nodata";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import PopupEdit from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
@@ -79,7 +80,7 @@ const Popup_status = (props) => {
                                     {data?.map((e) => (
                                         <RowTable gridCols={8} key={e?.id} >
                                             <RowItemTable colSpan={1} textAlign={'center'}>
-                                                {e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY") : ""}
+                                                {e?.date_coupon != null ? formatMoment(e?.date_coupon, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </RowItemTable>
                                             <RowItemTable colSpan={1} textAlign={'center'}>
                                                 {e?.code_coupon}
@@ -127,7 +128,7 @@ const Popup_status = (props) => {
                                                                         Date:{" "}
                                                                     </h6>
                                                                     <h6 className="px-1 w-[full] text-center">
-                                                                        {e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY") : "-"}
+                                                                        {e.expiration_date ? formatMoment(e.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                     </h6>
                                                                 </div>
                                                             </div>

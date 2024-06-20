@@ -5,36 +5,37 @@ import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 
 import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Grid6,
+    Grid6
 } from "iconsax-react";
 
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import moment from "moment/moment";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Popup_chitiet from "./components/pupup";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
+import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
+import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 
 import { routerReturns } from "@/routers/buyImportGoods";
 
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
-import { debounce } from "lodash";
+import TabFilter from "@/components/UI/TabFilter";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import ButtonAddNew from "@/components/UI/button/buttonAddNew";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import {
     Container,
     ContainerBody,
@@ -42,30 +43,24 @@ import {
     ContainerTable,
     ContainerTotal,
 } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { useSelector } from "react-redux";
-import useActionRole from "@/hooks/useRole";
-import TabFilter from "@/components/UI/TabFilter";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import NoData from "@/components/UI/noData/nodata";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
+import useActionRole from "@/hooks/useRole";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import usePagination from "@/hooks/usePagination";
+import { debounce } from "lodash";
+import { useSelector } from "react-redux";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -663,9 +658,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={10} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet

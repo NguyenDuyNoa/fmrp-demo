@@ -1,35 +1,36 @@
-import moment from "moment";
-import Head from "next/head";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
 import { debounce } from "lodash";
-import React, { useState, useEffect } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 
-import { _ServerInstance as Axios } from "/services/axios";
 import Popup_chitietPhatsinh from "./components/details_arises";
 import Popup_chitietDauki from "./components/details_first";
+import { _ServerInstance as Axios } from "/services/axios";
 
-import Loading from "@/components/UI/loading";
-import Pagination from "@/components/UI/pagination";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { HeaderTable } from "@/components/UI/common/Table";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import Loading from "@/components/UI/loading";
+import Pagination from "@/components/UI/pagination";
 
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import usePagination from "@/hooks/usePagination";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 const Index = (props) => {
     const initialData = {
         data: [],
@@ -83,14 +84,8 @@ const Index = (props) => {
                     page: router.query?.page || 1,
                     "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
                     "filter[client_id]": valueChange.idClient ? valueChange.idClient.value : null,
-                    "filter[start_date]":
-                        valueChange.valueDate?.startDate != null
-                            ? moment(valueChange.valueDate?.startDate).format("YYYY-MM-DD")
-                            : null,
-                    "filter[end_date]":
-                        valueChange.valueDate?.endDate != null
-                            ? moment(valueChange.valueDate?.endDate).format("YYYY-MM-DD")
-                            : null,
+                    "filter[start_date]": valueChange.valueDate?.startDate != null ? formatMoment(valueChange.valueDate?.startDate, FORMAT_MOMENT.DATE_LONG) : null,
+                    "filter[end_date]": valueChange.valueDate?.endDate != null ? formatMoment(valueChange.valueDate?.endDate, FORMAT_MOMENT.DATE_LONG) : null,
                 },
             },
             (err, response) => {

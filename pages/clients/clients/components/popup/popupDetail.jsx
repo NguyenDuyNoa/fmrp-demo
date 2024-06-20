@@ -1,28 +1,23 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { _ServerInstance as Axios } from "/services/axios";
-import PopupEdit from "/components/UI/popup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import ImageErrors from "components/UI/imageErrors";
+import Loading from "components/UI/loading";
+import {
+    SearchNormal1 as IconSearch
+} from "iconsax-react";
 import dynamic from "next/dynamic";
+import { Tooltip } from "react-tippy";
+import TableContact from "../table/tableContact";
+import TableDelivery from "../table/tableDelivery";
+import PopupEdit from "/components/UI/popup";
+import { _ServerInstance as Axios } from "/services/axios";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import Loading from "components/UI/loading";
-import Popup from "reactjs-popup";
-import moment from "moment/moment";
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Map,
-} from "iconsax-react";
-import TableContact from "../table/tableContact";
-import TableDelivery from "../table/tableDelivery";
-import ImageErrors from "components/UI/imageErrors";
-import { Tooltip } from "react-tippy";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 
 const Popup_chitiet = (props) => {
     const scrollAreaRef = useRef(null);
@@ -349,14 +344,7 @@ const Popup_chitiet = (props) => {
                                                     :
                                                 </span>{" "}
                                                 <span className="font-normal capitalize">
-                                                    {data?.date_incorporation !=
-                                                        null &&
-                                                        data?.date_incorporation !=
-                                                        "0000-00-00"
-                                                        ? moment(
-                                                            data?.date_incorporation
-                                                        ).format("DD/MM/YYYY")
-                                                        : ""}
+                                                    {data?.date_incorporation != null && data?.date_incorporation != "0000-00-00" ? formatMoment(data?.date_incorporation, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                 </span>
                                             </div>
                                             <div className="mb-4 flex justify-between items-center p-2">

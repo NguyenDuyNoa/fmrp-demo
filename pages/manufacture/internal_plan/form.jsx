@@ -33,6 +33,8 @@ import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiIn
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 const Index = (props) => {
     const initsFetching = {
         onFetching: false,
@@ -228,7 +230,7 @@ const Index = (props) => {
     };
 
     const handleChangeDate = (value) => {
-        checkValue({ date: moment(value).format("YYYY-MM-DD HH:mm:ss") });
+        checkValue({ date: formatMoment(value, FORMAT_MOMENT.DATE_TIME_LONG) });
     };
 
     const handleStartDate = () => {
@@ -444,10 +446,7 @@ const Index = (props) => {
         formData.append("reference_no", idChange.code ? idChange.code : "");
 
         formData.append(
-            "date",
-            moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
-                ? moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
-                : ""
+            "date", formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_LONG).format("YYYY-MM-DD HH:mm:ss") ? formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_LONG) : ""
         );
 
         formData.append("branch_id", idChange.idBranch?.value ? idChange.idBranch?.value : "");
@@ -463,7 +462,7 @@ const Index = (props) => {
 
             formData.append(`items[${index}][quantity]`, item?.quantity ? item?.quantity : "");
 
-            formData.append(`items[${index}][date_needed]`, item?.date ? moment(item?.date).format("DD/MM/YYYY") : "");
+            formData.append(`items[${index}][date_needed]`, item?.date ? formatMoment(item?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
 
             formData.append(`items[${index}][note_item]`, item?.note ? item?.note : "");
         });
@@ -866,11 +865,11 @@ const Index = (props) => {
                                                             )}
                                                             value={e.quantity || null}
                                                             className={`${errors.errQuantity &&
-                                                                    (e.quantity == null ||
-                                                                        e.quantity == "" ||
-                                                                        e.quantity == 0)
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
+                                                                (e.quantity == null ||
+                                                                    e.quantity == "" ||
+                                                                    e.quantity == 0)
+                                                                ? "border-b border-red-500"
+                                                                : "border-b border-gray-200"
                                                                 }
                                                                 ${e.quantity == null ||
                                                                     e.quantity == "" ||
@@ -902,8 +901,8 @@ const Index = (props) => {
                                                             value={e.date}
                                                             placeholderText="Chọn ngày"
                                                             className={`outline-none ${errors.errDate && (e.date == null || e.date == "")
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
+                                                                ? "border-b border-red-500"
+                                                                : "border-b border-gray-200"
                                                                 } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
                                                         />
                                                     </div>

@@ -1,41 +1,37 @@
-import React, { useState, useEffect } from "react";
-import Head from "next/head";
-import { debounce } from "lodash";
-import { useRouter } from "next/router";
-import { _ServerInstance as Axios } from "/services/axios";
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Grid6,
-} from "iconsax-react";
-import moment from "moment/moment";
-import { useSelector } from "react-redux";
-import Loading from "components/UI/loading";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import Loading from "components/UI/loading";
+import {
+    Grid6
+} from "iconsax-react";
+import { debounce } from "lodash";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { _ServerInstance as Axios } from "/services/axios";
 
-import useToast from "@/hooks/useToast";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import usePagination from "@/hooks/usePagination";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
-import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import usePagination from "@/hooks/usePagination";
+import useToast from "@/hooks/useToast";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -237,9 +233,8 @@ const Index = (props) => {
                 { value: `${e.position ? e.position : ""}` },
                 { value: `${e.email ? e.email : ""}` },
                 {
-                    value: `${
-                        e.birthday ? (e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "") : ""
-                    }`,
+                    value: `${e.birthday ? (e.birthday != "0000-00-00" ? formatMoment(e.birthday, FORMAT_MOMENT.DATE_SLASH_LONG) : "") : ""
+                        }`,
                 },
                 { value: `${e.address ? e.address : ""}` },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
@@ -400,9 +395,7 @@ const Index = (props) => {
                                                             {e.position}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e.birthday != "0000-00-00"
-                                                                ? moment(e.birthday).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e.birthday != "0000-00-00" ? formatMoment(e.birthday, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"left"}>
                                                             {e.address}

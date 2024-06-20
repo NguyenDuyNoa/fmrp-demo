@@ -1,25 +1,25 @@
-import React, { useRef, useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import ModalImage from "react-modal-image";
+import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 import PopupEdit from "../../../../components/UI/popup";
 
 import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
-import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoney from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import formatMoney from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const PopupDetailProduct = (props) => {
     const scrollAreaRef = useRef(null);
@@ -104,7 +104,7 @@ const PopupDetailProduct = (props) => {
                                         {props.dataLang?.sales_product_date || "sales_product_date"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-normal items-start col-span-4 ml-3">
-                                        {data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}
+                                        {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                     </h3>
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -324,9 +324,7 @@ const PopupDetailProduct = (props) => {
                                                         {formatNumberMoney(e?.amount)}
                                                     </h6>
                                                     <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] col-span-1 rounded-md text-center whitespace-normal">
-                                                        {e?.delivery_date != null
-                                                            ? moment(e?.delivery_date).format("DD/MM/YYYY")
-                                                            : ""}
+                                                        {e?.delivery_date != null ? formatMoment(e?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </h6>
                                                     <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] pl-4 col-span-1 rounded-md text-left whitespace-normal">
                                                         {e?.note != undefined ? e?.note : ""}

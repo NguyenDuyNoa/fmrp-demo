@@ -1,37 +1,20 @@
-import React, { useState, useRef, useEffect } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { NumericFormat } from "react-number-format";
 import ReactExport from "react-data-export";
 
 import Swal from "sweetalert2";
 
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import Loading from "components/UI/loading";
 import {
-  Edit as IconEdit,
-  Grid6 as IconExcel,
-  Trash as IconDelete,
-  SearchNormal1 as IconSearch,
-  Add as IconAdd,
-  LocationTick,
-  User,
-  ArrowCircleDown,
-  Refresh2,
+  SearchNormal1 as IconSearch
 } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import { useDispatch } from "react-redux";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -240,9 +223,8 @@ const Popup_chitiet = (props) => {
                         <span className="font-normal capitalize">
                           {data?.date_incorporation != null
                             ? data?.date_incorporation != "0000-00-00"
-                              ? moment(data?.date_incorporation).format(
-                                "DD/MM/YYYY"
-                              )
+                              ?
+                              formatMoment(data?.date_incorporation, FORMAT_MOMENT.DATE_SLASH_LONG)
                               : ""
                             : ""}
                         </span>

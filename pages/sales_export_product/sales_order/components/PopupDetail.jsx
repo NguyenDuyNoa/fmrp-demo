@@ -1,38 +1,27 @@
-import React, { useRef, useState, useEffect } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import ModalImage from "react-modal-image";
+import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalImage from "react-modal-image";
 import PopupEdit from "../../../../components/UI/popup";
 
 import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-    ArrowCircleDown,
+    SearchNormal1 as IconSearch
 } from "iconsax-react";
-import Select from "react-select";
+import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
 
-import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
 registerLocale("vi", vi);
 
 
-import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from "/services/axios";
-import formatMoney from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoney from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import Loading from "components/UI/loading";
+import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupDetail = (props) => {
     const scrollAreaRef = useRef(null);
@@ -116,20 +105,15 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.price_quote_date || "price_quote_date"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-normal">
-                                                {data?.date != null
-                                                    ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss")
-                                                    : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang?.price_quote_effective_date ||
-                                                    "price_quote_effective_date"}
+                                                {props.dataLang?.price_quote_effective_date || "price_quote_effective_date"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-normal">
-                                                {data?.validity != null
-                                                    ? moment(data?.validity).format("DD/MM/YYYY")
-                                                    : ""}
+                                                {data?.validity != null ? formatMoment(data?.validity, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-medium grid grid-cols-2">

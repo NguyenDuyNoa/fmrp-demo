@@ -1,57 +1,48 @@
-import Head from "next/head";
 import { debounce } from "lodash";
-import moment from "moment/moment";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
-import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Eye as IconEye,
-    EyeSlash as IconEyeSlash,
-    Image as IconImage,
-    GalleryEdit as IconEditImg,
-    Grid6,
+    Grid6
 } from "iconsax-react";
 
 import Popup_dsnd from "./components/staff/popup";
 import Popup_chitiet from "./components/staff/popupDetail";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import Loading from "@/components/UI/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
-import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 
-import useToast from "@/hooks/useToast";
-import useActionRole from "@/hooks/useRole";
-import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
 import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { WARNING_STATUS_ROLE, WARNING_STATUS_ROLE_ADMIN } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -585,9 +576,7 @@ const Index = (props) => {
                                                             {e.position_name}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={2} textAlign={"center"}>
-                                                            {e.last_login != null
-                                                                ? moment(e.last_login).format("DD/MM/YYYY, h:mm:ss")
-                                                                : ""}
+                                                            {e.last_login != null ? formatMoment(e.last_login, FORMAT_MOMENT.DATE_TIME_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <label
@@ -644,7 +633,7 @@ const Index = (props) => {
                                                             />
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => {}}
+                                                                onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="personnel_staff"

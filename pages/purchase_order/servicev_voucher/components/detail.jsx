@@ -1,44 +1,29 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import ModalImage from "react-modal-image";
+import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { NumericFormat } from "react-number-format";
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    Edit as IconEdit,
-    Trash as IconDelete,
-    TickCircle,
-} from "iconsax-react";
 
-import Popup from "reactjs-popup";
-import moment from "moment/moment";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 
-import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
+import PopupEdit from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { useEffect } from "react";
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import NoData from "@/components/UI/noData/nodata";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import ImageErrors from "components/UI/imageErrors";
+import ExpandableContent from "components/UI/more";
+import { useEffect } from "react";
 
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -102,10 +87,7 @@ const Popup_chitiet = (props) => {
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
                                                 {data?.date != null
-                                                    ? moment(data?.date).format(
-                                                        "DD/MM/YYYY"
-                                                    )
-                                                    : ""}
+                                                    ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-2 items-center font-medium grid grid-cols-2">

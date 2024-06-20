@@ -29,9 +29,11 @@ import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { SelectCore } from "@/utils/lib/Select";
 const Index = (props) => {
@@ -71,7 +73,7 @@ const Index = (props) => {
 
     const [note, sNote] = useState("");
 
-    const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+    const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
     const [dataBranch, sDataBranch] = useState([]);
 
@@ -121,7 +123,7 @@ const Index = (props) => {
             sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
             sOnLoading(false);
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -157,9 +159,8 @@ const Index = (props) => {
                     idParenBackend: e?.item?.id,
                     matHang: {
                         e: e?.item,
-                        label: `${e.item?.name} <span style={{display: none}}>${
-                            e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
+                        label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
                         value: e.item?.id,
                     },
                     child: e?.child.map((ce) => ({
@@ -171,10 +172,10 @@ const Index = (props) => {
                         location:
                             ce?.warehouse?.location_name || ce?.warehouse?.id || ce?.warehouse?.warehouse_name
                                 ? {
-                                      label: ce?.warehouse?.location_name || null,
-                                      value: ce?.warehouse?.id || null,
-                                      warehouse_name: ce?.warehouse?.warehouse_name || null,
-                                  }
+                                    label: ce?.warehouse?.location_name || null,
+                                    value: ce?.warehouse?.id || null,
+                                    warehouse_name: ce?.warehouse?.warehouse_name || null,
+                                }
                                 : null,
                         price: ce?.price,
                         serial: ce?.serial == null ? "" : ce?.serial,
@@ -190,7 +191,7 @@ const Index = (props) => {
             sStartDate(moment(rResult?.date).toDate());
             sNote(rResult?.note);
             sOnFetchingDetail(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -206,8 +207,8 @@ const Index = (props) => {
             sOnFetchingDetail(true);
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
+        JSON.stringify(dataProductExpiry) !== "{}" &&
+        JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
     const _ServerFetching_ItemsAll = async () => {
@@ -220,7 +221,7 @@ const Index = (props) => {
                 },
             });
             sDataItems(result);
-        } catch (error) {}
+        } catch (error) { }
         sOnFetchingItemsAll(false);
     };
 
@@ -238,7 +239,7 @@ const Index = (props) => {
                     // warehouse_name: e?.warehouse_name,
                 }))
             );
-        } catch (error) {}
+        } catch (error) { }
         sOnFetchingWarehouse(false);
     };
 
@@ -259,7 +260,7 @@ const Index = (props) => {
                     },
                 });
                 sDataItems(result);
-            } catch (error) {}
+            } catch (error) { }
         }
     }, 500);
 
@@ -277,7 +278,7 @@ const Index = (props) => {
                     value: e?.id,
                 }))
             );
-        } catch (error) {}
+        } catch (error) { }
         sOnFetchingLocation(false);
     };
 
@@ -301,7 +302,7 @@ const Index = (props) => {
         if (type == "code") {
             sCode(value.target.value);
         } else if (type === "date") {
-            sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+            sDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type === "note") {
             sNote(value.target.value);
         } else if (type == "branch" && idBranch != value) {
@@ -443,7 +444,7 @@ const Index = (props) => {
     const _ServerSending = async () => {
         var formData = new FormData();
         formData.append("code", code);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", idBranch?.value);
         formData.append("warehouse_id", idRecalltWarehouse?.value);
         formData.append("note", note);
@@ -462,7 +463,7 @@ const Index = (props) => {
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][expiration_date]`,
-                    childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD")
+                    childItem?.date === null ? "" : formatMoment(childItem?.date, FORMAT_MOMENT.DATE_LONG)
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
@@ -488,7 +489,7 @@ const Index = (props) => {
             } else {
                 handleCheckError(dataLang[message] || message);
             }
-        } catch (error) {}
+        } catch (error) { }
         sOnSending(false);
     };
 
@@ -781,9 +782,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -811,9 +811,8 @@ const Index = (props) => {
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -873,9 +872,8 @@ const Index = (props) => {
                                             dataLang?.productsWarehouse_warehouseImport ||
                                             "productsWarehouse_warehouseImport"
                                         }
-                                        className={`${
-                                            errRecallWarehouse ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errRecallWarehouse ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -979,9 +977,8 @@ const Index = (props) => {
                         </h4>
                         <div className="col-span-9">
                             <div
-                                className={`${
-                                    dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
-                                } grid `}
+                                className={`${dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
+                                    } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
                                     {dataLang?.productsWarehouse_warehouseLocaImport ||
@@ -1113,9 +1110,8 @@ const Index = (props) => {
 
                         <div className="col-span-9">
                             <div
-                                className={`${
-                                    dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
-                                } grid  divide-x border-t border-b border-r border-l`}
+                                className={`${dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" : "grid-cols-5"
+                                    } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
                                     {" "}
@@ -1309,11 +1305,10 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-9  items-center">
                                                 <div
-                                                    className={`${
-                                                        dataMaterialExpiry.is_enable == "1"
-                                                            ? "grid-cols-7"
-                                                            : "grid-cols-5"
-                                                    }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
+                                                    className={`${dataMaterialExpiry.is_enable == "1"
+                                                        ? "grid-cols-7"
+                                                        : "grid-cols-5"
+                                                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
                                                 >
                                                     {e?.child?.map((ce) => (
                                                         <React.Fragment key={ce?.id?.toString()}>
@@ -1330,16 +1325,15 @@ const Index = (props) => {
                                                                         ce?.id,
                                                                         "location"
                                                                     )}
-                                                                    className={`${
-                                                                        errWarehouse && ce?.location == null
-                                                                            ? "border-red-500 border"
-                                                                            : ""
-                                                                    }  my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    className={`${errWarehouse && ce?.location == null
+                                                                        ? "border-red-500 border"
+                                                                        : ""
+                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
                                                                             : dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                                              "productsWarehouse_warehouseLocaImport"
+                                                                            "productsWarehouse_warehouseLocaImport"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata || "returns_nodata"
@@ -1385,15 +1379,14 @@ const Index = (props) => {
                                                                             <input
                                                                                 value={ce?.lot}
                                                                                 disabled={ce?.disabledDate}
-                                                                                className={`border ${
-                                                                                    ce?.disabledDate
-                                                                                        ? "bg-gray-50"
-                                                                                        : errLot &&
-                                                                                          (ce?.lot == "" ||
-                                                                                              ce?.lot == null)
+                                                                                className={`border ${ce?.disabledDate
+                                                                                    ? "bg-gray-50"
+                                                                                    : errLot &&
+                                                                                        (ce?.lot == "" ||
+                                                                                            ce?.lot == null)
                                                                                         ? "border-red-500"
                                                                                         : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                                                } placeholder:text-slate-300 w-full  bg-[#ffffff]  rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                    } placeholder:text-slate-300 w-full  bg-[#ffffff]  rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                 onChange={_HandleChangeChild.bind(
                                                                                     this,
                                                                                     e?.id,
@@ -1426,14 +1419,13 @@ const Index = (props) => {
                                                                                             dataLang?.price_quote_system_default ||
                                                                                             "price_quote_system_default"
                                                                                         }
-                                                                                        className={`border ${
-                                                                                            ce?.disabledDate
-                                                                                                ? "bg-gray-50"
-                                                                                                : errDateList &&
-                                                                                                  ce?.date == null
+                                                                                        className={`border ${ce?.disabledDate
+                                                                                            ? "bg-gray-50"
+                                                                                            : errDateList &&
+                                                                                                ce?.date == null
                                                                                                 ? "border-red-500"
                                                                                                 : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                                     />
                                                                                     {effectiveDate && (
                                                                                         <>
@@ -1476,19 +1468,17 @@ const Index = (props) => {
                                                                 </button>
 
                                                                 <InPutNumericFormat
-                                                                    className={`${
-                                                                        errQty &&
+                                                                    className={`${errQty &&
                                                                         (ce?.recallQuantity == null ||
                                                                             ce?.recallQuantity == "" ||
                                                                             ce?.recallQuantity == 0)
-                                                                            ? "border-red-500 border-b"
-                                                                            : ""
-                                                                    }
-                                                                        ${
-                                                                            (ce?.recallQuantity == null ||
-                                                                                ce?.recallQuantity == "" ||
-                                                                                ce?.recallQuantity == 0) &&
-                                                                            "border-red-500 border-b"
+                                                                        ? "border-red-500 border-b"
+                                                                        : ""
+                                                                        }
+                                                                        ${(ce?.recallQuantity == null ||
+                                                                            ce?.recallQuantity == "" ||
+                                                                            ce?.recallQuantity == 0) &&
+                                                                        "border-red-500 border-b"
                                                                         }
                                                                         placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                     onValueChange={_HandleChangeChild.bind(

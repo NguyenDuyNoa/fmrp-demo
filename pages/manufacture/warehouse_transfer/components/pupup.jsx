@@ -1,4 +1,3 @@
-import moment from "moment/moment";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
@@ -15,8 +14,10 @@ import useSetingServer from "@/hooks/useConfigNumber";
 
 import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 const Popup_chitiet = (props) => {
@@ -45,7 +46,7 @@ const Popup_chitiet = (props) => {
             const data = await apiWarehouseTransfer.apiDetailTransfer(props?.id);
             sData(data);
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -77,7 +78,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
@@ -248,7 +249,7 @@ const Popup_chitiet = (props) => {
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
                                                                                         {e?.item?.serial == null ||
-                                                                                        e?.item?.serial == ""
+                                                                                            e?.item?.serial == ""
                                                                                             ? "-"
                                                                                             : e?.item?.serial}
                                                                                     </h6>
@@ -256,18 +257,14 @@ const Popup_chitiet = (props) => {
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
                                                                                             Lot:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e?.item?.lot == null ||
-                                                                                            e?.item?.lot == ""
-                                                                                                ? "-"
-                                                                                                : e?.item?.lot}
+                                                                                            {e?.item?.lot == null || e?.item?.lot == "" ? "-" : e?.item?.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className="flex gap-0.5">
@@ -275,12 +272,7 @@ const Popup_chitiet = (props) => {
                                                                                             Date:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e?.item?.expiration_date
-                                                                                                ? moment(
-                                                                                                      e?.item
-                                                                                                          ?.expiration_date
-                                                                                                  ).format("DD/MM/YYYY")
-                                                                                                : "-"}
+                                                                                            {e?.item?.expiration_date ? formatMoment(e?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>

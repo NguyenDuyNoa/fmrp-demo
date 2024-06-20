@@ -8,11 +8,12 @@ import SearchComponent from '@/components/UI/filterComponents/searchComponent';
 import Loading from '@/components/UI/loading';
 import NoData from '@/components/UI/noData/nodata';
 import Pagination from "@/components/UI/pagination";
+import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate';
 import useSetingServer from '@/hooks/useConfigNumber';
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems';
+import { formatMoment } from '@/utils/helpers/formatMoment';
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { Grid6 } from 'iconsax-react';
-import moment from 'moment';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -199,7 +200,7 @@ const TabWarehouseHistory = memo(({ isStateModal, width, dataLang, listTab }) =>
                                             {index + 1}
                                         </RowItemTable>
                                         <RowItemTable colSpan={2} textAlign={'center'}>
-                                            {moment(e.date).format("DD/MM/YYYY, hh:mm:ss")}
+                                            {formatMoment(e.date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG)}
                                         </RowItemTable>
                                         <RowItemTable colSpan={2} textAlign={'center'}>
                                             {e.codeResent}

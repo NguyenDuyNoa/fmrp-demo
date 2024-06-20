@@ -5,6 +5,7 @@ import { ListBtn_Setting } from "./information";
 
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container } from "@/components/UI/common/layout";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { Clock as IconClock, Money2 as IconMoney, Refresh as IconRefresh } from "iconsax-react";
@@ -12,8 +13,6 @@ import { useSelector } from "react-redux";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
-
-    const { isMoment } = formatMoment()
 
     const statusExprired = useStatusExprired()
 
@@ -42,7 +41,7 @@ const Index = (props) => {
             idStatus: +auth?.status_active_package?.status,
             member: auth?.number_of_users,
             capacity: +auth?.memory_storage,
-            expDate: isMoment(auth?.expiration_date, 'DD/MM/YYYY')
+            expDate: formatMoment(auth?.expiration_date, FORMAT_MOMENT.DATE_TIME_SLASH_LONG),
         })
     }, [auth])
 

@@ -21,35 +21,25 @@ const PopupConfim = (props) => {
     const handleConfimDelete = () => {
         switch (props?.nameModel) {
             case "client_contact":
-                //Xóa biến liên hệ KH
-                // if (!props?.isIdChild && !checkDelete) {
-                //     props.save();
-                // } else {
-                //     showToat('warning', 'Bạn không có quyền truy cập');
-                // }
-                props.save();
-                break;
+            //Xóa biến liên hệ KH
+            // if (!props?.isIdChild && !checkDelete) {
+            //     props.save();
+            // } else {
+            //     showToat('warning', 'Bạn không có quyền truy cập');
+            // }
             case "contacts_suppliers":
-                //Xóa biến liên hệ ncc
-                // if (!props?.isIdChild && !checkDelete) {
-                //     props.save();
-                // } else {
-                //     showToat('warning', 'Bạn không có quyền truy cập');
-                // }
-                props.save();
-                break;
+            //Xóa biến liên hệ ncc
+            // if (!props?.isIdChild && !checkDelete) {
+            //     props.save();
+            // } else {
+            //     showToat('warning', 'Bạn không có quyền truy cập');
+            // }
             case "change_item":
-                //Xóa các item ở form change_item
-                props.save();
-                break;
+            //Xóa các item ở form change_item
             case "material_variation":
-                //Xóa biến thể nvl
-                props.save();
-                break;
+            //Xóa biến thể nvl
             case 'product_variant':
-                //Xóa biến thể thành phẩm
-                props.save();
-                break;
+            //Xóa biến thể thành phẩm
             case 'personnel_staff_status':
                 // Đổi trạng thái hoạt động của người dùng
                 props.save();

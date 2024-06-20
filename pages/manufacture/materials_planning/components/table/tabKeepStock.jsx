@@ -3,12 +3,13 @@ import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import { motion } from "framer-motion";
 import { TickCircle } from "iconsax-react";
-import moment from "moment";
 import { useState } from "react";
 import ModalImage from "react-modal-image";
 
@@ -27,9 +28,8 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                     <button
                         type="button"
                         onClick={() => setIsTab("dataKeepStock")}
-                        className={`${
-                            isTab === "dataKeepStock" && "border-green-500 border"
-                        } bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit rounded-md  flex gap-1 items-center`}
+                        className={`${isTab === "dataKeepStock" && "border-green-500 border"
+                            } bg-[#EBFEF2] text-[#0BAA2E] py-[2px] px-[10px] font-normal text-xs w-fit rounded-md  flex gap-1 items-center`}
                     >
                         {dataLang?.materials_planning_keep_tock || "materials_planning_keep_tock"}
                         <span className="bg-[#0BAA2E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">
@@ -39,9 +39,8 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                     <button
                         type="button"
                         onClick={() => setIsTab("dataPurchases")}
-                        className={`${
-                            isTab === "dataPurchases" && "border-[#EE1E1E] border"
-                        } bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit rounded-md  flex gap-1 items-center`}
+                        className={`${isTab === "dataPurchases" && "border-[#EE1E1E] border"
+                            } bg-[#FFEEF0] text-[#EE1E1E] py-[2px] px-[10px] font-normal text-xs w-fit rounded-md  flex gap-1 items-center`}
                     >
                         {dataLang?.materials_planning_ycmh || "materials_planning_ycmh"}
                         <span className="bg-[#EE1E1E] text-white 3xl:px-[8.5px] px-[7px] py-0.5 rounded-full">
@@ -75,7 +74,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                     {e.showChild
                                                         ? dataLang?.materials_planning_hide || "materials_planning_hide"
                                                         : dataLang?.materials_planning_show_more ||
-                                                          "materials_planning_show_more"}
+                                                        "materials_planning_show_more"}
                                                 </h3>
                                             </Zoom>
                                             <Zoom
@@ -162,11 +161,10 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                     (dataLang?.price_quote_quantity || "price_quote_quantity")}
                                             </h4>
                                             <h4
-                                                className={`${
-                                                    isTab === "dataKeepStock"
+                                                className={`${isTab === "dataKeepStock"
                                                         ? "col-span-2 text-center px-4"
                                                         : "col-span-4 text-left px-0"
-                                                }   text-[#344054] font-normal text-xs`}
+                                                    }   text-[#344054] font-normal text-xs`}
                                             >
                                                 {isTab === "dataKeepStock" &&
                                                     (dataLang?.warehouseTransfer_rransferPosition ||
@@ -187,9 +185,8 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             {e.arrListData.map((i, index) => (
                                                 <div
                                                     key={i.id}
-                                                    className={`grid grid-cols-12 items-center ${
-                                                        e.arrListData?.length - 1 == index ? "" : "border-b"
-                                                    } `}
+                                                    className={`grid grid-cols-12 items-center ${e.arrListData?.length - 1 == index ? "" : "border-b"
+                                                        } `}
                                                 >
                                                     <h4 className="col-span-4 flex items-center py-2 px-4 gap-2">
                                                         <ModalImage
@@ -212,31 +209,22 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                     <div className="flex gap-0.5">
                                                                         <h6 className="text-[12px]">Serial:</h6>
                                                                         <h6 className="text-[10px]  px-2   w-[full] text-left ">
-                                                                            {i?.serial == null || i?.serial == ""
-                                                                                ? "-"
-                                                                                : i?.serial}
+                                                                            {i?.serial == null || i?.serial == "" ? "-" : i?.serial}
                                                                         </h6>
                                                                     </div>
                                                                 )}
-                                                                {(dataMaterialExpiry.is_enable === "1" ||
-                                                                    dataProductExpiry.is_enable === "1") && (
+                                                                {(dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1") && (
                                                                     <>
                                                                         <div className="flex gap-0.5">
                                                                             <h6 className="text-[10px]">Lot:</h6>{" "}
                                                                             <h6 className="text-[10px]  px-2   w-[full] text-left ">
-                                                                                {i?.lot == null || i?.lot == ""
-                                                                                    ? "-"
-                                                                                    : i?.lot}
+                                                                                {i?.lot == null || i?.lot == "" ? "-" : i?.lot}
                                                                             </h6>
                                                                         </div>
                                                                         <div className="flex gap-0.5">
                                                                             <h6 className="text-[10px]">Date:</h6>{" "}
                                                                             <h6 className="text-[10px]  px-2   w-[full] text-center ">
-                                                                                {i?.expiration_date
-                                                                                    ? moment(i?.expiration_date).format(
-                                                                                          "DD/MM/YYYY"
-                                                                                      )
-                                                                                    : "-"}
+                                                                                {i?.expiration_date ? formatMoment(i?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                             </h6>
                                                                         </div>
                                                                     </>
@@ -273,52 +261,46 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                         <div className="flex items-center w-full">
                                                                             {index === 0 && (
                                                                                 <div
-                                                                                    className={`${
-                                                                                        j.active
+                                                                                    className={`${j.active
                                                                                             ? "bg-[#00C170]"
                                                                                             : "bg-gray-500"
-                                                                                    } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
+                                                                                        } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
                                                                                 />
                                                                             )}
                                                                             <div
-                                                                                className={`${
-                                                                                    j.active
+                                                                                className={`${j.active
                                                                                         ? "bg-[#00C170]"
                                                                                         : "bg-gray-500"
-                                                                                }  h-[2px] w-full`}
+                                                                                    }  h-[2px] w-full`}
                                                                             />
                                                                             {index === i.processBar.length - 1 && (
                                                                                 <div
-                                                                                    className={`${
-                                                                                        j.active
+                                                                                    className={`${j.active
                                                                                             ? "bg-[#00C170]"
                                                                                             : "bg-gray-500"
-                                                                                    } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
+                                                                                        } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
                                                                                 />
                                                                             )}
                                                                         </div>
                                                                     </motion.div>
                                                                     <div
-                                                                        className={`mt-1 ${
-                                                                            index === i.processBar.length - 1 &&
+                                                                        className={`mt-1 ${index === i.processBar.length - 1 &&
                                                                             "relative -right-[94%]"
-                                                                        }`}
+                                                                            }`}
                                                                     >
                                                                         <p
-                                                                            className={`${
-                                                                                j.active
+                                                                            className={`${j.active
                                                                                     ? "text-[#0BAA2E]"
                                                                                     : "text-gray-500"
-                                                                            } font-normal text-[10px] uppercase`}
+                                                                                } font-normal text-[10px] uppercase`}
                                                                         >
                                                                             {j.title}
                                                                         </p>
                                                                         <p
-                                                                            className={` ${
-                                                                                j.quantity > 0
+                                                                            className={` ${j.quantity > 0
                                                                                     ? "opacity-100"
                                                                                     : "opacity-0"
-                                                                            } text-[#0BAA2E] font-normal text-[10px]`}
+                                                                                } text-[#0BAA2E] font-normal text-[10px]`}
                                                                         >
                                                                             SL:
                                                                             <span className="text-[#0BAA2E] font-semibold text-[11px] px-1">

@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
-import Image from "next/image";
 
-import { useSelector } from "react-redux";
-import { MdClose } from "react-icons/md";
-import { _ServerInstance as Axios } from "/services/axios";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import { Verify } from "iconsax-react";
-import moment from "moment";
+import { useSelector } from "react-redux";
+import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupAppTrial = () => {
     const [isMounted, setIsMounted] = useState(false);
@@ -20,7 +19,7 @@ const PopupAppTrial = () => {
     const handleCloseModal = () => {
         setOpenModal(false);
     };
-    
+
     useEffect(() => {
         if (dataAuthentication.active_popup) {
             setOpenModal(false);
@@ -108,13 +107,13 @@ const PopupAppTrial = () => {
                                     <span>Thời gian dùng thử: Bắt đầu từ ngày</span>
 
                                     <span className="text-blue-500 mx-1">
-                                        {moment(dataAuthentication?.start_date).format("DD/MM/YYYY")}
+                                        {formatMoment(dataAuthentication?.start_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                     </span>
 
                                     <span>đến ngày</span>
 
                                     <span className="text-blue-500 mx-1">
-                                        {moment(dataAuthentication?.expiration_date).format("DD/MM/YYYY")}
+                                        {formatMoment(dataAuthentication?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)}
                                     </span>
 
                                     <span>và kết thúc sau</span>

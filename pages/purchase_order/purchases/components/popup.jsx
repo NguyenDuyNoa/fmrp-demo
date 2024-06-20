@@ -1,7 +1,7 @@
 import {
     TickCircle
 } from "iconsax-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import PopupEdit from "/components/UI/popup";
 
@@ -12,11 +12,12 @@ import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import Loading from "components/UI/loading";
 import ExpandableContent from "components/UI/more";
-import moment from "moment/moment";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
@@ -75,7 +76,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.purchase_day || "purchase_day"}
                                             </h3>
                                             <h3 className="col-span-1 font-medium text-[13px]">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-semibold grid grid-cols-2">

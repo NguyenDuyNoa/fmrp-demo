@@ -1,5 +1,4 @@
 import { debounce } from "lodash";
-import moment from "moment/moment";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -36,11 +35,13 @@ import apiComons from "@/Api/apiComon/apiComon";
 import apiInternalPlan from "@/Api/apiManufacture/manufacture/internalPlan/apiInternalPlan";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
 import useActionRole from "@/hooks/useRole";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import { routerInternalPlan } from "routers/manufacture";
 
 const PopupDetail = dynamic(() => import("./components/PopupDetail"), { ssr: false });
@@ -93,14 +94,8 @@ const Index = (props) => {
             limit: limit,
             page: router.query?.page || 1,
             branch_id: idFillter.idBranch != null ? idFillter.idBranch.value : null,
-            start_date:
-                idFillter?.valueDate?.startDate != null
-                    ? moment(idFillter?.valueDate?.startDate).format("DD/MM/YYYY")
-                    : null,
-            end_date:
-                idFillter?.valueDate?.endDate != null
-                    ? moment(idFillter?.valueDate?.endDate).format("DD/MM/YYYY")
-                    : null,
+            start_date: idFillter?.valueDate?.startDate != null ? formatMoment(idFillter?.valueDate?.startDate, FORMAT_MOMENT.DATE_SLASH_LONG) : null,
+            end_date: idFillter?.valueDate?.endDate != null ? formatMoment(idFillter?.valueDate?.endDate, FORMAT_MOMENT.DATE_SLASH_LONG) : null,
         };
         try {
             const { data } = await apiInternalPlan.apiListInternalPlan({ params: params });
@@ -400,9 +395,7 @@ const Index = (props) => {
                                                 {listData?.data?.map((e, index) => (
                                                     <RowTable key={e.id.toString()} gridCols={9}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <PopupDetail

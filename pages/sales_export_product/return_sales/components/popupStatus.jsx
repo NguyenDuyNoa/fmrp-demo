@@ -1,38 +1,25 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
-import "react-datepicker/dist/react-datepicker.css";
 
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-} from "iconsax-react";
 
-import Select from "react-select";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from "reactjs-popup";
-import moment from "moment/moment";
 import vi from "date-fns/locale/vi";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
 
 
-import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
+import PopupEdit from "/components/UI/popup";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Swal from "sweetalert2";
 
-import { useEffect } from "react";
-import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useEffect } from "react";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -135,9 +122,7 @@ const Popup_status = (props) => {
                                     {data?.map((e) => (
                                         <div className={`grid-cols-8  grid hover:bg-slate-50 items-center`}>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center">
-                                                {e?.date_coupon != null
-                                                    ? moment(e?.date_coupon).format("DD/MM/YYYY")
-                                                    : ""}
+                                                {e?.date_coupon != null ? formatMoment(e?.date_coupon, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h6>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer">
                                                 {e?.code_coupon}
@@ -180,9 +165,7 @@ const Popup_status = (props) => {
                                                                 <div className="flex gap-1 items-center italic font-normal text-[12px]">
                                                                     <h6>Serial: </h6>
                                                                     <h6 className=" w-[full] text-center">
-                                                                        {e.serial == null || e.serial == ""
-                                                                            ? "-"
-                                                                            : e.serial}
+                                                                        {e.serial == null || e.serial == "" ? "-" : e.serial}
                                                                     </h6>
                                                                 </div>
                                                             ) : (
@@ -200,11 +183,7 @@ const Popup_status = (props) => {
                                                                     <div className="flex gap-1 items-center italic font-normal text-[12px]">
                                                                         <h6>Date: </h6>
                                                                         <h6 className="px-1 w-[full] text-center">
-                                                                            {e.expiration_date
-                                                                                ? moment(e.expiration_date).format(
-                                                                                    "DD/MM/YYYY"
-                                                                                )
-                                                                                : "-"}
+                                                                            {e.expiration_date ? formatMoment(e.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                         </h6>
                                                                     </div>
                                                                 </div>

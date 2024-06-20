@@ -1,51 +1,30 @@
-import React, { useState, useRef, useEffect } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import ReactExport from "react-data-export";
 import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import ReactExport from "react-data-export";
 
-import Swal from "sweetalert2";
 import { NumericFormat } from "react-number-format";
-import { v4 as uuidv4 } from "uuid";
+import Swal from "sweetalert2";
 
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import ModalImage from "react-modal-image";
+import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Add,
-} from "iconsax-react";
 
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
 
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
-import dynamic from "next/dynamic";
-import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import { useDispatch } from "react-redux";
-import CreatableSelect from "react-select/creatable";
-import formatNumber from "@/utils/helpers/formatnumber";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import ToatstNotifi from "@/utils/helpers/alerNotification";
-import { useForm, Controller } from "react-hook-form";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumber from "@/utils/helpers/formatnumber";
+import moment from "moment/moment";
+import dynamic from "next/dynamic";
+import { Controller, useForm } from "react-hook-form";
+import Select, { components } from "react-select";
+import CreatableSelect from "react-select/creatable";
+import PopupEdit from "/components/UI/popup";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -669,7 +648,7 @@ const Popup_dspt = (props) => {
     const _ServerSending = () => {
         let formData = new FormData();
         formData.append("code", listValue.code == null ? "" : listValue.code);
-        formData.append("date", moment(listValue.date).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(listValue.date, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", listValue.branch?.value);
         formData.append("objects", listValue.object?.value);
         formData.append("type_vouchers", listValue.typeOfDocument ? listValue.typeOfDocument?.value : "");
@@ -1152,10 +1131,10 @@ const Popup_dspt = (props) => {
                                                 }),
                                             }}
                                             className={`${error.errListTypeDoc &&
-                                                    listValue.typeOfDocument != null &&
-                                                    listValue.listTypeOfDocument?.length == 0
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
+                                                listValue.typeOfDocument != null &&
+                                                listValue.listTypeOfDocument?.length == 0
+                                                ? "border-red-500"
+                                                : "border-transparent"
                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
@@ -1214,8 +1193,8 @@ const Popup_dspt = (props) => {
                                                 }
                                             }}
                                             className={`${error.errPrice && listValue.price == null
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
                                                 } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
                                             thousandSeparator=","
                                         />

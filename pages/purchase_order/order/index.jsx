@@ -1,22 +1,15 @@
-import Head from "next/head";
 import { debounce } from "lodash";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
 
 import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-    Grid6,
+    Grid6
 } from "iconsax-react";
 
 import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment/moment";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -26,23 +19,15 @@ import Popup_chitiet from "./components/popup";
 
 import { routerOrder } from "routers/buyImportGoods";
 
-import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/TabFilter";
-import NoData from "@/components/UI/noData/nodata";
-import Pagination from "@/components/UI/pagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
-import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import {
     Container,
@@ -51,17 +36,27 @@ import {
     ContainerTable,
     ContainerTotal,
 } from "@/components/UI/common/layout";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
+import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import Loading from "@/components/UI/loading";
+import NoData from "@/components/UI/noData/nodata";
+import Pagination from "@/components/UI/pagination";
 
-import useActionRole from "@/hooks/useRole";
 import useSetingServer from "@/hooks/useConfigNumber";
-import useStatusExprired from "@/hooks/useStatusExprired";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
+import useActionRole from "@/hooks/useRole";
+import useStatusExprired from "@/hooks/useStatusExprired";
 
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import usePagination from "@/hooks/usePagination";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
-import usePagination from "@/hooks/usePagination";
 const Index = (props) => {
     const dataLang = props.dataLang;
 
@@ -367,13 +362,12 @@ const Index = (props) => {
                     value: `${e?.order_type ? (e?.order_type == "0" ? "Tạo mới" : "Theo YCHM") : ""}`,
                 },
                 {
-                    value: `${
-                        e?.purchases
+                    value: `${e?.purchases
                             ? e?.purchases?.map((e) => {
-                                  return e?.code;
-                              })
+                                return e?.code;
+                            })
                             : ""
-                    }`,
+                        }`,
                 },
                 {
                     value: `${e?.total_price ? formatMoney(e?.total_price) : ""}`,
@@ -386,13 +380,12 @@ const Index = (props) => {
                 },
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
-                    value: `${
-                        e?.status_pay
+                    value: `${e?.status_pay
                             ? (e?.status_pay === "0" && "Chưa nhập") ||
-                              (e?.status_pay === "1" && "Nhập 1 phần") ||
-                              (e?.status_pay === "2" && "Đã nhập đủ đủ")
+                            (e?.status_pay === "1" && "Nhập 1 phần") ||
+                            (e?.status_pay === "2" && "Đã nhập đủ đủ")
                             : ""
-                    }`,
+                        }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -640,7 +633,7 @@ const Index = (props) => {
                                             {isState.data?.map((e) => (
                                                 <RowTable key={e?.id} gridCols={12}>
                                                     <RowItemTable colSpan={1} textAlign="center">
-                                                        {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
+                                                        {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                     </RowItemTable>
                                                     <RowItemTable colSpan={1}>
                                                         <Popup_chitiet

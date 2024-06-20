@@ -1,5 +1,4 @@
 import { PopupParent } from "@/utils/lib/Popup";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 
@@ -14,6 +13,8 @@ import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import PopupEdit from "@/components/UI/popup";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
@@ -37,7 +38,7 @@ const Popup_chitiet = (props) => {
             const db = await apiInventory.apiDetailInventory(props?.id);
             sData(db);
             sOnFetching(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -81,7 +82,7 @@ const Popup_chitiet = (props) => {
                                                 {props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
                                             </h3>
                                             <h3 className="col-span-1 text-[13px] font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.date != null ? formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h3>
                                         </div>
                                         <div className="my-4 font-medium grid grid-cols-2">
@@ -135,8 +136,8 @@ const Popup_chitiet = (props) => {
                                                             {" "}
                                                             {data?.adjusted
                                                                 ? data?.adjusted.split("|||").length +
-                                                                  " " +
-                                                                  " Điều chỉnh"
+                                                                " " +
+                                                                " Điều chỉnh"
                                                                 : ""}
                                                         </span>
                                                     )}
@@ -241,27 +242,20 @@ const Popup_chitiet = (props) => {
                                                                                         Serial:
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e?.serial == null ||
-                                                                                        e?.serial == ""
-                                                                                            ? "-"
-                                                                                            : e?.serial}
+                                                                                        {e?.serial == null || e?.serial == "" ? "-" : e?.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable === "1" ||
-                                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
                                                                                         <h6 className="text-[12px]">
                                                                                             Lot:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e?.lot == null ||
-                                                                                            e?.lot == ""
-                                                                                                ? "-"
-                                                                                                : e?.lot}
+                                                                                            {e?.lot == null || e?.lot == "" ? "-" : e?.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className="flex gap-0.5">
@@ -269,11 +263,7 @@ const Popup_chitiet = (props) => {
                                                                                             Date:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e?.expiration_date
-                                                                                                ? moment(
-                                                                                                      e?.expiration_date
-                                                                                                  ).format("DD/MM/YYYY")
-                                                                                                : "-"}
+                                                                                            {e?.expiration_date ? formatMoment(e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                                                         </h6>
                                                                                     </div>
                                                                                 </>
@@ -306,11 +296,10 @@ const Popup_chitiet = (props) => {
                                                                 {formatNumber(e?.amount)}
                                                             </h6>
                                                             <h6
-                                                                className={`${
-                                                                    e?.handling != ""
-                                                                        ? "text-left text-[13px] px-2 py-1 col-span-1"
-                                                                        : "text-right 2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1"
-                                                                }`}
+                                                                className={`${e?.handling != ""
+                                                                    ? "text-left text-[13px] px-2 py-1 col-span-1"
+                                                                    : "text-right 2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1"
+                                                                    }`}
                                                             >
                                                                 {e?.handling != "" && props.dataLang[e?.handling]}{" "}
                                                                 {formatNumber(Math.abs(e?.quantity_diff))}

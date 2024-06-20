@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 
 import { Grid6 } from "iconsax-react";
 
-import moment from "moment/moment";
 import "react-datepicker/dist/react-datepicker.css";
 
 import LinkWarehouse from "../components/linkWarehouse";
@@ -55,8 +54,10 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import usePagination from "@/hooks/usePagination";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -145,7 +146,7 @@ const Index = (props) => {
             sTotalItems(output);
 
             queryState({ data: rResult, dataExcel: rResult, onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_group = async () => {
@@ -163,7 +164,7 @@ const Index = (props) => {
             });
 
             queryState({ listDs: data, onFetchingGroup: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _ServerFetching_filter = async () => {
@@ -180,7 +181,7 @@ const Index = (props) => {
                 dataWarehouse: data?.map((e) => ({ label: e?.warehouse_name, value: e?.id })) || [],
                 onFetching_filter: false,
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const _HandleSeachApi = debounce(async (inputValue) => {
@@ -191,7 +192,7 @@ const Index = (props) => {
                 },
             });
             queryState({ lisCode: result?.map((e) => ({ label: e?.code, value: e?.id })) || [] });
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     useEffect(() => {
@@ -383,7 +384,7 @@ const Index = (props) => {
             if (data_export?.length > 0) {
                 queryState({ data_export: data_export });
             }
-        } catch (error) {}
+        } catch (error) { }
         queryState({ onSending: false });
     };
     useEffect(() => {
@@ -611,9 +612,7 @@ const Index = (props) => {
                                                 {isState.data?.map((e) => (
                                                     <RowTable gridCols={10} key={e.id.toString()}>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
-                                                            {e?.date != null
-                                                                ? moment(e?.date).format("DD/MM/YYYY")
-                                                                : ""}
+                                                            {e?.date != null ? formatMoment(e?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                                         </RowItemTable>
                                                         <RowItemTable colSpan={1} textAlign={"center"}>
                                                             <Popup_chitiet

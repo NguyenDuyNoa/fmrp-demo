@@ -1,37 +1,38 @@
-import Head from "next/head";
+import { Add, Trash as IconDelete, Minus } from "iconsax-react";
 import moment from "moment";
-import { v4 as uuidv4 } from "uuid";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { MdClear } from "react-icons/md";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
-import React, { useState, useEffect } from "react";
-import Select, { components } from "react-select";
-import { NumberFormatBase, NumericFormat } from "react-number-format";
-import { Trash as IconDelete, Add, Minus } from "iconsax-react";
+import { MdClear } from "react-icons/md";
+import { components } from "react-select";
+import { v4 as uuidv4 } from "uuid";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import useToast from "@/hooks/useToast";
 import Loading from "@/components/UI/loading";
-import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
 
-import { TITLE_DELETE_ITEMS, CONFIRMATION_OF_CHANGES } from "@/constants/delete/deleteItems";
-import { routerSalesOrder } from "@/routers/sellingGoods";
-import { debounce } from "lodash";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import useSetingServer from "@/hooks/useConfigNumber";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container } from "@/components/UI/common/layout";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { routerSalesOrder } from "@/routers/sellingGoods";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { debounce } from "lodash";
 const Index = (props) => {
     const router = useRouter();
 
@@ -157,7 +158,7 @@ const Index = (props) => {
                         label: `${e.item?.item_name} <span style={{display: none}}>${
                             // e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
                             e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
+                            }</span>`,
                         value: e.item?.id,
                     },
                     quantity: +e?.quantity,
@@ -176,9 +177,9 @@ const Index = (props) => {
                 setContactPerson(
                     rResult?.contact_name !== null && rResult?.contact_name !== "0"
                         ? {
-                              label: rResult?.contact_name,
-                              value: rResult?.contact_id,
-                          }
+                            label: rResult?.contact_name,
+                            value: rResult?.contact_id,
+                        }
                         : null
                 );
                 setBranch({
@@ -1110,7 +1111,7 @@ const Index = (props) => {
     const handleSubmit = async () => {
         var formData = new FormData();
         formData.append("code", codeProduct);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", branch?.value ? branch?.value : "");
         formData.append("client_id", customer?.value ? customer?.value : "");
         formData.append("person_contact_id", contactPerson?.value ? contactPerson?.value : "");
@@ -1130,7 +1131,7 @@ const Index = (props) => {
             formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
             formData.append(
                 `items[${index}][delivery_date]`,
-                item?.delivery_date != undefined ? moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss") : ""
+                item?.delivery_date != undefined ? formatMoment(item?.delivery_date, FORMAT_MOMENT.DATE_TIME_LONG) : ""
             );
         });
 
@@ -1143,10 +1144,9 @@ const Index = (props) => {
         ) {
             await Axios(
                 "POST",
-                `${
-                    id
-                        ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`
-                        : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"
+                `${id
+                    ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`
+                    : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"
                 }`,
                 {
                     data: formData,
@@ -1534,9 +1534,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.select_branch || "select_branch"}
-                                        className={`${
-                                            errBranch ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                        className={`${errBranch ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         styles={{
@@ -1569,9 +1568,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.select_customer || "select_customer"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errCustomer ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errCustomer ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1649,9 +1647,8 @@ const Index = (props) => {
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                                         />
                                         {startDate && (
                                             <>
@@ -1685,9 +1682,8 @@ const Index = (props) => {
                                         }
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errStaff ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                        className={`${errStaff ? "border border-red-500 rounded-md" : ""
+                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1774,9 +1770,8 @@ const Index = (props) => {
                                             }
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${
-                                                errQuote && quote === null ? "border border-red-500 rounded-md" : ""
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            className={`${errQuote && quote === null ? "border border-red-500 rounded-md" : ""
+                                                } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -2209,10 +2204,9 @@ const Index = (props) => {
                                                         }
                                                     }}
                                                     allowNegative={false}
-                                                    className={`${
-                                                        (e?.quantity == 0 && "border-red-500") ||
+                                                    className={`${(e?.quantity == 0 && "border-red-500") ||
                                                         (e?.quantity == "" && "border-red-500")
-                                                    } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                        } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                                 <button
                                                     onClick={() => handleIncrease(e.id)}
@@ -2230,10 +2224,9 @@ const Index = (props) => {
                                                 }
                                                 isAllowed={isAllowedNumber}
                                                 allowNegative={false}
-                                                className={`${
-                                                    (e?.price == 0 && "border-red-500") ||
+                                                className={`${(e?.price == 0 && "border-red-500") ||
                                                     (e?.price == "" && "border-red-500")
-                                                } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                                                    } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                             />
                                         </div>
                                         <div className="col-span-1 text-center flex items-center justify-center">
@@ -2261,12 +2254,12 @@ const Index = (props) => {
                                                 value={
                                                     e?.tax
                                                         ? {
-                                                              label: taxOptions.find(
-                                                                  (item) => item.value === e?.tax?.value
-                                                              )?.label,
-                                                              value: e?.tax?.value,
-                                                              tax_rate: e?.tax?.tax_rate,
-                                                          }
+                                                            label: taxOptions.find(
+                                                                (item) => item.value === e?.tax?.value
+                                                            )?.label,
+                                                            value: e?.tax?.value,
+                                                            tax_rate: e?.tax?.tax_rate,
+                                                        }
                                                         : null
                                                 }
                                                 placeholder={"% Thuế"}
@@ -2315,11 +2308,10 @@ const Index = (props) => {
                                                     onChange={(date) =>
                                                         handleOnChangeInputOption(e?.id, "delivery_date", date)
                                                     }
-                                                    className={`${
-                                                        errDeliveryDate && e?.delivery_date === null
-                                                            ? "border-red-500"
-                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
+                                                    className={`${errDeliveryDate && e?.delivery_date === null
+                                                        ? "border-red-500"
+                                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                        } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
                                                 />
                                                 {e?.delivery_date && (
                                                     <>

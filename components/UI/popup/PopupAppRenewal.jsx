@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import Popup from "reactjs-popup";
-import Image from "next/image";
-import { MdClose } from "react-icons/md";
-import { FormatNumberDot } from "../format/FormatNumber";
 import { PresentionChart, User } from "iconsax-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Popup from "reactjs-popup";
+import { FormatNumberDot } from "../format/FormatNumber";
 
-import Select, { components } from "react-select";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import Select from "react-select";
 import { _ServerInstance as Axios } from "/services/axios";
-import moment from "moment";
 
 const PopupAppRenewal = () => {
     const [openModal, setOpenModal] = useState(false);
@@ -85,7 +85,7 @@ const PopupAppRenewal = () => {
                                 : ""}
                         </span>
                         <span>hết hạn ngày</span>
-                        <span>{moment(dataAuthentication?.expiration_date).format("DD/MM/YYYY")}</span>
+                        <span>{formatMoment(dataAuthentication?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)}</span>
                     </div>
                 </div>
                 <div className="bg-[#F3F9FF] border border-[#C7DFFB] rounded-xl 3xl:p-6 p-4 flex flex-col gap-2">

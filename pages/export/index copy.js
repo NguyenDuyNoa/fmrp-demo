@@ -1,27 +1,23 @@
+import Loading from "components/UI/loading";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useCallback, useEffect, useRef, useState } from "react";
 import TabClient from "./components/tabExport";
-import { useState } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-import { useRef } from "react";
-import Loading from "components/UI/loading";
 
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import ToatstNotifi from "@/utils/helpers/alerNotification";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import { useMemo } from "react";
 import ReactExport from "react-data-export";
 import Client from "./components/client/client";
-import TitleHeader from "./components/common/titleHeader";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
-import Supplier from "./components/supplier/supplier";
-import Materials from "./components/materials/materials";
-import Products from "./components/products/products";
-import { useMemo } from "react";
-import { Grid6 } from "iconsax-react";
-import { NumericFormat } from "react-number-format";
 import BtnParent from "./components/common/btnParent";
 import Progress from "./components/common/progress";
-import moment from "moment";
-import useStatusExprired from "@/hooks/useStatusExprired";
+import TitleHeader from "./components/common/titleHeader";
+import Materials from "./components/materials/materials";
+import Products from "./components/products/products";
+import Supplier from "./components/supplier/supplier";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -159,7 +155,7 @@ const Index = (props) => {
                     const data = db?.map((e) => ({
                         label: e?.code,
                         value: e?.id,
-                        date: moment(e?.date_create).format("DD/MM/YYYY"),
+                        date: formatMoment(e?.date_create, FORMAT_MOMENT.DATE_SLASH_LONG),
                         setup_colums: e?.setup_colums,
                     }));
                     sDataTemplate(data);

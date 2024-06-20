@@ -1,47 +1,42 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import Select from "react-select";
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Image as IconImage,
     Add,
-    Minus,
+    Trash as IconDelete,
+    Minus
 } from "iconsax-react";
+import Select from "react-select";
 
 import moment from "moment/moment";
-import { NumericFormat } from "react-number-format";
 
-import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 
-import { _ServerInstance as Axios } from "/services/axios";
 
 import { routerPurchases } from "routers/buyImportGoods";
 
-import useToast from "@/hooks/useToast";
-import useStatusExprired from "@/hooks/useStatusExprired";
-import { debounce } from "lodash";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import useSetingServer from "@/hooks/useConfigNumber";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { CONFIRMATION_OF_CHANGES } from "@/constants/changeStatus/changeStatus";
-import { useToggle } from "@/hooks/useToggle";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
-import { isAllowedNumber } from "@/utils/helpers/common";
-import ButtonBack from "@/components/UI/button/buttonBack";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiPurchases from "@/Api/apiPurchaseOrder/apiPurchases";
+import ButtonBack from "@/components/UI/button/buttonBack";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { CONFIRMATION_OF_CHANGES } from "@/constants/changeStatus/changeStatus";
+import { TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
+import useToast from "@/hooks/useToast";
+import { useToggle } from "@/hooks/useToggle";
+import { isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { debounce } from "lodash";
 
 const Index = (props) => {
     const router = useRouter();
@@ -66,7 +61,7 @@ const Index = (props) => {
 
     const [code, sCode] = useState("");
 
-    const [selectedDate, setSelectedDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+    const [selectedDate, setSelectedDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
 
     const [namePromis, sNamePromis] = useState("Yêu cầu mua hàng (PR)");
 
@@ -100,7 +95,7 @@ const Index = (props) => {
         router.query && sErrBranch(false);
         router.query && sCode("");
         router.query && sNamePromis("Yêu cầu mua hàng (PR)");
-        router.query && setSelectedDate(moment().format("YYYY-MM-DD HH:mm:ss"));
+        router.query && setSelectedDate(moment().format(FORMAT_MOMENT.DATE_TIME_LONG));
         router.query && sNote("");
         router.query && sStartDate(new Date());
     }, [router.query]);
@@ -253,7 +248,7 @@ const Index = (props) => {
                 sIdBranch(value);
             }
         } else if (type == "date") {
-            setSelectedDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+            setSelectedDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type == "code") {
             sCode(value.target.value);
         } else if (type == "namePromis") {
@@ -363,7 +358,7 @@ const Index = (props) => {
         let formData = new FormData();
         formData.append("code", code);
         formData.append("name", namePromis);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
         formData.append("branch_id", branch_id);
         formData.append("note", note);
         newDataOption.forEach((item, index) => {

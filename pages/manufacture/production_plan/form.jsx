@@ -19,6 +19,7 @@ import { routerPproductionPlan } from "@/routers/manufacture";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 
 const InFo = dynamic(() => import("./components/form/info"), { ssr: false });
@@ -29,8 +30,6 @@ const FormAdd = (props) => {
     const dataLang = props.dataLang;
 
     const showToat = useToast();
-
-    const { isMoment } = formatMoment();
 
     const initialData = {
         dataProduction: [],
@@ -89,7 +88,7 @@ const FormAdd = (props) => {
             if (isSuccess) {
                 queryData({ dataBrand: result?.map((e) => ({ value: e?.id, label: e?.name })) });
             }
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const handleSendItem = async () => {
@@ -113,11 +112,11 @@ const FormAdd = (props) => {
                         quantityWarehouse: +e?.quantity_warehouse,
                         productVariation: e?.product_variation,
                         date: { startDate: null, endDate: null },
-                        deliveryDate: isMoment(e?.delivery_date, "DD/MM/YYYY"),
+                        deliveryDate: formatMoment(e?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG),
                     };
                 }),
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     ///Xóa từng button dấu X
@@ -244,14 +243,14 @@ const FormAdd = (props) => {
 
         let formData = new FormData();
         formData.append("reference_no", "");
-        formData.append("date", isValue.date ? isMoment(isValue.date, "DD/MM/YYYY") : "");
+        formData.append("date", isValue.date ? formatMoment(isValue.date, FORMAT_MOMENT.DATE_SLASH_LONG) : "");
         formData.append("branch_id", isValue.idBrach?.value ? isValue.idBrach?.value : "");
         formData.append("option_id", tab == "plan" ? 2 : 1);
         formData.append(
             "timeline",
-            `${isMoment(isValue?.dateRange?.startDate, "DD/MM/YYYY")}-${isMoment(
+            `${formatMoment(isValue?.dateRange?.startDate, FORMAT_MOMENT.DATE_SLASH_LONG)}-${formatMoment(
                 isValue?.dateRange?.endDate,
-                "DD/MM/YYYY"
+                FORMAT_MOMENT.DATE_SLASH_LONG
             )}`
         );
         data.dataProduction.forEach((e, index) => {
@@ -259,7 +258,7 @@ const FormAdd = (props) => {
 
             formData.append(
                 `items[${index}][timeline]`,
-                e?.date ? `${isMoment(e?.date.startDate, "DD/MM/YYYY")}-${isMoment(e?.date.endDate, "DD/MM/YYYY")}` : ""
+                e?.date ? `${formatMoment(e?.date.startDate, FORMAT_MOMENT.DATE_SLASH_LONG)}-${formatMoment(e?.date.endDate, FORMAT_MOMENT.DATE_SLASH_LONG)}` : ""
             );
 
             formData.append(`items[${index}][delivery_date]`, e?.deliveryDate ? e?.deliveryDate : "");
@@ -282,7 +281,7 @@ const FormAdd = (props) => {
             } else {
                 showToat("error", message);
             }
-        } catch (error) {}
+        } catch (error) { }
         // showToat("success", "Thêm kế hoạch NVL thành công");
     };
 

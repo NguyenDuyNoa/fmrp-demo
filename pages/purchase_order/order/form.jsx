@@ -1,49 +1,44 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { MdClear } from "react-icons/md";
 import DatePicker from "react-datepicker";
 import { BsCalendarEvent } from "react-icons/bs";
+import { MdClear } from "react-icons/md";
 
 import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Image as IconImage,
     Add,
-    Minus,
+    Trash as IconDelete,
+    Minus
 } from "iconsax-react";
 
 import moment from "moment/moment";
-import Select, { components } from "react-select";
-import { NumericFormat } from "react-number-format";
+import Select from "react-select";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { routerOrder } from "routers/buyImportGoods";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import { routerOrder } from "routers/buyImportGoods";
 
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import useStatusExprired from "@/hooks/useStatusExprired";
 
-import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
-import { debounce } from "lodash";
-import useSetingServer from "@/hooks/useConfigNumber";
-import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
-import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import formatMoneyConfig from "@/utils/helpers/formatMoney";
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import { ERROR_DISCOUNT_MAX } from "@/constants/errorStatus/errorStatus";
-import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container } from "@/components/UI/common/layout";
+import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
+import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
+import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { isAllowedDiscount, isAllowedNumber } from "@/utils/helpers/common";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import { debounce } from "lodash";
 const Index = (props) => {
     const router = useRouter();
 
@@ -179,9 +174,8 @@ const Index = (props) => {
                         id: e.purchases_order_item_id,
                         mathang: {
                             e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${
-                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
+                            label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
                             value: e.item?.id,
                         },
                         soluong: Number(e?.quantity),
@@ -331,7 +325,7 @@ const Index = (props) => {
         } else if (type == "code") {
             sCode(value.target.value);
         } else if (type === "date") {
-            sSelectedDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+            sSelectedDate(formatMoment(value.target.value, FORMAT_MOMENT.DATE_TIME_LONG));
         } else if (type === "supplier") {
             sIdSupplier(value);
         } else if (type === "staff") {
@@ -1000,8 +994,8 @@ const Index = (props) => {
     const _ServerSending = () => {
         let formData = new FormData();
         formData.append("code", code);
-        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
-        formData.append("delivery_date", moment(delivery_dateNew).format("YYYY-MM-DD"));
+        formData.append("date", formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG));
+        formData.append("delivery_date", formatMoment(delivery_dateNew, FORMAT_MOMENT.DATE_LONG));
         formData.append("suppliers_id", idSupplier.value);
         formData.append("order_type ", loai);
         formData.append("branch_id", idBranch.value);
@@ -1031,10 +1025,9 @@ const Index = (props) => {
         });
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`
-                    : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
+            `${id
+                ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`
+                : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"
             }`,
             {
                 data: formData,
@@ -1150,9 +1143,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"}
-                                        className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         components={{ MultiValue }}
                                         style={{
@@ -1202,9 +1194,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.purchase_order_supplier || "purchase_order_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errSupplier ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errSupplier ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}
@@ -1261,9 +1252,8 @@ const Index = (props) => {
                                         placeholder={dataLang?.purchase_order_staff || "purchase_order_staff"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
-                                        className={`${
-                                            errStaff ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${errStaff ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => "Không có dữ liệu"}
                                         menuPortalTarget={document.body}
@@ -1327,9 +1317,8 @@ const Index = (props) => {
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
@@ -1431,9 +1420,8 @@ const Index = (props) => {
                                             }
                                             hideSelectedOptions={false}
                                             isClearable={true}
-                                            className={`${
-                                                errPurchase ? "border-red-500" : "border-transparent"
-                                            } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                            className={`${errPurchase ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             isSearchable={true}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
@@ -1528,9 +1516,9 @@ const Index = (props) => {
                                         <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
                                             <div className="col-span-3   my-auto">
                                                 <Select
-                                                   onInputChange={(event) =>{
-                                                    _HandleSeachApi(event)
-                                                }}
+                                                    onInputChange={(event) => {
+                                                        _HandleSeachApi(event)
+                                                    }}
                                                     dangerouslySetInnerHTML={{
                                                         __html: option.label,
                                                     }}
@@ -1583,9 +1571,8 @@ const Index = (props) => {
                                                                         </h5>
                                                                     </div>
                                                                     <h5
-                                                                        className={`${
-                                                                            loai == "1" ? "" : "flex items-center gap-1"
-                                                                        } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                                                        className={`${loai == "1" ? "" : "flex items-center gap-1"
+                                                                            } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
                                                                     >
                                                                         {dataLang[option.e?.text_type]}{" "}
                                                                         {loai == "1" ? "-" : ""}{" "}
@@ -1696,10 +1683,9 @@ const Index = (props) => {
                                                         isAllowed={isAllowedNumber}
                                                         className={`
                                                         ${index === 0 ? "cursor-default" : "cursor-text"} 
-                                                        ${
-                                                            (e?.soluong == 0 && "border-red-500") ||
+                                                        ${(e?.soluong == 0 && "border-red-500") ||
                                                             (e?.soluong == "" && "border-red-500")
-                                                        } 
+                                                            } 
                                                         appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                                                     />
                                                     <button
@@ -1722,10 +1708,9 @@ const Index = (props) => {
                                                     )}
                                                     readOnly={index === 0 ? readOnlyFirst : false}
                                                     className={`${index === 0 ? "cursor-default" : "cursor-text"}
-                                                ${
-                                                    (e?.dongia == 0 && "border-red-500") ||
-                                                    (e?.dongia == "" && "border-red-500")
-                                                } 
+                                                ${(e?.dongia == 0 && "border-red-500") ||
+                                                        (e?.dongia == "" && "border-red-500")
+                                                        } 
                                                 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                                                 />
                                             </div>
@@ -1755,12 +1740,12 @@ const Index = (props) => {
                                                     value={
                                                         e?.thue
                                                             ? {
-                                                                  label: taxOptions.find(
-                                                                      (item) => item.value === e?.thue?.value
-                                                                  )?.label,
-                                                                  value: e?.thue?.value,
-                                                                  tax_rate: e?.thue?.tax_rate,
-                                                              }
+                                                                label: taxOptions.find(
+                                                                    (item) => item.value === e?.thue?.value
+                                                                )?.label,
+                                                                value: e?.thue?.value,
+                                                                tax_rate: e?.thue?.tax_rate,
+                                                            }
                                                             : null
                                                     }
                                                     placeholder={"% Thuế"}

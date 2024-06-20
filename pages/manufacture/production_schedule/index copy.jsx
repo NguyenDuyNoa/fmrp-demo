@@ -1,18 +1,19 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useStatusExprired from "@/hooks/useStatusExprired";
+import { formatMoment } from "@/utils/helpers/formatMoment";
 import { isSameDay } from "date-fns";
+import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
 import "moment/locale/vi";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
+import { MdAddBox } from "react-icons/md";
 import { v4 as uuidV4 } from "uuid";
 import PopupAddTask from "./components/popupAddTask";
-import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
-import moment from "moment";
-import { MdAddBox } from "react-icons/md";
 
 const Index = (props) => {
     const dataLang = props?.dataLang
@@ -224,7 +225,7 @@ const Index = (props) => {
                                         }}
                                         onChange={(date) => {
                                             if (date) {
-                                                queryStateCalender({ dateSelected: date, month: moment(date).format("MM"), year: moment(date).format("YYYY") })
+                                                queryStateCalender({ dateSelected: date, month: formatMoment(date, FORMAT_MOMENT.MONTH), year: formatMoment(date, FORMAT_MOMENT.YYYY) })
                                                 return
                                             }
                                             queryStateCalender({ dateSelected: new Date(), month: new Date().getMonth() + 1, year: new Date().getFullYear() })

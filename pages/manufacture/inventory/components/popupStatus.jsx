@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
-import moment from "moment";
-import useFeature from "@/hooks/useConfigFeature";
-import useSetingServer from "@/hooks/useConfigNumber";
-import formatNumberConfig from "@/utils/helpers/formatnumber";
-import NoData from "@/components/UI/noData/nodata";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import NoData from "@/components/UI/noData/nodata";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useFeature from "@/hooks/useConfigFeature";
+import useSetingServer from "@/hooks/useConfigNumber";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatNumberConfig from "@/utils/helpers/formatnumber";
+import Loading from "components/UI/loading";
+import { useEffect, useState } from "react";
+import PopupEdit from "/components/UI/popup";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
@@ -107,30 +108,13 @@ const Popup_status = (props) => {
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px] mt-2 ">
                                     {data?.map((e) => (
                                         <div
-                                            className={`${dataProductSerial.is_enable ==
-                                                "1"
-                                                ? dataMaterialExpiry.is_enable !=
-                                                    dataProductExpiry.is_enable
-                                                    ? "grid-cols-12"
-                                                    : dataMaterialExpiry.is_enable ==
-                                                        "1"
-                                                        ? "grid-cols-12"
-                                                        : "grid-cols-10"
-                                                : dataMaterialExpiry.is_enable !=
-                                                    dataProductExpiry.is_enable
-                                                    ? "grid-cols-11"
-                                                    : dataMaterialExpiry.is_enable ==
-                                                        "1"
-                                                        ? "grid-cols-11"
-                                                        : "grid-cols-9"
+                                            className={`${dataProductSerial.is_enable == "1"
+                                                ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" : "grid-cols-10"
+                                                : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" : "grid-cols-9"
                                                 }  grid hover:bg-slate-50 items-center`}
                                         >
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-2 text-center">
-                                                {e?.date_coupon != null
-                                                    ? moment(
-                                                        e?.date_coupon
-                                                    ).format("DD/MM/YYYY")
-                                                    : ""}
+                                                {e?.date_coupon != null ? formatMoment(e?.date_coupon, FORMAT_MOMENT.DATE_SLASH_LONG) : ""}
                                             </h6>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer">
                                                 {e?.code_coupon}
@@ -139,41 +123,25 @@ const Popup_status = (props) => {
                                                 {dataLang[e?.type_text]}
                                             </h6>
 
-                                            {dataProductSerial.is_enable ===
-                                                "1" ? (
+                                            {dataProductSerial.is_enable === "1" ? (
                                                 <div className=" col-span-1 ">
                                                     <h6 className="text-[13px] px-2 py-1.5  w-[full] text-center">
-                                                        {e.serial == null ||
-                                                            e.serial == ""
-                                                            ? "-"
-                                                            : e.serial}
+                                                        {e.serial == null || e.serial == "" ? "-" : e.serial}
                                                     </h6>
                                                 </div>
                                             ) : (
                                                 ""
                                             )}
-                                            {dataMaterialExpiry.is_enable ===
-                                                "1" ||
-                                                dataProductExpiry.is_enable ===
-                                                "1" ? (
+                                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
                                                 <>
                                                     <div className=" col-span-1  ">
                                                         <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">
-                                                            {e.lot == null ||
-                                                                e.lot == ""
-                                                                ? "-"
-                                                                : e.lot}
+                                                            {e.lot == null || e.lot == "" ? "-" : e.lot}
                                                         </h6>
                                                     </div>
                                                     <div className=" col-span-1  ">
                                                         <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">
-                                                            {e.expiration_date
-                                                                ? moment(
-                                                                    e.expiration_date
-                                                                ).format(
-                                                                    "DD-MM-YYYY"
-                                                                )
-                                                                : "-"}
+                                                            {e.expiration_date ? formatMoment(e.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG) : "-"}
                                                         </h6>
                                                     </div>
                                                 </>
