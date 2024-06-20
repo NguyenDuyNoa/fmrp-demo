@@ -1879,7 +1879,7 @@ const FilePDF = ({
                                             italics: true,
                                         },
                                         {
-                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG).format("DD/MM/YYYY")}`,
+                                            text: `${formatMoment(data?.date, FORMAT_MOMENT.DATE_SLASH_LONG)}`,
                                             bold: true,
                                             fontSize: 8,
                                             italics: true,
