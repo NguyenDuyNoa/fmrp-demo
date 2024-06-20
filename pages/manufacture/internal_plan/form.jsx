@@ -446,7 +446,7 @@ const Index = (props) => {
         formData.append("reference_no", idChange.code ? idChange.code : "");
 
         formData.append(
-            "date", formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_LONG).format("YYYY-MM-DD HH:mm:ss") ? formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_LONG) : ""
+            "date", formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_LONG) ? formatMoment(idChange.date, FORMAT_MOMENT.DATE_TIME_LONG) : ""
         );
 
         formData.append("branch_id", idChange.idBranch?.value ? idChange.idBranch?.value : "");
@@ -990,7 +990,7 @@ const Index = (props) => {
                             <ButtonBack onClick={() => router.push(routerInternalPlan.home)} dataLang={dataLang} />
                             <ButtonSubmit
                                 loading={fetChingData.onSending}
-                                onClick={_HandleSubmit}
+                                onClick={(e) => _HandleSubmit(e)}
                                 dataLang={dataLang}
                             />
                         </div>
