@@ -1759,7 +1759,7 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <ButtonBack onClick={() => router.push(routerExportToOther.home)} dataLang={dataLang} />
-                            <ButtonSubmit loading={onSending} onClick={_HandleSubmit} dataLang={dataLang} />
+                            <ButtonSubmit loading={onSending} onClick={(e) => _HandleSubmit(e)} dataLang={dataLang} />
                         </div>
                     </div>
                 </div>

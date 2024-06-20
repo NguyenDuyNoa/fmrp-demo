@@ -104,7 +104,7 @@ const Form = (props) => {
             sDataProductSerial(data.find((x) => x.code == "product_serial"));
 
             sDataBranch(result.map((e) => ({ label: e.name, value: e.id })));
-        } catch (error) {}
+        } catch (error) { }
         sOnFetching(false);
     };
 
@@ -134,7 +134,7 @@ const Form = (props) => {
             const { rResult } = await apiInventory.apiWarehouseInventory(branch?.value);
 
             sDataWareHouse(rResult.map((e) => ({ label: e.name, value: e.id })));
-        } catch (error) {}
+        } catch (error) { }
 
         sOnFetchingWH(false);
         // Axios(
@@ -172,7 +172,7 @@ const Form = (props) => {
             });
 
             sDataPstWH(data.map((e) => ({ label: e.name, value: e.id })));
-        } catch (error) {}
+        } catch (error) { }
         sOnFetchingPstWH(false);
     };
 
@@ -531,7 +531,7 @@ const Form = (props) => {
                     sDataErr(false);
                 }
             }
-        } catch (error) {}
+        } catch (error) { }
         sOnSending(false);
     };
 
@@ -695,9 +695,8 @@ const Form = (props) => {
                                     placeholder={dataLang?.client_list_filterbrand}
                                     isClearable={true}
                                     isDisabled={dataChoose.length > 0}
-                                    className={`${
-                                        errBranch && branch == null ? "border-red-500" : "border-transparent"
-                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `}
+                                    className={`${errBranch && branch == null ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `}
                                     isSearchable={true}
                                     noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     style={{
@@ -740,9 +739,8 @@ const Form = (props) => {
                                     placeholder={"Chọn kho hàng"}
                                     isDisabled={dataChoose.length > 0}
                                     isClearable={true}
-                                    className={`${
-                                        errWareHouse ? "border-red-500" : "border-transparent"
-                                    } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `}
+                                    className={`${errWareHouse ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `}
                                     isSearchable={true}
                                     noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     style={{
@@ -801,19 +799,18 @@ const Form = (props) => {
                                     <h5 className="font-[300] text-slate-600 col-span-1 px-1.5">Tên mặt hàng</h5>
                                     {/* <div className={`${(dataMaterialExpiry.is_enable == "0" && dataProductSerial.is_enable == "0") ? "grid-cols-7" : (dataProductExpiry.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                     <div
-                                        className={`${
-                                            dataProductSerial.is_enable == "1"
-                                                ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                                    ? "grid-cols-10"
-                                                    : dataMaterialExpiry.is_enable == "1"
+                                        className={`${dataProductSerial.is_enable == "1"
+                                            ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                ? "grid-cols-10"
+                                                : dataMaterialExpiry.is_enable == "1"
                                                     ? "grid-cols-[repeat(10_minmax(0_1fr))]"
                                                     : "grid-cols-8"
-                                                : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                            : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                                 ? "grid-cols-9"
                                                 : dataMaterialExpiry.is_enable == "1"
-                                                ? "grid-cols-9"
-                                                : "grid-cols-7"
-                                        } grid col-span-5 `}
+                                                    ? "grid-cols-9"
+                                                    : "grid-cols-7"
+                                            } grid col-span-5 `}
                                     >
                                         <h5 className="font-[300] text-slate-600  px-1.5">Vị trí kho</h5>
                                         {/* {dataMaterialExpiry?.is_enable == "1" && <h5 className='font-[300] text-slate-600 text-center px-1.5'>LOT</h5>}
@@ -879,19 +876,18 @@ const Form = (props) => {
                                             </div>
                                             {/* <div className={`${(e?.checkExpiry == "0" && e?.checkSerial == "0") ? "grid-cols-7" : (e?.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                             <div
-                                                className={`${
-                                                    dataProductSerial.is_enable == "1"
-                                                        ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
-                                                            ? "grid-cols-10"
-                                                            : dataMaterialExpiry.is_enable == "1"
+                                                className={`${dataProductSerial.is_enable == "1"
+                                                    ? dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                        ? "grid-cols-10"
+                                                        : dataMaterialExpiry.is_enable == "1"
                                                             ? "grid-cols-[repeat(10_minmax(0_1fr))]"
                                                             : "grid-cols-8"
-                                                        : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
+                                                    : dataMaterialExpiry.is_enable != dataProductExpiry.is_enable
                                                         ? "grid-cols-9"
                                                         : dataMaterialExpiry.is_enable == "1"
-                                                        ? "grid-cols-9"
-                                                        : "grid-cols-7"
-                                                } grid col-span-5  h-full items-center`}
+                                                            ? "grid-cols-9"
+                                                            : "grid-cols-7"
+                                                    } grid col-span-5  h-full items-center`}
                                             >
                                                 {/* {loadingData ? <h1 className='text-4xl font-bold'>Loading</h1> */}
                                                 {/* : */}
@@ -911,11 +907,10 @@ const Form = (props) => {
                                                                     placeholder={"Vị trí kho"}
                                                                     isClearable={true}
                                                                     classNamePrefix="Select"
-                                                                    className={`${
-                                                                        errNullLocate && ce.locate == null
-                                                                            ? "border-red-500"
-                                                                            : "border-transparent"
-                                                                    } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                                    className={`${errNullLocate && ce.locate == null
+                                                                        ? "border-red-500"
+                                                                        : "border-transparent"
+                                                                        } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
                                                                     isSearchable={true}
                                                                     noOptionsMessage={() =>
                                                                         `${dataLang?.no_data_found}`
@@ -967,15 +962,14 @@ const Form = (props) => {
                                                                             ce?.id,
                                                                             "serial"
                                                                         )}
-                                                                        className={`${
-                                                                            e?.checkSerial == "0"
-                                                                                ? "border-transparent"
-                                                                                : errNullSerial &&
-                                                                                  (ce.serial === null ||
-                                                                                      ce.serial === "")
+                                                                        className={`${e?.checkSerial == "0"
+                                                                            ? "border-transparent"
+                                                                            : errNullSerial &&
+                                                                                (ce.serial === null ||
+                                                                                    ce.serial === "")
                                                                                 ? "border-red-500"
                                                                                 : "border-gray-200"
-                                                                        } text-center py-1 px-1 font-medium w-full focus:outline-none border-b-2 `}
+                                                                            } text-center py-1 px-1 font-medium w-full focus:outline-none border-b-2 `}
                                                                     />
                                                                     {isSubmitted && duplicateIds.includes(ce.id) && (
                                                                         <span className="text-red-500 text-[12px]">
@@ -987,7 +981,7 @@ const Form = (props) => {
                                                                 ""
                                                             )}
                                                             {dataMaterialExpiry.is_enable === "1" ||
-                                                            dataProductExpiry.is_enable === "1" ? (
+                                                                dataProductExpiry.is_enable === "1" ? (
                                                                 <>
                                                                     <div className="p-1.5 border h-full flex items-center">
                                                                         <CreatableSelectCore
@@ -1003,13 +997,12 @@ const Form = (props) => {
                                                                             )}
                                                                             isClearable={true}
                                                                             classNamePrefix="Select"
-                                                                            className={`${
-                                                                                e?.checkExpiry == "0"
-                                                                                    ? "border-transparent"
-                                                                                    : errNullLot && ce.lot == null
+                                                                            className={`${e?.checkExpiry == "0"
+                                                                                ? "border-transparent"
+                                                                                : errNullLot && ce.lot == null
                                                                                     ? "border-red-500"
                                                                                     : "border-transparent"
-                                                                            } Select__custom removeDivide placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                                                } Select__custom removeDivide placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
                                                                             isSearchable={true}
                                                                             menuPortalTarget={document.body}
                                                                             onMenuOpen={handleMenuOpen}
@@ -1067,13 +1060,12 @@ const Form = (props) => {
                                                                                 ce?.id,
                                                                                 "date"
                                                                             )}
-                                                                            className={`${
-                                                                                e?.checkExpiry == "0"
-                                                                                    ? "border-gray-200"
-                                                                                    : errNullDate && ce?.date == null
+                                                                            className={`${e?.checkExpiry == "0"
+                                                                                ? "border-gray-200"
+                                                                                : errNullDate && ce?.date == null
                                                                                     ? "border-red-500"
                                                                                     : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                            } bg-transparent disabled:bg-gray-100  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
+                                                                                } bg-transparent disabled:bg-gray-100  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-[13px] relative`}
                                                                         />
                                                                         <IconCalendar
                                                                             size={22}
@@ -1109,11 +1101,10 @@ const Form = (props) => {
                                                                         ce?.id,
                                                                         "amount"
                                                                     )}
-                                                                    className={`${
-                                                                        errNullQty && ce?.amount == null
-                                                                            ? "border-red-500 border-b-2"
-                                                                            : " border-gray-200 border-b-2"
-                                                                    }  appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none  `}
+                                                                    className={`${errNullQty && ce?.amount == null
+                                                                        ? "border-red-500 border-b-2"
+                                                                        : " border-gray-200 border-b-2"
+                                                                        }  appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none  `}
                                                                     isAllowed={(values) => {
                                                                         const { floatValue } = values;
                                                                         if (e?.checkSerial == "1") {
@@ -1231,7 +1222,7 @@ const Form = (props) => {
                             </div>
                             <div className="space-x-2">
                                 <ButtonBack onClick={() => router.back()} dataLang={dataLang} />
-                                <ButtonSubmit loading={onSending} onClick={_HandleSubmit} dataLang={dataLang} />
+                                <ButtonSubmit loading={onSending} onClick={(e) => _HandleSubmit(e)} dataLang={dataLang} />
                             </div>
                         </div>
                     </div>
@@ -1349,14 +1340,13 @@ const Popup_status = (props) => {
                                             </h6>
                                             <h6 className="text-[13px]  px-2 col-span-2 text-center capitalize">
                                                 {e?.quantity_net - e?.check_quantity_stock > 0
-                                                    ? `Mặt hàng cần điều chỉnh tăng ${
-                                                          formatnumber(e?.quantity_net) -
-                                                          formatnumber(e?.check_quantity_stock)
-                                                      }`
+                                                    ? `Mặt hàng cần điều chỉnh tăng ${formatnumber(e?.quantity_net) -
+                                                    formatnumber(e?.check_quantity_stock)
+                                                    }`
                                                     : `Mặt hàng cần điều chỉnh giảm ${Math.abs(
-                                                          formatnumber(e?.quantity_net) -
-                                                              formatnumber(e?.check_quantity_stock)
-                                                      )}`}
+                                                        formatnumber(e?.quantity_net) -
+                                                        formatnumber(e?.check_quantity_stock)
+                                                    )}`}
                                             </h6>
                                         </div>
                                     ))}

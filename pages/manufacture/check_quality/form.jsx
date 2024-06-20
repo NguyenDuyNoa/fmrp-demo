@@ -110,9 +110,8 @@ const Index = (props) => {
                     idParenBackend: e?.id,
                     matHang: {
                         e: e,
-                        label: `${e?.item_name} <span style={{display: none}}>${
-                            e?.code + e?.product_variation + e?.text_type + e?.unit_name
-                        }</span>`,
+                        label: `${e?.item_name} <span style={{display: none}}>${e?.code + e?.product_variation + e?.text_type + e?.unit_name
+                            }</span>`,
                         value: e?.item_id,
                     },
                     unit: e?.unit_name,
@@ -500,9 +499,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
-                                        className={`${
-                                            isStateQlty.errBranch ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${isStateQlty.errBranch ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -560,9 +558,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={"Lệnh sản xuất tổng"}
-                                        className={`${
-                                            isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -618,9 +615,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={"Kho QC"}
-                                        className={`${
-                                            isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -676,9 +672,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={"Kho lỗi"}
-                                        className={`${
-                                            isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        className={`${isStateQlty.errDetailedProduction ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -929,10 +924,10 @@ const Index = (props) => {
                                                         // )}
                                                         className={`
                                                             ${
-                                                                // errWarehouse && ce?.location == null
-                                                                //     ? "border-red-500 border"
-                                                                //     : ""
-                                                                ""
+                                                            // errWarehouse && ce?.location == null
+                                                            //     ? "border-red-500 border"
+                                                            //     : ""
+                                                            ""
                                                             } 
                                                          my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                         placeholder={"Công đoạn"}
@@ -1013,20 +1008,18 @@ const Index = (props) => {
                                                                 _HandleChangeChild(e?.id, "quantityQc", event)
                                                             }
                                                             value={e.quantityQc}
-                                                            className={`${
-                                                                isStateQlty.errQuantityQc &&
+                                                            className={`${isStateQlty.errQuantityQc &&
                                                                 (e.quantityQc == null ||
                                                                     e.quantityQc == "" ||
                                                                     e.quantityQc == 0)
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
-                                                            }
-                                                                ${
-                                                                    e.quantityQc == null ||
+                                                                ? "border-b border-red-500"
+                                                                : "border-b border-gray-200"
+                                                                }
+                                                                ${e.quantityQc == null ||
                                                                     e.quantityQc == "" ||
                                                                     e.quantityQc == 0
-                                                                        ? "border-b border-red-500"
-                                                                        : "border-b border-gray-200"
+                                                                    ? "border-b border-red-500"
+                                                                    : "border-b border-gray-200"
                                                                 }
                                                                 appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                             isAllowed={isAllowedNumber}
@@ -1097,20 +1090,18 @@ const Index = (props) => {
                                                 <div className="col-span-1 py-4 flex items-center justify-center ">
                                                     <PopupDetailError
                                                         dataLang={dataLang}
-                                                        name={`Chi tiết lỗi ${
-                                                            e?.dataDetailError?.length > 0
-                                                                ? `(${e?.dataDetailError?.length})`
-                                                                : ""
-                                                        }`}
+                                                        name={`Chi tiết lỗi ${e?.dataDetailError?.length > 0
+                                                            ? `(${e?.dataDetailError?.length})`
+                                                            : ""
+                                                            }`}
                                                         data={isStateQlty.listData}
                                                         id={e?.id}
                                                         quantityError={e.quantityError}
                                                         queryStateQlty={queryStateQlty}
-                                                        className={`px-4 py-1.5 rounded-2xl ${
-                                                            e?.dataDetailError && e?.dataDetailError?.length > 0
-                                                                ? "bg-blue-300 hover:bg-blue-500/80 text-blue-600 hover:text-white"
-                                                                : "bg-gray-300 hover:bg-gray-500/80 text-gray-600 hover:text-white"
-                                                        } hover:scale-105 text-xs font-medium text-[9px] text-center   transition-all ease-linear cursor-pointer`}
+                                                        className={`px-4 py-1.5 rounded-2xl ${e?.dataDetailError && e?.dataDetailError?.length > 0
+                                                            ? "bg-blue-300 hover:bg-blue-500/80 text-blue-600 hover:text-white"
+                                                            : "bg-gray-300 hover:bg-gray-500/80 text-gray-600 hover:text-white"
+                                                            } hover:scale-105 text-xs font-medium text-[9px] text-center   transition-all ease-linear cursor-pointer`}
                                                     />
                                                 </div>
                                                 <div className="col-span-1  h-full flex items-center justify-center">
@@ -1197,7 +1188,7 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <ButtonBack onClick={() => router.push(routerQc.home)} dataLang={dataLang} />
-                            <ButtonSubmit loading={isStateQlty.onSending} onClick={_HandleSubmit} dataLang={dataLang} />
+                            <ButtonSubmit loading={isStateQlty.onSending} onClick={(e) => _HandleSubmit(e)} dataLang={dataLang} />
                         </div>
                     </div>
                 </div>
