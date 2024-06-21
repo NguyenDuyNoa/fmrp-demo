@@ -13,16 +13,16 @@ import LinkWarehouse from "../components/linkWarehouse";
 import Popup_status from "../components/popupStatus";
 import Popup_chitiet from "./components/pupup";
 
-import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/TabFilter";
+import BtnAction from "@/components/UI/btnAction";
+import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import {
     Container,
     ContainerBody,

@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { routerOrder } from "routers/buyImportGoods";
 import NoData from "@/components/UI/noData/nodata";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";

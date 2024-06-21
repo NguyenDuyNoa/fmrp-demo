@@ -1,6 +1,6 @@
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";

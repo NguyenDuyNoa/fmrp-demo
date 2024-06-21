@@ -8,9 +8,9 @@ import React, { useEffect, useState } from "react";
 import Loading from "@/components/UI/loading";
 import PopupEdit from "@/components/UI/popup";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";

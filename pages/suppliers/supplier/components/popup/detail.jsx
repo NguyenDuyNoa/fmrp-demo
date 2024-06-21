@@ -5,9 +5,9 @@ import ReactExport from "react-data-export";
 
 import Swal from "sweetalert2";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import Loading from "components/UI/loading";

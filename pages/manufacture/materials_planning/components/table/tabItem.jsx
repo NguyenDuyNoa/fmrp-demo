@@ -6,7 +6,7 @@ import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import ModalImage from "react-modal-image";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 

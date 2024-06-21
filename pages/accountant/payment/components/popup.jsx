@@ -36,7 +36,7 @@ import useToast from "@/hooks/useToast";
 import { SelectCore } from "@/utils/lib/Select";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
@@ -1283,10 +1283,10 @@ const Popup_dspc = (props) => {
                                                 }),
                                             }}
                                             className={`${error.errListTypeDoc &&
-                                                    typeOfDocument != null &&
-                                                    listTypeOfDocument?.length == 0
-                                                    ? "border-red-500"
-                                                    : "border-transparent"
+                                                typeOfDocument != null &&
+                                                listTypeOfDocument?.length == 0
+                                                ? "border-red-500"
+                                                : "border-transparent"
                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
                                         />
                                         {error.errListTypeDoc &&
@@ -1383,8 +1383,8 @@ const Popup_dspc = (props) => {
                                                 }
                                             }}
                                             className={`${error.errPrice && price == null
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                                ? "border-red-500"
+                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
                                                 } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
                                         />
                                         {error.errPrice && (
@@ -1471,8 +1471,8 @@ const Popup_dspc = (props) => {
                                                             }),
                                                         }}
                                                         className={`${error.errCosts && e?.chiphi === ""
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
+                                                            ? "border-red-500"
+                                                            : "border-transparent"
                                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `}
                                                     />
                                                 </div>
@@ -1508,8 +1508,8 @@ const Popup_dspc = (props) => {
                                                             }
                                                         }}
                                                         className={`${error.errSotien && (e?.sotien === "" || e?.sotien === null)
-                                                                ? "border-b-red-500"
-                                                                : " border-gray-200"
+                                                            ? "border-b-red-500"
+                                                            : " border-gray-200"
                                                             } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                                     />
                                                 </div>

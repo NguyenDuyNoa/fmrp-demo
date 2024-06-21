@@ -8,17 +8,17 @@ import { useSelector } from "react-redux";
 
 import React, { useEffect, useState, useTransition } from "react";
 
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/btnStatusApproved";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
+import CustomAvatar from "@/components/UI/common/user/customAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";

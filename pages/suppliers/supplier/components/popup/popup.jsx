@@ -21,7 +21,7 @@ import { useToggle } from "@/hooks/useToggle";
 import PopupEdit from "@/components/UI/popup";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 
 const Popup_dsncc = (props) => {
   const dataLang = props.dataLang;

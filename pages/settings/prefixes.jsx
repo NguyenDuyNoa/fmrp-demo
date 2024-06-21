@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { ListBtn_Setting } from "./information";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import Swal from "sweetalert2";

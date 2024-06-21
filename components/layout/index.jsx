@@ -1,5 +1,5 @@
-import PopupAppRenewal from "../UI/popup/PopupAppRenewal";
-import PopupAppTrial from "../UI/popup/PopupAppTrial";
+import PopupAppRenewal from "../UI/popup/popupAppRenewal";
+import PopupAppTrial from "../UI/popup/popupAppTrial";
 import Header from "./header";
 
 const Index = ({ children }) => {

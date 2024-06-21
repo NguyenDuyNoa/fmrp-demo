@@ -3,16 +3,18 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Popup from "reactjs-popup";
-import { FormatNumberDot } from "../format/FormatNumber";
 
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import Select from "react-select";
 import { _ServerInstance as Axios } from "/services/axios";
 
 const PopupAppRenewal = () => {
     const [openModal, setOpenModal] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const dataSeting = useSetingServer()
     const dataAuthentication = useSelector((state) => state.auth);
 
     const initialState = {
@@ -23,6 +25,10 @@ const PopupAppRenewal = () => {
     const [isState, setIsState] = useState(initialState);
 
     const queryKeyIsState = (key) => setIsState((prev) => ({ ...prev, ...key }));
+
+    const formatMoney = (num) => {
+        formatMoneyConfig(+num, dataSeting)
+    }
 
     useEffect(() => {
         setIsMounted(true);
@@ -252,7 +258,7 @@ const PopupAppRenewal = () => {
                         <div className="flex items-center gap-1">
                             <span className="3xl:text-base text-sm text-[#344053]">Tổng: </span>
                             <span className="3xl:text-lg text-base text-[#344053] font-semibold">
-                                {FormatNumberDot(12000000)} VNĐ
+                                {formatMoney(12000000)} VNĐ
                             </span>
                         </div>
                     </div>

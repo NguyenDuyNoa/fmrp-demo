@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import useSetingServer from "@/hooks/useConfigNumber";
@@ -65,9 +65,8 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                             {dataBom?.productsBom.map((e, index) => (
                                 <div
                                     key={e.id}
-                                    className={`grid grid-cols-12 items-center py-2 ${
-                                        dataBom?.productsBom?.length - 1 == index ? "" : "border-b"
-                                    }
+                                    className={`grid grid-cols-12 items-center py-2 ${dataBom?.productsBom?.length - 1 == index ? "" : "border-b"
+                                        }
                                            `}
                                 >
                                     <h4 className="col-span-5 px-4 text-[#141522] flex items-center gap-2 font-medium text-sm">
@@ -136,9 +135,8 @@ const TabPlan = ({ dataTable, isFetching, dataLang }) => {
                             {dataBom?.materialsBom.map((e, index) => (
                                 <div
                                     key={e.id}
-                                    className={`grid grid-cols-8 items-center py-2 ${
-                                        dataBom?.materialsBom?.length - 1 == index ? "" : "border-b"
-                                    }`}
+                                    className={`grid grid-cols-8 items-center py-2 ${dataBom?.materialsBom?.length - 1 == index ? "" : "border-b"
+                                        }`}
                                 >
                                     <h4 className="col-span-3 px-4 text-[#141522] flex items-center gap-2 font-medium text-sm">
                                         <ModalImage

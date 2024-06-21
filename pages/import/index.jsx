@@ -21,7 +21,7 @@ import Select from "react-select";
 
 import { TiTick } from "react-icons/ti";
 
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container, ContainerBody } from "@/components/UI/common/layout";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -1419,9 +1419,9 @@ const Index = (props) => {
                                         <label
                                             for="importFile"
                                             className={`${(errFileImport && dataImport.length == 0) ||
-                                                    (errFileImport && fileImport == null)
-                                                    ? "border-red-500"
-                                                    : "border-gray-200"
+                                                (errFileImport && fileImport == null)
+                                                ? "border-red-500"
+                                                : "border-gray-200"
                                                 } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
                                         >
                                             <input
@@ -1593,8 +1593,8 @@ const Index = (props) => {
                                                                 }),
                                                             }}
                                                             className={`${errFiles && e.dataFields == null
-                                                                    ? "border-red-500"
-                                                                    : "border-transparent"
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
                                                                 }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                         />
                                                     </div>
@@ -1643,8 +1643,8 @@ const Index = (props) => {
                                                                 }),
                                                             }}
                                                             className={`${errColumn && e?.column == null
-                                                                    ? "border-red-500"
-                                                                    : "border-transparent"
+                                                                ? "border-red-500"
+                                                                : "border-transparent"
                                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                         />
                                                     </div>
@@ -1873,8 +1873,8 @@ const Index = (props) => {
                                 >
                                     <div
                                         className={`${multipleProgress
-                                                ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
-                                                : ""
+                                            ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin"
+                                            : ""
                                             }`}
                                     ></div>
                                     <span>{"Import"}</span>

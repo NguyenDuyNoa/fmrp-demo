@@ -1,5 +1,5 @@
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
 import Loading from "@/components/UI/loading";
 import NoData from "@/components/UI/noData/nodata";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
@@ -162,8 +162,8 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                             </h4>
                                             <h4
                                                 className={`${isTab === "dataKeepStock"
-                                                        ? "col-span-2 text-center px-4"
-                                                        : "col-span-4 text-left px-0"
+                                                    ? "col-span-2 text-center px-4"
+                                                    : "col-span-4 text-left px-0"
                                                     }   text-[#344054] font-normal text-xs`}
                                             >
                                                 {isTab === "dataKeepStock" &&
@@ -262,22 +262,22 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                             {index === 0 && (
                                                                                 <div
                                                                                     className={`${j.active
-                                                                                            ? "bg-[#00C170]"
-                                                                                            : "bg-gray-500"
+                                                                                        ? "bg-[#00C170]"
+                                                                                        : "bg-gray-500"
                                                                                         } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
                                                                                 />
                                                                             )}
                                                                             <div
                                                                                 className={`${j.active
-                                                                                        ? "bg-[#00C170]"
-                                                                                        : "bg-gray-500"
+                                                                                    ? "bg-[#00C170]"
+                                                                                    : "bg-gray-500"
                                                                                     }  h-[2px] w-full`}
                                                                             />
                                                                             {index === i.processBar.length - 1 && (
                                                                                 <div
                                                                                     className={`${j.active
-                                                                                            ? "bg-[#00C170]"
-                                                                                            : "bg-gray-500"
+                                                                                        ? "bg-[#00C170]"
+                                                                                        : "bg-gray-500"
                                                                                         } min-w-[10px] min-h-[10px] w-[10px] h-[10px] rounded-full`}
                                                                                 />
                                                                             )}
@@ -290,16 +290,16 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                                                                     >
                                                                         <p
                                                                             className={`${j.active
-                                                                                    ? "text-[#0BAA2E]"
-                                                                                    : "text-gray-500"
+                                                                                ? "text-[#0BAA2E]"
+                                                                                : "text-gray-500"
                                                                                 } font-normal text-[10px] uppercase`}
                                                                         >
                                                                             {j.title}
                                                                         </p>
                                                                         <p
                                                                             className={` ${j.quantity > 0
-                                                                                    ? "opacity-100"
-                                                                                    : "opacity-0"
+                                                                                ? "opacity-100"
+                                                                                : "opacity-0"
                                                                                 } text-[#0BAA2E] font-normal text-[10px]`}
                                                                         >
                                                                             SL:

@@ -1,5 +1,5 @@
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useStatusExprired from "@/hooks/useStatusExprired";

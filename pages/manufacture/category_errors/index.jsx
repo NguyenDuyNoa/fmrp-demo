@@ -7,14 +7,14 @@ import Pagination from "/components/UI/pagination";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiCategoryErrors from "@/Api/apiManufacture/qc/categoryErrors/apiCategoryErrors";
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -70,14 +70,14 @@ const Index = (props) => {
             const { data } = await apiCategoryErrors.apiCategoryErrors({ params: params });
             updateTotalItems(data);
             queryState({ data: data?.dtResult, data_ex: data?.dtResult, onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const fetchBranch = async () => {
         try {
             const { result } = await apiComons.apiBranchCombobox();
             queryState({ dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })) });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -337,7 +337,7 @@ const Index = (props) => {
                                                             />
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => {}}
+                                                                onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="category_errors"

@@ -9,7 +9,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import { Camera as IconCamera } from "iconsax-react";
 
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";

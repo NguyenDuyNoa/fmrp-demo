@@ -21,10 +21,10 @@ import Swal from "sweetalert2";
 
 import { useEffect } from "react";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { TagWarehouse } from "@/components/UI/common/tag/tagWarehouse";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import ImageErrors from "components/UI/imageErrors";

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import NoData from "@/components/UI/noData/nodata";
 import useToast from "@/hooks/useToast";
@@ -49,13 +49,13 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
                 <div className="grid grid-cols-2 items-center  cursor-pointer">
                     <div
                         className="hover:bg-slate-200 p-2 col-span-1 text-center text-sm"
-                        // onClick={_HandleSelectAll.bind(this)}
+                    // onClick={_HandleSelectAll.bind(this)}
                     >
                         Chọn tất cả
                     </div>
                     <div
                         className="hover:bg-slate-200 p-2 col-span-1 text-center text-sm"
-                        // onClick={_HandleDeleteAll.bind(this)}
+                    // onClick={_HandleDeleteAll.bind(this)}
                     >
                         Bỏ chọn tất cả
                     </div>
@@ -159,11 +159,10 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
                             closeMenuOnSelect={true}
                             hideSelectedOptions={false}
                             placeholder={"Danh mục lỗi"}
-                            className={`${
-                                isState.errorCategoryError && !isState.idCategoryError
-                                    ? "border-red-500"
-                                    : "border-transparent"
-                            }  placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                            className={`${isState.errorCategoryError && !isState.idCategoryError
+                                ? "border-red-500"
+                                : "border-transparent"
+                                }  placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                             isSearchable={true}
                             style={{
                                 border: "none",
@@ -215,11 +214,10 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
                             closeMenuOnSelect={true}
                             hideSelectedOptions={false}
                             placeholder={"Chi tiết lỗi"}
-                            className={`${
-                                isState.errorDetailError && !isState.idDetailError
-                                    ? "border-red-500"
-                                    : "border-transparent"
-                            }  placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                            className={`${isState.errorDetailError && !isState.idDetailError
+                                ? "border-red-500"
+                                : "border-transparent"
+                                }  placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                             isSearchable={true}
                             style={{
                                 border: "none",
@@ -277,11 +275,10 @@ const PopupDetailError = ({ data, id, quantityError, queryStateQlty, ...props })
                                             <InPutNumericFormat
                                                 onValueChange={(event) => _HandleChangeChild(e?.id, event)}
                                                 value={e.quantityDetailError || null}
-                                                className={`${
-                                                    !e.quantityDetailError || e.quantityDetailError == 0
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                } border-b-2  bg-transparent appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full  focus:outline-none `}
+                                                className={`${!e.quantityDetailError || e.quantityDetailError == 0
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                                    } border-b-2  bg-transparent appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full  focus:outline-none `}
                                                 isAllowed={isAllowedNumber}
                                             />
                                         </h6>

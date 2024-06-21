@@ -1,9 +1,9 @@
 // bảng đối chiếu công nợ
 import OnResetData from '@/components/UI/btnResetData/btnReset';
-import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
-import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
-import { EmptyExprired } from '@/components/UI/common/EmptyExprired';
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
+import ContainerPagination from '@/components/UI/common/containerPagination/containerPagination';
+import TitlePagination from '@/components/UI/common/containerPagination/titlePagination';
+import { EmptyExprired } from '@/components/UI/common/emptyExprired';
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/table';
 import { Container } from '@/components/UI/common/layout';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';

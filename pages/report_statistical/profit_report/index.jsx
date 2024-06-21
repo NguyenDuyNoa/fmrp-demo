@@ -1,9 +1,9 @@
 // Báo cáo lợi nhuận
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import { Container } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
@@ -171,9 +171,9 @@ const Index = (props) => {
                                     </div>
                                     <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                         <div className="flex justify-end gap-2 space-x-2 items-center">
-                                            <OnResetData sOnFetching={() => {}} />
+                                            <OnResetData sOnFetching={() => { }} />
                                             <button
-                                                onClick={() => {}}
+                                                onClick={() => { }}
                                                 className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                             >
                                                 <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />
@@ -214,9 +214,8 @@ const Index = (props) => {
                                         <div className="flex flex-col">
                                             {isState.data?.map((e, eIndex) => (
                                                 <RowItemTable
-                                                    className={`w-full py-1.5 ${
-                                                        isState.data?.length - 1 == eIndex ? "" : "border-b"
-                                                    }`}
+                                                    className={`w-full py-1.5 ${isState.data?.length - 1 == eIndex ? "" : "border-b"
+                                                        }`}
                                                     textAlign={"left"}
                                                 >
                                                     {e.name}
@@ -233,26 +232,23 @@ const Index = (props) => {
                                             <RowTable
                                                 key={e.id}
                                                 display={"flex"}
-                                                className={`w-full !py-0 ${
-                                                    isState.columnTable?.length == 0 &&
+                                                className={`w-full !py-0 ${isState.columnTable?.length == 0 &&
                                                     (isState.data?.length - 1 == eIndex ? "" : "border-b")
-                                                }`}
+                                                    }`}
                                             >
                                                 {isState.columnTable?.map((x, index) => (
                                                     <RowItemTable
                                                         textAlign={"right"}
-                                                        className={`min-w-[20%]  py-1.5 ${
-                                                            isState.data?.length - 1 == eIndex ? "" : "border-b"
-                                                        }`}
+                                                        className={`min-w-[20%]  py-1.5 ${isState.data?.length - 1 == eIndex ? "" : "border-b"
+                                                            }`}
                                                     >
                                                         {index}
                                                     </RowItemTable>
                                                 ))}
                                                 <RowItemTable
-                                                    className={`min-w-[20%]  py-1.5 ${
-                                                        isState.columnTable?.length > 0 &&
+                                                    className={`min-w-[20%]  py-1.5 ${isState.columnTable?.length > 0 &&
                                                         (isState.data?.length - 1 == eIndex ? "" : "border-b")
-                                                    }`}
+                                                        }`}
                                                     textAlign={"right"}
                                                 >
                                                     0

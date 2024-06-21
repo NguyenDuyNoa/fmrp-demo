@@ -20,7 +20,7 @@ import {
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import Loading from "@/components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";

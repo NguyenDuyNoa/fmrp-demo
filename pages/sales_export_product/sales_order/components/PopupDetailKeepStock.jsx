@@ -26,8 +26,8 @@ import ModalImage from "react-modal-image";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useFeature from "@/hooks/useConfigFeature";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 
 const Popup_EditDetail = dynamic(() => import("./PopupEditDetail"), { ssr: false });
 

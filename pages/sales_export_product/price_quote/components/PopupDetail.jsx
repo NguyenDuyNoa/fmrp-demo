@@ -15,8 +15,8 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { formatMoment } from "@/utils/helpers/formatMoment";

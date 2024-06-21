@@ -6,13 +6,13 @@ import React, { useEffect, useState } from "react";
 import Pagination from "/components/UI/pagination";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -28,7 +28,7 @@ import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import PopupCategoryErrors from "./components/popup";
 import apiCategoryDetailErrors from "@/Api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import apiComons from "@/Api/apiComon/apiComon";
 
@@ -74,7 +74,7 @@ const Index = (props) => {
             const { data } = await apiCategoryDetailErrors.apiListDetailError({ params: params });
             updateTotalItems(data);
             queryState({ data: data?.dtResult, data_ex: data?.dtResult, onFetching: false });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const fetchCategoryError = debounce(async (value) => {
@@ -87,14 +87,14 @@ const Index = (props) => {
                     branchId: e?.branch_id,
                 })),
             });
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     const fetchBranch = async () => {
         try {
             const { result } = await apiComons.apiBranchCombobox();
             queryState({ dataBranch: result?.map((e) => ({ label: e?.name, value: e?.id })) });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -390,7 +390,7 @@ const Index = (props) => {
                                                             />
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => {}}
+                                                                onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="category_detail_errors"

@@ -11,7 +11,7 @@ import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { VscFilePdf } from "react-icons/vsc";
 
-import FilePDF from "./FilePDF";
+import FilePDF from "./filePDF";
 
 import { routerImport, routerOrder, routerPurchases, routerReturns } from "@/routers/buyImportGoods";
 import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";
@@ -275,9 +275,8 @@ const BtnAction = React.memo((props) => {
             if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
                 isShow(
                     "error",
-                    `${
-                        (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-                        (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
+                    `${(props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
+                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
                     }`
                 );
             } else {
@@ -289,9 +288,8 @@ const BtnAction = React.memo((props) => {
             if (props?.warehouseman_id != "0" || props?.status_pay != "not_spent") {
                 isShow(
                     "error",
-                    `${
-                        (props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit) ||
-                        (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
+                    `${(props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit) ||
+                    (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
                     }`
                 );
             } else {
@@ -572,9 +570,8 @@ const BtnAction = React.memo((props) => {
                                         <button
                                             onClick={() => isShow("warning", WARNING_STATUS_ROLE)}
                                             type="button"
-                                            className={`${
-                                                props.type == "sales_product" ? "" : "justify-center"
-                                            } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                                            className={`${props.type == "sales_product" ? "" : "justify-center"
+                                                } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                         >
                                             <Box1
                                                 size={20}
@@ -632,11 +629,10 @@ const BtnAction = React.memo((props) => {
                                                 }
                                             }}
                                             className={` group transition-all ease-in-out flex items-center 
-                                                ${
-                                                    (props.type == "products" && "justify-start") ||
+                                                ${(props.type == "products" && "justify-start") ||
                                                     props.type == "sales_product"
-                                                        ? ""
-                                                        : "justify-center"
+                                                    ? ""
+                                                    : "justify-center"
                                                 }  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                                         >
                                             <RiDeleteBin6Line

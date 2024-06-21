@@ -25,16 +25,16 @@ import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
-import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/TabFilter";
+import BtnAction from "@/components/UI/btnAction";
+import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import {
     Container,
     ContainerBody,
@@ -56,7 +56,7 @@ import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
@@ -386,12 +386,12 @@ const Index = (props) => {
                 },
                 {
                     value: `${e?.status === "0"
-                            ? "Chưa thanh toán"
-                            : "" || e?.status === "1"
-                                ? "Thanh toán 1 phần"
-                                : "" || e?.status === "2"
-                                    ? "Thanh toán đủ"
-                                    : ""
+                        ? "Chưa thanh toán"
+                        : "" || e?.status === "1"
+                            ? "Thanh toán 1 phần"
+                            : "" || e?.status === "2"
+                                ? "Thanh toán đủ"
+                                : ""
                         }`,
                 },
                 {

@@ -1,8 +1,8 @@
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import { Container, ContainerTotal } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
@@ -72,7 +72,7 @@ const Index = (props) => {
                                                         colSpan={1}
                                                         dataLang={dataLang}
                                                         placeholder={dataLang?.branch_search}
-                                                        onChange={() => {}}
+                                                        onChange={() => { }}
                                                     />
                                                     <SelectComponent
                                                         options={[
@@ -150,9 +150,9 @@ const Index = (props) => {
                                         </div>
                                         <div className="col-span-1 xl:col-span-2 lg:col-span-2">
                                             <div className="flex justify-end gap-2 space-x-2 items-center">
-                                                <OnResetData sOnFetching={() => {}} />
+                                                <OnResetData sOnFetching={() => { }} />
                                                 <button
-                                                    onClick={() => {}}
+                                                    onClick={() => { }}
                                                     className={`xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition`}
                                                 >
                                                     <Grid6 className="2xl:scale-100 xl:scale-100 scale-75" size={18} />

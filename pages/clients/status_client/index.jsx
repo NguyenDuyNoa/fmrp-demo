@@ -17,21 +17,21 @@ import "react-phone-input-2/lib/style.css";
 import Loading from "@/components/UI/loading";
 import Popup_status from "./components/popup";
 import NoData from "@/components/UI/noData/nodata";
-import BtnAction from "@/components/UI/BtnAction";
+import BtnAction from "@/components/UI/btnAction";
 import Pagination from "@/components/UI/pagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
 
 import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
@@ -355,7 +355,7 @@ const Index = (props) => {
                                                             )}
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => {}}
+                                                                onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="client_status"

@@ -28,15 +28,15 @@ import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import BtnAction from "@/components/UI/BtnAction";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import BtnAction from "@/components/UI/btnAction";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import NoData from "@/components/UI/noData/nodata";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { RowItemTable, RowTable } from "@/components/UI/common/Table";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { RowItemTable, RowTable } from "@/components/UI/common/table";
 import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {
@@ -353,7 +353,7 @@ const Index = (props) => {
                                                             )}
                                                             <BtnAction
                                                                 onRefresh={_ServerFetching.bind(this)}
-                                                                onRefreshGroup={() => {}}
+                                                                onRefreshGroup={() => { }}
                                                                 dataLang={dataLang}
                                                                 id={e?.id}
                                                                 type="client_group"

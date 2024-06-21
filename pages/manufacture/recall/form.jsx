@@ -25,7 +25,7 @@ import apiComons from "@/Api/apiComon/apiComon";
 import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
 import ButtonBack from "@/components/UI/button/buttonBack";
 import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/deleteItems";

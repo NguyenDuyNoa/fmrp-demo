@@ -17,7 +17,7 @@ import Image from "next/image";
 import useToast from "@/hooks/useToast";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import { MdClear } from "react-icons/md";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { useSelector } from "react-redux";
 import useActionRole from "@/hooks/useRole";
@@ -273,10 +273,9 @@ const Popup_dsnd = (props) => {
         form.append("permissions", utf8Bytes);
         Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/api_staff/staff/${id}?csrf_protection=true`
-                    : "/api_web/api_staff/staff/?csrf_protection=true"
+            `${id
+                ? `/api_web/api_staff/staff/${id}?csrf_protection=true`
+                : "/api_web/api_staff/staff/?csrf_protection=true"
             }`,
             {
                 data: form,
@@ -403,9 +402,8 @@ const Popup_dsnd = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={() => queryState({ tab: 0 })}
-                        className={`${
-                            isState.tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${isState.tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_info}
                     </button>
@@ -417,9 +415,8 @@ const Popup_dsnd = (props) => {
                                 isShow("warning", WARNING_STATUS_ROLE_ADMIN);
                             }
                         }}
-                        className={`${
-                            isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${isState.tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.personnels_staff_popup_power}
                     </button>
@@ -453,11 +450,10 @@ const Popup_dsnd = (props) => {
                                                     onChange={(e) => queryState({ name: e.target.value })}
                                                     placeholder={props.dataLang?.personnels_staff_popup_name}
                                                     type="text"
-                                                    className={`${
-                                                        isState.errInput
+                                                    className={`${isState.errInput
                                                             ? "border-red-500"
                                                             : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                                 />
 
                                                 {isState.errInput && (
@@ -506,9 +502,8 @@ const Popup_dsnd = (props) => {
                                                             position: "absolute",
                                                         }),
                                                     }}
-                                                    className={`${
-                                                        isState.errInputBr ? "border-red-500" : "border-transparent"
-                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                    className={`${isState.errInputBr ? "border-red-500" : "border-transparent"
+                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                 />
 
                                                 {isState.errInputBr && (
@@ -601,11 +596,10 @@ const Popup_dsnd = (props) => {
                                                         value={isState.password}
                                                         id="userpwd"
                                                         onChange={(e) => queryState({ password: e?.target?.value })}
-                                                        className={`${
-                                                            isState.errInputPas
+                                                        className={`${isState.errInputPas
                                                                 ? "border-red-500"
                                                                 : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal py-2 pl-3 pr-12  border outline-none `}
+                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal py-2 pl-3 pr-12  border outline-none `}
                                                     />
                                                     <button
                                                         type="button"
@@ -856,10 +850,9 @@ const Popup_dsnd = (props) => {
                                                                     return (
                                                                         <div
                                                                             key={i?.key}
-                                                                            className={`${
-                                                                                e?.child?.length - 1 == index &&
+                                                                            className={`${e?.child?.length - 1 == index &&
                                                                                 "border-b"
-                                                                            } ml-10 border-t border-x`}
+                                                                                } ml-10 border-t border-x`}
                                                                         >
                                                                             <div className="border-b p-2 text-sm">
                                                                                 {i?.name}
@@ -892,7 +885,7 @@ const Popup_dsnd = (props) => {
                                                                                                         value={s?.name}
                                                                                                         checked={
                                                                                                             s?.is_check ==
-                                                                                                            1
+                                                                                                                1
                                                                                                                 ? true
                                                                                                                 : false
                                                                                                         }

@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { v4 as uuid } from "uuid";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import { Container } from "@/components/UI/common/layout";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 const Index = (props) => {
     const dataLang = props.dataLang;
     const statusExprired = useStatusExprired();

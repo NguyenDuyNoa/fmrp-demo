@@ -22,7 +22,7 @@ import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import InPutMoneyFormat from "@/components/UI/inputNumericFormat/inputMoneyFormat";
 import Loading from "@/components/UI/loading";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import Image from "next/image";
 const Popup_NVL = React.memo((props) => {
     const dataOptUnit = useSelector((state) => state.unit_NVL);
@@ -244,7 +244,7 @@ const Popup_NVL = React.memo((props) => {
             for (const id in idMap) {
                 processedData.push(idMap[id]);
             }
-       
+
             sDataTotalVariant(processedData.reverse());
             // sDataTotalVariant([
             //     ...(optSelectedVariantMain?.length > 0

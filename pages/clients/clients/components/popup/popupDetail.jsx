@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import ImageErrors from "components/UI/imageErrors";

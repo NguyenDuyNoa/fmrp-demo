@@ -1,5 +1,5 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { ContainerFilterTab } from "@/components/UI/common/layout";
 import useSetingServer from "@/hooks/useConfigNumber";
 import formatNumberConfig from "@/utils/helpers/formatnumber";

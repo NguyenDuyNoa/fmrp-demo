@@ -8,14 +8,14 @@ import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/TabFilter";
+import BtnAction from "@/components/UI/btnAction";
+import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
 import {
     Container,
     ContainerBody,
@@ -44,8 +44,8 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from "@/constants/changeStatus/changeStatus";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";

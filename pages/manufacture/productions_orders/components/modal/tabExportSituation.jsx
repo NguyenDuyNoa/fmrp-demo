@@ -1,7 +1,7 @@
 // tình hình xuất NVL
 import apiProductionsOrders from '@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders';
 import OnResetData from '@/components/UI/btnResetData/btnReset';
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/table';
 import { ContainerTotal } from '@/components/UI/common/layout';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet';

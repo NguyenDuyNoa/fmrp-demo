@@ -14,7 +14,7 @@ import ProductionProgressTracker from "./components/ProductionProgressTracker";
 import ManufacturingStatusMonitor from "./components/ManufacturingStatusMonitor";
 import AreaChart from "./components/AreaChart";
 import BarChart from "./components/BarChart";
-import PopupAppTrial from "@/components/UI/popup/PopupAppTrial";
+import PopupAppTrial from "@/components/UI/popup/popupAppTrial";
 
 const Dashboard = () => {
     const dispatch = useDispatch();

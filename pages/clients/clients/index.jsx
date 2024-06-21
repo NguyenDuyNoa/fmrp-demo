@@ -20,22 +20,22 @@ import Popup_dskh from "./components/popup/popupAdd";
 import Popup_chitiet from "./components/popup/popupDetail";
 
 import Loading from "@/components/UI/loading";
-import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/TabFilter";
+import BtnAction from "@/components/UI/btnAction";
+import TabFilter from "@/components/UI/tabFilter";
 import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import ImageErrors from "@/components/UI/imageErrors";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
 import { Container, ContainerBody, ContainerFilterTab, ContainerTable } from "@/components/UI/common/layout";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 
@@ -100,10 +100,9 @@ const Index = (props) => {
         const id = Number(router.query?.tab);
         Axios(
             "GET",
-            `/api_web/${
-                router.query?.tab === "0" || router.query?.tab === "-1"
-                    ? "api_client/client?csrf_protection=true"
-                    : "api_client/client/?csrf_protection=true"
+            `/api_web/${router.query?.tab === "0" || router.query?.tab === "-1"
+                ? "api_client/client?csrf_protection=true"
+                : "api_client/client/?csrf_protection=true"
             }`,
             {
                 params: {
@@ -511,25 +510,25 @@ const Index = (props) => {
                                                     >
                                                         {e?.staff_charge
                                                             ? e.staff_charge?.map((d) => {
-                                                                  return (
-                                                                      <>
-                                                                          <Tooltip
-                                                                              title={d.full_name}
-                                                                              arrow
-                                                                              theme="dark"
-                                                                          >
-                                                                              <ImageErrors
-                                                                                  src={d.profile_image}
-                                                                                  width={40}
-                                                                                  height={40}
-                                                                                  defaultSrc="/user-placeholder.jpg"
-                                                                                  alt="Image"
-                                                                                  className="min-w-[40px] min-h-[40px] object-cover rounded-[100%] text-left cursor-pointer"
-                                                                              />
-                                                                          </Tooltip>
-                                                                      </>
-                                                                  );
-                                                              })
+                                                                return (
+                                                                    <>
+                                                                        <Tooltip
+                                                                            title={d.full_name}
+                                                                            arrow
+                                                                            theme="dark"
+                                                                        >
+                                                                            <ImageErrors
+                                                                                src={d.profile_image}
+                                                                                width={40}
+                                                                                height={40}
+                                                                                defaultSrc="/user-placeholder.jpg"
+                                                                                alt="Image"
+                                                                                className="min-w-[40px] min-h-[40px] object-cover rounded-[100%] text-left cursor-pointer"
+                                                                            />
+                                                                        </Tooltip>
+                                                                    </>
+                                                                );
+                                                            })
                                                             : ""}
                                                     </RowItemTable>
                                                     <RowItemTable
@@ -541,16 +540,14 @@ const Index = (props) => {
                                                                 <span
                                                                     key={h.id}
                                                                     style={{
-                                                                        backgroundColor: `${
-                                                                            h.color == "" || h.color == null
-                                                                                ? "#e2f0fe"
-                                                                                : h.color
-                                                                        }`,
-                                                                        color: `${
-                                                                            h.color == "" || h.color == null
-                                                                                ? "#0F4F9E"
-                                                                                : "white"
-                                                                        }`,
+                                                                        backgroundColor: `${h.color == "" || h.color == null
+                                                                            ? "#e2f0fe"
+                                                                            : h.color
+                                                                            }`,
+                                                                        color: `${h.color == "" || h.color == null
+                                                                            ? "#0F4F9E"
+                                                                            : "white"
+                                                                            }`,
                                                                     }}
                                                                     className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}
                                                                 >

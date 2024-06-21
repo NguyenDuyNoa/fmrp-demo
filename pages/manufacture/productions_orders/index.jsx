@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import useStatusExprired from "@/hooks/useStatusExprired";
 

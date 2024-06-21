@@ -22,7 +22,7 @@ import {
 import { _ServerInstance as Axios } from "/services/axios";
 
 import PopupEdit from "@/components/UI/popup";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import useToast from "@/hooks/useToast";
 import apiComons from "@/Api/apiComon/apiComon";
 import apiWarehouse from "@/Api/apiManufacture/warehouse/apiWarehouse/apiWarehouse";
@@ -68,11 +68,11 @@ const Popup_kho = (props) => {
         sValueBr(
             props.branch
                 ? [
-                      ...props.branch?.map((e) => ({
-                          label: e.name,
-                          value: e.id,
-                      })),
-                  ]
+                    ...props.branch?.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                    })),
+                ]
                 : []
         );
     }, [open]);
@@ -104,7 +104,7 @@ const Popup_kho = (props) => {
             try {
                 const { result } = await apiComons.apiBranchCombobox();
                 sListBrand(result?.map((e) => ({ label: e.name, value: e.id })));
-            } catch (error) {}
+            } catch (error) { }
         };
         if (open) {
             fetchListBranchWarehouse();
@@ -141,7 +141,7 @@ const Popup_kho = (props) => {
             } else {
                 isShow("error", `${props.dataLang[message]}` || message);
             }
-        } catch (error) {}
+        } catch (error) { }
         sOnSending(false);
     };
     //da up date
@@ -213,11 +213,10 @@ const Popup_kho = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_code}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputCode
+                                                className={`${errInputCode
                                                         ? "border-red-500"
                                                         : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputCode && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -236,11 +235,10 @@ const Popup_kho = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_name}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputName
+                                                className={`${errInputName
                                                         ? "border-red-500"
                                                         : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputName && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -259,11 +257,10 @@ const Popup_kho = (props) => {
                                                 placeholder={props.dataLang?.Warehouse_poppup_address}
                                                 name="fname"
                                                 type="text"
-                                                className={`${
-                                                    errInputAddress
+                                                className={`${errInputAddress
                                                         ? "border-red-500"
                                                         : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                                             />
                                             {errInputAddress && (
                                                 <label className="mb-4  text-[14px] text-red-500">
@@ -314,9 +311,8 @@ const Popup_kho = (props) => {
                                                         },
                                                     }),
                                                 }}
-                                                className={`${
-                                                    errInputBr ? "border-red-500" : "border-transparent"
-                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                                className={`${errInputBr ? "border-red-500" : "border-transparent"
+                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                             />
                                             {errInputBr && (
                                                 <label className="mb-2  text-[14px] text-red-500">

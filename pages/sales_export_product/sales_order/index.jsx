@@ -14,8 +14,8 @@ registerLocale("vi", vi);
 import PopupDetailQuote from "../price_quote/components/PopupDetailQuote";
 import PopupDetailProduct from "./components/PopupDetailProduct";
 
-import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/TabFilter";
+import BtnAction from "@/components/UI/btnAction";
+import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import Loading from "@/components/UI/loading";
@@ -32,15 +32,15 @@ import { useToggle } from "@/hooks/useToggle";
 import { routerSalesOrder } from "@/routers/sellingGoods";
 import formatMoney from "@/utils/helpers/formatMoney";
 
-import BtnStatusApproved from "@/components/UI/btnStatusApproved/BtnStatusApproved";
+import BtnStatusApproved from "@/components/UI/btnStatusApproved/btnStatusApproved";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import {
     Container,
     ContainerBody,

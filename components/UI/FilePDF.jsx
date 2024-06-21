@@ -12,7 +12,7 @@ import {
     styleMarginChildTotal,
     styles,
     uppercaseTextHeaderTabel,
-} from "../../configs/stylePdf/style";
+} from "@/configs/stylePdf/style";
 
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
@@ -27,7 +27,7 @@ import {
     titleFooter,
     titleHeader,
     titleValue,
-} from "../../configs/stylePdf/receiptsEndPayment";
+} from "@/configs/stylePdf/receiptsEndPayment";
 
 const FilePDF = ({
     props,

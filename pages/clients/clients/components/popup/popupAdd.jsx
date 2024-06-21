@@ -31,7 +31,7 @@ import useToast from "@/hooks/useToast";
 import useActionRole from "@/hooks/useRole";
 import { useSelector } from "react-redux";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 
 const Popup_dskh = (props) => {
     const scrollAreaRef = useRef(null);
@@ -126,9 +126,9 @@ const Popup_dskh = (props) => {
                     debt_limit_day: db?.debt_limit_day,
                     valueDitrict: db?.district.districtid
                         ? {
-                              label: db?.district.name,
-                              value: db?.district.districtid,
-                          }
+                            label: db?.district.name,
+                            value: db?.district.districtid,
+                        }
                         : null,
                     valueCt: {
                         value: db?.city.provinceid,
@@ -364,10 +364,9 @@ const Popup_dskh = (props) => {
         });
         await Axios(
             "POST",
-            `${
-                id
-                    ? `/api_web/api_client/client/${id}?csrf_protection=true`
-                    : "/api_web/api_client/client?csrf_protection=true"
+            `${id
+                ? `/api_web/api_client/client/${id}?csrf_protection=true`
+                : "/api_web/api_client/client?csrf_protection=true"
             }`,
             {
                 data: data,
@@ -516,25 +515,22 @@ const Popup_dskh = (props) => {
                 <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
-                        className={`${
-                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_general}
                     </button>
                     <button
                         onClick={() => _HandleSelectTab(1)}
-                        className={`${
-                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_contact}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 2)}
-                        className={`${
-                            tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
-                        }  px-4 py-2 outline-none font-semibold`}
+                        className={`${tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
+                            }  px-4 py-2 outline-none font-semibold`}
                     >
                         {props.dataLang?.client_popup_devivelyInfo}
                     </button>

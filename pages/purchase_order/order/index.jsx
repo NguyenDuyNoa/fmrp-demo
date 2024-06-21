@@ -19,16 +19,16 @@ import Popup_chitiet from "./components/popup";
 
 import { routerOrder } from "routers/buyImportGoods";
 
-import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/TabFilter";
+import BtnAction from "@/components/UI/btnAction";
+import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
-import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/emptyExprired";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import TagBranch from "@/components/UI/common/tag/tagBranch";
+import { TagColorLime, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/tag/tagStatus";
 import {
     Container,
     ContainerBody,
@@ -363,10 +363,10 @@ const Index = (props) => {
                 },
                 {
                     value: `${e?.purchases
-                            ? e?.purchases?.map((e) => {
-                                return e?.code;
-                            })
-                            : ""
+                        ? e?.purchases?.map((e) => {
+                            return e?.code;
+                        })
+                        : ""
                         }`,
                 },
                 {
@@ -381,10 +381,10 @@ const Index = (props) => {
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
                     value: `${e?.status_pay
-                            ? (e?.status_pay === "0" && "Chưa nhập") ||
-                            (e?.status_pay === "1" && "Nhập 1 phần") ||
-                            (e?.status_pay === "2" && "Đã nhập đủ đủ")
-                            : ""
+                        ? (e?.status_pay === "0" && "Chưa nhập") ||
+                        (e?.status_pay === "1" && "Nhập 1 phần") ||
+                        (e?.status_pay === "2" && "Đã nhập đủ đủ")
+                        : ""
                         }`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },

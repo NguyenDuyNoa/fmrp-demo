@@ -1,6 +1,6 @@
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import Loading from "@/components/UI/loading";
 import MultiValue from "@/components/UI/mutiValue/multiValue";
@@ -163,17 +163,17 @@ const Popup_Bom = React.memo((props) => {
                     const { rResult } = response.data;
                     const newData = rResult[0]?.product_variation?.includes("NONE")
                         ? [
-                              {
-                                  label: "Mặc định",
-                                  value: rResult[0]?.id,
-                                  child: [],
-                              },
-                          ]
+                            {
+                                label: "Mặc định",
+                                value: rResult[0]?.id,
+                                child: [],
+                            },
+                        ]
                         : rResult.map((e) => ({
-                              label: e?.product_variation,
-                              value: e?.id,
-                              child: [],
-                          }));
+                            label: e?.product_variation,
+                            value: e?.id,
+                            child: [],
+                        }));
                     const convertArr = newData?.map((e) => {
                         if (e?.label == "(NONE)") {
                             return {
@@ -395,10 +395,10 @@ const Popup_Bom = React.memo((props) => {
                                                     stage: null,
                                                     dataName: data?.items
                                                         ? data?.items.map((e) => ({
-                                                              label: e.name,
-                                                              value: e.id,
-                                                              product_variation: e?.product_variation,
-                                                          }))
+                                                            label: e.name,
+                                                            value: e.id,
+                                                            product_variation: e?.product_variation,
+                                                        }))
                                                         : [],
                                                 };
                                             }
@@ -444,9 +444,9 @@ const Popup_Bom = React.memo((props) => {
                                                     unit: null,
                                                     dataUnit: data?.units
                                                         ? data?.units.map((e) => ({
-                                                              label: e.unit,
-                                                              value: e.unitid,
-                                                          }))
+                                                            label: e.unit,
+                                                            value: e.unitid,
+                                                        }))
                                                         : [],
                                                 };
                                             }
@@ -609,9 +609,8 @@ const Popup_Bom = React.memo((props) => {
 
     return (
         <PopupEdit
-            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${
-                props.name
-            })`}
+            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name
+                })`}
             button={
                 <div
                     onClick={() => {
@@ -704,11 +703,10 @@ const Popup_Bom = React.memo((props) => {
                                     <button
                                         key={e?.value}
                                         onClick={_HandleSelectTab.bind(this, e?.value)}
-                                        className={`${
-                                            tab == e?.value
-                                                ? "text-[#0F4F9E] bg-[#0F4F9E10]"
-                                                : "hover:text-[#0F4F9E] bg-slate-50/50"
-                                        } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center whitespace-nowrap`}
+                                        className={`${tab == e?.value
+                                            ? "text-[#0F4F9E] bg-[#0F4F9E10]"
+                                            : "hover:text-[#0F4F9E] bg-slate-50/50"
+                                            } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center whitespace-nowrap`}
                                     >
                                         <span>{e?.label?.includes("NONE") ? "Mặc định" : e?.label}</span>
                                     </button>
@@ -769,11 +767,10 @@ const Popup_Bom = React.memo((props) => {
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         classNamePrefix="Select"
-                                                        className={`${
-                                                            errValue && e.type == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                        } 
+                                                        className={`${errValue && e.type == null
+                                                            ? "border-red-500"
+                                                            : "border-transparent"
+                                                            } 
                                                         [&>div>div_div]:!whitespace-nowrap placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
@@ -820,7 +817,7 @@ const Popup_Bom = React.memo((props) => {
                                                                 e.name
                                                             )
                                                         }
-                                                           
+
                                                         }
                                                         formatOptionLabel={(option) => (
                                                             <div className="">
@@ -847,11 +844,10 @@ const Popup_Bom = React.memo((props) => {
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         classNamePrefix="Select "
-                                                        className={`${
-                                                            errValue && e.name == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                        } Select__custom white placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                        className={`${errValue && e.name == null
+                                                            ? "border-red-500"
+                                                            : "border-transparent"
+                                                            } Select__custom white placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
                                                             colors: {
@@ -893,11 +889,10 @@ const Popup_Bom = React.memo((props) => {
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         classNamePrefix="Select"
-                                                        className={`${
-                                                            errValue && e.unit == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                        } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                        className={`${errValue && e.unit == null
+                                                            ? "border-red-500"
+                                                            : "border-transparent"
+                                                            } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
                                                             colors: {
@@ -957,10 +952,9 @@ const Popup_Bom = React.memo((props) => {
                                                             e.id,
                                                             "loss"
                                                         )}
-                                                        placeholder={`%${
-                                                            props.dataLang?.loss_finishedProduct ||
+                                                        placeholder={`%${props.dataLang?.loss_finishedProduct ||
                                                             "loss_finishedProduct"
-                                                        }`}
+                                                            }`}
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                                     />
                                                 </div>
@@ -981,11 +975,10 @@ const Popup_Bom = React.memo((props) => {
                                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
-                                                        className={`${
-                                                            errValue && e.stage == null
-                                                                ? "border-red-500"
-                                                                : "border-transparent"
-                                                        } [&>div>div_div]:!whitespace-nowrap placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                        className={`${errValue && e.stage == null
+                                                            ? "border-red-500"
+                                                            : "border-transparent"
+                                                            } [&>div>div_div]:!whitespace-nowrap placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
                                                         theme={(theme) => ({
                                                             ...theme,
                                                             colors: {

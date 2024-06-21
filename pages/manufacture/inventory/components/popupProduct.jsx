@@ -19,7 +19,7 @@ import moment from "moment";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 
-import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { Customscrollbar } from "@/components/UI/common/customscrollbar";
 import InPutNumericFormat from "@/components/UI/inputNumericFormat/inputNumericFormat";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
 
@@ -89,7 +89,7 @@ const Popup_Product = React.memo((props) => {
                     type: e.text_type,
                 }))
             );
-        } catch (error) {}
+        } catch (error) { }
     }, 500);
 
     const _ServerFetching = async () => {
@@ -105,7 +105,7 @@ const Popup_Product = React.memo((props) => {
                     type: e.text_type,
                 }))
             );
-        } catch (error) {}
+        } catch (error) { }
         sOnFetching(false);
     };
 
@@ -140,9 +140,9 @@ const Popup_Product = React.memo((props) => {
                         dataSerial:
                             e.serial_array?.length > 0
                                 ? e.serial_array?.map((e) => ({
-                                      label: e,
-                                      value: e,
-                                  }))
+                                    label: e,
+                                    value: e,
+                                }))
                                 : [],
                         child: [],
                         checkChild: e.warehouse?.map((ce) => ({
@@ -156,7 +156,7 @@ const Popup_Product = React.memo((props) => {
                     }))
                     .filter((e) => !props.dataChoose.some((ce) => e.id === ce.id))
             );
-        } catch (error) {}
+        } catch (error) { }
         sOnSendingProduct(false);
     };
 
@@ -549,9 +549,8 @@ const Popup_Product = React.memo((props) => {
                                                     {e.child?.length > 0 && (
                                                         <button
                                                             onClick={_HandleActionItem.bind(this, e.id, "show")}
-                                                            className={`${
-                                                                e.show ? "rotate-180" : "rotate-0"
-                                                            } transition w-6 h-6 rounded-full flex flex-col justify-center items-center bg-blue-200 text-blue-700`}
+                                                            className={`${e.show ? "rotate-180" : "rotate-0"
+                                                                } transition w-6 h-6 rounded-full flex flex-col justify-center items-center bg-blue-200 text-blue-700`}
                                                         >
                                                             <IconDown size="15" />
                                                         </button>
@@ -567,13 +566,12 @@ const Popup_Product = React.memo((props) => {
                                             {e.child?.length > 0 && e.show && (
                                                 <div className="w-full space-y-1">
                                                     <div
-                                                        className={`${
-                                                            e?.checkExpiry == "0" && e?.checkSerial == "0"
+                                                        className={`${e?.checkExpiry == "0" && e?.checkSerial == "0"
                                                                 ? "grid-cols-5"
                                                                 : e?.checkExpiry == "1"
-                                                                ? "grid-cols-7"
-                                                                : "grid-cols-6"
-                                                        } grid gap-2 items-center`}
+                                                                    ? "grid-cols-7"
+                                                                    : "grid-cols-6"
+                                                            } grid gap-2 items-center`}
                                                     >
                                                         <h5 className="font-[300] text-sm px-1 text-center">
                                                             Vị trí kho
@@ -601,13 +599,12 @@ const Popup_Product = React.memo((props) => {
                                                         <h5 className="font-[300] text-sm px-1 text-center">Tác vụ</h5>
                                                     </div>
                                                     <div
-                                                        className={`${
-                                                            e?.checkExpiry == "0" && e?.checkSerial == "0"
+                                                        className={`${e?.checkExpiry == "0" && e?.checkSerial == "0"
                                                                 ? "grid-cols-5"
                                                                 : e?.checkExpiry == "1"
-                                                                ? "grid-cols-7"
-                                                                : "grid-cols-6"
-                                                        } grid gap-2 items-center`}
+                                                                    ? "grid-cols-7"
+                                                                    : "grid-cols-6"
+                                                            } grid gap-2 items-center`}
                                                     >
                                                         {e.child.map((ce) => (
                                                             <React.Fragment key={ce.id}>
