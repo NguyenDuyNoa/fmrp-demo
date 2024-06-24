@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import Expirred from "components/UI/expired";
 import useStatusExprired from "@/hooks/useStatusExprired";
-import ListTask from "./components/ListTask";
-import PieChart from "./components/PieChart";
-import TableChart from "./components/TableChart";
-import LineChart from "./components/LineChart";
-import ColumnChart from "./components/ColumnChart";
-import ProductionProgressTracker from "./components/ProductionProgressTracker";
-import ManufacturingStatusMonitor from "./components/ManufacturingStatusMonitor";
 import AreaChart from "./components/AreaChart";
 import BarChart from "./components/BarChart";
-import PopupAppTrial from "@/components/UI/popup/popupAppTrial";
+import ColumnChart from "./components/ColumnChart";
+import LineChart from "./components/LineChart";
+import ListTask from "./components/ListTask";
+import ManufacturingStatusMonitor from "./components/ManufacturingStatusMonitor";
+import PieChart from "./components/PieChart";
+import ProductionProgressTracker from "./components/ProductionProgressTracker";
+import TableChart from "./components/TableChart";
 
 const Dashboard = () => {
     const dispatch = useDispatch();
