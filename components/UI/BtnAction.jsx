@@ -11,7 +11,7 @@ import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { VscFilePdf } from "react-icons/vsc";
 
-import FilePDF from "./filePDF";
+import FilePDF from "./FilePDF";
 
 import { routerImport, routerOrder, routerPurchases, routerReturns } from "@/routers/buyImportGoods";
 import { routerDeliveryReceipt, routerPriceQuote, routerReturnSales, routerSalesOrder } from "@/routers/sellingGoods";
