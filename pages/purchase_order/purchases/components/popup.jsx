@@ -10,7 +10,7 @@ import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
-import CustomAvatar from "@/components/UI/common/user/customAvatar";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useSetingServer from "@/hooks/useConfigNumber";

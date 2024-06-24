@@ -14,7 +14,7 @@ import ReactExport from "react-data-export";
 import LinkWarehouse from "../components/linkWarehouse";
 import Popup_chitiet from "./components/pupup";
 
-import BtnAction from "@/components/UI/btnAction";
+import BtnAction from "@/components/UI/BtnAction";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
@@ -32,8 +32,8 @@ import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWar
 import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";

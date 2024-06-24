@@ -1,9 +1,9 @@
 // Thu hồi nvl
 import OnResetData from '@/components/UI/btnResetData/btnReset';
-import ContainerPagination from '@/components/UI/common/ContainerPagination/containerPagination';
-import TitlePagination from '@/components/UI/common/ContainerPagination/titlePagination';
+import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination';
+import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination';
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
-import CustomAvatar from '@/components/UI/common/user/customAvatar';
+import CustomAvatar from '@/components/UI/common/user/CustomAvatar';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';
 import Loading from '@/components/UI/loading';

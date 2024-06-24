@@ -10,8 +10,8 @@ import Popup_chitietDauki from "./components/details_first";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { HeaderTable } from "@/components/UI/common/Table";

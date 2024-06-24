@@ -1,7 +1,7 @@
 // Tổng hợp công nợ phải thu theo nhân viên
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import { Container } from "@/components/UI/common/layout";

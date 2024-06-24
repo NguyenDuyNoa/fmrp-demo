@@ -5,8 +5,8 @@ import React, { useState } from "react";
 
 import apiContact from "@/Api/apiClients/contact/apiContact";
 import apiComons from "@/Api/apiComon/apiComon";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";

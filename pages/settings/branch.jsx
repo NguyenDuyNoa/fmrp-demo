@@ -10,9 +10,9 @@ import "react-phone-input-2/lib/style.css";
 
 import useStatusExprired from "@/hooks/useStatusExprired";
 
-import BtnAction from "@/components/UI/btnAction";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import BtnAction from "@/components/UI/BtnAction";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";

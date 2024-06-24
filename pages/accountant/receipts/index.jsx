@@ -12,17 +12,17 @@ import Popup_dspt from "./components/popup";
 
 import { _ServerInstance as Axios } from "/services/axios";
 
-import BtnAction from "@/components/UI/btnAction";
+import BtnAction from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import { Container, ContainerBody, ContainerTable, ContainerTotal } from "@/components/UI/common/layout";
-import CustomAvatar from "@/components/UI/common/user/customAvatar";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";

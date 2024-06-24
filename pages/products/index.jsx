@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { useDispatch, useSelector } from "react-redux";
 
-import BtnAction from "@/components/UI/btnAction";
+import BtnAction from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
@@ -35,8 +35,8 @@ import Popup_ThongTin from "./components/product/popupThongtin";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";

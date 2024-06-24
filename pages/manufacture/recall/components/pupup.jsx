@@ -19,7 +19,7 @@ import apiRecall from "@/Api/apiManufacture/warehouse/recall/apiRecall";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
-import CustomAvatar from "@/components/UI/common/user/customAvatar";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import ExpandableContent from "@/components/UI/more";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";

@@ -19,12 +19,12 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 
-import BtnAction from "@/components/UI/btnAction";
+import BtnAction from "@/components/UI/BtnAction";
 import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
@@ -37,7 +37,7 @@ import {
     ContainerTable,
     ContainerTotal,
 } from "@/components/UI/common/layout";
-import CustomAvatar from "@/components/UI/common/user/customAvatar";
+import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import DateToDateComponent from "@/components/UI/filterComponents/dateTodateComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";

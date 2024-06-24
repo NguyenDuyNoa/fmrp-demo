@@ -11,7 +11,7 @@ import {
     Minus as IconMinus
 } from "iconsax-react";
 
-import BtnAction from "@/components/UI/btnAction";
+import BtnAction from "@/components/UI/BtnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
@@ -32,8 +32,8 @@ import useToast from "@/hooks/useToast";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiCategory from "@/Api/apiProducts/category/apiCategory";
-import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
