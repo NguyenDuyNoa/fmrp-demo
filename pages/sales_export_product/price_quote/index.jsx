@@ -11,7 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/tabFilter";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import Loading from "@/components/UI/loading";
 import Pagination from "@/components/UI/pagination";

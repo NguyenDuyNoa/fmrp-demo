@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/tabFilter";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonWarehouse from "@/components/UI/btnWarehouse/btnWarehouse";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

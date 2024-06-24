@@ -29,7 +29,7 @@ import { routerProductionWarehouse } from "@/routers/manufacture";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProductionWarehouse from "@/Api/apiManufacture/warehouse/productionWarehouse/apiProductionWarehouse";
-import TabFilter from "@/components/UI/tabFilter";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";

@@ -15,7 +15,7 @@ import PopupDetailQuote from "../price_quote/components/PopupDetailQuote";
 import PopupDetailProduct from "./components/PopupDetailProduct";
 
 import BtnAction from "@/components/UI/BtnAction";
-import TabFilter from "@/components/UI/tabFilter";
+import TabFilter from "@/components/UI/TabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import Loading from "@/components/UI/loading";
