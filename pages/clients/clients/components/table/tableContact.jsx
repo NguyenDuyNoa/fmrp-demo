@@ -1,5 +1,5 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import Loading from "components/UI/loading";

@@ -1,5 +1,5 @@
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import NoData from "@/components/UI/noData/nodata";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";

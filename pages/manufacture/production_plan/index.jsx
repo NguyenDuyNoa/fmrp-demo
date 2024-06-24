@@ -17,8 +17,8 @@ import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from "@/constants/delete/
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
 import { Container } from "@/components/UI/common/layout";
 import Pagination from "@/components/UI/pagination";

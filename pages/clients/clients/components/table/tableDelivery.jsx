@@ -3,7 +3,7 @@ import Loading from "components/UI/loading";
 import { Map, IconSearch } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });

@@ -3,8 +3,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import ModalImage from "react-modal-image";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagWarehouse } from "@/components/UI/common/tag/TagWarehouse";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagWarehouse } from "@/components/UI/common/Tag/TagWarehouse";
 import ImageErrors from "@/components/UI/imageErrors";
 import Loading from "@/components/UI/loading";
 import ExpandableContent from "@/components/UI/more";
@@ -13,7 +13,7 @@ import PopupEdit from "@/components/UI/popup";
 import useSetingServer from "@/hooks/useConfigNumber";
 
 import apiWarehouseTransfer from "@/Api/apiManufacture/warehouse/warehouseTransfer/apiWarehouseTransfer";
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import LinkWarehouse from "@/pages/manufacture/components/linkWarehouse";

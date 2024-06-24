@@ -1,8 +1,8 @@
 // tình hình xuất NVL
 import OnResetData from '@/components/UI/btnResetData/btnReset';
-import ContainerPagination from '@/components/UI/common/containerPagination/containerPagination';
-import TitlePagination from '@/components/UI/common/containerPagination/titlePagination';
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/table';
+import ContainerPagination from '@/components/UI/common/ContainerPagination/containerPagination';
+import TitlePagination from '@/components/UI/common/ContainerPagination/titlePagination';
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table';
 import { ContainerTotal } from '@/components/UI/common/layout';
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit';
 import SearchComponent from '@/components/UI/filterComponents/searchComponent';

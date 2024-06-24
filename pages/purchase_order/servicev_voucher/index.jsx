@@ -22,13 +22,13 @@ import Pagination from "@/components/UI/pagination";
 
 import TabFilter from "@/components/UI/tabFilter";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorLime, TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import {
     Container,
     ContainerBody,

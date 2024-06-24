@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PopupEdit from "/components/UI/popup";
 
-import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import { ColumnTablePopup, GeneralInformation, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import useToast from "@/hooks/useToast";
 import NoData from "@/components/UI/noData/nodata";
 const PopupCheckQuality = (props) => {

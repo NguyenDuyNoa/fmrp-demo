@@ -8,11 +8,11 @@ import { _ServerInstance as Axios } from "/services/axios";
 
 import BtnAction from "@/components/UI/btnAction";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
 import { Container, ContainerBody, ContainerTable } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -28,7 +28,7 @@ import "react-phone-input-2/lib/style.css";
 import { useSelector } from "react-redux";
 import PopupCategoryErrors from "./components/popup";
 import apiCategoryDetailErrors from "@/Api/apiManufacture/qc/categoryDetailErrors/apiCategoryDetailErrors";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import apiComons from "@/Api/apiComon/apiComon";
 

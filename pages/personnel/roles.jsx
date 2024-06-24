@@ -46,10 +46,10 @@ import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import BtnAction from "@/components/UI/btnAction";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import usePagination from "@/hooks/usePagination";
 
 const Index = (props) => {

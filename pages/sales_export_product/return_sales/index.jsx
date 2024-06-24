@@ -26,13 +26,13 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 
 import ButtonAddNew from "@/components/UI/button/buttonAddNew";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/emptyExprired";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
-import { TagColorOrange, TagColorSky } from "@/components/UI/common/tag/TagStatus";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorOrange, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import {
     Container,
     ContainerBody,

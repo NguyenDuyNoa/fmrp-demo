@@ -35,11 +35,11 @@ import Popup_ThongTin from "./components/product/popupThongtin";
 
 import apiComons from "@/Api/apiComon/apiComon";
 import apiProducts from "@/Api/apiProducts/products/apiProducts";
-import ContainerPagination from "@/components/UI/common/containerPagination/containerPagination";
-import TitlePagination from "@/components/UI/common/containerPagination/titlePagination";
+import ContainerPagination from "@/components/UI/common/ContainerPagination/containerPagination";
+import TitlePagination from "@/components/UI/common/ContainerPagination/titlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/table";
-import TagBranch from "@/components/UI/common/tag/TagBranch";
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
+import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import useSetingServer from "@/hooks/useConfigNumber";
 import usePagination from "@/hooks/usePagination";
 import formatNumberConfig from "@/utils/helpers/formatnumber";

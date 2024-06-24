@@ -16,7 +16,7 @@ import ToatstNotifi from "@/utils/helpers/alerNotification";
 import formatNumberConfig from "@/utils/helpers/formatnumber";
 
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
-import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/tablePopup";
+import { ColumnTablePopup, HeaderTablePopup } from "@/components/UI/common/TablePopup";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
